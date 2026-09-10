@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "authority": "advisory syntax only; source wins",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "f095a39188149e5828b0bd8d232d15dca731efd28ccf724ac0a592f1f68a9c08"
+    },
+    {
+      "path": "cmd/ice/main.go",
+      "sha256": "1b97c1fa301db0cec7c330c8e1558279a10f6016cf7c20daf4af7513483b0f2c",
+      "package": "main",
+      "imports": [
+        "encoding/json",
+        "fmt",
+        "os",
+        "github.com/spoonman136668-ai/Wingless/ice"
+      ]
+    },
+    {
+      "path": "go.mod",
+      "sha256": "8600082b63aa7dc628fd81f0feeea09abe734689c4b6e47dfaada8c06384dd90"
+    },
+    {
+      "path": "ice/index.go",
+      "sha256": "0297722bf79c7f7cc7e3df9e5589196af41eb08cf519dba5753c5890821d2e27",
+      "package": "ice",
+      "imports": [
+        "crypto/sha256",
+        "encoding/hex",
+        "encoding/json",
+        "fmt",
+        "go/ast",
+        "go/parser",
+        "go/token",
+        "io/fs",
+        "os",
+        "path/filepath",
+        "sort",
+        "strings"
+      ]
+    },
+    {
+      "path": "ice/index_test.go",
+      "sha256": "73698343a847d9e7c6755a9c388d4e43525f6f679cb73e51e5ebfc8a95e6ace4",
+      "package": "ice",
+      "imports": [
+        "os",
+        "path/filepath",
+        "testing"
+      ]
+    }
+  ],
+  "symbols": [
+    {
+      "name": "main",
+      "kind": "function",
+      "file": "cmd/ice/main.go",
+      "start": 3,
+      "end": 3,
+      "calls": [
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "fmt.Fprintln",
+        "fmt.Fprintln",
+        "ice.Query",
+        "ice.Save",
+        "ice.Validate",
+        "json.NewEncoder",
+        "len",
+        "len",
+        "os.Exit",
+        "os.Exit"
+      ]
+    },
+    {
+      "name": "Symbol",
+      "kind": "type",
+      "file": "ice/index.go",
+      "start": 18,
+      "end": 18
+    },
+    {
+      "name": "File",
+      "kind": "type",
+      "file": "ice/index.go",
+      "start": 19,
+      "end": 19
+    },
+    {
+      "name": "Index",
+      "kind": "type",
+      "file": "ice/index.go",
+      "start": 20,
+      "end": 20
+    },
+    {
+      "name": "Build",
+      "kind": "function",
+      "file": "ice/index.go",
+      "start": 21,
+      "end": 40,
+      "calls": [
+        "append",
+        "append",
+        "append",
+        "append",
+        "append",
+        "append",
+        "ast.Inspect",
+        "d.IsDir",
+        "d.Name",
+        "d.Name",
+        "d.Type",
+        "filepath.Base",
+        "filepath.Ext",
+        "filepath.Rel",
+        "filepath.ToSlash",
+        "filepath.WalkDir",
+        "fmt.Errorf",
+        "hex.EncodeToString",
+        "os.ReadFile",
+        "parser.ParseFile",
+        "set.Position",
+        "set.Position",
+        "set.Position",
+        "set.Position",
+        "sha256.Sum256",
+        "sort.Strings",
+        "strings.HasPrefix",
+        "strings.Trim",
+        "t.End",
+        "t.Pos",
+        "token.NewFileSet",
+        "x.End",
+        "x.Pos"
+      ]
+    },
+    {
+      "name": "Save",
+      "kind": "function",
+      "file": "ice/index.go",
+      "start": 41,
+      "end": 41,
+      "calls": [
+        "Build",
+        "append",
+        "filepath.Join",
+        "filepath.Join",
+        "json.MarshalIndent",
+        "os.MkdirAll",
+        "os.WriteFile"
+      ]
+    },
+    {
+      "name": "Load",
+      "kind": "function",
+      "file": "ice/index.go",
+      "start": 42,
+      "end": 42,
+      "calls": [
+        "filepath.Join",
+        "json.Unmarshal",
+        "os.ReadFile"
+      ]
+    },
+    {
+      "name": "Validate",
+      "kind": "function",
+      "file": "ice/index.go",
+      "start": 43,
+      "end": 43,
+      "calls": [
+        "Build",
+        "Load",
+        "fmt.Errorf",
+        "json.Marshal",
+        "json.Marshal",
+        "string",
+        "string"
+      ]
+    },
+    {
+      "name": "Query",
+      "kind": "function",
+      "file": "ice/index.go",
+      "start": 44,
+      "end": 44,
+      "calls": [
+        "Load",
+        "Validate",
+        "append",
+        "fmt.Errorf",
+        "strings.Contains",
+        "strings.Join",
+        "strings.ToLower",
+        "strings.ToLower",
+        "strings.TrimSpace"
+      ]
+    },
+    {
+      "name": "TestSourceWins",
+      "kind": "function",
+      "file": "ice/index_test.go",
+      "start": 3,
+      "end": 3,
+      "calls": [
+        "Query",
+        "Query",
+        "Query",
+        "Save",
+        "Save",
+        "filepath.Join",
+        "len",
+        "len",
+        "os.WriteFile",
+        "os.WriteFile",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.TempDir"
+      ]
+    }
+  ]
+}
