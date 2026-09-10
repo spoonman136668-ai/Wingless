@@ -1,0 +1,1495 @@
+[
+  {
+    "name": "Fixture",
+    "kind": "type",
+    "file": "benchmark/replay.go",
+    "start": 12,
+    "end": 16
+  },
+  {
+    "name": "Row",
+    "kind": "type",
+    "file": "benchmark/replay.go",
+    "start": 17,
+    "end": 23
+  },
+  {
+    "name": "exact",
+    "kind": "type",
+    "file": "benchmark/replay.go",
+    "start": 24,
+    "end": 24
+  },
+  {
+    "name": "Verify",
+    "kind": "method",
+    "file": "benchmark/replay.go",
+    "start": 26,
+    "end": 31,
+    "receiver": "exact",
+    "calls": [
+      "fmt.Errorf",
+      "string"
+    ]
+  },
+  {
+    "name": "Replay",
+    "kind": "function",
+    "file": "benchmark/replay.go",
+    "start": 32,
+    "end": 59,
+    "calls": [
+      "append",
+      "exact",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Sprintf",
+      "r.Run",
+      "time.Now",
+      "time.Now",
+      "time.Since"
+    ]
+  },
+  {
+    "name": "metrics",
+    "kind": "type",
+    "file": "benchmark/replay_test.go",
+    "start": 11,
+    "end": 11
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "benchmark/replay_test.go",
+    "start": 13,
+    "end": 13,
+    "receiver": "metrics"
+  },
+  {
+    "name": "TestReplay",
+    "kind": "function",
+    "file": "benchmark/replay_test.go",
+    "start": 14,
+    "end": 28,
+    "calls": [
+      "Replay",
+      "Replay",
+      "context.Background",
+      "context.Background",
+      "len",
+      "reg.Register",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "Entry",
+    "kind": "type",
+    "file": "broker/router.go",
+    "start": 12,
+    "end": 16
+  },
+  {
+    "name": "Registry",
+    "kind": "type",
+    "file": "broker/router.go",
+    "start": 17,
+    "end": 20
+  },
+  {
+    "name": "Register",
+    "kind": "method",
+    "file": "broker/router.go",
+    "start": 22,
+    "end": 41,
+    "receiver": "Registry",
+    "calls": [
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "Entries",
+    "kind": "method",
+    "file": "broker/router.go",
+    "start": 42,
+    "end": 51,
+    "receiver": "Registry",
+    "calls": [
+      "append",
+      "sort.Slice"
+    ]
+  },
+  {
+    "name": "Policy",
+    "kind": "type",
+    "file": "broker/router.go",
+    "start": 53,
+    "end": 61
+  },
+  {
+    "name": "Decision",
+    "kind": "type",
+    "file": "broker/router.go",
+    "start": 62,
+    "end": 67
+  },
+  {
+    "name": "contains",
+    "kind": "function",
+    "file": "broker/router.go",
+    "start": 69,
+    "end": 76
+  },
+  {
+    "name": "Select",
+    "kind": "function",
+    "file": "broker/router.go",
+    "start": 77,
+    "end": 146,
+    "calls": [
+      "append",
+      "append",
+      "append",
+      "b.Capabilities",
+      "b.Health",
+      "b.ID",
+      "b.ID",
+      "b.ID",
+      "b.ID",
+      "b.ID",
+      "b.ID",
+      "contains",
+      "contains",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "reg.Entries",
+      "req.Validate",
+      "resources.Check"
+    ]
+  },
+  {
+    "name": "fixture",
+    "kind": "function",
+    "file": "broker/router_test.go",
+    "start": 12,
+    "end": 18,
+    "calls": [
+      "r.Register",
+      "time.Now"
+    ]
+  },
+  {
+    "name": "TestRoutes",
+    "kind": "function",
+    "file": "broker/router_test.go",
+    "start": 19,
+    "end": 65,
+    "calls": [
+      "Select",
+      "b.ID",
+      "context.Background",
+      "fixture",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Run"
+    ]
+  },
+  {
+    "name": "TestRegistration",
+    "kind": "function",
+    "file": "broker/router_test.go",
+    "start": 66,
+    "end": 74,
+    "calls": [
+      "fixture",
+      "len",
+      "r.Entries",
+      "r.Register",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "metrics",
+    "kind": "type",
+    "file": "broker/router_test.go",
+    "start": 76,
+    "end": 76
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "broker/router_test.go",
+    "start": 78,
+    "end": 78,
+    "receiver": "metrics"
+  },
+  {
+    "name": "verifier",
+    "kind": "type",
+    "file": "broker/router_test.go",
+    "start": 80,
+    "end": 80
+  },
+  {
+    "name": "Verify",
+    "kind": "method",
+    "file": "broker/router_test.go",
+    "start": 82,
+    "end": 87,
+    "receiver": "verifier",
+    "calls": [
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "TestBoundedRepairAndAuthority",
+    "kind": "function",
+    "file": "broker/router_test.go",
+    "start": 88,
+    "end": 103,
+    "calls": [
+      "context.Background",
+      "context.Background",
+      "context.Background",
+      "fixture",
+      "len",
+      "len",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestPlanThenFast",
+    "kind": "function",
+    "file": "broker/router_test.go",
+    "start": 104,
+    "end": 110,
+    "calls": [
+      "context.Background",
+      "fixture",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "Event",
+    "kind": "type",
+    "file": "broker/runner.go",
+    "start": 10,
+    "end": 16
+  },
+  {
+    "name": "Outcome",
+    "kind": "type",
+    "file": "broker/runner.go",
+    "start": 17,
+    "end": 21
+  },
+  {
+    "name": "Verifier",
+    "kind": "interface",
+    "file": "broker/runner.go",
+    "start": 24,
+    "end": 26
+  },
+  {
+    "name": "Runner",
+    "kind": "type",
+    "file": "broker/runner.go",
+    "start": 27,
+    "end": 31
+  },
+  {
+    "name": "Run",
+    "kind": "method",
+    "file": "broker/runner.go",
+    "start": 33,
+    "end": 112,
+    "receiver": "Runner",
+    "calls": [
+      "Select",
+      "append",
+      "append",
+      "append",
+      "append",
+      "append",
+      "append",
+      "append",
+      "append",
+      "b.Invoke",
+      "c",
+      "context.WithDeadline",
+      "ctx.Err",
+      "ctx.Err",
+      "ctx.Err",
+      "ctx.Err",
+      "e.Error",
+      "e.Error",
+      "err.Error",
+      "err.Error",
+      "fmt.Errorf",
+      "len",
+      "len",
+      "req.Validate"
+    ]
+  },
+  {
+    "name": "PlanThenImplement",
+    "kind": "method",
+    "file": "broker/runner.go",
+    "start": 116,
+    "end": 136,
+    "receiver": "Runner",
+    "calls": [
+      "len",
+      "planning.Run",
+      "r.Run"
+    ]
+  },
+  {
+    "name": "main",
+    "kind": "function",
+    "file": "cmd/ice/main.go",
+    "start": 11,
+    "end": 52,
+    "calls": [
+      "filepath.Join",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Fprintln",
+      "fmt.Fprintln",
+      "ice.Query",
+      "ice.Save",
+      "ice.Validate",
+      "ice.Validate",
+      "json.NewEncoder",
+      "len",
+      "len",
+      "os.Exit",
+      "os.Exit",
+      "os.ReadFile"
+    ]
+  },
+  {
+    "name": "unknown",
+    "kind": "type",
+    "file": "cmd/wingless/main.go",
+    "start": 16,
+    "end": 16
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "cmd/wingless/main.go",
+    "start": 18,
+    "end": 18,
+    "receiver": "unknown"
+  },
+  {
+    "name": "main",
+    "kind": "function",
+    "file": "cmd/wingless/main.go",
+    "start": 19,
+    "end": 49,
+    "calls": [
+      "benchmark.Replay",
+      "context.Background",
+      "context.Background",
+      "enc.Encode",
+      "enc.Encode",
+      "enc.SetIndent",
+      "fmt.Fprintln",
+      "fmt.Fprintln",
+      "json.NewEncoder",
+      "len",
+      "os.Exit",
+      "os.Exit",
+      "panic",
+      "panic",
+      "panic",
+      "reg.Register",
+      "runner.Run",
+      "time.Now"
+    ]
+  },
+  {
+    "name": "Snippet",
+    "kind": "type",
+    "file": "contextbroker/broker.go",
+    "start": 12,
+    "end": 17
+  },
+  {
+    "name": "Provider",
+    "kind": "interface",
+    "file": "contextbroker/broker.go",
+    "start": 18,
+    "end": 20
+  },
+  {
+    "name": "ICE",
+    "kind": "type",
+    "file": "contextbroker/broker.go",
+    "start": 21,
+    "end": 21
+  },
+  {
+    "name": "Retrieve",
+    "kind": "method",
+    "file": "contextbroker/broker.go",
+    "start": 23,
+    "end": 59,
+    "receiver": "ICE",
+    "calls": [
+      "append",
+      "filepath.FromSlash",
+      "filepath.Join",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Sprintf",
+      "ice.Query",
+      "ice.Validate",
+      "len",
+      "len",
+      "len",
+      "os.ReadFile",
+      "string",
+      "strings.Join",
+      "strings.Split"
+    ]
+  },
+  {
+    "name": "Collect",
+    "kind": "function",
+    "file": "contextbroker/broker.go",
+    "start": 60,
+    "end": 76,
+    "calls": [
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "len",
+      "p.Retrieve"
+    ]
+  },
+  {
+    "name": "oversized",
+    "kind": "type",
+    "file": "contextbroker/broker_test.go",
+    "start": 10,
+    "end": 10
+  },
+  {
+    "name": "Retrieve",
+    "kind": "method",
+    "file": "contextbroker/broker_test.go",
+    "start": 12,
+    "end": 12,
+    "receiver": "oversized"
+  },
+  {
+    "name": "TestContextBounds",
+    "kind": "function",
+    "file": "contextbroker/broker_test.go",
+    "start": 13,
+    "end": 30,
+    "calls": [
+      "Collect",
+      "Collect",
+      "Collect",
+      "filepath.Join",
+      "ice.Save",
+      "len",
+      "len",
+      "os.WriteFile",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.TempDir"
+    ]
+  },
+  {
+    "name": "Symbol",
+    "kind": "type",
+    "file": "ice/index.go",
+    "start": 21,
+    "end": 29
+  },
+  {
+    "name": "File",
+    "kind": "type",
+    "file": "ice/index.go",
+    "start": 30,
+    "end": 35
+  },
+  {
+    "name": "Implementation",
+    "kind": "type",
+    "file": "ice/index.go",
+    "start": 36,
+    "end": 41
+  },
+  {
+    "name": "Index",
+    "kind": "type",
+    "file": "ice/index.go",
+    "start": 42,
+    "end": 48
+  },
+  {
+    "name": "Build",
+    "kind": "function",
+    "file": "ice/index.go",
+    "start": 50,
+    "end": 146,
+    "calls": [
+      "a.String",
+      "append",
+      "append",
+      "append",
+      "append",
+      "append",
+      "append",
+      "append",
+      "ast.Inspect",
+      "b.String",
+      "d.IsDir",
+      "d.Name",
+      "d.Name",
+      "d.Type",
+      "filepath.Base",
+      "filepath.Ext",
+      "filepath.Rel",
+      "filepath.ToSlash",
+      "filepath.WalkDir",
+      "fmt.Errorf",
+      "format.Node",
+      "format.Node",
+      "hex.EncodeToString",
+      "len",
+      "os.ReadFile",
+      "parser.ParseFile",
+      "set.Position",
+      "set.Position",
+      "set.Position",
+      "set.Position",
+      "set.Position",
+      "sha256.Sum256",
+      "sort.Strings",
+      "strings.HasPrefix",
+      "strings.Trim",
+      "t.End",
+      "t.Pos",
+      "token.NewFileSet",
+      "v.Pos",
+      "x.End",
+      "x.Pos"
+    ]
+  },
+  {
+    "name": "derived",
+    "kind": "function",
+    "file": "ice/index.go",
+    "start": 147,
+    "end": 161,
+    "calls": [
+      "append",
+      "strings.HasPrefix",
+      "strings.HasSuffix"
+    ]
+  },
+  {
+    "name": "Save",
+    "kind": "function",
+    "file": "ice/index.go",
+    "start": 162,
+    "end": 192,
+    "calls": [
+      "Build",
+      "append",
+      "derived",
+      "filepath.Join",
+      "filepath.Join",
+      "filepath.Join",
+      "filepath.Join",
+      "json.MarshalIndent",
+      "os.IsNotExist",
+      "os.MkdirAll",
+      "os.ReadFile",
+      "os.WriteFile",
+      "os.WriteFile"
+    ]
+  },
+  {
+    "name": "Load",
+    "kind": "function",
+    "file": "ice/index.go",
+    "start": 193,
+    "end": 201,
+    "calls": [
+      "filepath.Join",
+      "json.Unmarshal",
+      "os.ReadFile"
+    ]
+  },
+  {
+    "name": "Validate",
+    "kind": "function",
+    "file": "ice/index.go",
+    "start": 202,
+    "end": 237,
+    "calls": [
+      "Build",
+      "Load",
+      "append",
+      "derived",
+      "filepath.Join",
+      "filepath.Join",
+      "filepath.Join",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "json.Marshal",
+      "json.Marshal",
+      "json.MarshalIndent",
+      "os.IsNotExist",
+      "os.ReadFile",
+      "os.ReadFile",
+      "os.ReadFile",
+      "string",
+      "string",
+      "string",
+      "string",
+      "string",
+      "string"
+    ]
+  },
+  {
+    "name": "Query",
+    "kind": "function",
+    "file": "ice/index.go",
+    "start": 238,
+    "end": 262,
+    "calls": [
+      "Load",
+      "Validate",
+      "append",
+      "fmt.Errorf",
+      "strings.Contains",
+      "strings.Contains",
+      "strings.Join",
+      "strings.ToLower",
+      "strings.ToLower",
+      "strings.ToLower",
+      "strings.ToLower",
+      "strings.TrimSpace"
+    ]
+  },
+  {
+    "name": "TestSourceWins",
+    "kind": "function",
+    "file": "ice/index_test.go",
+    "start": 9,
+    "end": 31,
+    "calls": [
+      "Query",
+      "Query",
+      "Query",
+      "Save",
+      "Save",
+      "filepath.Join",
+      "len",
+      "len",
+      "os.WriteFile",
+      "os.WriteFile",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.TempDir"
+    ]
+  },
+  {
+    "name": "TestDerivedTamperingDenied",
+    "kind": "function",
+    "file": "ice/inventory_test.go",
+    "start": 10,
+    "end": 20,
+    "calls": [
+      "Save",
+      "Validate",
+      "filepath.Join",
+      "filepath.Join",
+      "os.WriteFile",
+      "os.WriteFile",
+      "t.Fatal",
+      "t.Fatal",
+      "t.TempDir"
+    ]
+  },
+  {
+    "name": "TestIntegrationInventory",
+    "kind": "function",
+    "file": "ice/inventory_test.go",
+    "start": 21,
+    "end": 42,
+    "calls": [
+      "json.Unmarshal",
+      "len",
+      "os.ReadFile",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "Request",
+    "kind": "type",
+    "file": "inference/backend.go",
+    "start": 10,
+    "end": 21
+  },
+  {
+    "name": "Validate",
+    "kind": "method",
+    "file": "inference/backend.go",
+    "start": 23,
+    "end": 28,
+    "receiver": "Request",
+    "calls": [
+      "errors.New",
+      "len",
+      "len",
+      "time.Until",
+      "time.Until"
+    ]
+  },
+  {
+    "name": "Usage",
+    "kind": "type",
+    "file": "inference/backend.go",
+    "start": 30,
+    "end": 33
+  },
+  {
+    "name": "Telemetry",
+    "kind": "type",
+    "file": "inference/backend.go",
+    "start": 34,
+    "end": 41
+  },
+  {
+    "name": "Result",
+    "kind": "type",
+    "file": "inference/backend.go",
+    "start": 42,
+    "end": 53
+  },
+  {
+    "name": "Cost",
+    "kind": "type",
+    "file": "inference/backend.go",
+    "start": 54,
+    "end": 58
+  },
+  {
+    "name": "InferenceBackend",
+    "kind": "interface",
+    "file": "inference/backend.go",
+    "start": 59,
+    "end": 66
+  },
+  {
+    "name": "Classify",
+    "kind": "function",
+    "file": "inference/backend.go",
+    "start": 68,
+    "end": 79,
+    "calls": [
+      "errors.Is",
+      "errors.Is"
+    ]
+  },
+  {
+    "name": "request",
+    "kind": "function",
+    "file": "inference/backend_test.go",
+    "start": 14,
+    "end": 16,
+    "calls": [
+      "time.Now"
+    ]
+  },
+  {
+    "name": "TestMockCancellation",
+    "kind": "function",
+    "file": "inference/backend_test.go",
+    "start": 17,
+    "end": 58,
+    "calls": [
+      "c",
+      "c",
+      "context.Background",
+      "context.WithCancel",
+      "errors.Is",
+      "m.Cancel",
+      "m.Invoke",
+      "m.Invoke",
+      "make",
+      "request",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Run",
+      "time.Now",
+      "time.Now",
+      "time.Now",
+      "time.Sleep"
+    ]
+  },
+  {
+    "name": "TestBounds",
+    "kind": "function",
+    "file": "inference/backend_test.go",
+    "start": 59,
+    "end": 65,
+    "calls": [
+      "context.Background",
+      "request",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestLifecycle",
+    "kind": "function",
+    "file": "inference/backend_test.go",
+    "start": 66,
+    "end": 79,
+    "calls": [
+      "NewLifecycle",
+      "l.Move",
+      "l.Move",
+      "l.State",
+      "l.State",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestLocalTransport",
+    "kind": "function",
+    "file": "inference/backend_test.go",
+    "start": 80,
+    "end": 146,
+    "calls": [
+      "NewLocalHTTP",
+      "b.Health",
+      "b.Invoke",
+      "context.Background",
+      "context.Background",
+      "fmt.Fprint",
+      "fmt.Fprint",
+      "fmt.Fprintf",
+      "http.HandlerFunc",
+      "http.Redirect",
+      "httptest.NewServer",
+      "io.Copy",
+      "r.Context",
+      "request",
+      "server.Close",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Run",
+      "time.After",
+      "time.Now",
+      "w.WriteHeader",
+      "w.WriteHeader",
+      "w.WriteHeader"
+    ]
+  },
+  {
+    "name": "TestEndpointBoundary",
+    "kind": "function",
+    "file": "inference/backend_test.go",
+    "start": 147,
+    "end": 153,
+    "calls": [
+      "NewLocalHTTP",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "State",
+    "kind": "type",
+    "file": "inference/lifecycle.go",
+    "start": 8,
+    "end": 8
+  },
+  {
+    "name": "Lifecycle",
+    "kind": "type",
+    "file": "inference/lifecycle.go",
+    "start": 21,
+    "end": 24
+  },
+  {
+    "name": "NewLifecycle",
+    "kind": "function",
+    "file": "inference/lifecycle.go",
+    "start": 26,
+    "end": 26
+  },
+  {
+    "name": "State",
+    "kind": "method",
+    "file": "inference/lifecycle.go",
+    "start": 27,
+    "end": 27,
+    "receiver": "Lifecycle"
+  },
+  {
+    "name": "Move",
+    "kind": "method",
+    "file": "inference/lifecycle.go",
+    "start": 28,
+    "end": 39,
+    "receiver": "Lifecycle",
+    "calls": [
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "Mock",
+    "kind": "type",
+    "file": "inference/mock.go",
+    "start": 11,
+    "end": 20
+  },
+  {
+    "name": "ID",
+    "kind": "method",
+    "file": "inference/mock.go",
+    "start": 24,
+    "end": 24,
+    "receiver": "Mock"
+  },
+  {
+    "name": "Capabilities",
+    "kind": "method",
+    "file": "inference/mock.go",
+    "start": 25,
+    "end": 25,
+    "receiver": "Mock",
+    "calls": [
+      "append"
+    ]
+  },
+  {
+    "name": "Health",
+    "kind": "method",
+    "file": "inference/mock.go",
+    "start": 26,
+    "end": 34,
+    "receiver": "Mock",
+    "calls": [
+      "ctx.Err",
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "EstimateCost",
+    "kind": "method",
+    "file": "inference/mock.go",
+    "start": 35,
+    "end": 35,
+    "receiver": "Mock",
+    "calls": [
+      "len"
+    ]
+  },
+  {
+    "name": "Cancel",
+    "kind": "method",
+    "file": "inference/mock.go",
+    "start": 36,
+    "end": 44,
+    "receiver": "Mock",
+    "calls": [
+      "c"
+    ]
+  },
+  {
+    "name": "Invoke",
+    "kind": "method",
+    "file": "inference/mock.go",
+    "start": 45,
+    "end": 98,
+    "receiver": "Mock",
+    "calls": [
+      "Classify",
+      "cancel",
+      "context.WithDeadline",
+      "ctx.Done",
+      "ctx.Err",
+      "ctx.Err",
+      "delete",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "len",
+      "m.Health",
+      "r.Validate",
+      "time.NewTimer",
+      "time.Now",
+      "time.Since",
+      "timer.Stop"
+    ]
+  },
+  {
+    "name": "LocalHTTP",
+    "kind": "type",
+    "file": "inference/openai_compatible.go",
+    "start": 18,
+    "end": 24
+  },
+  {
+    "name": "NewLocalHTTP",
+    "kind": "function",
+    "file": "inference/openai_compatible.go",
+    "start": 28,
+    "end": 39,
+    "calls": [
+      "append",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "ip.IsLoopback",
+      "net.ParseIP",
+      "strings.TrimRight",
+      "u.Hostname",
+      "url.Parse"
+    ]
+  },
+  {
+    "name": "ID",
+    "kind": "method",
+    "file": "inference/openai_compatible.go",
+    "start": 40,
+    "end": 40,
+    "receiver": "LocalHTTP"
+  },
+  {
+    "name": "Capabilities",
+    "kind": "method",
+    "file": "inference/openai_compatible.go",
+    "start": 41,
+    "end": 41,
+    "receiver": "LocalHTTP",
+    "calls": [
+      "append"
+    ]
+  },
+  {
+    "name": "EstimateCost",
+    "kind": "method",
+    "file": "inference/openai_compatible.go",
+    "start": 42,
+    "end": 44,
+    "receiver": "LocalHTTP",
+    "calls": [
+      "len"
+    ]
+  },
+  {
+    "name": "Health",
+    "kind": "method",
+    "file": "inference/openai_compatible.go",
+    "start": 45,
+    "end": 74,
+    "receiver": "LocalHTTP",
+    "calls": [
+      "c",
+      "context.WithTimeout",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "http.NewRequestWithContext",
+      "io.LimitReader",
+      "json.NewDecoder"
+    ]
+  },
+  {
+    "name": "Cancel",
+    "kind": "method",
+    "file": "inference/openai_compatible.go",
+    "start": 75,
+    "end": 83,
+    "receiver": "LocalHTTP",
+    "calls": [
+      "c"
+    ]
+  },
+  {
+    "name": "Invoke",
+    "kind": "method",
+    "file": "inference/openai_compatible.go",
+    "start": 84,
+    "end": 183,
+    "receiver": "LocalHTTP",
+    "calls": [
+      "Classify",
+      "bytes.NewReader",
+      "c",
+      "context.WithDeadline",
+      "delete",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "http.NewRequestWithContext",
+      "int64",
+      "int64",
+      "io.LimitReader",
+      "io.ReadAll",
+      "json.Marshal",
+      "json.Unmarshal",
+      "len",
+      "len",
+      "r.Validate",
+      "time.Now",
+      "time.Since"
+    ]
+  },
+  {
+    "name": "TestTelemetrySerialization",
+    "kind": "function",
+    "file": "inference/telemetry_test.go",
+    "start": 9,
+    "end": 19,
+    "calls": [
+      "json.Marshal",
+      "json.Marshal",
+      "string",
+      "string",
+      "string",
+      "string",
+      "string",
+      "strings.Contains",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "Metrics",
+    "kind": "type",
+    "file": "resources/governor.go",
+    "start": 8,
+    "end": 19
+  },
+  {
+    "name": "Policy",
+    "kind": "type",
+    "file": "resources/governor.go",
+    "start": 20,
+    "end": 25
+  },
+  {
+    "name": "Provider",
+    "kind": "interface",
+    "file": "resources/governor.go",
+    "start": 26,
+    "end": 26
+  },
+  {
+    "name": "Check",
+    "kind": "function",
+    "file": "resources/governor.go",
+    "start": 28,
+    "end": 45,
+    "calls": [
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "math.IsNaN",
+      "math.IsNaN"
+    ]
+  },
+  {
+    "name": "TestFloors",
+    "kind": "function",
+    "file": "resources/governor_test.go",
+    "start": 8,
+    "end": 22,
+    "calls": [
+      "Check",
+      "Check",
+      "Check",
+      "math.NaN",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "uint64",
+      "uint64"
+    ]
+  },
+  {
+    "name": "Proposal",
+    "kind": "type",
+    "file": "toolboundary/tools.go",
+    "start": 14,
+    "end": 17
+  },
+  {
+    "name": "Policy",
+    "kind": "type",
+    "file": "toolboundary/tools.go",
+    "start": 18,
+    "end": 24
+  },
+  {
+    "name": "Observation",
+    "kind": "type",
+    "file": "toolboundary/tools.go",
+    "start": 25,
+    "end": 33
+  },
+  {
+    "name": "has",
+    "kind": "function",
+    "file": "toolboundary/tools.go",
+    "start": 35,
+    "end": 42
+  },
+  {
+    "name": "Execute",
+    "kind": "function",
+    "file": "toolboundary/tools.go",
+    "start": 43,
+    "end": 106,
+    "calls": [
+      "c",
+      "context.WithTimeout",
+      "ctx.Err",
+      "ctx.Err",
+      "err.Error",
+      "file.Close",
+      "file.Stat",
+      "filepath.IsAbs",
+      "filepath.IsLocal",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "has",
+      "has",
+      "info.Mode",
+      "int64",
+      "io.LimitReader",
+      "io.ReadAll",
+      "len",
+      "os.OpenRoot",
+      "root.Close",
+      "root.Open",
+      "string",
+      "strings.ContainsAny",
+      "time.Now",
+      "time.Since"
+    ]
+  },
+  {
+    "name": "TestBoundary",
+    "kind": "function",
+    "file": "toolboundary/tools_test.go",
+    "start": 11,
+    "end": 40,
+    "calls": [
+      "Execute",
+      "Execute",
+      "Execute",
+      "Execute",
+      "Execute",
+      "c",
+      "context.Background",
+      "context.Background",
+      "context.Background",
+      "context.Background",
+      "context.Background",
+      "context.WithCancel",
+      "filepath.Join",
+      "filepath.Join",
+      "filepath.Join",
+      "os.Symlink",
+      "os.WriteFile",
+      "os.WriteFile",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.TempDir",
+      "t.TempDir"
+    ]
+  },
+  {
+    "name": "Boundary",
+    "kind": "interface",
+    "file": "worker/service.go",
+    "start": 13,
+    "end": 20
+  },
+  {
+    "name": "job",
+    "kind": "type",
+    "file": "worker/service.go",
+    "start": 21,
+    "end": 25
+  },
+  {
+    "name": "Service",
+    "kind": "type",
+    "file": "worker/service.go",
+    "start": 26,
+    "end": 32
+  },
+  {
+    "name": "New",
+    "kind": "function",
+    "file": "worker/service.go",
+    "start": 36,
+    "end": 39,
+    "calls": [
+      "append"
+    ]
+  },
+  {
+    "name": "Capabilities",
+    "kind": "method",
+    "file": "worker/service.go",
+    "start": 40,
+    "end": 42,
+    "receiver": "Service"
+  },
+  {
+    "name": "Health",
+    "kind": "method",
+    "file": "worker/service.go",
+    "start": 43,
+    "end": 56,
+    "receiver": "Service",
+    "calls": [
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "len"
+    ]
+  },
+  {
+    "name": "SubmitWork",
+    "kind": "method",
+    "file": "worker/service.go",
+    "start": 57,
+    "end": 90,
+    "receiver": "Service",
+    "calls": [
+      "append",
+      "c",
+      "context.WithDeadline",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "len",
+      "parent.Err",
+      "r.Validate"
+    ]
+  },
+  {
+    "name": "Status",
+    "kind": "method",
+    "file": "worker/service.go",
+    "start": 91,
+    "end": 99,
+    "receiver": "Service",
+    "calls": [
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "Cancel",
+    "kind": "method",
+    "file": "worker/service.go",
+    "start": 100,
+    "end": 109,
+    "receiver": "Service",
+    "calls": [
+      "j.cancel"
+    ]
+  },
+  {
+    "name": "Result",
+    "kind": "method",
+    "file": "worker/service.go",
+    "start": 110,
+    "end": 124,
+    "receiver": "Service",
+    "calls": [
+      "fmt.Errorf",
+      "json.Marshal",
+      "json.Unmarshal"
+    ]
+  },
+  {
+    "name": "metrics",
+    "kind": "type",
+    "file": "worker/service_test.go",
+    "start": 12,
+    "end": 12
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "worker/service_test.go",
+    "start": 14,
+    "end": 14,
+    "receiver": "metrics"
+  },
+  {
+    "name": "TestSingleWorkerCancel",
+    "kind": "function",
+    "file": "worker/service_test.go",
+    "start": 15,
+    "end": 45,
+    "calls": [
+      "New",
+      "context.Background",
+      "context.Background",
+      "reg.Register",
+      "s.Cancel",
+      "s.Result",
+      "s.Status",
+      "s.SubmitWork",
+      "s.SubmitWork",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "time.Now",
+      "time.Now",
+      "time.Now",
+      "time.Sleep"
+    ]
+  }
+]
