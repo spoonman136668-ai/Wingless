@@ -23,6 +23,18 @@
   "authority": "advisory syntax only; source wins",
   "files": [
     {
+      "path": ".gitattributes",
+      "sha256": "9ab332fba1f3bba1c7e234d8d39974e1de53c3efaa612d5f9bdc2681db7f27a6"
+    },
+    {
+      "path": ".github/workflows/native.yml",
+      "sha256": "3719dbdb91e821263564348ef8432bcdcc51a8951687babdd1cd7e6a85a044e2"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "f4953190579b4e3c4628a2d6cbced7289d8d35f6302fc7eac59d2d55da91261f"
+    },
+    {
       "path": "AGENTS.md",
       "sha256": "f095a39188149e5828b0bd8d232d15dca731efd28ccf724ac0a592f1f68a9c08"
     },
@@ -105,7 +117,7 @@
     },
     {
       "path": "cmd/wingless/main.go",
-      "sha256": "4a7de3ab6af6bcf7e0cad5caddc71ba8c23b13febf3508f0ec4b3762a55ddefd",
+      "sha256": "23427ed179d73871c901029c75ddf4990a7089ff0dc1c892766c630eff2a049d",
       "package": "main",
       "imports": [
         "context",
@@ -192,7 +204,7 @@
     },
     {
       "path": "ice/index.go",
-      "sha256": "c8a265ba45ddf9df74989fc557c5428f54c69cae7b52f8d017d03658e0b8a9f6",
+      "sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
       "package": "ice",
       "imports": [
         "bytes",
@@ -227,6 +239,16 @@
       "package": "ice",
       "imports": [
         "encoding/json",
+        "os",
+        "path/filepath",
+        "testing"
+      ]
+    },
+    {
+      "path": "ice/portability_test.go",
+      "sha256": "f54f21f49f87b27dc41610dfd9baf3893965e53b62f2485394f7cf4789417725",
+      "package": "ice",
+      "imports": [
         "os",
         "path/filepath",
         "testing"
@@ -323,6 +345,58 @@
         "math",
         "testing"
       ]
+    },
+    {
+      "path": "resources/host.go",
+      "sha256": "3756a4f315fdd86d6c7ceee77ceb7c750d11cc1fb11093ac1abc74cec674faf2",
+      "package": "resources",
+      "imports": [
+        "fmt",
+        "sync"
+      ]
+    },
+    {
+      "path": "resources/host_linux.go",
+      "sha256": "3a383cf6826e1a96e0e51d2996de652df478d0c98a06661cfe1bc090a39fd20e",
+      "package": "resources",
+      "imports": [
+        "fmt",
+        "os",
+        "strconv",
+        "strings",
+        "syscall"
+      ]
+    },
+    {
+      "path": "resources/host_other.go",
+      "sha256": "bb58909e5fbd1ec05610b54af41ecf08f7ebe4d515b396a63347db51e7acecf4",
+      "package": "resources",
+      "imports": [
+        "fmt"
+      ]
+    },
+    {
+      "path": "resources/host_test.go",
+      "sha256": "f609146157bd1fbdbc935340243a0ea738f7a13d5b2864a30ded0c8261e65f01",
+      "package": "resources",
+      "imports": [
+        "testing",
+        "time"
+      ]
+    },
+    {
+      "path": "resources/host_windows.go",
+      "sha256": "94912a8be40bf6fce4e5de2fcf7ffee83853ec7023d4dbe3de14d022390ecef2",
+      "package": "resources",
+      "imports": [
+        "fmt",
+        "syscall",
+        "unsafe"
+      ]
+    },
+    {
+      "path": "scripts/Test-Native.ps1",
+      "sha256": "d5a495577dd8f8db5758f8ad4d528fb811eb6ee36e6fedb71ee351e76b27bd35"
     },
     {
       "path": "toolboundary/tools.go",
@@ -774,7 +848,7 @@
       "kind": "function",
       "file": "cmd/wingless/main.go",
       "start": 19,
-      "end": 49,
+      "end": 67,
       "calls": [
         "benchmark.Replay",
         "context.Background",
@@ -784,8 +858,17 @@
         "enc.SetIndent",
         "fmt.Fprintln",
         "fmt.Fprintln",
+        "fmt.Fprintln",
+        "fmt.Fprintln",
+        "h.Snapshot",
+        "h.Snapshot",
+        "json.NewEncoder",
         "json.NewEncoder",
         "len",
+        "len",
+        "os.Exit",
+        "os.Exit",
+        "os.Exit",
         "os.Exit",
         "os.Exit",
         "panic",
@@ -793,7 +876,8 @@
         "panic",
         "reg.Register",
         "runner.Run",
-        "time.Now"
+        "time.Now",
+        "time.Sleep"
       ]
     },
     {
@@ -925,9 +1009,10 @@
       "kind": "function",
       "file": "ice/index.go",
       "start": 50,
-      "end": 146,
+      "end": 156,
       "calls": [
         "a.String",
+        "append",
         "append",
         "append",
         "append",
@@ -940,7 +1025,11 @@
         "d.IsDir",
         "d.Name",
         "d.Name",
+        "d.Name",
+        "d.Name",
         "d.Type",
+        "filepath.Base",
+        "filepath.Base",
         "filepath.Base",
         "filepath.Ext",
         "filepath.Rel",
@@ -958,6 +1047,8 @@
         "set.Position",
         "set.Position",
         "set.Position",
+        "set.Position",
+        "set.Position",
         "sha256.Sum256",
         "sort.Strings",
         "strings.HasPrefix",
@@ -965,6 +1056,8 @@
         "t.End",
         "t.Pos",
         "token.NewFileSet",
+        "v.End",
+        "v.Pos",
         "v.Pos",
         "x.End",
         "x.Pos"
@@ -974,8 +1067,8 @@
       "name": "derived",
       "kind": "function",
       "file": "ice/index.go",
-      "start": 147,
-      "end": 161,
+      "start": 157,
+      "end": 171,
       "calls": [
         "append",
         "strings.HasPrefix",
@@ -986,8 +1079,8 @@
       "name": "Save",
       "kind": "function",
       "file": "ice/index.go",
-      "start": 162,
-      "end": 192,
+      "start": 172,
+      "end": 202,
       "calls": [
         "Build",
         "append",
@@ -1008,8 +1101,8 @@
       "name": "Load",
       "kind": "function",
       "file": "ice/index.go",
-      "start": 193,
-      "end": 201,
+      "start": 203,
+      "end": 211,
       "calls": [
         "filepath.Join",
         "json.Unmarshal",
@@ -1020,8 +1113,8 @@
       "name": "Validate",
       "kind": "function",
       "file": "ice/index.go",
-      "start": 202,
-      "end": 237,
+      "start": 212,
+      "end": 247,
       "calls": [
         "Build",
         "Load",
@@ -1052,8 +1145,8 @@
       "name": "Query",
       "kind": "function",
       "file": "ice/index.go",
-      "start": 238,
-      "end": 262,
+      "start": 248,
+      "end": 272,
       "calls": [
         "Load",
         "Validate",
@@ -1126,6 +1219,30 @@
         "t.Fatal",
         "t.Fatal",
         "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestDeclarationsAndOperationalFiles",
+      "kind": "function",
+      "file": "ice/portability_test.go",
+      "start": 9,
+      "end": 26,
+      "calls": [
+        "Query",
+        "Save",
+        "Validate",
+        "filepath.Join",
+        "filepath.Join",
+        "filepath.Join",
+        "len",
+        "os.MkdirAll",
+        "os.WriteFile",
+        "os.WriteFile",
+        "os.WriteFile",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.TempDir"
       ]
     },
     {
@@ -1314,6 +1431,62 @@
       "file": "inference/lifecycle.go",
       "start": 8,
       "end": 8
+    },
+    {
+      "name": "Unavailable",
+      "kind": "const",
+      "file": "inference/lifecycle.go",
+      "start": 11,
+      "end": 11
+    },
+    {
+      "name": "Stopped",
+      "kind": "const",
+      "file": "inference/lifecycle.go",
+      "start": 12,
+      "end": 12
+    },
+    {
+      "name": "Starting",
+      "kind": "const",
+      "file": "inference/lifecycle.go",
+      "start": 13,
+      "end": 13
+    },
+    {
+      "name": "Ready",
+      "kind": "const",
+      "file": "inference/lifecycle.go",
+      "start": 14,
+      "end": 14
+    },
+    {
+      "name": "Busy",
+      "kind": "const",
+      "file": "inference/lifecycle.go",
+      "start": 15,
+      "end": 15
+    },
+    {
+      "name": "Idle",
+      "kind": "const",
+      "file": "inference/lifecycle.go",
+      "start": 16,
+      "end": 16
+    },
+    {
+      "name": "Draining",
+      "kind": "const",
+      "file": "inference/lifecycle.go",
+      "start": 17,
+      "end": 17
+    },
+    {
+      "name": "Failed",
+      "kind": "const",
+      "file": "inference/lifecycle.go",
+      "start": 18,
+      "end": 18
     },
     {
       "name": "Lifecycle",
@@ -1620,6 +1793,155 @@
         "t.Fatal",
         "uint64",
         "uint64"
+      ]
+    },
+    {
+      "name": "Host",
+      "kind": "type",
+      "file": "resources/host.go",
+      "start": 9,
+      "end": 13
+    },
+    {
+      "name": "cpuTicks",
+      "kind": "type",
+      "file": "resources/host.go",
+      "start": 14,
+      "end": 14
+    },
+    {
+      "name": "Snapshot",
+      "kind": "method",
+      "file": "resources/host.go",
+      "start": 16,
+      "end": 34,
+      "receiver": "Host",
+      "calls": [
+        "float64",
+        "float64",
+        "fmt.Errorf",
+        "hostSnapshot"
+      ]
+    },
+    {
+      "name": "hostSnapshot",
+      "kind": "function",
+      "file": "resources/host_linux.go",
+      "start": 13,
+      "end": 69,
+      "calls": [
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "len",
+        "len",
+        "os.ReadFile",
+        "os.ReadFile",
+        "strconv.ParseUint",
+        "strconv.ParseUint",
+        "string",
+        "string",
+        "strings.Fields",
+        "strings.Fields",
+        "strings.Split",
+        "strings.SplitN",
+        "strings.TrimSuffix",
+        "syscall.Statfs",
+        "uint64"
+      ]
+    },
+    {
+      "name": "hostSnapshot",
+      "kind": "function",
+      "file": "resources/host_other.go",
+      "start": 7,
+      "end": 9,
+      "calls": [
+        "fmt.Errorf"
+      ]
+    },
+    {
+      "name": "TestNativeHost",
+      "kind": "function",
+      "file": "resources/host_test.go",
+      "start": 10,
+      "end": 27,
+      "calls": [
+        "h.Snapshot",
+        "h.Snapshot",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf",
+        "t.TempDir",
+        "time.Sleep"
+      ]
+    },
+    {
+      "name": "kernel",
+      "kind": "var",
+      "file": "resources/host_windows.go",
+      "start": 11,
+      "end": 11
+    },
+    {
+      "name": "memoryStatus",
+      "kind": "var",
+      "file": "resources/host_windows.go",
+      "start": 12,
+      "end": 12
+    },
+    {
+      "name": "diskSpace",
+      "kind": "var",
+      "file": "resources/host_windows.go",
+      "start": 13,
+      "end": 13
+    },
+    {
+      "name": "systemTimes",
+      "kind": "var",
+      "file": "resources/host_windows.go",
+      "start": 14,
+      "end": 14
+    },
+    {
+      "name": "hostSnapshot",
+      "kind": "function",
+      "file": "resources/host_windows.go",
+      "start": 16,
+      "end": 51,
+      "calls": [
+        "diskSpace.Call",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "memoryStatus.Call",
+        "syscall.UTF16PtrFromString",
+        "systemTimes.Call",
+        "ticks",
+        "ticks",
+        "ticks",
+        "uint32",
+        "uint64",
+        "uint64",
+        "uintptr",
+        "uintptr",
+        "uintptr",
+        "uintptr",
+        "uintptr",
+        "uintptr",
+        "uintptr",
+        "uintptr",
+        "unsafe.Pointer",
+        "unsafe.Pointer",
+        "unsafe.Pointer",
+        "unsafe.Pointer",
+        "unsafe.Pointer",
+        "unsafe.Pointer",
+        "unsafe.Pointer",
+        "unsafe.Pointer",
+        "unsafe.Sizeof"
       ]
     },
     {

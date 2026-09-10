@@ -1,0 +1,32 @@
+name: Wingless native validation
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Native tests and evidence
+        shell: pwsh
+        run: ./scripts/Test-Native.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-${{ matrix.os }}
+          path: evidence/
+          retention-days: 14

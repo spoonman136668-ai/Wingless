@@ -58,7 +58,7 @@ func Build(root string) (Index, error) {
 			return e
 		}
 		if d.IsDir() {
-			if rel != "." && (strings.HasPrefix(d.Name(), ".") || d.Name() == "bin") {
+			if rel != "." && ((strings.HasPrefix(d.Name(), ".") && d.Name() != ".github") || d.Name() == "bin" || d.Name() == "evidence") {
 				return filepath.SkipDir
 			}
 			return nil
@@ -67,7 +67,7 @@ func Build(root string) (Index, error) {
 			return fmt.Errorf("symlink rejected: %s", rel)
 		}
 		ext := filepath.Ext(path)
-		if ext != ".go" && ext != ".md" && ext != ".json" && filepath.Base(path) != "go.mod" {
+		if ext != ".go" && ext != ".md" && ext != ".json" && ext != ".ps1" && ext != ".yml" && ext != ".yaml" && filepath.Base(path) != ".gitattributes" && filepath.Base(path) != ".gitignore" && filepath.Base(path) != "go.mod" {
 			return nil
 		}
 		b, e := os.ReadFile(path)
@@ -100,23 +100,33 @@ func Build(root string) (Index, error) {
 							s.Receiver = n.Name
 						}
 					}
-					ast.Inspect(x.Body, func(n ast.Node) bool {
-						if c, ok := n.(*ast.CallExpr); ok {
-							switch a := c.Fun.(type) {
-							case *ast.Ident:
-								s.Calls = append(s.Calls, a.Name)
-							case *ast.SelectorExpr:
-								if q, ok := a.X.(*ast.Ident); ok {
-									s.Calls = append(s.Calls, q.Name+"."+a.Sel.Name)
+					if x.Body != nil {
+						ast.Inspect(x.Body, func(n ast.Node) bool {
+							if c, ok := n.(*ast.CallExpr); ok {
+								switch a := c.Fun.(type) {
+								case *ast.Ident:
+									s.Calls = append(s.Calls, a.Name)
+								case *ast.SelectorExpr:
+									if q, ok := a.X.(*ast.Ident); ok {
+										s.Calls = append(s.Calls, q.Name+"."+a.Sel.Name)
+									}
 								}
 							}
-						}
-						return true
-					})
+							return true
+						})
+					}
 					sort.Strings(s.Calls)
 					idx.Symbols = append(idx.Symbols, s)
 				case *ast.GenDecl:
 					for _, spec := range x.Specs {
+						if v, ok := spec.(*ast.ValueSpec); ok {
+							for _, name := range v.Names {
+								if name.Name != "_" {
+									idx.Symbols = append(idx.Symbols, Symbol{Name: name.Name, Kind: x.Tok.String(), File: f.Path, Start: set.Position(v.Pos()).Line, End: set.Position(v.End()).Line})
+								}
+							}
+						}
+
 						if v, ok := spec.(*ast.ValueSpec); ok && v.Type != nil {
 							for n, name := range v.Names {
 								if name.Name == "_" && n < len(v.Values) {

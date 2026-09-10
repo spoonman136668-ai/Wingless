@@ -17,6 +17,24 @@ type unknown struct{}
 
 func (unknown) Snapshot() (resources.Metrics, error) { return resources.Metrics{}, nil }
 func main() {
+	if len(os.Args) == 2 && os.Args[1] == "host" {
+		h := &resources.Host{Path: "."}
+		if _, e := h.Snapshot(); e != nil {
+			fmt.Fprintln(os.Stderr, e)
+			os.Exit(1)
+		}
+		time.Sleep(100 * time.Millisecond)
+		m, e := h.Snapshot()
+		if e != nil {
+			fmt.Fprintln(os.Stderr, e)
+			os.Exit(1)
+		}
+		if e = json.NewEncoder(os.Stdout).Encode(m); e != nil {
+			os.Exit(1)
+		}
+		return
+	}
+
 	if len(os.Args) != 2 || (os.Args[1] != "demo" && os.Args[1] != "benchmark") {
 		fmt.Fprintln(os.Stderr, "usage: wingless demo|benchmark (offline mock only)")
 		os.Exit(2)

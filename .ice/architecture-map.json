@@ -1,5 +1,17 @@
 [
   {
+    "path": ".gitattributes",
+    "sha256": "9ab332fba1f3bba1c7e234d8d39974e1de53c3efaa612d5f9bdc2681db7f27a6"
+  },
+  {
+    "path": ".github/workflows/native.yml",
+    "sha256": "3719dbdb91e821263564348ef8432bcdcc51a8951687babdd1cd7e6a85a044e2"
+  },
+  {
+    "path": ".gitignore",
+    "sha256": "f4953190579b4e3c4628a2d6cbced7289d8d35f6302fc7eac59d2d55da91261f"
+  },
+  {
     "path": "AGENTS.md",
     "sha256": "f095a39188149e5828b0bd8d232d15dca731efd28ccf724ac0a592f1f68a9c08"
   },
@@ -82,7 +94,7 @@
   },
   {
     "path": "cmd/wingless/main.go",
-    "sha256": "4a7de3ab6af6bcf7e0cad5caddc71ba8c23b13febf3508f0ec4b3762a55ddefd",
+    "sha256": "23427ed179d73871c901029c75ddf4990a7089ff0dc1c892766c630eff2a049d",
     "package": "main",
     "imports": [
       "context",
@@ -169,7 +181,7 @@
   },
   {
     "path": "ice/index.go",
-    "sha256": "c8a265ba45ddf9df74989fc557c5428f54c69cae7b52f8d017d03658e0b8a9f6",
+    "sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
     "package": "ice",
     "imports": [
       "bytes",
@@ -204,6 +216,16 @@
     "package": "ice",
     "imports": [
       "encoding/json",
+      "os",
+      "path/filepath",
+      "testing"
+    ]
+  },
+  {
+    "path": "ice/portability_test.go",
+    "sha256": "f54f21f49f87b27dc41610dfd9baf3893965e53b62f2485394f7cf4789417725",
+    "package": "ice",
+    "imports": [
       "os",
       "path/filepath",
       "testing"
@@ -300,6 +322,58 @@
       "math",
       "testing"
     ]
+  },
+  {
+    "path": "resources/host.go",
+    "sha256": "3756a4f315fdd86d6c7ceee77ceb7c750d11cc1fb11093ac1abc74cec674faf2",
+    "package": "resources",
+    "imports": [
+      "fmt",
+      "sync"
+    ]
+  },
+  {
+    "path": "resources/host_linux.go",
+    "sha256": "3a383cf6826e1a96e0e51d2996de652df478d0c98a06661cfe1bc090a39fd20e",
+    "package": "resources",
+    "imports": [
+      "fmt",
+      "os",
+      "strconv",
+      "strings",
+      "syscall"
+    ]
+  },
+  {
+    "path": "resources/host_other.go",
+    "sha256": "bb58909e5fbd1ec05610b54af41ecf08f7ebe4d515b396a63347db51e7acecf4",
+    "package": "resources",
+    "imports": [
+      "fmt"
+    ]
+  },
+  {
+    "path": "resources/host_test.go",
+    "sha256": "f609146157bd1fbdbc935340243a0ea738f7a13d5b2864a30ded0c8261e65f01",
+    "package": "resources",
+    "imports": [
+      "testing",
+      "time"
+    ]
+  },
+  {
+    "path": "resources/host_windows.go",
+    "sha256": "94912a8be40bf6fce4e5de2fcf7ffee83853ec7023d4dbe3de14d022390ecef2",
+    "package": "resources",
+    "imports": [
+      "fmt",
+      "syscall",
+      "unsafe"
+    ]
+  },
+  {
+    "path": "scripts/Test-Native.ps1",
+    "sha256": "d5a495577dd8f8db5758f8ad4d528fb811eb6ee36e6fedb71ee351e76b27bd35"
   },
   {
     "path": "toolboundary/tools.go",
