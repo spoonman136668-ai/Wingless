@@ -1,0 +1,49 @@
+// wingless currently runs offline demonstrations only. No live-plane daemon is installed.
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/spoonman136668-ai/Wingless/benchmark"
+	"github.com/spoonman136668-ai/Wingless/broker"
+	"github.com/spoonman136668-ai/Wingless/inference"
+	"github.com/spoonman136668-ai/Wingless/resources"
+	"os"
+	"time"
+)
+
+type unknown struct{}
+
+func (unknown) Snapshot() (resources.Metrics, error) { return resources.Metrics{}, nil }
+func main() {
+	if len(os.Args) != 2 || (os.Args[1] != "demo" && os.Args[1] != "benchmark") {
+		fmt.Fprintln(os.Stderr, "usage: wingless demo|benchmark (offline mock only)")
+		os.Exit(2)
+	}
+	reg := &broker.Registry{}
+	for _, tier := range []string{"fast", "deep"} {
+		if e := reg.Register(broker.Entry{Backend: &inference.Mock{Name: tier, Features: []string{"code"}, Reply: "fixture-ok"}, Class: "mock", Tier: tier}); e != nil {
+			panic(e)
+		}
+	}
+	runner := broker.Runner{Registry: reg, Metrics: unknown{}}
+	p := broker.Policy{AllowedBackends: []string{"fast", "deep"}, AllowDeep: true, MaxRepairs: 1}
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	if os.Args[1] == "benchmark" {
+		rows, e := benchmark.Replay(context.Background(), runner, p, "D", []benchmark.Fixture{{ID: "fixture-1", Prompt: "Return fixture-ok", Expected: "fixture-ok"}})
+		if e != nil {
+			fmt.Fprintln(os.Stderr, e)
+			os.Exit(1)
+		}
+		if e = enc.Encode(rows); e != nil {
+			panic(e)
+		}
+		return
+	}
+	out := runner.Run(context.Background(), inference.Request{ID: "demo-1", ParentWorkID: "offline-demo", Role: "code", Context: "Return fixture-ok", MaxContextBytes: 4096, MaxOutputTokens: 128, Deadline: time.Now().Add(time.Second), Workspace: "mock-workspace", Capabilities: []string{"code"}}, p)
+	if e := enc.Encode(out); e != nil {
+		panic(e)
+	}
+}
