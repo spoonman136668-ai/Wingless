@@ -21,6 +21,18 @@ import (
 )
 
 type Config struct {
+	RuntimeVersion string `json:"runtime_version"`
+	ModelRepo      string `json:"model_repo"`
+	ModelRevision  string `json:"model_revision"`
+	Quantization   string `json:"quantization"`
+
+	GPULayers  int    `json:"gpu_layers"`
+	Batch      int    `json:"batch"`
+	MicroBatch int    `json:"micro_batch"`
+	MinVRAM    uint64 `json:"min_vram"`
+	NvidiaSMI  string `json:"nvidia_smi"`
+	GPUIndex   int    `json:"gpu_index"`
+
 	Executable       string `json:"executable"`
 	ExecutableSHA256 string `json:"executable_sha256"`
 	Model            string `json:"model"`
@@ -34,6 +46,10 @@ type Config struct {
 	MinRAM           uint64 `json:"min_ram"`
 }
 type Evidence struct {
+	Containment  string                    `json:"containment"`
+	Process      *resources.ProcessMetrics `json:"process_metrics"`
+	ProcessError *string                   `json:"process_metrics_error"`
+
 	State       inference.State `json:"state"`
 	PID         int             `json:"pid"`
 	StartedAt   time.Time       `json:"started_at"`
@@ -69,6 +85,7 @@ func (t *tail) text() string {
 }
 
 type Supervisor struct {
+	probe    *resources.ProcessProbe
 	started  bool
 	mu       sync.Mutex
 	cfg      Config
@@ -80,6 +97,15 @@ type Supervisor struct {
 }
 
 func New(c Config, m resources.Provider) (*Supervisor, error) {
+	if c.Batch == 0 {
+		c.Batch = 512
+	}
+	if c.MicroBatch == 0 {
+		c.MicroBatch = 128
+	}
+	if c.GPULayers < 0 || c.GPULayers > 128 || c.Batch < 1 || c.Batch > 2048 || c.MicroBatch < 1 || c.MicroBatch > c.Batch || c.GPUIndex < 0 || c.GPUIndex > 31 || c.GPULayers > 0 && (c.MinVRAM == 0 || c.NvidiaSMI == "") {
+		return nil, fmt.Errorf("invalid GPU/batch resource configuration")
+	}
 	if m == nil || !filepath.IsAbs(c.Executable) || !filepath.IsAbs(c.Model) || c.ModelID == "" || strings.ContainsAny(c.ModelID, "\r\n") || c.Port < 1024 || c.Port > 65535 || c.Threads < 1 || c.Threads > 16 || c.ContextTokens < 128 || c.ContextTokens > 4096 || c.StartupSeconds < 1 || c.StartupSeconds > 300 || c.RuntimeSeconds < c.StartupSeconds || c.RuntimeSeconds > 900 || c.MinRAM < 1<<30 {
 		return nil, fmt.Errorf("invalid bounded model configuration")
 	}
@@ -121,6 +147,20 @@ func (s *Supervisor) Status() Evidence {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	e := s.evidence
+	if e.ProcessError != nil {
+		message := *e.ProcessError
+		e.ProcessError = &message
+	}
+	if s.probe != nil && e.CompletedAt == nil {
+		m, err := s.probe.Snapshot()
+		if err == nil {
+			e.Process = &m
+		} else {
+			message := err.Error()
+			e.ProcessError = &message
+		}
+	}
+
 	e.StdoutTail = s.out.text()
 	e.StderrTail = s.err.text()
 	if e.ExitCode != nil {
@@ -170,10 +210,31 @@ func (s *Supervisor) Start(parent context.Context) error {
 		conn.Close()
 		return fail(fmt.Errorf("configured port already occupied"))
 	}
+	gpuUUID := ""
+	if s.cfg.GPULayers > 0 {
+		g, err := (resources.NVIDIA{Executable: s.cfg.NvidiaSMI, Index: s.cfg.GPUIndex}).GPU(parent)
+		if err != nil {
+			return fail(err)
+		}
+		if err = resources.Check(resources.Policy{MinVRAM: s.cfg.MinVRAM}, resources.Metrics{VRAMFree: g.FreeBytes}); err != nil {
+			return fail(err)
+		}
+		gpuUUID = g.UUID
+	}
+	job, e := newContainment()
+	if e != nil {
+		return fail(e)
+	}
 	ctx, cancel := context.WithTimeout(parent, time.Duration(s.cfg.RuntimeSeconds)*time.Second)
-	cmd := exec.CommandContext(ctx, s.cfg.Executable, "--model", s.cfg.Model, "--alias", s.cfg.ModelID, "--host", "127.0.0.1", "--port", strconv.Itoa(s.cfg.Port), "--threads", strconv.Itoa(s.cfg.Threads), "--ctx-size", strconv.Itoa(s.cfg.ContextTokens), "--parallel", "1", "--n-gpu-layers", "0")
+	cmd := exec.CommandContext(ctx, s.cfg.Executable, "--model", s.cfg.Model, "--alias", s.cfg.ModelID, "--host", "127.0.0.1", "--port", strconv.Itoa(s.cfg.Port), "--threads", strconv.Itoa(s.cfg.Threads), "--ctx-size", strconv.Itoa(s.cfg.ContextTokens), "--parallel", "1", "--n-gpu-layers", strconv.Itoa(s.cfg.GPULayers), "--batch-size", strconv.Itoa(s.cfg.Batch), "--ubatch-size", strconv.Itoa(s.cfg.MicroBatch))
+	if s.cfg.GPULayers > 0 {
+		cmd.Args = append(cmd.Args, "--device", "CUDA0")
+	}
 	// Never inherit API keys, proxies or arbitrary model runtime flags.
 	cmd.Env = []string{}
+	if gpuUUID != "" {
+		cmd.Env = append(cmd.Env, "CUDA_VISIBLE_DEVICES="+gpuUUID)
+	}
 	for _, key := range []string{"SystemRoot", "WINDIR", "TEMP", "TMP"} {
 		if v := os.Getenv(key); v != "" {
 			cmd.Env = append(cmd.Env, key+"="+v)
@@ -187,12 +248,28 @@ func (s *Supervisor) Start(parent context.Context) error {
 	if s.evidence.State != inference.Starting {
 		s.mu.Unlock()
 		cancel()
+		job.Close()
 		return fmt.Errorf("startup stopped")
 	}
 	if e = cmd.Start(); e != nil {
 		s.mu.Unlock()
 		cancel()
+		job.Close()
 		return fail(e)
+	}
+	if e = job.Attach(cmd.Process); e != nil {
+		cmd.Process.Kill()
+		cmd.Wait()
+		job.Close()
+		s.mu.Unlock()
+		cancel()
+		return fail(e)
+	}
+	s.evidence.Containment = containmentName()
+	s.probe, e = resources.NewProcessProbe(cmd.Process.Pid)
+	if e != nil {
+		message := e.Error()
+		s.evidence.ProcessError = &message
 	}
 	s.cancel = cancel
 	s.done = make(chan struct{})
@@ -202,6 +279,7 @@ func (s *Supervisor) Start(parent context.Context) error {
 	s.mu.Unlock()
 	go func() {
 		e := cmd.Wait()
+		job.Close()
 		s.mu.Lock()
 		defer s.mu.Unlock()
 		now := time.Now().UTC()

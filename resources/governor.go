@@ -6,6 +6,8 @@ import (
 )
 
 type Metrics struct {
+	GPU           *GPU     `json:"gpu"`
+	GPUError      *string  `json:"gpu_error"`
 	RAMTotal      *uint64  `json:"ram_total"`
 	RAMFree       *uint64  `json:"ram_free"`
 	VRAMTotal     *uint64  `json:"vram_total"`
