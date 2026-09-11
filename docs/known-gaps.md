@@ -1,13 +1,20 @@
 # Known gaps and nonclaims
 
-- No live-plane integration, durable work queue, dispatcher leases, crash recovery, production service, installer or WebUI transport. Plane contracts await reconciliation.
-- No real autonomous edit/build/test agent yet. The read-only tool is tested independently; model proposals are not automatically executed. Compiler/process tools and artifact application require a later sandboxed executor.
-- No real model benchmark or Codex parity evidence. CLI demo/benchmark use fixtures. B/C/D policy replays work; A/E/F/G explicitly report unavailable. E needs a fixture-integrated context pipeline, F an expert cache, G speculation.
-- No real host collector, resource reservation, GPU scheduler, model supervisor or weight downloads. Lifecycle is a transition model, not an attached process manager.
-- LocalHTTP is a nonstreaming compatibility subset. It trusts the configured localhost server to honor max_tokens when token usage is absent; a separate byte bound still applies. Model IDs must match exactly.
-- ICE test/call links are syntax hints, not type-resolved call graphs or proof of coverage. Explicit implementation assertions are compiler checked; unasserted implementations may be omitted. Source hash validation costs a repository scan; optimize only with safe invalidation evidence.
-- Workspace roots must be caller-trusted and stable. Rooted reads prevent path traversal; regular file IO is checked for timeout before/after, not forcibly interruptible on a hung filesystem. No OS sandbox or adversarial mutable filesystem guarantee is claimed.
-- Worker storage is in-memory and bounded; caller contexts must outlive work. Trusted plugin implementations must cooperate with deadlines. A malicious arbitrary Go plugin cannot be contained by this API.
-- Telemetry captures total latency and available snapshots; optional fine-grained metrics remain null. Timing values vary between runs; routing and fixed-input serialization are deterministic.
+## Plane-dependent: deliberately deferred
 
-Future seams: bounded expert cache and residency policy, asynchronous NVMe reads/prefetch, speculative drafting/verification, KV budgeting, process sleep/eviction, energy-aware scheduling. These are research directions, not implemented features.
+No live-plane integration, durable work queue, leases, crash recovery, dispatcher ownership, write/process tool authority, plane retry ownership or acceptance ownership. The service remains a provisional in-memory test boundary. No model output becomes acceptance. Reconcile contracts only after stabilized plane source is supplied.
+
+## Wingless-internal
+
+- Native Windows execution remains unproven: the hosted CI attempt failed before any test step. Windows code can be cross-compiled but that is not native acceptance.
+- Host RAM/disk/CPU collection exists for Windows/Linux. GPU/VRAM, energy, container limits, per-process memory, peak sampling and resource reservations are unavailable.
+- A pinned local llama-server can be started/stopped for bounded CPU-only experiments. No arbitrary command interface, model download manager, automatic restart, descendant containment, supervisor-crash recovery, GPU lifecycle, pressure eviction or graceful unload exists. Trusted stable runtime directories are required.
+- SSE and nonstreaming LocalHTTP work with bounded payloads and cancellation. Authentication, remote endpoints, tool calls, logprobs and an exhaustive server compatibility matrix are not supported. Missing token usage stays null; byte bounds still apply.
+- A real 0.5B model was tested on two strict microfixtures. Both failed formatting requirements. Transport/supervision success does not establish coding quality or Codex parity.
+- No autonomous edit/build/test loop. Read-only tools remain separately authorized; no model proposal gets shell or write access.
+- ICE maps are syntax hints, not type-resolved call graphs or measured coverage. Explicit interface assertions are compiler checked; other implementations can be absent. Validation rescans source. Generated indexes are advisory.
+- Worker storage is bounded and in-memory. Trusted Go implementations must cooperate with deadlines. Rooted regular-file reads cannot forcibly interrupt a hung filesystem.
+
+Future internal research: stronger output contracts, broader coding fixtures, measured resource peaks, runtime dependency integrity, GPU collectors, bounded expert caching, speculative drafting, KV budgets and energy-aware scheduling. These are not implemented or accepted features.
+
+See [stage 2 evidence](internal-stage-2.md).

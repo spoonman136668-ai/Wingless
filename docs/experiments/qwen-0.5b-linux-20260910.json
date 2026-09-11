@@ -1,0 +1,155 @@
+{
+  "report": {
+    "version": 1,
+    "os": "linux",
+    "arch": "amd64",
+    "logical_cpus": 9,
+    "resource_scope": "OS host, not per-process/container allocation",
+    "started_at": "2026-09-10T23:31:19.813846012Z",
+    "rows": [
+      {
+        "task": "json-arithmetic",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 609,
+            "generation_ms": 603,
+            "model_load_ms": null,
+            "before": {
+              "ram_total": 16793288704,
+              "ram_free": 15968215040,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 30338314240,
+              "cpu_percent": 15.351681957186544,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "ram_total": 16793288704,
+              "ram_free": 15966887936,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 30338314240,
+              "cpu_percent": 24.189307624890446,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-0.5b",
+          "status": "completed",
+          "text": "```json\n{\n    \"sum\": 5\n}\n```",
+          "usage": {
+            "prompt_tokens": 44,
+            "output_tokens": 14
+          },
+          "latency_ms": 1269,
+          "termination_reason": "stop",
+          "resources": {
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 23.217247097844112
+      },
+      {
+        "task": "go-add-shape",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 513,
+            "generation_ms": 1053,
+            "model_load_ms": null,
+            "before": {
+              "ram_total": 16793288704,
+              "ram_free": 15966887936,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 30338314240,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "ram_total": 16793288704,
+              "ram_free": 15967866880,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 30338314240,
+              "cpu_percent": 23.071672354948806,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-0.5b",
+          "status": "completed",
+          "text": "```go\npackage candidate\n\nfunc Add(a, b int) int {\n    return a + b\n}\n```",
+          "usage": {
+            "prompt_tokens": 57,
+            "output_tokens": 24
+          },
+          "latency_ms": 1626,
+          "termination_reason": "stop",
+          "resources": {
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 22.79202279202279
+      }
+    ],
+    "acceptance": "external_required"
+  },
+  "process": {
+    "state": "STOPPED",
+    "pid": 78,
+    "started_at": "2026-09-10T23:31:18.009995654Z",
+    "completed_at": "2026-09-10T23:31:22.74250725Z",
+    "reason": "operator_stop",
+    "exit_code": -1
+  },
+  "provenance": {
+    "runtime_release": "b10809",
+    "runtime_archive_sha256": "5e34434ddc6d03cd1584f403201aff0d4bd1a5793a72ff7e286532dfd1e4b941",
+    "runtime_url": "https://github.com/ggml-org/llama.cpp/releases/tag/b10809",
+    "model_repository": "Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF",
+    "model_revision": "ebb2015119c907b064c512bf053e945850b5875f",
+    "model_file": "qwen2.5-coder-0.5b-instruct-q4_k_m.gguf",
+    "model_bytes": 491400064,
+    "model_sha256": "1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32",
+    "threads": 2,
+    "gpu_layers": 0,
+    "context_tokens": 1024,
+    "repeats": 1,
+    "purpose": "transport/supervision/telemetry proof; not coding readiness or parity",
+    "executable_sha256": "07723ae07835bdf11cf0d00d68eb4df8308df0603f689c64c9f841a626cad01d"
+  }
+}

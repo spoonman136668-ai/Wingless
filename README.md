@@ -22,6 +22,19 @@ if ($LASTEXITCODE -ne 0) { throw "build failed" }
 
 `demo` returns a mock candidate with `acceptance: external_required`. `benchmark` compares a mock response against a fixed expected value. It does not run a model or touch CKB. There is no installable daemon yet.
 
+## Local host and small-model experiments
+
+```powershell
+go run ./cmd/wingless host
+# An already-running, operator-selected localhost model:
+go run ./cmd/wingless local-benchmark --endpoint http://127.0.0.1:8080 --model your-model-id
+# Or a pinned local llama-server and GGUF using an explicit configuration:
+.\scripts\New-LocalModelConfig.ps1 -Executable C:\models\llama-server.exe -Model C:\models\small.gguf
+go run ./cmd/wingless local-benchmark --config .\local-model.json
+```
+
+The configuration helper records hashes of your chosen files; it does not authenticate their source. Obtain a trusted runtime/model first. No automatic downloads occur. The model experiment uses only fixed public prompts, CPU inference and a bounded owned process. It does not execute generated code. See [real benchmark results and limits](docs/internal-stage-2.md). Run `scripts/Test-Native.ps1` for evidence-producing native validation.
+
 ## Context retrieval
 
 ```sh

@@ -1,4 +1,19 @@
 {
+  "benchmark/local.go": [
+    "context",
+    "encoding/json",
+    "fmt",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "go/ast",
+    "go/parser",
+    "go/token",
+    "runtime",
+    "time"
+  ],
+  "benchmark/local_test.go": [
+    "testing"
+  ],
   "benchmark/replay.go": [
     "context",
     "fmt",
@@ -41,6 +56,21 @@
     "github.com/spoonman136668-ai/Wingless/ice",
     "os",
     "path/filepath"
+  ],
+  "cmd/wingless/local.go": [
+    "bytes",
+    "context",
+    "encoding/json",
+    "flag",
+    "fmt",
+    "github.com/spoonman136668-ai/Wingless/benchmark",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/modelhost",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "io",
+    "os",
+    "os/signal",
+    "time"
   ],
   "cmd/wingless/main.go": [
     "context",
@@ -102,7 +132,8 @@
     "context",
     "errors",
     "github.com/spoonman136668-ai/Wingless/resources",
-    "time"
+    "time",
+    "unicode/utf8"
   ],
   "inference/backend_test.go": [
     "context",
@@ -135,11 +166,71 @@
     "net/url",
     "strings",
     "sync",
+    "time",
+    "unicode/utf8"
+  ],
+  "inference/stream.go": [
+    "bufio",
+    "encoding/json",
+    "fmt",
+    "io",
+    "strings",
+    "time",
+    "unicode/utf8"
+  ],
+  "inference/stream_test.go": [
+    "context",
+    "fmt",
+    "io",
+    "net/http",
+    "net/http/httptest",
+    "testing",
     "time"
   ],
   "inference/telemetry_test.go": [
     "encoding/json",
     "strings",
+    "testing"
+  ],
+  "modelhost/process_test.go": [
+    "context",
+    "crypto/sha256",
+    "fmt",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "io",
+    "net",
+    "net/http",
+    "os",
+    "path/filepath",
+    "runtime",
+    "testing",
+    "time"
+  ],
+  "modelhost/supervisor.go": [
+    "context",
+    "crypto/sha256",
+    "encoding/hex",
+    "fmt",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "io",
+    "net",
+    "os",
+    "os/exec",
+    "path/filepath",
+    "strconv",
+    "strings",
+    "sync",
+    "time"
+  ],
+  "modelhost/supervisor_test.go": [
+    "context",
+    "crypto/sha256",
+    "fmt",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "os",
+    "path/filepath",
     "testing"
   ],
   "resources/governor.go": [

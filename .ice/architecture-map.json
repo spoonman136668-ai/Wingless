@@ -9,7 +9,7 @@
   },
   {
     "path": ".gitignore",
-    "sha256": "f4953190579b4e3c4628a2d6cbced7289d8d35f6302fc7eac59d2d55da91261f"
+    "sha256": "9f93aed12ceda66d771bf2e59efabad85e4ad021b9ec006f38f36e948b07a8af"
   },
   {
     "path": "AGENTS.md",
@@ -17,7 +17,32 @@
   },
   {
     "path": "README.md",
-    "sha256": "82739725b86e16cd162887a1f2226a2b0b589a11f8cf7118edfba0fa1a86e23e"
+    "sha256": "97caae23528e40ccb7ccb0ee74dc4c35ae6a25748f0701ac7b33bb879cd841f6"
+  },
+  {
+    "path": "benchmark/local.go",
+    "sha256": "c3de435f22424b7ee5d1a78f0bbfe6ab86aef142f1876f56b4f6f9d2910b1237",
+    "package": "benchmark",
+    "imports": [
+      "context",
+      "encoding/json",
+      "fmt",
+      "github.com/spoonman136668-ai/Wingless/inference",
+      "github.com/spoonman136668-ai/Wingless/resources",
+      "go/ast",
+      "go/parser",
+      "go/token",
+      "runtime",
+      "time"
+    ]
+  },
+  {
+    "path": "benchmark/local_test.go",
+    "sha256": "02ee86a0ff296d37852dc808d594b1ea00f512af697ae10e67353d64a9148db2",
+    "package": "benchmark",
+    "imports": [
+      "testing"
+    ]
   },
   {
     "path": "benchmark/replay.go",
@@ -93,8 +118,28 @@
     ]
   },
   {
+    "path": "cmd/wingless/local.go",
+    "sha256": "6d03d54945fb3e80cf92a03e6f33012742eac081cc59ceed6b3d91c047254007",
+    "package": "main",
+    "imports": [
+      "bytes",
+      "context",
+      "encoding/json",
+      "flag",
+      "fmt",
+      "github.com/spoonman136668-ai/Wingless/benchmark",
+      "github.com/spoonman136668-ai/Wingless/inference",
+      "github.com/spoonman136668-ai/Wingless/modelhost",
+      "github.com/spoonman136668-ai/Wingless/resources",
+      "io",
+      "os",
+      "os/signal",
+      "time"
+    ]
+  },
+  {
     "path": "cmd/wingless/main.go",
-    "sha256": "23427ed179d73871c901029c75ddf4990a7089ff0dc1c892766c630eff2a049d",
+    "sha256": "1e02ac4edd336b6904a99a653f3c2fba599f5c86ecd52881599f70f7ab400450",
     "package": "main",
     "imports": [
       "context",
@@ -137,15 +182,19 @@
   },
   {
     "path": "docs/architecture.md",
-    "sha256": "514fdb9eded9a3c9ee2890bcd07423301af6832a7387c16ac959d777bbbe0764"
+    "sha256": "05d5ca888bd45bead4aa0a3b58874677ebcd381ddb2fff2bfda63281cb06a1c1"
   },
   {
     "path": "docs/decisions.json",
-    "sha256": "696bb7a147d15ea3c23e1bd669b0fe3b3328ffd19c76108f058c1748eea48a8d"
+    "sha256": "b1972e5e85a693189c9b2809c4449342690fd7c4e9c85cdf3f6f779fdb5957b4"
   },
   {
     "path": "docs/decisions.md",
     "sha256": "744e43a5c855401ab1ef215584bf7ddae6b6197f4cd3a87e53fad85074f66595"
+  },
+  {
+    "path": "docs/experiments/qwen-0.5b-linux-20260910.json",
+    "sha256": "4de301abafa7c223b7ef7968400287a454e7e5cbde2f8c485d3be4aec5a6cec8"
   },
   {
     "path": "docs/ice-schema.md",
@@ -153,23 +202,27 @@
   },
   {
     "path": "docs/inference-backends.md",
-    "sha256": "0113e52e6a5c2f4a9cc60615c9a6364d914c46d5083077078e1ee44d1e4e0321"
+    "sha256": "f12537a7a1d522e9795cf8d9b2e1a3e007e488a8515f8a7d51fb20ac8dacf8e1"
   },
   {
     "path": "docs/integration-seams.json",
-    "sha256": "44888c61d80bf602970c04ef235cf9aff42b4d3cd9e36a0241a0e8541bdafce5"
+    "sha256": "29caa68e939de11ad89231c1a83fdc0a3243a2d2dc3290a1ba5197c38539a54e"
   },
   {
     "path": "docs/integration-seams.md",
-    "sha256": "d57d61eed4b2139b6087bb5ab05744f1c76d995327107508aa5beaebbd595634"
+    "sha256": "91e5ae92b070c2e212f6023124e2f786997e863d724b973cefb80ad24be7e41e"
+  },
+  {
+    "path": "docs/internal-stage-2.md",
+    "sha256": "1716f1ab67a18d822b8d10c22e7dbadc9d40639001d0f7717b0d6f9413ae5923"
   },
   {
     "path": "docs/known-gaps.md",
-    "sha256": "6c9701ac830f002c3a0f4a938118b1173e5e3bef187cb5709ef68377dcbdc920"
+    "sha256": "cd412de12cef3b474f152cd906095e878d0b5fae19d5c8472246d7bec7705856"
   },
   {
     "path": "docs/resource-model.md",
-    "sha256": "23e078344d6afdfcfa06d17b475410edbf362283b4ffa6a8345b46a32c635378"
+    "sha256": "4d71bc6d55d26b9269817f89dbd72ebb6ff8540a5e7f6943c344cef250094615"
   },
   {
     "path": "docs/worker-protocol.md",
@@ -233,13 +286,14 @@
   },
   {
     "path": "inference/backend.go",
-    "sha256": "30abc1ea9f7520009824aa3c89c948fc169acb94312552d6b1774c99a98e3d4e",
+    "sha256": "ea8c5a92c602132fac5fe191b2222ea9fc6a98fe9c4646c9583e2c21dc3c3f51",
     "package": "inference",
     "imports": [
       "context",
       "errors",
       "github.com/spoonman136668-ai/Wingless/resources",
-      "time"
+      "time",
+      "unicode/utf8"
     ]
   },
   {
@@ -279,7 +333,7 @@
   },
   {
     "path": "inference/openai_compatible.go",
-    "sha256": "9946919719bf01d718a03f8139db5ca31344cf8a0d42c714cbbdadc5194ead90",
+    "sha256": "3fda06a5aa404572d140b6d240ee6f110582bba9a66d9cc66361d38858fed6b0",
     "package": "inference",
     "imports": [
       "bytes",
@@ -292,6 +346,35 @@
       "net/url",
       "strings",
       "sync",
+      "time",
+      "unicode/utf8"
+    ]
+  },
+  {
+    "path": "inference/stream.go",
+    "sha256": "ece202a433677d165713e813f2d2f1faffd4923db99602cc48701c14689df8f2",
+    "package": "inference",
+    "imports": [
+      "bufio",
+      "encoding/json",
+      "fmt",
+      "io",
+      "strings",
+      "time",
+      "unicode/utf8"
+    ]
+  },
+  {
+    "path": "inference/stream_test.go",
+    "sha256": "879e269effb38e6c5dc1406a15489bb40ff05a47a6d153db9b7c1008d4ac4297",
+    "package": "inference",
+    "imports": [
+      "context",
+      "fmt",
+      "io",
+      "net/http",
+      "net/http/httptest",
+      "testing",
       "time"
     ]
   },
@@ -302,6 +385,62 @@
     "imports": [
       "encoding/json",
       "strings",
+      "testing"
+    ]
+  },
+  {
+    "path": "modelhost/process_test.go",
+    "sha256": "223bcc17e0e57e67077cf3a5ece14a3e4427b6d1b86bd31d9d22cda680f59395",
+    "package": "modelhost",
+    "imports": [
+      "context",
+      "crypto/sha256",
+      "fmt",
+      "github.com/spoonman136668-ai/Wingless/inference",
+      "github.com/spoonman136668-ai/Wingless/resources",
+      "io",
+      "net",
+      "net/http",
+      "os",
+      "path/filepath",
+      "runtime",
+      "testing",
+      "time"
+    ]
+  },
+  {
+    "path": "modelhost/supervisor.go",
+    "sha256": "2eea2bd3d3f178c31f64d0688b3afd94c737aea5d9a7935f82c18f1fc1ecc863",
+    "package": "modelhost",
+    "imports": [
+      "context",
+      "crypto/sha256",
+      "encoding/hex",
+      "fmt",
+      "github.com/spoonman136668-ai/Wingless/inference",
+      "github.com/spoonman136668-ai/Wingless/resources",
+      "io",
+      "net",
+      "os",
+      "os/exec",
+      "path/filepath",
+      "strconv",
+      "strings",
+      "sync",
+      "time"
+    ]
+  },
+  {
+    "path": "modelhost/supervisor_test.go",
+    "sha256": "db398c5c0e5b9f5d25661adec1551b8d358428c4e4ca6ba78bb69e262ffcec03",
+    "package": "modelhost",
+    "imports": [
+      "context",
+      "crypto/sha256",
+      "fmt",
+      "github.com/spoonman136668-ai/Wingless/resources",
+      "os",
+      "path/filepath",
       "testing"
     ]
   },
@@ -370,6 +509,10 @@
       "syscall",
       "unsafe"
     ]
+  },
+  {
+    "path": "scripts/New-LocalModelConfig.ps1",
+    "sha256": "f90ef9906500df0cfded9d1600145c34f344504e0e2ad8114395b5b6801628ba"
   },
   {
     "path": "scripts/Test-Native.ps1",

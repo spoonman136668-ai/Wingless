@@ -100,3 +100,7 @@ No interface here is authoritative for ckb-plane. Reconcile every seam before ac
 - **failure semantics:** unsupported configurations return unavailable
 - **risk if plane differs:** real coding acceptance more complex than exact text
 - **reconciliation action:** add isolated coding fixtures and authoritative acceptance adapter
+
+## modelhost — independent experiment
+
+No plane interface is activated. Operator configuration starts one pinned local inference server. Lifecycle ownership must be reconciled against the stabilized plane before integration. No model/tool execution authority is added. Machine-readable details are in integration-seams.json.
