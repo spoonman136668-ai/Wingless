@@ -12,10 +12,12 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 // LocalHTTP only contacts numeric loopback endpoints. No proxy, redirects or credentials.
 type LocalHTTP struct {
+	streaming             bool
 	name, model, endpoint string
 	features              []string
 	client                *http.Client
@@ -62,7 +64,14 @@ func (b *LocalHTTP) Health(ctx context.Context) error {
 			ID string `json:"id"`
 		} `json:"data"`
 	}
-	if e = json.NewDecoder(io.LimitReader(res.Body, 65536)).Decode(&body); e != nil {
+	raw, e := io.ReadAll(io.LimitReader(res.Body, 65537))
+	if e != nil {
+		return e
+	}
+	if len(raw) > 65536 || !utf8.Valid(raw) {
+		return fmt.Errorf("invalid/oversize health response")
+	}
+	if e = json.Unmarshal(raw, &body); e != nil {
 		return e
 	}
 	for _, m := range body.Data {
@@ -87,6 +96,7 @@ func (b *LocalHTTP) Invoke(parent context.Context, r Request) (out Result, err e
 	defer func() {
 		out.LatencyMS = time.Since(start).Milliseconds()
 		if err != nil {
+			out.Status = "failed"
 			if out.ErrorClass == "" {
 				out.ErrorClass = Classify(err)
 			}
@@ -108,11 +118,15 @@ func (b *LocalHTTP) Invoke(parent context.Context, r Request) (out Result, err e
 	b.mu.Unlock()
 	defer func() { b.mu.Lock(); delete(b.active, r.ID); b.mu.Unlock() }()
 	payload := struct {
-		Model     string              `json:"model"`
-		Messages  []map[string]string `json:"messages"`
-		MaxTokens int                 `json:"max_tokens"`
-		Stream    bool                `json:"stream"`
-	}{b.model, []map[string]string{{"role": "user", "content": r.Context}}, r.MaxOutputTokens, false}
+		Model         string              `json:"model"`
+		Messages      []map[string]string `json:"messages"`
+		MaxTokens     int                 `json:"max_tokens"`
+		Stream        bool                `json:"stream"`
+		StreamOptions map[string]bool     `json:"stream_options,omitempty"`
+	}{b.model, []map[string]string{{"role": "user", "content": r.Context}}, r.MaxOutputTokens, b.streaming, nil}
+	if b.streaming {
+		payload.StreamOptions = map[string]bool{"include_usage": true}
+	}
 	data, _ := json.Marshal(payload)
 	req, e := http.NewRequestWithContext(ctx, "POST", b.endpoint+"/v1/chat/completions", bytes.NewReader(data))
 	if e != nil {
@@ -138,6 +152,17 @@ func (b *LocalHTTP) Invoke(parent context.Context, r Request) (out Result, err e
 		err = fmt.Errorf("inference HTTP %d", res.StatusCode)
 		return
 	}
+	if b.streaming {
+		if !strings.HasPrefix(strings.ToLower(res.Header.Get("Content-Type")), "text/event-stream") {
+			err = fmt.Errorf("SSE content type required")
+			return
+		}
+		out, err = b.readStream(res.Body, r, start)
+		if ctx.Err() != nil {
+			err = ctx.Err()
+		}
+		return
+	}
 	limit := int64(r.MaxOutputTokens*16 + 65536)
 	data, err = io.ReadAll(io.LimitReader(res.Body, limit+1))
 	if err != nil {
@@ -160,6 +185,10 @@ func (b *LocalHTTP) Invoke(parent context.Context, r Request) (out Result, err e
 			Completion *int `json:"completion_tokens"`
 		} `json:"usage"`
 	}
+	if !utf8.Valid(data) {
+		err = fmt.Errorf("invalid UTF-8 response")
+		return
+	}
 	if err = json.Unmarshal(data, &wire); err != nil {
 		return
 	}
@@ -173,6 +202,10 @@ func (b *LocalHTTP) Invoke(parent context.Context, r Request) (out Result, err e
 	}
 	if wire.Choices[0].Finish != "stop" {
 		err = fmt.Errorf("incomplete generation: %s", wire.Choices[0].Finish)
+		return
+	}
+	if len(wire.Choices[0].Message.Content) > r.MaxOutputTokens*16 {
+		err = fmt.Errorf("output byte limit")
 		return
 	}
 	out.Text = wire.Choices[0].Message.Content

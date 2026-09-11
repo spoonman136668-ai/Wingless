@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/spoonman136668-ai/Wingless/resources"
 	"time"
+	"unicode/utf8"
 )
 
 type Request struct {
@@ -21,7 +22,7 @@ type Request struct {
 }
 
 func (r Request) Validate() error {
-	if r.ID == "" || r.ParentWorkID == "" || r.Workspace == "" || r.Role == "" || len(r.Capabilities) == 0 || r.MaxContextBytes <= 0 || r.MaxContextBytes > 1048576 || len(r.Context) > r.MaxContextBytes || r.MaxOutputTokens <= 0 || r.MaxOutputTokens > 32768 || r.Deadline.IsZero() || time.Until(r.Deadline) <= 0 || time.Until(r.Deadline) > 15*time.Minute {
+	if !utf8.ValidString(r.Context) || r.ID == "" || r.ParentWorkID == "" || r.Workspace == "" || r.Role == "" || len(r.Capabilities) == 0 || r.MaxContextBytes <= 0 || r.MaxContextBytes > 1048576 || len(r.Context) > r.MaxContextBytes || r.MaxOutputTokens <= 0 || r.MaxOutputTokens > 32768 || r.Deadline.IsZero() || time.Until(r.Deadline) <= 0 || time.Until(r.Deadline) > 15*time.Minute {
 		return errors.New("invalid or unbounded request")
 	}
 	return nil
