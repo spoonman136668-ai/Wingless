@@ -15,6 +15,12 @@ func main() {
 	}
 	var err error
 	switch os.Args[1] {
+	case "relationships":
+		var report ice.TypeReport
+		report, err = ice.Relationships(".")
+		if err == nil {
+			err = json.NewEncoder(os.Stdout).Encode(report)
+		}
 	case "build":
 		err = ice.Save(".")
 	case "validate":

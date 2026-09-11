@@ -17,6 +17,13 @@ type unknown struct{}
 
 func (unknown) Snapshot() (resources.Metrics, error) { return resources.Metrics{}, nil }
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "gpu" {
+		if e := runGPU(os.Args[2:]); e != nil {
+			fmt.Fprintln(os.Stderr, e)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) > 1 && os.Args[1] == "local-benchmark" {
 		if e := runLocal(os.Args[2:]); e != nil {
 			fmt.Fprintln(os.Stderr, e)

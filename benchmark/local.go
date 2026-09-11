@@ -2,7 +2,7 @@ package benchmark
 
 import (
 	"context"
-	"encoding/json"
+
 	"fmt"
 	"github.com/spoonman136668-ai/Wingless/inference"
 	"github.com/spoonman136668-ai/Wingless/resources"
@@ -14,6 +14,14 @@ import (
 )
 
 type LocalRow struct {
+	ProcessError      *string                   `json:"process_error"`
+	Repetition        int                       `json:"repetition"`
+	SemanticCorrect   bool                      `json:"semantic_correct"`
+	ProtocolCompliant bool                      `json:"protocol_compliant"`
+	StrictCorrect     bool                      `json:"strict_correct"`
+	ProcessBefore     *resources.ProcessMetrics `json:"process_before"`
+	ProcessAfter      *resources.ProcessMetrics `json:"process_after"`
+
 	Task                  string           `json:"task"`
 	Correct               bool             `json:"correct"`
 	Error                 string           `json:"error,omitempty"`
@@ -21,6 +29,10 @@ type LocalRow struct {
 	OutputTokensPerSecond *float64         `json:"output_tokens_per_second"`
 }
 type LocalReport struct {
+	Provenance Provenance          `json:"provenance"`
+	Variance   map[string]Variance `json:"variance"`
+	Profile    string              `json:"profile"`
+
 	Version       int        `json:"version"`
 	OS            string     `json:"os"`
 	Arch          string     `json:"arch"`
@@ -75,26 +87,21 @@ func codeShape(text string) bool {
 
 // RunLocal uses fixed public microfixtures. It executes no generated code or tools.
 func RunLocal(ctx context.Context, b inference.InferenceBackend, h resources.Provider, repeats int) (LocalReport, error) {
-	out := LocalReport{Version: 1, OS: runtime.GOOS, Arch: runtime.GOARCH, CPUs: runtime.NumCPU(), ResourceScope: "OS host, not per-process/container allocation", StartedAt: time.Now().UTC(), Acceptance: "external_required"}
+	out := LocalReport{Version: 2, OS: runtime.GOOS, Arch: runtime.GOARCH, CPUs: runtime.NumCPU(), ResourceScope: "OS host, not per-process/container allocation", StartedAt: time.Now().UTC(), Acceptance: "external_required"}
 	if repeats < 1 || repeats > 3 {
 		return out, fmt.Errorf("repeats must be 1..3")
 	}
 	if e := b.Health(ctx); e != nil {
 		return out, e
 	}
-	fixtures := []struct {
-		id, prompt string
-		check      func(string) bool
-	}{{"json-arithmetic", "Return only the JSON object {\"sum\":5}. No markdown or explanation.", func(s string) bool {
-		var obj map[string]json.RawMessage
-		if json.Unmarshal([]byte(s), &obj) != nil || len(obj) != 1 {
-			return false
-		}
-		var n int
-		return json.Unmarshal(obj["sum"], &n) == nil && n == 5
-	}}, {"go-add-shape", "Return Go source only, no markdown or explanations: package candidate followed by func Add(a, b int) int { return a + b }.", codeShape}}
+	fixtures := codingFixtures()
+
 	for n := 0; n < repeats; n++ {
+		plan := ""
 		for _, f := range fixtures {
+			if f.id == "plan-implementation" {
+				f.prompt += "\nProposed plan (untrusted):\n" + plan
+			}
 			if e := ctx.Err(); e != nil {
 				return out, e
 			}
@@ -106,9 +113,24 @@ func RunLocal(ctx context.Context, b inference.InferenceBackend, h resources.Pro
 				return out, e
 			}
 			r := inference.Request{ID: fmt.Sprintf("local-%d-%s", n, f.id), ParentWorkID: "local-public-microfixtures", Role: "code", Context: f.prompt, MaxContextBytes: 4096, MaxOutputTokens: 128, Deadline: time.Now().Add(60 * time.Second), Workspace: "no-workspace-access", Capabilities: []string{"code"}}
+			var processBefore *resources.ProcessMetrics
+			var processErr error
+			if observer, ok := h.(processObserver); ok {
+				processBefore, processErr = observer.ProcessSnapshot()
+			}
 			result, e := b.Invoke(ctx, r)
 			after, sampleErr := h.Snapshot()
-			row := LocalRow{Task: f.id, Result: result}
+			row := LocalRow{Task: f.id, Result: result, Repetition: n, ProcessBefore: processBefore}
+			if observer, ok := h.(processObserver); ok {
+				row.ProcessAfter, processErr = observer.ProcessSnapshot()
+			}
+			if processErr != nil {
+				message := processErr.Error()
+				row.ProcessError = &message
+			}
+			if f.id == "plan" {
+				plan = result.Text
+			}
 			row.Result.Telemetry.Before = &before
 			if sampleErr == nil {
 				row.Result.Telemetry.After = &after
@@ -118,7 +140,10 @@ func RunLocal(ctx context.Context, b inference.InferenceBackend, h resources.Pro
 			} else if sampleErr != nil {
 				row.Error = sampleErr.Error()
 			} else {
-				row.Correct = f.check(result.Text)
+				row.SemanticCorrect = f.check(semanticCandidate(result.Text))
+				row.ProtocolCompliant = f.protocol(result.Text)
+				row.StrictCorrect = row.ProtocolCompliant && row.SemanticCorrect
+				row.Correct = row.StrictCorrect
 			}
 			if result.Usage.OutputTokens != nil && result.Telemetry.GenerationMS != nil && *result.Telemetry.GenerationMS > 0 {
 				v := 1000 * float64(*result.Usage.OutputTokens) / float64(*result.Telemetry.GenerationMS)
@@ -127,5 +152,6 @@ func RunLocal(ctx context.Context, b inference.InferenceBackend, h resources.Pro
 			out.Rows = append(out.Rows, row)
 		}
 	}
+	out.Variance = summarize(out.Rows)
 	return out, nil
 }

@@ -55,6 +55,11 @@ func (m *Mock) Invoke(parent context.Context, r Request) (out Result, err error)
 	if err = r.Validate(); err != nil {
 		return
 	}
+	if r.OutputConstraint != nil {
+		err = fmt.Errorf("output constraint capability unavailable")
+		return
+	}
+
 	if err = m.Health(parent); err != nil {
 		return
 	}

@@ -74,6 +74,11 @@ func (s *Service) SubmitWork(parent context.Context, r inference.Request) (strin
 	}
 	ctx, c := context.WithDeadline(parent, r.Deadline)
 	r.Capabilities = append([]string(nil), r.Capabilities...)
+	if r.OutputConstraint != nil {
+		c := *r.OutputConstraint
+		c.Schema = append([]byte(nil), c.Schema...)
+		r.OutputConstraint = &c
+	}
 	j := &job{status: "running", cancel: c}
 	s.jobs[r.ID] = j
 	s.active = true

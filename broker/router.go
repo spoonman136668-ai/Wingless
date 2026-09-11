@@ -88,7 +88,7 @@ func Select(ctx context.Context, reg *Registry, req inference.Request, p Policy,
 	tier := "fast"
 	switch p.Reason {
 	case "", "routine":
-	case "low_confidence", "hard_failure", "ambiguous_architecture", "explicit_deep":
+	case "low_confidence", "hard_failure", "protocol_failure", "ambiguous_architecture", "explicit_deep":
 		if !p.AllowDeep && p.Explicit == "" {
 			return nil, d, fmt.Errorf("deep escalation unauthorized")
 		}

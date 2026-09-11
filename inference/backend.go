@@ -9,19 +9,23 @@ import (
 )
 
 type Request struct {
-	ID              string           `json:"request_id"`
-	ParentWorkID    string           `json:"parent_work_id"`
-	Role            string           `json:"role"`
-	Context         string           `json:"context"`
-	MaxContextBytes int              `json:"max_context_bytes"`
-	MaxOutputTokens int              `json:"max_output_tokens"`
-	Deadline        time.Time        `json:"deadline"`
-	Workspace       string           `json:"workspace"`
-	Capabilities    []string         `json:"capabilities"`
-	Resources       resources.Policy `json:"resources"`
+	OutputConstraint *OutputConstraint `json:"output_constraint,omitempty"`
+	ID               string            `json:"request_id"`
+	ParentWorkID     string            `json:"parent_work_id"`
+	Role             string            `json:"role"`
+	Context          string            `json:"context"`
+	MaxContextBytes  int               `json:"max_context_bytes"`
+	MaxOutputTokens  int               `json:"max_output_tokens"`
+	Deadline         time.Time         `json:"deadline"`
+	Workspace        string            `json:"workspace"`
+	Capabilities     []string          `json:"capabilities"`
+	Resources        resources.Policy  `json:"resources"`
 }
 
 func (r Request) Validate() error {
+	if e := r.OutputConstraint.Validate(); e != nil {
+		return e
+	}
 	if !utf8.ValidString(r.Context) || r.ID == "" || r.ParentWorkID == "" || r.Workspace == "" || r.Role == "" || len(r.Capabilities) == 0 || r.MaxContextBytes <= 0 || r.MaxContextBytes > 1048576 || len(r.Context) > r.MaxContextBytes || r.MaxOutputTokens <= 0 || r.MaxOutputTokens > 32768 || r.Deadline.IsZero() || time.Until(r.Deadline) <= 0 || time.Until(r.Deadline) > 15*time.Minute {
 		return errors.New("invalid or unbounded request")
 	}

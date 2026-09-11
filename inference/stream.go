@@ -29,6 +29,7 @@ func (b *LocalHTTP) readStream(body io.Reader, r Request, start time.Time) (Resu
 	reader := &io.LimitedReader{R: body, N: limit + 1}
 	scan := bufio.NewScanner(reader)
 	scan.Buffer(make([]byte, 4096), r.MaxOutputTokens*16+65536)
+	seenUsage := false
 	finished := false
 	done := false
 	data := ""
@@ -40,6 +41,9 @@ func (b *LocalHTTP) readStream(body io.Reader, r Request, start time.Time) (Resu
 		payload := strings.TrimSuffix(data, "\n")
 		data = ""
 		if payload == "[DONE]" {
+			if done {
+				return fmt.Errorf("duplicate completion")
+			}
 			if !finished {
 				return fmt.Errorf("stream ended before stop")
 			}
@@ -75,6 +79,10 @@ func (b *LocalHTTP) readStream(body io.Reader, r Request, start time.Time) (Resu
 			return fmt.Errorf("invalid stream model/error/choices")
 		}
 		if chunk.Usage != nil {
+			if seenUsage {
+				return fmt.Errorf("duplicate usage event")
+			}
+			seenUsage = true
 			out.Usage = Usage{chunk.Usage.Prompt, chunk.Usage.Output}
 			if !usageValid(out.Usage, r.MaxOutputTokens) {
 				return fmt.Errorf("stream token budget exceeded")
@@ -116,9 +124,7 @@ func (b *LocalHTTP) readStream(body io.Reader, r Request, start time.Time) (Resu
 			if e := event(); e != nil {
 				return out, e
 			}
-			if done {
-				break
-			}
+
 			continue
 		}
 		if strings.HasPrefix(line, "data:") {

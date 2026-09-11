@@ -106,6 +106,11 @@ func (b *LocalHTTP) Invoke(parent context.Context, r Request) (out Result, err e
 	if err = r.Validate(); err != nil {
 		return
 	}
+	if r.OutputConstraint != nil {
+		err = fmt.Errorf("output constraint capability unavailable")
+		return
+	}
+
 	ctx, c := context.WithDeadline(parent, r.Deadline)
 	defer c()
 	b.mu.Lock()
