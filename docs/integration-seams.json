@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "status": "provisional; integration deferred",
+  "version": 2,
+  "status": "BLOCKED: stabilized plane source not supplied; all plane-facing contracts remain provisional",
   "seams": [
     {
       "module": "worker",
@@ -11,7 +11,15 @@
       "authority_boundary": "plane owns queue, dispatch and acceptance",
       "failure_semantics": "busy/duplicate/full rejected; terminal operator_blocked",
       "risk_if_plane_differs": "plane may require durable asynchronous resume",
-      "reconciliation_action": "map IDs, retention, leases and recovery to authoritative plane contract"
+      "reconciliation_action": "map IDs, retention, leases and recovery to authoritative plane contract",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "plane may require durable asynchronous resume",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "ADAPTER_ONLY"
     },
     {
       "module": "broker",
@@ -22,7 +30,15 @@
       "authority_boundary": "caller config authorizes routing; output does not",
       "failure_semantics": "no allowed healthy capable backend => blocked",
       "risk_if_plane_differs": "plane authorization schema may differ",
-      "reconciliation_action": "translate signed/validated plane envelope without widening permissions"
+      "reconciliation_action": "translate signed/validated plane envelope without widening permissions",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "plane authorization schema may differ",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "KEEP_INTERNAL"
     },
     {
       "module": "inference",
@@ -33,7 +49,15 @@
       "authority_boundary": "inference outputs candidates only",
       "failure_semantics": "typed timeout/canceled/HTTP failure; no implicit retry",
       "risk_if_plane_differs": "plane may mandate artifacts rather than text",
-      "reconciliation_action": "version result envelope and artifact exchange before integration"
+      "reconciliation_action": "version result envelope and artifact exchange before integration",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "plane may mandate artifacts rather than text",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "KEEP_INTERNAL"
     },
     {
       "module": "resources",
@@ -44,7 +68,15 @@
       "authority_boundary": "trusted provider; request policy cannot come from model",
       "failure_semantics": "missing required metric denies; provider error blocks",
       "risk_if_plane_differs": "plane may reserve resources or manage processes itself",
-      "reconciliation_action": "reconcile reservation ownership; add context-aware Windows collector"
+      "reconciliation_action": "Reconcile reservation ownership; Stage 3 already supplies Windows host collectors, with native proof still outstanding.",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "plane may reserve resources or manage processes itself",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "KEEP_INTERNAL"
     },
     {
       "module": "contextbroker",
@@ -55,7 +87,15 @@
       "authority_boundary": "ICE advisory; source hashes checked",
       "failure_semantics": "stale or over-budget provider fails",
       "risk_if_plane_differs": "plane may supply revision-bound source provider",
-      "reconciliation_action": "bind ICE root and source revision to isolated workspace lease"
+      "reconciliation_action": "Bind ICE root, workspace identity and source revision using the actual plane contract; do not assume a lease exists.",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "plane may supply revision-bound source provider",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "KEEP_INTERNAL"
     },
     {
       "module": "toolboundary",
@@ -66,7 +106,15 @@
       "authority_boundary": "caller grants tool/path; model only proposes",
       "failure_semantics": "deny escapes/nonregular/oversize/canceled reads",
       "risk_if_plane_differs": "plane may require compiler/edit tools and OS sandbox",
-      "reconciliation_action": "delegate future writes/processes to stabilized plane executor; do not expand shell access"
+      "reconciliation_action": "delegate future writes/processes to stabilized plane executor; do not expand shell access",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "plane may require compiler/edit tools and OS sandbox",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "ADAPTER_ONLY"
     },
     {
       "module": "broker verification",
@@ -77,7 +125,15 @@
       "authority_boundary": "fixture verdict is not plane acceptance",
       "failure_semantics": "failed checks escalate only if authorized; otherwise blocked",
       "risk_if_plane_differs": "plane may own all retries",
-      "reconciliation_action": "disable local repairs when plane owns retry budget"
+      "reconciliation_action": "disable local repairs when plane owns retry budget",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "plane may own all retries",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "KEEP_INTERNAL"
     },
     {
       "module": "inference lifecycle",
@@ -88,7 +144,15 @@
       "authority_boundary": "no process launch permission implied",
       "failure_semantics": "invalid transition rejected",
       "risk_if_plane_differs": "plane may own runtime lifecycle",
-      "reconciliation_action": "reconcile supervisor; attach transition state to managed backend before real deployment"
+      "reconciliation_action": "reconcile supervisor; attach transition state to managed backend before real deployment",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "plane may own runtime lifecycle",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "KEEP_INTERNAL"
     },
     {
       "module": "benchmark",
@@ -99,18 +163,34 @@
       "authority_boundary": "exact fixture comparison is research evidence only",
       "failure_semantics": "unsupported configurations return unavailable",
       "risk_if_plane_differs": "real coding acceptance more complex than exact text",
-      "reconciliation_action": "add isolated coding fixtures and authoritative acceptance adapter"
+      "reconciliation_action": "add isolated coding fixtures and authoritative acceptance adapter",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "real coding acceptance more complex than exact text",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "KEEP_INTERNAL"
     },
     {
       "module": "modelhost (independent experiment)",
       "assumed_external_interface": "none activated; operator-owned Config only",
       "reason": "verify local inference lifecycle without plane contracts",
       "expected_plane_point": "deferred worker-runtime reconciliation",
-      "data_contract": "pinned executable/model, bounded CPU-only config and process evidence",
+      "data_contract": "Pinned executable/model; bounded CPU and experimental GPU configuration; process evidence; hardware qualification separate.",
       "authority_boundary": "no model-proposed execution and no plane authority",
       "failure_semantics": "startup/runtime failure stops owned child; no automatic retry",
       "risk_if_plane_differs": "plane may own inference runtime lifecycle",
-      "reconciliation_action": "reconcile lifecycle ownership before exposing any plane adapter"
+      "reconciliation_action": "reconcile lifecycle ownership before exposing any plane adapter",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "plane may own inference runtime lifecycle",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "KEEP_INTERNAL"
     },
     {
       "module": "stage3 internal telemetry and output contracts",
@@ -121,7 +201,26 @@
       "authority_boundary": "no resource lease, generic process tool or acceptance grant",
       "failure_semantics": "required missing telemetry denies; unsupported constraints/profiles report unavailable",
       "risk_if_plane_differs": "plane may own lifecycle, resource reservations and output schemas",
-      "reconciliation_action": "map only after stabilized source; preserve one authority"
+      "reconciliation_action": "map only after stabilized source; preserve one authority",
+      "status": "BLOCKED",
+      "plane_source_reference": null,
+      "wingless_reference": "docs/worker-protocol.md",
+      "owner_basis": "Stage 3.5 requested architecture; not verified against plane implementation",
+      "translation_rules": "Undefined until frozen plane contract is inspected. Existing data_contract is a provisional Wingless description only.",
+      "remaining_uncertainty": "plane may own lifecycle, resource reservations and output schemas",
+      "test_coverage": "No plane contract replay tests added; actual plane fixtures unavailable.",
+      "disposition": "KEEP_INTERNAL"
     }
-  ]
+  ],
+  "reconciliation": {
+    "stage": "3.5",
+    "wingless_baseline": "584c92a04b9a9944fee491cc59a4025ea4143ffc",
+    "plane_source": null,
+    "plane_branch": null,
+    "plane_commit": null,
+    "plane_snapshot_timestamp": null,
+    "plane_acceptance_evidence": [],
+    "live_activation": false,
+    "readiness": "NOT_READY_FOR_ISOLATED_INTEGRATION_PROOF"
+  }
 }
