@@ -6,6 +6,7 @@ Set-Location $Repo
 $ExpectedPlaneSource = "539d56fec273c8851aea131cf4d31425a62f7250"
 $EvidenceDir = Join-Path $Repo "evidence"
 $EvidencePath = Join-Path $EvidenceDir "stage3-5-isolated-plane-integration.json"
+$TempBuild = Join-Path $env:TEMP "wingless-stage3-5-proof.exe"
 New-Item -ItemType Directory -Path $EvidenceDir -Force | Out-Null
 
 function Invoke-Checked {
@@ -70,9 +71,18 @@ Invoke-Checked "run full Wingless repository suite" {
         Tee-Object -FilePath $FullLog
 }
 
-Invoke-Checked "build Wingless command" {
-    go build -buildvcs=false ./cmd/wingless 2>&1 |
-        Tee-Object -FilePath $BuildLog
+if (Test-Path -LiteralPath $TempBuild) {
+    Remove-Item -LiteralPath $TempBuild -Force
+}
+try {
+    Invoke-Checked "build Wingless command" {
+        go build -buildvcs=false -o $TempBuild ./cmd/wingless 2>&1 |
+            Tee-Object -FilePath $BuildLog
+    }
+} finally {
+    if (Test-Path -LiteralPath $TempBuild) {
+        Remove-Item -LiteralPath $TempBuild -Force
+    }
 }
 
 $Head = ""
