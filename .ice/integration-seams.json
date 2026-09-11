@@ -1,127 +1,32 @@
 {
-  "version": 1,
-  "status": "provisional; integration deferred",
+  "version": 2,
+  "status": "reconciled_against_frozen_windows_accepted_ckb_plane",
+  "plane_source": {
+    "repository": "spoonman136668-ai/ckb-plane",
+    "commit": "539d56fec273c8851aea131cf4d31425a62f7250",
+    "acceptance": "acceptance/frozen-contract-closeout-20260911.json"
+  },
   "seams": [
-    {
-      "module": "worker",
-      "assumed_external_interface": "SubmitWork / Status / Cancel / Result / Health / Capabilities",
-      "reason": "narrow independently testable worker boundary",
-      "expected_plane_point": "future worker adapter",
-      "data_contract": "Request + Outcome; in-memory IDs; shared deadline",
-      "authority_boundary": "plane owns queue, dispatch and acceptance",
-      "failure_semantics": "busy/duplicate/full rejected; terminal operator_blocked",
-      "risk_if_plane_differs": "plane may require durable asynchronous resume",
-      "reconciliation_action": "map IDs, retention, leases and recovery to authoritative plane contract"
-    },
-    {
-      "module": "broker",
-      "assumed_external_interface": "trusted route Policy and backend allowlist",
-      "reason": "models must not select their own authority",
-      "expected_plane_point": "dispatch policy",
-      "data_contract": "Explicit, AllowedBackends, AllowDeep, AllowFallback, MaxRepairs <= 8",
-      "authority_boundary": "caller config authorizes routing; output does not",
-      "failure_semantics": "no allowed healthy capable backend => blocked",
-      "risk_if_plane_differs": "plane authorization schema may differ",
-      "reconciliation_action": "translate signed/validated plane envelope without widening permissions"
-    },
-    {
-      "module": "inference",
-      "assumed_external_interface": "InferenceBackend",
-      "reason": "vendor-neutral bounded generation",
-      "expected_plane_point": "worker inference operation",
-      "data_contract": "Request carries IDs, role, context byte limit, token cap, absolute deadline, workspace identity, capabilities, resources",
-      "authority_boundary": "inference outputs candidates only",
-      "failure_semantics": "typed timeout/canceled/HTTP failure; no implicit retry",
-      "risk_if_plane_differs": "plane may mandate artifacts rather than text",
-      "reconciliation_action": "version result envelope and artifact exchange before integration"
-    },
-    {
-      "module": "resources",
-      "assumed_external_interface": "Provider.Snapshot + Policy",
-      "reason": "fail closed on unknown required floors",
-      "expected_plane_point": "pre-inference host budget check",
-      "data_contract": "nullable metrics; RAM/VRAM/disk floors; CPU ceiling",
-      "authority_boundary": "trusted provider; request policy cannot come from model",
-      "failure_semantics": "missing required metric denies; provider error blocks",
-      "risk_if_plane_differs": "plane may reserve resources or manage processes itself",
-      "reconciliation_action": "reconcile reservation ownership; add context-aware Windows collector"
-    },
-    {
-      "module": "contextbroker",
-      "assumed_external_interface": "Provider.Retrieve",
-      "reason": "bounded source context",
-      "expected_plane_point": "workspace materialization output",
-      "data_contract": "query + byte budget -> source snippets",
-      "authority_boundary": "ICE advisory; source hashes checked",
-      "failure_semantics": "stale or over-budget provider fails",
-      "risk_if_plane_differs": "plane may supply revision-bound source provider",
-      "reconciliation_action": "bind ICE root and source revision to isolated workspace lease"
-    },
-    {
-      "module": "toolboundary",
-      "assumed_external_interface": "Execute with caller-owned Policy",
-      "reason": "no model shell authority",
-      "expected_plane_point": "isolated tool executor",
-      "data_contract": "read_file proposal; exact allowed paths; rooted read; byte/time policy",
-      "authority_boundary": "caller grants tool/path; model only proposes",
-      "failure_semantics": "deny escapes/nonregular/oversize/canceled reads",
-      "risk_if_plane_differs": "plane may require compiler/edit tools and OS sandbox",
-      "reconciliation_action": "delegate future writes/processes to stabilized plane executor; do not expand shell access"
-    },
-    {
-      "module": "broker verification",
-      "assumed_external_interface": "Verifier.Verify",
-      "reason": "bounded deterministic repair",
-      "expected_plane_point": "plane acceptance/test evidence",
-      "data_contract": "trusted verifier error; at most MaxRepairs+1 attempts; shared deadline",
-      "authority_boundary": "fixture verdict is not plane acceptance",
-      "failure_semantics": "failed checks escalate only if authorized; otherwise blocked",
-      "risk_if_plane_differs": "plane may own all retries",
-      "reconciliation_action": "disable local repairs when plane owns retry budget"
-    },
-    {
-      "module": "inference lifecycle",
-      "assumed_external_interface": "Lifecycle.Move",
-      "reason": "explicit lifecycle transitions",
-      "expected_plane_point": "future local model supervisor",
-      "data_contract": "STOPPED/STARTING/READY/BUSY/IDLE/DRAINING/FAILED/UNAVAILABLE",
-      "authority_boundary": "no process launch permission implied",
-      "failure_semantics": "invalid transition rejected",
-      "risk_if_plane_differs": "plane may own runtime lifecycle",
-      "reconciliation_action": "reconcile supervisor; attach transition state to managed backend before real deployment"
-    },
-    {
-      "module": "benchmark",
-      "assumed_external_interface": "Replay B/C/D plus future A/E/F/G",
-      "reason": "compare identical deterministic fixtures",
-      "expected_plane_point": "offline experiment harness",
-      "data_contract": "fixture ID/prompt/expected; per-attempt result and route",
-      "authority_boundary": "exact fixture comparison is research evidence only",
-      "failure_semantics": "unsupported configurations return unavailable",
-      "risk_if_plane_differs": "real coding acceptance more complex than exact text",
-      "reconciliation_action": "add isolated coding fixtures and authoritative acceptance adapter"
-    },
-    {
-      "module": "modelhost (independent experiment)",
-      "assumed_external_interface": "none activated; operator-owned Config only",
-      "reason": "verify local inference lifecycle without plane contracts",
-      "expected_plane_point": "deferred worker-runtime reconciliation",
-      "data_contract": "pinned executable/model, bounded CPU-only config and process evidence",
-      "authority_boundary": "no model-proposed execution and no plane authority",
-      "failure_semantics": "startup/runtime failure stops owned child; no automatic retry",
-      "risk_if_plane_differs": "plane may own inference runtime lifecycle",
-      "reconciliation_action": "reconcile lifecycle ownership before exposing any plane adapter"
-    },
-    {
-      "module": "stage3 internal telemetry and output contracts",
-      "assumed_external_interface": "none activated; GPUProvider, ProcessProbe, OutputConstraint remain internal/provisional",
-      "reason": "measure hardware and protocol behavior before integration",
-      "expected_plane_point": "future resource provider and worker request reconciliation",
-      "data_contract": "nullable hardware/process samples; bounded output constraint; independent benchmark scores",
-      "authority_boundary": "no resource lease, generic process tool or acceptance grant",
-      "failure_semantics": "required missing telemetry denies; unsupported constraints/profiles report unavailable",
-      "risk_if_plane_differs": "plane may own lifecycle, resource reservations and output schemas",
-      "reconciliation_action": "map only after stabilized source; preserve one authority"
-    }
-  ]
+    {"module":"worker","classification":"ADAPTER_REQUIRED","owner":"plane_lifecycle","wingless":"internal_intelligence","reference":"integration/ckbplane"},
+    {"module":"broker","classification":"WINGLESS_OWNS","owner":"wingless","constraint":"plane_driven_max_repairs_0"},
+    {"module":"inference","classification":"WINGLESS_OWNS","owner":"wingless","constraint":"candidate_only_external_required"},
+    {"module":"resources","classification":"WINGLESS_OWNS","owner":"wingless_measurement","constraint":"measurement_not_allocation_lease"},
+    {"module":"contextbroker","classification":"WINGLESS_OWNS","owner":"wingless","constraint":"bind_work_order_workspace_baseline_sha"},
+    {"module":"toolboundary","classification":"ADAPTER_REQUIRED","owner":"plane_write_process_authority","constraint":"wingless_read_only"},
+    {"module":"broker_verification","classification":"OBSOLETE","owner":"internal_research_only","constraint":"no_plane_retry_or_acceptance"},
+    {"module":"inference_lifecycle","classification":"WINGLESS_OWNS","owner":"wingless","constraint":"cannot_mutate_plane_lifecycle"},
+    {"module":"benchmark","classification":"WINGLESS_OWNS","owner":"wingless_research"},
+    {"module":"modelhost","classification":"WINGLESS_OWNS","owner":"wingless_independent_experiment"},
+    {"module":"stage3_telemetry_output","classification":"WINGLESS_OWNS","owner":"wingless_evidence"}
+  ],
+  "plane_owns": ["work_orders","authorization_contract","queue_dispatch","workspace_materialization","retry_reconciliation","cancel_control","acceptance","authoritative_evidence"],
+  "adapter": {
+    "path": "integration/ckbplane",
+    "active": false,
+    "transport": false,
+    "plane_mutation": false,
+    "repair_budget": 0
+  },
+  "activation_blocker": "frozen plane worker.preferred permits only fake or codex; no wingless worker kind exists",
+  "readiness": "READY_FOR_ISOLATED_INTEGRATION_PROOF"
 }
