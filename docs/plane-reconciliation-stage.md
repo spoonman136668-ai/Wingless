@@ -1,6 +1,6 @@
 # Plane reconciliation — Stage 3.5
 
-State: **READY_FOR_ISOLATED_INTEGRATION_PROOF**
+State: **ISOLATED_INTEGRATION_PROOF_ACCEPTED**
 
 ## Frozen and accepted plane input
 
@@ -15,25 +15,11 @@ Wingless reconciles against one immutable plane source only:
 - Go files: 75
 - source bytes: 758340
 
-The exact source was re-qualified on authoritative Windows PowerShell and sealed as `acceptance/frozen-contract-closeout-20260911.json` in ckb-plane. The closeout established:
+The exact source was re-qualified on authoritative Windows PowerShell and sealed as `acceptance/frozen-contract-closeout-20260911.json` in ckb-plane. The closeout established manifest verification, exact live-source equality, focused post-DT regressions PASS, full `internal/plane` suite PASS, frozen `cmd/ckb-plane` build PASS, authority=`plane`, controller paused with fresh heartbeat, accepted-ref mutation disabled, and original GitHub runner stopped.
 
-- frozen manifest verification: PASS;
-- live contract source equals frozen snapshot: true;
-- focused post-DT regressions: PASS;
-- full `internal/plane` suite: PASS;
-- frozen `cmd/ckb-plane` build: PASS;
-- authority: `plane`;
-- controller paused with fresh heartbeat;
-- accepted-ref mutation disabled;
-- original GitHub runner stopped.
-
-The observed controller was operator-blocked on an unrelated product work order during verification. That state did not invalidate or mutate the frozen contract closeout.
-
-Historical DN/DO/DP/DT evidence remains supplemental provenance; it is no longer required to infer source identity because the exact frozen source itself has a direct Windows acceptance binding.
+Historical DN/DO/DP/DT evidence remains supplemental provenance; exact source identity is now established directly by the frozen-source Windows closeout.
 
 ## Reconciled ownership
-
-Source inspection confirms the intended one-authority architecture:
 
 | Concern | Authoritative owner | Reconciled disposition |
 | --- | --- | --- |
@@ -51,61 +37,76 @@ Source inspection confirms the intended one-authority architecture:
 | Write/process tool authority | ckb-plane boundary | `ADAPTER_REQUIRED` |
 | Worker protocol translation | shared boundary | `ADAPTER_REQUIRED` |
 
-Key frozen source references are `internal/plane/model.go`, `worker.go`, `contracts.go`, `profile_workspace.go`, `profile_workspace_materialize.go`, `autonomy_retry.go` and `autonomy_controls.go`.
+The frozen plane worker contract is synchronous `Worker.Run(ctx, workspace, WorkOrder, stdout, stderr)`. Wingless's `worker.Boundary` (`SubmitWork/Status/Cancel/Result`) is therefore internal only; it is not projected as plane lifecycle.
 
-The plane worker contract is synchronous `Worker.Run(ctx, workspace, WorkOrder, stdout, stderr)`. Wingless's existing `worker.Boundary` (`SubmitWork/Status/Cancel/Result`) is therefore retained as an internal in-memory service only; it is not projected as plane lifecycle.
+## Inactive adapter
 
-## Inactive adapter implemented
+`integration/ckbplane` is a pure, non-default translation/replay layer with no network listener, controller transport, queue write, worker launch, accepted-ref access, generic process authority, or live-plane mutation.
 
-`integration/ckbplane` now contains a pure, non-default adapter/replay layer. It has no network listener, local-controller transport, queue write, worker launch, accepted-ref access, process execution or live-plane mutation.
+It pins the frozen plane source identity, consumes verified work-order/workspace identity, requires exact baseline agreement and plane protection gates, rejects stale identity and unknown fields, passes only trusted local routing/resource policy, forces `Repairs=0` and `MaxRepairs=0`, maps cancellation cooperatively, emits candidate-only output with `external_required`, and rejects any Wingless acceptance claim or unknown terminal state.
 
-The adapter:
+## Isolated integration proof — accepted
 
-- pins the frozen plane source identity in code;
-- consumes a normalized subset of verified plane `WorkOrder` facts plus plane-owned workspace binding;
-- deterministically maps work-order ID + attempt to a Wingless request ID;
-- requires work-order/workspace ID agreement and exact baseline-SHA agreement;
-- requires the plane clean-baseline and accepted-ref protection gates;
-- rejects stale workspace revisions and unknown replay fields;
-- passes trusted local resource/routing policy into Wingless without treating it as a plane reservation;
-- forces `Repairs=0` and `MaxRepairs=0` for plane-driven work so Wingless cannot duplicate plane retry ownership;
-- maps plane cancellation into cooperative cancellation of the corresponding Wingless request while leaving authoritative terminal state to plane;
-- projects only candidate output with `external_required` acceptance;
-- rejects any Wingless acceptance claim or unknown terminal state.
+Authoritative Windows evidence is sealed in:
 
-Replay tests cover valid request translation, workspace identity mismatch, stale revision, protection-gate refusal, missing trusted backend policy, resource/routing translation, zero duplicate retry budget, cancellation mapping, candidate-only success, blocked backend outcome, acceptance-claim rejection, unknown-field refusal and unknown-terminal-state refusal.
+`acceptance/stage3-5-isolated-integration-20260911.json`
 
-## Validation state
+Accepted Wingless source commit:
 
-An isolated adapter compile/replay harness using the reconciled Wingless API shapes passed locally. This establishes the adapter's pure translation contract independently of live-plane state.
+`806740246fd4af5032b70f9025c43ec667fe8add`
 
-The repository's `native.yml` GitHub Actions workflow was also triggered by the adapter commits. Two attempts failed before step 1 on both `windows-latest` and `ubuntu-latest`: each job reported `runner_id=0` with an empty step list. No checkout, Go setup or test command ran. This is classified as hosted-runner infrastructure unavailability, not a source/test failure and not a green CI result.
+Frozen plane source commit:
 
-No live ckb-plane tests were performed by Wingless, and no queue/control mutation was used for reconciliation.
+`539d56fec273c8851aea131cf4d31425a62f7250`
 
-## Reconciled seam classification
+Windows toolchain:
 
-`docs/integration-seams.md`, `docs/integration-seams.json` and `.ice/integration-seams.json` now carry the source-backed classifications. The former all-`BLOCKED` inventory is retired.
+`go version go1.25.5 windows/amd64`
 
-Notable decisions:
+Accepted proof results:
 
-- `worker`: `ADAPTER_REQUIRED`;
-- `broker`, `inference`, `resources`, `contextbroker`, inference lifecycle, benchmark, modelhost and telemetry: `WINGLESS_OWNS` within their bounded intelligence/evidence role;
-- `toolboundary`: `ADAPTER_REQUIRED` for any write/process operation;
-- broker fixture verification as a plane retry/acceptance mechanism: `OBSOLETE`; internal offline research use remains allowed.
+- focused adapter/proof tests: PASS;
+- reconciled Wingless stack packages: PASS;
+- full Wingless repository suite: PASS;
+- Wingless build: PASS;
+- candidate acceptance remains `external_required`;
+- Wingless work-order retry budget remains `0`;
+- live plane transport used: false;
+- live plane queue mutated: false;
+- accepted refs mutated: false;
+- CKB runtime launched: false;
+- Coinbase/broker used: false;
+- credentials read: false;
+- production state touched: false.
 
-## Remaining blockers before live activation
+The accepted isolated proof exercised the actual adapter/broker/internal-worker stack with recorded/mock plane input and covered candidate success, authorized deep-to-fast fallback, backend failure with one attempt/no duplicate retry, and cancellation propagation.
 
-These blockers are intentionally outside Stage 3.5 isolated-readiness:
+GitHub hosted native CI remains separately classified as infrastructure-unavailable-before-step-1 because jobs were returned with `runner_id=0` and no executed steps. That infrastructure state does not replace or negate the authoritative Windows proof.
 
-1. **No plane Wingless worker kind exists.** Frozen `WorkOrder.Validate` permits only `fake` or `codex`. A future live integration must add an explicit plane-side Wingless worker contract; it must not alias Wingless to `codex` or bypass validation.
-2. **No live transport is authorized or implemented.** The current adapter is pure translation/replay only.
-3. **Write/process tools remain plane-owned.** Wingless's current tool boundary remains bounded/read-oriented.
-4. **Hardware qualification remains separate.** Native Windows/NVIDIA/CUDA inference, residency, process GPU attribution, Windows Job Object runtime containment and energy telemetry remain Stage 3 qualification items.
-5. **Activation requires a new isolated proof.** That proof must use mock/fixture plane inputs first and must not consume the live queue, change accepted refs, launch CKB, touch Coinbase/broker/credentials/production state or broaden authority.
+## Live activation blockers
 
-## Next proof
+The isolated proof does **not** authorize live activation. Remaining blockers are deliberate:
 
-The next permitted engineering step is an isolated integration proof that exercises the inactive adapter with recorded/mock plane fixtures and a Wingless mock backend. It should prove request translation, cancellation propagation, workspace/revision binding, authorized routing/fallback, backend failure evidence, candidate-only results and absence of duplicate retry ownership. Only after that proof should a proposal be made for the explicit plane-side Wingless worker contract.
+1. Frozen plane `WorkOrder.Validate` only accepts worker kinds `fake` and `codex`; no explicit `wingless` worker kind exists.
+2. No live plane↔Wingless transport is implemented or authorized.
+3. Plane must remain sole owner of queue, retry, cancellation terminal state, workspace lifetime, acceptance and evidence.
+4. Wingless must not acquire generic shell/write/process authority; write/process execution remains behind the plane contract.
+5. Hardware qualification remains separate: native NVIDIA/CUDA inference, model residency, process GPU attribution, Windows Job Object runtime containment and energy telemetry.
+6. Any future activation requires a new isolated Windows proof against the explicit plane-side Wingless worker contract before touching a live queue.
 
-READY_FOR_ISOLATED_INTEGRATION_PROOF
+## Next engineering stage
+
+The next permitted step is to design and test an **explicit plane-side `wingless` worker contract** without activating it.
+
+The contract must:
+
+- add `wingless` as an explicit validated worker kind rather than aliasing `codex`;
+- preserve the existing synchronous plane `Worker.Run` ownership model;
+- pass only plane-owned immutable work-order/workspace identity plus bounded intelligence policy;
+- keep plane-owned retry budget, cancellation terminal state, workspace lifecycle, acceptance and evidence unchanged;
+- keep Wingless output candidate-only;
+- fail closed on unsupported fields, stale identity, unknown state and unavailable backend;
+- have no implicit live transport or default registration;
+- include replay/unit coverage proving zero authority widening and zero duplicate retry ownership.
+
+**ISOLATED_INTEGRATION_PROOF_ACCEPTED**
