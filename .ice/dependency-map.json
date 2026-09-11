@@ -1,7 +1,14 @@
 {
+  "benchmark/fixtures.go": [
+    "encoding/json",
+    "go/parser",
+    "go/token",
+    "io",
+    "reflect",
+    "strings"
+  ],
   "benchmark/local.go": [
     "context",
-    "encoding/json",
     "fmt",
     "github.com/spoonman136668-ai/Wingless/inference",
     "github.com/spoonman136668-ai/Wingless/resources",
@@ -13,6 +20,13 @@
   ],
   "benchmark/local_test.go": [
     "testing"
+  ],
+  "benchmark/profile_test.go": [
+    "testing"
+  ],
+  "benchmark/provenance.go": [
+    "fmt",
+    "github.com/spoonman136668-ai/Wingless/resources"
   ],
   "benchmark/replay.go": [
     "context",
@@ -56,6 +70,13 @@
     "github.com/spoonman136668-ai/Wingless/ice",
     "os",
     "path/filepath"
+  ],
+  "cmd/wingless/gpu.go": [
+    "context",
+    "encoding/json",
+    "flag",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "os"
   ],
   "cmd/wingless/local.go": [
     "bytes",
@@ -128,6 +149,24 @@
     "path/filepath",
     "testing"
   ],
+  "ice/relationships.go": [
+    "fmt",
+    "go/ast",
+    "go/build",
+    "go/importer",
+    "go/parser",
+    "go/token",
+    "go/types",
+    "path/filepath",
+    "runtime",
+    "sort",
+    "strings"
+  ],
+  "ice/relationships_test.go": [
+    "os",
+    "path/filepath",
+    "testing"
+  ],
   "inference/backend.go": [
     "context",
     "errors",
@@ -144,6 +183,10 @@
     "net/http/httptest",
     "testing",
     "time"
+  ],
+  "inference/constraint.go": [
+    "encoding/json",
+    "fmt"
   ],
   "inference/lifecycle.go": [
     "fmt",
@@ -169,6 +212,15 @@
     "time",
     "unicode/utf8"
   ],
+  "inference/robustness_test.go": [
+    "context",
+    "fmt",
+    "io",
+    "net/http",
+    "net/http/httptest",
+    "strings",
+    "testing"
+  ],
   "inference/stream.go": [
     "bufio",
     "encoding/json",
@@ -191,6 +243,19 @@
     "encoding/json",
     "strings",
     "testing"
+  ],
+  "modelhost/containment_other.go": [
+    "os"
+  ],
+  "modelhost/containment_windows.go": [
+    "fmt",
+    "os",
+    "syscall",
+    "unsafe"
+  ],
+  "modelhost/containment_windows_other.go": [
+    "fmt",
+    "os"
   ],
   "modelhost/process_test.go": [
     "context",
@@ -260,6 +325,49 @@
     "time"
   ],
   "resources/host_windows.go": [
+    "fmt",
+    "syscall",
+    "unsafe"
+  ],
+  "resources/nvidia.go": [
+    "context",
+    "encoding/csv",
+    "fmt",
+    "io",
+    "math",
+    "os",
+    "os/exec",
+    "path/filepath",
+    "strconv",
+    "strings",
+    "time"
+  ],
+  "resources/nvidia_test.go": [
+    "context",
+    "fmt",
+    "testing"
+  ],
+  "resources/process.go": [
+    "errors",
+    "fmt",
+    "sync",
+    "time"
+  ],
+  "resources/process_linux.go": [
+    "fmt",
+    "os",
+    "strconv",
+    "strings"
+  ],
+  "resources/process_other.go": [
+    "fmt"
+  ],
+  "resources/process_test.go": [
+    "errors",
+    "os",
+    "testing"
+  ],
+  "resources/process_windows.go": [
     "fmt",
     "syscall",
     "unsafe"

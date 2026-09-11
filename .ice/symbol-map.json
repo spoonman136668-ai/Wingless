@@ -1,24 +1,130 @@
 [
   {
+    "name": "localFixture",
+    "kind": "type",
+    "file": "benchmark/fixtures.go",
+    "start": 12,
+    "end": 15
+  },
+  {
+    "name": "object",
+    "kind": "function",
+    "file": "benchmark/fixtures.go",
+    "start": 17,
+    "end": 49,
+    "calls": [
+      "d.Decode",
+      "d.Decode",
+      "d.More",
+      "d.Token",
+      "d.Token",
+      "d.Token",
+      "json.Delim",
+      "json.Delim",
+      "json.NewDecoder",
+      "new",
+      "strings.NewReader"
+    ]
+  },
+  {
+    "name": "jsonFixture",
+    "kind": "function",
+    "file": "benchmark/fixtures.go",
+    "start": 50,
+    "end": 65,
+    "calls": [
+      "len",
+      "len",
+      "object",
+      "object",
+      "object",
+      "reflect.DeepEqual",
+      "reflect.TypeOf",
+      "reflect.TypeOf"
+    ]
+  },
+  {
+    "name": "sourceProtocol",
+    "kind": "function",
+    "file": "benchmark/fixtures.go",
+    "start": 66,
+    "end": 69,
+    "calls": [
+      "parser.ParseFile",
+      "token.NewFileSet"
+    ]
+  },
+  {
+    "name": "semanticCandidate",
+    "kind": "function",
+    "file": "benchmark/fixtures.go",
+    "start": 73,
+    "end": 83,
+    "calls": [
+      "len",
+      "len",
+      "len",
+      "strings.Contains",
+      "strings.Join",
+      "strings.Split",
+      "strings.TrimSpace"
+    ]
+  },
+  {
+    "name": "codingFixtures",
+    "kind": "function",
+    "file": "benchmark/fixtures.go",
+    "start": 84,
+    "end": 96,
+    "calls": [
+      "jsonFixture",
+      "jsonFixture",
+      "jsonFixture",
+      "jsonFixture",
+      "jsonFixture",
+      "jsonFixture"
+    ]
+  },
+  {
+    "name": "Variance",
+    "kind": "type",
+    "file": "benchmark/fixtures.go",
+    "start": 98,
+    "end": 102
+  },
+  {
+    "name": "summarize",
+    "kind": "function",
+    "file": "benchmark/fixtures.go",
+    "start": 104,
+    "end": 124,
+    "calls": [
+      "float64",
+      "float64",
+      "float64",
+      "float64"
+    ]
+  },
+  {
     "name": "LocalRow",
     "kind": "type",
     "file": "benchmark/local.go",
     "start": 16,
-    "end": 22
+    "end": 30
   },
   {
     "name": "LocalReport",
     "kind": "type",
     "file": "benchmark/local.go",
-    "start": 23,
-    "end": 32
+    "start": 31,
+    "end": 44
   },
   {
     "name": "codeShape",
     "kind": "function",
     "file": "benchmark/local.go",
-    "start": 34,
-    "end": 74,
+    "start": 46,
+    "end": 86,
     "calls": [
       "append",
       "len",
@@ -34,27 +140,31 @@
     "name": "RunLocal",
     "kind": "function",
     "file": "benchmark/local.go",
-    "start": 77,
-    "end": 131,
+    "start": 89,
+    "end": 157,
     "calls": [
       "append",
       "b.Health",
       "b.Invoke",
+      "codingFixtures",
       "ctx.Err",
       "e.Error",
       "f.check",
+      "f.protocol",
       "float64",
       "float64",
       "fmt.Errorf",
       "fmt.Sprintf",
       "h.Snapshot",
       "h.Snapshot",
-      "json.Unmarshal",
-      "json.Unmarshal",
-      "len",
+      "observer.ProcessSnapshot",
+      "observer.ProcessSnapshot",
+      "processErr.Error",
       "resources.Check",
       "runtime.NumCPU",
       "sampleErr.Error",
+      "semanticCandidate",
+      "summarize",
       "time.Now",
       "time.Now"
     ]
@@ -71,6 +181,68 @@
       "t.Fatal",
       "t.Fatal"
     ]
+  },
+  {
+    "name": "TestSemanticNeverOverridesStrict",
+    "kind": "function",
+    "file": "benchmark/local_test.go",
+    "start": 17,
+    "end": 29,
+    "calls": [
+      "f.check",
+      "f.check",
+      "f.protocol",
+      "f.protocol",
+      "f.protocol",
+      "jsonFixture",
+      "semanticCandidate",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestProfilesFailClosed",
+    "kind": "function",
+    "file": "benchmark/profile_test.go",
+    "start": 5,
+    "end": 17,
+    "calls": [
+      "Profile",
+      "Profile",
+      "Profile",
+      "Profile",
+      "Profile",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "Provenance",
+    "kind": "type",
+    "file": "benchmark/provenance.go",
+    "start": 8,
+    "end": 23
+  },
+  {
+    "name": "Profile",
+    "kind": "function",
+    "file": "benchmark/provenance.go",
+    "start": 25,
+    "end": 39,
+    "calls": [
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "processObserver",
+    "kind": "interface",
+    "file": "benchmark/provenance.go",
+    "start": 41,
+    "end": 43
   },
   {
     "name": "Fixture",
@@ -429,7 +601,7 @@
     "kind": "function",
     "file": "cmd/ice/main.go",
     "start": 11,
-    "end": 52,
+    "end": 58,
     "calls": [
       "filepath.Join",
       "fmt.Errorf",
@@ -437,9 +609,11 @@
       "fmt.Fprintln",
       "fmt.Fprintln",
       "ice.Query",
+      "ice.Relationships",
       "ice.Save",
       "ice.Validate",
       "ice.Validate",
+      "json.NewEncoder",
       "json.NewEncoder",
       "len",
       "len",
@@ -449,13 +623,29 @@
     ]
   },
   {
+    "name": "runGPU",
+    "kind": "function",
+    "file": "cmd/wingless/gpu.go",
+    "start": 11,
+    "end": 23,
+    "calls": [
+      "context.Background",
+      "f.Int",
+      "f.Parse",
+      "f.String",
+      "flag.NewFlagSet",
+      "json.NewEncoder"
+    ]
+  },
+  {
     "name": "runLocal",
     "kind": "function",
     "file": "cmd/wingless/local.go",
     "start": 20,
-    "end": 107,
+    "end": 147,
     "calls": [
       "b.Close",
+      "benchmark.Profile",
       "benchmark.RunLocal",
       "bytes.NewReader",
       "c",
@@ -480,6 +670,8 @@
       "flags.String",
       "flags.String",
       "flags.String",
+      "flags.String",
+      "fmt.Errorf",
       "fmt.Errorf",
       "fmt.Errorf",
       "fmt.Errorf",
@@ -494,14 +686,41 @@
       "modelhost.New",
       "new",
       "os.Open",
+      "os.Stat",
       "signal.NotifyContext",
+      "st.Size",
       "stop",
       "supervisor.Endpoint",
       "supervisor.Start",
       "supervisor.Status",
       "supervisor.Status",
       "supervisor.Stop",
-      "supervisor.Stop"
+      "supervisor.Stop",
+      "textPointer",
+      "textPointer",
+      "textPointer",
+      "textPointer",
+      "textPointer",
+      "textPointer"
+    ]
+  },
+  {
+    "name": "experimentMetrics",
+    "kind": "type",
+    "file": "cmd/wingless/local.go",
+    "start": 149,
+    "end": 152
+  },
+  {
+    "name": "ProcessSnapshot",
+    "kind": "method",
+    "file": "cmd/wingless/local.go",
+    "start": 154,
+    "end": 163,
+    "receiver": "experimentMetrics",
+    "calls": [
+      "fmt.Errorf",
+      "fmt.Errorf"
     ]
   },
   {
@@ -524,7 +743,7 @@
     "kind": "function",
     "file": "cmd/wingless/main.go",
     "start": 19,
-    "end": 74,
+    "end": 81,
     "calls": [
       "benchmark.Replay",
       "context.Background",
@@ -537,6 +756,7 @@
       "fmt.Fprintln",
       "fmt.Fprintln",
       "fmt.Fprintln",
+      "fmt.Fprintln",
       "h.Snapshot",
       "h.Snapshot",
       "json.NewEncoder",
@@ -544,6 +764,8 @@
       "len",
       "len",
       "len",
+      "len",
+      "os.Exit",
       "os.Exit",
       "os.Exit",
       "os.Exit",
@@ -554,6 +776,7 @@
       "panic",
       "panic",
       "reg.Register",
+      "runGPU",
       "runLocal",
       "runner.Run",
       "time.Now",
@@ -926,18 +1149,123 @@
     ]
   },
   {
+    "name": "Relationship",
+    "kind": "type",
+    "file": "ice/relationships.go",
+    "start": 17,
+    "end": 23
+  },
+  {
+    "name": "TypeReport",
+    "kind": "type",
+    "file": "ice/relationships.go",
+    "start": 24,
+    "end": 30
+  },
+  {
+    "name": "typeLoader",
+    "kind": "type",
+    "file": "ice/relationships.go",
+    "start": 31,
+    "end": 39
+  },
+  {
+    "name": "Import",
+    "kind": "method",
+    "file": "ice/relationships.go",
+    "start": 41,
+    "end": 114,
+    "receiver": "typeLoader",
+    "calls": [
+      "append",
+      "append",
+      "ast.Inspect",
+      "call.Pos",
+      "candidate.Pos",
+      "candidate.Type",
+      "candidate.Type",
+      "candidate.Type",
+      "cfg.Check",
+      "delete",
+      "filepath.Rel",
+      "filepath.Rel",
+      "filepath.ToSlash",
+      "filepath.ToSlash",
+      "fmt.Errorf",
+      "iface.Complete",
+      "obj.Type",
+      "pkg.Scope",
+      "pkg.Scope",
+      "pkg.Scope",
+      "target.FullName",
+      "types.Implements",
+      "types.Implements",
+      "types.NewPointer"
+    ]
+  },
+  {
+    "name": "Relationships",
+    "kind": "function",
+    "file": "ice/relationships.go",
+    "start": 118,
+    "end": 169,
+    "calls": [
+      "Load",
+      "Validate",
+      "append",
+      "append",
+      "append",
+      "e.Error",
+      "filepath.Base",
+      "filepath.Dir",
+      "filepath.Dir",
+      "filepath.FromSlash",
+      "filepath.Join",
+      "filepath.ToSlash",
+      "importer.ForCompiler",
+      "l.Import",
+      "parser.ParseFile",
+      "sort.Slice",
+      "sort.Strings",
+      "strings.HasSuffix",
+      "token.NewFileSet"
+    ]
+  },
+  {
+    "name": "TestTypeResolvedRelationships",
+    "kind": "function",
+    "file": "ice/relationships_test.go",
+    "start": 9,
+    "end": 32,
+    "calls": [
+      "Relationships",
+      "Relationships",
+      "Save",
+      "filepath.Join",
+      "filepath.Join",
+      "len",
+      "os.WriteFile",
+      "os.WriteFile",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.TempDir"
+    ]
+  },
+  {
     "name": "Request",
     "kind": "type",
     "file": "inference/backend.go",
     "start": 11,
-    "end": 22
+    "end": 23
   },
   {
     "name": "Validate",
     "kind": "method",
     "file": "inference/backend.go",
-    "start": 24,
-    "end": 29,
+    "start": 25,
+    "end": 33,
     "receiver": "Request",
     "calls": [
       "errors.New",
@@ -952,43 +1280,43 @@
     "name": "Usage",
     "kind": "type",
     "file": "inference/backend.go",
-    "start": 31,
-    "end": 34
+    "start": 35,
+    "end": 38
   },
   {
     "name": "Telemetry",
     "kind": "type",
     "file": "inference/backend.go",
-    "start": 35,
-    "end": 42
+    "start": 39,
+    "end": 46
   },
   {
     "name": "Result",
     "kind": "type",
     "file": "inference/backend.go",
-    "start": 43,
-    "end": 54
+    "start": 47,
+    "end": 58
   },
   {
     "name": "Cost",
     "kind": "type",
     "file": "inference/backend.go",
-    "start": 55,
-    "end": 59
+    "start": 59,
+    "end": 63
   },
   {
     "name": "InferenceBackend",
     "kind": "interface",
     "file": "inference/backend.go",
-    "start": 60,
-    "end": 67
+    "start": 64,
+    "end": 71
   },
   {
     "name": "Classify",
     "kind": "function",
     "file": "inference/backend.go",
-    "start": 69,
-    "end": 80,
+    "start": 73,
+    "end": 84,
     "calls": [
       "errors.Is",
       "errors.Is"
@@ -1105,6 +1433,36 @@
       "NewLocalHTTP",
       "t.Fatal"
     ]
+  },
+  {
+    "name": "OutputConstraint",
+    "kind": "type",
+    "file": "inference/constraint.go",
+    "start": 10,
+    "end": 13
+  },
+  {
+    "name": "Validate",
+    "kind": "method",
+    "file": "inference/constraint.go",
+    "start": 15,
+    "end": 27,
+    "receiver": "OutputConstraint",
+    "calls": [
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "json.Unmarshal",
+      "json.Valid",
+      "len",
+      "len"
+    ]
+  },
+  {
+    "name": "ConstraintCapability",
+    "kind": "function",
+    "file": "inference/constraint.go",
+    "start": 28,
+    "end": 33
   },
   {
     "name": "State",
@@ -1267,7 +1625,7 @@
     "kind": "method",
     "file": "inference/mock.go",
     "start": 45,
-    "end": 98,
+    "end": 103,
     "receiver": "Mock",
     "calls": [
       "Classify",
@@ -1277,6 +1635,7 @@
       "ctx.Err",
       "ctx.Err",
       "delete",
+      "fmt.Errorf",
       "fmt.Errorf",
       "fmt.Errorf",
       "len",
@@ -1379,7 +1738,7 @@
     "kind": "method",
     "file": "inference/openai_compatible.go",
     "start": 93,
-    "end": 216,
+    "end": 221,
     "receiver": "LocalHTTP",
     "calls": [
       "Classify",
@@ -1390,6 +1749,7 @@
       "ctx.Err",
       "ctx.Err",
       "delete",
+      "fmt.Errorf",
       "fmt.Errorf",
       "fmt.Errorf",
       "fmt.Errorf",
@@ -1415,6 +1775,84 @@
       "time.Now",
       "time.Since",
       "utf8.Valid"
+    ]
+  },
+  {
+    "name": "TestSSEFragmentationAndBounds",
+    "kind": "function",
+    "file": "inference/robustness_test.go",
+    "start": 13,
+    "end": 27,
+    "calls": [
+      "NewStreamingLocalHTTP",
+      "b.Close",
+      "b.readStream",
+      "b.readStream",
+      "request",
+      "string",
+      "strings.NewReader",
+      "strings.NewReader",
+      "strings.Repeat",
+      "strings.Repeat",
+      "strings.Replace",
+      "strings.Replace",
+      "strings.Replace",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "oneByte",
+    "kind": "type",
+    "file": "inference/robustness_test.go",
+    "start": 29,
+    "end": 29
+  },
+  {
+    "name": "Read",
+    "kind": "method",
+    "file": "inference/robustness_test.go",
+    "start": 31,
+    "end": 31,
+    "receiver": "oneByte"
+  },
+  {
+    "name": "TestOversizeHealthAndConstraintUnavailable",
+    "kind": "function",
+    "file": "inference/robustness_test.go",
+    "start": 32,
+    "end": 45,
+    "calls": [
+      "NewLocalHTTP",
+      "b.Close",
+      "b.Health",
+      "b.Invoke",
+      "context.Background",
+      "context.Background",
+      "fmt.Fprint",
+      "http.HandlerFunc",
+      "httptest.NewServer",
+      "request",
+      "s.Close",
+      "strings.Repeat",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestDuplicateCompletionAndUsage",
+    "kind": "function",
+    "file": "inference/robustness_test.go",
+    "start": 47,
+    "end": 57,
+    "calls": [
+      "NewStreamingLocalHTTP",
+      "b.Close",
+      "b.readStream",
+      "request",
+      "request",
+      "strings.NewReader",
+      "t.Fatal"
     ]
   },
   {
@@ -1447,7 +1885,7 @@
     "kind": "method",
     "file": "inference/stream.go",
     "start": 26,
-    "end": 150,
+    "end": 156,
     "receiver": "LocalHTTP",
     "calls": [
       "bufio.NewScanner",
@@ -1455,6 +1893,8 @@
       "first.IsZero",
       "first.IsZero",
       "first.Sub",
+      "fmt.Errorf",
+      "fmt.Errorf",
       "fmt.Errorf",
       "fmt.Errorf",
       "fmt.Errorf",
@@ -1572,6 +2012,174 @@
     ]
   },
   {
+    "name": "containment",
+    "kind": "type",
+    "file": "modelhost/containment_other.go",
+    "start": 7,
+    "end": 7
+  },
+  {
+    "name": "newContainment",
+    "kind": "function",
+    "file": "modelhost/containment_other.go",
+    "start": 9,
+    "end": 9
+  },
+  {
+    "name": "Attach",
+    "kind": "method",
+    "file": "modelhost/containment_other.go",
+    "start": 10,
+    "end": 10,
+    "receiver": "containment"
+  },
+  {
+    "name": "Close",
+    "kind": "method",
+    "file": "modelhost/containment_other.go",
+    "start": 11,
+    "end": 11,
+    "receiver": "containment"
+  },
+  {
+    "name": "containmentName",
+    "kind": "function",
+    "file": "modelhost/containment_other.go",
+    "start": 12,
+    "end": 12
+  },
+  {
+    "name": "jobs",
+    "kind": "var",
+    "file": "modelhost/containment_windows.go",
+    "start": 12,
+    "end": 12
+  },
+  {
+    "name": "createJob",
+    "kind": "var",
+    "file": "modelhost/containment_windows.go",
+    "start": 13,
+    "end": 13
+  },
+  {
+    "name": "setJob",
+    "kind": "var",
+    "file": "modelhost/containment_windows.go",
+    "start": 14,
+    "end": 14
+  },
+  {
+    "name": "assignJob",
+    "kind": "var",
+    "file": "modelhost/containment_windows.go",
+    "start": 15,
+    "end": 15
+  },
+  {
+    "name": "containment",
+    "kind": "type",
+    "file": "modelhost/containment_windows.go",
+    "start": 17,
+    "end": 17
+  },
+  {
+    "name": "newContainment",
+    "kind": "function",
+    "file": "modelhost/containment_windows.go",
+    "start": 19,
+    "end": 44,
+    "calls": [
+      "c.Close",
+      "createJob.Call",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "setJob.Call",
+      "syscall.Handle",
+      "uintptr",
+      "unsafe.Pointer",
+      "unsafe.Sizeof"
+    ]
+  },
+  {
+    "name": "Attach",
+    "kind": "method",
+    "file": "modelhost/containment_windows.go",
+    "start": 45,
+    "end": 56,
+    "receiver": "containment",
+    "calls": [
+      "assignJob.Call",
+      "fmt.Errorf",
+      "syscall.CloseHandle",
+      "syscall.OpenProcess",
+      "uint32",
+      "uintptr",
+      "uintptr"
+    ]
+  },
+  {
+    "name": "Close",
+    "kind": "method",
+    "file": "modelhost/containment_windows.go",
+    "start": 57,
+    "end": 62,
+    "receiver": "containment",
+    "calls": [
+      "syscall.CloseHandle"
+    ]
+  },
+  {
+    "name": "containmentName",
+    "kind": "function",
+    "file": "modelhost/containment_windows.go",
+    "start": 63,
+    "end": 63
+  },
+  {
+    "name": "containment",
+    "kind": "type",
+    "file": "modelhost/containment_windows_other.go",
+    "start": 10,
+    "end": 10
+  },
+  {
+    "name": "newContainment",
+    "kind": "function",
+    "file": "modelhost/containment_windows_other.go",
+    "start": 12,
+    "end": 14,
+    "calls": [
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "Attach",
+    "kind": "method",
+    "file": "modelhost/containment_windows_other.go",
+    "start": 15,
+    "end": 15,
+    "receiver": "containment",
+    "calls": [
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "Close",
+    "kind": "method",
+    "file": "modelhost/containment_windows_other.go",
+    "start": 16,
+    "end": 16,
+    "receiver": "containment"
+  },
+  {
+    "name": "containmentName",
+    "kind": "function",
+    "file": "modelhost/containment_windows_other.go",
+    "start": 17,
+    "end": 17
+  },
+  {
     "name": "TestMain",
     "kind": "function",
     "file": "modelhost/process_test.go",
@@ -1663,28 +2271,28 @@
     "kind": "type",
     "file": "modelhost/supervisor.go",
     "start": 23,
-    "end": 35
+    "end": 47
   },
   {
     "name": "Evidence",
     "kind": "type",
     "file": "modelhost/supervisor.go",
-    "start": 36,
-    "end": 45
+    "start": 48,
+    "end": 61
   },
   {
     "name": "tail",
     "kind": "type",
     "file": "modelhost/supervisor.go",
-    "start": 46,
-    "end": 49
+    "start": 62,
+    "end": 65
   },
   {
     "name": "Write",
     "kind": "method",
     "file": "modelhost/supervisor.go",
-    "start": 51,
-    "end": 64,
+    "start": 67,
+    "end": 80,
     "receiver": "tail",
     "calls": [
       "append",
@@ -1698,8 +2306,8 @@
     "name": "text",
     "kind": "method",
     "file": "modelhost/supervisor.go",
-    "start": 65,
-    "end": 69,
+    "start": 81,
+    "end": 85,
     "receiver": "tail",
     "calls": [
       "string",
@@ -1710,19 +2318,20 @@
     "name": "Supervisor",
     "kind": "type",
     "file": "modelhost/supervisor.go",
-    "start": 71,
-    "end": 80
+    "start": 87,
+    "end": 97
   },
   {
     "name": "New",
     "kind": "function",
     "file": "modelhost/supervisor.go",
-    "start": 82,
-    "end": 91,
+    "start": 99,
+    "end": 117,
     "calls": [
       "filepath.Base",
       "filepath.IsAbs",
       "filepath.IsAbs",
+      "fmt.Errorf",
       "fmt.Errorf",
       "fmt.Errorf",
       "strings.ContainsAny",
@@ -1733,8 +2342,8 @@
     "name": "pinned",
     "kind": "function",
     "file": "modelhost/supervisor.go",
-    "start": 92,
-    "end": 118,
+    "start": 118,
+    "end": 144,
     "calls": [
       "f.Close",
       "f.Stat",
@@ -1760,8 +2369,8 @@
     "name": "Endpoint",
     "kind": "method",
     "file": "modelhost/supervisor.go",
-    "start": 119,
-    "end": 119,
+    "start": 145,
+    "end": 145,
     "receiver": "Supervisor",
     "calls": [
       "strconv.Itoa"
@@ -1771,18 +2380,23 @@
     "name": "Status",
     "kind": "method",
     "file": "modelhost/supervisor.go",
-    "start": 120,
-    "end": 135,
-    "receiver": "Supervisor"
+    "start": 146,
+    "end": 175,
+    "receiver": "Supervisor",
+    "calls": [
+      "err.Error"
+    ]
   },
   {
     "name": "Start",
     "kind": "method",
     "file": "modelhost/supervisor.go",
-    "start": 136,
-    "end": 267,
+    "start": 176,
+    "end": 345,
     "receiver": "Supervisor",
     "calls": [
+      "append",
+      "append",
       "append",
       "backend.Close",
       "backend.Health",
@@ -1791,17 +2405,25 @@
       "cancel",
       "cancel",
       "cancel",
+      "cancel",
       "close",
       "cmd.Start",
       "cmd.Wait",
+      "cmd.Wait",
       "conn.Close",
+      "containmentName",
       "context.WithTimeout",
       "context.WithTimeout",
       "ctx.Err",
       "ctx.Err",
       "ctx.Err",
       "e.Error",
+      "e.Error",
       "exec.CommandContext",
+      "fail",
+      "fail",
+      "fail",
+      "fail",
       "fail",
       "fail",
       "fail",
@@ -1817,9 +2439,15 @@
       "fmt.Errorf",
       "fmt.Errorf",
       "inference.NewLocalHTTP",
+      "job.Attach",
+      "job.Close",
+      "job.Close",
+      "job.Close",
+      "job.Close",
       "make",
       "net.DialTimeout",
       "net.JoinHostPort",
+      "newContainment",
       "os.Getenv",
       "parent.Err",
       "pinned",
@@ -1828,8 +2456,13 @@
       "ready.Err",
       "ready.Err",
       "resources.Check",
+      "resources.Check",
+      "resources.NewProcessProbe",
       "s.Endpoint",
       "stop",
+      "strconv.Itoa",
+      "strconv.Itoa",
+      "strconv.Itoa",
       "strconv.Itoa",
       "strconv.Itoa",
       "strconv.Itoa",
@@ -1846,8 +2479,8 @@
     "name": "Stop",
     "kind": "method",
     "file": "modelhost/supervisor.go",
-    "start": 268,
-    "end": 297,
+    "start": 346,
+    "end": 375,
     "receiver": "Supervisor",
     "calls": [
       "ctx.Done",
@@ -1919,28 +2552,28 @@
     "kind": "type",
     "file": "resources/governor.go",
     "start": 8,
-    "end": 19
+    "end": 21
   },
   {
     "name": "Policy",
     "kind": "type",
     "file": "resources/governor.go",
-    "start": 20,
-    "end": 25
+    "start": 22,
+    "end": 27
   },
   {
     "name": "Provider",
     "kind": "interface",
     "file": "resources/governor.go",
-    "start": 26,
-    "end": 26
+    "start": 28,
+    "end": 28
   },
   {
     "name": "Check",
     "kind": "function",
     "file": "resources/governor.go",
-    "start": 28,
-    "end": 45,
+    "start": 30,
+    "end": 47,
     "calls": [
       "fmt.Errorf",
       "fmt.Errorf",
@@ -2117,6 +2750,378 @@
     ]
   },
   {
+    "name": "GPU",
+    "kind": "type",
+    "file": "resources/nvidia.go",
+    "start": 17,
+    "end": 28
+  },
+  {
+    "name": "GPUProvider",
+    "kind": "interface",
+    "file": "resources/nvidia.go",
+    "start": 29,
+    "end": 31
+  },
+  {
+    "name": "NVIDIA",
+    "kind": "type",
+    "file": "resources/nvidia.go",
+    "start": 32,
+    "end": 35
+  },
+  {
+    "name": "limitedOutput",
+    "kind": "type",
+    "file": "resources/nvidia.go",
+    "start": 36,
+    "end": 36
+  },
+  {
+    "name": "Write",
+    "kind": "method",
+    "file": "resources/nvidia.go",
+    "start": 38,
+    "end": 44,
+    "receiver": "limitedOutput",
+    "calls": [
+      "append",
+      "fmt.Errorf",
+      "len",
+      "len",
+      "len"
+    ]
+  },
+  {
+    "name": "GPU",
+    "kind": "method",
+    "file": "resources/nvidia.go",
+    "start": 45,
+    "end": 67,
+    "receiver": "NVIDIA",
+    "calls": [
+      "append",
+      "c",
+      "cmd.Run",
+      "context.WithTimeout",
+      "exec.CommandContext",
+      "filepath.Base",
+      "filepath.IsAbs",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "os.Getenv",
+      "parseGPU",
+      "strconv.Itoa",
+      "string",
+      "strings.ToLower"
+    ]
+  },
+  {
+    "name": "number",
+    "kind": "function",
+    "file": "resources/nvidia.go",
+    "start": 68,
+    "end": 78,
+    "calls": [
+      "fmt.Errorf",
+      "math.IsInf",
+      "math.IsNaN",
+      "strconv.ParseFloat",
+      "strings.TrimSpace"
+    ]
+  },
+  {
+    "name": "parseGPU",
+    "kind": "function",
+    "file": "resources/nvidia.go",
+    "start": 79,
+    "end": 133,
+    "calls": [
+      "bytes",
+      "bytes",
+      "bytes",
+      "csv.NewReader",
+      "float64",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "len",
+      "len",
+      "make",
+      "number",
+      "reader.Read",
+      "reader.Read",
+      "strings.ContainsAny",
+      "strings.HasPrefix",
+      "strings.NewReader",
+      "strings.TrimSpace",
+      "strings.TrimSpace",
+      "uint64"
+    ]
+  },
+  {
+    "name": "WithGPU",
+    "kind": "type",
+    "file": "resources/nvidia.go",
+    "start": 136,
+    "end": 139
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "resources/nvidia.go",
+    "start": 141,
+    "end": 160,
+    "receiver": "WithGPU",
+    "calls": [
+      "context.Background",
+      "e.Error",
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "TestNVIDIAParsing",
+    "kind": "function",
+    "file": "resources/nvidia_test.go",
+    "start": 9,
+    "end": 23,
+    "calls": [
+      "parseGPU",
+      "parseGPU",
+      "parseGPU",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "unavailableGPU",
+    "kind": "type",
+    "file": "resources/nvidia_test.go",
+    "start": 25,
+    "end": 25
+  },
+  {
+    "name": "GPU",
+    "kind": "method",
+    "file": "resources/nvidia_test.go",
+    "start": 27,
+    "end": 27,
+    "receiver": "unavailableGPU",
+    "calls": [
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "emptyHost",
+    "kind": "type",
+    "file": "resources/nvidia_test.go",
+    "start": 29,
+    "end": 29
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "resources/nvidia_test.go",
+    "start": 31,
+    "end": 31,
+    "receiver": "emptyHost"
+  },
+  {
+    "name": "TestOptionalGPUStillDeniesRequiredVRAM",
+    "kind": "function",
+    "file": "resources/nvidia_test.go",
+    "start": 32,
+    "end": 37,
+    "calls": [
+      "Check",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "ErrProcessNamespace",
+    "kind": "var",
+    "file": "resources/process.go",
+    "start": 10,
+    "end": 10
+  },
+  {
+    "name": "ProcessMetrics",
+    "kind": "type",
+    "file": "resources/process.go",
+    "start": 12,
+    "end": 21
+  },
+  {
+    "name": "ProcessProbe",
+    "kind": "type",
+    "file": "resources/process.go",
+    "start": 24,
+    "end": 29
+  },
+  {
+    "name": "NewProcessProbe",
+    "kind": "function",
+    "file": "resources/process.go",
+    "start": 31,
+    "end": 40,
+    "calls": [
+      "fmt.Errorf",
+      "sampleProcess",
+      "time.Now"
+    ]
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "resources/process.go",
+    "start": 41,
+    "end": 54,
+    "receiver": "ProcessProbe",
+    "calls": [
+      "fmt.Errorf",
+      "sampleProcess",
+      "time.Since"
+    ]
+  },
+  {
+    "name": "processIdentity",
+    "kind": "function",
+    "file": "resources/process_linux.go",
+    "start": 12,
+    "end": 26,
+    "calls": [
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "len",
+      "os.ReadFile",
+      "string",
+      "string",
+      "strings.Fields",
+      "strings.LastIndex"
+    ]
+  },
+  {
+    "name": "sampleProcess",
+    "kind": "function",
+    "file": "resources/process_linux.go",
+    "start": 27,
+    "end": 82,
+    "calls": [
+      "fmt.Errorf",
+      "len",
+      "len",
+      "os.Getpid",
+      "os.ReadFile",
+      "os.ReadFile",
+      "os.Readlink",
+      "processIdentity",
+      "processIdentity",
+      "strconv.Itoa",
+      "strconv.Itoa",
+      "strconv.ParseUint",
+      "strconv.ParseUint",
+      "string",
+      "string",
+      "strings.Fields",
+      "strings.Fields",
+      "strings.Split",
+      "strings.Split"
+    ]
+  },
+  {
+    "name": "sampleProcess",
+    "kind": "function",
+    "file": "resources/process_other.go",
+    "start": 7,
+    "end": 9,
+    "calls": [
+      "fmt.Errorf"
+    ]
+  },
+  {
+    "name": "TestOwnedProcessSampling",
+    "kind": "function",
+    "file": "resources/process_test.go",
+    "start": 11,
+    "end": 27,
+    "calls": [
+      "NewProcessProbe",
+      "errors.Is",
+      "os.Getpid",
+      "os.Getpid",
+      "p.Snapshot",
+      "p.Snapshot",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Skip"
+    ]
+  },
+  {
+    "name": "processMemory",
+    "kind": "var",
+    "file": "resources/process_windows.go",
+    "start": 11,
+    "end": 11
+  },
+  {
+    "name": "processTimes",
+    "kind": "var",
+    "file": "resources/process_windows.go",
+    "start": 12,
+    "end": 12
+  },
+  {
+    "name": "processIO",
+    "kind": "var",
+    "file": "resources/process_windows.go",
+    "start": 13,
+    "end": 13
+  },
+  {
+    "name": "sampleProcess",
+    "kind": "function",
+    "file": "resources/process_windows.go",
+    "start": 15,
+    "end": 49,
+    "calls": [
+      "fmt.Sprint",
+      "processIO.Call",
+      "processMemory.Call",
+      "processTimes.Call",
+      "syscall.CloseHandle",
+      "syscall.OpenProcess",
+      "ticks",
+      "ticks",
+      "ticks",
+      "uint32",
+      "uint32",
+      "uint64",
+      "uint64",
+      "uint64",
+      "uint64",
+      "uintptr",
+      "uintptr",
+      "uintptr",
+      "uintptr",
+      "uintptr",
+      "uintptr",
+      "uintptr",
+      "uintptr",
+      "uintptr",
+      "uintptr",
+      "unsafe.Pointer",
+      "unsafe.Pointer",
+      "unsafe.Pointer",
+      "unsafe.Pointer",
+      "unsafe.Pointer",
+      "unsafe.Pointer",
+      "unsafe.Sizeof"
+    ]
+  },
+  {
     "name": "Proposal",
     "kind": "type",
     "file": "toolboundary/tools.go",
@@ -2274,9 +3279,10 @@
     "kind": "method",
     "file": "worker/service.go",
     "start": 57,
-    "end": 90,
+    "end": 95,
     "receiver": "Service",
     "calls": [
+      "append",
       "append",
       "c",
       "context.WithDeadline",
@@ -2292,8 +3298,8 @@
     "name": "Status",
     "kind": "method",
     "file": "worker/service.go",
-    "start": 91,
-    "end": 99,
+    "start": 96,
+    "end": 104,
     "receiver": "Service",
     "calls": [
       "fmt.Errorf"
@@ -2303,8 +3309,8 @@
     "name": "Cancel",
     "kind": "method",
     "file": "worker/service.go",
-    "start": 100,
-    "end": 109,
+    "start": 105,
+    "end": 114,
     "receiver": "Service",
     "calls": [
       "j.cancel"
@@ -2314,8 +3320,8 @@
     "name": "Result",
     "kind": "method",
     "file": "worker/service.go",
-    "start": 110,
-    "end": 124,
+    "start": 115,
+    "end": 129,
     "receiver": "Service",
     "calls": [
       "fmt.Errorf",

@@ -111,6 +111,17 @@
       "failure_semantics": "startup/runtime failure stops owned child; no automatic retry",
       "risk_if_plane_differs": "plane may own inference runtime lifecycle",
       "reconciliation_action": "reconcile lifecycle ownership before exposing any plane adapter"
+    },
+    {
+      "module": "stage3 internal telemetry and output contracts",
+      "assumed_external_interface": "none activated; GPUProvider, ProcessProbe, OutputConstraint remain internal/provisional",
+      "reason": "measure hardware and protocol behavior before integration",
+      "expected_plane_point": "future resource provider and worker request reconciliation",
+      "data_contract": "nullable hardware/process samples; bounded output constraint; independent benchmark scores",
+      "authority_boundary": "no resource lease, generic process tool or acceptance grant",
+      "failure_semantics": "required missing telemetry denies; unsupported constraints/profiles report unavailable",
+      "risk_if_plane_differs": "plane may own lifecycle, resource reservations and output schemas",
+      "reconciliation_action": "map only after stabilized source; preserve one authority"
     }
   ]
 }

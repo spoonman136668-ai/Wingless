@@ -104,3 +104,7 @@ No interface here is authoritative for ckb-plane. Reconcile every seam before ac
 ## modelhost — independent experiment
 
 No plane interface is activated. Operator configuration starts one pinned local inference server. Lifecycle ownership must be reconciled against the stabilized plane before integration. No model/tool execution authority is added. Machine-readable details are in integration-seams.json.
+
+## Stage 3 internal interfaces
+
+GPUProvider and ProcessProbe are measurement providers, not plane resource reservations. Windows Job Object ownership is limited to the trusted inference supervisor. OutputConstraint is a backend-neutral, currently unsupported seam. Benchmark semantic/protocol/strict scores do not change plane acceptance. No new plane contract is finalized.

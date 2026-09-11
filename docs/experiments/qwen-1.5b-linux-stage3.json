@@ -1,0 +1,1390 @@
+{
+  "report": {
+    "provenance": {
+      "runtime_version": "b10809",
+      "runtime_hash": "07723ae07835bdf11cf0d00d68eb4df8308df0603f689c64c9f841a626cad01d",
+      "model_repo": "Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF",
+      "model_revision": "f86cb2c1fa58255f8052cc32aeede1b7482d4361",
+      "model_hash": "cc324af070c2ecbfd324a30884d2f951a7ff756aba85cb811a6ec436933bb046",
+      "quantization": "Q4_K_M",
+      "model_bytes": 1117320768,
+      "context_tokens": 1024,
+      "threads": 2,
+      "gpu_layers": 0,
+      "batch": 512,
+      "micro_batch": 128,
+      "cpu_model": null,
+      "gpu": null
+    },
+    "variance": {
+      "bug-diagnosis": {
+        "count": 2,
+        "mean_latency_ms": 795,
+        "latency_variance_ms2": 22801
+      },
+      "code-repair": {
+        "count": 2,
+        "mean_latency_ms": 788.5,
+        "latency_variance_ms2": 46010.25
+      },
+      "code-review": {
+        "count": 2,
+        "mean_latency_ms": 1031,
+        "latency_variance_ms2": 28224
+      },
+      "go-add-shape": {
+        "count": 2,
+        "mean_latency_ms": 1178.5,
+        "latency_variance_ms2": 16512.25
+      },
+      "json-arithmetic": {
+        "count": 2,
+        "mean_latency_ms": 829,
+        "latency_variance_ms2": 95481
+      },
+      "multi-file": {
+        "count": 2,
+        "mean_latency_ms": 750,
+        "latency_variance_ms2": 67600
+      },
+      "plan": {
+        "count": 2,
+        "mean_latency_ms": 638.5,
+        "latency_variance_ms2": 16512.25
+      },
+      "plan-implementation": {
+        "count": 2,
+        "mean_latency_ms": 1192,
+        "latency_variance_ms2": 25281
+      },
+      "tool-proposal": {
+        "count": 2,
+        "mean_latency_ms": 1018,
+        "latency_variance_ms2": 43681
+      }
+    },
+    "profile": "CPU_ONLY",
+    "version": 2,
+    "os": "linux",
+    "arch": "amd64",
+    "logical_cpus": 9,
+    "resource_scope": "OS host, not per-process/container allocation",
+    "started_at": "2026-09-11T08:41:20.243141586Z",
+    "rows": [
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 0,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "json-arithmetic",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 622,
+            "generation_ms": 466,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15283412992,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": 12.81198003327787,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15282335744,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": 23.2421875,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\n  \"sum\": 5\n}\n```",
+          "usage": {
+            "prompt_tokens": 44,
+            "output_tokens": 14
+          },
+          "latency_ms": 1138,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 30.042918454935624
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 0,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "go-add-shape",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 509,
+            "generation_ms": 766,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15282069504,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15282962432,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": 22.29787234042553,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```go\npackage candidate\n\nfunc Add(a, b int) int {\n    return a + b\n}\n```",
+          "usage": {
+            "prompt_tokens": 55,
+            "output_tokens": 24
+          },
+          "latency_ms": 1307,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 31.33159268929504
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 0,
+        "semantic_correct": true,
+        "protocol_compliant": true,
+        "strict_correct": true,
+        "process_before": null,
+        "process_after": null,
+        "task": "code-repair",
+        "correct": true,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 533,
+            "generation_ms": 438,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15282962432,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15286718464,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": 22.369878183831673,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "package candidate; func Add(a,b int) int {return a+b}",
+          "usage": {
+            "prompt_tokens": 64,
+            "output_tokens": 16
+          },
+          "latency_ms": 1003,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 36.529680365296805
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 0,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "bug-diagnosis",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 560,
+            "generation_ms": 353,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15286718464,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15288025088,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": 22.508792497069166,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\"cause\":\"off_by_one\"}\n```",
+          "usage": {
+            "prompt_tokens": 72,
+            "output_tokens": 12
+          },
+          "latency_ms": 946,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 33.994334277620396
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 0,
+        "semantic_correct": false,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "code-review",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 534,
+            "generation_ms": 633,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15288025088,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15291305984,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": 22.5,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\n  \"safeBoolean\": false,\n  \"issue\": \"unchecked_index\"\n}\n```",
+          "usage": {
+            "prompt_tokens": 65,
+            "output_tokens": 22
+          },
+          "latency_ms": 1199,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 34.75513428120063
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 0,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "multi-file",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 600,
+            "generation_ms": 380,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15291305984,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28910080000,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15290961920,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 22.442244224422442,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\n  \"value\": 6\n}\n```",
+          "usage": {
+            "prompt_tokens": 68,
+            "output_tokens": 14
+          },
+          "latency_ms": 1010,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 36.8421052631579
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 0,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "plan",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 462,
+            "generation_ms": 270,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15290961920,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15286317056,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 22.431259044862518,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\"operation\":\"add\"}\n```",
+          "usage": {
+            "prompt_tokens": 54,
+            "output_tokens": 10
+          },
+          "latency_ms": 767,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 37.03703703703704
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 0,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "plan-implementation",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 635,
+            "generation_ms": 685,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15286317056,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15292219392,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 22.514379622021362,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```go\npackage candidate\n\nfunc Add(a, b int) int {\n    return a + b\n}\n```",
+          "usage": {
+            "prompt_tokens": 78,
+            "output_tokens": 24
+          },
+          "latency_ms": 1351,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 35.03649635036496
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 0,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "tool-proposal",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 411,
+            "generation_ms": 766,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15292219392,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15294349312,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 22.323049001814883,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\n  \"tool\": \"read_file\",\n  \"path\": \"src/add.go\"\n}\n```",
+          "usage": {
+            "prompt_tokens": 58,
+            "output_tokens": 24
+          },
+          "latency_ms": 1227,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 31.33159268929504
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 1,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "json-arithmetic",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 60,
+            "generation_ms": 426,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15294349312,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15292735488,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 22.601279317697227,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\n  \"sum\": 5\n}\n```",
+          "usage": {
+            "prompt_tokens": 44,
+            "output_tokens": 14
+          },
+          "latency_ms": 520,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 32.863849765258216
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 1,
+        "semantic_correct": false,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "go-add-shape",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 38,
+            "generation_ms": 978,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15292735488,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15294910464,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 22.53968253968254,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```go\npackage candidate\n\nimport \"fmt\"\n\nfunc Add(a, b int) int {\n    return a + b\n}\n```",
+          "usage": {
+            "prompt_tokens": 55,
+            "output_tokens": 28
+          },
+          "latency_ms": 1050,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 28.629856850715747
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 1,
+        "semantic_correct": true,
+        "protocol_compliant": true,
+        "strict_correct": true,
+        "process_before": null,
+        "process_after": null,
+        "task": "code-repair",
+        "correct": true,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 40,
+            "generation_ms": 498,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15294910464,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293911040,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 22.286821705426355,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "package candidate; func Add(a,b int) int {return a+b}",
+          "usage": {
+            "prompt_tokens": 64,
+            "output_tokens": 16
+          },
+          "latency_ms": 574,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 32.1285140562249
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 1,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "bug-diagnosis",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 39,
+            "generation_ms": 562,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293911040,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293313024,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 23.156089193825043,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\n  \"cause\": \"off_by_one\"\n}\n```",
+          "usage": {
+            "prompt_tokens": 72,
+            "output_tokens": 16
+          },
+          "latency_ms": 644,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 28.469750889679716
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 1,
+        "semantic_correct": false,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "code-review",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 42,
+            "generation_ms": 786,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293313024,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293722624,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 22.422680412371133,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\n  \"safeBoolean\": false,\n  \"issue\": \"unchecked_index\"\n}\n```",
+          "usage": {
+            "prompt_tokens": 65,
+            "output_tokens": 22
+          },
+          "latency_ms": 863,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 27.989821882951652
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 1,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "multi-file",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 38,
+            "generation_ms": 415,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293722624,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293882368,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 22.448979591836736,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\n  \"value\": 6\n}\n```",
+          "usage": {
+            "prompt_tokens": 68,
+            "output_tokens": 14
+          },
+          "latency_ms": 490,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 33.734939759036145
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 1,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "plan",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 39,
+            "generation_ms": 438,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293882368,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 0,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293624320,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": 23.043478260869566,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\n  \"operation\": \"add\"\n}\n```",
+          "usage": {
+            "prompt_tokens": 54,
+            "output_tokens": 14
+          },
+          "latency_ms": 510,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 31.963470319634702
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 1,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "plan-implementation",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 293,
+            "generation_ms": 707,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293624320,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909912064,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293206528,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909752320,
+              "cpu_percent": 22.38966630785791,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```go\npackage candidate\n\nfunc Add(a, b int) int {\n    return a + b\n}\n```",
+          "usage": {
+            "prompt_tokens": 82,
+            "output_tokens": 24
+          },
+          "latency_ms": 1033,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 33.946251768033946
+      },
+      {
+        "process_error": "procfs PID namespace differs from caller",
+        "repetition": 1,
+        "semantic_correct": true,
+        "protocol_compliant": false,
+        "strict_correct": false,
+        "process_before": null,
+        "process_after": null,
+        "task": "tool-proposal",
+        "correct": false,
+        "result": {
+          "telemetry": {
+            "time_to_first_token_ms": 36,
+            "generation_ms": 737,
+            "model_load_ms": null,
+            "before": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293206528,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909752320,
+              "cpu_percent": null,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            },
+            "peak": null,
+            "after": {
+              "gpu": null,
+              "gpu_error": null,
+              "ram_total": 16793292800,
+              "ram_free": 15293140992,
+              "vram_total": null,
+              "vram_free": null,
+              "disk_free": 28909752320,
+              "cpu_percent": 22.633744855967077,
+              "gpu_percent": null,
+              "resident": null,
+              "disk_bytes_read": null,
+              "energy_joules": null
+            }
+          },
+          "backend_id": "local-benchmark",
+          "model_id": "wingless-qwen-coder-1.5b",
+          "status": "completed",
+          "text": "```json\n{\n  \"tool\": \"read_file\",\n  \"path\": \"src/add.go\"\n}\n```",
+          "usage": {
+            "prompt_tokens": 58,
+            "output_tokens": 24
+          },
+          "latency_ms": 809,
+          "termination_reason": "stop",
+          "resources": {
+            "gpu": null,
+            "gpu_error": null,
+            "ram_total": null,
+            "ram_free": null,
+            "vram_total": null,
+            "vram_free": null,
+            "disk_free": null,
+            "cpu_percent": null,
+            "gpu_percent": null,
+            "resident": null,
+            "disk_bytes_read": null,
+            "energy_joules": null
+          }
+        },
+        "output_tokens_per_second": 32.56445047489824
+      }
+    ],
+    "acceptance": "external_required"
+  },
+  "process": {
+    "containment": "direct_child_only",
+    "process_metrics": null,
+    "process_metrics_error": "procfs PID namespace differs from caller",
+    "state": "STOPPED",
+    "pid": 102,
+    "started_at": "2026-09-11T08:41:18.241641715Z",
+    "completed_at": "2026-09-11T08:41:36.722136699Z",
+    "reason": "operator_stop",
+    "exit_code": -1
+  },
+  "measurement_notes": [
+    "Raw outputs preserved. Semantic-only fence recognition never changes protocol or strict scoring.",
+    "CPU_ONLY run; no GPU measurements.",
+    "Process measurements unavailable because procfs and caller PID namespaces differ.",
+    "Two repetitions are descriptive evidence, not statistical confidence or Codex parity."
+  ]
+}

@@ -13,6 +13,42 @@
     ]
   },
   {
+    "name": "TestSemanticNeverOverridesStrict",
+    "kind": "function",
+    "file": "benchmark/local_test.go",
+    "start": 17,
+    "end": 29,
+    "calls": [
+      "f.check",
+      "f.check",
+      "f.protocol",
+      "f.protocol",
+      "f.protocol",
+      "jsonFixture",
+      "semanticCandidate",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestProfilesFailClosed",
+    "kind": "function",
+    "file": "benchmark/profile_test.go",
+    "start": 5,
+    "end": 17,
+    "calls": [
+      "Profile",
+      "Profile",
+      "Profile",
+      "Profile",
+      "Profile",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
     "name": "TestReplay",
     "kind": "function",
     "file": "benchmark/replay_test.go",
@@ -196,6 +232,28 @@
     ]
   },
   {
+    "name": "TestTypeResolvedRelationships",
+    "kind": "function",
+    "file": "ice/relationships_test.go",
+    "start": 9,
+    "end": 32,
+    "calls": [
+      "Relationships",
+      "Relationships",
+      "Save",
+      "filepath.Join",
+      "filepath.Join",
+      "len",
+      "os.WriteFile",
+      "os.WriteFile",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.TempDir"
+    ]
+  },
+  {
     "name": "TestMockCancellation",
     "kind": "function",
     "file": "inference/backend_test.go",
@@ -294,6 +352,69 @@
     "end": 153,
     "calls": [
       "NewLocalHTTP",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestSSEFragmentationAndBounds",
+    "kind": "function",
+    "file": "inference/robustness_test.go",
+    "start": 13,
+    "end": 27,
+    "calls": [
+      "NewStreamingLocalHTTP",
+      "b.Close",
+      "b.readStream",
+      "b.readStream",
+      "request",
+      "string",
+      "strings.NewReader",
+      "strings.NewReader",
+      "strings.Repeat",
+      "strings.Repeat",
+      "strings.Replace",
+      "strings.Replace",
+      "strings.Replace",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestOversizeHealthAndConstraintUnavailable",
+    "kind": "function",
+    "file": "inference/robustness_test.go",
+    "start": 32,
+    "end": 45,
+    "calls": [
+      "NewLocalHTTP",
+      "b.Close",
+      "b.Health",
+      "b.Invoke",
+      "context.Background",
+      "context.Background",
+      "fmt.Fprint",
+      "http.HandlerFunc",
+      "httptest.NewServer",
+      "request",
+      "s.Close",
+      "strings.Repeat",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestDuplicateCompletionAndUsage",
+    "kind": "function",
+    "file": "inference/robustness_test.go",
+    "start": 47,
+    "end": 57,
+    "calls": [
+      "NewStreamingLocalHTTP",
+      "b.Close",
+      "b.readStream",
+      "request",
+      "request",
+      "strings.NewReader",
       "t.Fatal"
     ]
   },
@@ -515,6 +636,51 @@
       "t.Fatalf",
       "t.TempDir",
       "time.Sleep"
+    ]
+  },
+  {
+    "name": "TestNVIDIAParsing",
+    "kind": "function",
+    "file": "resources/nvidia_test.go",
+    "start": 9,
+    "end": 23,
+    "calls": [
+      "parseGPU",
+      "parseGPU",
+      "parseGPU",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestOptionalGPUStillDeniesRequiredVRAM",
+    "kind": "function",
+    "file": "resources/nvidia_test.go",
+    "start": 32,
+    "end": 37,
+    "calls": [
+      "Check",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestOwnedProcessSampling",
+    "kind": "function",
+    "file": "resources/process_test.go",
+    "start": 11,
+    "end": 27,
+    "calls": [
+      "NewProcessProbe",
+      "errors.Is",
+      "os.Getpid",
+      "os.Getpid",
+      "p.Snapshot",
+      "p.Snapshot",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Skip"
     ]
   },
   {

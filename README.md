@@ -47,3 +47,7 @@ go run ./cmd/ice query Boundary
 Read only the returned file ranges, expand as needed, verify against source. After source or documentation changes: `go run ./cmd/ice build`. Validation checks source hashes and all generated maps, including deletions. Indexes are advisory and cannot authorize acceptance. `implementations.json` records explicit compiler-checked assertions; test/call maps are syntax references, not measured test coverage.
 
 See [architecture](docs/architecture.md), [integration seams](docs/integration-seams.md) and [known gaps](docs/known-gaps.md).
+
+## Stage 3 candidate
+
+See [Windows/GPU acceptance and measured 1.5B results](docs/internal-stage-3.md). Native hardware qualification remains pending. `go run ./cmd/ice relationships` derives active-platform Go type relationships. `go run ./cmd/wingless gpu --nvidia-smi <absolute-driver-tool-path>` measures a supported NVIDIA device. Neither command activates the plane.
