@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.stage3_6.listener-validation.v1",
+  "status": "WINDOWS_PROOF_PENDING",
+  "stage3_5_report_commit": "d89217a4fb1d7d425058e38664510655452a0679",
+  "accepted_stage3_5_source_commit": "806740246fd4af5032b70f9025c43ec667fe8add",
+  "frozen_plane_source_commit": "539d56fec273c8851aea131cf4d31425a62f7250",
+  "accepted_plane_transport_commit": "f3daaf40552a4d4d1bdbd9e4a929e03d61100657",
+  "listener_contract": "docs/plane-listener-contract-v1.json",
+  "listener_files": [
+    "integration/ckbplane/listener.go",
+    "integration/ckbplane/listener_contract.go",
+    "integration/ckbplane/listener_test.go"
+  ],
+  "proof_harness": "scripts/Test-Stage3-6-Listener.ps1",
+  "static_review": "PASS",
+  "native_windows_proof": "NOT_RUN",
+  "focused_listener_tests": "PENDING_WINDOWS",
+  "existing_ckbplane_tests": "PENDING_WINDOWS",
+  "full_wingless_suite": "PENDING_WINDOWS",
+  "wingless_build": "PENDING_WINDOWS",
+  "isolated_listener_replay": "PENDING_WINDOWS",
+  "request_body_consumed_before_inference": true,
+  "inference_parented_to_http_request_context": true,
+  "candidate_acceptance": "external_required",
+  "work_order_retry_budget": 0,
+  "default_listener_start": false,
+  "bind_or_listen_api": false,
+  "process_launch": false,
+  "live_plane_contact": false,
+  "live_queue": false,
+  "worker_registration": false,
+  "acceptance_authority": false,
+  "edit_application_authority": false,
+  "accepted_ref_mutation": false,
+  "notes": [
+    "The listener is an inactive http.Handler only; cmd/wingless remains unchanged and does not start it.",
+    "The handler fully consumes and closes the bounded request body before invoking intelligence, then parents intelligence to the HTTP request context.",
+    "The isolated replay test routes through the existing Wingless broker with an inference.Mock backend and returns a candidate-only structured edit envelope.",
+    "The listener validates but never applies edits, never accepts work, never retries a work order, and never transitions plane queue state.",
+    "Authoritative compile/test/build claims remain pending Windows PowerShell acceptance."
+  ]
+}
