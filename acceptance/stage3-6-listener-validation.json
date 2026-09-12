@@ -1,6 +1,6 @@
 {
   "schema": "wingless.stage3_6.listener-validation.v1",
-  "status": "WINDOWS_PROOF_PENDING",
+  "status": "WINDOWS_ACCEPTED_NO_ACTIVATION",
   "stage3_5_report_commit": "d89217a4fb1d7d425058e38664510655452a0679",
   "accepted_stage3_5_source_commit": "806740246fd4af5032b70f9025c43ec667fe8add",
   "frozen_plane_source_commit": "539d56fec273c8851aea131cf4d31425a62f7250",
@@ -12,15 +12,21 @@
     "integration/ckbplane/listener_test.go"
   ],
   "proof_harness": "scripts/Test-Stage3-6-Listener.ps1",
+  "windows_acceptance_record": "acceptance/stage3-6-inactive-listener-20260912.json",
+  "windows_commit_tested": "ff816f6497edd4fd9a9834c67364432dc048d404",
+  "windows_observed_at_utc": "2026-09-12T07:40:40.6819020+00:00",
+  "go_version": "go version go1.25.5 windows/amd64",
   "static_review": "PASS",
-  "native_windows_proof": "NOT_RUN",
-  "focused_listener_tests": "PENDING_WINDOWS",
-  "existing_ckbplane_tests": "PENDING_WINDOWS",
-  "full_wingless_suite": "PENDING_WINDOWS",
-  "wingless_build": "PENDING_WINDOWS",
-  "isolated_listener_replay": "PENDING_WINDOWS",
+  "native_windows_proof": "PASS",
+  "focused_listener_tests": "PASS",
+  "existing_ckbplane_tests": "PASS",
+  "full_wingless_suite": "PASS",
+  "wingless_build": "PASS",
+  "isolated_listener_replay": "PASS",
   "request_body_consumed_before_inference": true,
   "inference_parented_to_http_request_context": true,
+  "cancellation_propagation": "PASS",
+  "broker_backed_mock_replay": "PASS",
   "candidate_acceptance": "external_required",
   "work_order_retry_budget": 0,
   "default_listener_start": false,
@@ -32,11 +38,14 @@
   "acceptance_authority": false,
   "edit_application_authority": false,
   "accepted_ref_mutation": false,
+  "activation_authorized": false,
+  "next_gate": "CROSS_REPO_PLANE_CLIENT_TO_REAL_WINGLESS_LISTENER_REPLAY",
   "notes": [
-    "The listener is an inactive http.Handler only; cmd/wingless remains unchanged and does not start it.",
+    "Authoritative Windows PowerShell acceptance passed at Wingless commit ff816f6497edd4fd9a9834c67364432dc048d404.",
+    "The listener remains an inactive http.Handler only; cmd/wingless remains unchanged and does not start it.",
     "The handler fully consumes and closes the bounded request body before invoking intelligence, then parents intelligence to the HTTP request context.",
-    "The isolated replay test routes through the existing Wingless broker with an inference.Mock backend and returns a candidate-only structured edit envelope.",
+    "The isolated replay routes through the existing Wingless broker with an inference.Mock backend and returns a candidate-only structured edit envelope.",
     "The listener validates but never applies edits, never accepts work, never retries a work order, and never transitions plane queue state.",
-    "Authoritative compile/test/build claims remain pending Windows PowerShell acceptance."
+    "Live activation remains explicitly unauthorized."
   ]
 }
