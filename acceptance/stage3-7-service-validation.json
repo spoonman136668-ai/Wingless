@@ -1,20 +1,23 @@
 {
   "schema": "wingless.stage3_7.service-validation.v1",
-  "status": "WINDOWS_PROOF_PENDING",
+  "status": "WINDOWS_ACCEPTED_NO_ACTIVATION",
   "accepted_stage3_6_listener_source_commit": "ff816f6497edd4fd9a9834c67364432dc048d404",
   "accepted_stage3_6_metadata_commit": "d1eff46077f45e10531c843cea2ada7184ff7cfb",
+  "candidate_commit": "02c8b6103893f2ed3590cad01640fc4f1fc48e25",
   "proposal": "docs/plane-service-lifecycle-v1.json",
   "service_source": "integration/ckbplane/service.go",
   "service_tests": "integration/ckbplane/service_test.go",
   "proof_service": "integration/ckbplane/proofservice/main.go",
   "static_review": "PASS",
-  "focused_service_tests": "PENDING_WINDOWS",
-  "existing_ckbplane_tests": "PENDING_WINDOWS",
-  "full_wingless_suite": "PENDING_WINDOWS",
-  "normal_wingless_build": "PENDING_WINDOWS",
-  "proof_service_build": "PENDING_WINDOWS",
+  "focused_service_tests": "PASS_WINDOWS",
+  "existing_ckbplane_tests": "PASS_WINDOWS",
+  "full_wingless_suite": "PASS_WINDOWS",
+  "normal_wingless_build": "PASS_WINDOWS",
+  "proof_service_build": "PASS_WINDOWS",
   "bind_address": "127.0.0.1:0",
   "bind_network": "tcp4",
+  "request_body_consumed_before_inference": true,
+  "request_context_cancellation": "PASS_WINDOWS",
   "default_service_start": false,
   "production_backend_wired": false,
   "worker_registration": false,
@@ -24,10 +27,19 @@
   "work_order_retry_budget": 0,
   "candidate_acceptance": "external_required",
   "activation_authorized": false,
+  "windows_acceptance": {
+    "date": "2026-09-12",
+    "go_version": "go version go1.25.5 windows/amd64",
+    "focused_loopback_service_tests": "PASS",
+    "all_ckbplane_integration_tests": "PASS",
+    "full_wingless_suite": "PASS",
+    "normal_wingless_build": "PASS",
+    "proof_service_build": "PASS"
+  },
   "notes": [
     "ServeLoopbackService is an inactive library primitive around the accepted Listener and binds only numeric IPv4 loopback on an ephemeral port.",
     "The proofservice command is test/proof-only and is not referenced by cmd/wingless.",
     "The plane remains responsible for generating the session, launching and containing the process, and stopping it.",
-    "No default daemon, live registration, queue consumption, acceptance authority, edit application authority, or work-order retry ownership is introduced."
+    "Authoritative Windows qualification passed with no default daemon, live registration, queue consumption, acceptance authority, edit application authority, or work-order retry ownership introduced."
   ]
 }
