@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.stage3_7.service-validation.v1",
+  "status": "WINDOWS_PROOF_PENDING",
+  "accepted_stage3_6_listener_source_commit": "ff816f6497edd4fd9a9834c67364432dc048d404",
+  "accepted_stage3_6_metadata_commit": "d1eff46077f45e10531c843cea2ada7184ff7cfb",
+  "proposal": "docs/plane-service-lifecycle-v1.json",
+  "service_source": "integration/ckbplane/service.go",
+  "service_tests": "integration/ckbplane/service_test.go",
+  "proof_service": "integration/ckbplane/proofservice/main.go",
+  "static_review": "PASS",
+  "focused_service_tests": "PENDING_WINDOWS",
+  "existing_ckbplane_tests": "PENDING_WINDOWS",
+  "full_wingless_suite": "PENDING_WINDOWS",
+  "normal_wingless_build": "PENDING_WINDOWS",
+  "proof_service_build": "PENDING_WINDOWS",
+  "bind_address": "127.0.0.1:0",
+  "bind_network": "tcp4",
+  "default_service_start": false,
+  "production_backend_wired": false,
+  "worker_registration": false,
+  "live_queue": false,
+  "acceptance_authority": false,
+  "edit_application_authority": false,
+  "work_order_retry_budget": 0,
+  "candidate_acceptance": "external_required",
+  "activation_authorized": false,
+  "notes": [
+    "ServeLoopbackService is an inactive library primitive around the accepted Listener and binds only numeric IPv4 loopback on an ephemeral port.",
+    "The proofservice command is test/proof-only and is not referenced by cmd/wingless.",
+    "The plane remains responsible for generating the session, launching and containing the process, and stopping it.",
+    "No default daemon, live registration, queue consumption, acceptance authority, edit application authority, or work-order retry ownership is introduced."
+  ]
+}
