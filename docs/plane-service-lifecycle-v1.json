@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.plane-service-lifecycle.v1",
+  "status": "PROPOSAL_ONLY_INACTIVE",
+  "owner": "ckb-plane",
+  "wingless_role": "listener_service_only",
+  "prerequisites": {
+    "accepted_stage3_6_listener_source_commit": "ff816f6497edd4fd9a9834c67364432dc048d404",
+    "accepted_stage3_6_metadata_commit": "d1eff46077f45e10531c843cea2ada7184ff7cfb",
+    "accepted_plane_crossrepo_record": "ckb-plane/acceptance/wingless-crossrepo-v1-inactive-windows-20260912.json"
+  },
+  "service": {
+    "bind_network": "tcp4",
+    "bind_address": "127.0.0.1:0",
+    "path": "/v1/wingless/candidate",
+    "ready_schema": "wingless.loopback-service-ready.v1",
+    "ready_channel": "stdout_first_json_line",
+    "session_source": "plane_owned_environment",
+    "session_environment_variable": "CKB_WINGLESS_SESSION",
+    "session_on_command_line": false,
+    "session_in_ready_message": false,
+    "default_start": false,
+    "queue_access": false,
+    "acceptance_authority": false,
+    "edit_application_authority": false,
+    "work_order_retry_budget": 0
+  },
+  "plane_launcher": {
+    "program_path": "trusted_plane_configuration_only",
+    "program_sha256_required": true,
+    "generic_args": false,
+    "shell": false,
+    "environment": "minimal_plane_environment_plus_session",
+    "process_containment": "existing_ckb_plane_supervised_runner",
+    "restart_budget": 0,
+    "startup_timeout_required": true,
+    "stop_owned_by_plane": true
+  },
+  "proof_service": {
+    "path": "integration/ckbplane/proofservice",
+    "purpose": "isolated process-boundary replay only",
+    "production_backend": false,
+    "default_command": false
+  },
+  "required_wingless_tests": [
+    "TestWinglessLoopbackServiceReadyContract",
+    "TestWinglessLoopbackServiceNumericIPv4Only",
+    "TestWinglessLoopbackServiceCancellationStopsListener",
+    "TestWinglessLoopbackServiceNoDefaultActivationSurface"
+  ],
+  "required_cross_process_proof": [
+    "plane launches exact hashed Wingless proof service through SupervisedRunner",
+    "ready endpoint is numeric IPv4 loopback and exact transport path",
+    "accepted plane transport performs one successful exchange",
+    "plane validates candidate and applies edits",
+    "plane cancellation propagates to listener inference",
+    "plane service close terminates contained process",
+    "no restart or retry occurs",
+    "default Wingless registration remains absent"
+  ],
+  "deferred": [
+    "production Wingless model-service command",
+    "live worker registration",
+    "live queue consumption",
+    "automatic service startup",
+    "persistent warm model process",
+    "production deployment",
+    "accepted-ref mutation"
+  ]
+}
