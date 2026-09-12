@@ -1,0 +1,83 @@
+{
+  "schema": "wingless.ckb-plane-listener-contract.v1",
+  "status": "INACTIVE_WINDOWS_PROOF_PENDING",
+  "plane_contract": {
+    "repository": "spoonman136668-ai/ckb-plane",
+    "frozen_source_commit": "539d56fec273c8851aea131cf4d31425a62f7250",
+    "accepted_transport_commit": "f3daaf40552a4d4d1bdbd9e4a929e03d61100657",
+    "accepted_transport_record": "acceptance/wingless-transport-v1-inactive-windows-20260911.json",
+    "request_schema": "ckb-plane.wingless-transport-request.v1",
+    "response_schema": "ckb-plane.wingless-candidate-envelope.v1",
+    "path": "/v1/wingless/candidate"
+  },
+  "wingless_baseline": {
+    "stage3_5_report_commit": "d89217a4fb1d7d425058e38664510655452a0679",
+    "accepted_stage3_5_source_commit": "806740246fd4af5032b70f9025c43ec667fe8add"
+  },
+  "listener": {
+    "default_start": false,
+    "bind_or_listen_api": false,
+    "process_launch": false,
+    "queue_consumption": false,
+    "worker_registration": false,
+    "acceptance_authority": false,
+    "retry_authority": false,
+    "accepted_ref_mutation": false,
+    "handler_only": true,
+    "session_header": "X-CKB-Wingless-Session",
+    "session_format": "64_lower_hex",
+    "request_body_max_bytes": 2097152,
+    "candidate_body_max_bytes": 7340032
+  },
+  "request_rules": {
+    "method": "POST",
+    "content_type": "application/json",
+    "strict_unknown_fields": true,
+    "strict_duplicate_fields": true,
+    "strict_trailing_json": true,
+    "source_commit_exact": true,
+    "request_id_derived_from_work_order_and_attempt": true,
+    "work_order_retry_budget": 0,
+    "deadline_max_minutes": 15,
+    "body_must_be_fully_consumed_and_closed_before_inference": true,
+    "inference_context_parent": "http_request_context"
+  },
+  "candidate_rules": {
+    "acceptance": "external_required",
+    "allowed_statuses": ["result_ready", "verified_candidate", "operator_blocked"],
+    "identity_exact_echo_required": true,
+    "nonblocked_requires_edits": true,
+    "operator_blocked_forbids_edits": true,
+    "candidate_text_advisory": true,
+    "edit_application_owner": "ckb-plane"
+  },
+  "required_tests": [
+    "TestWinglessListenerAcceptsExactPlaneRequest",
+    "TestWinglessListenerRejectsSessionMethodPathAndContentType",
+    "TestWinglessListenerRejectsUnknownDuplicateAndTrailingJSON",
+    "TestWinglessListenerConsumesAndClosesBodyBeforeInference",
+    "TestWinglessListenerCancellationParentsInferenceToRequest",
+    "TestWinglessListenerRejectsAcceptanceClaimAndIdentityChange",
+    "TestWinglessListenerCallsIntelligenceExactlyOnce",
+    "TestWinglessListenerNoProcessListenQueueOrAcceptanceSurface",
+    "TestWinglessListenerFullRequestResponseReplayThroughBroker",
+    "TestWinglessListenerIsolatedProof"
+  ],
+  "acceptance_gate": {
+    "focused_listener_tests": "PASS",
+    "existing_ckbplane_tests": "PASS",
+    "full_wingless_suite": "PASS",
+    "wingless_build": "PASS",
+    "isolated_listener_replay": "PASS",
+    "default_listener_start": "ABSENT"
+  },
+  "deferred": [
+    "default_listener_start",
+    "plane_owned_service_launcher",
+    "live_worker_registration",
+    "live_queue_consumption",
+    "real_model_listener_replay",
+    "production_activation",
+    "promotion_deployment"
+  ]
+}
