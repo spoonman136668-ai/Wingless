@@ -31,6 +31,13 @@ func main() {
 		}
 		return
 	}
+	if len(os.Args) > 1 && os.Args[1] == "replay-report" {
+		if e := runReplayReport(os.Args[2:]); e != nil {
+			fmt.Fprintln(os.Stderr, e)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) == 2 && os.Args[1] == "host" {
 		h := &resources.Host{Path: "."}
 		if _, e := h.Snapshot(); e != nil {
@@ -50,7 +57,7 @@ func main() {
 	}
 
 	if len(os.Args) != 2 || (os.Args[1] != "demo" && os.Args[1] != "benchmark") {
-		fmt.Fprintln(os.Stderr, "usage: wingless host|demo|benchmark|local-benchmark (--config FILE or --endpoint URL --model ID)")
+		fmt.Fprintln(os.Stderr, "usage: wingless host|demo|benchmark|local-benchmark (--config FILE or --endpoint URL --model ID)|replay-report --report FILE")
 		os.Exit(2)
 	}
 	reg := &broker.Registry{}
