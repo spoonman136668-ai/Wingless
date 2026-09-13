@@ -1,0 +1,46 @@
+﻿{
+    "schema":  "wingless.model-qualification-hardened-gate.v1",
+    "recorded_at":  "2026-09-13T17:56:06.1665124-04:00",
+    "branch":  "model-qualification-v1",
+    "source_commit":  "9ba6c4d21bba9e72505fa27de1e541eae0125ade",
+    "platform":  "windows",
+    "authority":  "external_required",
+    "model":  {
+                  "family":  "Devstral-Small-2-24B-Instruct-2512",
+                  "quantization":  "IQ3_M",
+                  "sha256":  "758ba97c3f7c03cd2e3c5fa10c8ad4a6c37c75e5e4d931c9afd97d6efe62ebb3"
+              },
+    "trust_ramp":  {
+                       "base_real_patch":  "PASS",
+                       "stage_1":  "PASS",
+                       "stage_2":  "REJECTED_AFTER_BOUNDED_REPAIR",
+                       "stage_2_reason":  "latent_routing_semantic_drift",
+                       "stage_3":  "NOT_AUTHORIZED"
+                   },
+    "hardened_gate":  {
+                          "validated":  true,
+                          "validation_result":  "HARDENED_GATE_VALIDATED_REJECTION_PATH",
+                          "requires_schema_valid_candidate":  true,
+                          "requires_exact_preimage":  true,
+                          "requires_immutable_tests":  true,
+                          "requires_bounded_production_scope":  true,
+                          "requires_targeted_test":  true,
+                          "requires_scenario_counterexample":  true,
+                          "requires_full_suite":  true,
+                          "requires_full_build":  true,
+                          "requires_gofmt_clean":  true,
+                          "known_single_mutation_requires_exact_source_restoration":  true
+                      },
+    "windows_evidence":  {
+                             "hardened_gate_result_sha256":  "827548595ea6704f2c7118c584119b424fd10f8e741d319970b9d60799b12ca2",
+                             "semantic_counterexample_result_sha256":  "4745c2a9582563c79c1081745a5f7757569ba3bff39d4dfa6fee23a04caba0b8"
+                         },
+    "boundaries":  {
+                       "model_edit_authority":  false,
+                       "model_test_authority":  false,
+                       "ckb_plane_mutated":  false,
+                       "accepted_ref_mutated":  false,
+                       "live_wingless_activated":  false,
+                       "merge_to_main_authorized":  false
+                   }
+}
