@@ -42,6 +42,17 @@ func (b *limitedOutput) Write(p []byte) (int, error) {
 	b.data = append(b.data, p...)
 	return len(p), nil
 }
+
+func nvidiaEnvironment() []string {
+	env := []string{}
+	for _, key := range []string{"SystemRoot", "WINDIR", "TEMP", "TMP", "ProgramW6432"} {
+		if v := os.Getenv(key); v != "" {
+			env = append(env, key+"="+v)
+		}
+	}
+	return env
+}
+
 func (n NVIDIA) GPU(parent context.Context) (GPU, error) {
 	base := strings.ToLower(filepath.Base(n.Executable))
 	if !filepath.IsAbs(n.Executable) || (base != "nvidia-smi" && base != "nvidia-smi.exe") || n.Index < 0 || n.Index > 31 {
@@ -50,12 +61,7 @@ func (n NVIDIA) GPU(parent context.Context) (GPU, error) {
 	ctx, c := context.WithTimeout(parent, 2*time.Second)
 	defer c()
 	cmd := exec.CommandContext(ctx, n.Executable, "--id="+strconv.Itoa(n.Index), "--query-gpu=uuid,name,memory.total,memory.used,memory.free,utilization.gpu,utilization.memory,temperature.gpu,power.draw", "--format=csv,noheader,nounits")
-	cmd.Env = []string{}
-	for _, key := range []string{"SystemRoot", "WINDIR", "TEMP", "TMP"} {
-		if v := os.Getenv(key); v != "" {
-			cmd.Env = append(cmd.Env, key+"="+v)
-		}
-	}
+	cmd.Env = nvidiaEnvironment()
 	var out, errout limitedOutput
 	cmd.Stdout = &out
 	cmd.Stderr = &errout
