@@ -101,6 +101,34 @@ func TestBoundedRepairAndAuthority(t *testing.T) {
 		t.Fatal(out)
 	}
 }
+func TestVerifiedCandidateNormalizesSingleFenceAndPreservesRaw(t *testing.T) {
+	r, q, p := fixture()
+	p.MaxRepairs = 0
+	raw := "```go\ndeep\n```"
+	r.entries["fast"].Backend.(*inference.Mock).Reply = raw
+	out := (Runner{r, metrics{}, verifier{}}).Run(context.Background(), q, p)
+	if out.Status != "verified_candidate" || len(out.Events) != 1 {
+		t.Fatal(out)
+	}
+	e := out.Events[0]
+	if e.Result.Text != "deep" || e.RawModelText != raw || e.Verification != "fixture_pass" || out.Acceptance != "external_required" {
+		t.Fatal(e, out.Acceptance)
+	}
+}
+func TestUnverifiedResultPreservesRawFence(t *testing.T) {
+	r, q, p := fixture()
+	p.MaxRepairs = 0
+	raw := "```go\ndeep\n```"
+	r.entries["fast"].Backend.(*inference.Mock).Reply = raw
+	out := (Runner{r, metrics{}, nil}).Run(context.Background(), q, p)
+	if out.Status != "result_ready" || len(out.Events) != 1 {
+		t.Fatal(out)
+	}
+	e := out.Events[0]
+	if e.Result.Text != raw || e.RawModelText != "" || e.Verification != "not_run" || out.Acceptance != "external_required" {
+		t.Fatal(e, out.Acceptance)
+	}
+}
 func TestPlanThenFast(t *testing.T) {
 	r, q, p := fixture()
 	a, b := (Runner{r, metrics{}, nil}).PlanThenImplement(context.Background(), q, p)
