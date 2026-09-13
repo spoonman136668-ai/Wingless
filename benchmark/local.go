@@ -14,13 +14,14 @@ import (
 )
 
 type LocalRow struct {
-	ProcessError      *string                   `json:"process_error"`
-	Repetition        int                       `json:"repetition"`
-	SemanticCorrect   bool                      `json:"semantic_correct"`
-	ProtocolCompliant bool                      `json:"protocol_compliant"`
-	StrictCorrect     bool                      `json:"strict_correct"`
-	ProcessBefore     *resources.ProcessMetrics `json:"process_before"`
-	ProcessAfter      *resources.ProcessMetrics `json:"process_after"`
+	ProcessError          *string                   `json:"process_error"`
+	ResourceSamplingError *string                   `json:"resource_sampling_error"`
+	Repetition            int                       `json:"repetition"`
+	SemanticCorrect       bool                      `json:"semantic_correct"`
+	ProtocolCompliant     bool                      `json:"protocol_compliant"`
+	StrictCorrect         bool                      `json:"strict_correct"`
+	ProcessBefore         *resources.ProcessMetrics `json:"process_before"`
+	ProcessAfter          *resources.ProcessMetrics `json:"process_after"`
 
 	Task                  string           `json:"task"`
 	Correct               bool             `json:"correct"`
@@ -87,7 +88,7 @@ func codeShape(text string) bool {
 
 // RunLocal uses fixed public microfixtures. It executes no generated code or tools.
 func RunLocal(ctx context.Context, b inference.InferenceBackend, h resources.Provider, repeats int) (LocalReport, error) {
-	out := LocalReport{Version: 2, OS: runtime.GOOS, Arch: runtime.GOARCH, CPUs: runtime.NumCPU(), ResourceScope: "OS host, not per-process/container allocation", StartedAt: time.Now().UTC(), Acceptance: "external_required"}
+	out := LocalReport{Version: 3, OS: runtime.GOOS, Arch: runtime.GOARCH, CPUs: runtime.NumCPU(), ResourceScope: "OS host, not per-process/container allocation", StartedAt: time.Now().UTC(), Acceptance: "external_required"}
 	if repeats < 1 || repeats > 3 {
 		return out, fmt.Errorf("repeats must be 1..3")
 	}
@@ -118,9 +119,19 @@ func RunLocal(ctx context.Context, b inference.InferenceBackend, h resources.Pro
 			if observer, ok := h.(processObserver); ok {
 				processBefore, processErr = observer.ProcessSnapshot()
 			}
+			sampler := startResourceSampler(ctx, h, before)
 			result, e := b.Invoke(ctx, r)
+			peak, samplingErr := sampler.finish(nil)
 			after, sampleErr := h.Snapshot()
+			if sampleErr == nil {
+				merged := mergePeak(*peak, after)
+				peak = &merged
+			}
 			row := LocalRow{Task: f.id, Result: result, Repetition: n, ProcessBefore: processBefore}
+			if samplingErr != nil {
+				message := samplingErr.Error()
+				row.ResourceSamplingError = &message
+			}
 			if observer, ok := h.(processObserver); ok {
 				row.ProcessAfter, processErr = observer.ProcessSnapshot()
 			}
@@ -132,6 +143,7 @@ func RunLocal(ctx context.Context, b inference.InferenceBackend, h resources.Pro
 				plan = result.Text
 			}
 			row.Result.Telemetry.Before = &before
+			row.Result.Telemetry.Peak = peak
 			if sampleErr == nil {
 				row.Result.Telemetry.After = &after
 			}
