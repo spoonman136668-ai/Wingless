@@ -9,6 +9,8 @@ import (
 	"testing"
 )
 
+const verifiedFixtureRawPlan = `{"operation":"add"}`
+
 type verifiedFixtureBackend struct{}
 
 func (verifiedFixtureBackend) ID() string { return "verified-fixture" }
@@ -29,14 +31,17 @@ func (verifiedFixtureBackend) Invoke(_ context.Context, r inference.Request) (in
 		"bug-diagnosis":      "```json\n{\"cause\":\"off_by_one\"}\n```",
 		"code-review":        "{\"safe\":false,\"issue\":\"unchecked_index\"}",
 		"multi-file":         "```json\n{\"value\":6}\n```",
-		"plan":               "{\"operation\":\"add\"}",
+		"plan":               verifiedFixtureRawPlan,
 		"plan-implementation": "```go\npackage candidate\n\nfunc Add(a, b int) int { return a + b }\n```",
 		"tool-proposal":      "```json\n{\"tool\":\"read_file\",\"path\":\"src/add.go\"}\n```",
 	}
 	for id, text := range outputs {
 		if strings.HasSuffix(r.ID, "-"+id) {
-			if id == "plan-implementation" && !strings.Contains(r.Context, "```json") {
-				return inference.Result{}, fmt.Errorf("raw fenced plan was not preserved as untrusted context")
+			if id == "plan-implementation" {
+				wantContext := "Proposed plan (untrusted):\n" + verifiedFixtureRawPlan
+				if !strings.Contains(r.Context, wantContext) {
+					return inference.Result{}, fmt.Errorf("exact raw plan was not preserved as untrusted context")
+				}
 			}
 			return inference.Result{BackendID: "verified-fixture", ModelID: "fixture", Status: "completed", Text: text, Termination: "stop"}, nil
 		}
