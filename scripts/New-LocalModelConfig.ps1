@@ -1,6 +1,10 @@
 param(
  [Parameter(Mandatory=$true)][string]$Executable,
  [Parameter(Mandatory=$true)][string]$Model,
+ [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$RuntimeVersion,
+ [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$ModelRepo,
+ [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$ModelRevision,
+ [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$Quantization,
  [string]$Output = (Join-Path (Split-Path $PSScriptRoot -Parent) 'local-model.json'),
  [ValidateRange(1024,65535)][int]$Port = 18791,
  [ValidateRange(0,128)][int]$GPULayers = 0,
@@ -15,12 +19,19 @@ $ErrorActionPreference = 'Stop'
 $ExeFile = Get-Item -LiteralPath $Executable
 $ModelFile = Get-Item -LiteralPath $Model
 if ($ExeFile.Name -notin @('llama-server.exe','llama-server')) { throw 'Choose a trusted llama-server executable.' }
-if ($ExeFile.PSIsContainer -or $ModelFile.PSIsContainer -or $ExeFile.Length -gt 512MB -or $ModelFile.Length -gt 2GB) { throw 'File type/size outside experiment limits.' }
+if ($ExeFile.PSIsContainer -or $ModelFile.PSIsContainer -or $ExeFile.Length -gt 512MB -or $ModelFile.Length -gt 24GB) { throw 'File type/size outside experiment limits.' }
 if (Test-Path -LiteralPath $Output) { throw 'Output exists; choose a new configuration path.' }
 if ($MicroBatch -gt $Batch) { throw 'MicroBatch must not exceed Batch.' }
 if ($GPULayers -gt 0 -and (-not $NvidiaSMI -or $MinVRAM -eq 0)) { throw 'GPU configuration requires NVIDIA utility and VRAM floor.' }
 if ($NvidiaSMI) { $NvidiaSMI = (Get-Item -LiteralPath $NvidiaSMI).FullName }
+foreach ($Value in @($RuntimeVersion,$ModelRepo,$ModelRevision,$Quantization)) {
+ if ($Value.Length -gt 256 -or $Value -match '[\r\n]') { throw 'Provenance value is invalid or too long.' }
+}
 $Config = [ordered]@{
+ runtime_version = $RuntimeVersion
+ model_repo = $ModelRepo
+ model_revision = $ModelRevision
+ quantization = $Quantization
  gpu_layers = $GPULayers
  nvidia_smi = $NvidiaSMI
  gpu_index = $GPUIndex
