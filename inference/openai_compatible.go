@@ -36,7 +36,10 @@ func NewLocalHTTP(id, model, endpoint string, features []string) (*LocalHTTP, er
 	if id == "" || model == "" || u.Scheme != "http" || ip == nil || !ip.IsLoopback() || u.User != nil || u.RawQuery != "" || u.Fragment != "" || u.Path != "" && u.Path != "/" {
 		return nil, fmt.Errorf("explicit numeric loopback HTTP origin required")
 	}
-	tr := &http.Transport{Proxy: nil, DialContext: (&net.Dialer{Timeout: 5 * time.Second}).DialContext, ResponseHeaderTimeout: 30 * time.Second, MaxResponseHeaderBytes: 16384}
+	// Non-streaming local inference servers may not send response headers until generation
+	// completes. The request context and client timeout already bound total request lifetime,
+	// so a shorter transport ResponseHeaderTimeout would incorrectly kill valid generations.
+	tr := &http.Transport{Proxy: nil, DialContext: (&net.Dialer{Timeout: 5 * time.Second}).DialContext, MaxResponseHeaderBytes: 16384}
 	return &LocalHTTP{name: id, model: model, endpoint: strings.TrimRight(endpoint, "/"), features: append([]string(nil), features...), client: &http.Client{Transport: tr, Timeout: 15 * time.Minute, CheckRedirect: func(*http.Request, []*http.Request) error { return fmt.Errorf("redirect denied") }}, active: map[string]context.CancelFunc{}}, nil
 }
 func (b *LocalHTTP) ID() string             { return b.name }
