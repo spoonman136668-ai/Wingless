@@ -71,7 +71,7 @@ func TestOwnedProcessLifecycle(t *testing.T) {
 	}
 	port := listener.Addr().(*net.TCPAddr).Port
 	listener.Close()
-	s, e := New(Config{Executable: exe, ExecutableSHA256: fmt.Sprintf("%x", h.Sum(nil)), Model: model, ModelSHA256: mh, ModelID: "fixture", Port: port, Threads: 1, ContextTokens: 128, StartupSeconds: 5, RuntimeSeconds: 10, MinRAM: 1 << 30}, ample{})
+	s, e := New(Config{RuntimeVersion: "test-runtime", ModelRepo: "test/fixture", ModelRevision: "test-revision", Quantization: "test-quant", Executable: exe, ExecutableSHA256: fmt.Sprintf("%x", h.Sum(nil)), Model: model, ModelSHA256: mh, ModelID: "fixture", Port: port, Threads: 1, ContextTokens: 128, StartupSeconds: 5, RuntimeSeconds: 10, MinRAM: 1 << 30}, ample{})
 	if e != nil {
 		t.Fatal(e)
 	}
