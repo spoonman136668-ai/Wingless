@@ -3,6 +3,7 @@ package resources
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -22,13 +23,35 @@ func TestNVIDIAParsing(t *testing.T) {
 	}
 }
 
+func TestNVIDIAEnvironmentIsBounded(t *testing.T) {
+	t.Setenv("SystemRoot", `C:\Windows`)
+	t.Setenv("WINDIR", `C:\Windows`)
+	t.Setenv("TEMP", `C:\Temp`)
+	t.Setenv("TMP", `C:\Tmp`)
+	t.Setenv("ProgramW6432", `C:\Program Files`)
+	t.Setenv("PATH", `C:\sensitive-path`)
+	t.Setenv("OPENAI_API_KEY", "do-not-inherit")
+	t.Setenv("HTTPS_PROXY", "http://do-not-inherit")
+
+	want := []string{
+		`SystemRoot=C:\Windows`,
+		`WINDIR=C:\Windows`,
+		`TEMP=C:\Temp`,
+		`TMP=C:\Tmp`,
+		`ProgramW6432=C:\Program Files`,
+	}
+	if got := nvidiaEnvironment(); !reflect.DeepEqual(got, want) {
+		t.Fatalf("unexpected NVIDIA environment: got=%q want=%q", got, want)
+	}
+}
+
 type unavailableGPU struct{}
 
 func (unavailableGPU) GPU(context.Context) (GPU, error) { return GPU{}, fmt.Errorf("unavailable") }
 
 type emptyHost struct{}
 
-func (emptyHost) Snapshot() (Metrics, error) { return Metrics{}, nil }
+func (emptyHost) Snapshot() (Metrics, error) { return resources.Metrics{}, nil }
 func TestOptionalGPUStillDeniesRequiredVRAM(t *testing.T) {
 	m, e := (WithGPU{emptyHost{}, unavailableGPU{}}).Snapshot()
 	if e != nil || m.GPUError == nil || m.VRAMFree != nil || Check(Policy{MinVRAM: 1}, m) == nil {
