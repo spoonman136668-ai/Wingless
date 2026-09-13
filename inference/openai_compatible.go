@@ -123,12 +123,13 @@ func (b *LocalHTTP) Invoke(parent context.Context, r Request) (out Result, err e
 	b.mu.Unlock()
 	defer func() { b.mu.Lock(); delete(b.active, r.ID); b.mu.Unlock() }()
 	payload := struct {
-		Model         string              `json:"model"`
-		Messages      []map[string]string `json:"messages"`
-		MaxTokens     int                 `json:"max_tokens"`
-		Stream        bool                `json:"stream"`
-		StreamOptions map[string]bool     `json:"stream_options,omitempty"`
-	}{b.model, []map[string]string{{"role": "user", "content": r.Context}}, r.MaxOutputTokens, b.streaming, nil}
+		Model           string              `json:"model"`
+		Messages        []map[string]string `json:"messages"`
+		MaxTokens       int                 `json:"max_tokens"`
+		Stream          bool                `json:"stream"`
+		StreamOptions   map[string]bool     `json:"stream_options,omitempty"`
+		TimingsPerToken bool                `json:"timings_per_token,omitempty"`
+	}{b.model, []map[string]string{{"role": "user", "content": r.Context}}, r.MaxOutputTokens, b.streaming, nil, b.streaming}
 	if b.streaming {
 		payload.StreamOptions = map[string]bool{"include_usage": true}
 	}
