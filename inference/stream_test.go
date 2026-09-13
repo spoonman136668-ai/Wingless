@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -52,6 +53,37 @@ func TestStreamingValidation(t *testing.T) {
 				t.Fatal("invalid stream accepted", out, e)
 			}
 		})
+	}
+}
+
+func TestStreamingCapturesLlamaTimings(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(io.LimitReader(r.Body, 65536))
+		if err != nil {
+			t.Errorf("read request: %v", err)
+			return
+		}
+		if !strings.Contains(string(body), `"timings_per_token":true`) {
+			t.Errorf("timing request flag missing: %s", body)
+			return
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		fmt.Fprint(w, "data: {\"model\":\"fixture\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"ok\"}}]}\n\n")
+		fmt.Fprint(w, "data: {\"model\":\"fixture\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":20,\"completion_tokens\":2},\"timings\":{\"prompt_ms\":100.0,\"prompt_per_second\":200.0,\"predicted_per_second\":40.0}}\n\n")
+		fmt.Fprint(w, "data: [DONE]\n\n")
+	}))
+	defer server.Close()
+	b, err := NewStreamingLocalHTTP("local", "fixture", server.URL, []string{"code"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer b.Close()
+	out, err := b.Invoke(context.Background(), request())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if out.Telemetry.PromptEvalMS == nil || *out.Telemetry.PromptEvalMS != 100 || out.Telemetry.PromptTokensPerSecond == nil || *out.Telemetry.PromptTokensPerSecond != 200 || out.Telemetry.ServerGenerationTokensPerSecond == nil || *out.Telemetry.ServerGenerationTokensPerSecond != 40 {
+		t.Fatal("missing timing telemetry", out.Telemetry)
 	}
 }
 
