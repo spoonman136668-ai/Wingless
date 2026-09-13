@@ -27,7 +27,7 @@ func TestPinnedAndResourceDenial(t *testing.T) {
 	if pinned(model, sum, 2) == nil {
 		t.Fatal("size accepted")
 	}
-	c := Config{Executable: exe, Model: model, ExecutableSHA256: sum, ModelSHA256: sum, ModelID: "fixture", Port: 18080, Threads: 1, ContextTokens: 512, StartupSeconds: 1, RuntimeSeconds: 2, MinRAM: 1 << 30}
+	c := Config{RuntimeVersion: "test-runtime", ModelRepo: "test/model", ModelRevision: "deadbeef", Quantization: "Q4_K_M", Executable: exe, Model: model, ExecutableSHA256: sum, ModelSHA256: sum, ModelID: "fixture", Port: 18080, Threads: 1, ContextTokens: 512, StartupSeconds: 1, RuntimeSeconds: 2, MinRAM: 1 << 30}
 	s, e := New(c, unknown{})
 	if e != nil {
 		t.Fatal(e)
@@ -38,6 +38,22 @@ func TestPinnedAndResourceDenial(t *testing.T) {
 	c.Executable = filepath.Join(root, "shell")
 	if _, e = New(c, unknown{}); e == nil {
 		t.Fatal("arbitrary command accepted")
+	}
+}
+func TestQualificationRequiresProvenanceAndBoundedContext(t *testing.T) {
+	root := t.TempDir()
+	c := Config{RuntimeVersion: "runtime", ModelRepo: "repo", ModelRevision: "rev", Quantization: "Q4_K_M", Executable: filepath.Join(root, "llama-server"), Model: filepath.Join(root, "model.gguf"), ModelID: "fixture", Port: 18080, Threads: 1, ContextTokens: 16384, StartupSeconds: 1, RuntimeSeconds: 2, MinRAM: 1 << 30}
+	if _, e := New(c, unknown{}); e != nil {
+		t.Fatalf("bounded 16K context rejected: %v", e)
+	}
+	c.RuntimeVersion = ""
+	if _, e := New(c, unknown{}); e == nil {
+		t.Fatal("missing provenance accepted")
+	}
+	c.RuntimeVersion = "runtime"
+	c.ContextTokens = 16385
+	if _, e := New(c, unknown{}); e == nil {
+		t.Fatal("oversize context accepted")
 	}
 }
 func TestTailBound(t *testing.T) {
