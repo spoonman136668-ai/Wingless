@@ -8,6 +8,7 @@ import (
 type Provenance struct {
 	RuntimeVersion *string        `json:"runtime_version"`
 	RuntimeHash    *string        `json:"runtime_hash"`
+	RuntimeStartupMS *int64       `json:"runtime_startup_ms"`
 	ModelRepo      *string        `json:"model_repo"`
 	ModelRevision  *string        `json:"model_revision"`
 	ModelHash      *string        `json:"model_hash"`
