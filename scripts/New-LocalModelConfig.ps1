@@ -11,7 +11,7 @@ param(
  [string]$NvidiaSMI = '',
  [ValidateRange(0,31)][int]$GPUIndex = 0,
  [UInt64]$MinVRAM = 1073741824,
- [ValidateRange(128,4096)][int]$ContextTokens = 1024,
+ [ValidateRange(128,16384)][int]$ContextTokens = 1024,
  [ValidateRange(1,2048)][int]$Batch = 512,
  [ValidateRange(1,2048)][int]$MicroBatch = 128
 )
