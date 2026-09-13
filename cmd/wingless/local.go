@@ -17,8 +17,18 @@ import (
 )
 
 // runLocal is an operator-only local inference experiment, never a plane worker/tool.
-func runLocal(args []string) error {
-	flags := flag.NewFlagSet("local-benchmark", flag.ContinueOnError)
+func runLocal(args []string) error { return runLocalMode(args, false) }
+
+// runLocalVerified uses the same pinned local model/runtime path, but routes the
+// fixed fixtures through the real broker/verifier seam. It remains operator-only.
+func runLocalVerified(args []string) error { return runLocalMode(args, true) }
+
+func runLocalMode(args []string, verified bool) error {
+	command := "local-benchmark"
+	if verified {
+		command = "local-verified-benchmark"
+	}
+	flags := flag.NewFlagSet(command, flag.ContinueOnError)
 	config := flags.String("config", "", "pinned llama-server/model JSON configuration")
 	endpoint := flags.String("endpoint", "", "existing numeric loopback endpoint (no process launch)")
 	model := flags.String("model", "", "existing endpoint model ID")
@@ -117,12 +127,46 @@ func runLocal(args []string) error {
 		}
 		*profile = "EXTERNAL_UNVERIFIED"
 	}
-	b, e := inference.NewStreamingLocalHTTP("local-benchmark", id, url, []string{"code"})
+	backendID := "local-benchmark"
+	if verified {
+		backendID = "local-verified-benchmark"
+	}
+	b, e := inference.NewStreamingLocalHTTP(backendID, id, url, []string{"code"})
 	if e != nil {
 		return e
 	}
 	defer b.Close()
-	report, e := benchmark.RunLocal(ctx, b, experimentMetrics{provider, supervisor}, *repeats)
+	metrics := experimentMetrics{provider, supervisor}
+
+	if verified {
+		report, runErr := benchmark.RunLocalVerified(ctx, b, metrics, *repeats)
+		report.Profile = *profile
+		report.Provenance = provenance
+		if supervisor != nil {
+			stopCtx, c := context.WithTimeout(context.Background(), 5*time.Second)
+			stopErr := supervisor.Stop(stopCtx)
+			c()
+			if stopErr != nil {
+				return stopErr
+			}
+		}
+		envelope := struct {
+			Report  benchmark.VerifiedLocalReport `json:"report"`
+			Process *modelhost.Evidence           `json:"process,omitempty"`
+		}{Report: report}
+		if supervisor != nil {
+			state := supervisor.Status()
+			envelope.Process = &state
+		}
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		if encodeErr := enc.Encode(envelope); encodeErr != nil {
+			return encodeErr
+		}
+		return runErr
+	}
+
+	report, runErr := benchmark.RunLocal(ctx, b, metrics, *repeats)
 	report.Profile = *profile
 	report.Provenance = provenance
 	if supervisor != nil {
@@ -146,7 +190,7 @@ func runLocal(args []string) error {
 	if encodeErr := enc.Encode(envelope); encodeErr != nil {
 		return encodeErr
 	}
-	return e
+	return runErr
 }
 
 type experimentMetrics struct {
