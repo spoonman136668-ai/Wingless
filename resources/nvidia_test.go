@@ -51,7 +51,7 @@ func (unavailableGPU) GPU(context.Context) (GPU, error) { return GPU{}, fmt.Erro
 
 type emptyHost struct{}
 
-func (emptyHost) Snapshot() (Metrics, error) { return resources.Metrics{}, nil }
+func (emptyHost) Snapshot() (Metrics, error) { return Metrics{}, nil }
 func TestOptionalGPUStillDeniesRequiredVRAM(t *testing.T) {
 	m, e := (WithGPU{emptyHost{}, unavailableGPU{}}).Snapshot()
 	if e != nil || m.GPUError == nil || m.VRAMFree != nil || Check(Policy{MinVRAM: 1}, m) == nil {
