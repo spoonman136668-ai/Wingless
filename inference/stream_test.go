@@ -63,7 +63,7 @@ func TestStreamingCapturesLlamaTimings(t *testing.T) {
 			t.Errorf("read request: %v", err)
 			return
 		}
-		if !strings.Contains(string(body), `"timings_per_token":true`) {
+		if !strings.Contains(string(body), "\"timings_per_token\":true") {
 			t.Errorf("timing request flag missing: %s", body)
 			return
 		}
