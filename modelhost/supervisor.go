@@ -96,6 +96,10 @@ type Supervisor struct {
 	out, err tail
 }
 
+func validProvenance(value string) bool {
+	return value != "" && len(value) <= 256 && !strings.ContainsAny(value, "\r\n")
+}
+
 func New(c Config, m resources.Provider) (*Supervisor, error) {
 	if c.Batch == 0 {
 		c.Batch = 512
@@ -106,7 +110,10 @@ func New(c Config, m resources.Provider) (*Supervisor, error) {
 	if c.GPULayers < 0 || c.GPULayers > 128 || c.Batch < 1 || c.Batch > 2048 || c.MicroBatch < 1 || c.MicroBatch > c.Batch || c.GPUIndex < 0 || c.GPUIndex > 31 || c.GPULayers > 0 && (c.MinVRAM == 0 || c.NvidiaSMI == "") {
 		return nil, fmt.Errorf("invalid GPU/batch resource configuration")
 	}
-	if m == nil || !filepath.IsAbs(c.Executable) || !filepath.IsAbs(c.Model) || c.ModelID == "" || strings.ContainsAny(c.ModelID, "\r\n") || c.Port < 1024 || c.Port > 65535 || c.Threads < 1 || c.Threads > 16 || c.ContextTokens < 128 || c.ContextTokens > 4096 || c.StartupSeconds < 1 || c.StartupSeconds > 300 || c.RuntimeSeconds < c.StartupSeconds || c.RuntimeSeconds > 900 || c.MinRAM < 1<<30 {
+	if !validProvenance(c.RuntimeVersion) || !validProvenance(c.ModelRepo) || !validProvenance(c.ModelRevision) || !validProvenance(c.Quantization) {
+		return nil, fmt.Errorf("complete bounded model provenance required")
+	}
+	if m == nil || !filepath.IsAbs(c.Executable) || !filepath.IsAbs(c.Model) || c.ModelID == "" || strings.ContainsAny(c.ModelID, "\r\n") || c.Port < 1024 || c.Port > 65535 || c.Threads < 1 || c.Threads > 16 || c.ContextTokens < 128 || c.ContextTokens > 16384 || c.StartupSeconds < 1 || c.StartupSeconds > 300 || c.RuntimeSeconds < c.StartupSeconds || c.RuntimeSeconds > 900 || c.MinRAM < 1<<30 {
 		return nil, fmt.Errorf("invalid bounded model configuration")
 	}
 	base := strings.ToLower(filepath.Base(c.Executable))
@@ -195,7 +202,7 @@ func (s *Supervisor) Start(parent context.Context) error {
 	if e := pinned(s.cfg.Executable, s.cfg.ExecutableSHA256, 512<<20); e != nil {
 		return fail(e)
 	}
-	if e := pinned(s.cfg.Model, s.cfg.ModelSHA256, 2<<30); e != nil {
+	if e := pinned(s.cfg.Model, s.cfg.ModelSHA256, 24<<30); e != nil {
 		return fail(e)
 	}
 	metrics, e := s.metrics.Snapshot()
