@@ -12,6 +12,7 @@ type Event struct {
 	Route        Decision         `json:"route"`
 	Result       inference.Result `json:"result"`
 	Verification string           `json:"verification"`
+	RawModelText string           `json:"raw_model_text,omitempty"`
 	Error        string           `json:"error,omitempty"`
 }
 type Outcome struct {
@@ -75,7 +76,13 @@ func (r Runner) Run(parent context.Context, req inference.Request, p Policy) (ou
 				out.Status = "result_ready"
 				return
 			}
-			e = r.Verifier.Verify(ctx, event.Result)
+			verifyResult := event.Result
+			if candidate, normalized := inference.VerificationCandidate(event.Result.Text); normalized {
+				event.RawModelText = event.Result.Text
+				verifyResult.Text = candidate
+				event.Result.Text = candidate
+			}
+			e = r.Verifier.Verify(ctx, verifyResult)
 			if e == nil {
 				e = ctx.Err()
 			}
