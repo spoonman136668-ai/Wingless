@@ -37,12 +37,15 @@ type Usage struct {
 	OutputTokens *int `json:"output_tokens"`
 }
 type Telemetry struct {
-	TimeToFirstTokenMS *int64             `json:"time_to_first_token_ms"`
-	GenerationMS       *int64             `json:"generation_ms"`
-	ModelLoadMS        *int64             `json:"model_load_ms"`
-	Before             *resources.Metrics `json:"before"`
-	Peak               *resources.Metrics `json:"peak"`
-	After              *resources.Metrics `json:"after"`
+	TimeToFirstTokenMS              *int64             `json:"time_to_first_token_ms"`
+	GenerationMS                    *int64             `json:"generation_ms"`
+	PromptEvalMS                    *float64           `json:"prompt_eval_ms"`
+	PromptTokensPerSecond           *float64           `json:"prompt_tokens_per_second"`
+	ServerGenerationTokensPerSecond *float64           `json:"server_generation_tokens_per_second"`
+	ModelLoadMS                     *int64             `json:"model_load_ms"`
+	Before                          *resources.Metrics `json:"before"`
+	Peak                            *resources.Metrics `json:"peak"`
+	After                           *resources.Metrics `json:"after"`
 }
 type Result struct {
 	Telemetry   Telemetry         `json:"telemetry"`
