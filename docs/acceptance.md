@@ -42,3 +42,27 @@ Qualification status for Devstral Small 2 IQ3_M after the trust ramp:
 - Stage 3: NOT AUTHORIZED.
 
 Do not widen model trust from visible-suite success alone.
+## Qwen3-Coder 30B-A3B Q3_K_M qualification — 2026-09-13
+
+Windows PowerShell qualification used the hardened external acceptance gate on model-qualification-v1.
+
+Pinned model identity:
+
+- family: Qwen3-Coder-30B-A3B-Instruct;
+- quantization: Q3_K_M;
+- Hugging Face revision: 13a17f197c4d0d777e5eda136a47a17662c9f952;
+- GGUF SHA-256: 67299d72124ed68b4cbf3a776079df289bd854a17dfe6febfc835d1e1fbdefb;
+- validated llama.cpp offload: -ngl 32.
+
+Qualification status:
+
+- resource / LocalHTTP compatibility probe: PASS;
+- base real-patch qualification: PASS under the explicit byte-exact preservation contract;
+- trust-ramp Stage 1 tool-boundary authorization repair: PASS;
+- trust-ramp Stage 2 broker fallback repair: FAIL;
+- trust ceiling: Stage 1 only;
+- Stage 3: NOT AUTHORIZED.
+
+Stage 2 is a substantive semantic failure, not a verifier or packaging artifact. The candidate retained the injected broken fallback guard (	ier == "deep" instead of the authoritative 	ier != "deep"), changed capability filtering so a capability mismatch could still proceed to backend selection, and was not gofmt-clean. Visible TestRoutes, the persisted routine-fast semantic regression, broker package tests, integration acceptance, and the full suite all rejected the candidate. Full build alone remained green and is not acceptance.
+
+No Stage 2 repair retry is authorized from this evidence. Model output remains candidate-only, deterministic external acceptance remains authoritative, and Qwen3-Coder must not be widened beyond Stage 1 trust based on its base-patch and Stage 1 success.

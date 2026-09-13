@@ -1,0 +1,67 @@
+{
+    "schema":  "wingless.model-qualification-qwen3-coder-30ba3b-q3km.v1",
+    "recorded_at":  "2026-09-13T19:50:53.5091481-04:00",
+    "branch":  "model-qualification-v1",
+    "source_commit":  "af99cca38ca34b5d3c45111edebe09477e991ce1",
+    "platform":  "windows",
+    "authority":  "external_required",
+    "model":  {
+                  "family":  "Qwen3-Coder-30B-A3B-Instruct",
+                  "quantization":  "Q3_K_M",
+                  "hf_repo":  "tensorblock/Qwen_Qwen3-Coder-30B-A3B-Instruct-GGUF",
+                  "hf_revision":  "13a17f197c4d0d777e5eda136a47a17662c9f952",
+                  "file":  "Qwen3-Coder-30B-A3B-Instruct-Q3_K_M.gguf",
+                  "bytes":  14711848640,
+                  "sha256":  "f67299d72124ed68b4cbf3a776079df289bd854a17dfe6febfc835d1e1fbdefb",
+                  "ngl":  32
+              },
+    "runtime":  {
+                    "llama_server_sha256":  "cb29f66008d4d73cce17cab2c2569ab318eb244b0b2ca2a15024b44d90dfcd3f",
+                    "context_tokens":  4096
+                },
+    "qualification":  {
+                          "resource_localhttp_probe":  "PASS",
+                          "base_real_patch":  "PASS",
+                          "trust_ramp_stage_1":  "PASS",
+                          "trust_ramp_stage_2":  "FAIL",
+                          "trust_ramp_stage_2_reason":  "substantive_semantic_repair_failure",
+                          "trust_ceiling":  "STAGE_1_ONLY",
+                          "trust_ramp_stage_3":  "NOT_AUTHORIZED"
+                      },
+    "stage_2_forensics":  {
+                              "model_rerun":  false,
+                              "repair_retry":  false,
+                              "target_only_modified":  true,
+                              "existing_tests_immutable":  true,
+                              "gofmt_clean":  false,
+                              "canonical_guard_count":  0,
+                              "injected_broken_guard_count":  1,
+                              "pass_based_guard_count":  0,
+                              "retained_broken_guard":  "if p.Explicit != \"\" || !p.AllowFallback || tier == \"deep\" {",
+                              "authoritative_guard":  "if p.Explicit != \"\" || !p.AllowFallback || tier != \"deep\" {",
+                              "additional_semantic_defect":  "capability mismatch appended rejection but did not set ok=false, permitting backend selection to proceed",
+                              "visible_TestRoutes":  "FAIL",
+                              "hidden_routine_fast_counterexample":  "FAIL",
+                              "broker_package":  "FAIL",
+                              "full_suite":  "FAIL",
+                              "full_build":  "PASS",
+                              "classification":  "injected_broken_guard_retained_with_additional_capability_filter_semantic_defect"
+                          },
+    "windows_evidence":  {
+                             "probe_result_sha256":  "5699b6742d9bc1e6d2a55e1a72c491be51cea19b33d7bf8d99d700f173fb8841",
+                             "base_real_patch_r1_rejected_sha256":  "6e8e30ada8d5e73a4132b4efeced8f39472f2729057be68959722b21cf3fd278",
+                             "base_real_patch_r1_drift_audit_sha256":  "3c9c4f7a4b786cf189cf3e8989dffe1360a52c20681d7c8bbe3ed68bbda68f74",
+                             "base_real_patch_r2_pass_sha256":  "80ef5ed0c9ad76a35f553545e3b77b2e5b59486185da6d8f4ad14022853939e3",
+                             "trust_ramp_stage_1_sha256":  "ecf9489c86db9374cf264e283779894597b6422b05c6a5273e2a0958eb2d4d3c",
+                             "trust_ramp_stage_2_sha256":  "a83f7740dc6b138191bbab1680d7fbf7d13d12311c2e85173b7e103d9debfd7b",
+                             "trust_ramp_stage_2_audit_sha256":  "ca01cd2c766301d65daa92c85f8b219772cc9e12b003195fe56d8e4664b5a346"
+                         },
+    "boundaries":  {
+                       "model_edit_authority":  false,
+                       "model_test_authority":  false,
+                       "ckb_plane_mutated":  false,
+                       "accepted_ref_mutated":  false,
+                       "live_wingless_activated":  false,
+                       "merge_to_main_authorized":  false
+                   }
+}
