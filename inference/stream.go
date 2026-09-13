@@ -71,6 +71,11 @@ func (b *LocalHTTP) readStream(body io.Reader, r Request, start time.Time) (Resu
 				Prompt *int `json:"prompt_tokens"`
 				Output *int `json:"completion_tokens"`
 			} `json:"usage"`
+			Timings *struct {
+				PromptMS           float64 `json:"prompt_ms"`
+				PromptPerSecond    float64 `json:"prompt_per_second"`
+				PredictedPerSecond float64 `json:"predicted_per_second"`
+			} `json:"timings"`
 		}
 		if e := json.Unmarshal([]byte(payload), &chunk); e != nil {
 			return e
@@ -86,6 +91,23 @@ func (b *LocalHTTP) readStream(body io.Reader, r Request, start time.Time) (Resu
 			out.Usage = Usage{chunk.Usage.Prompt, chunk.Usage.Output}
 			if !usageValid(out.Usage, r.MaxOutputTokens) {
 				return fmt.Errorf("stream token budget exceeded")
+			}
+		}
+		if chunk.Timings != nil {
+			if chunk.Timings.PromptMS < 0 || chunk.Timings.PromptPerSecond < 0 || chunk.Timings.PredictedPerSecond < 0 {
+				return fmt.Errorf("invalid stream timings")
+			}
+			if chunk.Timings.PromptMS > 0 {
+				v := chunk.Timings.PromptMS
+				out.Telemetry.PromptEvalMS = &v
+			}
+			if chunk.Timings.PromptPerSecond > 0 {
+				v := chunk.Timings.PromptPerSecond
+				out.Telemetry.PromptTokensPerSecond = &v
+			}
+			if chunk.Timings.PredictedPerSecond > 0 {
+				v := chunk.Timings.PredictedPerSecond
+				out.Telemetry.ServerGenerationTokensPerSecond = &v
 			}
 		}
 		if len(chunk.Choices) == 1 {
