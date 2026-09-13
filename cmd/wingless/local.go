@@ -102,10 +102,13 @@ func runLocal(args []string) error {
 			defer c()
 			supervisor.Stop(stopCtx)
 		}()
+		startupStarted := time.Now()
 		if e = supervisor.Start(ctx); e != nil {
 			json.NewEncoder(os.Stderr).Encode(supervisor.Status())
 			return e
 		}
+		startupMS := time.Since(startupStarted).Milliseconds()
+		provenance.RuntimeStartupMS = &startupMS
 		url, id = supervisor.Endpoint(), cfg.ModelID
 	}
 	if supervisor == nil {
