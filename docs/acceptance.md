@@ -125,3 +125,13 @@ The verifier takes the already-bound Stage-1 request, the non-executing external
 Success means only `postimage_verified`. Acceptance remains `external_required`; the verifier cannot emit accepted/promoted status.
 
 This seam performs no file writes, model invocation, test execution, acceptance, promotion, queue mutation, ckb-plane mutation, or live Wingless activation.
+
+## Stage-1 local-model boundary seal — 2026-09-13
+
+The Wingless-side Stage-1 local-model boundary is closed and sealed on `model-qualification-v1`.
+
+The accepted inactive chain is: fail-closed Stage-1 model selection; plane/workspace authority projection; exact-preimage schema-bound candidate-request construction; strict raw-JSON candidate validation; non-executing external application planning; and post-application byte verification. The chain ends at `postimage_verified` with acceptance still `external_required`.
+
+Qwen3-Coder 30B-A3B Q3_K_M remains the preferred Stage-1 candidate generator and Devstral Small 2 IQ3_M remains secondary. Both remain capped at Stage 1. Stage 2 remains failed and Stage 3 is not authorized.
+
+No further Wingless-side seam is required before an explicit ckb-plane integration stage. Wingless still has no filesystem write authority, model-owned test authority, acceptance or promotion authority, queue authority, accepted-ref mutation authority, live broker authority, or live activation. `main` remains unchanged.
