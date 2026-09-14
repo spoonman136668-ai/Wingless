@@ -67,3 +67,13 @@ Qualification status:
 Stage 2 is a substantive semantic failure, not a verifier or packaging artifact. The candidate retained the injected broken fallback guard (`tier == "deep"` instead of the authoritative `tier != "deep"`), changed capability filtering so a capability mismatch could still proceed to backend selection, and was not gofmt-clean. Visible `TestRoutes`, the persisted routine-fast semantic regression, broker package tests, integration acceptance, and the full suite all rejected the candidate. Full build alone remained green and is not acceptance.
 
 No Stage 2 repair retry is authorized from this evidence. Model output remains candidate-only, deterministic external acceptance remains authoritative, and Qwen3-Coder must not be widened beyond Stage 1 trust based on its base-patch and Stage 1 success.
+
+## Stage-1 local-model selection contract — 2026-09-13
+
+The qualification branch now contains an unwired, fail-closed Stage-1 local-model eligibility seam in `broker/stage1_local_selection.go`. It does not invoke inference, alter `broker.Select`, apply edits, run tests, grant acceptance, or activate Wingless.
+
+An allowed Stage-1 task must be exactly one bounded production-file repair with candidate-only structured output, exact preimage binding, immutable tests, external application, external acceptance, and zero model repair retries. Routing/architecture changes, authority changes, live actions, arbitrary shell, model-owned edits, and model-owned tests are rejected.
+
+The preferred Stage-1 candidate generator is `qwen3-coder-30ba3b-q3km`; the secondary candidate generator is `devstral-small-2-24b-iq3m`. Both remain capped at Stage 1. This preference is a selection contract only and does not widen either model's authority.
+
+Runtime wiring is intentionally absent. Any later caller must still pass the deterministic eligibility contract and preserve external application, testing, semantic verification, and promotion authority outside the model.

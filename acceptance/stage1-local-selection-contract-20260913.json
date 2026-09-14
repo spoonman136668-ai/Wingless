@@ -1,0 +1,57 @@
+{
+    "schema":  "wingless.stage1-local-selection-contract.v1",
+    "recorded_at":  "2026-09-13T20:06:16.1992557-04:00",
+    "branch":  "model-qualification-v1",
+    "source_commit":  "feef95263bcc81f1108133f0e7e4660673722819",
+    "platform":  "windows",
+    "status":  "PASS",
+    "contract":  {
+                     "wired_into_runtime":  false,
+                     "alters_broker_select":  false,
+                     "invokes_backend":  false,
+                     "allowed_task_class":  "bounded_single_file_repair",
+                     "production_files":  1,
+                     "candidate_only":  true,
+                     "structured_candidate":  true,
+                     "exact_preimage":  true,
+                     "tests_immutable":  true,
+                     "external_application":  true,
+                     "external_acceptance":  true,
+                     "model_repair_retries":  0,
+                     "preferred_model":  "qwen3-coder-30ba3b-q3km",
+                     "secondary_model":  "devstral-small-2-24b-iq3m",
+                     "trust_ceiling":  "stage_1_only"
+                 },
+    "deterministic_rejections":  [
+                                     "unknown_task_class",
+                                     "zero_or_multiple_production_files",
+                                     "non_candidate_only",
+                                     "unstructured_candidate",
+                                     "missing_exact_preimage",
+                                     "mutable_tests",
+                                     "non_external_application",
+                                     "non_external_acceptance",
+                                     "model_repair_retry",
+                                     "routing_or_architecture_change",
+                                     "authority_change",
+                                     "live_action",
+                                     "arbitrary_shell",
+                                     "model_edit_authority",
+                                     "model_test_authority"
+                                 ],
+    "acceptance":  {
+                       "stage1_selection_tests":  "PASS",
+                       "hardened_broker_regression":  "PASS",
+                       "full_suite":  "PASS",
+                       "full_build":  "PASS",
+                       "gofmt_clean":  true
+                   },
+    "boundaries":  {
+                       "main_merged":  false,
+                       "ckb_plane_mutated":  false,
+                       "accepted_ref_mutated":  false,
+                       "live_wingless_activated":  false,
+                       "model_edit_authority":  false,
+                       "model_test_authority":  false
+                   }
+}
