@@ -97,3 +97,13 @@ The builder first revalidates the Stage-1 authority envelope through `ProjectSta
 Work-order title and instructions are prompt context only and cannot widen authority. The schema and external verifier remain authoritative. The request explicitly states that application, testing, semantic verification, acceptance, and promotion are external.
 
 This seam remains inactive: it does not select or invoke a backend, alter `broker.Select` or `Runner`, apply edits, run acceptance, mutate ckb-plane, or activate live Wingless.
+
+## Stage-1 candidate validator — 2026-09-13
+
+The qualification branch now contains an inactive strict Stage-1 candidate validator in `integration/ckbplane/stage1_candidate_validator.go`.
+
+The validator accepts only one raw JSON object with exactly the four schema fields. Markdown fences, explanatory prefixes/suffixes, additional JSON values, arrays, unknown fields, non-`write_text` operations, path drift, preimage drift, empty/NUL content, no-op replacement content, stale current source, and tampered request/schema bindings are rejected.
+
+Before validating the candidate operation, the validator rechecks the current source bytes against the authority-bound SHA-256 and rechecks that the built request's `json_schema` still exactly matches the authorized production path and preimage.
+
+The validator is non-applying by design. It returns candidate data only and does not write files, invoke a backend, run tests, grant acceptance, mutate ckb-plane, or activate live Wingless.
