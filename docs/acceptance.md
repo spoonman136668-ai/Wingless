@@ -115,3 +115,13 @@ The qualification branch now contains a non-executing Stage-1 external applicati
 The planner revalidates the request binding, current source preimage, candidate operation/path/preimage/content, replacement size, and candidate postimage hash. It emits immutable plan data containing work-order/request identity, workspace, repository-relative path, expected before SHA-256, expected after SHA-256, replacement content, external application authority, `external_required` acceptance authority, and the Stage-1 trust ceiling.
 
 This is deliberately not an application engine. There is no filesystem write, rename, chmod, shell, subprocess, test execution, acceptance, promotion, queue mutation, ckb-plane mutation, or live Wingless activation. The existing `toolboundary` package remains read-only.
+
+## Stage-1 post-application verifier — 2026-09-13
+
+The qualification branch now contains an inactive Stage-1 post-application verifier in `integration/ckbplane/stage1_postapplication.go`.
+
+The verifier takes the already-bound Stage-1 request, the non-executing external application plan, and bytes observed after an external application step. It revalidates request identity, work-order identity, workspace, repository path, before hash, after hash, replacement content, external application authority, `external_required` acceptance authority, and the Stage-1 trust ceiling. It then requires the observed bytes to equal the planned content and planned SHA-256 exactly.
+
+Success means only `postimage_verified`. Acceptance remains `external_required`; the verifier cannot emit accepted/promoted status.
+
+This seam performs no file writes, model invocation, test execution, acceptance, promotion, queue mutation, ckb-plane mutation, or live Wingless activation.
