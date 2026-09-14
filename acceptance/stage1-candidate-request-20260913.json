@@ -1,0 +1,55 @@
+{
+    "schema":  "wingless.stage1-candidate-request.v1",
+    "recorded_at":  "2026-09-13T20:55:00.3227300-04:00",
+    "branch":  "model-qualification-v1",
+    "source_commit":  "8d2c9032c8e4cccebed2823295efaea2437df9c2",
+    "platform":  "windows",
+    "status":  "PASS",
+    "request_builder":  {
+                            "active":  false,
+                            "authority_revalidated":  true,
+                            "actual_source_preimage_verified":  true,
+                            "source_must_be_utf8_text":  true,
+                            "source_nul_rejected":  true,
+                            "operation_enum":  [
+                                                   "write_text"
+                                               ],
+                            "path_enum_bound_to_authority":  true,
+                            "preimage_enum_bound_to_authority":  true,
+                            "additional_properties":  false,
+                            "required_fields":  [
+                                                    "type",
+                                                    "path",
+                                                    "expected_before_sha256",
+                                                    "content"
+                                                ],
+                            "candidate_only":  true,
+                            "instructions_can_widen_authority":  false
+                        },
+    "runtime":  {
+                    "backend_selected":  false,
+                    "backend_invoked":  false,
+                    "broker_select_changed":  false,
+                    "runner_changed":  false,
+                    "edits_applied":  false,
+                    "tests_run_by_builder":  false,
+                    "acceptance_granted":  false
+                },
+    "acceptance":  {
+                       "candidate_request_tests":  "PASS",
+                       "authority_projector_tests":  "PASS",
+                       "stage1_selection_tests":  "PASS",
+                       "hardened_broker_regression":  "PASS",
+                       "full_suite":  "PASS",
+                       "full_build":  "PASS",
+                       "gofmt_clean":  true
+                   },
+    "boundaries":  {
+                       "main_merged":  false,
+                       "ckb_plane_mutated":  false,
+                       "accepted_ref_mutated":  false,
+                       "live_wingless_activated":  false,
+                       "model_edit_authority":  false,
+                       "model_test_authority":  false
+                   }
+}

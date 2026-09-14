@@ -87,3 +87,13 @@ The projector requires exactly one work-order-allowed production path expressed 
 Repository-path validation is platform-independent: Git/repository paths are validated with slash semantics rather than host filesystem normalization. Backslashes, drive syntax, absolute paths, dot paths, and parent traversal are rejected.
 
 The projector is intentionally inactive. It does not alter `Translate`, `broker.Select`, `Runner`, listener/service behavior, model invocation, edit application, testing, acceptance, queue authority, or live Wingless activation. Runtime wiring remains a separate future gate.
+
+## Stage-1 candidate request builder — 2026-09-13
+
+The qualification branch now contains an inactive Stage-1 candidate-request builder in `integration/ckbplane/stage1_candidate_request.go`.
+
+The builder first revalidates the Stage-1 authority envelope through `ProjectStage1LocalTask`, then hashes the actual UTF-8 production-file preimage and requires it to equal the authority-bound SHA-256. It constructs a bounded `inference.Request` whose JSON schema permits exactly one `write_text` operation, exactly one production path, and exactly one expected preimage hash.
+
+Work-order title and instructions are prompt context only and cannot widen authority. The schema and external verifier remain authoritative. The request explicitly states that application, testing, semantic verification, acceptance, and promotion are external.
+
+This seam remains inactive: it does not select or invoke a backend, alter `broker.Select` or `Runner`, apply edits, run acceptance, mutate ckb-plane, or activate live Wingless.
