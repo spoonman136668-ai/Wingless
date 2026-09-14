@@ -107,3 +107,11 @@ The validator accepts only one raw JSON object with exactly the four schema fiel
 Before validating the candidate operation, the validator rechecks the current source bytes against the authority-bound SHA-256 and rechecks that the built request's `json_schema` still exactly matches the authorized production path and preimage.
 
 The validator is non-applying by design. It returns candidate data only and does not write files, invoke a backend, run tests, grant acceptance, mutate ckb-plane, or activate live Wingless.
+
+## Stage-1 external application plan — 2026-09-13
+
+The qualification branch now contains a non-executing Stage-1 external application-plan seam in `integration/ckbplane/stage1_application_plan.go`.
+
+The planner revalidates the request binding, current source preimage, candidate operation/path/preimage/content, replacement size, and candidate postimage hash. It emits immutable plan data containing work-order/request identity, workspace, repository-relative path, expected before SHA-256, expected after SHA-256, replacement content, external application authority, `external_required` acceptance authority, and the Stage-1 trust ceiling.
+
+This is deliberately not an application engine. There is no filesystem write, rename, chmod, shell, subprocess, test execution, acceptance, promotion, queue mutation, ckb-plane mutation, or live Wingless activation. The existing `toolboundary` package remains read-only.
