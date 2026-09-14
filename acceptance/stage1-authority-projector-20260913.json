@@ -1,0 +1,60 @@
+{
+    "schema":  "wingless.stage1-authority-projector.v1",
+    "recorded_at":  "2026-09-13T20:51:31.7763272-04:00",
+    "branch":  "model-qualification-v1",
+    "source_commit":  "8285394db198e9205e3bee4a68f423ca6564393b",
+    "platform":  "windows",
+    "status":  "PASS",
+    "fix_history":  {
+                        "original_r1":  "UNSCORED_HARNESS_CODE_DEFECT",
+                        "fixa_resume":  "UNSCORED_BRITTLE_PATCH_ASSUMPTION",
+                        "fixb_resume":  "PASS",
+                        "model_inference_rerun":  false,
+                        "tests_modified_to_avoid_failure":  false,
+                        "root_cause":  "platform-dependent filepath normalization was used for canonical repository paths",
+                        "remediation":  "source-only rewrite using path.Clean slash semantics"
+                    },
+    "projector":  {
+                      "active":  false,
+                      "bound_to_frozen_work_order":  true,
+                      "bound_to_workspace_identity":  true,
+                      "exact_one_allowed_production_path":  true,
+                      "canonical_repo_slash_path":  true,
+                      "exact_sha256_preimage":  true,
+                      "candidate_format":  "write_text_json_schema",
+                      "tests_immutable":  true,
+                      "application_authority":  "external",
+                      "acceptance_authority":  "external_required",
+                      "model_repair_retries":  0,
+                      "changes_routing_architecture":  false,
+                      "changes_authority":  false,
+                      "live_action":  false,
+                      "arbitrary_shell":  false,
+                      "model_edit_authority":  false,
+                      "model_test_authority":  false
+                  },
+    "runtime":  {
+                    "translate_changed":  false,
+                    "broker_select_changed":  false,
+                    "runner_changed":  false,
+                    "listener_changed":  false,
+                    "service_changed":  false,
+                    "invokes_backend":  false,
+                    "applies_edits":  false,
+                    "grants_acceptance":  false
+                },
+    "acceptance":  {
+                       "authority_projector_tests":  "PASS",
+                       "stage1_selection_tests":  "PASS",
+                       "hardened_broker_regression":  "PASS",
+                       "full_suite":  "PASS",
+                       "full_build":  "PASS",
+                       "gofmt_clean":  true
+                   },
+    "boundaries":  {
+                       "main_merged":  false,
+                       "ckb_plane_mutated":  false,
+                       "accepted_ref_mutated":  false,
+                       "live_wingless_activated":  false
+                   }
+}

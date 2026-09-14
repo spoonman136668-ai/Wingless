@@ -77,3 +77,13 @@ An allowed Stage-1 task must be exactly one bounded production-file repair with 
 The preferred Stage-1 candidate generator is `qwen3-coder-30ba3b-q3km`; the secondary candidate generator is `devstral-small-2-24b-iq3m`. Both remain capped at Stage 1. This preference is a selection contract only and does not widen either model's authority.
 
 Runtime wiring is intentionally absent. Any later caller must still pass the deterministic eligibility contract and preserve external application, testing, semantic verification, and promotion authority outside the model.
+
+## Stage-1 authority projector — 2026-09-13
+
+The qualification branch now contains an inactive Stage-1 authority projector in `integration/ckbplane/stage1_authority.go`. It binds Stage-1 eligibility metadata to the existing frozen plane `WorkOrderContract` and `WorkspaceBinding` before producing the broker's pure `Stage1LocalTask`.
+
+The projector requires exactly one work-order-allowed production path expressed as a canonical repository-relative slash path, an exact lowercase SHA-256 preimage, a structured `write_text` JSON-schema candidate contract, immutable tests, external application, `external_required` acceptance, zero model repair retries, and all routing/architecture, authority, live-action, arbitrary-shell, model-edit, and model-test flags to remain false.
+
+Repository-path validation is platform-independent: Git/repository paths are validated with slash semantics rather than host filesystem normalization. Backslashes, drive syntax, absolute paths, dot paths, and parent traversal are rejected.
+
+The projector is intentionally inactive. It does not alter `Translate`, `broker.Select`, `Runner`, listener/service behavior, model invocation, edit application, testing, acceptance, queue authority, or live Wingless activation. Runtime wiring remains a separate future gate.
