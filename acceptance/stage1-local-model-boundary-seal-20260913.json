@@ -1,10 +1,32 @@
 {
     "schema":  "wingless.stage1-local-model-boundary-seal.v1",
     "recorded_at":  "2026-09-13T21:07:52.8325411-04:00",
+    "corrected_at":  "2026-09-13T21:10:06.8216528-04:00",
     "branch":  "model-qualification-v1",
     "source_commit":  "175ea08f2b4c477fd21b3f99dedfd64d391e8527",
+    "seal_commit":  "70972976116b51b89708ff5ec7580b8f3280d5a2",
     "platform":  "windows",
     "status":  "SEALED",
+    "correction":  {
+                       "classification":  "UNSCORED_SEAL_HARNESS_PROOF_DEFECT",
+                       "original_defect":  "single-branch clone did not materialize origin/main; git merge-base exit 128 was incorrectly treated as equivalent to exit 1",
+                       "production_code_changed":  false,
+                       "tests_weakened_or_changed":  false,
+                       "corrected_main_proof":  true,
+                       "explicit_main_ref":  "refs/remotes/origin/main",
+                       "pinned_main_head":  "3196880e54f89f2f55509ccf06ce627409c29bd4",
+                       "merge_base":  "3196880e54f89f2f55509ccf06ce627409c29bd4",
+                       "seal_head_contained_by_main":  false,
+                       "main_is_ancestor_of_seal_head":  true,
+                       "github_crosscheck":  {
+                                                 "verified_before_correction":  true,
+                                                 "compare_status":  "ahead",
+                                                 "ahead_by":  49,
+                                                 "behind_by":  0,
+                                                 "base_commit":  "3196880e54f89f2f55509ccf06ce627409c29bd4",
+                                                 "merge_base_commit":  "3196880e54f89f2f55509ccf06ce627409c29bd4"
+                                             }
+                   },
     "boundary":  {
                      "state":  "STAGE1_WINGLESS_BOUNDARY_CLOSED",
                      "runtime_wired":  false,
@@ -44,7 +66,9 @@
                        "stage1_selection_and_hardened_routing":  "PASS",
                        "full_suite":  "PASS",
                        "full_build":  "PASS",
-                       "main_contains_seal_head":  false
+                       "main_isolation_proof":  "PASS",
+                       "main_contains_seal_head":  false,
+                       "main_is_ancestor_of_seal_head":  true
                    },
     "next_frontier":  {
                           "wingless_side":  "CLOSED",

@@ -135,3 +135,9 @@ The accepted inactive chain is: fail-closed Stage-1 model selection; plane/works
 Qwen3-Coder 30B-A3B Q3_K_M remains the preferred Stage-1 candidate generator and Devstral Small 2 IQ3_M remains secondary. Both remain capped at Stage 1. Stage 2 remains failed and Stage 3 is not authorized.
 
 No further Wingless-side seam is required before an explicit ckb-plane integration stage. Wingless still has no filesystem write authority, model-owned test authority, acceptance or promotion authority, queue authority, accepted-ref mutation authority, live broker authority, or live activation. `main` remains unchanged.
+
+### Stage-1 seal main-isolation proof correction — 2026-09-13
+
+The original R1 seal runner had a proof-harness defect: its single-branch clone did not materialize `origin/main`, and `git merge-base --is-ancestor` exit 128 was not distinguished from the normal not-an-ancestor exit 1. The Stage-1 contract, targeted tests, full suite, full build, and seal commit were unaffected.
+
+The corrected proof explicitly fetches `refs/heads/main:refs/remotes/origin/main`, requires the pinned `main` head, treats any merge-base exit other than 0 or 1 as a hard failure, proves the sealed qualification head is not contained by `main`, proves `main` is an ancestor of the qualification head, and verifies the merge base equals the pinned `main` commit. The Wingless Stage-1 boundary remains sealed; `main` remains unchanged.
