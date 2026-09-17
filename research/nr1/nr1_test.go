@@ -7,36 +7,41 @@ import (
 
 func syntheticTrace() []TraceEvent {
 	return []TraceEvent{
-		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", TokenIndex: 0, Layer: 0, Experts: []int{0, 1}},
-		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", TokenIndex: 0, Layer: 1, Experts: []int{2, 3}},
-		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", TokenIndex: 1, Layer: 0, Experts: []int{0, 1}},
-		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", TokenIndex: 1, Layer: 1, Experts: []int{2, 4}},
-		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", TokenIndex: 2, Layer: 0, Experts: []int{0, 5}},
-		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", TokenIndex: 2, Layer: 1, Experts: []int{2, 3}},
+		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", Phase: "prefill", TokenIndex: 0, Layer: 0, Experts: []int{0, 1}},
+		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", Phase: "prefill", TokenIndex: 0, Layer: 1, Experts: []int{2, 3}},
+		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", Phase: "decode", TokenIndex: 1, Layer: 0, Experts: []int{0, 1}},
+		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", Phase: "decode", TokenIndex: 1, Layer: 1, Experts: []int{2, 4}},
+		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", Phase: "decode", TokenIndex: 2, Layer: 0, Experts: []int{0, 5}},
+		{Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "repair", Phase: "decode", TokenIndex: 2, Layer: 1, Experts: []int{2, 3}},
 	}
 }
 
 func TestReadJSONLStrict(t *testing.T) {
 	input := strings.Join([]string{
-		`{"schema":"wingless.nr1.router-trace.v1","session_id":"s1","workload_id":"w1","task_family":"code","token_index":0,"layer":0,"experts":[1,2],"scores":[0.7,0.3]}`,
-		`{"schema":"wingless.nr1.router-trace.v1","session_id":"s1","workload_id":"w1","task_family":"code","token_index":1,"layer":0,"experts":[1,3]}`,
+		`{"schema":"wingless.nr1.router-trace.v2","session_id":"s1","workload_id":"w1","task_family":"code","phase":"prefill","token_index":0,"layer":0,"experts":[1,2],"scores":[0.7,0.3]}`,
+		`{"schema":"wingless.nr1.router-trace.v2","session_id":"s1","workload_id":"w1","task_family":"code","phase":"decode","token_index":1,"layer":0,"experts":[1,3]}`,
 	}, "\n")
 	got, err := ReadJSONL(strings.NewReader(input), 10)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(got) != 2 || got[1].Experts[1] != 3 {
+	if len(got) != 2 || got[1].Experts[1] != 3 || got[1].Phase != "decode" {
 		t.Fatalf("unexpected trace: %+v", got)
 	}
 
-	bad := `{"schema":"wingless.nr1.router-trace.v1","session_id":"s1","workload_id":"w1","task_family":"code","token_index":0,"layer":0,"experts":[1,1]}`
+	bad := `{"schema":"wingless.nr1.router-trace.v2","session_id":"s1","workload_id":"w1","task_family":"code","phase":"prefill","token_index":0,"layer":0,"experts":[1,1]}`
 	if _, err = ReadJSONL(strings.NewReader(bad), 10); err == nil {
 		t.Fatal("duplicate expert accepted")
 	}
 
-	unknown := `{"schema":"wingless.nr1.router-trace.v1","session_id":"s1","workload_id":"w1","task_family":"code","token_index":0,"layer":0,"experts":[1],"extra":true}`
+	unknown := `{"schema":"wingless.nr1.router-trace.v2","session_id":"s1","workload_id":"w1","task_family":"code","phase":"prefill","token_index":0,"layer":0,"experts":[1],"extra":true}`
 	if _, err = ReadJSONL(strings.NewReader(unknown), 10); err == nil {
 		t.Fatal("unknown field accepted")
+	}
+
+	missingPhase := `{"schema":"wingless.nr1.router-trace.v2","session_id":"s1","workload_id":"w1","task_family":"code","token_index":0,"layer":0,"experts":[1]}`
+	if _, err = ReadJSONL(strings.NewReader(missingPhase), 10); err == nil {
+		t.Fatal("missing phase accepted")
 	}
 }
 
