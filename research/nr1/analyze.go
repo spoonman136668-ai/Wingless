@@ -29,10 +29,10 @@ type LayerStats struct {
 }
 
 type ScopeHotset struct {
-	Scope        string          `json:"scope"`
-	Events       int             `json:"events"`
-	UniqueExperts int            `json:"unique_experts"`
-	Coverage     []CoveragePoint `json:"coverage"`
+	Scope            string          `json:"scope"`
+	Events           int             `json:"events"`
+	UniqueExpertKeys int             `json:"unique_expert_keys"`
+	Coverage         []CoveragePoint `json:"coverage"`
 }
 
 type Transition struct {
@@ -43,21 +43,21 @@ type Transition struct {
 }
 
 type LocalityReport struct {
-	Schema             string            `json:"schema"`
-	Events             int               `json:"events"`
-	Tokens             int               `json:"tokens"`
-	Sessions           int               `json:"sessions"`
-	Workloads          int               `json:"workloads"`
-	TaskFamilies       int               `json:"task_families"`
-	UniqueExpertKeys   int               `json:"unique_expert_keys"`
-	AdjacentPairs      int               `json:"adjacent_pairs"`
-	AdjacentReuseRate  float64           `json:"adjacent_reuse_rate"`
-	GlobalCoverage     []CoveragePoint   `json:"global_coverage"`
-	GlobalTopTraffic   []FractionTraffic `json:"global_top_traffic"`
-	Layers             []LayerStats      `json:"layers"`
-	SessionHotsets     []ScopeHotset     `json:"session_hotsets"`
-	TaskHotsets        []ScopeHotset     `json:"task_hotsets"`
-	TopTransitions     []Transition      `json:"top_transitions"`
+	Schema            string            `json:"schema"`
+	Events            int               `json:"events"`
+	Tokens            int               `json:"tokens"`
+	Sessions          int               `json:"sessions"`
+	Workloads         int               `json:"workloads"`
+	TaskFamilies      int               `json:"task_families"`
+	UniqueExpertKeys  int               `json:"unique_expert_keys"`
+	AdjacentPairs     int               `json:"adjacent_pairs"`
+	AdjacentReuseRate float64           `json:"adjacent_reuse_rate"`
+	GlobalCoverage    []CoveragePoint   `json:"global_coverage"`
+	GlobalTopTraffic  []FractionTraffic `json:"global_top_traffic"`
+	Layers            []LayerStats      `json:"layers"`
+	SessionHotsets    []ScopeHotset     `json:"session_hotsets"`
+	TaskHotsets       []ScopeHotset     `json:"task_hotsets"`
+	TopTransitions    []Transition      `json:"top_transitions"`
 }
 
 type routedKey struct {
@@ -66,10 +66,11 @@ type routedKey struct {
 }
 
 type orderedEvent struct {
-	Session string
-	Layer   int
-	Token   int64
-	Experts []int
+	Session  string
+	Workload string
+	Layer    int
+	Token    int64
+	Experts  []int
 }
 
 func Analyze(events []TraceEvent) (LocalityReport, error) {
@@ -120,7 +121,10 @@ func Analyze(events []TraceEvent) (LocalityReport, error) {
 			bySession[e.SessionID][key]++
 			byTask[e.TaskFamily][key]++
 		}
-		ordered = append(ordered, orderedEvent{Session: e.SessionID, Layer: e.Layer, Token: e.TokenIndex, Experts: append([]int(nil), e.Experts...)})
+		ordered = append(ordered, orderedEvent{
+			Session: e.SessionID, Workload: e.WorkloadID, Layer: e.Layer,
+			Token: e.TokenIndex, Experts: append([]int(nil), e.Experts...),
+		})
 	}
 
 	report.Tokens = len(tokens)
@@ -135,6 +139,9 @@ func Analyze(events []TraceEvent) (LocalityReport, error) {
 		if ordered[i].Session != ordered[j].Session {
 			return ordered[i].Session < ordered[j].Session
 		}
+		if ordered[i].Workload != ordered[j].Workload {
+			return ordered[i].Workload < ordered[j].Workload
+		}
 		if ordered[i].Layer != ordered[j].Layer {
 			return ordered[i].Layer < ordered[j].Layer
 		}
@@ -147,7 +154,7 @@ func Analyze(events []TraceEvent) (LocalityReport, error) {
 	var overlapSum float64
 	for i := 1; i < len(ordered); i++ {
 		prev, cur := ordered[i-1], ordered[i]
-		if prev.Session != cur.Session || prev.Layer != cur.Layer || cur.Token != prev.Token+1 {
+		if prev.Session != cur.Session || prev.Workload != cur.Workload || prev.Layer != cur.Layer || cur.Token != prev.Token+1 {
 			continue
 		}
 		overlap := selectedOverlap(prev.Experts, cur.Experts)
@@ -245,7 +252,9 @@ func scopeHotsets(freq map[string]map[routedKey]int, events map[string]int) []Sc
 	sort.Strings(ids)
 	out := make([]ScopeHotset, 0, len(ids))
 	for _, id := range ids {
-		out = append(out, ScopeHotset{Scope: id, Events: events[id], UniqueExperts: len(freq[id]), Coverage: coverageRouted(freq[id])})
+		out = append(out, ScopeHotset{
+			Scope: id, Events: events[id], UniqueExpertKeys: len(freq[id]), Coverage: coverageRouted(freq[id]),
+		})
 	}
 	return out
 }
