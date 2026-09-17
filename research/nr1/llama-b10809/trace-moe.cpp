@@ -22,10 +22,15 @@ struct options {
     std::string model_path;
     std::string trace_path;
     std::string prompt_file;
+    std::string user_file;
+    std::string system_file;
     std::string prompt;
+    std::string user;
+    std::string system;
     std::string session_id;
     std::string workload_id;
     std::string task_family;
+    bool chat_mode = false;
     int n_gpu_layers = 32;
     int n_ctx = 4096;
     int n_batch = 256;
@@ -35,7 +40,8 @@ struct options {
 static void usage(const char * argv0) {
     std::fprintf(stderr,
         "usage: %s -m MODEL --trace TRACE --session ID --workload ID --task FAMILY "
-        "[--prompt-file FILE | PROMPT] [-ngl 32] [-c 4096] [-b 256] [-n 128]\n",
+        "(--user-file FILE [--system-file FILE] | --prompt-file FILE | PROMPT) "
+        "[-ngl 32] [-c 4096] [-b 256] [-n 128]\n",
         argv0);
 }
 
@@ -104,6 +110,10 @@ static bool parse_options(int argc, char ** argv, options & opt) {
             const char * v = next(); if (!v) return false; opt.task_family = v;
         } else if (arg == "--prompt-file") {
             const char * v = next(); if (!v) return false; opt.prompt_file = v;
+        } else if (arg == "--user-file") {
+            const char * v = next(); if (!v) return false; opt.user_file = v;
+        } else if (arg == "--system-file") {
+            const char * v = next(); if (!v) return false; opt.system_file = v;
         } else if (arg == "-ngl") {
             const char * v = next(); if (!v || !parse_int(v, opt.n_gpu_layers)) return false;
         } else if (arg == "-c") {
@@ -125,11 +135,58 @@ static bool parse_options(int argc, char ** argv, options & opt) {
         opt.n_ctx < 2 || opt.n_batch < 1 || opt.n_predict < 0 || opt.n_gpu_layers < 0) {
         return false;
     }
-    if (!opt.prompt_file.empty()) {
-        if (!opt.prompt.empty() || !read_text(opt.prompt_file, opt.prompt)) {
+
+    const bool has_raw_file = !opt.prompt_file.empty();
+    const bool has_raw_text = !opt.prompt.empty();
+    const bool has_user_file = !opt.user_file.empty();
+    const int input_modes = (has_raw_file ? 1 : 0) + (has_raw_text ? 1 : 0) + (has_user_file ? 1 : 0);
+    if (input_modes != 1 || (!opt.system_file.empty() && !has_user_file)) {
+        return false;
+    }
+
+    if (has_user_file) {
+        if (!read_text(opt.user_file, opt.user) || opt.user.empty()) {
+            return false;
+        }
+        if (!opt.system_file.empty() && !read_text(opt.system_file, opt.system)) {
+            return false;
+        }
+        opt.chat_mode = true;
+    } else if (has_raw_file) {
+        if (!read_text(opt.prompt_file, opt.prompt) || opt.prompt.empty()) {
             return false;
         }
     }
+    return true;
+}
+
+static bool apply_chat_template(const llama_model * model, options & opt) {
+    const char * tmpl = llama_model_chat_template(model, nullptr);
+    if (tmpl == nullptr || *tmpl == '\0') {
+        std::fprintf(stderr, "model has no default chat template\n");
+        return false;
+    }
+
+    std::vector<llama_chat_message> messages;
+    if (!opt.system.empty()) {
+        messages.push_back({"system", opt.system.c_str()});
+    }
+    messages.push_back({"user", opt.user.c_str()});
+
+    int required = llama_chat_apply_template(tmpl, messages.data(), messages.size(), true, nullptr, 0);
+    if (required < 0 || required > 16 * 1024 * 1024) {
+        std::fprintf(stderr, "failed to size model chat template output\n");
+        return false;
+    }
+
+    std::vector<char> formatted(static_cast<size_t>(required) + 1, '\0');
+    const int written = llama_chat_apply_template(
+        tmpl, messages.data(), messages.size(), true, formatted.data(), formatted.size());
+    if (written < 0 || written > required) {
+        std::fprintf(stderr, "failed to apply model chat template\n");
+        return false;
+    }
+    opt.prompt.assign(formatted.data(), static_cast<size_t>(written));
     return !opt.prompt.empty();
 }
 
@@ -303,26 +360,31 @@ int main(int argc, char ** argv) {
         return 4;
     }
 
-    const llama_vocab * vocab = llama_model_get_vocab(model);
-    const bool add_bos = llama_vocab_get_add_bos(vocab);
-    const int n_prompt = -llama_tokenize(vocab, opt.prompt.c_str(), opt.prompt.size(), nullptr, 0, add_bos, true);
-    if (n_prompt <= 0 || n_prompt >= opt.n_ctx) {
-        std::fprintf(stderr, "prompt token count %d does not fit context %d\n", n_prompt, opt.n_ctx);
+    if (opt.chat_mode && !apply_chat_template(model, opt)) {
         llama_model_free(model);
         return 5;
     }
 
-    std::vector<llama_token> prompt_tokens(static_cast<size_t>(n_prompt));
-    if (llama_tokenize(vocab, opt.prompt.c_str(), opt.prompt.size(), prompt_tokens.data(), prompt_tokens.size(), add_bos, true) < 0) {
-        std::fprintf(stderr, "failed to tokenize prompt\n");
+    const llama_vocab * vocab = llama_model_get_vocab(model);
+    const bool add_special = opt.chat_mode ? true : llama_vocab_get_add_bos(vocab);
+    const int n_prompt = -llama_tokenize(vocab, opt.prompt.c_str(), opt.prompt.size(), nullptr, 0, add_special, true);
+    if (n_prompt <= 0 || n_prompt >= opt.n_ctx) {
+        std::fprintf(stderr, "prompt token count %d does not fit context %d\n", n_prompt, opt.n_ctx);
         llama_model_free(model);
         return 6;
+    }
+
+    std::vector<llama_token> prompt_tokens(static_cast<size_t>(n_prompt));
+    if (llama_tokenize(vocab, opt.prompt.c_str(), opt.prompt.size(), prompt_tokens.data(), prompt_tokens.size(), add_special, true) < 0) {
+        std::fprintf(stderr, "failed to tokenize prompt\n");
+        llama_model_free(model);
+        return 7;
     }
 
     if (n_prompt + opt.n_predict > opt.n_ctx) {
         std::fprintf(stderr, "prompt + prediction exceeds context: %d + %d > %d\n", n_prompt, opt.n_predict, opt.n_ctx);
         llama_model_free(model);
-        return 7;
+        return 8;
     }
 
     llama_context_params ctx_params = llama_context_default_params();
@@ -337,7 +399,7 @@ int main(int argc, char ** argv) {
     if (ctx == nullptr) {
         std::fprintf(stderr, "failed to create context\n");
         llama_model_free(model);
-        return 8;
+        return 9;
     }
 
     auto sparams = llama_sampler_chain_default_params();
@@ -355,7 +417,7 @@ int main(int argc, char ** argv) {
             llama_sampler_free(sampler);
             llama_free(ctx);
             llama_model_free(model);
-            return 9;
+            return 10;
         }
         n_pos += n;
     }
@@ -374,13 +436,14 @@ int main(int argc, char ** argv) {
             llama_sampler_free(sampler);
             llama_free(ctx);
             llama_model_free(model);
-            return 10;
+            return 11;
         }
         ++n_pos;
         ++generated;
     }
 
-    std::fprintf(stderr, "NR-1A trace complete: prompt_tokens=%d generated_tokens=%d\n", n_prompt, generated);
+    std::fprintf(stderr, "NR-1A trace complete: mode=%s prompt_tokens=%d generated_tokens=%d\n",
+        opt.chat_mode ? "model_chat_template" : "raw_prompt", n_prompt, generated);
     llama_perf_context_print(ctx);
 
     llama_sampler_free(sampler);
