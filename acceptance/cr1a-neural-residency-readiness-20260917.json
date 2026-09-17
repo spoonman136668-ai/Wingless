@@ -1,0 +1,71 @@
+{
+  "schema": "wingless.cr1a.neural-residency-readiness-acceptance.v1",
+  "status": "WINDOWS_ACCEPTED_NO_ACTIVATION",
+  "base_commit": "b65c645f8b43b459a8c9dd0575f92c3d7790bdf1",
+  "candidate_commit": "50d42eaa4e34f25d87bc48a1afce28422201df04",
+  "source_branch": "cognitive-runtime-cr1a-residency-readiness",
+  "promotion_target": "cognitive-runtime-cr1a",
+  "authoritative_platform": "windows/amd64",
+  "windows_acceptance": {
+    "date": "2026-09-17",
+    "go_version": "go version go1.25.5 windows/amd64",
+    "cgo_enabled": true,
+    "c_compiler": "MSYS2 UCRT64 gcc 16.2.0",
+    "focused_race_tests_resources": "PASS",
+    "focused_race_tests_cognitive": "PASS",
+    "focused_race_tests_benchmark": "PASS",
+    "full_cr1a_suite": "PASS",
+    "wingless_build": "PASS",
+    "ice_build": "PASS",
+    "ice_validate": "PASS",
+    "diff_check": "PASS"
+  },
+  "benchmark": {
+    "schema": "wingless.cognitive-runtime-reuse-benchmark.v1",
+    "repetitions": 100,
+    "semantic_correct": true,
+    "strict_correct": true,
+    "protocol_correct": true,
+    "control_model_calls": 100,
+    "control_cognitive_passes": 0,
+    "experiment_model_calls": 1,
+    "experiment_cognitive_passes": 1,
+    "experiment_skill_reuses": 99,
+    "first_solution_model_calls": 1,
+    "reuse_solution_model_calls": 0,
+    "model_telemetry": "unavailable/null in deterministic fixture"
+  },
+  "ice_snapshot": {
+    "generated_worktree_validation": "PASS",
+    "committed": false,
+    "reason": "Generated ICE reconciliation was broad inherited advisory snapshot churn spanning unrelated historical acceptance/model-qualification state; it was validated but intentionally excluded from this bounded CR-1A promotion."
+  },
+  "scope": {
+    "telemetry_schema": "accepted",
+    "resource_accounting": "accepted",
+    "inference_session_identity": "accepted",
+    "working_set_metrics_schema": "accepted",
+    "routing_evidence_extensibility": "accepted",
+    "paging_implementation": false,
+    "model_surgery": false,
+    "moe_conversion": false,
+    "nvme_streaming": false,
+    "directstorage": false,
+    "live_activation": false
+  },
+  "authority": {
+    "external_acceptance_authorized": true,
+    "canonical_cr1a_branch_promotion_authorized": true,
+    "main_promotion_authorized": false,
+    "accepted_ref_outside_cr1a_authorized": false,
+    "cr2_authorized": false,
+    "live_wingless_activation_authorized": false,
+    "runtime_result_acceptance_semantics": "external_required"
+  },
+  "notes": [
+    "This acceptance promotes only the bounded CR-1A cognitive runtime plus neural-residency-readiness schema work to the canonical CR-1A branch.",
+    "Unknown telemetry remains null; measured zero remains distinct from unavailable telemetry.",
+    "No neural paging, storage scheduler, model surgery, model conversion, live activation, or ckb-plane authority change is included.",
+    "CR-1A stops at this exit gate until a separately authorized successor stage begins."
+  ]
+}
