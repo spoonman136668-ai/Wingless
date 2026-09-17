@@ -93,6 +93,20 @@ func TestResidencySimulation(t *testing.T) {
 		if result.BudgetBytes == 16384 && result.Slots >= 8 && result.Policy != "static-global" && result.Policy != "session-static" && result.HitRate <= 0 {
 			t.Fatalf("large cache made no reuse: %+v", result)
 		}
+		switch result.Policy {
+		case "static-global":
+			if !result.UsesFutureTrace || result.CacheLifecycle != "persistent_across_sessions" {
+				t.Fatalf("static-global oracle metadata invalid: %+v", result)
+			}
+		case "session-static":
+			if !result.UsesFutureTrace || result.CacheLifecycle != "reset_per_session" {
+				t.Fatalf("session-static oracle metadata invalid: %+v", result)
+			}
+		default:
+			if result.UsesFutureTrace || result.CacheLifecycle != "persistent_across_sessions" {
+				t.Fatalf("online policy metadata invalid: %+v", result)
+			}
+		}
 	}
 }
 
@@ -117,5 +131,8 @@ func TestSessionStaticIsOracleBound(t *testing.T) {
 	}
 	if sessionStatic.HitRate < 0 || sessionStatic.HitRate > 1 || lru.HitRate < 0 || lru.HitRate > 1 {
 		t.Fatal("invalid hit rate")
+	}
+	if !sessionStatic.UsesFutureTrace || lru.UsesFutureTrace {
+		t.Fatal("oracle classification mismatch")
 	}
 }
