@@ -115,6 +115,17 @@ int main(int argc, char ** argv) {
         return 3;
     }
 
+    uint64_t total_tensor_bytes = 0;
+    const int64_t n_tensors = gguf_get_n_tensors(ctx);
+    for (int64_t i = 0; i < n_tensors; ++i) {
+        const uint64_t size = static_cast<uint64_t>(gguf_get_tensor_size(ctx, i));
+        if (!checked_add(total_tensor_bytes, size, total_tensor_bytes)) {
+            std::fprintf(stderr, "total tensor byte count overflow\n");
+            gguf_free(ctx);
+            return 4;
+        }
+    }
+
     std::vector<layer_info> layers;
     layers.reserve(k_layers);
     uint64_t pool_bytes = 0;
@@ -129,7 +140,7 @@ int main(int argc, char ** argv) {
             !inspect_tensor(ctx, prefix + ".ffn_up_exps.weight", info.up) ||
             !inspect_tensor(ctx, prefix + ".ffn_down_exps.weight", info.down)) {
             gguf_free(ctx);
-            return 4;
+            return 5;
         }
 
         uint64_t tmp = 0;
@@ -138,28 +149,38 @@ int main(int argc, char ** argv) {
             !checked_add(pool_bytes, info.bytes, pool_bytes)) {
             std::fprintf(stderr, "expert storage byte count overflow\n");
             gguf_free(ctx);
-            return 5;
+            return 6;
         }
         info.bytes_per_expert = info.bytes / k_experts;
         if (info.bytes % k_experts != 0) {
             std::fprintf(stderr, "layer %d expert storage is not evenly divisible by %d\n", layer, k_experts);
             gguf_free(ctx);
-            return 6;
+            return 7;
         }
         if (info.bytes_per_expert < min_bytes_per_expert) min_bytes_per_expert = info.bytes_per_expert;
         if (info.bytes_per_expert > max_bytes_per_expert) max_bytes_per_expert = info.bytes_per_expert;
         layers.push_back(info);
     }
 
+    if (pool_bytes > total_tensor_bytes) {
+        std::fprintf(stderr, "expert pool exceeds total tensor bytes\n");
+        gguf_free(ctx);
+        return 8;
+    }
+    const uint64_t non_expert_tensor_bytes = total_tensor_bytes - pool_bytes;
     const bool uniform = min_bytes_per_expert == max_bytes_per_expert;
+    const std::string uniform_json = uniform ? std::to_string(min_bytes_per_expert) : "null";
 
     std::fputs("{\"schema\":\"", stdout);
     std::fputs(k_schema, stdout);
     std::fputs("\",\"llama_source_commit\":\"", stdout);
     std::fputs(k_llama_commit, stdout);
-    std::printf("\",\"layers\":%d,\"experts_per_layer\":%d,\"expert_pool_bytes\":%" PRIu64,
+    std::printf("\",\"tensor_count\":%" PRId64 ",\"total_tensor_bytes\":%" PRIu64,
+        n_tensors, total_tensor_bytes);
+    std::printf(",\"layers\":%d,\"experts_per_layer\":%d,\"expert_pool_bytes\":%" PRIu64,
         k_layers, k_experts, pool_bytes);
-    std::printf(",\"uniform_expert_bytes\":%s", uniform ? std::to_string(min_bytes_per_expert).c_str() : "null");
+    std::printf(",\"non_expert_tensor_bytes\":%" PRIu64, non_expert_tensor_bytes);
+    std::printf(",\"uniform_expert_bytes\":%s", uniform_json.c_str());
     std::printf(",\"min_expert_bytes\":%" PRIu64 ",\"max_expert_bytes\":%" PRIu64, min_bytes_per_expert, max_bytes_per_expert);
     std::fputs(",\"layer_storage\":[", stdout);
 
