@@ -1,0 +1,24 @@
+Debug this Go function. It occasionally deadlocks under load and also returns stale data after a failed refresh. Explain the root causes, then provide the smallest correct rewrite without weakening error handling.
+
+```go
+type Store struct {
+    mu sync.RWMutex
+    value string
+}
+
+func (s *Store) Refresh(ctx context.Context, load func(context.Context) (string, error)) (string, error) {
+    s.mu.RLock()
+    defer s.mu.RUnlock()
+    if s.value != "" {
+        return s.value, nil
+    }
+    s.mu.Lock()
+    defer s.mu.Unlock()
+    v, err := load(ctx)
+    s.value = v
+    if err != nil {
+        return s.value, err
+    }
+    return s.value, nil
+}
+```
