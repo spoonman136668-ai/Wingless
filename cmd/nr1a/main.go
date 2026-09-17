@@ -16,10 +16,10 @@ import (
 const reportSchema = "wingless.nr1a.report.v1"
 
 type report struct {
-	Schema     string              `json:"schema"`
-	TracePath  string              `json:"trace_path"`
-	Locality   nr1.LocalityReport  `json:"locality"`
-	Residency  nr1.ResidencyReport `json:"residency"`
+	Schema    string               `json:"schema"`
+	TracePath string               `json:"trace_path"`
+	Locality  nr1.LocalityReport   `json:"locality"`
+	Residency *nr1.ResidencyReport `json:"residency,omitempty"`
 }
 
 func main() {
@@ -34,17 +34,13 @@ func main() {
 	flag.StringVar(&tracePath, "trace", "", "NR-1 router trace JSONL")
 	flag.StringVar(&outPath, "out", "", "output report JSON (stdout when empty)")
 	flag.StringVar(&budgetsGiB, "budgets-gib", "4,6,8,12,16", "comma-separated total residency budgets in GiB")
-	flag.Uint64Var(&expertBytes, "expert-bytes", 0, "encoded bytes per layer/expert object; required")
+	flag.Uint64Var(&expertBytes, "expert-bytes", 0, "encoded bytes per layer/expert object; 0 emits locality only")
 	flag.Uint64Var(&reservedBytes, "reserved-bytes", 0, "bytes reserved for core, KV cache, and runtime buffers")
 	flag.IntVar(&maxEvents, "max-events", 10_000_000, "maximum trace events")
 	flag.Parse()
 
-	if tracePath == "" || expertBytes == 0 || maxEvents < 1 {
-		fatal(errors.New("-trace, -expert-bytes, and positive -max-events are required"))
-	}
-	budgets, err := parseBudgets(budgetsGiB)
-	if err != nil {
-		fatal(err)
+	if tracePath == "" || maxEvents < 1 {
+		fatal(errors.New("-trace and positive -max-events are required"))
 	}
 
 	f, err := os.Open(tracePath)
@@ -61,16 +57,23 @@ func main() {
 	if err != nil {
 		fatal(err)
 	}
-	residency, err := nr1.Simulate(events, nr1.ResidencyConfig{
-		ExpertBytes: expertBytes, ReservedBytes: reservedBytes, BudgetsBytes: budgets,
-	})
-	if err != nil {
-		fatal(err)
+
+	result := report{Schema: reportSchema, TracePath: tracePath, Locality: locality}
+	if expertBytes != 0 {
+		budgets, err := parseBudgets(budgetsGiB)
+		if err != nil {
+			fatal(err)
+		}
+		residency, err := nr1.Simulate(events, nr1.ResidencyConfig{
+			ExpertBytes: expertBytes, ReservedBytes: reservedBytes, BudgetsBytes: budgets,
+		})
+		if err != nil {
+			fatal(err)
+		}
+		result.Residency = &residency
 	}
 
-	payload, err := json.MarshalIndent(report{
-		Schema: reportSchema, TracePath: tracePath, Locality: locality, Residency: residency,
-	}, "", "  ")
+	payload, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		fatal(err)
 	}
