@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-static constexpr const char * k_trace_schema = "wingless.nr1.router-trace.v1";
+static constexpr const char * k_trace_schema = "wingless.nr1.router-trace.v2";
 static constexpr const char * k_llama_commit = "5266f24da75dc449bd56cbed7addb9c8e4a6a73e";
 static constexpr const char * k_topk_marker = "ffn_moe_topk-";
 
@@ -282,9 +282,10 @@ public:
     bool ready() const { return out_.is_open(); }
     bool failed() const { return failed_.load(); }
 
-    void set_token_base(int64_t base) {
+    void set_token_scope(int64_t base, const char * phase) {
         std::lock_guard<std::mutex> lock(mu_);
         token_base_ = base;
+        phase_ = phase != nullptr ? phase : "";
     }
 
     bool wants(const ggml_tensor * t) const {
@@ -306,6 +307,10 @@ public:
         }
 
         std::lock_guard<std::mutex> lock(mu_);
+        if (phase_ != "prefill" && phase_ != "decode") {
+            fail_locked("trace phase is not initialized");
+            return false;
+        }
         for (int64_t token = 0; token < t->ne[1]; ++token) {
             pending_ += "{\"schema\":\"";
             pending_ += k_trace_schema;
@@ -315,6 +320,8 @@ public:
             pending_ += workload_;
             pending_ += "\",\"task_family\":\"";
             pending_ += task_;
+            pending_ += "\",\"phase\":\"";
+            pending_ += phase_;
             pending_ += "\",\"token_index\":";
             pending_ += std::to_string(token_base_ + token);
             pending_ += ",\"layer\":";
@@ -365,6 +372,7 @@ private:
     std::string session_;
     std::string workload_;
     std::string task_;
+    std::string phase_;
     std::string pending_;
     int64_t token_base_ = 0;
     std::atomic<bool> failed_{false};
@@ -461,7 +469,7 @@ int main(int argc, char ** argv) {
     while (n_pos < n_prompt) {
         const int n = std::min<int64_t>(opt.n_batch, n_prompt - n_pos);
         llama_batch batch = llama_batch_get_one(prompt_tokens.data() + n_pos, n);
-        collector.set_token_base(n_pos);
+        collector.set_token_scope(n_pos, "prefill");
         if (llama_decode(ctx, batch) != 0 || collector.failed() || !collector.flush()) {
             std::fprintf(stderr, "prompt decode/trace failed at token %lld\n", static_cast<long long>(n_pos));
             llama_sampler_free(sampler);
@@ -480,7 +488,7 @@ int main(int argc, char ** argv) {
         }
 
         llama_batch batch = llama_batch_get_one(&token, 1);
-        collector.set_token_base(n_pos);
+        collector.set_token_scope(n_pos, "decode");
         if (llama_decode(ctx, batch) != 0 || collector.failed() || !collector.flush()) {
             std::fprintf(stderr, "generation decode/trace failed at token %lld\n", static_cast<long long>(n_pos));
             llama_sampler_free(sampler);
