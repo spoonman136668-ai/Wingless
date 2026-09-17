@@ -1,0 +1,24 @@
+Repair the following bounded worker so cancellation cannot leak a goroutine and a result is never accepted after the context deadline. Keep the public function signature unchanged and do not convert cancellation into success. Return the corrected function and focused tests that would fail on the original implementation.
+
+```go
+func RunBounded(ctx context.Context, work func() (string, error)) (string, error) {
+    result := make(chan string)
+    errs := make(chan error)
+    go func() {
+        v, err := work()
+        if err != nil {
+            errs <- err
+            return
+        }
+        result <- v
+    }()
+    select {
+    case v := <-result:
+        return v, nil
+    case err := <-errs:
+        return "", err
+    case <-ctx.Done():
+        return "", nil
+    }
+}
+```
