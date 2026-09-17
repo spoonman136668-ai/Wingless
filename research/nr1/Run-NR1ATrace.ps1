@@ -42,8 +42,8 @@ foreach ($Required in $RequiredFiles) {
         throw "Missing required file: $Required"
     }
 }
-if ($NPredict -lt 0 -or $NPredict -gt 2048) {
-    throw "NPredict out of bounded research range: $NPredict"
+if ($NPredict -lt 1 -or $NPredict -gt 2048) {
+    throw "NPredict out of bounded decode-research range: $NPredict"
 }
 
 $ModelInfo = Get-Item -LiteralPath $Model
@@ -121,7 +121,8 @@ if ($SystemFile) {
 }
 
 $WinglessRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$LocalityReport = "$Trace.locality.json"
+$LocalityAllReport = "$Trace.locality-all.json"
+$LocalityDecodeReport = "$Trace.locality-decode.json"
 $RuntimeScenarios = [ordered]@{
     optimistic = [uint64]536870912
     expected = [uint64]1073741824
@@ -131,21 +132,26 @@ $ResidencyReports = [ordered]@{}
 
 Push-Location $WinglessRoot
 try {
-    go run ./cmd/nr1a -trace $Trace -out $LocalityReport
-    if ($LASTEXITCODE -ne 0) { throw 'NR-1A locality analysis failed' }
+    go run ./cmd/nr1a -trace $Trace -phase all -out $LocalityAllReport
+    if ($LASTEXITCODE -ne 0) { throw 'NR-1A all-phase locality analysis failed' }
+
+    go run ./cmd/nr1a -trace $Trace -phase decode -out $LocalityDecodeReport
+    if ($LASTEXITCODE -ne 0) { throw 'NR-1A decode locality analysis failed' }
 
     foreach ($Scenario in $RuntimeScenarios.GetEnumerator()) {
         $Reserved = [uint64]($NonExpertTensorBytes + $KVPayloadBytes4096F16 + [uint64]$Scenario.Value)
-        $ReportPath = "$Trace.residency-$($Scenario.Key).json"
+        $ReportPath = "$Trace.residency-decode-$($Scenario.Key).json"
         go run ./cmd/nr1a `
             -trace $Trace `
+            -phase decode `
             -expert-bytes $ExpertBytes `
             -reserved-bytes $Reserved `
             -budgets-gib '4,6,8,12,16' `
             -out $ReportPath
-        if ($LASTEXITCODE -ne 0) { throw "NR-1A residency simulation failed: $($Scenario.Key)" }
+        if ($LASTEXITCODE -ne 0) { throw "NR-1A decode residency simulation failed: $($Scenario.Key)" }
         $ResidencyReports[$Scenario.Key] = [ordered]@{
             path = $ReportPath
+            phase = 'decode'
             runtime_buffer_assumption_bytes = [uint64]$Scenario.Value
             reserved_bytes = $Reserved
         }
@@ -156,7 +162,7 @@ try {
 
 $MetaPath = "$Trace.meta.json"
 $Meta = [ordered]@{
-    schema = 'wingless.nr1.trace-run.v1'
+    schema = 'wingless.nr1.trace-run.v2'
     recorded_at = (Get-Date).ToUniversalTime().ToString('o')
     research_only = $true
     live_wingless_activation = $false
@@ -187,9 +193,15 @@ $Meta = [ordered]@{
         n_predict = $NPredict
     }
     trace = [ordered]@{
+        schema = 'wingless.nr1.router-trace.v2'
         path = $Trace
         bytes = [int64]$TraceInfo.Length
         sha256 = $TraceHash
+        phases = @('prefill','decode')
+    }
+    locality_reports = [ordered]@{
+        all = $LocalityAllReport
+        decode = $LocalityDecodeReport
     }
     storage_measurement = [ordered]@{
         path = $StoragePath
@@ -200,20 +212,23 @@ $Meta = [ordered]@{
         classification = 'measured_from_gguf_tensor_metadata'
     }
     residency_assumptions = [ordered]@{
+        phase = 'decode'
         kv_payload_bytes = $KVPayloadBytes4096F16
         kv_classification = 'analytical_48_layers_4_kv_heads_128_head_dim_k_and_v_f16_4096_tokens_excludes_allocator_overhead'
         runtime_buffer_classification = 'hypothetical_scenarios_not_measured'
         reports = $ResidencyReports
     }
 }
-$Meta | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $MetaPath -Encoding UTF8
+$UTF8NoBOM = [Text.UTF8Encoding]::new($false)
+[IO.File]::WriteAllText($MetaPath, (($Meta | ConvertTo-Json -Depth 10) + "`r`n"), $UTF8NoBOM)
 
 Write-Host "TRACE=$Trace"
 Write-Host "TRACE_SHA256=$TraceHash"
 Write-Host "EXPERT_STORAGE=$StoragePath"
 Write-Host "EXPERT_BYTES=$ExpertBytes"
 Write-Host "META=$MetaPath"
-Write-Host "LOCALITY_REPORT=$LocalityReport"
+Write-Host "LOCALITY_ALL=$LocalityAllReport"
+Write-Host "LOCALITY_DECODE=$LocalityDecodeReport"
 foreach ($Scenario in $ResidencyReports.GetEnumerator()) {
-    Write-Host ("RESIDENCY_{0}={1}" -f $Scenario.Key.ToUpperInvariant(), $Scenario.Value.path)
+    Write-Host ("RESIDENCY_DECODE_{0}={1}" -f $Scenario.Key.ToUpperInvariant(), $Scenario.Value.path)
 }
