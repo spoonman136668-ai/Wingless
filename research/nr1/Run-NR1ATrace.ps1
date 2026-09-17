@@ -2,7 +2,8 @@ param(
     [Parameter(Mandatory = $true)] [string]$LlamaRoot,
     [Parameter(Mandatory = $true)] [string]$TracerExe,
     [Parameter(Mandatory = $true)] [string]$Model,
-    [Parameter(Mandatory = $true)] [string]$PromptFile,
+    [Parameter(Mandatory = $true)] [string]$UserFile,
+    [string]$SystemFile = '',
     [Parameter(Mandatory = $true)] [string]$Trace,
     [Parameter(Mandatory = $true)] [string]$Session,
     [Parameter(Mandatory = $true)] [string]$Workload,
@@ -32,7 +33,9 @@ foreach ($Line in $Changed) {
     }
 }
 
-foreach ($Required in @($TracerExe, $Model, $PromptFile)) {
+$RequiredFiles = @($TracerExe, $Model, $UserFile)
+if ($SystemFile) { $RequiredFiles += $SystemFile }
+foreach ($Required in $RequiredFiles) {
     if (-not (Test-Path -LiteralPath $Required -PathType Leaf)) {
         throw "Missing required file: $Required"
     }
@@ -57,17 +60,23 @@ if (Test-Path -LiteralPath $Trace) {
     throw "Trace output already exists: $Trace"
 }
 
-& $TracerExe `
-    -m $Model `
-    --trace $Trace `
-    --session $Session `
-    --workload $Workload `
-    --task $TaskFamily `
-    -ngl 32 `
-    -c 4096 `
-    -b 256 `
-    -n $NPredict `
-    --prompt-file $PromptFile
+$TraceArgs = @(
+    '-m', $Model,
+    '--trace', $Trace,
+    '--session', $Session,
+    '--workload', $Workload,
+    '--task', $TaskFamily,
+    '-ngl', '32',
+    '-c', '4096',
+    '-b', '256',
+    '-n', [string]$NPredict,
+    '--user-file', $UserFile
+)
+if ($SystemFile) {
+    $TraceArgs += @('--system-file', $SystemFile)
+}
+
+& $TracerExe @TraceArgs
 if ($LASTEXITCODE -ne 0) {
     throw "llama-trace-moe failed with exit code $LASTEXITCODE"
 }
@@ -80,7 +89,11 @@ if ($TraceInfo.Length -le 0) {
     throw 'Trace is empty'
 }
 $TraceHash = (Get-FileHash -LiteralPath $Trace -Algorithm SHA256).Hash.ToLowerInvariant()
-$PromptHash = (Get-FileHash -LiteralPath $PromptFile -Algorithm SHA256).Hash.ToLowerInvariant()
+$UserHash = (Get-FileHash -LiteralPath $UserFile -Algorithm SHA256).Hash.ToLowerInvariant()
+$SystemHash = $null
+if ($SystemFile) {
+    $SystemHash = (Get-FileHash -LiteralPath $SystemFile -Algorithm SHA256).Hash.ToLowerInvariant()
+}
 
 $MetaPath = "$Trace.meta.json"
 $Meta = [ordered]@{
@@ -105,10 +118,12 @@ $Meta = [ordered]@{
         note = 'Research tracer is a separate executable and does not inherit qualified server identity.'
     }
     workload = [ordered]@{
+        prompt_mode = 'model_chat_template'
         session_id = $Session
         workload_id = $Workload
         task_family = $TaskFamily
-        prompt_sha256 = $PromptHash
+        user_sha256 = $UserHash
+        system_sha256 = $SystemHash
         n_predict = $NPredict
     }
     trace = [ordered]@{
