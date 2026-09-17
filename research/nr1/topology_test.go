@@ -8,13 +8,17 @@ import (
 func qualifiedTrace(tokens int) []TraceEvent {
 	out := make([]TraceEvent, 0, tokens*QualifiedQwen3CoderLayers)
 	for token := 0; token < tokens; token++ {
+		phase := "prefill"
+		if token > 0 {
+			phase = "decode"
+		}
 		for layer := 0; layer < QualifiedQwen3CoderLayers; layer++ {
 			experts := make([]int, QualifiedQwen3CoderExpertsPerToken)
 			for i := range experts {
 				experts[i] = (layer*QualifiedQwen3CoderExpertsPerToken + i) % QualifiedQwen3CoderExpertsPerLayer
 			}
 			out = append(out, TraceEvent{
-				Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "coding",
+				Schema: TraceSchema, SessionID: "s1", WorkloadID: "w1", TaskFamily: "coding", Phase: phase,
 				TokenIndex: int64(token), Layer: layer, Experts: experts,
 			})
 		}
