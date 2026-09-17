@@ -15,7 +15,7 @@ if (-not $Session) {
     $Session = 'nr1a-' + (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
 }
 if ($Session -notmatch '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$') {
-    throw "Invalid NR-1A session id: $Session"
+    throw "Invalid NR-1A corpus id: $Session"
 }
 if (Test-Path -LiteralPath $OutputDir) {
     throw "Output directory already exists; refuse to mix corpus runs: $OutputDir"
@@ -50,6 +50,13 @@ foreach ($Spec in $Workloads) {
         throw "Missing required workload: $UserFile"
     }
 
+    # Each tracer invocation creates a fresh model context, so it must have a
+    # distinct session id. The outer $Session value is the corpus/run id only.
+    $RunSession = "$Session-$($Spec.task)"
+    if ($RunSession -notmatch '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$') {
+        throw "Derived NR-1A session id is invalid or too long: $RunSession"
+    }
+
     $Trace = Join-Path $OutputDir ($Spec.task + '.jsonl')
     & $SingleRunner `
         -LlamaRoot $LlamaRoot `
@@ -59,7 +66,7 @@ foreach ($Spec in $Workloads) {
         -UserFile $UserFile `
         -SystemFile $SystemFile `
         -Trace $Trace `
-        -Session $Session `
+        -Session $RunSession `
         -Workload $Spec.id `
         -TaskFamily $Spec.task `
         -NPredict $NPredict
@@ -71,7 +78,7 @@ foreach ($Spec in $Workloads) {
     if (-not (Test-Path -LiteralPath $StoragePath -PathType Leaf)) { throw "Missing expert storage report: $StoragePath" }
 
     $Meta = Get-Content -LiteralPath $MetaPath -Raw | ConvertFrom-Json
-    if ([string]$Meta.schema -ne 'wingless.nr1.trace-run.v1' -or
+    if ([string]$Meta.schema -ne 'wingless.nr1.trace-run.v2' -or
         -not [bool]$Meta.research_only -or [bool]$Meta.live_wingless_activation -or [bool]$Meta.ckb_plane_used) {
         throw "Trace metadata violated NR-1A research boundary: $MetaPath"
     }
@@ -92,6 +99,7 @@ foreach ($Spec in $Workloads) {
     [IO.File]::AppendAllText($CorpusTrace, $TraceText, $UTF8NoBOM)
 
     $Runs += [ordered]@{
+        session_id = $RunSession
         workload_id = $Spec.id
         task_family = $Spec.task
         user_file = $Spec.file
@@ -114,26 +122,32 @@ $RuntimeScenarios = [ordered]@{
     expected = [uint64]1073741824
     pessimistic = [uint64]1610612736
 }
-$AggregateLocality = Join-Path $OutputDir 'corpus.locality.json'
+$AggregateLocalityAll = Join-Path $OutputDir 'corpus.locality-all.json'
+$AggregateLocalityDecode = Join-Path $OutputDir 'corpus.locality-decode.json'
 $AggregateResidency = [ordered]@{}
 
 Push-Location $WinglessRoot
 try {
-    go run ./cmd/nr1a -trace $CorpusTrace -out $AggregateLocality
-    if ($LASTEXITCODE -ne 0) { throw 'NR-1A aggregate locality analysis failed' }
+    go run ./cmd/nr1a -trace $CorpusTrace -phase all -out $AggregateLocalityAll
+    if ($LASTEXITCODE -ne 0) { throw 'NR-1A aggregate all-phase locality analysis failed' }
+
+    go run ./cmd/nr1a -trace $CorpusTrace -phase decode -out $AggregateLocalityDecode
+    if ($LASTEXITCODE -ne 0) { throw 'NR-1A aggregate decode locality analysis failed' }
 
     foreach ($Scenario in $RuntimeScenarios.GetEnumerator()) {
         $Reserved = [uint64]($NonExpertTensorBytes + $KVPayloadBytes4096F16 + [uint64]$Scenario.Value)
-        $ReportPath = Join-Path $OutputDir ("corpus.residency-{0}.json" -f $Scenario.Key)
+        $ReportPath = Join-Path $OutputDir ("corpus.residency-decode-{0}.json" -f $Scenario.Key)
         go run ./cmd/nr1a `
             -trace $CorpusTrace `
+            -phase decode `
             -expert-bytes $ExpertBytes `
             -reserved-bytes $Reserved `
             -budgets-gib '4,6,8,12,16' `
             -out $ReportPath
-        if ($LASTEXITCODE -ne 0) { throw "NR-1A aggregate residency simulation failed: $($Scenario.Key)" }
+        if ($LASTEXITCODE -ne 0) { throw "NR-1A aggregate decode residency simulation failed: $($Scenario.Key)" }
         $AggregateResidency[$Scenario.Key] = [ordered]@{
             path = [IO.Path]::GetFileName($ReportPath)
+            phase = 'decode'
             runtime_buffer_assumption_bytes = [uint64]$Scenario.Value
             reserved_bytes = $Reserved
         }
@@ -144,19 +158,21 @@ try {
 
 $CorpusHash = (Get-FileHash -LiteralPath $CorpusTrace -Algorithm SHA256).Hash.ToLowerInvariant()
 $CorpusMeta = [ordered]@{
-    schema = 'wingless.nr1.corpus-run.v1'
+    schema = 'wingless.nr1.corpus-run.v2'
     recorded_at = (Get-Date).ToUniversalTime().ToString('o')
     research_only = $true
     ckb_plane_used = $false
     live_wingless_activation = $false
-    session_id = $Session
+    corpus_id = $Session
     n_predict_per_workload = $NPredict
     workload_count = $Workloads.Count
     workloads = $Runs
     corpus_trace = [ordered]@{
+        schema = 'wingless.nr1.router-trace.v2'
         path = [IO.Path]::GetFileName($CorpusTrace)
         sha256 = $CorpusHash
         bytes = [int64](Get-Item -LiteralPath $CorpusTrace).Length
+        phases = @('prefill','decode')
     }
     expert_storage = [ordered]@{
         expert_bytes = $ExpertBytes
@@ -164,7 +180,10 @@ $CorpusMeta = [ordered]@{
         non_expert_tensor_bytes = $NonExpertTensorBytes
         classification = 'measured_from_gguf_tensor_metadata'
     }
-    aggregate_locality = [IO.Path]::GetFileName($AggregateLocality)
+    aggregate_locality = [ordered]@{
+        all = [IO.Path]::GetFileName($AggregateLocalityAll)
+        decode = [IO.Path]::GetFileName($AggregateLocalityDecode)
+    }
     aggregate_residency = $AggregateResidency
 }
 $CorpusMetaPath = Join-Path $OutputDir 'corpus.meta.json'
@@ -173,7 +192,8 @@ $CorpusMetaPath = Join-Path $OutputDir 'corpus.meta.json'
 Write-Host "NR1A_CORPUS=$CorpusTrace"
 Write-Host "NR1A_CORPUS_SHA256=$CorpusHash"
 Write-Host "NR1A_CORPUS_META=$CorpusMetaPath"
-Write-Host "NR1A_LOCALITY=$AggregateLocality"
+Write-Host "NR1A_LOCALITY_ALL=$AggregateLocalityAll"
+Write-Host "NR1A_LOCALITY_DECODE=$AggregateLocalityDecode"
 foreach ($Scenario in $AggregateResidency.GetEnumerator()) {
-    Write-Host ("NR1A_RESIDENCY_{0}={1}" -f $Scenario.Key.ToUpperInvariant(), (Join-Path $OutputDir $Scenario.Value.path))
+    Write-Host ("NR1A_RESIDENCY_DECODE_{0}={1}" -f $Scenario.Key.ToUpperInvariant(), (Join-Path $OutputDir $Scenario.Value.path))
 }
