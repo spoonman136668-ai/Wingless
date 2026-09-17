@@ -36,12 +36,15 @@ if ($Status.Count -ne 0) {
 if (-not (Test-Path -LiteralPath $ExamplesCMake)) {
     throw "Missing examples CMake file: $ExamplesCMake"
 }
-if (-not (Test-Path -LiteralPath (Join-Path $SourceDir 'trace-moe.cpp'))) {
-    throw 'NR-1A trace source missing from Wingless research branch'
+foreach ($SourceName in @('trace-moe.cpp','measure-expert-bytes.cpp','CMakeLists.txt')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $SourceDir $SourceName) -PathType Leaf)) {
+        throw "NR-1A overlay source missing from Wingless research branch: $SourceName"
+    }
 }
 
 New-Item -ItemType Directory -Force -Path $ExampleDir | Out-Null
 Copy-Item -LiteralPath (Join-Path $SourceDir 'trace-moe.cpp') -Destination (Join-Path $ExampleDir 'trace-moe.cpp')
+Copy-Item -LiteralPath (Join-Path $SourceDir 'measure-expert-bytes.cpp') -Destination (Join-Path $ExampleDir 'measure-expert-bytes.cpp')
 Copy-Item -LiteralPath (Join-Path $SourceDir 'CMakeLists.txt') -Destination (Join-Path $ExampleDir 'CMakeLists.txt')
 
 $CMakeText = Get-Content -LiteralPath $ExamplesCMake -Raw
@@ -77,20 +80,32 @@ if ($Build) {
     & cmake @Configure
     if ($LASTEXITCODE -ne 0) { throw 'NR-1A CMake configure failed' }
 
-    & cmake --build $BuildDir --config Release --target llama-trace-moe
-    if ($LASTEXITCODE -ne 0) { throw 'NR-1A tracer build failed' }
+    & cmake --build $BuildDir --config Release --target llama-trace-moe llama-measure-experts
+    if ($LASTEXITCODE -ne 0) { throw 'NR-1A research utility build failed' }
 
-    $Candidates = @(
-        (Join-Path $BuildDir 'bin\Release\llama-trace-moe.exe'),
-        (Join-Path $BuildDir 'bin\llama-trace-moe.exe'),
-        (Join-Path $BuildDir 'examples\trace-moe\Release\llama-trace-moe.exe'),
-        (Join-Path $BuildDir 'examples\trace-moe\llama-trace-moe.exe')
-    )
-    $Tracer = $Candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+    function Find-NR1AExe([string]$Name) {
+        $Candidates = @(
+            (Join-Path $BuildDir "bin\Release\$Name.exe"),
+            (Join-Path $BuildDir "bin\$Name.exe"),
+            (Join-Path $BuildDir "examples\trace-moe\Release\$Name.exe"),
+            (Join-Path $BuildDir "examples\trace-moe\$Name.exe")
+        )
+        return $Candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+    }
+
+    $Tracer = Find-NR1AExe 'llama-trace-moe'
+    $Measure = Find-NR1AExe 'llama-measure-experts'
     if (-not $Tracer) {
         throw 'Build reported success but llama-trace-moe.exe was not found in expected locations'
     }
-    $Hash = (Get-FileHash -LiteralPath $Tracer -Algorithm SHA256).Hash.ToLowerInvariant()
+    if (-not $Measure) {
+        throw 'Build reported success but llama-measure-experts.exe was not found in expected locations'
+    }
+
+    $TracerHash = (Get-FileHash -LiteralPath $Tracer -Algorithm SHA256).Hash.ToLowerInvariant()
+    $MeasureHash = (Get-FileHash -LiteralPath $Measure -Algorithm SHA256).Hash.ToLowerInvariant()
     Write-Host "TRACE_EXE=$Tracer"
-    Write-Host "TRACE_EXE_SHA256=$Hash"
+    Write-Host "TRACE_EXE_SHA256=$TracerHash"
+    Write-Host "EXPERT_MEASURE_EXE=$Measure"
+    Write-Host "EXPERT_MEASURE_EXE_SHA256=$MeasureHash"
 }
