@@ -52,6 +52,9 @@ func main() {
 	if err != nil {
 		fatal(err)
 	}
+	if err := nr1.ValidateQualifiedQwen3CoderTrace(events); err != nil {
+		fatal(err)
+	}
 
 	locality, err := nr1.Analyze(events)
 	if err != nil {
