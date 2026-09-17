@@ -11,7 +11,7 @@ import (
 	"regexp"
 )
 
-const TraceSchema = "wingless.nr1.router-trace.v1"
+const TraceSchema = "wingless.nr1.router-trace.v2"
 
 var traceID = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$`)
 
@@ -23,6 +23,7 @@ type TraceEvent struct {
 	SessionID  string    `json:"session_id"`
 	WorkloadID string    `json:"workload_id"`
 	TaskFamily string    `json:"task_family"`
+	Phase      string    `json:"phase"`
 	TokenIndex int64     `json:"token_index"`
 	Layer      int       `json:"layer"`
 	Experts    []int     `json:"experts"`
@@ -35,6 +36,9 @@ func (e TraceEvent) Validate() error {
 	}
 	if !traceID.MatchString(e.SessionID) || !traceID.MatchString(e.WorkloadID) || !traceID.MatchString(e.TaskFamily) {
 		return errors.New("NR1_TRACE_ID_INVALID")
+	}
+	if e.Phase != "prefill" && e.Phase != "decode" {
+		return errors.New("NR1_TRACE_PHASE_INVALID")
 	}
 	if e.TokenIndex < 0 || e.Layer < 0 || e.Layer > 255 {
 		return errors.New("NR1_TRACE_POSITION_INVALID")
