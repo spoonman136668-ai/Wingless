@@ -26,6 +26,7 @@ func (r Router) Decide(ctx context.Context, req RunRequest) (RoutingDecision, *M
 	}
 
 	decision := RoutingDecision{
+		Version:    RoutingDecisionVersion,
 		Policy:     r.Policy.Version,
 		RequestID:  req.RequestID,
 		TaskFamily: req.TaskFamily,
@@ -74,6 +75,8 @@ func (r Router) Decide(ctx context.Context, req RunRequest) (RoutingDecision, *M
 }
 
 func finalizeDecision(d *RoutingDecision, req RunRequest) {
+	// Keep the v1 decision hash basis byte-for-byte compatible. The explicit
+	// decision version is evidence metadata and may gate a future hash basis.
 	basis := struct {
 		Policy         string      `json:"policy"`
 		RequestID      string      `json:"request_id"`

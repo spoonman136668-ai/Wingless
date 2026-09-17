@@ -7,11 +7,13 @@ import (
 	"time"
 
 	"github.com/spoonman136668-ai/Wingless/inference"
+	"github.com/spoonman136668-ai/Wingless/resources"
 )
 
 const (
-	EvidenceSchema     = "wingless.cognitive-runtime-run.v1"
-	AcceptanceExternal = "external_required"
+	EvidenceSchema         = "wingless.cognitive-runtime-run.v1"
+	AcceptanceExternal     = "external_required"
+	RoutingDecisionVersion = 1
 )
 
 type MemoryClass string
@@ -97,13 +99,16 @@ type SkillStore interface {
 type Route string
 
 const (
-	RouteMemory          Route = "memory"
-	RouteSkill           Route = "skill"
-	RouteInferenceSingle Route = "single_pass_inference"
-	RouteInferenceMulti  Route = "multi_pass_inference"
+	RouteMemory                  Route = "memory"
+	RouteSkill                   Route = "skill"
+	RouteInferenceSingle         Route = "single_pass_inference"
+	RouteInferenceMulti          Route = "multi_pass_inference"
+	RouteAuthorizedDeeperBackend Route = "authorized_deeper_backend"
+	RouteToolProposal            Route = "tool_proposal"
 )
 
 type RoutingDecision struct {
+	Version     int      `json:"version"`
 	ID          string   `json:"id"`
 	Policy      string   `json:"policy"`
 	RequestID   string   `json:"request_id"`
@@ -189,20 +194,35 @@ type PassEvidence struct {
 	Telemetry        inference.Telemetry `json:"telemetry"`
 }
 
+type InferenceSessionEvidence struct {
+	SessionID           string                    `json:"session_id"`
+	BackendID           *string                   `json:"backend_id"`
+	ModelID             *string                   `json:"model_id"`
+	StartedAt           time.Time                 `json:"started_at"`
+	FinishedAt          time.Time                 `json:"finished_at"`
+	ModelCalls          int                       `json:"model_calls"`
+	CognitivePasses     int                       `json:"cognitive_passes"`
+	MemoryRetrievals    int                       `json:"memory_retrievals"`
+	SkillReuses         int                       `json:"skill_reuses"`
+	TerminationReason   string                    `json:"termination_reason"`
+	ResourceTelemetry   *resources.ModelTelemetry `json:"resource_telemetry"`
+}
+
 type RunEvidence struct {
-	Schema            string          `json:"schema"`
-	RequestID         string          `json:"request_id"`
-	Decision          RoutingDecision `json:"decision"`
-	Passes            []PassEvidence  `json:"passes"`
-	ModelCalls        int             `json:"model_calls"`
-	TotalInputTokens  *int            `json:"total_input_tokens"`
-	TotalOutputTokens *int            `json:"total_output_tokens"`
-	TotalLatencyMS    int64           `json:"total_latency_ms"`
-	TerminationReason string          `json:"termination_reason"`
-	Reuse             bool            `json:"reuse"`
-	Acceptance        string          `json:"acceptance"`
-	StartedAt         time.Time       `json:"started_at"`
-	FinishedAt        time.Time       `json:"finished_at"`
+	Schema            string                   `json:"schema"`
+	RequestID         string                   `json:"request_id"`
+	Decision          RoutingDecision          `json:"decision"`
+	Session           InferenceSessionEvidence `json:"session"`
+	Passes            []PassEvidence           `json:"passes"`
+	ModelCalls        int                      `json:"model_calls"`
+	TotalInputTokens  *int                     `json:"total_input_tokens"`
+	TotalOutputTokens *int                     `json:"total_output_tokens"`
+	TotalLatencyMS    int64                    `json:"total_latency_ms"`
+	TerminationReason string                   `json:"termination_reason"`
+	Reuse             bool                     `json:"reuse"`
+	Acceptance        string                   `json:"acceptance"`
+	StartedAt         time.Time                `json:"started_at"`
+	FinishedAt        time.Time                `json:"finished_at"`
 }
 
 type RunResult struct {

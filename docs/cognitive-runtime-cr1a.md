@@ -76,20 +76,38 @@ Routing is deterministic:
 3. bounded multi-pass inference when explicitly allowed and `MaxPasses > 1`;
 4. otherwise single-pass inference.
 
-Each decision has a stable SHA-256 decision ID and input digest for replay comparison.
+Each decision has a stable SHA-256 decision ID and input digest for replay comparison. Routing evidence now carries an explicit typed version while retaining the existing v1 hash basis. The `Route` type can represent `authorized_deeper_backend` and `tool_proposal` without making either executable in CR-1A. Any route outside the current executable set fails closed. Future route constants such as resident fast paths or expanded working sets can therefore be added without turning unknown evidence into execution semantics.
+
+### Inference session boundary
+
+Each CR-1A run now carries one bounded inference-session evidence record. It is not a daemon, lease, scheduler, or authority mechanism. Its lifetime is exactly the caller-bounded cognitive run.
+
+The record supports:
+
+- `session_id`;
+- backend/model identity when consistent and known;
+- start/end timestamps;
+- model-call count;
+- cognitive-pass count;
+- memory-retrieval and skill-reuse counts;
+- termination reason;
+- nullable model-resource telemetry.
+
+A single model call can safely carry its model-resource telemetry into the session record. For multiple inference calls, CR-1A leaves the session-level resource aggregate null rather than guessing whether backend counters are per-call, cumulative, or process-wide. Per-pass telemetry remains intact in the evidence.
 
 ### Evidence
 
 Each run emits `wingless.cognitive-runtime-run.v1` evidence with:
 
 - route decision;
+- bounded inference-session record;
 - model-call count;
 - pass count;
 - per-pass reason;
 - backend/model identity;
 - input/output token counts when reported;
 - latency;
-- inference telemetry, including existing resource telemetry;
+- inference telemetry, including existing host resource telemetry and optional model-attributable telemetry;
 - evaluator reason;
 - termination reason;
 - total known token/latency cost;
@@ -97,6 +115,14 @@ Each run emits `wingless.cognitive-runtime-run.v1` evidence with:
 - fixed `external_required` acceptance.
 
 Unknown inference telemetry remains unknown; CR-1A does not manufacture missing measurements.
+
+### Neural residency readiness only
+
+CR-1A no longer needs to assume that a logical model is one monolithic permanently resident weight blob. The optional `wingless.model-resource-telemetry.v1` shape can distinguish logical capacity, resident capacity, active working set, model-attributable VRAM/RAM/storage state, data movement, and future cache/page counters.
+
+This is schema and accounting readiness only. CR-1A does **not** implement neural paging, MoE conversion, model surgery, NVMe streaming, DirectStorage, cache eviction, cold-state loading, storage scheduling, or any change to the underlying inference algorithm. Existing RAM/VRAM admission policy is unchanged.
+
+Unknown is null. Measured zero is zero. Process RSS is not model RAM. Total GPU allocation is not model residency. File size and token count are not used to infer active model bytes or active parameters. Parameter activity can only be recorded through an explicit estimate record that marks itself as estimated and states its basis.
 
 ## Deterministic repeated-task fixture
 
@@ -106,7 +132,7 @@ The control performs the same deterministic fixture through the existing `infere
 
 The experiment performs the first solution through inference, checks it against an exact deterministic expected result, then the harness — not the model — creates and promotes a `static_text` skill using deterministic validation evidence. Later related tasks reuse that validated skill without a model call.
 
-The report exposes per-run cost checkpoints at repetitions 1, 10, 50, and 100 when present.
+The report exposes semantic/strict/protocol correctness, model calls, tokens, latency, cognitive passes, memory retrievals, skill reuses, minimum observed free RAM/VRAM when actual resource snapshots are present, and nullable model-residency telemetry. The deterministic fixture does not fabricate RAM, VRAM, or residency values, so those fields remain null there. Per-run cost checkpoints remain available at repetitions 1, 10, 50, and 100 when present.
 
 `cmd/cognitive-bench` prints the report as JSON.
 
@@ -115,14 +141,19 @@ The report exposes per-run cost checkpoints at repetitions 1, 10, 50, and 100 wh
 - `cognitive/types.go`
 - `cognitive/store.go`
 - `cognitive/router.go`
+- `cognitive/route_policy.go`
 - `cognitive/runtime.go`
 - `cognitive/runtime_test.go`
+- `cognitive/residency_readiness_test.go`
 - `cognitive/store_test.go`
+- `resources/model_telemetry.go`
+- `resources/model_telemetry_test.go`
 - `benchmark/cognitive_reuse.go`
 - `benchmark/cognitive_reuse_test.go`
 - `cmd/cognitive-bench/main.go`
 - `scripts/Test-CR1A.ps1`
 - `docs/cognitive-runtime-cr1a.md`
+- `docs/resource-model.md`
 
 ## Authoritative Windows acceptance
 
@@ -162,6 +193,9 @@ The gate requires authoritative Windows evidence that:
 - memory cannot mutate authority;
 - non-static stored skills cannot execute;
 - deterministic routing is replay-stable;
+- unknown route evidence cannot create executable behavior;
+- telemetry preserves null versus measured zero;
+- multi-pass sessions do not fabricate residency aggregates;
 - baseline/non-cognitive behavior remains available because no live wiring changed;
 - the A/B repeated-task fixture records first-run versus reuse cost;
 - no live activation or accepted-ref mutation occurred.

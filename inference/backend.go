@@ -3,14 +3,16 @@ package inference
 import (
 	"context"
 	"errors"
-	"github.com/spoonman136668-ai/Wingless/resources"
 	"time"
 	"unicode/utf8"
+
+	"github.com/spoonman136668-ai/Wingless/resources"
 )
 
 type Request struct {
 	OutputConstraint *OutputConstraint `json:"output_constraint,omitempty"`
 	ID               string            `json:"request_id"`
+	SessionID        string            `json:"session_id,omitempty"`
 	ParentWorkID     string            `json:"parent_work_id"`
 	Role             string            `json:"role"`
 	Context          string            `json:"context"`
@@ -36,17 +38,20 @@ type Usage struct {
 	PromptTokens *int `json:"prompt_tokens"`
 	OutputTokens *int `json:"output_tokens"`
 }
+
 type Telemetry struct {
-	TimeToFirstTokenMS              *int64             `json:"time_to_first_token_ms"`
-	GenerationMS                    *int64             `json:"generation_ms"`
-	PromptEvalMS                    *float64           `json:"prompt_eval_ms"`
-	PromptTokensPerSecond           *float64           `json:"prompt_tokens_per_second"`
-	ServerGenerationTokensPerSecond *float64           `json:"server_generation_tokens_per_second"`
-	ModelLoadMS                     *int64             `json:"model_load_ms"`
-	Before                          *resources.Metrics `json:"before"`
-	Peak                            *resources.Metrics `json:"peak"`
-	After                           *resources.Metrics `json:"after"`
+	TimeToFirstTokenMS              *int64                    `json:"time_to_first_token_ms"`
+	GenerationMS                    *int64                    `json:"generation_ms"`
+	PromptEvalMS                    *float64                  `json:"prompt_eval_ms"`
+	PromptTokensPerSecond           *float64                  `json:"prompt_tokens_per_second"`
+	ServerGenerationTokensPerSecond *float64                  `json:"server_generation_tokens_per_second"`
+	ModelLoadMS                     *int64                    `json:"model_load_ms"`
+	Before                          *resources.Metrics        `json:"before"`
+	Peak                            *resources.Metrics        `json:"peak"`
+	After                           *resources.Metrics        `json:"after"`
+	Model                           *resources.ModelTelemetry `json:"model"`
 }
+
 type Result struct {
 	Telemetry   Telemetry         `json:"telemetry"`
 	BackendID   string            `json:"backend_id"`
@@ -59,11 +64,13 @@ type Result struct {
 	ErrorClass  string            `json:"error_class,omitempty"`
 	Resources   resources.Metrics `json:"resources"`
 }
+
 type Cost struct {
 	InputBytes      int
 	MaxOutputTokens int
 	Estimated       bool
 }
+
 type InferenceBackend interface {
 	ID() string
 	Capabilities() []string

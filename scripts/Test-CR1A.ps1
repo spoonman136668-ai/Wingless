@@ -23,7 +23,7 @@ if ($LASTEXITCODE -ne 0) { throw 'ICE stale; run go run -buildvcs=false ./cmd/ic
     Out-File -Encoding utf8 (Join-Path $Evidence 'tests-full.jsonl')
 if ($LASTEXITCODE -ne 0) { throw 'Full Wingless test suite failed' }
 
-& go test -buildvcs=false -race ./cognitive ./benchmark -count=1 -timeout 90s -json |
+& go test -buildvcs=false -race ./resources ./cognitive ./benchmark -count=1 -timeout 90s -json |
     Out-File -Encoding utf8 (Join-Path $Evidence 'tests-cognitive.jsonl')
 if ($LASTEXITCODE -ne 0) { throw 'CR-1A focused tests failed' }
 

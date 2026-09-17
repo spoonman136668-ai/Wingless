@@ -26,6 +26,10 @@ func (r Runtime) Run(ctx context.Context, req RunRequest) (RunResult, error) {
 		now = time.Now
 	}
 	started := now().UTC()
+	sessionID := req.RequestID
+	if sessionID != "" {
+		sessionID += ":inference-session"
+	}
 	out := RunResult{
 		Evidence: RunEvidence{
 			Schema:     EvidenceSchema,
@@ -33,11 +37,19 @@ func (r Runtime) Run(ctx context.Context, req RunRequest) (RunResult, error) {
 			Acceptance: AcceptanceExternal,
 			StartedAt:  started,
 			Passes:     []PassEvidence{},
+			Session: InferenceSessionEvidence{
+				SessionID: sessionID,
+				StartedAt: started,
+			},
 		},
 	}
 	finish := func(reason string) {
+		finished := now().UTC()
 		out.Evidence.TerminationReason = reason
-		out.Evidence.FinishedAt = now().UTC()
+		out.Evidence.FinishedAt = finished
+		out.Evidence.Session.TerminationReason = reason
+		out.Evidence.Session.FinishedAt = finished
+		out.Evidence.Session.ModelCalls = out.Evidence.ModelCalls
 	}
 
 	if err := r.Policy.Validate(); err != nil {
@@ -77,6 +89,7 @@ func (r Runtime) Run(ctx context.Context, req RunRequest) (RunResult, error) {
 		out.Evidence.TotalInputTokens = &zero
 		out.Evidence.TotalOutputTokens = &zero
 		out.Evidence.Reuse = true
+		out.Evidence.Session.MemoryRetrievals++
 		finish("memory_reuse")
 		return out, nil
 
@@ -101,8 +114,15 @@ func (r Runtime) Run(ctx context.Context, req RunRequest) (RunResult, error) {
 				return out, err
 			}
 		}
+		out.Evidence.Session.SkillReuses++
 		finish("skill_reuse")
 		return out, nil
+
+	case RouteInferenceSingle, RouteInferenceMulti:
+		// These are the only executable inference routes in CR-1A.
+	default:
+		finish("unsupported_route")
+		return out, fmt.Errorf("unsupported cognitive route %q", decision.Route)
 	}
 
 	if r.Backend == nil {
@@ -132,6 +152,7 @@ func (r Runtime) Run(ctx context.Context, req RunRequest) (RunResult, error) {
 		}
 		passReq := req.Base
 		passReq.ID = fmt.Sprintf("%s-cognitive-%02d", req.Base.ID, pass)
+		passReq.SessionID = sessionID
 		if pass > 1 {
 			if !utf8.ValidString(previous.Text) {
 				out.Candidate = candidateFromInference(previous, "incomplete")
@@ -152,6 +173,16 @@ func (r Runtime) Run(ctx context.Context, req RunRequest) (RunResult, error) {
 
 		result, invokeErr := r.Backend.Invoke(ctx, passReq)
 		out.Evidence.ModelCalls++
+		out.Evidence.Session.ModelCalls = out.Evidence.ModelCalls
+		out.Evidence.Session.CognitivePasses++
+		observeSessionIdentity(&out.Evidence.Session, result.BackendID, result.ModelID)
+		if out.Evidence.Session.ModelCalls == 1 {
+			out.Evidence.Session.ResourceTelemetry = result.Telemetry.Model
+		} else {
+			// Pass telemetry remains available individually. CR-1A does not guess how
+			// backend counters should aggregate across multiple inference calls.
+			out.Evidence.Session.ResourceTelemetry = nil
+		}
 		passEv := PassEvidence{
 			Pass:         pass,
 			Reason:       nextReason,
@@ -208,6 +239,26 @@ func (r Runtime) Run(ctx context.Context, req RunRequest) (RunResult, error) {
 
 	finish("unreachable")
 	return out, errors.New("cognitive runtime reached impossible state")
+}
+
+func observeSessionIdentity(session *InferenceSessionEvidence, backendID, modelID string) {
+	if session.ModelCalls == 1 {
+		if backendID != "" {
+			v := backendID
+			session.BackendID = &v
+		}
+		if modelID != "" {
+			v := modelID
+			session.ModelID = &v
+		}
+		return
+	}
+	if session.BackendID != nil && *session.BackendID != backendID {
+		session.BackendID = nil
+	}
+	if session.ModelID != nil && *session.ModelID != modelID {
+		session.ModelID = nil
+	}
 }
 
 func candidateFromInference(result inference.Result, status string) Candidate {

@@ -14,13 +14,20 @@ import (
 
 	"github.com/spoonman136668-ai/Wingless/cognitive"
 	"github.com/spoonman136668-ai/Wingless/inference"
+	"github.com/spoonman136668-ai/Wingless/resources"
 )
 
 type CognitiveCost struct {
-	ModelCalls   int   `json:"model_calls"`
-	InputTokens  int   `json:"input_tokens"`
-	OutputTokens int   `json:"output_tokens"`
-	LatencyMS    int64 `json:"latency_ms"`
+	ModelCalls       int                       `json:"model_calls"`
+	InputTokens      int                       `json:"input_tokens"`
+	OutputTokens     int                       `json:"output_tokens"`
+	LatencyMS        int64                     `json:"latency_ms"`
+	MemoryRetrievals int                       `json:"memory_retrievals"`
+	SkillReuses      int                       `json:"skill_reuses"`
+	CognitivePasses  int                       `json:"cognitive_passes"`
+	RAMFreeMinBytes  *uint64                   `json:"ram_free_min_bytes"`
+	VRAMFreeMinBytes *uint64                   `json:"vram_free_min_bytes"`
+	ModelTelemetry   *resources.ModelTelemetry `json:"model_telemetry"`
 }
 
 type CognitiveReuseReport struct {
@@ -30,6 +37,7 @@ type CognitiveReuseReport struct {
 	Experiment              CognitiveCost            `json:"experiment"`
 	FirstSolutionModelCalls int                      `json:"first_solution_model_calls"`
 	ReuseSolutionModelCalls int                      `json:"reuse_solution_model_calls"`
+	SemanticCorrect         bool                     `json:"semantic_correct"`
 	StrictCorrect           bool                     `json:"strict_correct"`
 	ProtocolCorrect         bool                     `json:"protocol_correct"`
 	SkillReuseCount         int                      `json:"skill_reuse_count"`
@@ -74,6 +82,7 @@ func RunCognitiveReuseFixture(ctx context.Context, repetitions int) (CognitiveRe
 	report := CognitiveReuseReport{
 		Schema:                "wingless.cognitive-runtime-reuse-benchmark.v1",
 		Repetitions:           repetitions,
+		SemanticCorrect:       true,
 		StrictCorrect:         true,
 		ProtocolCorrect:       true,
 		ExperimentCheckpoints: map[string]CognitiveCost{},
@@ -86,7 +95,8 @@ func RunCognitiveReuseFixture(ctx context.Context, repetitions int) (CognitiveRe
 		if err != nil {
 			return report, err
 		}
-		strict, protocol := validateFixtureOutput(result.Text)
+		semantic, strict, protocol := validateFixtureOutput(result.Text)
+		report.SemanticCorrect = report.SemanticCorrect && semantic
 		report.StrictCorrect = report.StrictCorrect && strict
 		report.ProtocolCorrect = report.ProtocolCorrect && protocol
 		accumulateInferenceCost(&report.Control, result)
@@ -114,7 +124,8 @@ func RunCognitiveReuseFixture(ctx context.Context, repetitions int) (CognitiveRe
 	if err != nil {
 		return report, err
 	}
-	strict, protocol := validateFixtureOutput(first.Candidate.Text)
+	semantic, strict, protocol := validateFixtureOutput(first.Candidate.Text)
+	report.SemanticCorrect = report.SemanticCorrect && semantic
 	report.StrictCorrect = report.StrictCorrect && strict
 	report.ProtocolCorrect = report.ProtocolCorrect && protocol
 	if !strict || !protocol {
@@ -152,7 +163,8 @@ func RunCognitiveReuseFixture(ctx context.Context, repetitions int) (CognitiveRe
 		if err != nil {
 			return report, err
 		}
-		strict, protocol := validateFixtureOutput(res.Candidate.Text)
+		semantic, strict, protocol := validateFixtureOutput(res.Candidate.Text)
+		report.SemanticCorrect = report.SemanticCorrect && semantic
 		report.StrictCorrect = report.StrictCorrect && strict
 		report.ProtocolCorrect = report.ProtocolCorrect && protocol
 		if res.Evidence.Reuse {
@@ -189,28 +201,33 @@ func fixtureRequest(prefix string, i int) cognitive.RunRequest {
 	}
 }
 
-func validateFixtureOutput(text string) (strict bool, protocol bool) {
+func validateFixtureOutput(text string) (semantic bool, strict bool, protocol bool) {
 	strict = text == `{"sum":5}`
 	dec := json.NewDecoder(strings.NewReader(text))
 	var obj map[string]json.RawMessage
-	if err := dec.Decode(&obj); err != nil || len(obj) != 1 {
-		return strict, false
+	if err := dec.Decode(&obj); err != nil {
+		return false, strict, false
 	}
 	raw, ok := obj["sum"]
 	if !ok {
-		return strict, false
+		return false, strict, false
 	}
 	var sum int
 	if err := json.Unmarshal(raw, &sum); err != nil || sum != 5 {
-		return strict, false
+		return false, strict, false
+	}
+	semantic = true
+	if len(obj) != 1 {
+		return semantic, strict, false
 	}
 	if err := dec.Decode(new(any)); err != io.EOF {
-		return strict, false
+		return semantic, strict, false
 	}
-	return strict, true
+	return semantic, strict, true
 }
 
 func accumulateInferenceCost(dst *CognitiveCost, result inference.Result) {
+	previousCalls := dst.ModelCalls
 	dst.ModelCalls++
 	if result.Usage.PromptTokens != nil {
 		dst.InputTokens += *result.Usage.PromptTokens
@@ -219,9 +236,18 @@ func accumulateInferenceCost(dst *CognitiveCost, result inference.Result) {
 		dst.OutputTokens += *result.Usage.OutputTokens
 	}
 	dst.LatencyMS += result.LatencyMS
+	observeInferenceTelemetry(dst, result.Telemetry)
+	if previousCalls == 0 {
+		dst.ModelTelemetry = result.Telemetry.Model
+	} else {
+		// The benchmark does not assume per-call residency/counter values can be
+		// combined across calls without backend-declared aggregation semantics.
+		dst.ModelTelemetry = nil
+	}
 }
 
 func accumulateCost(dst *CognitiveCost, ev cognitive.RunEvidence) {
+	previousCalls := dst.ModelCalls
 	dst.ModelCalls += ev.ModelCalls
 	if ev.TotalInputTokens != nil {
 		dst.InputTokens += *ev.TotalInputTokens
@@ -230,6 +256,38 @@ func accumulateCost(dst *CognitiveCost, ev cognitive.RunEvidence) {
 		dst.OutputTokens += *ev.TotalOutputTokens
 	}
 	dst.LatencyMS += ev.TotalLatencyMS
+	dst.MemoryRetrievals += ev.Session.MemoryRetrievals
+	dst.SkillReuses += ev.Session.SkillReuses
+	dst.CognitivePasses += ev.Session.CognitivePasses
+	for _, pass := range ev.Passes {
+		observeInferenceTelemetry(dst, pass.Telemetry)
+	}
+	if previousCalls == 0 && ev.ModelCalls == 1 {
+		dst.ModelTelemetry = ev.Session.ResourceTelemetry
+	} else if ev.ModelCalls > 0 && dst.ModelCalls > 1 {
+		dst.ModelTelemetry = nil
+	}
+}
+
+func observeInferenceTelemetry(dst *CognitiveCost, telemetry inference.Telemetry) {
+	for _, snapshot := range []*resources.Metrics{telemetry.Before, telemetry.Peak, telemetry.After} {
+		if snapshot == nil {
+			continue
+		}
+		dst.RAMFreeMinBytes = minKnownUint(dst.RAMFreeMinBytes, snapshot.RAMFree)
+		dst.VRAMFreeMinBytes = minKnownUint(dst.VRAMFreeMinBytes, snapshot.VRAMFree)
+	}
+}
+
+func minKnownUint(current, candidate *uint64) *uint64 {
+	if candidate == nil {
+		return current
+	}
+	if current == nil || *candidate < *current {
+		v := *candidate
+		return &v
+	}
+	return current
 }
 
 func itoa(n int) string {
