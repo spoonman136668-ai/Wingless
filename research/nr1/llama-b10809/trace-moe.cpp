@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <limits>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -215,6 +216,61 @@ static bool parse_layer(const char * raw_name, int & layer) {
     return true;
 }
 
+static bool read_topk_ids(const ggml_tensor * t, std::vector<int32_t> & ids, const char *& error) {
+    if (t == nullptr || t->type != GGML_TYPE_I32 ||
+        t->ne[0] < 1 || t->ne[0] > 128 || t->ne[1] < 1 || t->ne[2] != 1 || t->ne[3] != 1) {
+        error = "unexpected ffn_moe_topk tensor shape/type";
+        return false;
+    }
+    if (t->nb[0] != sizeof(int32_t)) {
+        error = "ffn_moe_topk dimension-0 is not dense I32";
+        return false;
+    }
+
+    const size_t cols = static_cast<size_t>(t->ne[0]);
+    const size_t rows = static_cast<size_t>(t->ne[1]);
+    if (cols > std::numeric_limits<size_t>::max() / sizeof(int32_t)) {
+        error = "ffn_moe_topk row byte size overflow";
+        return false;
+    }
+    const size_t row_bytes = cols * sizeof(int32_t);
+    if (rows > std::numeric_limits<size_t>::max() / row_bytes) {
+        error = "ffn_moe_topk dense byte size overflow";
+        return false;
+    }
+    const size_t dense_bytes = rows * row_bytes;
+    const size_t count = rows * cols;
+
+    if (static_cast<size_t>(ggml_nelements(t)) != count) {
+        error = "unexpected ffn_moe_topk tensor rank";
+        return false;
+    }
+
+    ids.resize(count);
+    if (ggml_is_contiguous(t)) {
+        ggml_backend_tensor_get(t, ids.data(), 0, dense_bytes);
+        return true;
+    }
+
+    // argsort_top_k is logically [n_expert_used, n_tokens], but backend graph
+    // rewrites may leave the token rows strided. Copy only the dense I32 row
+    // payload into our packed host buffer; never read ggml_nbytes(t) into a
+    // ggml_nelements(t)-sized vector because a view can include stride gaps.
+    if (t->nb[1] < row_bytes) {
+        error = "ffn_moe_topk row stride is smaller than dense row";
+        return false;
+    }
+    ggml_backend_tensor_get_2d(
+        t,
+        ids.data(),
+        0,
+        row_bytes,
+        rows,
+        t->nb[1],
+        row_bytes);
+    return true;
+}
+
 class trace_collector {
 public:
     trace_collector(const options & opt) :
@@ -241,19 +297,13 @@ public:
         if (t == nullptr || !parse_layer(t->name, layer)) {
             return true;
         }
-        if (t->type != GGML_TYPE_I32 || t->ne[0] < 1 || t->ne[0] > 128 || t->ne[1] < 1) {
-            fail("unexpected ffn_moe_topk tensor shape/type");
+
+        std::vector<int32_t> ids;
+        const char * read_error = nullptr;
+        if (!read_topk_ids(t, ids, read_error)) {
+            fail(read_error != nullptr ? read_error : "failed to read ffn_moe_topk tensor");
             return false;
         }
-
-        const size_t count = static_cast<size_t>(ggml_nelements(t));
-        if (count != static_cast<size_t>(t->ne[0] * t->ne[1])) {
-            fail("unexpected ffn_moe_topk tensor rank");
-            return false;
-        }
-
-        std::vector<int32_t> ids(count);
-        ggml_backend_tensor_get(t, ids.data(), 0, ggml_nbytes(t));
 
         std::lock_guard<std::mutex> lock(mu_);
         for (int64_t token = 0; token < t->ne[1]; ++token) {
