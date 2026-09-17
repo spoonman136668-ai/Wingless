@@ -7,7 +7,7 @@ import (
 	"sort"
 )
 
-const ResidencyReportSchema = "wingless.nr1.residency-report.v1"
+const ResidencyReportSchema = "wingless.nr1.residency-report.v2"
 
 type ResidencyConfig struct {
 	ExpertBytes   uint64   `json:"expert_bytes"`
@@ -17,6 +17,8 @@ type ResidencyConfig struct {
 
 type ResidencyResult struct {
 	Policy            string  `json:"policy"`
+	UsesFutureTrace   bool    `json:"uses_future_trace"`
+	CacheLifecycle    string  `json:"cache_lifecycle"`
 	BudgetBytes       uint64  `json:"budget_bytes"`
 	ReservedBytes     uint64  `json:"reserved_bytes"`
 	ExpertCacheBytes  uint64  `json:"expert_cache_bytes"`
@@ -78,6 +80,20 @@ func Simulate(events []TraceEvent, cfg ResidencyConfig) (ResidencyReport, error)
 				hits = simulateSessionStatic(events, slots, sessionRanks)
 			}
 			result := buildResidencyResult(policy, budget, cfg.ReservedBytes, cacheBytes, slots, int64(len(accesses)), hits, cfg.ExpertBytes, tokens)
+			switch policy {
+			case "static-global":
+				// Ranked from the full replay before access 0. This is an offline
+				// stationary upper bound, not an online implementable policy.
+				result.UsesFutureTrace = true
+				result.CacheLifecycle = "persistent_across_sessions"
+			case "session-static":
+				// Ranked using each full session before replaying that same session.
+				// Treat it as an oracle bound for attainable session locality.
+				result.UsesFutureTrace = true
+				result.CacheLifecycle = "reset_per_session"
+			default:
+				result.CacheLifecycle = "persistent_across_sessions"
+			}
 			report.Results = append(report.Results, result)
 		}
 	}
