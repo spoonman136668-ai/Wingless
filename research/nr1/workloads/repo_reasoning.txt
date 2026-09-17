@@ -1,0 +1,20 @@
+You are reviewing a Go repository with this simplified layout:
+
+```text
+cmd/service/main.go
+internal/api/http.go
+internal/control/engine.go
+internal/control/store.go
+internal/worker/runner.go
+internal/worker/retry.go
+internal/evidence/seal.go
+```
+
+Observed facts:
+- `api/http.go` accepts operator requests and calls `control.Engine.Submit`.
+- `engine.go` persists intent before handing work to `worker.Runner`.
+- `retry.go` may schedule another attempt after worker failure.
+- `seal.go` is the only package allowed to mark evidence immutable.
+- `store.go` is the durable state authority.
+
+A proposed change adds retry logic directly to `api/http.go` and lets the HTTP handler mark work accepted after a 200 response from the worker. Analyze the authority and failure-mode consequences. Identify which files should own retry and acceptance, what invariants should be tested, and propose the smallest repository change that preserves a single durable authority.
