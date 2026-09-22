@@ -1,6 +1,6 @@
 # Wingless UP-0: unitary interference routing
 
-Status: research branch only; not accepted, activated, or connected to ckb-plane.
+Status: Windows-qualified research primitive; not activated, promoted, or connected to ckb-plane.
 
 Baseline source: `3196880e54f89f2f55509ccf06ce627409c29bd4` (Stage 3.7 Windows acceptance seal).
 
@@ -46,3 +46,17 @@ It does not:
 - mutate ckb-plane, CKB, accepted refs, broker state, credentials, or production state.
 
 A positive UP-0 result authorizes only the next research question: whether a trainable propagator can learn a bounded routing task under a matched classical baseline.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `2167d5cf255a0f139a17959c2cfeaa888fb53484` passed the focused UP-0 suite and the complete existing Wingless regression.
+
+Observed results:
+
+- magnitude-only baseline accuracy: 0.5;
+- unitary routing accuracy: 1.0;
+- maximum norm drift: 2.220446049250313e-16;
+- maximum forward/inverse round-trip error: 1.1102230246251565e-16.
+
+The post-run worktree contained only regenerated advisory `.ice` files. This qualification does not authorize Wingless activation or change ckb-plane authority.
