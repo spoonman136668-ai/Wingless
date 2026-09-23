@@ -414,7 +414,7 @@ func RunUP38() (DirectOffsetOptimizationProbeResult, error) {
 
 		if output.Objective > selectedEval.Objective ||
 			(output.Objective == selectedEval.Objective &&
-				outputCapacity < doseMaxMultiplicity(selectedEval.Offsets)) {
+				output.SoftCapacity < selectedEval.SoftCapacity) {
 			selectedEval = output
 			selectedStep = entry
 			selectedStepNumber = step
