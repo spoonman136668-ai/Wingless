@@ -1,6 +1,6 @@
 # Wingless UP-29: exact real orthogonal equivalence
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific pass; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-28 qualified scientific pass sealed at `f0c4f92fda1d8e6ef44273edf061fbb3b11beac9`.
 
@@ -123,3 +123,14 @@ If the behavior is identical, the important discovery is not “quantum magic”
 ## Authority boundary
 
 UP-29 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35872433016` completed successfully at source head `fe68394ca040d32d9b9a687fadc7934e38d14fe4`.
+
+Every equivalence gate passed. The realified one-step transport was orthogonal to maximum error 1.6044321673990453e-14. Complex and real evolved states differed by at most 7.693119685911194e-16, and the complete quadratic observable features differed by at most 4.163336342344337e-17.
+
+The frozen decoder produced zero decision disagreements: both complex and real arms achieved 1.0 held-out accuracy. The real mutable arm achieved 1.0 commit, 1.0 exact-final, and 1.0 relational-query accuracy with essentially identical margins to UP-28.
+
+Interpretation: the accepted capability is not uniquely complex or quantum. It is exactly expressible as an ordinary real orthogonal system at equal real-scalar degrees of freedom. Subsequent experiments should therefore test the causal geometry—especially the repeated transport multiplicity and its stable observable algebra—rather than treating complex phase itself as the explanation.
