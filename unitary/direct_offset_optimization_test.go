@@ -151,3 +151,24 @@ func TestUP38DeterministicDirectionsSpanZeroMeanTangent(t *testing.T) {
 		t.Fatalf("direction tangent rank=%d want=%d", got, compositeChannels-1)
 	}
 }
+
+
+func TestUP38ProjectedCentralDifferenceEstimator(t *testing.T) {
+	direction := []float64{1, -1, 2, -2, 0.5, -0.5}
+	gradient := directGradientEstimate(
+		1.0+2*directOffsetPerturbation,
+		1.0-2*directOffsetPerturbation,
+		direction,
+	)
+	var normSquared float64
+	for _, value := range direction {
+		normSquared += value * value
+	}
+	wantScale := 2.0 / normSquared
+	for i, value := range direction {
+		want := wantScale * value
+		if math.Abs(gradient[i]-want) > 1e-12 {
+			t.Fatalf("gradient[%d]=%g want=%g", i, gradient[i], want)
+		}
+	}
+}
