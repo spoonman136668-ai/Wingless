@@ -1,6 +1,6 @@
 # Wingless UP-32: repeated-spectrum multiplicity dose response
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified ordered dose trend with preregistered material-endpoint gate negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-31 qualified causal positive sealed at 601ac75b827d239b1dbdce1df16f6627877b31d4.
 
@@ -55,3 +55,20 @@ If performance falls as that number falls, we have much stronger evidence that t
 ## Authority boundary
 
 UP-32 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35875796731` completed successfully at source head `278f5b719d744be15b68a39f21f0120d9bb0a3c0`.
+
+All four adjacent steps satisfied the preregistered +0.03 ordering tolerance for both held-out accuracy and mutable commit accuracy. The curve was:
+
+- multiplicity 6: held 1.0, commit 1.0;
+- 4+2: held 0.996826171875, commit 0.9908854166666666;
+- 3+3: held 0.994873046875, commit 0.9947916666666666;
+- 2+2+2: held 0.986328125, commit 0.96484375;
+- singleton: held 0.90185546875, commit 0.34375.
+
+The overall preregistered dose-response gate remained negative because its endpoint material-effect clause required both static and mutable endpoint drops to be at least 0.25. The mutable endpoint drop was 0.65625, but the held-out endpoint drop was 0.09814453125.
+
+Interpretation: this is ordered graded evidence for repeated-spectrum structure, but not a gate-positive dose-response result. It also reveals a remaining confound: the tested partitions change both maximum multiplicity and total commutant capacity `sum(m_i^2)`. UP-33 should compare equal-capacity partitions with different maximum multiplicity.
