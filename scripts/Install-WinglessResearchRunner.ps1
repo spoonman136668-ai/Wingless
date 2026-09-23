@@ -1,6 +1,6 @@
 param(
     [string]$RepositoryUrl = 'https://github.com/spoonman136668-ai/Wingless',
-    [string]$InstallRoot = 'C:\\actions-runner-wingless',
+    [string]$InstallRoot = 'C:\actions-runner-wingless',
     [string]$RunnerName = ('WINGLESS-' + $env:COMPUTERNAME),
     [string]$Labels = 'wingless-research',
     [string]$RegistrationToken
@@ -52,7 +52,65 @@ $release = Invoke-RestMethod `
 
 $asset = @(
     $release.assets |
-    Where-Object { $_.name -match '^actions-runner-win-x64-.*\\.zip$' } |
+    Where-Object { $_.name -match '^actions-runner-win-x64-.*\.zip } |
+    Select-Object -First 1
+)
+
+if ($asset.Count -ne 1) {
+    throw 'WINGLESS_RUNNER_PACKAGE_NOT_FOUND'
+}
+
+$zip = Join-Path $env:TEMP $asset[0].name
+Invoke-WebRequest -Uri $asset[0].browser_download_url -OutFile $zip
+
+try {
+    Expand-Archive -Path $zip -DestinationPath $InstallRoot -Force
+}
+finally {
+    Remove-Item -Force $zip -ErrorAction SilentlyContinue
+}
+
+Push-Location $InstallRoot
+try {
+    & .\config.cmd `
+        --unattended `
+        --url $RepositoryUrl `
+        --token $RegistrationToken `
+        --name $RunnerName `
+        --labels $Labels `
+        --work '_work' `
+        --runasservice `
+        --replace
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'WINGLESS_RUNNER_CONFIG_FAILED'
+    }
+}
+finally {
+    Pop-Location
+}
+
+$services = @(
+    Get-Service |
+    Where-Object {
+        $_.Name -like 'actions.runner.*' -and
+        $_.Status -ne 'Running'
+    }
+)
+
+foreach ($service in $services) {
+    if ($service.Name -like '*Wingless*' -or $service.DisplayName -like '*Wingless*') {
+        Start-Service $service.Name
+    }
+}
+
+Write-Host ''
+Write-Host 'WINGLESS_RESEARCH_RUNNER_INSTALL_COMPLETE'
+Write-Host "InstallRoot: $InstallRoot"
+Write-Host "RunnerName:  $RunnerName"
+Write-Host "Labels:      $Labels"
+Write-Host 'Existing KTRADE/CKB runner paths were not modified.'
+ } |
     Select-Object -First 1
 )
 
