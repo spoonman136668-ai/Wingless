@@ -1,6 +1,6 @@
 # Wingless UP-39: rich-task direct spectral-offset optimization
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-38 qualified scientific negative sealed at `54dc8619149bbd0db8f6949f21453f52d5707ca4`.
 
@@ -149,3 +149,25 @@ If this produces the symmetry that UP-38 failed to discover, we will know the mi
 ## Authority boundary
 
 UP-39 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+The authoritative Windows qualification on workflow run `35930763303` completed successfully at source head `62ad70fc579fe8fc780c5ca2f05f838a5868ac2c` on runner `WINGLESS-LINKDEADKB`.
+
+The harness and full repository regression passed. The rich smooth architecture objective improved deterministically from `0.6867884391276392` at initialization to `0.6972457303665964` at selected step 7. Its harmonic task score improved from `0.6901217724609725` to `0.7005790636999297`. The main contributing signal was correct-relation probability, which rose from `0.5260644564224123` to `0.5489698582362194`; normalized phase score and correct-value probability moved slightly downward.
+
+Despite that smooth-objective improvement, no exact fusion occurred and selected commutant capacity remained 6. On the untouched true held-out pool, the selected checkpoint reached:
+
+- static held-out accuracy: `0.901123046875`;
+- mutable commit accuracy: `0.34375`;
+- exact final table accuracy: `0.3541666666666667`;
+- relational query accuracy: `0.5416666666666666`;
+- held-out retention loss versus capacity 36: `0.098876953125`;
+- mutable-commit retention loss versus capacity 36: `0.65625`.
+
+The full-capacity control remained perfect.
+
+Scientific classification: **qualified negative**. Because the smooth objective improved while the actual free-running recurrent loop remained poor, the frozen interpretation fork points to **teacher-forcing exposure mismatch** rather than permission to retune thresholds or gates.
+
+The successor experiment should preserve the rich objective and corrected direct optimizer while replacing the teacher-forced mutable surrogate with a smooth free-running probabilistic memory rollout. The soft recurrent state should be reconstructed directly from the four decoder distributions in the existing 16-dimensional one-hot-per-entity memory representation, apply the commanded write exactly to the written entity, renormalize, and transport again. Final scientific evaluation remains the unchanged hard recurrent loop on the untouched held-out pool.
