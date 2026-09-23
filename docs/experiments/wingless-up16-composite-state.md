@@ -1,6 +1,6 @@
 # Wingless UP-16: single composite recurrent state
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified single-composite-state result; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-15 Windows learned-anchor qualification sealed at `33162a84dfd91e405564f3812303e0d49bf9ed8b`.
 
@@ -150,3 +150,16 @@ That is the next boundary. A positive UP-16 permits UP-17 to apply a dense chann
 ## Authority boundary
 
 UP-16 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-23 against source head `91700cdc25e2ac538742ebd95b31010ee6dc1e2a` passed the harness and complete Wingless regression.
+
+The packed 96-dimensional unitary state matched the historical separate-state observables with maximum error 1.176836406102666e-14 across depths 1, 8, 128, and 1024.
+
+Fresh unitary decoders reached 1.0 train and 1.0 unseen-depth held-out accuracy with maximum composite norm drift 3.175237850427948e-14. The matched non-unitary composite path reached 0.763427734375 held-out accuracy and maximum norm drift 2211700831922.4956.
+
+Mutable integration used 48 scenarios × 16 writes and achieved 1.0 commit decode, 1.0 exact final-table, and 1.0 relational-query accuracy. Minimum value margin was 0.17822707126915677.
+
+Interpretation: memory plus the learned frame can be carried as one recurrent state object without changing observable behavior. The remaining explicit structure is the six known internal channel subspaces.
