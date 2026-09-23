@@ -1,6 +1,6 @@
 # Wingless UP-34: task-allocated commutant capacity
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific positive; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-33 qualified causal positive sealed at `b83e09b45b0c3c887778fa6c907444a36e6b3f55`.
 
@@ -128,3 +128,16 @@ If it chooses a smaller internal symmetry space and still performs almost as wel
 ## Authority boundary
 
 UP-34 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+The corrected balanced-split qualification on workflow run `35898278295` completed successfully at source head `dbb6edfdd212f54790a323ef3c8abc67746ba386`.
+
+The allocator used 96 inner-fit tables and 32 inner-validation tables, with the true 128-table held-out pool excluded from selection. It chose `capacity18_4_1_1_rotate_two`, reducing commutant capacity from 36 to 18.
+
+On inner validation the selected candidate scored 0.9794921875 static accuracy and 0.921875 mutable-commit accuracy before the frozen resource penalty.
+
+After the candidate was locked and retrained on the complete original training pool, it reached 1.0 held-out accuracy, 1.0 mutable-commit accuracy, 1.0 exact-final-table accuracy, and 1.0 relational-query accuracy on the untouched true held-out pool. The capacity-36 control also scored 1.0 on the two primary metrics, so both retention deltas were exactly zero.
+
+Interpretation: task evidence plus an explicit resource cost can select a substantially smaller stable symmetry space without sacrificing measured capability. The next step is no longer menu selection. UP-35 should begin from minimum symmetry and create repeated structure incrementally through task-justified merges.
