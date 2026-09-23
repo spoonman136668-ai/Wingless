@@ -1,6 +1,6 @@
 # Wingless UP-22: full 96-dimensional latent mixing
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-21 qualified scientific pass sealed at `3c2181a95f7834b43ec58e5bf63abcb899d711b0`.
 
@@ -154,3 +154,14 @@ If this passes, there is no runtime place we can point to and say “this block 
 ## Authority boundary
 
 UP-22 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35853721728` completed successfully at source head `2d4b1cadf9d00451a76f855654eb41b92ac12f71`.
+
+The transport construction itself passed. Conjugation equivalence held, with maximum oracle recovery error 5.627308017761762e-12, and the fixed DFT mixer had full participation ratio 96.
+
+The learned full-latent observer was a scientific negative. It fit the training set perfectly but fell to 0.267333984375 held-out accuracy across unseen depths, with mean held phase cosine only 0.020758496278884302. Mutable integration consequently failed.
+
+Interpretation: removing the visible 6 × 16 block layout does not destroy the underlying state or transport, but coordinate-basis Hermitian features do not provide a depth-stable task representation. The next experiment should derive invariants directly from the full latent transport operator rather than relearn coordinate features at sampled depths.
