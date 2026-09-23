@@ -1,6 +1,6 @@
 # Wingless UP-28: interaction-aware discovered commutant selection
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific pass; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-27 qualified selector-negative result sealed at `04074246d0ca13ae7714bbf26e40eb86ed14d7cd`.
 
@@ -165,3 +165,14 @@ If this closes the remaining write errors, we have a principled way to pick the 
 ## Authority boundary
 
 UP-28 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35871410555` completed successfully at source head `8c6cb97a2d0ed38968f3c1f7bf7f24c839f6bea4`.
+
+All preregistered scientific gates passed. The prefix-64 control reproduced UP-26 exactly at 0.998779296875 held-out accuracy.
+
+The interaction-aware selected bank reached 1.0 training accuracy and 1.0 held-out accuracy at all four entities. Mutable integration was perfect: 768/768 commits, 48/48 exact-final tables, and 48/48 relational queries. Minimum value margin was 0.6863349995234037 and minimum relation margin was 0.9189526148791317.
+
+Interpretation: transport-only commutant discovery plus training-only quadratic interaction importance is sufficient to derive a robust 64-observable runtime measurement bank from the fully mixed 96-dimensional state. The next required control is a real orthogonal representation comparator before making any claim that the result depends specifically on complex phase or unitary structure.
