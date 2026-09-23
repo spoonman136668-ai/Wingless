@@ -1,8 +1,8 @@
 param(
     [int]$WaitMinutes = 120,
     [int]$PollSeconds = 20,
-    [string[]]$PriorityRunnerRoots = @('C:\\actions-runner'),
-    [string]$WinglessRunnerRoot = 'C:\\actions-runner-wingless'
+    [string[]]$PriorityRunnerRoots = @('C:\actions-runner'),
+    [string]$WinglessRunnerRoot = 'C:\actions-runner-wingless'
 )
 
 $ErrorActionPreference = 'Stop'
