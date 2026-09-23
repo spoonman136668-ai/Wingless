@@ -264,10 +264,14 @@ func evaluateGreedySymmetryGrouping(
 }
 
 func structurallyValidGreedyArm(arm MultiplicityDoseArm) bool {
+	rmsValid := math.Abs(arm.OffsetRMS-multiplicityDoseRMS) <= 1e-12
+	if arm.MaxMultiplicity == compositeChannels {
+		rmsValid = math.Abs(arm.OffsetRMS) <= 1e-12
+	}
 	return arm.OrthogonalityError <= 1e-10 &&
 		arm.DiscoveryCommutatorError <= 1e-5 &&
 		arm.FeatureDrift <= 5e-3 &&
-		math.Abs(arm.OffsetRMS-multiplicityDoseRMS) <= 1e-12
+		rmsValid
 }
 
 func RunUP35() (GreedySymmetryInductionProbeResult, error) {
