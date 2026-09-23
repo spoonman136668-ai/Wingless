@@ -92,21 +92,32 @@ func identityChannelMatrix() ChannelMatrix {
 	return out
 }
 
-// denseChannelMixer is a real orthogonal DCT-II matrix.
-// Every output channel is a dense mixture of the six historical semantic
-// channels. The learner is never given this matrix.
+// denseChannelMixer is a deterministic dense real orthogonal matrix.
+//
+// It is built by applying one nontrivial Givens rotation for every channel
+// pair. The resulting transform is strongly scrambled: every output channel
+// contains a nonzero contribution from every historical semantic channel.
+// The learner is never given this matrix.
 func denseChannelMixer() ChannelMatrix {
-	var out ChannelMatrix
-	const n = 6
-	for k := 0; k < n; k++ {
-		alpha := math.Sqrt(2.0 / n)
-		if k == 0 {
-			alpha = math.Sqrt(1.0 / n)
-		}
-		for j := 0; j < n; j++ {
-			out[k][j] = alpha * math.Cos(
-				math.Pi*(float64(j)+0.5)*float64(k)/n,
-			)
+	out := identityChannelMatrix()
+	index := 0
+	for first := 0; first < 6; first++ {
+		for second := first + 1; second < 6; second++ {
+			theta := 0.43 + 0.071*float64(index)
+			c := math.Cos(theta)
+			s := math.Sin(theta)
+
+			beforeFirst := out[first]
+			beforeSecond := out[second]
+			for column := 0; column < 6; column++ {
+				out[first][column] =
+					c*beforeFirst[column] -
+						s*beforeSecond[column]
+				out[second][column] =
+					s*beforeFirst[column] +
+						c*beforeSecond[column]
+			}
+			index++
 		}
 	}
 	return out
