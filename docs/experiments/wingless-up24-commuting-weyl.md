@@ -1,6 +1,6 @@
 # Wingless UP-24: commuting Weyl observable algebra
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific pass; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-23 qualified scientific negative sealed at `8e54fba4e58e632c37d580e2d9cf4b58e92ba4f7`.
 
@@ -157,3 +157,12 @@ If that restores perfect memory, we have located the missing ingredient: not lab
 ## Authority boundary
 
 UP-24 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35868771822` completed successfully at source head `98e173b3c785526f40f7d5a94f1c92ecdc865719`.
+
+All preregistered scientific gates passed. Maximum observable commutator error was 1.622242763424964e-14 and maximum feature drift was 1.7917889394425401e-12. The unitary path achieved 1.0 training accuracy, 1.0 held-out accuracy, and 1.0 / 1.0 / 1.0 mutable commit, exact-final, and relation accuracy. Minimum value margin was 0.6370882275394993.
+
+Interpretation: UP-23 failed because scalar spectral moments collapsed the six-fold multiplicity-space orientation. A sufficiently rich commuting observable algebra preserves that orientation without runtime unmixing or visible channel blocks. The remaining cheat is explicit: UP-24 was handed the Weyl algebra using the known multiplicity structure. UP-25 must discover commuting observables from the transport itself.
