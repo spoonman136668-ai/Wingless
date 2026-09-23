@@ -1,6 +1,6 @@
 # Wingless UP-38: direct continuous spectral-offset optimization
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-37 qualified near-positive gate-negative sealed at `79d2638496cfa94591d332c6369ad66b1062402f`.
 
@@ -162,3 +162,14 @@ If some walls still converge and the resulting structure works on unseen data, w
 ## Authority boundary
 
 UP-38 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+The authoritative FIXB Windows qualification on workflow run `35929190469` completed successfully at source head `984081060f25d50cbf112f0821addeebf25d0d5b`.
+
+The corrected projected central-difference optimizer ran all 12 frozen steps with full-rank deterministic tangent directions. Its best checkpoint was step 10. Mean phase cosine improved to 0.8847250035698582, but no exact spectral fusion occurred and the selected commutant capacity remained 6.
+
+On the untouched true held-out pool the selected checkpoint reached 0.900634765625 static accuracy, 0.3424479166666667 mutable-commit accuracy, 0.375 exact-final-table accuracy, and 0.6041666666666666 relational-query accuracy. The capacity-36 control remained perfect.
+
+Interpretation: direct transport-parameter optimization itself is viable as an optimization mechanism, but mean phase cosine plus smooth symmetry cost is not a sufficient task objective. The next experiment should retain direct optimization while exposing smooth mutable value-confidence and relational-probability pressure on the training-side split.
