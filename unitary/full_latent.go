@@ -101,26 +101,15 @@ func identityLatentMatrix(dimension int) latentMatrix {
 }
 
 func fullLatentMixer() latentMatrix {
-	out := identityLatentMatrix(fullLatentDimension)
-	index := 0
-	for first := 0; first < fullLatentDimension; first++ {
-		for second := first + 1; second < fullLatentDimension; second++ {
-			theta := 0.071 +
-				0.00037*float64((index*17+11)%997)
-			if index%3 == 1 {
-				theta = -theta
-			}
-			c := complex(math.Cos(theta), 0)
-			s := complex(math.Sin(theta), 0)
-			beforeFirst := append([]complex128(nil), out[first]...)
-			beforeSecond := append([]complex128(nil), out[second]...)
-			for column := 0; column < fullLatentDimension; column++ {
-				out[first][column] =
-					c*beforeFirst[column] - s*beforeSecond[column]
-				out[second][column] =
-					s*beforeFirst[column] + c*beforeSecond[column]
-			}
-			index++
+	out := make(latentMatrix, fullLatentDimension)
+	scale := 1 / math.Sqrt(float64(fullLatentDimension))
+	for row := 0; row < fullLatentDimension; row++ {
+		out[row] = make([]complex128, fullLatentDimension)
+		for column := 0; column < fullLatentDimension; column++ {
+			phase := 2 * math.Pi *
+				float64(row*column) /
+				float64(fullLatentDimension)
+			out[row][column] = cmplx.Rect(scale, phase)
 		}
 	}
 	return out
