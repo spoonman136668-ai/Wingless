@@ -1,6 +1,6 @@
 # Wingless UP-2: multilayer phase routing
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified research primitive; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-1 Windows qualification sealed at `eb68ea7435e385b63c2f0bd427fd28476c9b7494`.
 
@@ -77,3 +77,19 @@ A positive result permits UP-3: repeated/deeper propagation with distractor dime
 ## Authority boundary
 
 UP-2 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `b07848b5ecbb2594f06646fe1487374f4e4326d1` passed the focused UP-2 suite and complete Wingless regression.
+
+Observed results:
+
+- both matched models: 1.0 train accuracy and 1.0 held-out accuracy;
+- unitary final loss: 3.1754427471288606e-9;
+- matched non-unitary final loss: 0.0006077264502525287;
+- unitary maximum norm drift: 5.551115123125783e-16;
+- matched non-unitary maximum norm drift: 2.735086374557516;
+- unitary forward/inverse round-trip error: 2.603703785810335e-16.
+
+Interpretation is deliberately bounded: both paths solved the routing task. The unitary path additionally preserved norm/reversibility and reached lower loss on this task under this optimizer. UP-2 alone does not establish a general unitary advantage.
