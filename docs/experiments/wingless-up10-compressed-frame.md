@@ -1,6 +1,6 @@
 # Wingless UP-10: compressed and noisy internal frame
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified negative compression result; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-9 Windows internal-frame qualification sealed at `8c4b2b9f108169fed4b01897c14dadb492541c78`.
 
@@ -109,3 +109,22 @@ A positive UP-10 permits UP-11: train or synthesize the compressed frame paramet
 ## Authority boundary
 
 UP-10 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `f6f36cfc6c0a3532a7472b1e6492b7670699f7a5` passed the harness and complete Wingless regression, while all three primary scientific gates failed.
+
+Observed held-out accuracies:
+
+- original five-pilot unitary frame: 1.0;
+- compressed three-pilot unitary frame: 0.85546875;
+- compressed frame with reference noise 0.01: 0.853515625;
+- compressed frame with reference noise 0.03: 0.818359375;
+- compressed frame with reference transport scale 1.0001: 0.853515625;
+- compressed frame with reference transport scale 1.001: 0.8515625;
+- matched non-unitary compressed frame: 0.541015625.
+
+Mutable integration reached 0.375 commit accuracy, 0.6875 exact final-table accuracy, and 0.65625 relational-query accuracy.
+
+Interpretation: the 40% pilot-state compression removed too much usable margin for the standing noisy-memory workload. Independent reference noise and modest reference-transport mismatch were secondary effects because they barely changed the already-degraded compressed baseline. The next experiment should isolate pilot rank from memory-noise sensitivity before attempting learned frame folding.
