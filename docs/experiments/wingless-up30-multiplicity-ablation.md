@@ -1,6 +1,6 @@
 # Wingless UP-30: orthogonal transport multiplicity ablation
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified causal positive with alignment caveat; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-29 qualified real-orthogonal equivalence pass sealed at `e787e506f6a8b31d703bb8e735c82bf8fb09334c`.
 
@@ -157,3 +157,16 @@ If memory breaks even though nothing loses norm or reversibility, we have strong
 ## Authority boundary
 
 UP-30 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification completed successfully on workflow run `35873650226` at source head `fb0ce8161e2fa16afbaebd43dee5cb516d5033f1`.
+
+The repeated-spectrum control reproduced the UP-28 frontier exactly: 1.0 held-out accuracy, 1.0 commit decode, 1.0 exact-final accuracy, and 1.0 relational-query accuracy.
+
+The split transport remained norm-preserving and real-orthogonally equivalent, and transport-only observable discovery still produced approximately commuting, depth-stable observables. However, held-out accuracy fell to 0.461181640625 and mutable commit accuracy fell to 0.0078125. The preregistered material-effect and multiplicity-dependence gates passed.
+
+Interpretation boundary: the split ablation breaks both repeated eigenvalue multiplicity **and** exact shared co-evolution/alignment across the six historical copies. Therefore UP-30 supports dependence on the repeated/aligned transport symmetry, but it does not yet isolate which part is causal.
+
+The next experiment must preserve the repeated spectrum exactly while conjugating each copy into a different internal basis. That separates "same eigenvalues/multiplicity" from "same coordinate-aligned dynamics."
