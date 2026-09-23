@@ -129,3 +129,8 @@ The original 128/128 split used `memoryTableIndex(table) % 2`. Because the table
 Therefore UP-7 remains a valid negative result for the exact tested harness, but it is **not a clean causal test** of phase loss or depth ambiguity. The held-out set also contains unseen marginal labels for one entity.
 
 UP-8 corrects this before drawing architectural conclusions: it uses a balanced combinatorial split in which every entity/value marginal appears in both partitions, verifies that property explicitly, and then compares magnitude-only and phase/coherence-aware direct observers under identical data and transport conditions.
+
+
+A second confound was found during UP-8 design: the UP-7 observer concatenated global state probabilities with an entity one-hot selector and then used one linear softmax head. That selector can change only the class biases; it cannot make the state-feature weights depend on the queried entity. The observer therefore lacked a multiplicative/entity-conditioned read mechanism.
+
+UP-8 removes this confound by training four entity-conditioned heads with the same architecture and budget, so each queried entity has a legitimate direct readout map. The scientific comparison then isolates feature content and depth/frame generalization.
