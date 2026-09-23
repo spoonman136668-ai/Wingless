@@ -2,7 +2,6 @@ package unitary
 
 import (
 	"fmt"
-	"math"
 	"math/cmplx"
 )
 
