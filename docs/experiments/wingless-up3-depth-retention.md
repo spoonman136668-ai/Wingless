@@ -1,6 +1,6 @@
 # Wingless UP-3: depth retention stress
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified research primitive; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-2 Windows qualification sealed at `fa5e9e80737d90e9c1ad901319bcd2b045c3c94f`.
 
@@ -70,3 +70,14 @@ That is a memory/transport result, not evidence of language reasoning. A positiv
 ## Authority boundary
 
 UP-3 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `b4115bdcf58125b856851ad0fbd90355b40de86c` passed the focused UP-3 suite and complete Wingless regression.
+
+At depth 128 the unitary path retained 1.0 classification accuracy with maximum norm drift 7.771561172376096e-15, maximum Gram/fidelity error 2.7755575615628914e-15, perturbation gain 1.0000000000000098, and complete forward/inverse round-trip error 9.92884257223707e-15.
+
+The matched non-unitary path also retained 1.0 classification accuracy, but its maximum norm drift reached 26.751397615116673, maximum Gram/fidelity error reached 0.0781818758548447, and perturbation gain reached 5.541839982219787.
+
+Interpretation remains bounded: UP-3 establishes a deep transport/stability distinction under this matched stress construction. It does not establish language reasoning or a general performance advantage.
