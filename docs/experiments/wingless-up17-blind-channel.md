@@ -1,0 +1,130 @@
+# Wingless UP-17: blind anonymous-channel recovery
+
+Status: research branch only; not activated, promoted, or connected to ckb-plane.
+
+Parent research qualification: UP-16 Windows single-composite-state qualification sealed at `d60c993b8d98b2af05f3aa66c9cab8042d829b3f`.
+
+## Question
+
+Can the one-state UP-16 system remain usable when the observer is no longer told which internal channel is memory, anchor, or a specific pilot?
+
+UP-17 keeps one 96-dimensional recurrent state but densely mixes the six historical channel subspaces before transport.
+
+The observer is not given the mixer, its inverse, or target demixing coefficients.
+
+## Anonymous channel mixing
+
+The UP-16 packed state has six 16-dimensional logical channels.
+
+UP-17 applies a fixed dense real orthogonal 6 × 6 DCT-II matrix across the channel axis at every coordinate.
+
+After mixing, every anonymous channel contains contributions from all six historical semantic channels.
+
+Because the same 16-dimensional transport acts on every channel, the dense channel mixing commutes with propagation. The state therefore stays anonymous across all depths.
+
+The fixed mixing matrix is used only by the encoder that creates the experimental state. It is not exposed to the learning objective as a target or feature.
+
+## Learned readout projection
+
+A trainable real 6 × 6 readout projection begins as identity.
+
+It is used only at observation time.
+
+The recurrent state itself is never unmixed during transport.
+
+The projection is learned from classification loss using 32 balanced training tables with memory noise 0.05 and memory-only global-phase nuisance.
+
+Training alternates:
+
+1. ten full-batch softmax updates for each entity;
+2. central-difference gradients over all 36 projection coefficients;
+3. row normalization.
+
+Parameters:
+
+- 70 outer steps;
+- demixer learning rate 0.22;
+- finite-difference epsilon 1e-4.
+
+No target inverse or channel labels are supplied to the optimizer.
+
+Post-hoc role alignment with the hidden encoder mixer is reported only as a diagnostic. It does not drive learning.
+
+## Fresh unseen-depth evaluation
+
+After channel learning, the alternating heads are discarded.
+
+Fresh entity decoders train on:
+
+- all 128 balanced training tables;
+- depths 8, 24, 72, 216, 432, 648;
+- four noisy trials per table/depth;
+- 1,200 softmax steps.
+
+Evaluation uses:
+
+- all 128 disjoint held-out tables;
+- unseen depths 32, 128, 512, 1024;
+- two noisy trials per table/depth.
+
+The matched non-unitary path receives the same anonymous mixing, learned projection, table pools, and decoder budget.
+
+## Mutable integration
+
+The mixed unitary state then runs:
+
+- 48 scenarios;
+- 16 writes each;
+- 768 commit opportunities;
+- held-out depths only;
+- memory noise 0.05;
+- memory-only global-phase nuisance;
+- no explicit depth;
+- no inverse transport;
+- no runtime prototype lookup;
+- explicit irreversible overwrite/re-encode boundary.
+
+The learned 6 × 6 projection is applied only at readout. No persistent semantic side states are reconstructed.
+
+## Scientific gates
+
+**Channel-learning pass**
+
+- identity-readout initial saturated capacity < 0.70;
+- final unitary train accuracy >= 0.99;
+- final channel-learning loss < initial loss;
+- learned projection moves at least 0.50 L2 from identity.
+
+**Unseen-depth pass**
+
+- unitary held-out accuracy >= 0.99;
+- recurrent-state norm drift <= 1e-12.
+
+**Mutable-integration pass**
+
+- commit accuracy >= 0.99;
+- exact final-table accuracy >= 0.95;
+- relational-query accuracy >= 0.95;
+- recurrent-state norm drift <= 1e-12.
+
+## Interpretation boundary
+
+A positive result means the observer can learn where the useful semantic reference directions are after they have been hidden inside anonymous channel mixtures.
+
+The 96-dimensional state still has six anonymous 16-dimensional channel blocks, and the readout architecture still reconstructs three roles transiently before applying the established gauge-invariant observable.
+
+So UP-17 removes **fixed semantic locations**, not the existence of a six-channel factorization.
+
+A positive UP-17 permits UP-18 to mix channel and coordinate dimensions together so even the anonymous 6 × 16 block structure is no longer available to the observer.
+
+## Plain speak
+
+UP-16 put the memory and compass into one box, but the compartments were labeled.
+
+UP-17 shakes the box until every compartment contains a mixture of everything, removes the labels, and asks the system to learn from task success how to read the right internal directions again.
+
+If it succeeds, we no longer have to tell it where the memory, anchor, or pilot channels live.
+
+## Authority boundary
+
+UP-17 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
