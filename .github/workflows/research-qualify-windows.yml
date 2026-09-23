@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 180
     defaults:
       run:
-        shell: powershell
+        shell: powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
     steps:
       - name: Checkout exact research head
         uses: actions/checkout@v4
