@@ -1,6 +1,6 @@
 # Wingless UP-41: direct optimizer reachability calibration
 
-Status: preregistered calibration branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified optimizer calibration; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-40 qualified scientific negative sealed at `3df8ca932b974e7e12f103820550ad107dd71b91`.
 
@@ -129,3 +129,38 @@ That tells us what to repair next without changing the scientific target or hand
 ## Authority boundary
 
 UP-41 is geometry-only mathematical calibration. It does not invoke a language model, activate Wingless, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+The authoritative Windows qualification on workflow run `35934100720` completed successfully at source head `2e5d8fdc0b55dc4ab5a1104974b9a9a88370330c` on runner `WINGLESS-LINKDEADKB`. Focused tests, deterministic double probe, and full repository regression passed.
+
+The calibration produced three independent findings.
+
+### 1. Twelve-step reachability is insufficient
+
+The exact analytic-gradient/no-sticky reference improved target cosine from `0.44721359549995804` to `0.8805670712125754`, but its final target-group spread remained `0.07413747148400111`, far outside the already-frozen `0.0025` fusion basin. It never entered that basin in 12 updates.
+
+Therefore the 12-update horizon is insufficient for this independently known-good UP-35 geometry even when gradient estimation and sticky snapping are removed as confounds.
+
+### 2. Sequential one-direction estimation materially limits movement
+
+With sticky projection removed from both arms:
+
+- sequential projected central difference best cosine: `0.6715712791297879`;
+- analytic reference best cosine: `0.8805670712125754`;
+- exact best-cosine gap: `0.2089957920827875`.
+
+Thus the sequential estimator leaves substantial useful target-directed motion unrealized within the same update horizon.
+
+### 3. Sticky projection can irreversibly fuse the wrong structure
+
+The current sequential+sticky arm ended with groups `[0]`, `[1]`, `[2]`, `[3]`, `[4,5]`, although members 4 and 5 belong to different accepted UP-35 target groups.
+
+The analytic-gradient+sticky arm also made a cross-target fusion, ending with `[0]`, `[1]`, `[2]`, `[3,5]`, `[4]`.
+
+Therefore the sticky threshold can lock an incorrect structural decision even when the objective gradient is exact.
+
+Scientific classification: **qualified mechanistic calibration**. UP-41 does not select or authorize an architecture. It shows that the UP-38/39/40 direct optimizer combines three distinct limitations: insufficient 12-step reachability, incomplete one-direction gradient information, and an irreversible snapping mechanism capable of wrong fusion.
+
+The next experiment should remain geometry-only and remove sticky snapping as a known confound. It should compare the current sequential estimator, a computationally efficient rolling full-rank reconstruction from the existing deterministic directional probes, and the analytic reference over a preregistered doubling horizon. This determines whether a corrected two-evaluations-per-update estimator can enter the accepted UP-35 fusion basin without requiring an impractical full finite-difference gradient at every update.
