@@ -1,6 +1,6 @@
 # Wingless UP-20: closed-form anonymous quadratic readout
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified partial positive; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-19 qualified scientific negative sealed at `c511ff937a02692c5d5bec0d1d397d1a3f3df22b`.
 
@@ -144,3 +144,16 @@ If that works, the problem was not the anonymous state. It was the way we were t
 ## Authority boundary
 
 UP-20 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35852144146` completed successfully at source head `69da5e36dff0f85ea5006def5a4f660e87891d9b`.
+
+The exact quadratic witness passed with maximum reconstruction error 7.3504189744306e-18 and 0.996826171875 held-out classification accuracy. This directly verifies that the anonymous 702-feature span contains the historical task-relevant phase direction.
+
+The generic closed-form ridge learner also passed its training gate at 0.99169921875 accuracy and reached 0.97216796875 held-out accuracy without a demixer, hidden mixer, inverse, depth input, or runtime prototype lookup. The matched non-unitary path using the same heads reached 0.513916015625.
+
+The full unseen-depth and mutable gates did not pass. Entity 1 held-out accuracy was 0.9091796875, and error accumulation reduced mutable commit accuracy to 0.7018229166666666 and exact-final accuracy to 0.6666666666666666.
+
+Interpretation: UP-19's near-chance result was substantially an optimizer/readout problem. Direct anonymous-state learning is viable, but a generic one-hot ridge target does not generalize tightly enough for recurrent mutable use. The next experiment should use the already learned value-phase alphabet as a low-rank circular supervision target.
