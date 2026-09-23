@@ -111,9 +111,9 @@ func compositeWeylOperator(shift, phaseIndex int) (latentMatrix, error) {
 			2*math.Pi*float64(phaseIndex*channel)/
 				float64(weylMultiplicityDimension),
 		)
-		for coordinate := 0; coordinate < compositeBlockDimension; coordinate++ {
-			row := target*compositeBlockDimension + coordinate
-			column := channel*compositeBlockDimension + coordinate
+		for coordinate := 0; coordinate < compositeChannelDim; coordinate++ {
+			row := target*compositeChannelDim + coordinate
+			column := channel*compositeChannelDim + coordinate
 			out[row][column] = phase
 		}
 	}
