@@ -1,6 +1,6 @@
 # Wingless UP-25: dynamics-discovered commuting observables
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified partial positive with unseen-depth/mutable gates negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-24 qualified scientific pass sealed at `08acd3e00736069e3682813c4a905691697ed505`.
 
@@ -153,3 +153,14 @@ If those measurements still recover memory perfectly, the system no longer needs
 ## Authority boundary
 
 UP-25 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35869512824` completed successfully at source head `69e57caa13e91353e9a02540525a9e4cd08c9e93`.
+
+The discovery mechanism itself passed: maximum commutator entry error was 2.678430105985744e-7 and maximum feature drift was 2.2921056928353924e-5. Training accuracy reached 0.994140625 without hidden multiplicity or mixer information.
+
+The full generalization gates remained negative. Held-out accuracy was 0.9248046875, with the largest weakness in entity 3 at 0.8623046875. Mutable commit accuracy was 0.5989583333333334.
+
+Interpretation: dynamics-only commutant discovery works, but 32 generic discovered directions do not span enough of the task-relevant stable observable space. UP-26 changes only observable-bank breadth and compares the frozen 32-observable arm against 64 observables. Projection rounds, task learner, training data, ridge lambda, held-out depths, and acceptance thresholds remain unchanged.
