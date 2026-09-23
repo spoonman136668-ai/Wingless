@@ -1,6 +1,6 @@
 # Wingless UP-37: adaptive task-weighted continuous symmetry fusion
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified near-positive with frozen relational-query gate negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-36 qualified scientific negative sealed at `fde6ad40fdd9548e24374c16a2459d42f9c076d3`.
 
@@ -132,3 +132,16 @@ If that lets the system grow enough symmetry to recover robust mutable memory, i
 ## Authority boundary
 
 UP-37 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35919151769` completed successfully at source head `9f442cf5e1acf9627a35e32fb2ddaf34b5a9609e`.
+
+Adaptive affinity recomputation ran for all 10 flow steps and produced 53 positive task-derived affinities. The best training-side checkpoint was step 5, where exact symmetry had grown from capacity 6 to capacity 12 with groups `[0] + [1,2,3] + [4] + [5]`.
+
+On the untouched true held-out pool the selected structure reached 0.994873046875 static accuracy, 0.9739583333333334 mutable-commit accuracy, 0.9166666666666666 exact-final-table accuracy, and 0.9375 relational-query accuracy. Static and commit retention deltas versus the capacity-36 control were 0.005126953125 and 0.02604166666666663.
+
+The preregistered adaptive-fusion gate remains negative because relational-query accuracy was 0.9375 against the frozen 0.95 threshold. No threshold is changed after seeing the result.
+
+Interpretation: refreshing the task-attraction field substantially repairs UP-36's stale-guidance failure, but the hand-designed flow still leaves a small residual relational deficit. The next experiment should remove the attraction-flow rule and optimize the continuous spectral parameters directly under a smooth task/resource objective.
