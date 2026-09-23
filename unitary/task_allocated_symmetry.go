@@ -75,15 +75,19 @@ type taskAllocationSpec struct {
 func splitTaskAllocationTrainingPool(
 	tables []memoryTable,
 ) ([]memoryTable, []memoryTable) {
-	fit := make([]memoryTable, 0, len(tables)*3/4)
-	validation := make([]memoryTable, 0, len(tables)/4)
-	for index, table := range tables {
-		if index%4 == 0 {
-			validation = append(validation, table)
-		} else {
-			fit = append(fit, table)
+	ordered := append([]memoryTable(nil), tables...)
+	sort.Slice(ordered, func(i, j int) bool {
+		hi := observerTableHash(ordered[i])
+		hj := observerTableHash(ordered[j])
+		if hi == hj {
+			return memoryTableIndex(ordered[i]) < memoryTableIndex(ordered[j])
 		}
-	}
+		return hi < hj
+	})
+
+	validationCount := len(ordered) / 4
+	validation := append([]memoryTable(nil), ordered[:validationCount]...)
+	fit := append([]memoryTable(nil), ordered[validationCount:]...)
 	return fit, validation
 }
 
