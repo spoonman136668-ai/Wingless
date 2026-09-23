@@ -1,6 +1,6 @@
 # Wingless UP-36: task-weighted continuous symmetry fusion
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-35 qualified scientific positive sealed at `09284aa70203adf8881be42f67084c49b338dabe`.
 
@@ -138,3 +138,14 @@ If some walls naturally collapse onto the same location and the resulting struct
 ## Authority boundary
 
 UP-36 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35913964677` completed successfully at source head `c5dcbd283d27c1757102f2f5359658b23bd3c73a`.
+
+The continuous process generated 14 positive pair affinities and created an exact fusion without evaluating hard merge candidates. The best validation checkpoint was flow step 1, where channels 1 and 2 fused and commutant capacity increased from 6 to 8.
+
+That checkpoint did not meet the scientific performance gates. After retraining on the complete original training pool, true held-out accuracy was 0.974609375, mutable-commit accuracy was 0.8502604166666666, exact-final-table accuracy was 0.7916666666666666, and relational-query accuracy was 0.8333333333333334. The full-capacity control remained perfect.
+
+Interpretation: continuous symmetry formation itself is viable, but the fixed affinity field estimated only at the singleton starting geometry does not supply enough adaptive guidance. The next experiment should recompute task-derived continuous affinities after each flow step rather than freezing them at initialization.
