@@ -1,6 +1,6 @@
 # Wingless UP-1: trained unitary propagator
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified research primitive; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-0 Windows proof at source head `2167d5cf255a0f139a17959c2cfeaa888fb53484`.
 
@@ -52,3 +52,21 @@ A positive UP-1 result permits the next research step: multi-parameter learned p
 ## Authority boundary
 
 UP-1 does not register an inference backend, invoke a language model, activate a worker/listener, execute model-selected tools, or alter ckb-plane authority. Queue, retry, workspace, acceptance, and promotion authority remain outside Wingless.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `94233c18573a59cfe77dc2bd6c32444ff1285636` passed the focused UP-1 suite and the complete existing Wingless regression.
+
+Observed results:
+
+- initial accuracy: 0.5;
+- train accuracy: 1.0;
+- held-out accuracy: 1.0;
+- learned theta: 0.7848813910942543 rad;
+- target theta: 0.7853981633974483 rad;
+- final loss: 2.670536252342773e-7;
+- maximum norm drift: 4.440892098500626e-16;
+- maximum forward/inverse round-trip error: 2.482534153247273e-16.
+
+The post-run worktree contained only regenerated advisory `.ice` files. This qualification does not authorize Wingless activation or change ckb-plane authority.
