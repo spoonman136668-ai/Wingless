@@ -2,6 +2,7 @@ package unitary
 
 import (
 	"math"
+	"math/cmplx"
 	"testing"
 )
 
@@ -22,7 +23,7 @@ func TestUP22FullLatentMixerIsUnitaryAndDistributed(t *testing.T) {
 			if row == column {
 				want = 1
 			}
-			delta := cmplxAbs(product[row][column] - want)
+			delta := cmplx.Abs(product[row][column] - want)
 			if delta > maximum {
 				maximum = delta
 			}
@@ -36,9 +37,9 @@ func TestUP22FullLatentMixerIsUnitaryAndDistributed(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if participation < 8 {
+	if participation < 90 {
 		t.Fatalf(
-			"minimum mixer participation=%g want>=8",
+			"minimum mixer participation=%g want>=90",
 			participation,
 		)
 	}
