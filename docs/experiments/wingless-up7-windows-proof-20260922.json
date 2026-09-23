@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.unitary-direct-observer-windows-proof.v1",
+  "experiment": "UP-7-direct-transported-state-observer",
+  "status": "qualified-negative",
+  "observed_at": "2026-09-22T20:53:52-04:00",
+  "source_head": "8f201ecca5d680020dba340464464aa5b2ec6a49",
+  "baseline_head": "c431bf27e021e9aa83f99155bbb597d1a5e24434",
+  "platform": "windows",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "scientific_gate": {
+    "unitary_hypothesis_pass": false,
+    "control_hypothesis_pass": false
+  },
+  "unitary_observer": {
+    "train_accuracy": 0.4217122395833333,
+    "train_loss": 1.1628195719587509,
+    "static_held_out_accuracy": 0.205078125
+  },
+  "control_observer": {
+    "train_accuracy": 0.4244791666666667,
+    "train_loss": 1.1698577077801693,
+    "static_held_out_accuracy": 0.20703125
+  },
+  "unitary": {
+    "commit_decode_accuracy": 0.005208333333333333,
+    "exact_final_table_accuracy": 0.0,
+    "relational_query_accuracy": 0.75,
+    "min_value_margin": 0.00008657528457561847,
+    "min_relation_margin": 3.6483089366212695e-7,
+    "max_forward_norm_drift": 7.571721027943568e-14
+  },
+  "non_unitary_matched": {
+    "commit_decode_accuracy": 0.0,
+    "exact_final_table_accuracy": 0.0,
+    "relational_query_accuracy": 0.5625,
+    "min_value_margin": 0.00003210907395323481,
+    "min_relation_margin": 0.0005315702587392335,
+    "max_forward_norm_drift": 4714800782374.951
+  },
+  "runtime_prototype_lookup": false,
+  "explicit_inverse_readout": false,
+  "depth_feature_provided": false,
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "The harness qualified, but the direct-observation hypothesis failed for both paths. A depth-agnostic linear observer over transported coordinate probabilities did not recover unseen tables at unseen depths. Because the feature map discards relative phase, the result motivates a phase/coherence-aware observer ablation before adding clocks, explicit depth, or a larger neural observer."
+}
