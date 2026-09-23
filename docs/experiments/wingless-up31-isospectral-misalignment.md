@@ -1,6 +1,6 @@
 # Wingless UP-31: isospectral hidden per-copy misalignment
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified causal positive; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-30 qualified causal positive with alignment caveat sealed at `7a8343cd2056033183ff0d374c6eeccc3fcc24e9`.
 
@@ -133,3 +133,16 @@ If Wingless still works, the copies do not need to line up coordinate-for-coordi
 ## Authority boundary
 
 UP-31 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35874862731` completed successfully at source head `95d0c7e587cf7b09134af7850983b1aeba8852ba`.
+
+The hidden per-copy basis change was genuine: the old aligned cross-copy shift commutator rose to 0.13094732886183125, while the correctly conjugated hidden intertwiner still commuted to 9.626179587282793e-15. Exact isospectral conjugacy error was 1.3100721734176645e-14.
+
+Despite the coordinate misalignment, the transport-only discovered observer reached 1.0 training accuracy, 0.999755859375 held-out accuracy, 1.0 mutable commit accuracy, 1.0 exact-final accuracy, and 1.0 relational-query accuracy.
+
+Interpretation: exact coordinate-aligned co-evolution is not required. Together with UP-30, the evidence now points more specifically at repeated-spectrum multiplicity / its commutant structure as the important tested ingredient.
+
+Next: preregister a multiplicity dose-response that progressively partitions the six repeated copies while preserving norm, state dimension, and observer protocol. A monotonic or threshold-like loss would materially strengthen that causal interpretation.
