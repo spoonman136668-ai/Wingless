@@ -53,7 +53,7 @@ try {
     if ($Result.hard_merge_candidates_evaluated) { throw 'UP38_HARD_MERGE_SEARCH_PRESENT' }
     if ($Result.pair_affinity_field_used) { throw 'UP38_PAIR_AFFINITY_FIELD_PRESENT' }
     if (-not $Result.direct_offsets_optimized) { throw 'UP38_DIRECT_OPTIMIZATION_MISSING' }
-    if ($Result.optimizer -cne 'deterministic-spsa') { throw 'UP38_OPTIMIZER_MISMATCH' }
+    if ($Result.optimizer -cne 'deterministic-projected-central-difference') { throw 'UP38_OPTIMIZER_MISMATCH' }
     if (-not $Result.smooth_task_objective) { throw 'UP38_SMOOTH_TASK_OBJECTIVE_MISSING' }
     if (-not $Result.smooth_resource_objective) { throw 'UP38_SMOOTH_RESOURCE_OBJECTIVE_MISSING' }
     if (-not $Result.sticky_exact_fusion_projection) { throw 'UP38_STICKY_FUSION_BOUNDARY_MISSING' }
