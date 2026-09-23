@@ -1,6 +1,6 @@
 # Wingless UP-13: task-learned phase frame
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified task-learned phase-frame result; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-12 Windows full-rank mutable-memory qualification sealed at `20ae7845042af43f60634926c96347d80e214265`.
 
@@ -120,3 +120,22 @@ A positive UP-13 permits UP-14: learn the pilot support/mixing directions themse
 ## Authority boundary
 
 UP-13 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-23 against source head `e4d831bab9d170299b825d08e2d05426a5c1ef07` passed the harness and complete Wingless regression.
+
+The deliberately clustered starting alphabet `[0, 0.12, 0.24, 0.36]` had saturated canonical capacity 0.3046875 and minimum phase separation 0.12 radians.
+
+Task-loss optimization learned:
+
+`[0, -1.7700278912430298, 1.1656136621055615, 2.5917033093902164]`
+
+with final alternating-training loss 0.009349958179460495 and minimum phase separation 1.1656136621055615 radians.
+
+Fresh post-learning unitary decoders reached 1.0 train and 1.0 unseen-depth held-out accuracy. The matched non-unitary transport reached 0.7802734375 held-out accuracy.
+
+Mutable integration used 48 scenarios × 16 writes and achieved 1.0 commit decode, 1.0 exact final-table, and 1.0 relational-query accuracy with minimum value margin 0.924336004903164.
+
+Interpretation: UP-13 removes manual selection of the value-phase alphabet. Entity-local pilot supports, the global anchor, and rank-4 structure remain hand specified and are the next research boundary.
