@@ -1,6 +1,6 @@
 # Wingless UP-14: task-learned pilot support
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified task-learned support-frame result; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-13 Windows learned-phase qualification sealed at `ea19f64307567fcab2853055fcabd6d18f1f5093`.
 
@@ -138,3 +138,18 @@ A positive UP-14 permits UP-15 to learn or eliminate the anchor and/or fold the 
 ## Authority boundary
 
 UP-14 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-23 against source head `9c326f3497db8aa67553aaebe616c1b80a4fd296` passed the harness and complete Wingless regression.
+
+The dense starting support had mean nominal-target purity 0.2649941199529597 and saturated initial capacity 0.453125.
+
+Task-loss optimization learned a near-entity-selective support matrix with mean target purity 0.9996657702546374 and minimum row purity 0.9995317710567762. Average alternating-training loss fell from 1.210122312263619 to 0.00731077627204388.
+
+Fresh unitary decoders reached 1.0 train and 1.0 unseen-depth held-out accuracy. The matched non-unitary path reached 0.779296875 held-out accuracy.
+
+Mutable integration used 48 scenarios × 16 writes and achieved 1.0 commit decode, 1.0 exact final-table, and 1.0 relational-query accuracy with minimum value margin 0.9041895757606637.
+
+Interpretation: UP-14 removes manual selection of pilot support. The fixed global anchor and explicit five-state side-frame topology remain hand specified.
