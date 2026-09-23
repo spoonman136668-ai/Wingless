@@ -1,6 +1,6 @@
 # Wingless UP-42: rolling full-rank gradient horizon calibration
 
-Status: preregistered calibration branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified optimizer calibration; not activated, promoted, or connected to ckb-plane.
 
 Parent calibration: UP-41 sealed at `d5c622da08b3a13b7df3c4d3fd8ade45d2cc961a`.
 
@@ -107,3 +107,33 @@ The horizon sweep then tells us whether that cheap memory is enough to steer lik
 ## Authority boundary
 
 UP-42 is geometry-only mathematical calibration. It does not invoke a language model, activate Wingless, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+The authoritative Windows qualification on workflow run `35934585631` completed successfully at source head `416032419c1189b5b6d2a5e19ca86300957cba3e` on runner `WINGLESS-LINKDEADKB`. Focused tests, deterministic double probe, and full repository regression passed.
+
+The minimum tested horizon that entered the fixed UP-35 target fusion basin was:
+
+- sequential projected central difference: **none through 96**;
+- rolling full-rank directional memory: **48**;
+- analytic cosine reference: **48**.
+
+Within their 48-step runs:
+
+- rolling first entered the basin at step `30`;
+- analytic reference first entered at step `38`.
+
+At the maximum 96-step horizon:
+
+- sequential best target cosine: `0.9961184309672584`, final target-group spread `0.014265454630732626`, still outside the `0.0025` basin;
+- rolling best target cosine: `0.9999999863645984`, with basin entry preserved;
+- analytic best target cosine: `0.9999999999934922`, with basin entry preserved.
+
+The rolling estimator used full-rank reconstruction on 44 of 48 updates in the 48-step arm, after accumulating enough independent directional observations. It required no extra plus/minus probe pair per update beyond the sequential estimator.
+
+Scientific classification: **qualified positive optimizer calibration**.
+
+Interpretation: preserving recent directional derivatives repairs the major information-loss defect of the one-direction update. With sticky snapping removed, rolling full-rank memory reaches the known-good fusion basin on the same tested horizon as the exact-gradient reference, while simply extending the old sequential estimator to 96 steps does not.
+
+The next experiment should return this calibrated optimizer to the real UP-40 free-running rich task objective without injecting the UP-35 target. Use a maximum 48-step trajectory, no sticky fusion, and training-only checkpoint selection on the preregistered `12/24/48` schedule. Measure near-symmetry reversibly rather than mutating geometry at a threshold. Only after that task-side bridge succeeds should a principled exact-fusion operator be introduced.
