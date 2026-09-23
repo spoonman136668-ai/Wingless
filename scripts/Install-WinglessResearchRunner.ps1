@@ -25,7 +25,7 @@ if (Test-Path (Join-Path $InstallRoot '.runner')) {
 if ([string]::IsNullOrWhiteSpace($RegistrationToken)) {
     $gh = Get-Command gh -ErrorAction SilentlyContinue
     if ($null -eq $gh) {
-        throw 'WINGLESS_RUNNER_TOKEN_REQUIRED: install/authenticate GitHub CLI or pass -RegistrationToken from Settings > Actions > Runners > New self-hosted runner.'
+        throw 'WINGLESS_RUNNER_TOKEN_REQUIRED: pass -RegistrationToken from Settings > Actions > Runners > New self-hosted runner, or install/authenticate GitHub CLI.'
     }
 
     & gh auth status
@@ -52,12 +52,16 @@ $release = Invoke-RestMethod `
 
 $asset = @(
     $release.assets |
-    Where-Object { $_.name -match '^actions-runner-win-x64-.*\.zip } |
+    Where-Object {
+        $_.name.StartsWith('actions-runner-win-x64-') -and
+        $_.name.EndsWith('.zip')
+    } |
     Select-Object -First 1
 )
 
 if ($asset.Count -ne 1) {
-    throw 'WINGLESS_RUNNER_PACKAGE_NOT_FOUND'
+    $available = @($release.assets | ForEach-Object { $_.name }) -join ', '
+    throw "WINGLESS_RUNNER_PACKAGE_NOT_FOUND available=$available"
 }
 
 $zip = Join-Path $env:TEMP $asset[0].name
@@ -70,9 +74,14 @@ finally {
     Remove-Item -Force $zip -ErrorAction SilentlyContinue
 }
 
+$Config = Join-Path $InstallRoot 'config.cmd'
+if (-not (Test-Path $Config)) {
+    throw "WINGLESS_RUNNER_CONFIG_CMD_MISSING: $Config"
+}
+
 Push-Location $InstallRoot
 try {
-    & .\config.cmd `
+    & $Config `
         --unattended `
         --url $RepositoryUrl `
         --token $RegistrationToken `
@@ -83,23 +92,35 @@ try {
         --replace
 
     if ($LASTEXITCODE -ne 0) {
-        throw 'WINGLESS_RUNNER_CONFIG_FAILED'
+        throw "WINGLESS_RUNNER_CONFIG_FAILED exit=$LASTEXITCODE"
     }
 }
 finally {
     Pop-Location
 }
 
-$services = @(
+$runnerConfig = Join-Path $InstallRoot '.runner'
+if (-not (Test-Path $runnerConfig)) {
+    throw "WINGLESS_RUNNER_REGISTRATION_MISSING: $runnerConfig"
+}
+
+$matchingServices = @(
     Get-Service |
     Where-Object {
         $_.Name -like 'actions.runner.*' -and
-        $_.Status -ne 'Running'
+        (
+            $_.Name -like '*WINGLESS*' -or
+            $_.DisplayName -like '*WINGLESS*'
+        )
     }
 )
 
-foreach ($service in $services) {
-    if ($service.Name -like '*Wingless*' -or $service.DisplayName -like '*Wingless*') {
+if ($matchingServices.Count -lt 1) {
+    throw 'WINGLESS_RUNNER_SERVICE_NOT_FOUND_AFTER_CONFIG'
+}
+
+foreach ($service in $matchingServices) {
+    if ($service.Status -ne 'Running') {
         Start-Service $service.Name
     }
 }
@@ -110,61 +131,8 @@ Write-Host "InstallRoot: $InstallRoot"
 Write-Host "RunnerName:  $RunnerName"
 Write-Host "Labels:      $Labels"
 Write-Host 'Existing KTRADE/CKB runner paths were not modified.'
- } |
-    Select-Object -First 1
-)
-
-if ($asset.Count -ne 1) {
-    throw 'WINGLESS_RUNNER_PACKAGE_NOT_FOUND'
-}
-
-$zip = Join-Path $env:TEMP $asset[0].name
-Invoke-WebRequest -Uri $asset[0].browser_download_url -OutFile $zip
-
-try {
-    Expand-Archive -Path $zip -DestinationPath $InstallRoot -Force
-}
-finally {
-    Remove-Item -Force $zip -ErrorAction SilentlyContinue
-}
-
-Push-Location $InstallRoot
-try {
-    & .\\config.cmd `
-        --unattended `
-        --url $RepositoryUrl `
-        --token $RegistrationToken `
-        --name $RunnerName `
-        --labels $Labels `
-        --work '_work' `
-        --runasservice `
-        --replace
-
-    if ($LASTEXITCODE -ne 0) {
-        throw 'WINGLESS_RUNNER_CONFIG_FAILED'
-    }
-}
-finally {
-    Pop-Location
-}
-
-$services = @(
-    Get-Service |
-    Where-Object {
-        $_.Name -like 'actions.runner.*' -and
-        $_.Status -ne 'Running'
-    }
-)
-
-foreach ($service in $services) {
-    if ($service.Name -like '*Wingless*' -or $service.DisplayName -like '*Wingless*') {
-        Start-Service $service.Name
-    }
-}
-
 Write-Host ''
-Write-Host 'WINGLESS_RESEARCH_RUNNER_INSTALL_COMPLETE'
-Write-Host "InstallRoot: $InstallRoot"
-Write-Host "RunnerName:  $RunnerName"
-Write-Host "Labels:      $Labels"
-Write-Host 'Existing KTRADE/CKB runner paths were not modified.'
+Write-Host 'Wingless runner services:'
+Get-Service |
+    Where-Object { $_.Name -like 'actions.runner.*' } |
+    Select-Object Name, Status
