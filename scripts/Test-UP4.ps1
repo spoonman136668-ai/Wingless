@@ -1,10 +1,22 @@
 $ErrorActionPreference = 'Stop'
 
 $Repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$PriorGoCache = $env:GOCACHE
+$PriorGoTmp   = $env:GOTMPDIR
+$GoCache      = Join-Path $env:TEMP ("wingless-up4-gocache-" + $PID)
+$GoTmp        = Join-Path $env:TEMP ("wingless-up4-gotmp-" + $PID)
+
+New-Item -ItemType Directory -Force -Path $GoCache | Out-Null
+New-Item -ItemType Directory -Force -Path $GoTmp | Out-Null
+$env:GOCACHE = $GoCache
+$env:GOTMPDIR = $GoTmp
+
 Push-Location $Repo
 try {
     Write-Host '=== WINGLESS UP-4 SEQUENTIAL COMPOSITION ==='
     Write-Host "Repo: $Repo"
+    Write-Host "Isolated GOCACHE: $GoCache"
+    Write-Host "Isolated GOTMPDIR: $GoTmp"
 
     go env -w GOFLAGS=-buildvcs=false
     if ($LASTEXITCODE -ne 0) { throw 'UP4_GO_ENV_FAILED' }
@@ -47,4 +59,13 @@ try {
 }
 finally {
     Pop-Location
+
+    if ($null -eq $PriorGoCache) { Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue }
+    else { $env:GOCACHE = $PriorGoCache }
+
+    if ($null -eq $PriorGoTmp) { Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue }
+    else { $env:GOTMPDIR = $PriorGoTmp }
+
+    Remove-Item -Recurse -Force $GoCache -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $GoTmp -ErrorAction SilentlyContinue
 }
