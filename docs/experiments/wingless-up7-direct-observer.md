@@ -1,6 +1,6 @@
 # Wingless UP-7: direct transported-state observer
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified negative research result; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-6 Windows qualification sealed at `c431bf27e021e9aa83f99155bbb597d1a5e24434`.
 
@@ -109,3 +109,14 @@ Either outcome informs UP-8. No language-reasoning claim follows from UP-7.
 ## Authority boundary
 
 UP-7 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `8f201ecca5d680020dba340464464aa5b2ec6a49` passed the harness and complete Wingless regression, while both scientific hypotheses failed.
+
+The unitary direct observer reached 0.4217122395833333 training accuracy and 0.205078125 static held-out accuracy. In mutable-memory integration it reached 0.005208333333333333 commit accuracy, 0 exact final-table accuracy, and 0.75 relational-query accuracy. The unitary transport itself remained bounded with maximum norm drift 7.571721027943568e-14.
+
+The matched control showed essentially the same observer failure while its transport norm drift reached 4714800782374.951.
+
+The primary next diagnosis is representation loss: UP-7 exposed only coordinate probabilities, discarding relative phase/coherence. UP-8 therefore tests phase-aware, global-phase-invariant observation before introducing an explicit clock/depth signal or a larger nonlinear observer.
