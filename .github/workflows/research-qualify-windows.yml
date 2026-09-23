@@ -1,0 +1,50 @@
+name: Wingless research Windows qualification
+
+on:
+  push:
+    branches:
+      - 'research/wingless-up**'
+    paths:
+      - '.wingless/qualification-request.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-research-windows
+  cancel-in-progress: false
+
+jobs:
+  qualify:
+    name: Windows research qualification
+    runs-on: [self-hosted, Windows, X64, wingless-research]
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout exact research head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Production-priority guard
+        run: |
+          ./scripts/Test-WinglessHostGuard.ps1 -WaitMinutes 120
+
+      - name: Run research qualification
+        run: |
+          ./scripts/Invoke-ResearchQualification.ps1 `
+            -RequestPath '.wingless/qualification-request.json' `
+            -OutputDirectory 'evidence/research-qualification'
+
+      - name: Upload qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-research-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/research-qualification/
+          if-no-files-found: warn
+          retention-days: 30
