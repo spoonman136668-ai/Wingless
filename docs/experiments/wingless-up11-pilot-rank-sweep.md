@@ -1,6 +1,6 @@
 # Wingless UP-11: pilot-rank and memory-noise sweep
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified pilot-rank result; not activated, promoted, or connected to ckb-plane.
 
 Parent research record: UP-10 Windows-qualified negative compression result sealed at `d125a6e69c95f0a887322afcf96a0870d8e599e9`.
 
@@ -97,3 +97,22 @@ If rank 2 passes noiselessly but fails with noise, the UP-10 failure is primaril
 ## Authority boundary
 
 UP-11 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-23 against source head `f74dce32c330969b599690a190419c8f16fa3fe6` passed the harness and complete Wingless regression.
+
+Observed held-out accuracies:
+
+- rank 1, no memory noise: 0.4296875;
+- rank 1, memory noise 0.05: 0.421875;
+- rank 2, no memory noise: 0.53125;
+- rank 2, memory noise 0.05: 0.525390625;
+- rank 3, no memory noise: 0.7734375;
+- rank 3, memory noise 0.05: 0.70703125;
+- rank 4, no memory noise: 0.96875;
+- rank 4, memory noise 0.05: 0.95703125;
+- matched non-unitary rank 4, memory noise 0.05: 0.732421875.
+
+The minimum passing code rank is 4 both noiselessly and with memory noise 0.05. This supports intrinsic rank loss as the dominant explanation for UP-10's three-pilot failure under the current coherence/readout interface. It does not prove that five physical side vectors are globally minimal for every possible representation.
