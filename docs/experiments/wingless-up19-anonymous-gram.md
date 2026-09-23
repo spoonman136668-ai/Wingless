@@ -1,6 +1,6 @@
 # Wingless UP-19: direct anonymous Gram readout
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-18 qualified scientific negative sealed at `070b759e6284830726e758e1b2ab9aae245ea5a5`.
 
@@ -140,3 +140,14 @@ If that works, Wingless does not need to figure out which hidden piece used to b
 ## Authority boundary
 
 UP-19 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35851476994` completed successfully at source head `7eb608cf291adb2dcb7718582d93fe148b0fbd56`.
+
+The unitary anonymous Gram representation passed its depth-invariance gate: maximum quadratic-feature drift at depth 1024 was 1.389999226830696e-13, with state norm drift 3.3306690738754696e-14. The matched non-unitary feature drift was 1.077751562699128e25.
+
+The learned readouts were scientific negatives. The 36-feature linear head reached 0.26220703125 held-out accuracy. The complete 702-feature degree-2 head reached only 0.2529296875 training accuracy and 0.25146484375 held-out accuracy. Mutable integration consequently failed.
+
+Interpretation: the anonymous relational representation is stable, but the existing gradient softmax learner does not extract the task signal from it. Because the established semantic decision function is algebraically contained in the degree-2 feature span after fixed invertible channel mixing, the next experiment isolates the optimizer by keeping the exact same representation and replacing gradient softmax with a deterministic closed-form ridge readout.
