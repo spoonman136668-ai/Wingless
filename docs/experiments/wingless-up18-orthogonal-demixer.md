@@ -1,6 +1,6 @@
 # Wingless UP-18: orthogonal anonymous-channel demixer
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-17 qualified scientific negative sealed at `652cefb5ce4b629a048f10c9ed82c622695c35b1`.
 
@@ -155,3 +155,14 @@ If that works, the problem was the learner's steering mechanism—not missing in
 ## Authority boundary
 
 UP-18 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE queue or acceptance authority, access brokers or credentials, or promote/deploy code.
+
+
+## Windows qualification result
+
+Authoritative autonomous Windows qualification on workflow run `35847657929` completed successfully at source head `b6d831bdf1e864d12c79c1bfb7e16c2671efaaa5`.
+
+The oracle recoverability control passed completely: held-out accuracy was 1.0, feature reconstruction error was 8.881784197001252e-16, and unitary norm drift remained 3.219646771412954e-14. The anonymous mixing therefore did not destroy the usable representation.
+
+The learned 15-angle orthogonal demixer was a scientific negative. Task loss decreased from 1.3007693192539334 to 1.1894680255014871 and the angle vector moved by L2 distance 0.7483513080484312, but held-out accuracy reached only 0.34423828125. Mean post-hoc role alignment was 0.13934972461308595. Mutable integration failed at 0.010416666666666666 commit accuracy, 0 exact-final accuracy, and 0.08333333333333333 relational-query accuracy.
+
+Interpretation: the limiting factor is now blind role discovery / observer architecture, not information preservation, unitary stability, or representability of the inverse transform. The next experiment should avoid forcing the learner to reconstruct historical semantic channels and instead test direct task readout from anonymous relational state.
