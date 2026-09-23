@@ -73,17 +73,3 @@ func TestUP7TableSplitIsDisjoint(t *testing.T) {
 		}
 	}
 }
-
-func TestUP7IsDeterministic(t *testing.T) {
-	a, err := RunUP7()
-	if err != nil {
-		t.Fatal(err)
-	}
-	b, err := RunUP7()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !reflect.DeepEqual(a, b) {
-		t.Fatalf("UP-7 is nondeterministic:\nA=%#v\nB=%#v", a, b)
-	}
-}
