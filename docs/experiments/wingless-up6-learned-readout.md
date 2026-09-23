@@ -1,6 +1,6 @@
 # Wingless UP-6: learned observation and query interface
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified learned-readout primitive; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-5 Windows qualification sealed at `1c61d679b4928e6e4f92fa63236a7872bcce4a15`.
 
@@ -114,3 +114,14 @@ A positive UP-6 permits UP-7: learn a depth-agnostic observation map directly fr
 ## Authority boundary
 
 UP-6 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `a9d617a0fc7f10987544382fedbcaa0903ad087a` passed the focused UP-6 suite and complete Wingless regression.
+
+Both paths achieved 1.0 commit, exact final-table, and relational-query accuracy when their exact known transport inverses were applied before learned observation.
+
+The unitary path stayed bounded with maximum forward norm drift 6.683542608243442e-14. The matched non-unitary path reached maximum forward norm drift 3970852389496.2446 yet remained recoverable by its exact algebraic inverse, with round-trip error 5.97826796336944e-14.
+
+Interpretation: UP-6 validates reusable learned value and relation heads without runtime full-table prototype lookup. Because exact inverse transport was still supplied to both paths, UP-6 does not establish direct learned observation of the transported latent state. UP-7 must remove that inverse.
