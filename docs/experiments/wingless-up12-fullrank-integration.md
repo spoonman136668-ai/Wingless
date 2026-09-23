@@ -1,6 +1,6 @@
 # Wingless UP-12: full-rank decoder saturation and mutable integration
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified full-rank mutable-memory result; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-11 Windows pilot-rank qualification sealed at `48db0c6fe4180a71a2f1a118eaea83691736c35f`.
 
@@ -121,3 +121,27 @@ If static saturation passes but mutable integration fails, the residual per-step
 ## Authority boundary
 
 UP-12 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-23 against source head `65eccb205b53642e3fa306beb0a1ad4e46899097` passed the harness and complete Wingless regression.
+
+The saturated rank-4 unitary decoder reached:
+
+- train accuracy: 1.0;
+- unseen-depth held-out accuracy: 1.0;
+- per-entity held-out accuracy: 1.0 for all four entities.
+
+The matched non-unitary rank-4 control reached 0.860595703125 held-out accuracy under the identical full-pool/trial/optimizer budget.
+
+Mutable integration used 48 scenarios with 16 writes each (768 commit opportunities) and achieved:
+
+- commit decode accuracy: 1.0;
+- exact final-table accuracy: 1.0;
+- relational-query accuracy: 1.0;
+- minimum value margin: 0.9301842157965665;
+- minimum relation margin: 0.9622169888928173;
+- maximum norm drift: 6.616929226765933e-14.
+
+Interpretation: UP-11's residual rank-4 error was a decoder/data-coverage limitation rather than missing reference rank or a need for nonlinear readout under the tested workload.
