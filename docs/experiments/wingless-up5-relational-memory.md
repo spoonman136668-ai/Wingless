@@ -1,6 +1,6 @@
 # Wingless UP-5: relational read/write memory
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified hybrid memory primitive; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-4 Windows qualification sealed at `5b1224cb55ec431e196e0e42b12cbfdd1b431734`.
 
@@ -113,3 +113,26 @@ A positive UP-5 permits UP-6: learn the observation/query interface rather than 
 ## Authority boundary
 
 UP-5 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `c32645990f063f29dfdbb9d8aff1e193baa6312b` passed the focused UP-5 suite and complete Wingless regression.
+
+Observed unitary results:
+
+- commit decode accuracy: 1.0 across all 384 intermediate commits;
+- exact final-table accuracy: 1.0;
+- relational query accuracy: 1.0;
+- minimum decode margin: 0.14831766737214314;
+- maximum norm drift: 3.3306690738754696e-14.
+
+Matched non-unitary results:
+
+- commit decode accuracy: 0.9791666666666666;
+- exact final-table accuracy: 0.90625;
+- relational query accuracy: 0.96875;
+- minimum decode margin: 0.0017640472309445876;
+- maximum norm drift: 1735325.743672419.
+
+Interpretation remains bounded: UP-5 establishes a hybrid mutable-memory result under the explicit irreversible commit boundary and tested workload. It does not establish general language reasoning.
