@@ -1,6 +1,6 @@
 # Wingless UP-33: equal commutant-capacity partition control
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified causal positive; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-32 ordered graded multiplicity trend sealed at `e97ad901dec440d6ffed209504363f79ff2e70ff`.
 
@@ -96,3 +96,14 @@ If systems with the same symmetry capacity behave similarly even when their larg
 ## Authority boundary
 
 UP-33 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35881192286` completed successfully at source head `5aaf6a54278e1744e35d919487af80e9458a8c79`.
+
+Both equal-capacity equivalence controls passed. For capacity 18, the median held-out difference between `4+1+1` and `3+3` was 0.00244140625 and the median mutable-commit difference was 0.0. For capacity 12, the corresponding differences were 0.00537109375 and 0.00390625.
+
+The higher-capacity pair also outperformed the lower-capacity pair on both aggregate metrics: mean held-out accuracy 0.9974365234375 versus 0.985107421875, and mean mutable-commit accuracy 0.9963107638888888 versus 0.9233940972222221.
+
+Interpretation: in the tested architecture, commutant capacity is a better causal descriptor than maximum multiplicity alone. The next research frontier is to determine whether useful commutant capacity can be discovered, induced, or allocated by the system itself rather than hand-specified through repeated-spectrum structure.
