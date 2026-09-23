@@ -30,21 +30,18 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Production-priority guard
-        run: |
-          ./scripts/Test-WinglessHostGuard.ps1 -WaitMinutes 120
-
-      - name: Run research qualification
+      - name: Run guarded research qualification
         run: |
           ./scripts/Invoke-ResearchQualification.ps1 `
             -RequestPath '.wingless/qualification-request.json' `
-            -OutputDirectory 'evidence/research-qualification'
+            -OutputDirectory "$env:RUNNER_TEMP\wingless-research-qualification" `
+            -GuardWaitMinutes 120
 
       - name: Upload qualification evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: wingless-research-${{ github.run_id }}-${{ github.run_attempt }}
-          path: evidence/research-qualification/
+          path: ${{ runner.temp }}/wingless-research-qualification/
           if-no-files-found: warn
           retention-days: 30
