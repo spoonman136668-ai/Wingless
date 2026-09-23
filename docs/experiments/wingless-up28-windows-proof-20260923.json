@@ -1,0 +1,59 @@
+{
+  "schema": "wingless.unitary-interaction-selected-windows-proof.v1",
+  "experiment": "UP-28-interaction-aware-discovered-commutant-selection",
+  "status": "qualified-scientific-pass",
+  "observed_at": "2026-09-23T14:04:29Z",
+  "source_head": "8c6cb97a2d0ed38968f3c1f7bf7f24c839f6bea4",
+  "parent_up27_seal": "04074246d0ca13ae7714bbf26e40eb86ed14d7cd",
+  "workflow_run_id": 35871410555,
+  "workflow_artifact_id": 10755581227,
+  "workflow_artifact_sha256": "46c915dbeea1cdb1b7d53822ef9b72b25aa41776f7ed3047dcf08b6464f870c9",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "selector": {
+    "candidate_count": 128,
+    "runtime_count": 64,
+    "training_labels_only": true,
+    "heldout_data_used": false,
+    "explicit_depth_used": false,
+    "quadratic_interactions_used": true,
+    "selected_overlap_with_prefix64": 29,
+    "selected_overlap_with_up27": 32
+  },
+  "prefix64_control": {
+    "reproduction_pass": true,
+    "held_out_accuracy": 0.998779296875,
+    "held_out_delta": 0.0
+  },
+  "selected64": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 1.0,
+    "per_entity_held_out_accuracy": [1.0, 1.0, 1.0, 1.0],
+    "mean_phase_cosine": 0.9912820455877824,
+    "max_norm_drift": 1.3704593015972932e-12
+  },
+  "discovery": {
+    "commutator_pass": true,
+    "feature_invariance_pass": true,
+    "max_commutator_entry_error": 2.7732573643493167e-7,
+    "max_feature_drift": 0.0000273863743293027
+  },
+  "matched_control": {
+    "held_out_accuracy": 0.575439453125,
+    "max_norm_drift": 2201078893387.29
+  },
+  "mutable_integration": {
+    "pass": true,
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "min_value_margin": 0.6863349995234037,
+    "min_relation_margin": 0.9189526148791317,
+    "max_norm_drift": 1.248112724283601e-12
+  },
+  "interpretation": "The dynamics-discovered commutant contains enough stable task structure for a robust fixed-width runtime observer. Generic prefix breadth and marginal correlation selection were insufficient, but training-only importance from the exact quadratic task model identifies a 64-observable bank that achieves perfect unseen-depth and mutable performance without hidden multiplicity, hidden mixer, runtime unmixing, visible channel blocks, prototypes, inverse transport, or explicit depth. The next required causal control is a real orthogonal comparator before any stronger phase-specific or unitary claim.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}
