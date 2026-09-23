@@ -20,6 +20,8 @@ type breadthRegressor struct {
 }
 
 type DiscoveryBreadthArm struct {
+	Name                     string    `json:"name"`
+	Path                     string    `json:"path"`
 	ObservableCount          int       `json:"observable_count"`
 	RawFeatureDimension      int       `json:"raw_feature_dimension"`
 	QuadraticFeatureDimension int      `json:"quadratic_feature_dimension"`
