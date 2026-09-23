@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.multiplicity-ablation-windows-proof.v1",
+  "experiment": "UP-30-orthogonal-transport-multiplicity-ablation",
+  "status": "qualified-causal-positive-with-alignment-caveat",
+  "observed_at": "2026-09-23T14:23:17Z",
+  "source_head": "fb0ce8161e2fa16afbaebd43dee5cb516d5033f1",
+  "parent_up29_seal": "e787e506f6a8b31d703bb8e735c82bf8fb09334c",
+  "workflow_run_id": 35873650226,
+  "workflow_artifact_id": 10756786004,
+  "workflow_artifact_sha256": "663a30fb7041e4e6442c3391511db32fc7e588eb7c51a35c7f546d7b80e451a5",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "artifact_repairs_before_result": [
+    "qualification wrapper changed to capture native stderr without terminating",
+    "removed unused math import"
+  ],
+  "base_control": {
+    "held_out_accuracy": 1.0,
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "max_norm_drift": 1.3704593015972932e-12
+  },
+  "split_transport": {
+    "orthogonality_pass": true,
+    "orthogonality_error": 1.6261243653697965e-14,
+    "degeneracy_break_pass": true,
+    "cross_shift_commutator": 0.04983579083514546,
+    "discovery_commutator_pass": true,
+    "feature_invariance_pass": true,
+    "train_accuracy": 0.5830078125,
+    "held_out_accuracy": 0.461181640625,
+    "commit_decode_accuracy": 0.0078125,
+    "exact_final_table_accuracy": 0.0,
+    "relational_query_accuracy": 0.1875,
+    "max_norm_drift": 1.518118963872439e-12
+  },
+  "effect": {
+    "held_out_accuracy_drop": 0.538818359375,
+    "mutable_commit_drop": 0.9921875,
+    "material_ablation_effect": true,
+    "multiplicity_dependence_supported_by_preregistered_gate": true
+  },
+  "interpretation": "Breaking the six-copy repeated/aligned transport symmetry while preserving norm preservation, orthogonal equivalence, transport-only observable discovery, and full coordinate mixing produces a very large loss of static and mutable capability. This supports a causal dependence on the repeated/aligned symmetry in the tested architecture. The ablation also makes the six semantic copies evolve differently, so this result does not yet distinguish eigenvalue multiplicity itself from exact shared co-evolution/alignment. The next experiment must preserve exact spectral multiplicity while misaligning the six copy bases.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}
