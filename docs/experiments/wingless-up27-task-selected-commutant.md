@@ -1,6 +1,6 @@
 # Wingless UP-27: training-selected discovered commutant
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified selector negative with static/mutable gates unresolved; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-26 qualified strong partial positive sealed at `e9b94494eac451e94c97a5b17a26cd53ba0ced64`.
 
@@ -162,3 +162,14 @@ If that closes the final gap, the problem was not capacity alone. It was choosin
 ## Authority boundary
 
 UP-27 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35870850841` completed successfully at source head `8123bf823fc4679fea8ac1ac4fc23beaa82fe0a2`.
+
+The prefix-64 control reproduced UP-26 exactly at 0.998779296875 held-out accuracy.
+
+The training-selected bank used 33 observables outside that prefix, but reached 0.995849609375 held-out accuracy and 0.9869791666666666 mutable commit accuracy (758/768). Exact-final accuracy was 0.9791666666666666 and relational-query accuracy was 1.0.
+
+Interpretation: ranking observables by their individual linear association with the phase target is not sufficient. The useful decoder is explicitly quadratic, so UP-28 will derive selection scores from a training-only full quadratic task model and count both direct and pairwise interaction contributions before freezing a 64-observable runtime bank.
