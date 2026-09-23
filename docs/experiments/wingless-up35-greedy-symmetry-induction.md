@@ -1,6 +1,6 @@
 # Wingless UP-35: greedy task-driven symmetry induction
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific positive; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-34 qualified scientific positive sealed at `46403f5dbbbc73327f37ab392ea9db849c5eda4b`.
 
@@ -136,3 +136,16 @@ If the resulting layout still performs almost perfectly on unseen data, the syst
 ## Authority boundary
 
 UP-35 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35899713393` completed successfully at source head `99ae568ad891577f702793e258948570daa66ce8`.
+
+The system started from six singleton spectral groups, capacity 6, with no finished partition menu. Using only the balanced training-side fit/validation split and the frozen objective, it accepted three pairwise merges and stopped because the next best merge failed the frozen minimum-gain rule.
+
+The selected groups were `[0,1,2,5] + [3] + [4]`, with commutant capacity 18. Its inner-validation static accuracy was 0.9873046875 and mutable-commit accuracy was 0.9700520833333334.
+
+After retraining on the complete original training pool, the induced structure reached 1.0 held-out accuracy, 1.0 mutable-commit accuracy, 1.0 exact-final-table accuracy, and 1.0 relational-query accuracy on the untouched true held-out pool. The capacity-36 control also scored 1.0 on the two primary metrics, leaving both retention deltas at zero.
+
+Interpretation: this is a bounded positive for task-driven symmetry induction. Useful repeated-spectrum structure can be constructed incrementally from the minimum-symmetry state under a frozen local task-minus-capacity rule, without a finished partition catalog or true held-out guidance. The next experiment should remove the discrete merge operator and test continuous symmetry formation from independently parameterized spectral directions.
