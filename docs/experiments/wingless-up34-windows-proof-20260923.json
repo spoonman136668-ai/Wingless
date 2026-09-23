@@ -1,0 +1,51 @@
+{
+  "schema": "wingless.task-allocated-symmetry-windows-proof.v1",
+  "experiment": "UP-34-task-allocated-commutant-capacity",
+  "status": "qualified-scientific-positive",
+  "observed_at": "2026-09-23T17:58:27Z",
+  "source_head": "dbb6edfdd212f54790a323ef3c8abc67746ba386",
+  "parent_up33_seal": "b83e09b45b0c3c887778fa6c907444a36e6b3f55",
+  "workflow_run_id": 35898278295,
+  "workflow_artifact_id": 10768081723,
+  "workflow_artifact_sha256": "5027a8b103d3dcff354ae1c03a16995b2fd6e98d65b253b223fd39eb8b25fb03",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "allocator": {
+    "candidate_menu_hand_specified": true,
+    "allocation_uses_training_only": true,
+    "selection_uses_heldout_data": false,
+    "fit_tables": 96,
+    "validation_tables": 32,
+    "true_heldout_tables": 128,
+    "capacity_price": 0.02,
+    "selected_candidate": "capacity18_4_1_1_rotate_two",
+    "selected_capacity": 18,
+    "max_available_capacity": 36,
+    "capacity_reduction_fraction": 0.5,
+    "selected_validation_held_accuracy": 0.9794921875,
+    "selected_validation_commit_accuracy": 0.921875,
+    "selected_validation_score": 0.911875
+  },
+  "true_heldout": {
+    "selected_held_out_accuracy": 1.0,
+    "selected_commit_decode_accuracy": 1.0,
+    "selected_exact_final_table_accuracy": 1.0,
+    "selected_relational_query_accuracy": 1.0,
+    "selected_min_value_margin": 0.3936525839548434,
+    "selected_min_relation_margin": 0.8637470623745727,
+    "full_capacity_held_out_accuracy": 1.0,
+    "full_capacity_commit_decode_accuracy": 1.0,
+    "heldout_retention_delta": 0.0,
+    "commit_retention_delta": 0.0
+  },
+  "diagnosis": {
+    "inner_split_balanced_pass": true,
+    "selected_below_max_capacity": true,
+    "task_allocation_pass": true
+  },
+  "interpretation": "Using only a deterministic inner split of the training pool plus a frozen commutant-capacity price, the allocator selected a capacity-18 4+1+1 organization instead of the capacity-36 fully repeated transport. After retraining on the complete training pool, the selected structure matched the full-capacity control at perfect true held-out and mutable performance. This is a bounded architecture-selection positive: task evidence can allocate substantially less stable symmetry capacity without consulting the true held-out set. The remaining limitation is that the candidate menu is hand-specified. The next experiment should start from minimum symmetry and allow the task to create symmetry incrementally through accepted pairwise merges.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}
