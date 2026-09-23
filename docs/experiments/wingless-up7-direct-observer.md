@@ -120,3 +120,12 @@ The unitary direct observer reached 0.4217122395833333 training accuracy and 0.2
 The matched control showed essentially the same observer failure while its transport norm drift reached 4714800782374.951.
 
 The primary next diagnosis is representation loss: UP-7 exposed only coordinate probabilities, discarding relative phase/coherence. UP-8 therefore tests phase-aware, global-phase-invariant observation before introducing an explicit clock/depth signal or a larger nonlinear observer.
+
+
+## Post-qualification confound discovery
+
+The original 128/128 split used `memoryTableIndex(table) % 2`. Because the table index is base-4 and its parity is determined by the final entity value, this split unintentionally gave entity 3 only values 0/2 during observer training and only values 1/3 during held-out evaluation.
+
+Therefore UP-7 remains a valid negative result for the exact tested harness, but it is **not a clean causal test** of phase loss or depth ambiguity. The held-out set also contains unseen marginal labels for one entity.
+
+UP-8 corrects this before drawing architectural conclusions: it uses a balanced combinatorial split in which every entity/value marginal appears in both partitions, verifies that property explicitly, and then compares magnitude-only and phase/coherence-aware direct observers under identical data and transport conditions.
