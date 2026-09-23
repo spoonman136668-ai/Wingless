@@ -2,7 +2,7 @@ param(
     [string]$RepositoryUrl = 'https://github.com/spoonman136668-ai/Wingless',
     [string]$InstallRoot = 'C:\actions-runner-wingless',
     [string]$RunnerName = ('WINGLESS-' + $env:COMPUTERNAME),
-    [string]$Labels = 'wingless-research',
+    [string]$Labels = 'wingless-research-safe',
     [string]$RegistrationToken
 )
 
