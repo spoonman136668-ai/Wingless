@@ -1,6 +1,6 @@
 # Wingless UP-15: task-learned global anchor
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified task-learned anchor result; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-14 Windows learned-support qualification sealed at `eb8affea150f4564502145bc50607ef863b2f425`.
 
@@ -137,3 +137,16 @@ That topology becomes the UP-16 boundary: determine whether those five co-evolvi
 ## Authority boundary
 
 UP-15 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-23 against source head `062eabadceea220e17398911378789228f1d702d` passed the harness and complete Wingless regression.
+
+The irregular starting anchor had saturated capacity 0.447265625 and table-phase concentration 0.19313507842984184. Task-loss optimization moved the anchor by L2 distance 1.2810354629307779, raised table-phase concentration to 0.9893853411379732, and reduced average alternating-training loss from 1.2161035415312518 to 0.023262457632572883.
+
+Fresh unitary decoders reached 1.0 train and 1.0 unseen-depth held-out accuracy. The matched non-unitary path reached 0.763427734375 held-out accuracy.
+
+Mutable integration used 48 scenarios × 16 writes and achieved 1.0 commit decode, 1.0 exact final-table, and 1.0 relational-query accuracy. Minimum value margin was 0.17830499668449967 and maximum norm drift was 6.750155989720952e-14.
+
+Interpretation: UP-15 removes manual specification of the anchor geometry. The remaining explicit design is the multi-state frame topology itself.
