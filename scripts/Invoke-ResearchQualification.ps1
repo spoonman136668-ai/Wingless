@@ -11,7 +11,12 @@ $ErrorActionPreference = 'Stop'
 
 $Repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $RequestFull = Join-Path $Repo $RequestPath
-$OutputFull = Join-Path $Repo $OutputDirectory
+$OutputFull = if ([IO.Path]::IsPathRooted($OutputDirectory)) {
+    $OutputDirectory
+}
+else {
+    Join-Path $Repo $OutputDirectory
+}
 
 if (-not (Test-Path $RequestFull)) {
     throw "WINGLESS_QUAL_REQUEST_MISSING: $RequestFull"
