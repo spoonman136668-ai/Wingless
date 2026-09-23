@@ -1,6 +1,6 @@
 # Wingless UP-21: anonymous phase-code bottleneck
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific pass; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-20 qualified partial positive sealed at `bd735f81c8586a462bc9992f7de37da52563f45d`.
 
@@ -109,3 +109,16 @@ If it works, we keep the state scrambled and never have to rebuild the old label
 ## Authority boundary
 
 UP-21 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35852739971` completed successfully at source head `6b150300b2782625e11ad97136861dece6ebac37`.
+
+The anonymous phase-code bottleneck reached 1.0 train and 1.0 held-out accuracy across every entity at unseen depths 32, 128, 512, and 1024. Mean cosine alignment with the learned UP-13 phase target was 0.9861381590317367.
+
+The exact same learned regressors and calibration heads on the matched non-unitary transport reached 0.59765625 held-out accuracy while its norm drift reached 2211700831922.4893.
+
+Mutable integration used 48 scenarios × 16 writes and achieved 1.0 commit decode, 1.0 exact final-table, and 1.0 relational-query accuracy. Minimum value margin was 0.5043631193460631 and minimum relation margin was 0.9014937818220882.
+
+Interpretation: historical semantic channel recovery is not required. A low-rank task-relevant phase bottleneck can decode the anonymously mixed recurrent state directly and remain exact under deep unitary transport and repeated irreversible commits. The remaining explicit structural assumption is the six anonymous 16-dimensional block factorization.
