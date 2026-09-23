@@ -1,0 +1,38 @@
+{
+  "schema": "wingless.unitary-memory-windows-proof.v1",
+  "experiment": "UP-5-relational-read-write-memory",
+  "status": "qualified",
+  "observed_at": "2026-09-22T20:31:02-04:00",
+  "source_head": "c32645990f063f29dfdbb9d8aff1e193baa6312b",
+  "baseline_head": "5b1224cb55ec431e196e0e42b12cbfdd1b431734",
+  "platform": "windows",
+  "focused_pass": true,
+  "full_regression_pass": true,
+  "entities": 4,
+  "values_per_entity": 4,
+  "dimension": 16,
+  "scenarios": 32,
+  "writes_per_scenario": 12,
+  "commit_decodes_per_path": 384,
+  "transport_depths": [8,32,128,512],
+  "noise_amplitude": 0.1,
+  "write_boundary": "observe_decode_overwrite_reencode",
+  "unitary": {
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "min_decode_margin": 0.14831766737214314,
+    "max_norm_drift": 3.3306690738754696e-14
+  },
+  "non_unitary_matched": {
+    "commit_decode_accuracy": 0.9791666666666666,
+    "exact_final_table_accuracy": 0.90625,
+    "relational_query_accuracy": 0.96875,
+    "min_decode_margin": 0.0017640472309445876,
+    "max_norm_drift": 1735325.743672419
+  },
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "With the same irreversible observe/decode/overwrite/re-encode boundary, the unitary transport preserved mutable memory perfectly across the tested noisy long-gap workload. The matched non-unitary transport incurred commit/final-memory errors and extreme norm growth. This is a bounded working-memory result, not language reasoning."
+}
