@@ -39,17 +39,24 @@ func TestUP8BalancedSplitMarginals(t *testing.T) {
 }
 
 func TestUP8CoherenceFeaturesPreserveGlobalPhase(t *testing.T) {
-	state, err := Normalize(State{
-		complex(1, 2), complex(-2, 0.5), complex(0.25, -1), complex(3, 0),
-	})
+	state, err := encodeMemory(memoryTable{0, 1, 2, 3})
 	if err != nil {
 		t.Fatal(err)
 	}
+	for i := range state {
+		state[i] += complex(0.01*float64(i+1), -0.007*float64((i*3)%5))
+	}
+	state, err = Normalize(state)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	rotated := make(State, len(state))
 	global := cmplx.Rect(1, 0.731)
 	for i := range state {
 		rotated[i] = state[i] * global
 	}
+
 	a, err := observerCoherenceFeatures(state)
 	if err != nil {
 		t.Fatal(err)
@@ -58,12 +65,8 @@ func TestUP8CoherenceFeaturesPreserveGlobalPhase(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(a) != 16 && len(state) == 4 {
-		// The production UP-8 state is 16-D. This branch intentionally avoids
-		// asserting 256 features for the smaller fixture below.
-	}
-	if len(a) != len(b) {
-		t.Fatalf("feature length mismatch %d vs %d", len(a), len(b))
+	if len(a) != 256 || len(b) != 256 {
+		t.Fatalf("feature lengths=%d,%d want=256,256", len(a), len(b))
 	}
 	for i := range a {
 		if math.Abs(a[i]-b[i]) > 1e-12 {
