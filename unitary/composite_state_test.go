@@ -45,6 +45,16 @@ func TestUP16CompositeObservableMatchesSeparateFrame(t *testing.T) {
 	}
 }
 
+func inverseCompositeCouplings(block []Coupling) []Coupling {
+	out := make([]Coupling, len(block))
+	for i := range block {
+		coupling := block[len(block)-1-i]
+		coupling.Theta = -coupling.Theta
+		out[i] = coupling
+	}
+	return out
+}
+
 func TestUP16UnitaryCompositeRoundTrip(t *testing.T) {
 	memory, err := encodeMemory(memoryTable{3, 2, 1, 0})
 	if err != nil {
@@ -65,7 +75,7 @@ func TestUP16UnitaryCompositeRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	reversed := reverseCouplings(block)
+	reversed := inverseCompositeCouplings(block)
 	roundTrip, err := evolveCompositeState(
 		forward, reversed, 128, applyStressUnitary,
 	)
