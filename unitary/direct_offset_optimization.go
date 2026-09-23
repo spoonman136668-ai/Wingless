@@ -178,20 +178,32 @@ func deterministicSPSADirection(
 	step int,
 	groups [][]int,
 ) []float64 {
+	// Non-constant rows of an 8x8 Sylvester-Hadamard matrix, restricted
+	// to the six available group coordinates. After zero-mean projection
+	// these rows span the full five-dimensional tangent space when all six
+	// groups are independent, and the full (k-1)-dimensional tangent space
+	// for every k=2..6 prefix of active groups.
+	patterns := [7][compositeChannels]float64{
+		{1, -1, 1, -1, 1, -1},
+		{1, 1, -1, -1, 1, 1},
+		{1, -1, -1, 1, 1, -1},
+		{1, 1, 1, 1, -1, -1},
+		{1, -1, 1, -1, -1, 1},
+		{1, 1, -1, -1, -1, -1},
+		{1, -1, -1, 1, -1, 1},
+	}
+	row := patterns[(step-1+len(patterns))%len(patterns)]
+
 	direction := make([]float64, compositeChannels)
 	for groupIndex, group := range groups {
-		// Deterministic balanced sign family. No randomness or held-out state.
-		code := (step+1)*17 + (groupIndex+1)*31
-		sign := 1.0
-		if code%4 == 0 || code%4 == 3 {
-			sign = -1
-		}
+		sign := row[groupIndex]
 		for _, member := range group {
 			direction[member] = sign
 		}
 	}
-	// Remove the weighted mean so the perturbation stays tangent to the
-	// zero-mean manifold before RMS renormalization.
+
+	// Remove the member-weighted mean so the perturbation remains tangent
+	// to the zero-mean manifold even after groups have fused.
 	var mean float64
 	for _, value := range direction {
 		mean += value
