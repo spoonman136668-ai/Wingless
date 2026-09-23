@@ -87,3 +87,67 @@ func TestUP38GradientUpdateIsBounded(t *testing.T) {
 		}
 	}
 }
+
+
+func directDirectionRank(rows [][]float64) int {
+	if len(rows) == 0 {
+		return 0
+	}
+	matrix := make([][]float64, len(rows))
+	for i := range rows {
+		matrix[i] = append([]float64(nil), rows[i]...)
+	}
+	rank := 0
+	columnCount := len(matrix[0])
+	for column := 0; column < columnCount && rank < len(matrix); column++ {
+		pivot := -1
+		for row := rank; row < len(matrix); row++ {
+			if math.Abs(matrix[row][column]) > 1e-12 {
+				pivot = row
+				break
+			}
+		}
+		if pivot < 0 {
+			continue
+		}
+		matrix[rank], matrix[pivot] = matrix[pivot], matrix[rank]
+		pivotValue := matrix[rank][column]
+		for c := column; c < columnCount; c++ {
+			matrix[rank][c] /= pivotValue
+		}
+		for row := 0; row < len(matrix); row++ {
+			if row == rank {
+				continue
+			}
+			factor := matrix[row][column]
+			if math.Abs(factor) <= 1e-12 {
+				continue
+			}
+			for c := column; c < columnCount; c++ {
+				matrix[row][c] -= factor * matrix[rank][c]
+			}
+		}
+		rank++
+	}
+	return rank
+}
+
+func TestUP38DeterministicDirectionsSpanZeroMeanTangent(t *testing.T) {
+	groups := initialSymmetryGroupsJSON()
+	rows := make([][]float64, 0, 7)
+	for step := 1; step <= 7; step++ {
+		direction := deterministicSPSADirection(step, groups)
+		var mean float64
+		for _, value := range direction {
+			mean += value
+		}
+		mean /= float64(len(direction))
+		if math.Abs(mean) > 1e-12 {
+			t.Fatalf("step=%d direction mean=%g want=0", step, mean)
+		}
+		rows = append(rows, direction)
+	}
+	if got := directDirectionRank(rows); got != compositeChannels-1 {
+		t.Fatalf("direction tangent rank=%d want=%d", got, compositeChannels-1)
+	}
+}
