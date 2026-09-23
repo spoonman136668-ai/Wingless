@@ -1,0 +1,111 @@
+# Wingless UP-7: direct transported-state observer
+
+Status: research branch only; not activated, promoted, or connected to ckb-plane.
+
+Parent research qualification: UP-6 Windows qualification sealed at `c431bf27e021e9aa83f99155bbb597d1a5e24434`.
+
+## Question
+
+Can a learned observer read mutable memory directly from the transported latent state without an explicit inverse, a runtime prototype table, or knowledge of transport depth?
+
+This is intentionally a falsifiable question. A scientifically negative result is valid evidence and must not be reported as an acceptance-artifact failure.
+
+## Methodological change
+
+UP-7 separates two concepts:
+
+1. **harness qualification** — code compiles, results are finite and deterministic, frozen Wingless regression stays green;
+2. **scientific hypothesis gate** — direct observation reaches predefined generalization thresholds.
+
+The Windows acceptance script fails only for harness/invariant defects. It prints the scientific gate independently.
+
+## Observer input
+
+The observer receives:
+
+- the 16 normalized transported coordinate probabilities;
+- a four-way one-hot entity selector.
+
+It does **not** receive:
+
+- the transport depth;
+- an inverse-transformed state;
+- a memory-table prototype;
+- a table ID.
+
+The unitary and matched non-unitary paths receive identical observer architecture and optimization budget, but each observer is trained on its own transport outputs.
+
+## Data split
+
+All 256 possible four-entity memory tables are partitioned deterministically:
+
+- 128 training tables;
+- 128 disjoint held-out tables.
+
+Training depths:
+
+`8, 24, 72, 216, 432, 648`
+
+Held-out depths:
+
+`32, 128, 512, 1024`
+
+Held-out depths never appear in observer training.
+
+Both train and held-out states receive deterministic bounded complex perturbation with amplitude 0.05.
+
+## Learned direct observer
+
+A shared four-class linear-softmax observer uses 20 features:
+
+- 16 transported probabilities;
+- 4 entity-selector features.
+
+The same observer parameters are reused for all four entities.
+
+The observer is trained for 500 deterministic full-batch gradient steps with learning rate 1.0.
+
+A shared learned relation head from the UP-6 design maps the two predicted value distributions to one of four relation classes.
+
+## Integration workload
+
+After static held-out evaluation, the direct observer is placed inside 32 unseen mutable-memory programs with 12 writes each.
+
+Every transport gap uses only held-out depths.
+
+The explicit irreversible overwrite/re-encode boundary remains, but the state is decoded directly from its forward transported representation.
+
+## Scientific hypothesis gate
+
+The direct-observation hypothesis is considered positive for a path only when all of the following hold:
+
+- static held-out value accuracy >= 0.95;
+- integration commit decode accuracy >= 0.95;
+- exact final-table accuracy >= 0.90;
+- relational-query accuracy >= 0.90.
+
+The matched control is evaluated by the identical thresholds. It is not required to fail.
+
+## Harness qualification conditions
+
+- no runtime prototype lookup;
+- no explicit inverse readout;
+- no depth feature;
+- 128/128 disjoint table split;
+- train and held-out depth sets exact and disjoint;
+- relation head trains successfully;
+- every reported metric is finite;
+- complete output is deterministic;
+- full existing Wingless regression remains green after advisory ICE rebuild.
+
+## Interpretation boundary
+
+If the unitary hypothesis passes, UP-7 establishes that a small learned observer can directly decode unseen memories at unseen propagation depths without being handed the inverse or the depth.
+
+If it fails, that is still useful: it indicates the transported state needs an explicit clock/frame signal, a more expressive observer, or a different invariant representation before direct readout is viable.
+
+Either outcome informs UP-8. No language-reasoning claim follows from UP-7.
+
+## Authority boundary
+
+UP-7 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
