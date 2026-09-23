@@ -241,9 +241,24 @@ func directGradientEstimate(
 ) []float64 {
 	gradient := make([]float64, len(direction))
 	denominator := 2 * directOffsetPerturbation
-	delta := (objectivePlus - objectiveMinus) / denominator
-	for i, sign := range direction {
-		gradient[i] = delta * sign
+	directionalDerivative :=
+		(objectivePlus - objectiveMinus) / denominator
+
+	var normSquared float64
+	for _, value := range direction {
+		normSquared += value * value
+	}
+	if normSquared <= 1e-15 {
+		return gradient
+	}
+
+	// The central difference estimates grad(J) dot d along the current
+	// constrained direction d. Project that scalar derivative back onto d:
+	// ((grad J) dot d / ||d||^2) d. This remains valid after zero-mean
+	// projection, unlike the Rademacher-only SPSA shortcut Delta^-1=Delta.
+	scale := directionalDerivative / normSquared
+	for i, value := range direction {
+		gradient[i] = scale * value
 	}
 	return gradient
 }
@@ -504,7 +519,7 @@ func RunUP38() (DirectOffsetOptimizationProbeResult, error) {
 		HardMergeCandidatesEvaluated:  false,
 		PairAffinityFieldUsed:         false,
 		DirectOffsetsOptimized:        true,
-		Optimizer:                     "deterministic-spsa",
+		Optimizer:                     "deterministic-projected-central-difference",
 		SmoothTaskObjective:           true,
 		SmoothResourceObjective:       true,
 		StickyExactFusionProjection:   true,
