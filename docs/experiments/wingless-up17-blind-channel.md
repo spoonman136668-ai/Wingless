@@ -1,6 +1,6 @@
 # Wingless UP-17: blind anonymous-channel recovery
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-16 Windows single-composite-state qualification sealed at `d60c993b8d98b2af05f3aa66c9cab8042d829b3f`.
 
@@ -128,3 +128,18 @@ If it succeeds, we no longer have to tell it where the memory, anchor, or pilot 
 ## Authority boundary
 
 UP-17 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification result
+
+The autonomous Windows research runner completed UP-17 at source head `f50d0656c6458cf0102e21296d066372916b9db7` under workflow run `35846369957`. The harness and automation qualification passed, so this is a valid scientific result rather than an artifact failure.
+
+The identity-readout initial capacity was 0.42578125. After 70 outer learning steps the projection moved 1.4117056793980443 L2 from identity and loss decreased modestly from 1.2455451194780893 to 1.182344267859216, but mean hidden-role alignment reached only 0.16618402487488318 and minimum alignment remained 0.000321463516866842.
+
+Fresh unitary decoders reached only 0.38972981770833337 train and 0.379150390625 unseen-depth held-out accuracy. The matched non-unitary control reached 0.3681640625 held-out accuracy.
+
+Mutable integration collapsed: commit decode 0.006510416666666667, exact final-table 0.041666666666666664, and relational-query 0.20833333333333334. Unitary norm preservation itself remained intact at approximately 3e-14 drift.
+
+Interpretation: the tested row-normalized 6x6 task-learned projection did not recover anonymous semantic channel roles. This does not show that the mixing destroyed information. It leaves open whether the failure is due to optimization geometry, role permutation/symmetry, or insufficient structure in the learner.
+
+The next experiment should first prove oracle transpose recoverability and then constrain the learned demixer to the correct orthogonal family with a lower-dimensional Givens parameterization before attempting full channel-plus-coordinate scrambling.
