@@ -1,6 +1,6 @@
 # Wingless UP-9: co-evolving internal frame
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified internal-frame result; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-8 Windows observer ablation sealed at `e357e8bf25b69e838aca9652e8454fe2e83cd97b`.
 
@@ -102,3 +102,21 @@ A negative result would indicate that the proposed five-pilot frame is insuffici
 ## Authority boundary
 
 UP-9 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `66f9678373831188ab00d26b9ea01ffc4d405600` passed the harness and complete Wingless regression.
+
+Observed held-out accuracies:
+
+- unitary static frame, fixed depth: 0.37109375;
+- unitary co-evolving frame, fixed depth: 1.0;
+- unitary static frame, unseen depths: 0.2607421875;
+- unitary co-evolving frame, unseen depths: 1.0;
+- matched-control static frame, unseen depths: 0.2783203125;
+- matched-control co-evolving frame, unseen depths: 0.8076171875.
+
+The unitary co-evolving frame improved unseen-depth held-out accuracy by 0.7392578125 over static references while using only five pilot states and two real observer features per entity. No depth value, explicit inverse, or runtime prototype lookup was supplied.
+
+Interpretation: within the tested substrate, a compact co-evolving internal reference frame resolves the frame/depth ambiguity isolated by UP-8.
