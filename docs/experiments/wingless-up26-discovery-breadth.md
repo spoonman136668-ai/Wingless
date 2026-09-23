@@ -1,6 +1,6 @@
 # Wingless UP-26: dynamics-discovered observable breadth
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified strong partial positive with mutable commit gate negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-25 qualified partial positive sealed at `6dcbec3c567e2dc39f4052948925a62c758377fb`.
 
@@ -153,3 +153,16 @@ The first half must behave exactly like UP-25. If the full bank closes the gap, 
 ## Authority boundary
 
 UP-26 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35870174317` completed successfully at source head `663ae33f9ef84d425e9a9da687ae3281af266113`.
+
+The 32-observable control reproduced UP-25 exactly: held-out accuracy was 0.9248046875 with zero delta.
+
+The 64-observable primary arm reached 1.0 training accuracy and 0.998779296875 held-out accuracy, so the preregistered unseen-depth gate passed. Per-entity held-out accuracies were 0.9970703125, 1.0, 1.0, and 0.998046875.
+
+Mutable performance improved sharply but remained just below the preregistered commit threshold: 756/768 commits were correct (0.984375), exact-final accuracy was 0.9583333333333334, and relational-query accuracy was 1.0.
+
+Interpretation: dynamics-discovered observable breadth is a real capacity variable, but simply retaining more generic directions should not be extended blindly. UP-27 keeps runtime width fixed at 64 and tests whether training-only task relevance can choose a better 64-observable subset from a 128-observable discovered candidate bank.
