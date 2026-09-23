@@ -60,14 +60,14 @@ Thus the task must earn any movement toward higher symmetry.
 
 ## Optimizer
 
-UP-38 uses deterministic SPSA-style direct optimization:
+UP-38 uses deterministic projected central-difference direct optimization:
 
 - 12 optimization steps;
 - perturbation magnitude 0.002;
 - learning rate 0.002;
 - maximum per-coordinate update 0.004;
-- one deterministic zero-mean perturbation direction per step;
-- two objective evaluations per gradient estimate;
+- one deterministic full-rank zero-mean perturbation direction per step;
+- two objective evaluations per projected directional-gradient estimate;
 - all six offsets updated simultaneously.
 
 No pair-attraction matrix is constructed.
