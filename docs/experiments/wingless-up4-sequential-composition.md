@@ -1,6 +1,6 @@
 # Wingless UP-4: learned sequential memory/composition
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified sequential research primitive; not activated, promoted, or connected to ckb-plane.
 
 Parent research qualification: UP-3 Windows qualification sealed at `d5f63c863af4cf85a813bc3d45cb8bccd6b89e2b`.
 
@@ -100,3 +100,23 @@ A positive UP-4 permits UP-5: train a read/write memory task in which new facts 
 ## Authority boundary
 
 UP-4 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `7def6815b665710649234fa8d30345cd31cee52a` passed the focused UP-4 suite and complete Wingless regression.
+
+Observed results:
+
+- unitary one-step train accuracy: 1.0;
+- unitary unseen long-sequence accuracy through length 128: 1.0;
+- unitary final loss: 1.2851168659739225e-5;
+- unitary maximum norm drift: 1.6209256159527285e-14;
+- unitary full-sequence round-trip error: 1.6215291016099233e-14;
+- matched control one-step train accuracy: 1.0;
+- matched control long-sequence accuracy: 0.4270833333333333;
+- matched control maximum norm drift: 1.496812711127465e64.
+
+The task is order-sensitive: A then B from state 0 targets state 2, while B then A targets state 1.
+
+Interpretation remains bounded: UP-4 establishes learned local transition composition over unseen long horizons under this state-machine task. It is not evidence of general language reasoning.
