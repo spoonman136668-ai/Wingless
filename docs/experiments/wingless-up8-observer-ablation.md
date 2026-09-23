@@ -1,6 +1,6 @@
 # Wingless UP-8: confound-controlled observer ablation
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified observer-ablation result; not activated, promoted, or connected to ckb-plane.
 
 Parent research record: UP-7 qualified as a negative result, then two post-qualification confounds were identified and recorded at `c9522ed665e4d1edfaa2d6c5001b00e15f9e3e47`.
 
@@ -108,3 +108,23 @@ The scientific flags are reported independently and do not control harness accep
 ## Authority boundary
 
 UP-8 is mathematical research only. It does not register an inference backend, invoke a language model, activate a Wingless worker/listener, execute model-selected tools, or alter ckb-plane queue, retry, workspace, acceptance, promotion, broker, credential, or production authority.
+
+
+## Windows qualification
+
+Authoritative operator proof on 2026-09-22 against source head `d4ec92378407e46b2d38577a0ef096c2d0f526d0` passed the harness and complete Wingless regression.
+
+The corrected balanced split remained valid with minimum entity/value marginal counts 14 in training and 13 in held-out data.
+
+Observed held-out accuracies:
+
+- unitary magnitude-only, fixed frame: 0.62109375;
+- unitary coherence-aware, fixed frame: 1.0;
+- unitary magnitude-only, unseen depth: 0.294921875;
+- unitary coherence-aware, unseen depth: 0.373046875;
+- matched-control coherence-aware, fixed frame: 1.0;
+- matched-control coherence-aware, unseen depth: 0.3896484375.
+
+The fixed-frame coherence advantage over magnitude-only observation was 0.37890625.
+
+Interpretation: the corrected ablation supports two distinct effects. First, relative phase/coherence contains memory information lost by magnitude-only measurement. Second, even coherence-aware observation remains frame-dependent and does not generalize across unseen propagation depths without additional frame information.
