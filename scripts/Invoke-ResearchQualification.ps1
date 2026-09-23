@@ -83,9 +83,20 @@ Write-Host "HEAD:       $Head"
 Write-Host "Test:       $($Request.test_script)"
 
 $TestExit = 0
-& powershell -ExecutionPolicy Bypass -File $TestScript 2>&1 |
-    Tee-Object -FilePath $TranscriptPath
-$TestExit = $LASTEXITCODE
+$PriorErrorActionPreference = $ErrorActionPreference
+try {
+    # Windows PowerShell wraps redirected native stderr as ErrorRecord objects.
+    # Keep the parent pipeline non-terminating while the child qualification
+    # runs so compiler/test diagnostics are captured in full. The child exit
+    # code remains authoritative for pass/fail classification below.
+    $ErrorActionPreference = 'Continue'
+    & powershell -ExecutionPolicy Bypass -File $TestScript 2>&1 |
+        Tee-Object -FilePath $TranscriptPath
+    $TestExit = $LASTEXITCODE
+}
+finally {
+    $ErrorActionPreference = $PriorErrorActionPreference
+}
 
 $Transcript = Get-Content -Raw -Path $TranscriptPath
 
