@@ -20,7 +20,7 @@ This lets an experiment be assembled across multiple commits without launching i
 
 The workflow requires a dedicated self-hosted runner label:
 
-`wingless-research`
+`wingless-research-safe`
 
 Recommended install root:
 
