@@ -1,6 +1,6 @@
 # Wingless UP-23: full-latent transport spectral invariants
 
-Status: research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific negative; not activated, promoted, or connected to ckb-plane.
 
 Parent research result: UP-22 qualified scientific negative sealed at `e25b0312c1ee15ecda95cd56a105efa3a73bf060`.
 
@@ -124,3 +124,12 @@ Those resonance signatures stay the same no matter how long the unitary state ev
 ## Authority boundary
 
 UP-23 is mathematical research only. It does not invoke a language model, activate Wingless in production, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+Autonomous Windows qualification on workflow run `35864220728` completed successfully at source head `fb663a9a885a1dc8337e8792b2d8ad19fa021348`.
+
+The spectral-moment invariance premise passed: maximum moment drift was 1.5197149094703377e-12. The learned observer nevertheless reached only 0.4091796875 training accuracy and 0.3720703125 held-out accuracy, so the negative is representational rather than an optimizer-only failure.
+
+Interpretation: scalar moments of one transport operator preserve only aggregate weight across its eigenspaces. Because the full-latent transport retains the six-fold multiplicity inherited from the historical composite transport, these moments discard orientation inside degenerate multiplicity spaces. UP-24 therefore tests a generic algebra of observables that commute with the transport and resolve that missing multiplicity-space information without runtime unmixing or visible channel blocks.
