@@ -54,3 +54,39 @@ Until now, we taught the rule while showing it every possible starting arrangeme
 This time it sees only one-third of them.
 
 If it still works perfectly on the other two-thirds—including operations we never directly taught—then the rule is behaving much more like a reusable algorithm than a memorized table.
+
+
+## Authoritative Windows result
+
+Workflow run: `35988486702`
+
+Runner: `WINGLESS-LINKDEADKB`
+
+Source head: `8634133223bf069602e3984d43d662e8b85990ec`
+
+Artifact: `10803720434`
+
+Artifact digest: `sha256:e4afe3c9cc9a33162c2348d5d271a360aef610104821a03067b2731ef3c17480`
+
+The production-priority guard, focused tests, deterministic double probe, and full repository regression passed.
+
+Results:
+
+- training basis states: `9 / 27` (`0.3333333333333333`);
+- unitary train accuracy: `1.0`;
+- unseen-basis primitive accuracy: `1.0`;
+- unseen swap-1/2 accuracy: `1.0`;
+- derived role-1 accuracy: `1.0`;
+- derived role-2 accuracy: `1.0`;
+- long-program accuracy: `1.0`;
+- aggregate held-out accuracy: `1.0`;
+- sparse-generalization gate: `PASS`;
+- matched non-unitary held-out accuracy: `0.5034722222222222`;
+- unitary max norm drift: `3.1086244689504383e-15`;
+- unitary max round-trip error: `3.330763465843276e-15`.
+
+## Scientific classification
+
+The learned unitary operators remain fully structural under one-third basis coverage in this frozen task. Exhaustive basis enumeration is not required for the demonstrated primitive transfer, derived-role composition, or long-program behavior.
+
+The next A-lane experiment is a preregistered coverage ladder that reduces the number of observed basis configurations while preserving the same primitives, optimizer, evaluation categories, and numerical gates. The purpose is to locate the supervision boundary rather than to tune for another pass.
