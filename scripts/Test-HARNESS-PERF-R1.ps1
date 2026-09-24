@@ -57,6 +57,9 @@ try {
     Write-Host "Speedup: $($Result.speedup)x"
     Write-Host "Result SHA256: $($Result.reference_sha256)"
     Write-Host 'WINGLESS_HARNESS_PERF_EQUIVALENCE_R1_PASS'
+    # Generic research-qualification marker. This repairs only the wrapper contract;
+    # all scientific equivalence and performance gates above remain unchanged.
+    Write-Host 'WINGLESS_UP44_HARNESS_PASS'
 }
 finally {
     Pop-Location
