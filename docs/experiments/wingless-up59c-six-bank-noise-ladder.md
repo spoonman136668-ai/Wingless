@@ -29,3 +29,30 @@ No family selection, decoder change, dimension increase, threshold change, or re
 ## Interpretation
 
 The experiment identifies geometry-specific robustness boundaries. It does not promote a geometry. Any promotion or architectural change requires a separate untouched confirmation or an integration gate.
+
+
+## Authoritative Windows result
+
+Workflow run: `36049267013`
+
+Runner: `WINGLESS-UP-C`
+
+Source head: `27460ef4f1276fdf923632c15660f859b96e963c`
+
+Artifact: `10830135725`
+
+Artifact digest: `sha256:ed2346a39577291a75ea3f18a03c4f8b3e8700794d13c4715d2778a5d206404f`
+
+Results on both untouched schedules:
+
+- golden rotation: PASS at every tested noise through `0.0075`, with value/exact accuracy `1.0 / 1.0`;
+- fixed irregular: PASS at every tested noise through `0.0075`, with value/exact accuracy `1.0 / 1.0`;
+- quadratic extension: PASS at `0.0025` and `0.0035`, FAIL at `0.0045`, `0.0055`, and `0.0075`.
+
+At the first quadratic failure (0.0045), exact-scenario accuracy fell to approximately `0.906–0.918`.
+
+## Scientific classification
+
+Six-bank capacity at fixed dimension 16 is strongly geometry-dependent under noise. Golden and fixed-irregular codes retain a materially larger noise margin than the quadratic code under the same decoder, scenarios, and frozen gate.
+
+The next C-lane experiment extends only the two still-passing geometries into a higher-noise ladder on new schedules. This is boundary continuation after a sealed negative, not threshold or geometry retuning.
