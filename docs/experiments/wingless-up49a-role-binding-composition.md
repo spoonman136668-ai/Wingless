@@ -1,6 +1,6 @@
 # Wingless UP-49A — role-binding composition
 
-Status: preregistered scientific cognition experiment.
+Status: Windows-qualified scientific result.
 
 Scientific parent: UP-48A seal `9d76277d68b392597ac3a4e6cad2352a3c15b849`.
 
@@ -54,3 +54,39 @@ We teach the system how to change the left variable and how to swap the two vari
 We never teach it how to change the right variable.
 
 Then we ask whether it can discover that changing the right variable is just: swap the roles, use the left rule, swap them back.
+
+
+## Authoritative Windows result
+
+Workflow run: `35987217037`
+
+Runner: `WINGLESS-LINKDEADKB`
+
+Artifact: `10801709799`
+
+Artifact digest: `sha256:a1a85c30892c23b10fe1f27a8bb1381fb08ec2e1b0577e9b7df023dfe1e46496`
+
+The harness, deterministic double probe, focused tests, full repository regression, and host-priority guard passed.
+
+Results:
+
+- unitary train accuracy: `1.0`
+- unitary held-out accuracy: `1.0`
+- unseen conjugated-right accuracy: `1.0`
+- long mixed-program accuracy: `1.0`
+- frozen role-binding gate: `PASS`
+- matched non-unitary held-out accuracy: `0.20703125`
+
+## Scientific classification
+
+The learned unitary primitives composed into a right-role operation that was never directly trained, and the same system remained perfect on long noncommuting mixed programs.
+
+The next cognition experiment should increase binding complexity rather than sequence length: multiple simultaneous roles and transfer of an operation across more than one role position.
+
+## Plain speak
+
+We taught it how to change the left variable and how to swap the two variables.
+
+It correctly created the never-taught right-variable operation by composing those learned pieces, and it stayed perfect through long mixed programs.
+
+That clears the first role-binding test cleanly.
