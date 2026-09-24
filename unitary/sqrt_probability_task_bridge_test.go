@@ -119,3 +119,13 @@ func TestUP44KeepsUP43OptimizerAndHorizon(t *testing.T) {
 		}
 	}
 }
+
+
+func TestUP44FIXAUsesUP43NoiseSchedule(t *testing.T) {
+	if sqrtProbabilityNoiseSeedPrefix != 39000000 {
+		t.Fatalf(
+			"sqrt probability noise prefix=%d want=39000000",
+			sqrtProbabilityNoiseSeedPrefix,
+		)
+	}
+}

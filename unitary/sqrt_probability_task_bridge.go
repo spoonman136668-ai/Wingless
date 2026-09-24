@@ -11,6 +11,8 @@ const SqrtProbabilityTaskBridgeSchema =
 const sqrtProbabilitySoftWriteBoundary =
 	"decode_probability_sqrt_amplitude_commanded_write_no_global_renormalization"
 
+const sqrtProbabilityNoiseSeedPrefix = 39000000
+
 type SqrtProbabilityTaskBridgeProbeResult struct {
 	Schema                           string                     `json:"schema"`
 	Experiment                       string                     `json:"experiment"`
@@ -150,7 +152,7 @@ func sqrtFreeRunningProbabilisticSignals(
 		}
 
 		for writeIndex, write := range scenario.writes {
-			seed := 44000000 + scenarioIndex*10000 + writeIndex*31
+			seed := sqrtProbabilityNoiseSeedPrefix + scenarioIndex*10000 + writeIndex*31
 			memory, err := perturbMemory(
 				softMemory, seed, memoryNoise,
 			)
@@ -202,7 +204,7 @@ func sqrtFreeRunningProbabilisticSignals(
 			}
 		}
 
-		seed := 44000000 + scenarioIndex*10000 + 9999
+		seed := sqrtProbabilityNoiseSeedPrefix + scenarioIndex*10000 + 9999
 		memory, err := perturbMemory(
 			softMemory, seed, memoryNoise,
 		)
