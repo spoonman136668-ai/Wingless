@@ -7,54 +7,61 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-function Get-PriorityRunnerWorkers {
-    $workers = @(
-        Get-CimInstance Win32_Process |
-        Where-Object {
-            $_.Name -ieq 'Runner.Worker.exe' -and
-            -not [string]::IsNullOrWhiteSpace($_.ExecutablePath)
-        }
-    )
-
-    return @(
-        foreach ($worker in $workers) {
-            $path = $worker.ExecutablePath
-            if ($path.StartsWith($WinglessRunnerRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
-                continue
+if ($env:RUNNER_ENVIRONMENT -ceq 'github-hosted') {
+    Write-Host 'WINGLESS_HOST_GUARD_PASS: GitHub-hosted ephemeral VM is isolated from production runners.'
+    Write-Host 'WINGLESS_HOST_GUARD_MODE: ephemeral-github-hosted'
+}
+else {
+    function Get-PriorityRunnerWorkers {
+        $workers = @(
+            Get-CimInstance Win32_Process |
+            Where-Object {
+                $_.Name -ieq 'Runner.Worker.exe' -and
+                -not [string]::IsNullOrWhiteSpace($_.ExecutablePath)
             }
+        )
 
-            foreach ($root in $PriorityRunnerRoots) {
-                if ($path.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
-                    $worker
-                    break
+        return @(
+            foreach ($worker in $workers) {
+                $path = $worker.ExecutablePath
+                if ($path.StartsWith($WinglessRunnerRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+                    continue
+                }
+
+                foreach ($root in $PriorityRunnerRoots) {
+                    if ($path.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
+                        $worker
+                        break
+                    }
                 }
             }
-        }
-    )
-}
-
-$deadline = (Get-Date).AddMinutes($WaitMinutes)
-
-while ($true) {
-    $active = @(Get-PriorityRunnerWorkers)
-
-    if ($active.Count -eq 0) {
-        Write-Host 'WINGLESS_HOST_GUARD_PASS: no priority production runner worker is active.'
-        break
+        )
     }
 
-    $descriptions = @(
-        foreach ($worker in $active) {
-            "PID=$($worker.ProcessId) PATH=$($worker.ExecutablePath)"
+    $deadline = (Get-Date).AddMinutes($WaitMinutes)
+
+    while ($true) {
+        $active = @(Get-PriorityRunnerWorkers)
+
+        if ($active.Count -eq 0) {
+            Write-Host 'WINGLESS_HOST_GUARD_PASS: no priority production runner worker is active.'
+            Write-Host 'WINGLESS_HOST_GUARD_MODE: local-production-priority'
+            break
         }
-    )
 
-    if ((Get-Date) -ge $deadline) {
-        throw "WINGLESS_HOST_GUARD_TIMEOUT: priority production runner remained active. $($descriptions -join '; ')"
+        $descriptions = @(
+            foreach ($worker in $active) {
+                "PID=$($worker.ProcessId) PATH=$($worker.ExecutablePath)"
+            }
+        )
+
+        if ((Get-Date) -ge $deadline) {
+            throw "WINGLESS_HOST_GUARD_TIMEOUT: priority production runner remained active. $($descriptions -join '; ')"
+        }
+
+        Write-Host "WINGLESS_HOST_GUARD_WAIT: production runner active; Wingless yields. $($descriptions -join '; ')"
+        Start-Sleep -Seconds $PollSeconds
     }
-
-    Write-Host "WINGLESS_HOST_GUARD_WAIT: production runner active; Wingless yields. $($descriptions -join '; ')"
-    Start-Sleep -Seconds $PollSeconds
 }
 
 try {
