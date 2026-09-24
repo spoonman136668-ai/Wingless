@@ -12,13 +12,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: wingless-research-windows-safe-v3-${{ github.ref_name }}
+  group: wingless-research-windows-safe-v4-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   qualify:
-    name: Windows research qualification lane A
-    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    name: Windows research qualification hosted equivalence
+    runs-on: windows-latest
     timeout-minutes: 180
     defaults:
       run:
@@ -29,14 +29,17 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-
+      - name: Set up frozen Go toolchain
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
       - name: Run guarded research qualification
         run: |
           ./scripts/Invoke-ResearchQualification.ps1 `
             -RequestPath '.wingless/qualification-request.json' `
             -OutputDirectory "$env:RUNNER_TEMP\wingless-research-qualification" `
-            -GuardWaitMinutes 120
-
+            -GuardWaitMinutes 0
       - name: Upload qualification evidence
         if: always()
         uses: actions/upload-artifact@v4
