@@ -1,6 +1,6 @@
 # Wingless UP-46 — objective decomposition audit
 
-Status: staged diagnostic only. Qualification is intentionally not triggered while the UP-44 FIXA seed-matched causal control is active.
+Status: Windows-qualified scientific diagnostic; frozen Case 3.
 
 Scientific source state: UP-45 seal `48fb886f517db0cb21fdbc757cd7bc9500ed9f59`.
 
@@ -95,3 +95,82 @@ UP-45 made exact equality, but the scoring system chose an earlier non-equal sta
 UP-46 freezes those two states and takes the scoring system apart piece by piece. It tells us whether equality was genuinely worse, whether our score misunderstood a useful state, or whether the penalty term itself discouraged the structure we were trying to learn.
 
 Nothing is tuned during this audit.
+
+
+## Authoritative Windows result
+
+Workflow run: `35980095156`
+
+Source head: `d44ca6b026e402da46f9e6612de66027ba9cae4a`
+
+Artifact: `10799921479`
+
+Artifact digest: `sha256:cc30d79663622f8ab4988dba07883a5a106743ee519be387b55fd0a37f37fab9`
+
+The production-priority guard, focused tests, deterministic double probe, and full repository regression passed.
+
+### Smooth objective: exact-fused step 29 minus selected step 24
+
+- phase score: `+0.02756598541151123`;
+- value probability: `+0.07131344939574924`;
+- relation probability: `-0.02673136875219645`;
+- harmonic task score: `+0.00340133713965618`;
+- soft capacity: `+4.349173290834152`;
+- resource penalty: `+0.0024162073837967514`;
+- final objective: `+0.000985129755859404`.
+
+Absolute smooth objective:
+
+- selected step 24: `0.5581278352889602`;
+- exact-fused step 29: `0.5591129650448196`.
+
+The exact-fused state therefore scores **better on the frozen task objective**, even after paying its larger resource penalty.
+
+### Hard capability
+
+Selected step 24:
+
+- held-out accuracy: `0.907958984375`;
+- mutable commit accuracy: `0.3385416666666667`;
+- exact final-table accuracy: `0.3541666666666667`;
+- relation accuracy: `0.5833333333333334`.
+
+Exact-fused step 29:
+
+- held-out accuracy: `0.945068359375`;
+- mutable commit accuracy: `0.6171875`;
+- exact final-table accuracy: `0.625`;
+- relation accuracy: `0.75`.
+
+Exact-fused minus selected:
+
+- held-out: `+0.037109375`;
+- commit: `+0.2786458333333333`;
+- final-table: `+0.2708333333333333`;
+- relation: `+0.16666666666666663`.
+
+## Scientific classification
+
+**Frozen Case 3: checkpoint scheduling, not objective rejection, caused exact fusion to be missed by selection.**
+
+UP-45 only evaluated selection checkpoints at 0/12/24/48. Step 29 was therefore never eligible for checkpoint selection, despite having a better task objective than step 24 when evaluated directly.
+
+The hard recurrent metrics independently move in the same direction and by much larger margins.
+
+This does not establish that step 29 is the globally best point on the 48-step trajectory. The preregistered successor is therefore a dense checkpoint replay over the already frozen UP-45 trajectory, with no optimizer rerun and no result-informed state construction.
+
+## Seed-matched causal note
+
+The UP-44 FIXA seed-matched control sealed at `013339e102080ce57e7600ebacb8ab086fd53467` as objective-positive but selected-geometry-negative. Therefore the stronger claim that square-root probability encoding alone caused task selection to enter the symmetry basin remains downgraded.
+
+UP-46's comparison is still valid as an internal analysis of the observed UP-45 trajectory. It must not be used to restore the rejected UP-43 -> UP-44 representation-only causal claim.
+
+## Plain speak
+
+We thought the scoring system rejected exact equality. It did not.
+
+The exact-equality state at step 29 actually scored a little better than the chosen step 24, and its real memory/relation performance was dramatically better.
+
+The problem was much simpler: we only let the system choose among steps 0, 12, 24, and 48. Step 29 was never on the ballot.
+
+The next experiment replays every already-recorded state and asks what the same score would have selected if every step had been eligible.
