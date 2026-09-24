@@ -27,13 +27,12 @@ Across two untouched schedules:
 
 - four banks / noise 0.04: PASS, reproducing the confirmed control;
 - five banks / noise 0: PASS;
-- five banks / noise 0.005: PASS;
-- five banks / noise 0.01: FAIL on the exact-scenario gate despite value accuracy around 0.997;
-- five banks degrade progressively at 0.02–0.04;
-- six banks / zero noise: FAIL, with value accuracy about 0.959–0.961 and exact-scenario accuracy about 0.66–0.67.
+- five banks / noise 0.005: FAIL on both untouched schedules (value accuracy about 0.993–0.994; exact-scenario accuracy about 0.934–0.941);
+- five banks degrade sharply from 0.01 through 0.04;
+- six banks / zero noise: PASS on both untouched schedules with value accuracy `1.0` and exact-scenario accuracy `1.0`.
 
 ## Scientific classification
 
-The confirmed golden code extends fixed 16-dimensional simultaneous-memory capacity from four to five banks at very low noise. The current six-bank failure exists even at zero noise, but one phase geometry is insufficient to distinguish a geometry collision from a more fundamental fixed-state capacity boundary.
+The confirmed golden code supports six simultaneous banks at zero noise in the fixed 16-dimensional state. The immediate boundary is noise robustness, not zero-noise six-bank capacity. The stored summary originally inverted the five-bank 0.005 and six-bank zero-noise classifications; this paragraph records the authoritative runner-log result.
 
-The next C-lane experiment preregisters several six-bank phase-tag families at zero and low noise, with no family selection or dimension change.
+UP-58C remains the preregistered geometry/noise follow-up.
