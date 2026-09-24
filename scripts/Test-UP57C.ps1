@@ -1,0 +1,16 @@
+$ErrorActionPreference='Stop'
+$Repo=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$PriorGoCache=$env:GOCACHE;$PriorGoTmp=$env:GOTMPDIR
+$GoCache=Join-Path $env:TEMP ("wingless-up57c-gocache-"+$PID);$GoTmp=Join-Path $env:TEMP ("wingless-up57c-gotmp-"+$PID)
+New-Item -ItemType Directory -Force -Path $GoCache|Out-Null;New-Item -ItemType Directory -Force -Path $GoTmp|Out-Null
+$env:GOCACHE=$GoCache;$env:GOTMPDIR=$GoTmp
+Push-Location $Repo
+try{
+ go env -w GOFLAGS=-buildvcs=false;if($LASTEXITCODE-ne 0){throw 'UP57C_GO_ENV_FAILED'}
+ go clean -cache -testcache;if($LASTEXITCODE-ne 0){throw 'UP57C_GO_CLEAN_FAILED'}
+ go run ./cmd/ice build;if($LASTEXITCODE-ne 0){throw 'UP57C_ICE_BUILD_FAILED'};go run ./cmd/ice validate;if($LASTEXITCODE-ne 0){throw 'UP57C_ICE_VALIDATE_FAILED'}
+ go test ./unitary ./cmd/unitary-up57c-golden-scale -count=1;if($LASTEXITCODE-ne 0){throw 'UP57C_FOCUSED_TEST_FAILED'};go test ./... -count=1;if($LASTEXITCODE-ne 0){throw 'UP57C_FULL_REGRESSION_FAILED'}
+ $P1=((go run ./cmd/unitary-up57c-golden-scale)|Out-String).Trim();$P2=((go run ./cmd/unitary-up57c-golden-scale)|Out-String).Trim();if($P1-cne $P2){throw 'UP57C_NONDETERMINISTIC_OUTPUT'}
+ $R=$P1|ConvertFrom-Json;if($R.schema-cne 'wingless.up57c-golden-bank-scale.v1'){throw 'UP57C_SCHEMA_MISMATCH'};if($R.selection_performed){throw 'UP57C_SELECTION_PRESENT'};if([int]$R.points.Count-ne 16){throw 'UP57C_POINT_COUNT'}
+ Write-Host $P1;Write-Host '';Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ===';foreach($P in $R.points){Write-Host "schedule=$($P.schedule_base) banks=$($P.banks) noise=$($P.memory_noise) gate=$($P.gate) value=$($P.value_accuracy) exact=$($P.exact_scenario_accuracy) margin=$($P.minimum_margin)"};Write-Host 'WINGLESS_UP57_HARNESS_PASS'
+}finally{Pop-Location;if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache};if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp};Remove-Item -Recurse -Force $GoCache -ErrorAction SilentlyContinue;Remove-Item -Recurse -Force $GoTmp -ErrorAction SilentlyContinue}
