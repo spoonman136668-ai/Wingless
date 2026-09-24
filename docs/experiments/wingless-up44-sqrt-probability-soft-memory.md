@@ -1,6 +1,6 @@
 # Wingless UP-44: square-root probability soft-memory bridge
 
-Status: preregistered research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific result; representation diagnosis supported; capability gates remain negative; not activated, promoted, or connected to ckb-plane.
 
 Parent result: UP-43 qualified scientific negative sealed at `85f9ab7837bacda5deed635c5e7bf1e5ed5b4c05`.
 
@@ -94,3 +94,42 @@ If the task score now starts preferring the symmetry neighborhoods, we will have
 ## Authority boundary
 
 UP-44 is isolated mathematical research. It does not invoke a language model, activate Wingless, alter CKB/ckb-plane/KTRADE/Nemotron authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+The authoritative Windows qualification on workflow run `35938135168` completed successfully at source head `2ec0e9eb8af9e797249840e2dd23fb7eb18bdd57` on runner `WINGLESS-LINKDEADKB`. The production-priority guard, focused tests, deterministic double probe, and full repository regression passed.
+
+The square-root probability representation materially changed the task-gradient behavior:
+
+- initial objective: `0.5267850187116467`;
+- step 12 objective: `0.5271858343445059`;
+- step 24 objective: `0.5374434332944105`;
+- step 48 objective: `0.49481882113517606`;
+- selected checkpoint: step `24`;
+- selected objective gain: `0.010658414582763731`.
+
+The repaired rolling optimizer entered reversible symmetry neighborhoods and the selected checkpoint itself lies in one:
+
+- first provisional fusion step: `9`;
+- maximum provisional capacity: `8`;
+- selected provisional capacity: `8`;
+- selected nearest offset gap: `0.00009309022967083583`;
+- full-rank reconstruction steps: `44`.
+
+On the untouched true held-out pool, the selected checkpoint reached:
+
+- held-out accuracy: `0.902099609375`;
+- mutable commit accuracy: `0.3450520833333333`;
+- exact final table accuracy: `0.3541666666666667`;
+- relation accuracy: `0.5416666666666666`;
+- held-out retention loss versus capacity 36: `0.097900390625`;
+- mutable-commit retention loss versus capacity 36: `0.6549479166666667`.
+
+Capability gates excluding exact equality did not pass.
+
+Scientific classification: **qualified representation-positive / capability-negative result**.
+
+Interpretation: UP-43 showed the repaired optimizer could reach symmetry neighborhoods but the old `p`-amplitude recurrent representation caused the smooth objective to reject those states. UP-44 changed only the probability-to-amplitude mapping to `sqrt(p)`, after which the training objective selected a capacity-8 symmetry-basin checkpoint with positive gain. That is direct evidence that the previous soft-state representation was a material blocker to objective/geometry alignment.
+
+This is not yet a capability breakthrough. Under the frozen UP-44 interpretation, the scientific successor is a principled proximal exact-fusion test, never a return to irreversible sticky snapping. Before that successor is run, the separately staged performance-equivalence qualification must prove that any harness speedup is scientifically identical to the reference evaluator.
