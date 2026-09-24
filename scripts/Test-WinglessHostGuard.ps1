@@ -11,6 +11,14 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+if ($env:RUNNER_ENVIRONMENT -ceq 'github-hosted') {
+    Write-Host 'WINGLESS_HOST_GUARD_PASS: GitHub-hosted ephemeral VM is isolated from production runners.'
+    Write-Host 'WINGLESS_HOST_GUARD_MODE: ephemeral-github-hosted'
+    if ([string]::IsNullOrWhiteSpace($env:GOMAXPROCS)) { $env:GOMAXPROCS = '4' }
+    Write-Host "WINGLESS_HOST_GUARD_GOMAXPROCS: $env:GOMAXPROCS"
+    return
+}
+
 function Test-PathUnderRoot {
     param(
         [Parameter(Mandatory = $true)]
