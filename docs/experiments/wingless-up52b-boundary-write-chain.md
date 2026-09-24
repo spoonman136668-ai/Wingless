@@ -36,3 +36,40 @@ If short chains pass and longer chains fail, cumulative commit-chain error is th
 If the full-capacity control degrades similarly, the boundary is broader memory-decoder robustness rather than a pair-[0,5] structural cost.
 
 No geometry, thresholds, optimizer settings, or noise values may be changed after observing results.
+
+
+## Authoritative Windows result
+
+Workflow run: `36031119720`
+
+Runner: `WINGLESS-UP-B`
+
+Source head: `1a14f0ec4fc0a768a76b6e17529dc604ec2754cc`
+
+Artifact: `10821941255`
+
+Artifact digest: `sha256:b5fa16163e33afc3b148c0f422364c34472aeff03d12be9d37e0e50e835ce69f`
+
+The guarded qualification, focused tests, deterministic double probe, and full repository regression passed. The required 16-write reproduction succeeded: noise 0.065 PASS and noise 0.07 FAIL.
+
+At noise 0.065:
+
+- writes 1/2/4/8/16: PASS;
+- writes 32/64: FAIL;
+- commit accuracy declines from `0.9791666666666666` at one write to `0.923828125` at 64 writes;
+- relation accuracy remains at or above the unchanged gate.
+
+At noise 0.07:
+
+- writes 1/2/4/8: PASS;
+- writes 16/32/64: FAIL;
+- commit accuracy declines from `0.9791666666666666` at one write to `0.90625` at 64 writes;
+- relation accuracy remains at or above the unchanged gate.
+
+The full-capacity control remains at commit/final/relation accuracy `1.0` throughout the reported long-chain points.
+
+## Scientific classification
+
+The pair-[0,5] robustness boundary is **cumulative commit-chain error**, not immediate decode failure. Higher noise moves the chain-length failure earlier: from between 16 and 32 writes at noise 0.065 to between 8 and 16 writes at noise 0.07.
+
+The next B-lane experiment should separate closed-loop error propagation from per-step decoder noise by comparing the unchanged recurrent commit path against a teacher-forced/oracle-reset path at the same frozen geometries, noise levels, and write counts.
