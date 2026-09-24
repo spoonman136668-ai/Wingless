@@ -1,11 +1,15 @@
 name: Wingless hosted research qualification
 
 on:
+  push:
+    branches:
+      - 'infra/public-hosted-qualification-bootstrap-r2'
   workflow_dispatch:
     inputs:
       research_ref:
         description: Exact Wingless research branch or SHA to qualify
-        required: true
+        required: false
+        default: 'research/wingless-up51h-public-runner-equivalence-r1'
         type: string
 
 permissions:
