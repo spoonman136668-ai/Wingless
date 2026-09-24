@@ -11,6 +11,8 @@ type UP58CTagFamily struct {
 type UP58CTagMetric struct {
 	Family string `json:"family"`
 	MemoryNoise float64 `json:"memory_noise"`
+	EncodingValid bool `json:"encoding_valid"`
+	EncodingError string `json:"encoding_error,omitempty"`
 	ValueAccuracy float64 `json:"value_accuracy"`
 	ExactScenarioAccuracy float64 `json:"exact_scenario_accuracy"`
 	MinimumMargin float64 `json:"minimum_margin"`
@@ -49,7 +51,7 @@ func up58cFamilies()[]UP58CTagFamily{
 
 func up58cEvaluate(tags []float64,noise float64)(UP58CTagMetric,error){
 	const(banks=6;scenarios=256;depth=64)
-	prototypes,err:=up53cPrototypeBank(banks,tags);if err!=nil{return UP58CTagMetric{},err}
+	prototypes,err:=up53cPrototypeBank(banks,tags);if err!=nil{return UP58CTagMetric{MemoryNoise:noise,EncodingValid:false,EncodingError:err.Error(),Gate:false},nil}
 	for i:=range prototypes{prototypes[i].state,err=up53cTransportLocalPrototype(prototypes[i].state,depth);if err!=nil{return UP58CTagMetric{},err}}
 	block:=up53cTransportBlock()
 	var coherentCorrect,magnitudeCorrect,totalValues,coherentExact int
@@ -76,7 +78,7 @@ func up58cEvaluate(tags []float64,noise float64)(UP58CTagMetric,error){
 		if exact{coherentExact++}
 	}
 	m:=UP58CTagMetric{
-		MemoryNoise:noise,
+		MemoryNoise:noise,EncodingValid:true,
 		ValueAccuracy:float64(coherentCorrect)/float64(totalValues),
 		ExactScenarioAccuracy:float64(coherentExact)/scenarios,
 		MinimumMargin:minMargin,
