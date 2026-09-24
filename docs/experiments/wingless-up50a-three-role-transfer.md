@@ -1,6 +1,6 @@
 # Wingless UP-50A — three-role transfer
 
-Status: preregistered scientific cognition experiment.
+Status: Windows-qualified scientific result.
 
 Scientific parent: UP-49A seal `d5a709e13ead3a7c2fef4df913a1b3e3acd3139b`.
 
@@ -37,3 +37,39 @@ Scientific negatives are valid.
 The previous test moved a learned rule from left to right.
 
 This one adds a third variable. We never teach the system the second role-swap position or how to mutate roles 1 or 2. It has to reuse and compose what it learned to make those operations work.
+
+
+## Authoritative Windows result
+
+Workflow run: `35987591398`
+
+Runner: `WINGLESS-LINKDEADKB`
+
+Artifact: `10803020811`
+
+Artifact digest: `sha256:1b8fc0e4f2df05f8cff5e7ba60ee8eccde2e025233de700ec1ce096ccdd6ffc9`
+
+Results:
+
+- unitary train accuracy: `1.0`
+- aggregate unitary held-out accuracy: `1.0`
+- never-trained swap(1,2): `1.0`
+- derived role-1 mutation: `1.0`
+- derived role-2 mutation: `1.0`
+- long mixed programs: `1.0`
+- frozen three-role transfer gate: `PASS`
+- matched non-unitary held-out accuracy: `0.4074074074074074`
+
+## Scientific classification
+
+The learned unitary rules transferred across an untrained role-swap position and supported multi-hop transport of a learned operation across three bound roles without direct training of those derived primitives.
+
+The next A-lane experiment should reduce supervision rather than add a fourth role: train the same structural rules on a sparse subset of basis configurations, then test held-out basis states and coherent superpositions to determine whether the rule is genuinely structural rather than dependent on exhaustive basis coverage.
+
+## Plain speak
+
+The system did not need us to teach every role position separately.
+
+It reused one learned swap rule in a new position and carried a learned value operation across two role boundaries perfectly.
+
+The next harder question is whether it can do that without seeing every possible training state first.
