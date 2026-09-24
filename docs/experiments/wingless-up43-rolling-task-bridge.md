@@ -1,6 +1,6 @@
 # Wingless UP-43: rolling-gradient free-running task bridge
 
-Status: preregistered research branch only; not activated, promoted, or connected to ckb-plane.
+Status: Windows-qualified scientific negative; not activated, promoted, or connected to ckb-plane.
 
 Parent calibration: UP-42 sealed at `a76463ccff664fdb392ead5d024fb1cb8e7778e6`.
 
@@ -106,3 +106,41 @@ That separates “can the task discover near-symmetry?” from “how should exa
 ## Authority boundary
 
 UP-43 is isolated Wingless research. It does not invoke a language model, activate Wingless, alter ckb-plane/KTRADE authority, access brokers or credentials, modify accepted refs, or perform promotion/deployment.
+
+
+## Windows qualification result
+
+The authoritative Windows qualification on workflow run `35935011865` completed successfully at source head `47fac701b3e73e19fa8826a959776ce65e8c01ea` on runner `WINGLESS-LINKDEADKB`. The production-priority guard, focused tests, deterministic double probe, and full repository regression passed.
+
+The repaired rolling optimizer did enter reversible symmetry neighborhoods:
+
+- first provisional fusion step: `10`;
+- maximum provisional capacity: `8`;
+- step-10 nearest gap: `0.0011419367693766488`;
+- step-24 provisional capacity: `8`;
+- step-24 nearest gap: `0.0007047869659162478`;
+- another capacity-8 visit occurred later with nearest gap `0.00010190873120542211`.
+
+However, the training-side objective rejected every preregistered checkpoint:
+
+- initial objective: `0.6498734172582427`;
+- step 12 objective: `0.6257176169903816`;
+- step 24 objective: `0.6164862228413023`;
+- step 48 objective: `0.6222920471220585`.
+
+Therefore the selected checkpoint remained step 0, with objective gain exactly `0`, provisional capacity 6, and nearest gap `0.029277002188455997`.
+
+On the untouched true held-out pool, the selected step-0 checkpoint reached:
+
+- held-out accuracy: `0.90185546875`;
+- mutable commit accuracy: `0.34375`;
+- exact final table accuracy: `0.375`;
+- relation accuracy: `0.5625`;
+- held-out retention loss versus capacity 36: `0.09814453125`;
+- mutable-commit retention loss versus capacity 36: `0.65625`.
+
+Capability gates excluding exact fusion did not pass.
+
+Scientific classification: **qualified negative with optimizer-transfer evidence**.
+
+Interpretation: UP-42 repaired reachability sufficiently for the task gradient to enter symmetry neighborhoods, but the UP-40 free-running soft-state objective did not prefer those states. Under the frozen UP-43 interpretation, the next controlled test changes the soft-state representation rather than the horizon, gates, optimizer, or fusion rule. The successor should replace amplitude `p` followed by global renormalization with a norm-faithful `sqrt(p)` block encoding while preserving the rolling optimizer, 48-step horizon, no sticky snapping, checkpoint schedule, task objective weights, and held-out discipline.
