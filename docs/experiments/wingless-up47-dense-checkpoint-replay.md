@@ -1,6 +1,6 @@
 # Wingless UP-47 — frozen dense checkpoint replay
 
-Status: preregistered scientific diagnostic.
+Status: Windows-qualified scientific result; dense replay selected step 42 and hard capability gates remained false.
 
 Scientific parent: UP-46 seal `3a4a5c209818a803b5451d2ca4adf74c62d16680`.
 
@@ -54,3 +54,49 @@ We already have the path the system took. We are not letting it train again.
 We simply score every point on that recorded path instead of looking only every 12 steps.
 
 That tells us whether the system actually found a better self-organization and our sparse inspection schedule failed to notice it.
+
+
+## Authoritative Windows result
+
+Workflow run: `35980735036`
+
+Source head: `474ebb42082d1a9dd022517edb3c48c4f16dbd1d`
+
+Runner: `WINGLESS-LINKDEADKB`
+
+Artifact: `10800157359`
+
+Artifact digest: `sha256:b43d7ab58f366b2d0b823c56967594d323daca824b02aae0edd78d14f59ed52a`
+
+The production-priority guard, focused tests, deterministic double probe, and full repository regression passed.
+
+Dense replay selected step `42`, not sparse step `24` and not exact-fused step `29`.
+
+- dense-selected objective: `0.591814132893378`
+- sparse step-24 objective: `0.5581278352889602`
+- exact-fused step-29 objective: `0.5591129650448196`
+- dense-minus-sparse objective: `+0.03368629760441788`
+- selected exact capacity: `6`
+- selected exact fusion: `false`
+- held-out accuracy: `0.906982421875`
+- mutable commit accuracy: `0.40625`
+- exact final-table accuracy: `0.4791666666666667`
+- relation accuracy: `0.5833333333333334`
+- capability gates: `false`
+
+## Scientific classification
+
+The sparse UP-45 checkpoint schedule did hide a substantially better objective point, but the best recorded state was a non-fused step 42 and still failed the hard recurrent capability gates.
+
+This separates two questions cleanly:
+
+1. why step 42 maximizes the smooth objective without recovering hard capability; and
+2. why exact-fused step 29 has markedly better hard recurrent capability than both step 24 and step 42 despite a lower smooth objective than step 42.
+
+The post-UP47 program may therefore branch without changing the frozen result: mechanism work can compare the three frozen geometries, cognition work can test broader compositional capability independently, and stress work can probe scaling/failure boundaries independently.
+
+## Plain speak
+
+Looking at every recorded step fixed one mistake: step 24 was not actually the best point on the path.
+
+But the new winner, step 42, still did not solve the real memory/relation task. That means the smooth score and the hard capability are still not aligned enough. We now have three useful frozen states—24, 29, and 42—that let us study that mismatch while other lanes push cognition and scale in parallel.
