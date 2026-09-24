@@ -26,3 +26,40 @@ The first failing noise and last passing noise are reported directly.
 This is boundary mapping, not threshold tuning. A scientific negative is valid and must be sealed exactly as observed.
 
 If a monotone crossing is observed, the next B-lane experiment should test the mechanism responsible for loss around that boundary rather than adjusting the gate. If behavior is non-monotone, the next experiment should reproduce the affected points with additional frozen deterministic noise schedules before changing architecture.
+
+
+## Authoritative Windows result
+
+Workflow run: `36030032811`
+
+Runner: `WINGLESS-UP-B`
+
+Source head: `e278cc6777e0e5fe1de350d9a65f0eaf9cc84024`
+
+Artifact: `10821835495`
+
+Artifact digest: `sha256:50baabb354d13b665ec2dbce82df86d9ccb7ceabb765711f18b7961189ee34bd`
+
+The guarded qualification, focused tests, deterministic double probe, and full repository regression passed.
+
+Frozen gate results:
+
+- noise 0.05: PASS;
+- noise 0.055: PASS;
+- noise 0.06: PASS;
+- noise 0.065: PASS;
+- noise 0.07: FAIL;
+- noise 0.075: FAIL;
+- noise 0.08: FAIL.
+
+Last passing noise: `0.065`.
+
+First failing noise: `0.07`.
+
+At the crossing, relation accuracy remains `1.0`; degradation is concentrated in held-out/static decoding and especially repeated mutable commit/final-table accuracy.
+
+## Scientific classification
+
+The frozen pair-[0,5] structure has a reproducible hard-gate boundary between memory-noise amplitudes 0.065 and 0.07 under the standard depth schedule.
+
+The next B-lane experiment will hold geometry and thresholds fixed and compare short-to-long mutable write chains at the two boundary noise levels. This tests whether the boundary is primarily immediate decoding corruption or cumulative error propagation across commits.
