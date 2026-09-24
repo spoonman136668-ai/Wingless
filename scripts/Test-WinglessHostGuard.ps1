@@ -2,10 +2,34 @@ param(
     [int]$WaitMinutes = 120,
     [int]$PollSeconds = 20,
     [string[]]$PriorityRunnerRoots = @('C:\actions-runner'),
-    [string]$WinglessRunnerRoot = 'C:\actions-runner-wingless'
+    [string[]]$WinglessRunnerRoots = @(
+        'C:\actions-runner-wingless',
+        'C:\actions-runner-up-b',
+        'C:\actions-runner-up-c'
+    )
 )
 
 $ErrorActionPreference = 'Stop'
+
+function Test-PathUnderRoot {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Root
+    )
+
+    $normalizedRoot = $Root.TrimEnd('\')
+    if ($Path.Equals($normalizedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+        return $true
+    }
+
+    return $Path.StartsWith(
+        $normalizedRoot + '\',
+        [System.StringComparison]::OrdinalIgnoreCase
+    )
+}
 
 function Get-PriorityRunnerWorkers {
     $workers = @(
@@ -19,12 +43,20 @@ function Get-PriorityRunnerWorkers {
     return @(
         foreach ($worker in $workers) {
             $path = $worker.ExecutablePath
-            if ($path.StartsWith($WinglessRunnerRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+
+            $isWingless = $false
+            foreach ($root in $WinglessRunnerRoots) {
+                if (Test-PathUnderRoot -Path $path -Root $root) {
+                    $isWingless = $true
+                    break
+                }
+            }
+            if ($isWingless) {
                 continue
             }
 
             foreach ($root in $PriorityRunnerRoots) {
-                if ($path.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
+                if (Test-PathUnderRoot -Path $path -Root $root) {
                     $worker
                     break
                 }
