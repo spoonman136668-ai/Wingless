@@ -1,6 +1,6 @@
 # Wingless UP-44 FIXA — seed-matched sqrt-probability causal control
 
-Status: preregistered causal replication.
+Status: **SEALED — qualified causal-control result; weaker representation benefit replicated, stronger geometry-alignment claim not replicated.**
 
 ## Why this exists
 
@@ -51,10 +51,40 @@ The value `39000000` is inherited exactly from UP-43; it is not chosen from any 
 
 No thresholds, optimizer settings, seeds, gates, or horizons may be changed after observing the result.
 
+## Authoritative Windows result
+
+GitHub Actions run `35975826227`, job `107555940483`, executed on dedicated runner `WINGLESS-LINKDEADKB` at research head `ba1314f784a2102c340273265e51cfabcf271c66`.
+
+Qualification evidence:
+
+- production-priority guard: PASS (`WINGLESS_HOST_GUARD_PASS`), BelowNormal priority, `GOMAXPROCS=4`;
+- guarded automated qualification: PASS;
+- focused UP-44 qualification and full Go regression: PASS;
+- deterministic qualification classification: `qualified-scientific-result`;
+- training/validation split remained 96/32;
+- true held-out remained 128 tables and was not used for selection;
+- selected checkpoint: step 48;
+- initial objective: `0.6047706218899666`;
+- selected objective: `0.6054161920939569`;
+- selected objective gain: `+0.0006455702039903644`;
+- first provisional fusion-basin entry: step 11;
+- maximum provisional capacity: 8;
+- selected provisional capacity: 6;
+- selected nearest offset gap: `0.0038524422318966453`, outside the frozen `0.0025` provisional fusion tolerance;
+- untouched selected true-heldout accuracy: `0.901123046875`;
+- mutable commit accuracy: `0.3411458333333333`;
+- exact final-table accuracy: `0.375`;
+- relation accuracy: `0.5416666666666666`;
+- capability gates without exact fusion: false.
+
+## Sealed classification
+
+This is the second preregistered interpretation case: **objective-positive, selected-geometry-negative**.
+
+The seed-matched square-root representation again produced a positive training-selected objective gain, so evidence that the square-root representation can improve the smooth objective survives the causal control. However, the selected checkpoint was step 48 with provisional capacity 6 and nearest gap above the frozen symmetry-basin tolerance. Therefore the stronger claim that the representation change by itself aligns task selection with the symmetry basin is **not replicated** and must be downgraded.
+
+The observed UP-45 trajectory facts remain unchanged. This control changes only the causal narrative around UP-43 -> UP-44.
+
 ## Plain speak
 
-We changed two things by accident in UP-44: the way uncertainty is represented and the exact deterministic noise sequence.
-
-This rerun puts the old noise sequence back while keeping the new representation.
-
-If the good behavior remains, we know the representation really caused it. If it disappears, we caught a confound before building more conclusions on top of it.
+The new uncertainty representation still helped the score even after restoring the old deterministic noise sequence, so that part is real. But it did **not** make the task choose the near-fused geometry this time. That means the representation helps, while the stronger claim that it alone steers training into the useful symmetry basin did not survive the cleaner test.
