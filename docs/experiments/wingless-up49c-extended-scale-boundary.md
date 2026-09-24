@@ -1,6 +1,6 @@
 # Wingless UP-49C — extended scale boundary screen
 
-Status: preregistered exploratory stress screen.
+Status: Windows-qualified scientific result.
 
 Scientific parent: UP-48C seal `d28cf67488c33509c7f42c6f523755e00031c467`.
 
@@ -33,3 +33,35 @@ The exact UP-48C unitary gate is reused unchanged.
 This run is a fast scouting mission.
 
 Instead of spending a long time proving every point we already expect to work, it jumps much farther out. If something cracks, the next experiment slows down and examines that exact crack carefully.
+
+
+## Authoritative Windows result
+
+Workflow run: `35987022666`
+
+Runner: `WINGLESS-UP-C`
+
+Artifact: `10802498095`
+
+Artifact digest: `sha256:e65adf84a04fac773c4383bf1d0ad2e4312d9fd90604ad21c2386e65228cb7c0`
+
+All four screening gates passed. No first failing case was found.
+
+- dim 128 / depth 8192: norm drift `9.88e-12`, round trip `9.88e-12`
+- dim 256 / depth 4096: norm drift `1.05e-12`, round trip `1.05e-12`
+- dim 512 / depth 2048: norm drift `6.38e-13`, round trip `6.37e-13`
+- dim 1024 / depth 1024: norm drift `1.50e-12`, round trip `1.50e-12`
+
+Accuracy remained 1 and fidelity-geometry error stayed near machine precision in every case.
+
+## Scientific classification
+
+The expanded width/depth screen still did not expose a unitary preservation boundary.
+
+The next C-lane question is whether a mathematically equivalent powered propagation method can reproduce iterative propagation at an overlapping depth and then probe orders-of-magnitude deeper without changing the underlying unitary block.
+
+## Plain speak
+
+We jumped much farther out and still did not find a break.
+
+The next efficient move is not to make the runner repeat the same block millions of times literally. We first prove a faster powered method matches the ordinary method, then use it to look vastly deeper.
