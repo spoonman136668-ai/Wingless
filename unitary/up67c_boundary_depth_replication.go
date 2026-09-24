@@ -1,6 +1,19 @@
 package unitary
 
+import "math"
+
 const UP67CBoundaryDepthReplicationSchema = "wingless.up67c-boundary-depth-replication.v1"
+
+type UP67CDepthMetric struct {
+	Family                string  `json:"family"`
+	ScheduleBase          int     `json:"schedule_base"`
+	MemoryNoise           float64 `json:"memory_noise"`
+	Depth                 int     `json:"depth"`
+	ValueAccuracy         float64 `json:"value_accuracy"`
+	ExactScenarioAccuracy float64 `json:"exact_scenario_accuracy"`
+	MinimumMargin         float64 `json:"minimum_margin"`
+	Gate                  bool    `json:"gate"`
+}
 
 type UP67CBoundaryDepthReplicationResult struct {
 	Schema               string             `json:"schema"`
@@ -13,7 +26,79 @@ type UP67CBoundaryDepthReplicationResult struct {
 	IrregularNoiseLevels []float64          `json:"irregular_noise_levels"`
 	DepthLevels          []int              `json:"depth_levels"`
 	SelectionPerformed   bool               `json:"selection_performed"`
-	Metrics              []UP64CDepthMetric `json:"metrics"`
+	Metrics              []UP67CDepthMetric `json:"metrics"`
+}
+
+func up67cEvaluate(tags []float64, family string, noise float64, seedBase, depth int) (UP67CDepthMetric, error) {
+	const banks = 6
+	const scenarios = 256
+	prototypes, err := up53cPrototypeBank(banks, tags)
+	if err != nil {
+		return UP67CDepthMetric{}, err
+	}
+	for i := range prototypes {
+		prototypes[i].state, err = up53cTransportLocalPrototype(prototypes[i].state, depth)
+		if err != nil {
+			return UP67CDepthMetric{}, err
+		}
+	}
+	block := up53cTransportBlock()
+	var correct, total, exact int
+	minMargin := math.Inf(1)
+	for scenario := 0; scenario < scenarios; scenario++ {
+		state, tables, err := up53cScenarioState(scenario, banks, tags)
+		if err != nil {
+			return UP67CDepthMetric{}, err
+		}
+		n := memoryNoise(seedBase+int(math.Round(noise*100000))*1000+scenario, 16, noise)
+		for i := range state {
+			state[i] += n[i]
+		}
+		state, err = Normalize(state)
+		if err != nil {
+			return UP67CDepthMetric{}, err
+		}
+		state = rotateGlobalPhase(state, math.Mod(0.317*float64(scenario+banks+1), 2*math.Pi))
+		for d := 0; d < depth; d++ {
+			state, err = Propagate(state, block)
+			if err != nil {
+				return UP67CDepthMetric{}, err
+			}
+		}
+		scenarioExact := true
+		for entity := 0; entity < 4; entity++ {
+			local := append(State(nil), state[entity*4:(entity+1)*4]...)
+			values, margin, err := up53cDecode(local, prototypes, true)
+			if err != nil {
+				return UP67CDepthMetric{}, err
+			}
+			if margin < minMargin {
+				minMargin = margin
+			}
+			for bank := 0; bank < banks; bank++ {
+				total++
+				if values[bank] == tables[bank][entity] {
+					correct++
+				} else {
+					scenarioExact = false
+				}
+			}
+		}
+		if scenarioExact {
+			exact++
+		}
+	}
+	m := UP67CDepthMetric{
+		Family: family,
+		ScheduleBase: seedBase,
+		MemoryNoise: noise,
+		Depth: depth,
+		ValueAccuracy: float64(correct) / float64(total),
+		ExactScenarioAccuracy: float64(exact) / float64(scenarios),
+		MinimumMargin: minMargin,
+	}
+	m.Gate = m.ValueAccuracy >= 0.99 && m.ExactScenarioAccuracy >= 0.95
+	return m, nil
 }
 
 func RunUP67C() (UP67CBoundaryDepthReplicationResult, error) {
@@ -48,14 +133,14 @@ func RunUP67C() (UP67CBoundaryDepthReplicationResult, error) {
 	for _, seedBase := range schedules {
 		for _, depth := range depths {
 			for _, noise := range goldenNoises {
-				m, err := up64cEvaluate(golden.Tags, golden.Name, noise, seedBase, depth)
+				m, err := up67cEvaluate(golden.Tags, golden.Name, noise, seedBase, depth)
 				if err != nil {
 					return UP67CBoundaryDepthReplicationResult{}, err
 				}
 				result.Metrics = append(result.Metrics, m)
 			}
 			for _, noise := range irregularNoises {
-				m, err := up64cEvaluate(irregular.Tags, irregular.Name, noise, seedBase, depth)
+				m, err := up67cEvaluate(irregular.Tags, irregular.Name, noise, seedBase, depth)
 				if err != nil {
 					return UP67CBoundaryDepthReplicationResult{}, err
 				}
