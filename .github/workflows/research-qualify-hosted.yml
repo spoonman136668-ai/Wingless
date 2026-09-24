@@ -1,0 +1,50 @@
+name: Wingless hosted research qualification
+
+on:
+  workflow_dispatch:
+    inputs:
+      research_ref:
+        description: Exact Wingless research branch or SHA to qualify
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: windows-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout requested research ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.research_ref }}
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up frozen Go toolchain
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+
+      - name: Run research qualification
+        shell: powershell
+        env:
+          WINGLESS_EXPECTED_REF: ${{ inputs.research_ref }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          ./scripts/Invoke-ResearchQualification.ps1 `
+            -RequestPath '.wingless/qualification-request.json' `
+            -OutputDirectory "$env:RUNNER_TEMP\wingless-research-qualification" `
+            -GuardWaitMinutes 0
+
+      - name: Upload qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-hosted-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/wingless-research-qualification/
+          if-no-files-found: warn
+          retention-days: 30
