@@ -23,7 +23,7 @@ jobs:
       - name: Checkout requested research ref
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.research_ref || 'research/wingless-up51h-public-runner-equivalence-r1' }}
+          ref: research/wingless-up51h-public-runner-equivalence-r1
           persist-credentials: false
           fetch-depth: 0
 
@@ -36,7 +36,7 @@ jobs:
       - name: Run research qualification
         shell: powershell
         env:
-          WINGLESS_EXPECTED_REF: ${{ inputs.research_ref || 'research/wingless-up51h-public-runner-equivalence-r1' }}
+          WINGLESS_EXPECTED_REF: research/wingless-up51h-public-runner-equivalence-r1
         run: |
           $ErrorActionPreference = 'Stop'
           ./scripts/Invoke-ResearchQualification.ps1 `
