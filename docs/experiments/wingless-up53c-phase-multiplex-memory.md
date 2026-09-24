@@ -34,3 +34,37 @@ A bank count passes when coherence decoding achieves:
 Magnitude-only performance does not control acceptance.
 
 Scientific negatives are valid. No phase tag, noise level, threshold, transport depth, or decoder rule may be changed after execution.
+
+
+## Authoritative Windows result
+
+Workflow run: `36031972244`
+
+Runner: `WINGLESS-UP-C`
+
+Source head: `fcfb8c3a76aede0d83c06f9d5a6daf6be5ed8dca`
+
+Artifact: `10823715628`
+
+Artifact digest: `sha256:904f222d1411edfdddf1e49637b3460cacc0c8f9d11551ddab2ad33d8c3091f5`
+
+The guarded qualification, focused tests, deterministic double probe, and full repository regression passed.
+
+Coherence-aware decoding:
+
+- 1 bank: value `1.0`, exact scenario `1.0`;
+- 2 banks: value `1.0`, exact scenario `1.0`;
+- 3 banks: value `1.0`, exact scenario `1.0`;
+- 4 banks: value `0.962646484375`, exact scenario `0.6875`;
+- 5 banks: value `0.8068359375`, exact scenario `0`;
+- 6 banks: value `0.7478841145833334`, exact scenario `0`.
+
+The minimum coherence margin collapsed from `0.023861231972672314` at three banks to `0.00008703271519971967` at four banks.
+
+Magnitude-only value accuracy was already only `0.7177734375` at two banks and `0.4501953125` at three banks.
+
+## Scientific classification
+
+At fixed dimension 16 and memory noise 0.05, phase/coherence carries substantially more simultaneous ordered-memory information than magnitude alone. The frozen phase code supports three banks perfectly but crosses a sharp robustness boundary at four banks.
+
+The next C-lane experiment freezes the four-bank phase geometry and maps its noise ladder down to zero. This distinguishes a finite-noise separation problem from a representational collision/information-limit problem.
