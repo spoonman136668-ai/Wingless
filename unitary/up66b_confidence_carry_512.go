@@ -2,6 +2,11 @@ package unitary
 
 const UP66BConfidenceCarry512Schema = "wingless.up66b-confidence-carry-512.v1"
 
+type UP66BDepthPolicyMetric struct {
+	Depth  int               `json:"depth"`
+	Metric UP57BPolicyMetric `json:"metric"`
+}
+
 type UP66BConfidenceCarry512Result struct {
 	Schema            string                   `json:"schema"`
 	Experiment        string                   `json:"experiment"`
@@ -14,7 +19,7 @@ type UP66BConfidenceCarry512Result struct {
 	OracleUsed        bool                     `json:"oracle_used"`
 	TrainingChanged   bool                     `json:"training_changed"`
 	ThresholdSelected bool                     `json:"threshold_selected"`
-	Metrics           []UP64BDepthPolicyMetric `json:"metrics"`
+	Metrics           []UP66BDepthPolicyMetric `json:"metrics"`
 }
 
 func RunUP66B()(UP66BConfidenceCarry512Result,error){
@@ -45,11 +50,11 @@ func RunUP66B()(UP66BConfidenceCarry512Result,error){
 			for _,seedBase:=range schedules{
 				base,err:=runUP57BPolicy(mixer,prepared,heldTables,fixedDepth,noise,writes,seedBase,0,false)
 				if err!=nil{return UP66BConfidenceCarry512Result{},err}
-				result.Metrics=append(result.Metrics,UP64BDepthPolicyMetric{Depth:depth,Metric:base})
+				result.Metrics=append(result.Metrics,UP66BDepthPolicyMetric{Depth:depth,Metric:base})
 				for _,threshold:=range thresholds{
 					m,err:=runUP57BPolicy(mixer,prepared,heldTables,fixedDepth,noise,writes,seedBase,threshold,true)
 					if err!=nil{return UP66BConfidenceCarry512Result{},err}
-					result.Metrics=append(result.Metrics,UP64BDepthPolicyMetric{Depth:depth,Metric:m})
+					result.Metrics=append(result.Metrics,UP66BDepthPolicyMetric{Depth:depth,Metric:m})
 				}
 			}
 		}
