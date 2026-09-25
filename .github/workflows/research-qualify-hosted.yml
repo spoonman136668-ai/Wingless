@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       research_ref:
-        description: Exact Wingless research branch or SHA to qualify
+        description: Exact Wingless research branch to qualify
         required: true
         type: string
 
@@ -35,8 +35,35 @@ jobs:
           WINGLESS_EXPECTED_REF: ${{ inputs.research_ref }}
         run: |
           $ErrorActionPreference = 'Stop'
+
+          $RequestPath = '.wingless/qualification-request.json'
+          if (-not (Test-Path -LiteralPath $RequestPath -PathType Leaf)) {
+            throw "WINGLESS_HOSTED_QUAL_REQUEST_MISSING: $RequestPath"
+          }
+
+          $Request = Get-Content -LiteralPath $RequestPath -Raw | ConvertFrom-Json
+          if ($Request.schema -cne 'wingless.research-qualification-request.v1') {
+            throw "WINGLESS_HOSTED_QUAL_REQUEST_SCHEMA_MISMATCH: $($Request.schema)"
+          }
+          if ([string]::IsNullOrWhiteSpace([string]$Request.branch)) {
+            throw 'WINGLESS_HOSTED_QUAL_REQUEST_BRANCH_MISSING'
+          }
+          if ([string]$Request.branch -cne $env:WINGLESS_EXPECTED_REF) {
+            throw "WINGLESS_HOSTED_QUAL_REF_MISMATCH expected=$env:WINGLESS_EXPECTED_REF request=$($Request.branch)"
+          }
+          if ([string]$Request.branch -notlike 'research/wingless-up*') {
+            throw "WINGLESS_HOSTED_QUAL_BRANCH_NOT_AUTOMATION_COMPATIBLE: $($Request.branch)"
+          }
+
+          # workflow_dispatch runs under the workflow control ref (normally main),
+          # while actions/checkout above intentionally switches the worktree to the
+          # research branch. The branch-local qualification script must validate
+          # the checked-out research state, not the workflow control ref.
+          Remove-Item Env:GITHUB_SHA -ErrorAction SilentlyContinue
+          Remove-Item Env:GITHUB_REF_NAME -ErrorAction SilentlyContinue
+
           ./scripts/Invoke-ResearchQualification.ps1 `
-            -RequestPath '.wingless/qualification-request.json' `
+            -RequestPath $RequestPath `
             -OutputDirectory "$env:RUNNER_TEMP\wingless-research-qualification" `
             -GuardWaitMinutes 0
 
