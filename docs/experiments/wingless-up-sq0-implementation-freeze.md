@@ -12,6 +12,7 @@ This file adds only implementation details that were not specified in the origin
 - each key/value vector is generated from the frozen generator seed, key id, and value id using a deterministic xorshift64 stream;
 - decoding uses dot-product similarity across the task's value vocabulary;
 - ties resolve to the numerically smallest value id;
+- prior-value presence is declared only when the strongest absolute similarity is at least 0.25; otherwise the write is treated as first insertion and no old-value subtraction occurs;
 - no learned parameter, oracle state, hidden state expansion, or post-result fit is used.
 
 ## Closed-loop write rule
