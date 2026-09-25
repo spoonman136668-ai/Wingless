@@ -1,0 +1,80 @@
+{
+  "schema": "wingless.up-sq0-windows-proof.v1",
+  "experiment": "UP-SQ0-serialized-pre-language-sequence-qualification",
+  "status": "qualified-scientific-result",
+  "source_head": "ddde5a17d87b30ccae90dc088e33d117b986b064",
+  "workflow_run_id": 36178686357,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10883352421,
+  "artifact_sha256": "e9343b93fc006eb245ba8c64702f7b65b63fb1701601e8a503938c7ea6133c4a",
+  "generator_seed_bases": [
+    120000000,
+    121000000,
+    122000000
+  ],
+  "recurrent_state_bytes": 512,
+  "exact_recall_entry_cap": 16,
+  "full_global_attention": false,
+  "aggregate_score_selected": false,
+  "total_metric_cells": 138,
+  "findings": {
+    "transport_only": {
+      "state_machine_composition": "perfect at depths 1,2,3,4,8,16",
+      "role_filler_heldout_primary": 0.9666666666666667,
+      "role_filler_heldout_exact": 0.8395061728395061,
+      "delayed_copy_length128_primary_range": [
+        0.11971028645833333,
+        0.12703450520833334
+      ],
+      "selective_copy_length256_primary": 0.09423828125,
+      "mqar_load16_noncollision_primary": 0.3111979166666667,
+      "multi_bank_6_full_primary": 0.3268229166666667
+    },
+    "gated_correction": {
+      "state_machine_composition": "perfect at depths 1,2,3,4,8,16",
+      "role_filler_heldout_primary": 0.9777777777777777,
+      "role_filler_heldout_exact": 0.8909465020576132,
+      "delayed_copy_length128_primary_range": [
+        0.15087890625,
+        0.15804036458333334
+      ],
+      "selective_copy_length256_primary": 0.11376953125,
+      "mqar_load16_noncollision_primary": 0.3919270833333333,
+      "multi_bank_6_full_primary": 0.3754340277777778
+    },
+    "gated_correction_bounded_exact_recall": {
+      "mqar_all_cells_primary": 1,
+      "mqar_all_cells_exact": 1,
+      "overwrite_all_cells_primary": 1,
+      "overwrite_all_cells_exact": 1,
+      "role_filler_all_cells_primary": 1,
+      "role_filler_all_cells_exact": 1,
+      "state_machine_all_cells_primary": 1,
+      "state_machine_all_cells_exact": 1,
+      "delayed_copy_length16_all_delays_primary": 1,
+      "delayed_copy_length32_primary_range": [
+        0.5641276041666666,
+        0.5758463541666666
+      ],
+      "delayed_copy_length128_primary_range": [
+        0.21826171875,
+        0.22444661458333334
+      ],
+      "selective_copy_length256_primary": 0.14713541666666666,
+      "multi_bank_4_full_primary": 1,
+      "multi_bank_4_full_exact": 1,
+      "multi_bank_6_half_primary": 1,
+      "multi_bank_6_half_exact": 1,
+      "multi_bank_6_full_primary": 0.7098524305555556,
+      "multi_bank_6_full_exact": 0,
+      "multi_bank_6_full_cross_bank_corruption_rate": 0.11666666666666667
+    }
+  },
+  "interpretation": {
+    "gated_correction": "improves the compact carrier across several interference-heavy tasks but does not solve long exact retention",
+    "bounded_exact_recall": "closes MQAR, overwrite, role/filler, and several multi-bank settings within the 16-entry working-set cap",
+    "capacity_boundary": "performance falls when exact working-set demand exceeds the 16-entry recall cap; this is an architectural capacity boundary, not a reason to silently expand the cap",
+    "next_stage": "advance to byte-level language objective while separately testing selective memory routing and interference-resistant fixed-budget carrier structure"
+  },
+  "activation_authorized": false
+}
