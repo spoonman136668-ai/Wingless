@@ -1,0 +1,63 @@
+{
+  "schema": "wingless.up-lm0d-windows-proof.v1",
+  "experiment": "UP-LM0D-multibinding-language",
+  "status": "qualified-scientific-result",
+  "source_head": "f06b119ef86a28c4b038c82c10cedf645acef908",
+  "workflow_run_id": 36191115902,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10888461066,
+  "artifact_sha256": "a0b333231dd2c8623157acca6c29daa71d885fae0f2cd6ed95410babe2bd0803",
+  "recurrent_state_bytes": 512,
+  "exact_recall_cap": 16,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "recurrent64": {
+    "train": {
+      "accuracy": 0.8993473895582329,
+      "perplexity": 1.464523777621406,
+      "dependent_accuracy": 0.19791666666666666,
+      "query_set_exact": 0
+    },
+    "heldout": {
+      "accuracy": 0.8987198795180723,
+      "perplexity": 1.4679426454847837,
+      "dependent_accuracy": 0.21354166666666666,
+      "query_set_exact": 0
+    },
+    "stream4": {
+      "accuracy": 0.893574297188755,
+      "perplexity": 1.480644969241942,
+      "dependent_accuracy": 0.21354166666666666,
+      "query_set_exact": 0
+    }
+  },
+  "syntax_recall16": {
+    "train": {
+      "accuracy": 0.9186746987951807,
+      "perplexity": 1.3999303961139569,
+      "dependent_accuracy": 1,
+      "query_set_exact": 1,
+      "max_recall_entries": 4
+    },
+    "heldout": {
+      "accuracy": 0.9176706827309237,
+      "perplexity": 1.4039390996137404,
+      "dependent_accuracy": 1,
+      "query_set_exact": 1,
+      "max_recall_entries": 4
+    },
+    "stream4": {
+      "accuracy": 0.9125251004016064,
+      "perplexity": 1.4160875735236431,
+      "dependent_accuracy": 1,
+      "query_set_exact": 1,
+      "max_recall_entries": 4
+    }
+  },
+  "interpretation": {
+    "multi_binding_language_recall_supported": true,
+    "bounded_memory_not_yet_capacity_limited": true,
+    "next_stage": "test mutable language bindings with overwrite/latest-value-wins and delayed reports under the same 16-entry cap"
+  },
+  "activation_authorized": false
+}
