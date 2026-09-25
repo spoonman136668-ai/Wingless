@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up-lm0b-windows-proof.v1",
+  "experiment": "UP-LM0B-long-dependency-byte",
+  "status": "qualified-scientific-result",
+  "source_head": "f3c82d54036a0e819666d10ce4e0173ca3ff45d3",
+  "workflow_run_id": 36186419249,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10886560086,
+  "artifact_sha256": "8141eca6241fce347ac87b2223d5b93903d4de99c64416dd28522fdfc226f23e",
+  "state_dimension": 64,
+  "epochs": 20,
+  "learning_rate": 0.08,
+  "recurrent64": {
+    "train": {
+      "accuracy": 0.8903409090909091,
+      "perplexity": 1.6304671836303675,
+      "dependent_accuracy": 0.13541666666666666,
+      "dependent_perplexity": 7.182577461696724
+    },
+    "heldout": {
+      "accuracy": 0.893560606060606,
+      "perplexity": 1.6341796912972009,
+      "dependent_accuracy": 0.2708333333333333,
+      "dependent_perplexity": 6.88506622376524
+    },
+    "heldout_stream4": {
+      "accuracy": 0.8708333333333333,
+      "perplexity": 1.7015502098904187,
+      "dependent_accuracy": 0.2708333333333333,
+      "dependent_perplexity": 6.885243790228004
+    }
+  },
+  "bigram": {
+    "heldout": {
+      "accuracy": 0.41363636363636364,
+      "perplexity": 4.564328700473829,
+      "dependent_accuracy": 0.16666666666666666,
+      "dependent_perplexity": 14.216321911466599
+    }
+  },
+  "interpretation": {
+    "surface_language_objective_generalizes": true,
+    "long_dependency_signal_above_bigram": true,
+    "long_dependency_not_solved": true,
+    "next_stage": "test bounded syntax-routed memory augmentation at unchanged 16-entry cap before attempting learned routing"
+  },
+  "activation_authorized": false
+}
