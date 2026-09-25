@@ -28,6 +28,7 @@ The write rule is identical across arms before optional correction / exact recal
 ## Gated-correction arm
 
 - endogenous confidence is the normalized decoder margin between the intended new value and the strongest competing value immediately after the base write;
+- normalized margin = (intended_score - strongest_competing_score) / max(1, abs(intended_score) + abs(strongest_competing_score));
 - frozen correction threshold: 0.15;
 - if the intended margin is below 0.15, exactly one additional copy of the intended key/value vector is added;
 - no repeated correction loop is permitted;
