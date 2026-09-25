@@ -40,11 +40,11 @@ Active keys:
 
 For each episode:
 1. store one value for every active key;
-2. choose a deterministic 16-key hot set;
+2. choose the deterministic hot set as the even-numbered original keys and the cold control as the odd-numbered original keys (12/12 when active_keys=24; 16/16 when active_keys=32);
 3. issue one rehearsal query to every hot key;
 4. append churn writes to 8 or 16 previously unseen keys, forcing eviction;
-5. final-query the 16 hot keys;
-6. final-query an equally sized deterministic cold-set subset drawn from non-hot original keys.
+5. final-query the complete hot set;
+6. final-query the equally sized cold control.
 
 Value vocabulary: 32.
 64 episodes per setting.
