@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.up-lm0g-windows-proof.v1",
+  "experiment": "UP-LM0G-domain-trained-admission",
+  "status": "qualified-scientific-result",
+  "source_head": "4fa6ad7e186411d51d77d7d6f70f2e5e59e513bb",
+  "workflow_run_id": 36200234693,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10891228004,
+  "artifact_sha256": "115729fdba7356c43bc55f40a35cc4a65fedf923de26dbc39f119bae42a7faf5",
+  "recurrent_state_bytes": 512,
+  "exact_recall_cap": 16,
+  "classifier_epochs": 20,
+  "classifier_learning_rate": 0.08,
+  "classifier_threshold": 0.5,
+  "explicit_type_at_learned_inference": false,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "classifier": {
+    "train_accuracy": 1,
+    "heldout_recombination_accuracy": 1,
+    "train_precision": 1,
+    "train_recall": 1,
+    "heldout_precision": 1,
+    "heldout_recall": 1
+  },
+  "learned_matches_explicit": {
+    "train_top1": 0.9027643455834945,
+    "heldout_top1": 0.8986137975499677,
+    "heldout_stream4_top1": 0.8944229529335912,
+    "heldout_perplexity": 2.0313490879607876,
+    "heldout_stream4_perplexity": 2.045976160260242,
+    "dependent_first_byte_accuracy": 1,
+    "query_set_exact_accuracy": 1,
+    "admission_precision": 1,
+    "admission_recall": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "natural_domain_training_closes_lm0f_transfer_failure": true,
+    "learned_admission_matches_explicit_on_tested_domain": true,
+    "tested_lexical_domain_is_small": true,
+    "next_stage": "hold out entire lexical surface families and increase stream diversity without changing recurrent state or exact recall budgets"
+  },
+  "activation_authorized": false
+}
