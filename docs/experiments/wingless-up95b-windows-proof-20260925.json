@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up95b-windows-proof.v1",
+  "experiment": "UP-95B-local-event-classifier",
+  "status": "qualified-scientific-result",
+  "source_head": "ad1b5b408b290ef4ac8f019810ad2d92424358bf",
+  "workflow_run_id": 36193134564,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10889346389,
+  "artifact_sha256": "62ccea79052b69cccdec340f7b8baeb3664e583b27e2538b158ae8441c3dfc2d",
+  "state_dimension": 64,
+  "classifier_epochs": 20,
+  "learning_rate": 0.08,
+  "decision_threshold": 0.5,
+  "exact_recall_cap": 16,
+  "recurrent_state_bytes": 512,
+  "classifier": {
+    "train": {
+      "accuracy": 1,
+      "precision": 1,
+      "recall": 1,
+      "examples": 1536
+    },
+    "heldout_keys": {
+      "accuracy": 1,
+      "precision": 1,
+      "recall": 1,
+      "examples": 512
+    }
+  },
+  "routing": {
+    "explicit_store_type": "perfect query/exact/admission precision/admission recall across all tested cells",
+    "learned_local_classifier": "identical perfect query/exact/admission precision/admission recall across all tested cells"
+  },
+  "interpretation": {
+    "learned_local_event_recognition_supported": true,
+    "exact_surface_form_generalization_across_heldout_keys_supported": true,
+    "next_stage": "test surface-form and lexical recombination generalization rather than repeating exact stores/observes phrasing"
+  },
+  "activation_authorized": false
+}
