@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.up-lm0c-windows-proof.v1",
+  "experiment": "UP-LM0C-syntax-routed-recall",
+  "status": "qualified-scientific-result",
+  "source_head": "e3428beb4ce2a48b6cecd16a7bc2e88ae0ad43ac",
+  "workflow_run_id": 36189813465,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10886899349,
+  "artifact_sha256": "942c4abad0e3c12c632fe434380e98a53459105f1721e6398aef653d8356b6f7",
+  "recurrent_state_bytes": 512,
+  "exact_recall_cap": 16,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "recurrent64": {
+    "heldout_accuracy": 0.893560606060606,
+    "heldout_perplexity": 1.6341796912972009,
+    "dependent_accuracy": 0.2708333333333333,
+    "dependent_perplexity": 6.88506622376524
+  },
+  "syntax_recall16": {
+    "train": {
+      "accuracy": 0.906060606060606,
+      "perplexity": 1.5730529051816253,
+      "dependent_accuracy": 1,
+      "dependent_perplexity": 1,
+      "max_recall_entries": 1
+    },
+    "heldout": {
+      "accuracy": 0.9068181818181819,
+      "perplexity": 1.5778478264012596,
+      "dependent_accuracy": 1,
+      "dependent_perplexity": 1,
+      "max_recall_entries": 1
+    },
+    "stream4": {
+      "accuracy": 0.884090909090909,
+      "perplexity": 1.6428952431467971,
+      "dependent_accuracy": 1,
+      "dependent_perplexity": 1,
+      "max_recall_entries": 1
+    }
+  },
+  "interpretation": {
+    "bounded_syntax_routed_memory_closes_tested_long_dependency": true,
+    "recurrent_surface_model_preserved": true,
+    "next_stage": "scale to multiple simultaneous language bindings and multiple delayed queries under the same 16-entry cap"
+  },
+  "activation_authorized": false
+}
