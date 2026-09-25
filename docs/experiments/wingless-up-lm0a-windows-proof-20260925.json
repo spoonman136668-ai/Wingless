@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.up-lm0a-windows-proof.v1",
+  "experiment": "UP-LM0A-byte-microlanguage",
+  "status": "qualified-scientific-result",
+  "source_up_sq0_seal": "8de9e11f26cc44c75f51d26cb606f97e35816479",
+  "source_head": "2880103701d5fc435b643162c5b143a2f3355ca6",
+  "workflow_run_id": 36184176182,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10885077075,
+  "artifact_sha256": "9a441e619287eb000ddc133b1c46e4411f2958634213b1680ac43fd4c7f44483",
+  "state_dimension": 64,
+  "epochs": 20,
+  "learning_rate": 0.08,
+  "train_sentences": 96,
+  "heldout_sentences": 48,
+  "attention_used": false,
+  "exact_recall_used": false,
+  "pretrained_weights": false,
+  "recurrent64": {
+    "train": {
+      "accuracy": 0.8591703056768559,
+      "cross_entropy": 0.6622794841746162,
+      "perplexity": 1.939207693368046
+    },
+    "heldout_recombination": {
+      "accuracy": 0.8668122270742358,
+      "cross_entropy": 0.6678730635599748,
+      "perplexity": 1.9500851992806294
+    },
+    "heldout_stream4": {
+      "accuracy": 0.8307860262008734,
+      "cross_entropy": 0.7697313301377847,
+      "perplexity": 2.159186067625851
+    }
+  },
+  "bigram_mle": {
+    "train": {
+      "accuracy": 0.44541484716157204,
+      "cross_entropy": 1.306961293004053,
+      "perplexity": 3.694928829826787
+    },
+    "heldout_recombination": {
+      "accuracy": 0.44541484716157204,
+      "cross_entropy": 1.3069612930040548,
+      "perplexity": 3.694928829826793
+    },
+    "heldout_stream4": {
+      "accuracy": 0.44541484716157204,
+      "cross_entropy": 1.3069612930040548,
+      "perplexity": 3.694928829826793
+    }
+  },
+  "interpretation": {
+    "recurrent_sequence_state_materially_outperforms_bigram_baseline": true,
+    "structural_recombination_generalizes": true,
+    "four_sentence_stream_retains_substantial_performance": true,
+    "real_language_claim": false,
+    "next_stage": "advance to larger byte-level corpus and explicit factual/retrieval language tasks while preserving bounded memory architecture"
+  },
+  "activation_authorized": false
+}
