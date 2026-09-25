@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up78c-windows-proof.v1",
+  "experiment": "UP-78C-marginal-impact-routing",
+  "status": "qualified-scientific-result",
+  "source_head": "351a740b19736f157630fb760d6a186f93d7c1e0",
+  "workflow_run_id": 36193137559,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10889017166,
+  "artifact_sha256": "1a0e9bb116c9cfd1c5de03c4d1640081b4f2892bc835b5f481956c5270b81b10",
+  "recurrent_state_bytes": 512,
+  "exact_recall_used": false,
+  "persistent_route_table": false,
+  "findings": {
+    "marginal_impact_nearly_identical_to_mixed_norm": true,
+    "fixed_mod8_outperforms_both_dynamic_arms_across_reported_families": true,
+    "examples": {
+      "fixed_banks8_full": 0.36083984375,
+      "mixed_norm_banks8_full": 0.3024088541666667,
+      "marginal_banks8_full": 0.3025716145833333,
+      "fixed_assoc32": 0.2630208333333333,
+      "mixed_norm_assoc32": 0.203125,
+      "marginal_assoc32": 0.203125,
+      "fixed_overwrite64": 0.6380208333333334,
+      "mixed_norm_overwrite64": 0.474609375,
+      "marginal_overwrite64": 0.474609375
+    }
+  },
+  "interpretation": {
+    "dynamic_two_choice_line_closed": true,
+    "downstream_carrier_geometry": "fixed_mod8",
+    "next_stage": "pivot C from dynamic routing to bounded exact-memory eviction under oversubscription"
+  },
+  "activation_authorized": false
+}
