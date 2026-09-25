@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up96b-windows-proof.v1",
+  "experiment": "UP-96B-surface-generalization",
+  "status": "qualified-scientific-result",
+  "source_head": "e528d7db5780aed9ca3bb0ba95d1754b7464dde6",
+  "workflow_run_id": 36198963722,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10891201420,
+  "artifact_sha256": "acbb86ae8dd7c0096255814ba0159bf2a68502293cbdb3230a3a1c912a9a6a30",
+  "state_dimension": 64,
+  "classifier_epochs": 20,
+  "learning_rate": 0.08,
+  "decision_threshold": 0.5,
+  "exact_recall_cap": 16,
+  "classifier": {
+    "train": {
+      "accuracy": 1,
+      "precision": 1,
+      "recall": 1,
+      "examples": 4608
+    },
+    "heldout_recombination": {
+      "accuracy": 1,
+      "precision": 1,
+      "recall": 1,
+      "examples": 1536
+    },
+    "per_verb": {
+      "stores": 1,
+      "keeps": 1,
+      "holds": 1,
+      "observes": 1,
+      "sees": 1,
+      "notes": 1
+    }
+  },
+  "routing": {
+    "explicit_event_class": "perfect query/exact/admission precision/recall across all tested cells",
+    "learned_surface_classifier": "identical perfect performance across all tested cells"
+  },
+  "interpretation": {
+    "multi_verb_surface_recombination_supported": true,
+    "synthetic_event_domain_closed_for_binary_store_vs_observe": true,
+    "next_stage": "test three-way store/observe/report classification on natural lexical clauses to reduce hand-coded query/store syntax"
+  },
+  "activation_authorized": false
+}
