@@ -67,3 +67,12 @@ This experiment does not seek one universally best eviction rule. It establishes
 ## Bounds
 
 No future-query labels, no capacity increase, no adaptive policy selection, no attention, no result-informed retry, no production authority, no live activation.
+
+
+## Frozen byte accounting
+
+- exact entry payload accounting: 16 bytes per occupied entry, matching the prior bounded-recall accounting;
+- full 16-entry payload budget: 256 bytes;
+- FIFO policy metadata: 16 bytes total for fixed-array head/count bookkeeping;
+- LRU policy metadata: 8-byte monotonic counter plus 8-byte last-touch stamp per capacity slot = 136 bytes;
+- reported total bounded-memory bytes = occupied payload bytes + frozen policy metadata bytes.
