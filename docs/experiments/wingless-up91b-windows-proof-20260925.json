@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.up91b-windows-proof.v1",
+  "experiment": "UP-91B-selective-recall-routing",
+  "status": "qualified-scientific-result",
+  "source_up_sq0_seal": "8de9e11f26cc44c75f51d26cb606f97e35816479",
+  "source_head": "d17ca92473e84e20ef4d78338fed586f8cba87f9",
+  "workflow_run_id": 36184310092,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10886141162,
+  "artifact_sha256": "f6fd5063215bd41b499b863e9365bf8d50f1e3974c7bc437d7da4e1880827ab0",
+  "exact_recall_cap": 16,
+  "recurrent_state_bytes": 512,
+  "findings": {
+    "selective_copy": {
+      "fifo_all_writes": {
+        "length32_query_accuracy": 0.5703125,
+        "length64_query_accuracy": 0.35009765625,
+        "length128_query_accuracy": 0.217529296875,
+        "length256_query_accuracy": 0.1431884765625
+      },
+      "salience_only": {
+        "length32": {
+          "query_accuracy": 1,
+          "exact_query_set_accuracy": 1,
+          "recall_entries": 8
+        },
+        "length64": {
+          "query_accuracy": 1,
+          "exact_query_set_accuracy": 1,
+          "recall_entries": 16
+        },
+        "length128": {
+          "query_accuracy": 0.539306640625,
+          "exact_query_set_accuracy": 0,
+          "recall_entries": 16
+        },
+        "length256": {
+          "query_accuracy": 0.3026123046875,
+          "exact_query_set_accuracy": 0,
+          "recall_entries": 16
+        }
+      }
+    },
+    "sparse_query_distractor_stream": {
+      "fifo_all_writes": "degrades sharply as distractor count grows; exact query-set accuracy is 0 in all tested cells except writes=32,salient=16",
+      "salience_only": "query_accuracy=1 and exact_query_set_accuracy=1 for every tested combination of writes 32/64/128/256 and salient set 4/8/16"
+    }
+  },
+  "interpretation": {
+    "local_salience_routing_supported": true,
+    "bounded_memory_can_ignore_large_distractor_context": true,
+    "hard_capacity_boundary_remains_when_salient_items_exceed_16": true,
+    "exact_recall_cap_changed": false,
+    "next_stage": "carry explicit learned-or-derived salience routing into language/retrieval experiments without increasing exact-recall capacity"
+  },
+  "activation_authorized": false
+}
