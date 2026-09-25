@@ -1,0 +1,67 @@
+{
+  "schema": "wingless.up79c-windows-proof.v1",
+  "experiment": "UP-79C-bounded-eviction-policy",
+  "status": "qualified-scientific-result",
+  "source_head": "473b7484ec4938d84bb33071ef18e5663ead4371",
+  "workflow_run_id": 36198966794,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10891690913,
+  "artifact_sha256": "edddf0d360ea9acd81132159b8c110c80869610fe6707f70e62f94884f3af599",
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "future_oracle_used": false,
+  "findings": {
+    "fifo": {
+      "active24_churn8": {
+        "hot": 0.3333333333333333,
+        "cold": 0.3333333333333333,
+        "total_bytes": 272
+      },
+      "active24_churn16": {
+        "hot": 0,
+        "cold": 0,
+        "total_bytes": 272
+      },
+      "active32_churn8": {
+        "hot": 0.25,
+        "cold": 0.25,
+        "total_bytes": 272
+      },
+      "active32_churn16": {
+        "hot": 0,
+        "cold": 0,
+        "total_bytes": 272
+      }
+    },
+    "lru": {
+      "active24_churn8": {
+        "hot": 0.6666666666666666,
+        "cold": 0,
+        "total_bytes": 392
+      },
+      "active24_churn16": {
+        "hot": 0,
+        "cold": 0,
+        "total_bytes": 392
+      },
+      "active32_churn8": {
+        "hot": 0.5,
+        "cold": 0,
+        "total_bytes": 392
+      },
+      "active32_churn16": {
+        "hot": 0,
+        "cold": 0,
+        "total_bytes": 392
+      }
+    }
+  },
+  "interpretation": {
+    "access_locality_has_value": true,
+    "lru_improves_hot_retention_at_moderate_churn": true,
+    "full_oversubscription_still_erases_rehearsed_set": true,
+    "metadata_cost_high": true,
+    "next_stage": "test low-metadata second-chance/CLOCK against FIFO and LRU under identical oversubscription"
+  },
+  "activation_authorized": false
+}
