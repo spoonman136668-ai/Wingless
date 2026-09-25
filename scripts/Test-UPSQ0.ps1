@@ -64,7 +64,7 @@ try{
  foreach($M in $R.Metrics){
    Write-Host "arm=$($M.Arm) family=$($M.Family) setting=$($M.Setting) primary=$($M.PrimaryAccuracy) secondary=$($M.SecondaryAccuracy) tertiary=$($M.TertiaryMetric):$($M.TertiaryValue) recall_bytes=$($M.ExactRecallBytes) events_per_sec=$($M.EventsPerSecond)"
  }
- Write-Host 'WINGLESS_UPSQ0_HARNESS_PASS'
+ Write-Host 'WINGLESS_UP90_HARNESS_PASS'
 }finally{
  Pop-Location
  if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache}
