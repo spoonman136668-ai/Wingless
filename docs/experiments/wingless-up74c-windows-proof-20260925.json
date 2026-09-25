@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up74c-windows-proof.v1",
+  "experiment": "UP-74C-partitioned-carrier",
+  "status": "qualified-scientific-result",
+  "source_up_sq0_seal": "8de9e11f26cc44c75f51d26cb606f97e35816479",
+  "source_head": "7f60b66525befe71cb0039d23a1ce54e51d4b2e7",
+  "workflow_run_id": 36184493441,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10885167705,
+  "artifact_sha256": "84e5e512de04c676f9f02fbc2efcf38f5501950567a99979fed4e9c3331514c1",
+  "recurrent_state_bytes": 512,
+  "exact_recall_used": false,
+  "findings": {
+    "multi_bank_interference": {
+      "partition4x16_improves_primary_all_six_settings": true,
+      "partition4x16_reduces_cross_bank_corruption_all_six_settings": true,
+      "flat64_banks8_full_primary": 0.3268229166666667,
+      "partition4x16_banks8_full_primary": 0.3351236979166667,
+      "flat64_banks8_full_cross": 0.5994466145833334,
+      "partition4x16_banks8_full_cross": 0.5646275111607143
+    },
+    "associative_recall": {
+      "flat64_load8_primary": 0.515625,
+      "partition4x16_load8_primary": 0.6145833333333334,
+      "flat64_load16_primary": 0.3763020833333333,
+      "partition4x16_load16_primary": 0.4296875,
+      "flat64_load32_primary": 0.24869791666666666,
+      "partition4x16_load32_primary": 0.2825520833333333
+    },
+    "overwrite": {
+      "flat64_writes16_primary": 0.6985677083333334,
+      "partition4x16_writes16_primary": 0.8001302083333334,
+      "flat64_writes64_primary": 0.5755208333333334,
+      "partition4x16_writes64_primary": 0.6087239583333334
+    }
+  },
+  "interpretation": {
+    "fixed_budget_partitioning_supported": true,
+    "high_load_interference_not_solved": true,
+    "state_budget_changed": false,
+    "next_stage": "test local two-choice partition routing using the same four 16-dimensional partitions and the same total 512-byte state"
+  },
+  "activation_authorized": false
+}
