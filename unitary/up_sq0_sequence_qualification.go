@@ -36,7 +36,7 @@ type UPSQ0Metric struct {
 }
 
 type UPSQ0SequenceQualificationResult struct {
-	Schema                 string
+	Schema                 string `json:"schema"`
 	Experiment             string
 	ImplementationFreeze   string
 	GeneratorSeedBases     []int
