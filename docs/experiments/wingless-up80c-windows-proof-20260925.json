@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up80c-windows-proof.v1",
+  "experiment": "UP-80C-second-chance-eviction",
+  "status": "qualified-scientific-result",
+  "source_head": "337c187b5c918cd5724c6969a21326a621ca31a9",
+  "workflow_run_id": 36200240546,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10891167987,
+  "artifact_sha256": "004a4934a6daaff9ccc94eb752f585b1ec47d3aaa96340a0977dc7779c21fadf",
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "future_oracle_used": false,
+  "moderate_churn": {
+    "fifo_active24_hot": 0.3333333333333333,
+    "lru_active24_hot": 0.6666666666666666,
+    "clock_active24_hot": 0.3333333333333333,
+    "fifo_active32_hot": 0.25,
+    "lru_active32_hot": 0.5,
+    "clock_active32_hot": 0.25
+  },
+  "full_churn": {
+    "fifo_hot": 0,
+    "lru_hot": 0,
+    "clock_hot": 0
+  },
+  "metadata_bytes": {
+    "fifo": 16,
+    "lru": 136,
+    "clock_second_chance": 3
+  },
+  "total_bounded_memory_bytes": {
+    "fifo": 272,
+    "lru": 392,
+    "clock_second_chance": 259
+  },
+  "interpretation": {
+    "clock_reduces_metadata": true,
+    "clock_matches_fifo_not_lru_on_locality": true,
+    "one_bit_second_chance_insufficient": true,
+    "full_oversubscription_boundary_persists": true,
+    "next_stage": "test a preregistered tiny multi-level aging signal under the same fixed 16-entry budget and identical oversubscription"
+  },
+  "activation_authorized": false
+}
