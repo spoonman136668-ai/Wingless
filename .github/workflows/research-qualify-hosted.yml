@@ -1,5 +1,5 @@
 name: Wingless hosted research qualification
-run-name: Wingless hosted qualification ${{ inputs.dispatch_token }}
+run-name: Wingless research ${{ inputs.research_ref }} [${{ inputs.dispatch_id }}]
 
 on:
   workflow_dispatch:
@@ -8,8 +8,8 @@ on:
         description: Exact Wingless research branch to qualify
         required: true
         type: string
-      dispatch_token:
-        description: Deterministic CKB-plane dispatch identity
+      dispatch_id:
+        description: Exact CKB-plane research dispatch identity
         required: true
         type: string
 
@@ -38,9 +38,13 @@ jobs:
         shell: powershell
         env:
           WINGLESS_EXPECTED_REF: ${{ inputs.research_ref }}
-          WINGLESS_DISPATCH_TOKEN: ${{ inputs.dispatch_token }}
+          WINGLESS_DISPATCH_ID: ${{ inputs.dispatch_id }}
         run: |
           $ErrorActionPreference = 'Stop'
+
+          if ($env:WINGLESS_DISPATCH_ID -notmatch '^[0-9a-f]{64}$') {
+            throw "WINGLESS_HOSTED_QUAL_DISPATCH_ID_INVALID: $env:WINGLESS_DISPATCH_ID"
+          }
 
           $RequestPath = '.wingless/qualification-request.json'
           if (-not (Test-Path -LiteralPath $RequestPath -PathType Leaf)) {
@@ -60,9 +64,6 @@ jobs:
           if ([string]$Request.branch -notlike 'research/wingless-up*') {
             throw "WINGLESS_HOSTED_QUAL_BRANCH_NOT_AUTOMATION_COMPATIBLE: $($Request.branch)"
           }
-          if ($env:WINGLESS_DISPATCH_TOKEN -notmatch '^wingless-[a-f0-9]{32}$') {
-            throw "WINGLESS_HOSTED_QUAL_DISPATCH_TOKEN_INVALID: $env:WINGLESS_DISPATCH_TOKEN"
-          }
 
           # workflow_dispatch runs under the workflow control ref (normally main),
           # while actions/checkout above intentionally switches the worktree to the
@@ -76,11 +77,19 @@ jobs:
             -OutputDirectory "$env:RUNNER_TEMP\wingless-research-qualification" `
             -GuardWaitMinutes 0
 
+          $SummaryPath = "$env:RUNNER_TEMP\wingless-research-qualification\summary.json"
+          if (-not (Test-Path -LiteralPath $SummaryPath -PathType Leaf)) {
+            throw "WINGLESS_HOSTED_QUAL_SUMMARY_MISSING: $SummaryPath"
+          }
+          $Summary = Get-Content -LiteralPath $SummaryPath -Raw | ConvertFrom-Json
+          $Summary | Add-Member -NotePropertyName dispatch_id -NotePropertyValue $env:WINGLESS_DISPATCH_ID -Force
+          $Summary | ConvertTo-Json -Depth 100 | Set-Content -Encoding UTF8 -LiteralPath $SummaryPath
+
       - name: Upload qualification evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: wingless-hosted-${{ inputs.dispatch_token }}-${{ github.run_attempt }}
+          name: wingless-hosted-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/wingless-research-qualification/
           if-no-files-found: warn
           retention-days: 30
