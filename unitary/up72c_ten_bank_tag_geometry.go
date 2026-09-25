@@ -14,6 +14,7 @@ type UP72CTagGeometryPoint struct {
 	MinimumMargin          float64 `json:"minimum_margin"`
 	MagnitudeValueAccuracy float64 `json:"magnitude_value_accuracy"`
 	Gate                   bool    `json:"gate"`
+	EvaluationError        string  `json:"evaluation_error,omitempty"`
 }
 
 type UP72CTenBankTagGeometryResult struct {
@@ -68,8 +69,18 @@ func RunUP72C()(UP72CTenBankTagGeometryResult,error){
 	schedules:=[]int{115000000,116000000};noises:=[]float64{0,0.001,0.002,0.004};families:=[]string{"golden_rotation","uniform_phase"}
 	result:=UP72CTenBankTagGeometryResult{Schema:UP72CTenBankTagGeometrySchema,Experiment:"UP-72C-ten-bank-tag-geometry",SourceUP70CSeal:"52af265b43b4074e62bdc3836ab68c7d90e58452",StateDimension:16,Banks:10,ScheduleBases:append([]int(nil),schedules...),NoiseLevels:append([]float64(nil),noises...),TagFamilies:append([]string(nil),families...),SelectionPerformed:false}
 	for _,seedBase:=range schedules{for _,noise:=range noises{
-		p,err:=up72cEvaluate("golden_rotation",up57cGoldenTags(10),noise,seedBase);if err!=nil{return UP72CTenBankTagGeometryResult{},err};result.Points=append(result.Points,p)
-		p,err=up72cEvaluate("uniform_phase",up72cUniformTags(10),noise,seedBase);if err!=nil{return UP72CTenBankTagGeometryResult{},err};result.Points=append(result.Points,p)
+		p,err:=up72cEvaluate("golden_rotation",up57cGoldenTags(10),noise,seedBase)
+		if err!=nil{
+			result.Points=append(result.Points,UP72CTagGeometryPoint{TagFamily:"golden_rotation",ScheduleBase:seedBase,Banks:10,MemoryNoise:noise,Gate:false,EvaluationError:err.Error()})
+		}else{
+			result.Points=append(result.Points,p)
+		}
+		p,err=up72cEvaluate("uniform_phase",up72cUniformTags(10),noise,seedBase)
+		if err!=nil{
+			result.Points=append(result.Points,UP72CTagGeometryPoint{TagFamily:"uniform_phase",ScheduleBase:seedBase,Banks:10,MemoryNoise:noise,Gate:false,EvaluationError:err.Error()})
+		}else{
+			result.Points=append(result.Points,p)
+		}
 	}}
 	return result,nil
 }
