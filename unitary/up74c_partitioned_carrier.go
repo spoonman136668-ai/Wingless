@@ -166,11 +166,24 @@ func up74cMultiBank(arm string, banks int, load float64, seedBases []int) UP74CP
 	if crossTotal>0 {rate=float64(crossErr)/float64(crossTotal)}
 	return UP74CPartitionedCarrierPoint{
 		Arm:arm,Family:"multi_bank_interference",
-		Setting:"banks="+itoa(banks)+",load="+formatLoad(load),
+		Setting:"banks="+up74cItoa(banks)+",load="+formatLoad(load),
 		PrimaryAccuracy:float64(hits)/float64(total),
 		ExactEpisodeAccuracy:float64(exactHits)/float64(episodes),
 		CrossBankCorruptionRate:rate,RecurrentStateBytes:512,
 	}
+}
+
+func up74cItoa(v int) string {
+	if v == 0 { return "0" }
+	var buf [24]byte
+	i := len(buf)
+	n := v
+	for n > 0 {
+		i--
+		buf[i] = byte('0' + n%10)
+		n /= 10
+	}
+	return string(buf[i:])
 }
 
 func formatLoad(v float64) string {
@@ -202,7 +215,7 @@ func up74cAssociative(arm string, load int, seedBases []int) UP74CPartitionedCar
 		}
 	}
 	return UP74CPartitionedCarrierPoint{
-		Arm:arm,Family:"associative_recall",Setting:"load="+itoa(load),
+		Arm:arm,Family:"associative_recall",Setting:"load="+up74cItoa(load),
 		PrimaryAccuracy:float64(hits)/float64(total),
 		ExactEpisodeAccuracy:float64(exactHits)/float64(episodes),
 		RecurrentStateBytes:512,
@@ -233,7 +246,7 @@ func up74cOverwrite(arm string, writes int, seedBases []int) UP74CPartitionedCar
 		}
 	}
 	return UP74CPartitionedCarrierPoint{
-		Arm:arm,Family:"overwrite_latest_value_wins",Setting:"writes="+itoa(writes),
+		Arm:arm,Family:"overwrite_latest_value_wins",Setting:"writes="+up74cItoa(writes),
 		PrimaryAccuracy:float64(hits)/float64(total),
 		ExactEpisodeAccuracy:float64(exactHits)/float64(episodes),
 		RecurrentStateBytes:512,
