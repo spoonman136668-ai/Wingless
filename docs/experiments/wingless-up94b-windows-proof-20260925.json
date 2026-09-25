@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.up94b-windows-proof.v1",
+  "experiment": "UP-94B-event-structured-routing",
+  "status": "qualified-scientific-result",
+  "source_head": "0151c464e4fb91024bdceeb5655077ba29467e1f",
+  "workflow_run_id": 36191119208,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10888635893,
+  "artifact_sha256": "b0537f5c9298f2d4644a08b2cf69646100859297c1fd38181031e5b728c965b9",
+  "exact_recall_cap": 16,
+  "recurrent_state_bytes": 512,
+  "external_salience_bit": false,
+  "findings": {
+    "structured_store_only": "query_accuracy=1 and exact_target_set_accuracy=1 for every tested writes/targets combination; precision=1 recall=1 false positives=0",
+    "structure_plus_change": {
+      "precision": 1,
+      "query_accuracy_range": [
+        0.9658203125,
+        0.978515625
+      ],
+      "exact_accuracy_range": [
+        0.578125,
+        0.9140625
+      ],
+      "admission_recall_range": [
+        0.8291015625,
+        0.93798828125
+      ]
+    }
+  },
+  "interpretation": {
+    "event_structure_is_sufficient_for_reliable_admission": true,
+    "extra_generic_change_filter_hurts_recall": true,
+    "next_stage": "test whether event type can be inferred from local byte context by a small frozen classifier rather than supplied as an explicit event label"
+  },
+  "activation_authorized": false
+}
