@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.up75c-windows-proof.v1",
+  "experiment": "UP-75C-two-choice-partition-routing",
+  "status": "qualified-scientific-result",
+  "source_head": "272261e0e5c3b8b3f8885fbe926f071ca16bacbb",
+  "workflow_run_id": 36186432166,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10886500199,
+  "artifact_sha256": "f252ce230813fad3abe975e84cd8c8d7511d47c04ebd8e6874d2b904cdc3e566",
+  "recurrent_state_bytes": 512,
+  "exact_recall_used": false,
+  "persistent_route_table": false,
+  "findings": {
+    "two_choice_norm_worse_than_fixed_mod4_all_reported_families": true,
+    "fixed_mod4_examples": {
+      "banks8_full_primary": 0.3380533854166667,
+      "associative_load32_primary": 0.22916666666666666,
+      "overwrite64_primary": 0.603515625
+    },
+    "two_choice_examples": {
+      "banks8_full_primary": 0.22591145833333334,
+      "associative_load32_primary": 0.12890625,
+      "overwrite64_primary": 0.4375
+    }
+  },
+  "interpretation": {
+    "dynamic_norm_based_two_choice_routing_rejected": true,
+    "fixed_partitioning_remains_better_supported": true,
+    "next_stage": "close partition geometry by comparing fixed 2x32,4x16,8x8 layouts at identical 512-byte budget"
+  },
+  "activation_authorized": false
+}
