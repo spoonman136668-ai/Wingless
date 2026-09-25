@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up77c-windows-proof.v1",
+  "experiment": "UP-77C-candidate-decorrelation",
+  "status": "qualified-scientific-result",
+  "source_head": "8e8ad29b0c8b262aa8c2d9fcd5953182f239e7bf",
+  "workflow_run_id": 36191123967,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10888391128,
+  "artifact_sha256": "4b1349435a2fd49e315b0678fc02bf318c9c24d496050f0f80b80378f4a9f5d9",
+  "recurrent_state_bytes": 512,
+  "exact_recall_used": false,
+  "persistent_route_table": false,
+  "findings": {
+    "fixed_mod8_outperforms_every_two_choice_arm_across_all_reported_families": true,
+    "examples": {
+      "fixed_banks8_full": 0.361328125,
+      "adjacent_banks8_full": 0.22542317708333334,
+      "antipodal_banks8_full": 0.23291015625,
+      "mixed_banks8_full": 0.28759765625,
+      "fixed_assoc32": 0.25,
+      "adjacent_assoc32": 0.1484375,
+      "antipodal_assoc32": 0.140625,
+      "mixed_assoc32": 0.19010416666666666,
+      "fixed_overwrite64": 0.6393229166666666,
+      "mixed_overwrite64": 0.4713541666666667
+    }
+  },
+  "interpretation": {
+    "candidate_correlation_not_sufficient_explanation": true,
+    "norm_based_two_choice_routing_rejected_on_frozen_8x8_geometry": true,
+    "next_stage": "single closure test of marginal-impact routing versus fixed_mod8; if negative, freeze dynamic routing out of downstream architecture"
+  },
+  "activation_authorized": false
+}
