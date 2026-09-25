@@ -1,0 +1,43 @@
+{
+  "schema": "wingless.up92b-windows-proof.v1",
+  "experiment": "UP-92B-endogenous-change-routing",
+  "status": "qualified-scientific-result",
+  "source_head": "5c1a47e2000716b6d59e6f147c23b484aeae814b",
+  "workflow_run_id": 36186422335,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10886189404,
+  "artifact_sha256": "4c011ca2c9e314090c6709619092b87535bf21aae162d83814dcc6946a35e85e",
+  "exact_recall_cap": 16,
+  "recurrent_state_bytes": 512,
+  "findings": {
+    "explicit_target_rewrite": "query_accuracy=1 and exact_target_set_accuracy=1 for every tested writes/targets combination",
+    "endogenous_change": {
+      "admission_recall_range": [
+        0.955078125,
+        0.9765625
+      ],
+      "precision_collapses_with_distractors": true,
+      "writes256_targets16": {
+        "query_accuracy": 0.02734375,
+        "exact": 0,
+        "precision": 0.06266029192920242,
+        "recall": 0.96630859375,
+        "false_positive_admissions": 29604
+      },
+      "writes32_targets16": {
+        "query_accuracy": 0.970703125,
+        "exact": 0.609375,
+        "precision": 0.518798955613577,
+        "recall": 0.97021484375,
+        "false_positive_admissions": 1843
+      }
+    }
+  },
+  "interpretation": {
+    "local_change_signal_has_high_recall": true,
+    "raw_change_signal_precision_inadequate": true,
+    "failure_mode": "interference-driven false change detections flood the bounded store",
+    "next_stage": "test confidence-qualified change admission using frozen margin thresholds without selecting one post hoc"
+  },
+  "activation_authorized": false
+}
