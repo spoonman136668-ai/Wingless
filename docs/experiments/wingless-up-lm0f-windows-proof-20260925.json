@@ -1,0 +1,72 @@
+{
+  "schema": "wingless.up-lm0f-windows-proof.v1",
+  "experiment": "UP-LM0F-learned-admission-language",
+  "status": "qualified-scientific-result",
+  "source_head": "c8dc8fdf47aab440ac6704f6a47cd6981d23a0cb",
+  "workflow_run_id": 36198960105,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10891575979,
+  "artifact_sha256": "f09b0cbc714ec4320fa52067ce4d602a1f3a9a969c9bcbcafd7ab8aba1c09702",
+  "recurrent_state_bytes": 512,
+  "exact_recall_cap": 16,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "explicit_store_admission": {
+    "train": {
+      "accuracy": 0.9027643455834945,
+      "perplexity": 2.011399571085838,
+      "dependent_accuracy": 1,
+      "query_set_exact": 1,
+      "precision": 1,
+      "recall": 1
+    },
+    "heldout": {
+      "accuracy": 0.8986137975499677,
+      "perplexity": 2.0313490879607876,
+      "dependent_accuracy": 1,
+      "query_set_exact": 1,
+      "precision": 1,
+      "recall": 1
+    },
+    "stream4": {
+      "accuracy": 0.8944229529335912,
+      "perplexity": 2.045976160260242,
+      "dependent_accuracy": 1,
+      "query_set_exact": 1,
+      "precision": 1,
+      "recall": 1
+    }
+  },
+  "learned_local_admission": {
+    "train": {
+      "accuracy": 0.8913604126370084,
+      "perplexity": 2.7564209909885182,
+      "dependent_accuracy": 0.2630208333333333,
+      "query_set_exact": 0,
+      "precision": 0.46740638002773927,
+      "recall": 0.6105072463768116
+    },
+    "heldout": {
+      "accuracy": 0.8874113475177305,
+      "perplexity": 2.7683051702946657,
+      "dependent_accuracy": 0.2760416666666667,
+      "query_set_exact": 0.041666666666666664,
+      "precision": 0.46814404432132967,
+      "recall": 0.6123188405797102
+    },
+    "stream4": {
+      "accuracy": 0.883220502901354,
+      "perplexity": 2.7882388193719327,
+      "dependent_accuracy": 0.2760416666666667,
+      "query_set_exact": 0.041666666666666664,
+      "precision": 0.46814404432132967,
+      "recall": 0.6123188405797102
+    }
+  },
+  "interpretation": {
+    "cross_domain_classifier_transfer_rejected": true,
+    "failure_mode": "classifier trained on synthetic kXX/vXX event surfaces does not transfer to natural-name/value language clauses",
+    "next_stage": "train/evaluate admission classifier on the same natural lexical domain with structurally held-out name/value combinations, then reintegrate"
+  },
+  "activation_authorized": false
+}
