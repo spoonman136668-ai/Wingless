@@ -1,0 +1,26 @@
+{
+  "schema": "wingless.up93b-windows-proof.v1",
+  "experiment": "UP-93B-confidence-change-routing",
+  "status": "qualified-scientific-result",
+  "source_head": "3b0f01eda8f7c60d4fd272e5340806042a86dc94",
+  "workflow_run_id": 36189816995,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10887831293,
+  "artifact_sha256": "8d43678011944d72215a4a3968a626e98f3d6d4d4165b1f8cc1f84f39766a7a1",
+  "exact_recall_cap": 16,
+  "recurrent_state_bytes": 512,
+  "threshold_selection": false,
+  "findings": {
+    "explicit_target_rewrite": "perfect all tested cells",
+    "raw_change": "high recall but low precision under distractors",
+    "margin_025": "greatly reduces false positives but collapses true-change recall to roughly 6-9%",
+    "margin_050": "nearly eliminates admissions including true positives",
+    "margin_075": "admits no true changes and no false positives"
+  },
+  "interpretation": {
+    "confidence_thresholding_alone_rejected": true,
+    "generic_change_detector_not_sufficient_for_memory_routing": true,
+    "next_stage": "move from generic change detection to event-structured/local syntax routing rather than further threshold ladders"
+  },
+  "activation_authorized": false
+}
