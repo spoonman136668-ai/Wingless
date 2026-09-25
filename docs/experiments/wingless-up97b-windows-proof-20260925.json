@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.up97b-windows-proof.v1",
+  "experiment": "UP-97B-threeway-natural-event",
+  "status": "qualified-scientific-result",
+  "source_head": "62c9d599a0b5bb8721c1e22e174c7bbfaf0badc3",
+  "workflow_run_id": 36200237002,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10891657671,
+  "artifact_sha256": "deac0bc5a78c66547de8543bf79e181ac90772aeb36c1579faca897fae0b47ae",
+  "state_dimension": 64,
+  "epochs": 20,
+  "learning_rate": 0.08,
+  "explicit_class_at_learned_inference": false,
+  "heldout_threeway": {
+    "accuracy": 0.7901234567901234,
+    "store_precision": 0.875,
+    "store_recall": 0.5185185185185185,
+    "observe_precision": 0.7058823529411765,
+    "observe_recall": 0.8888888888888888,
+    "report_precision": 0.8387096774193549,
+    "report_recall": 0.9629629629629629
+  },
+  "lexical_boundary": {
+    "stores_accuracy": 0.1111111111111111,
+    "keeps_accuracy": 0.5555555555555556,
+    "holds_accuracy": 0.8888888888888888
+  },
+  "routing_boundary": {
+    "learned_query_accuracy_range": [
+      0.39453125,
+      0.626953125
+    ],
+    "learned_exact_target_set_accuracy_max": 0.1015625,
+    "explicit_event_class_query_accuracy": 1,
+    "explicit_event_class_exact_target_set_accuracy": 1,
+    "recall_cap": 16
+  },
+  "interpretation": {
+    "threeway_natural_classification_partial_not_closed": true,
+    "store_class_is_primary_failure": true,
+    "learned_semantic_routing_not_yet_reliable": true,
+    "next_stage": "isolate lexical versus class-competition failure with preregistered balanced three-way training and held-out verb-family evaluation"
+  },
+  "activation_authorized": false
+}
