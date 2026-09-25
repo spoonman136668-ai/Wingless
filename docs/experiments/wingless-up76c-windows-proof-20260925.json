@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up76c-windows-proof.v1",
+  "experiment": "UP-76C-partition-granularity",
+  "status": "qualified-scientific-result",
+  "source_head": "a21a64ebcc1ef8a86b4c9016294f82e84efd1d89",
+  "workflow_run_id": 36189820006,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10887169201,
+  "artifact_sha256": "2ac4919ffa56fe7be191fe700aaccc35d120fd42f7a070af0df805c5d2a38126",
+  "recurrent_state_bytes": 512,
+  "exact_recall_used": false,
+  "dynamic_routing_used": false,
+  "findings": {
+    "partition8x8": {
+      "banks6_half_primary": 0.7157118055555556,
+      "banks6_half_cross": 0.1351518361581921,
+      "banks8_full_primary": 0.36083984375,
+      "banks8_full_cross": 0.5074869791666666,
+      "associative16_primary": 0.5221354166666666,
+      "associative32_primary": 0.2864583333333333,
+      "overwrite32_primary": 0.8125,
+      "overwrite64_primary": 0.642578125
+    },
+    "partition4x16": {
+      "banks6_half_primary": 0.5620659722222222,
+      "banks8_full_primary": 0.3444010416666667,
+      "associative16_primary": 0.4375,
+      "associative32_primary": 0.265625,
+      "overwrite32_primary": 0.7291666666666666,
+      "overwrite64_primary": 0.583984375
+    },
+    "partition2x32": {
+      "banks6_half_primary": 0.5442708333333334,
+      "banks8_full_primary": 0.3356119791666667,
+      "associative16_primary": 0.375,
+      "associative32_primary": 0.23697916666666666,
+      "overwrite32_primary": 0.689453125,
+      "overwrite64_primary": 0.5989583333333334
+    }
+  },
+  "interpretation": {
+    "fixed_partition_geometry_frozen": "8x8",
+    "partition_ladder_closed": true,
+    "high_load_interference_remains": true,
+    "next_stage": "test candidate decorrelation on frozen 8x8 geometry using current-pair versus antipodal versus independently mixed second candidate"
+  },
+  "activation_authorized": false
+}
