@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up-lm0w-windows-proof.v1",
+  "experiment": "UP-LM0W-paired-delta",
+  "status": "qualified-scientific-result",
+  "source_head": "eb92670c10a72d6fbbcc707f67814e3fd3936ab5",
+  "workflow_run_id": 36235194803,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10903862745,
+  "artifact_sha256": "551aabea519877618e9d46cb272e3add5ff175aee900b3b58b8e630210d6b35c",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_epochs": 20,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "findings": {
+    "paraphrase_then_base": {
+      "base_accuracy": 0.8650064474532559,
+      "base_perplexity": 1.5251789945731868,
+      "paraphrase_accuracy": 0.8173178458289335,
+      "paraphrase_perplexity": 1.7180808314886038
+    },
+    "base_then_paraphrase": {
+      "base_accuracy": 0.8556576402321083,
+      "base_perplexity": 1.5577912811389845,
+      "paraphrase_accuracy": 0.8316613868356213,
+      "paraphrase_perplexity": 1.6805709122148929
+    },
+    "paired_delta_sum": {
+      "base_accuracy": 0.8617021276595744,
+      "base_perplexity": 1.541000051625857,
+      "paraphrase_accuracy": 0.824181626187962,
+      "paraphrase_perplexity": 1.6984899835431646
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "paired_order_neutral_delta_does_not_beat_both_sequential_orders": true,
+    "paired_delta_result_lands_between_base_first_and_paraphrase_first_controls": true,
+    "remaining_retention_adaptation_tradeoff_reflects_genuinely_conflicting_update_directions_not_only_recency": true,
+    "routing_and_exact_memory_remain_stable": true,
+    "next_stage": "test conflict-aware projection of independently computed base and paraphrase deltas from the same pre-pair model"
+  },
+  "activation_authorized": false
+}
