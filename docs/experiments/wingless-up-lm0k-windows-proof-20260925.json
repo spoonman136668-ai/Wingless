@@ -1,0 +1,77 @@
+{
+  "schema": "wingless.up-lm0k-windows-proof.v1",
+  "experiment": "UP-LM0K-stream-scaling",
+  "status": "qualified-scientific-result",
+  "source_head": "a789ef71d8db37d0dd6d68a36f031acbce2d6c1b",
+  "workflow_run_id": 36205829007,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10893940514,
+  "artifact_sha256": "5dac7f4b215fe78f6100397e84f2c5efbcb49fcdb30a5c4634638f5c4883bc65",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "classifier_epochs": 20,
+  "classifier_learning_rate": 0.08,
+  "explicit_type_at_learned_inference": false,
+  "value_bytes_at_classifier_inference": false,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "findings": {
+    "classifier_train_accuracy": 1,
+    "classifier_heldout_subject_accuracy": 1,
+    "explicit_query_set_exact_by_stream": {
+      "1": 1,
+      "4": 1,
+      "8": 1,
+      "16": 1
+    },
+    "learned_query_set_exact_by_stream": {
+      "1": 1,
+      "4": 1,
+      "8": 1,
+      "16": 1
+    },
+    "learned_event_routing_accuracy_by_stream": {
+      "1": 1,
+      "4": 1,
+      "8": 1,
+      "16": 1
+    },
+    "learned_report_routing_accuracy_by_stream": {
+      "1": 1,
+      "4": 1,
+      "8": 1,
+      "16": 1
+    },
+    "learned_dependent_first_byte_accuracy_by_stream": {
+      "1": 1,
+      "4": 1,
+      "8": 1,
+      "16": 1
+    },
+    "learned_top1_accuracy_by_stream": {
+      "1": 0.9140876853642811,
+      "4": 0.9098968407479046,
+      "8": 0.9093326885880078,
+      "16": 0.9090103159252095
+    },
+    "learned_perplexity_by_stream": {
+      "1": 1.3250757921958152,
+      "4": 1.3346172243053287,
+      "8": 1.337360570548587,
+      "16": 1.3379480706068967
+    },
+    "max_recall_entries_by_stream": {
+      "1": 4,
+      "4": 4,
+      "8": 4,
+      "16": 5
+    }
+  },
+  "interpretation": {
+    "learned_threeway_routing_stable_through_stream16": true,
+    "exact_memory_dependent_language_behavior_matches_explicit_control": true,
+    "general_byte_model_shows_small_stream_length_drift_but_no_routing_or_recall_failure": true,
+    "next_stage": "test structural clause-order interleaving rather than simply extending the same block-ordered stream"
+  },
+  "activation_authorized": false
+}
