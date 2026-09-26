@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.up-lm2k-windows-proof.v1",
+  "experiment": "UP-LM2K-dependency-closure-boundary",
+  "status": "qualified-scientific-result",
+  "source_head": "b2aeb6c04396eee92002acf11c5ca6f4836c4deb",
+  "workflow_run_id": 36275368918,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10916617367,
+  "artifact_sha256": "ac3886f98144df8e42910e22bff130a917930b91a8a5fe9f69350f49c3ff44c5",
+  "findings": {
+    "exact_recall_cap": 16,
+    "deferred_levels": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      12
+    ],
+    "recall_hit_rate": {
+      "0": 1,
+      "2": 1,
+      "4": 1,
+      "6": 0.9166666666666666,
+      "8": 0.8333333333333334,
+      "12": 0.6666666666666666
+    },
+    "expected_curve_matched_all_cells": true,
+    "report_set_exact_through_deferred4": true,
+    "report_set_exact_fails_at_deferred6_and_above": true,
+    "routing_accuracy_all_cells": 1,
+    "max_recall_entries": 16,
+    "event_multiset_identical": true
+  },
+  "interpretation": {
+    "working_set_success_depends_on_dependency_closure_before_live_set_exceeds_16": true,
+    "four_deferred_first_chunk_dependencies_are_safe": true,
+    "six_deferred_dependencies_overflow_by_two_and_lose_exactness": true,
+    "observed_recall_curve_matches_fifo16_capacity_accounting": true,
+    "exact_transition_at_five_deferred_is_implied_but_not_directly_measured": true,
+    "plain_speak": "A chunk can carry four unfinished dependencies into the next 12-entity chunk and still fit exactly inside 16 memory slots. Carry six and two old dependencies are lost. The capacity math is exact; one final boundary probe at five deferred dependencies will pin the first failing case directly.",
+    "north_star_question": "Turns static working-set scheduling into a dependency-lifetime rule: sequence intelligence succeeds when unfinished cross-chunk state plus the next working set stays within fixed capacity.",
+    "next_stage": "test deferred levels 4,5,6 with mirrored deferred identities and report order to directly verify that five is the first failing level rather than an identity/order artifact"
+  },
+  "activation_authorized": false
+}
