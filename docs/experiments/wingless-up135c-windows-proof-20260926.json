@@ -1,0 +1,74 @@
+{
+  "schema": "wingless.up135c-windows-proof.v1",
+  "experiment": "UP-135C-history-requalification",
+  "status": "qualified-scientific-result",
+  "source_head": "6f874dc6a580b34861b446df80512c220861975e",
+  "workflow_run_id": 36268629942,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10914747035,
+  "artifact_sha256": "cf1a1b97d7820bfb1d4969b1963aef5900b73cd644be5b99120863db8822b0e0",
+  "findings": {
+    "target100": {
+      "live_pair_g1": {
+        "sightings": 2,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "expired_pair_g3": {
+        "sightings": 4,
+        "admission": 0,
+        "accuracy": 0
+      },
+      "rebuild_g3_admit_g4": {
+        "sightings": 6,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "expired_pair_g4_only": {
+        "sightings": 5,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "target103": {
+      "live_pair_g1": {
+        "sightings": 2,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "expired_pair_g3": {
+        "sightings": 4,
+        "admission": 0,
+        "accuracy": 0
+      },
+      "rebuild_g3_admit_g4": {
+        "sightings": 6,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "expired_pair_g4_only": {
+        "sightings": 5,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "hot_accuracy_all_arms": 1,
+    "nonpersistent_admission_all_arms": 0,
+    "nonpersistent_retention_all_arms": 0,
+    "one_shot_false_admissions_all_arms": 0,
+    "panic_rate_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "fresh_requalification_after_history_expiry_is_supported": true,
+    "expired_pair_rebuilds_history_but_does_not_immediately_admit": true,
+    "a_second_pair_in_the_following_generation_completes_fresh_two_stage_admission": true,
+    "isolated_single_sightings_do_not_substitute_for_either_stage": true,
+    "result_replicates_across_two_target_identities": true,
+    "plain_speak": "Once the old temporary trace has expired, a new pair of reminders does not instantly make the item durable. That pair rebuilds the temporary trace. A second pair in a later window can then match it and make the item durable again. So relearning works cleanly, but it follows the same two-stage rule as first learning.",
+    "north_star_question": "Establishes reversible, repeatable two-stage consolidation under fixed bounded memory, a key requirement for long language streams where evidence can disappear and later return.",
+    "next_stage": "map the exact lifetime of a rebuilt qualified history trace by delaying the second qualifying pair across successive generations"
+  },
+  "activation_authorized": false
+}
