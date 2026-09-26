@@ -71,6 +71,7 @@ func up159cArm(hand int,trigger,endangered int)(int,bool,int){
 	}
 	return horizon,x.find(endangered)>=0,loss
 }
+func up159cRate(a,b int)float64{if b==0{return 0};return float64(a)/float64(b)}
 func RunUP159C()(UP159CResult,error){
 	names:=[]string{"cohort_A","cohort_B","cohort_C","cohort_D"}
 	cohorts:=[][]int{{0,4,8,12},{1,5,9,13},{2,6,10,14},{3,7,11,15}}
@@ -83,9 +84,9 @@ func RunUP159C()(UP159CResult,error){
 		if pred&&durable{res.TruePositive++}else if pred&&!durable{res.FalsePositive++}else if !pred&&durable{res.FalseNegative++}else{res.TrueNegative++}
 		res.Points=append(res.Points,UP159CPoint{Cohort:names[ci],InitialHand:hand,TriggerStep:trigger,EndangeredKey:endangered,UniqueWriteHorizon:h,PredictedDurable:pred,ActualDurable:durable,ActualLossStep:loss})
 	}}
-	res.Precision=up158cRate(res.TruePositive,res.TruePositive+res.FalsePositive)
-	res.Recall=up158cRate(res.TruePositive,res.TruePositive+res.FalseNegative)
-	res.Accuracy=up158cRate(res.TruePositive+res.TrueNegative,res.Arms)
+	res.Precision=up159cRate(res.TruePositive,res.TruePositive+res.FalsePositive)
+	res.Recall=up159cRate(res.TruePositive,res.TruePositive+res.FalseNegative)
+	res.Accuracy=up159cRate(res.TruePositive+res.TrueNegative,res.Arms)
 	res.HorizonAUROC=up158cAUROC(perm,delay)
 	return res,nil
 }
