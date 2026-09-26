@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up135b-windows-proof.v1",
+  "experiment": "UP-135B-final-new-refresh",
+  "status": "qualified-scientific-result-with-preregistered-control-mismatch",
+  "source_head": "eb3ec226a66f336b0ddf235ef641d362b1296e64",
+  "workflow_run_id": 36252400161,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10909397002,
+  "artifact_sha256": "4480223cc0fe281b3091367a9c96e34a45d2980a582e0062a1fb34cc7079f27f",
+  "state_dimension": 64,
+  "gate_input_dimension": 128,
+  "grounding_epochs": 20,
+  "learning_rate": 0.08,
+  "new_updates_per_epoch": 24,
+  "old_updates_per_epoch": 15,
+  "findings": {
+    "refresh_0": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.9,
+      "old_unseen": 0.9333333333333333
+    },
+    "refresh_4": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.9333333333333333,
+      "old_unseen": 0.9444444444444444
+    },
+    "refresh_8": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.9,
+      "old_unseen": 0.9333333333333333
+    },
+    "refresh_12": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.8333333333333334,
+      "old_unseen": 0.9333333333333333
+    }
+  },
+  "interpretation": {
+    "within_the_preregistered_rotated_schedule_refresh4_has_the_best_old_family_retention_without_reducing_new_family_accuracy": true,
+    "larger_final_refreshes_do_not_monotonically_improve_balance": true,
+    "preregistered_refresh0_does_not_reproduce_up134b_terminal15_because_up135b_rotates_new_example_order_each_epoch": true,
+    "direct_absolute_comparison_between_up135b_refresh0_and_up134b_terminal15_is_not_valid": true,
+    "internal_up135b_arm_comparisons_remain_valid_because_all_arms_share_the_same_rotation": true,
+    "next_stage": "run a matched-order confirmation with the exact UP-134B new-example order as control and a fixed four-update final refresh, without epoch rotation"
+  },
+  "preregistration_note": "The preregistration simultaneously specified epoch rotation of new examples and called refresh_0 an exact UP-134B terminal_15 control. Those statements are incompatible; no post-result threshold or arm was changed.",
+  "activation_authorized": false
+}
