@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up99b-windows-proof.v1",
+  "experiment": "UP-99B-verb-window-separability",
+  "status": "qualified-scientific-result",
+  "source_head": "cf54b2785604ae0df72f7473cd1e2312b992f56e",
+  "workflow_run_id": 36203589835,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10893525244,
+  "artifact_sha256": "5c0c66f683db4c92269ffa3735b3580c36bd96b50074fba0588fb6e2172eb581",
+  "state_dimension": 64,
+  "epochs": 20,
+  "learning_rate": 0.08,
+  "explicit_class_at_inference": false,
+  "full_clause": {
+    "train_accuracy": 0.8065843621399177,
+    "heldout_accuracy": 0.7901234567901234,
+    "store_precision": 0.875,
+    "store_recall": 0.5185185185185185,
+    "stores_accuracy": 0.1111111111111111,
+    "keeps_accuracy": 0.5555555555555556
+  },
+  "prefix_through_verb": {
+    "train_accuracy": 1,
+    "heldout_accuracy": 1,
+    "store_precision": 1,
+    "store_recall": 1,
+    "observe_precision": 1,
+    "observe_recall": 1,
+    "report_precision": 1,
+    "report_recall": 1,
+    "all_verb_accuracy": 1
+  },
+  "interpretation": {
+    "suffix_interference_hypothesis_supported": true,
+    "verb_prefix_representation_is_perfectly_separable_on_tested_domain": true,
+    "decision_head_not_primary_boundary": true,
+    "next_stage": "integrate prefix-timed three-way classification into bounded downstream routing and test whether learned routing matches explicit event classes"
+  },
+  "activation_authorized": false
+}
