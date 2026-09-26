@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up-lm1o-windows-proof.v1",
+  "experiment": "UP-LM1O-balanced-reintegration",
+  "status": "qualified-scientific-result",
+  "source_head": "659424785ff4b059213ccafbb7c06bb3c3d515b9",
+  "workflow_run_id": 36251337546,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10909970037,
+  "artifact_sha256": "ac5348019a7fbf2c11081c53048f0343df2f53ac9b50706fcb87653985683317",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "adaptation_epochs": 4,
+  "full_step_learning_rate": 0.08,
+  "half_step_learning_rate": 0.04,
+  "findings": {
+    "cyclic_control": {
+      "base": 0.7925531914893617,
+      "paraphrase": 0.758799718409011,
+      "third": 0.7985339506172839,
+      "fourth": 0.8043547870637208,
+      "routing_top1_range": [
+        0.7720872932066174,
+        0.8154018571886007
+      ]
+    },
+    "mirrored_by_index": {
+      "base": 0.8214861379754996,
+      "paraphrase": 0.7841429074269624,
+      "third": 0.8078703703703703,
+      "fourth": 0.7828210054434839,
+      "routing_top1_range": [
+        0.7694524495677233,
+        0.8330109606705351
+      ]
+    },
+    "rotating_palindromic_split": {
+      "base": 0.81785944551902,
+      "paraphrase": 0.7804470256951778,
+      "third": 0.8064043209876544,
+      "fourth": 0.7961895613192443,
+      "routing_top1_range": [
+        0.7805795709253922,
+        0.8293842682140554
+      ]
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "admission_precision_all_cells": 1,
+    "admission_recall_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "balanced_four_family_update_schedules_remain_fully_compatible_with_corrected_router_and_exact_memory": true,
+    "rotating_palindromic_schedule_provides_the_best_integrated_worst_case_routing_top1_floor_of_the_tested_arms": true,
+    "mirrored_and_palindromic_schedules_preserve_the_byte_balance_improvements_seen_in_lm1n_after_full_reintegration": true,
+    "remaining_limit_is_byte_readout_balance_not_semantic_routing_or_exact_memory": true,
+    "next_stage": "stress the rotating-palindromic integrated schedule with a fifth lexical family while keeping router correction memory cap and recurrent state fixed"
+  },
+  "activation_authorized": false
+}
