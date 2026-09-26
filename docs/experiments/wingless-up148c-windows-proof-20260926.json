@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.up148c-windows-proof.v1",
+  "experiment": "UP-148C-recency-hand-alignment",
+  "status": "qualified-scientific-result",
+  "source_head": "6420b5502997c5eefc8a01c2393335f4b1536103",
+  "workflow_run_id": 36275365631,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10916667188,
+  "artifact_sha256": "69d2e4e25b3181c63b07634b3e05ebf4332a3561f50b2e13e4c6514c059e9c09",
+  "findings": {
+    "target_identity": "keys 0..3 in every arm",
+    "rotation0_slots": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "rotation0_retention_by_refresh": [
+      1,
+      0.75,
+      0.5,
+      0.25
+    ],
+    "rotation4_slots": [
+      12,
+      13,
+      14,
+      15
+    ],
+    "rotation8_slots": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "rotation12_slots": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "all_nonzero_rotations_retention_all_refresh_arms": 1,
+    "exact_recall_cap": 16,
+    "admissions_per_arm": 4
+  },
+  "interpretation": {
+    "vulnerability_moves_with_slot_hand_alignment_not_lexical_identity": true,
+    "target_keys_are_only_vulnerable_when_placed_directly_in_initial_hand_path": true,
+    "delayed_refresh_effect_disappears_when_same_targets_occupy_later_slot_regions": true,
+    "recency_and_hand_distance_interact_causally": true,
+    "plain_speak": "The same four lexical facts fail only when they start directly under the replacement hand. Move those exact facts to later slots and every tested refresh timing preserves them. The earlier 'recency gradient' was therefore really a recency-by-hand-position effect.",
+    "north_star_question": "Identifies durable-memory survival as predictable from replacement-hand geometry plus access timing rather than identity or semantic class.",
+    "next_stage": "hold slot contents fixed and rotate only the initial replacement hand to verify that the vulnerable region moves with hand position, closing the causal hand-versus-slot distinction"
+  },
+  "activation_authorized": false
+}
