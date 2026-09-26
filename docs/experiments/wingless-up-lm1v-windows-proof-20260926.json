@@ -1,0 +1,95 @@
+{
+  "schema": "wingless.up-lm1v-windows-proof.v1",
+  "experiment": "UP-LM1V-allfamily-integrated-retention",
+  "status": "qualified-scientific-result",
+  "source_head": "96ac089e1fe19fd9ccc7c70e5e02cc1dfd552810",
+  "workflow_run_id": 36257758943,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10911027744,
+  "artifact_sha256": "55005003ad9b67866fc045564c5380215326cc7e5e504fcea60db6def6ee5e9f",
+  "findings": {
+    "equal_mass_integrated_top1": {
+      "base": [
+        0.758220502901354,
+        0.7560444874274661
+      ],
+      "paraphrase": [
+        0.7595036958817318,
+        0.7551038366772264
+      ],
+      "third": [
+        0.7867283950617284,
+        0.785570987654321
+      ],
+      "fourth": [
+        0.7823406980467499,
+        0.781780339417227
+      ],
+      "fifth": [
+        0.7499175733597099,
+        0.7474447741510056
+      ]
+    },
+    "fifth_1p5_mass_integrated_top1": {
+      "base": [
+        0.7407317859445519,
+        0.7379110251450677
+      ],
+      "paraphrase": [
+        0.7499120028159099,
+        0.7456881379795847
+      ],
+      "third": [
+        0.7746141975308642,
+        0.7738425925925926
+      ],
+      "fourth": [
+        0.7693723983349343,
+        0.7689721421709894
+      ],
+      "fifth": [
+        0.798219584569733,
+        0.7945928123969667
+      ]
+    },
+    "fifth_2x_mass_integrated_top1": {
+      "base": [
+        0.7250967117988395,
+        0.7244519664732431
+      ],
+      "paraphrase": [
+        0.7348644843365012,
+        0.7332805350228793
+      ],
+      "third": [
+        0.761496913580247,
+        0.7616512345679012
+      ],
+      "fourth": [
+        0.7589657380723663,
+        0.7592058917707333
+      ],
+      "fifth": [
+        0.823277283217936,
+        0.8202274975272008
+      ]
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "admission_precision_all_cells": 1,
+    "admission_recall_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "prior_family_readout_loss_propagates_into_integrated_language_scores": true,
+    "fifth_family_integrated_language_scores_improve_with_more_fixed_mass_share": true,
+    "exact_sequence_memory_and_semantic_routing_are_invariant_across_the_tradeoff": true,
+    "integrated_task_correctness_is_more_robust_than_general_byte_readout_quality_under_moderate_drift": true,
+    "plain_speak": "Giving the newest vocabulary more of the same fixed learning budget makes its language predictions better and the older vocabularies' predictions worse. But the part that actually remembers values, recognizes event types, and answers the dependent sequence queries stays perfectly correct in every tested case. The language surface is trading accuracy while the core sequence skill remains stable.",
+    "north_star_question": "Separates language-surface retention from sequence-intelligence retention, showing that bounded memory and semantic routing can remain robust while lexical readout plasticity is rebalanced.",
+    "next_stage": "densify the mild fixed-mass region between equal allocation and the 1.5x fifth allocation, measuring all-family integrated quality to map whether a lower-cost plasticity point exists without adding budget"
+  },
+  "activation_authorized": false
+}
