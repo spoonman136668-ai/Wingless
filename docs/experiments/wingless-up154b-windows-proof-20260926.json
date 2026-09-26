@@ -1,0 +1,81 @@
+{
+  "schema": "wingless.up154b-windows-proof.v1",
+  "experiment": "UP-154B-rehearsal-placement",
+  "status": "qualified-scientific-result",
+  "source_head": "44b444c1c48d6c6778fb1702667e8148e8db23c3",
+  "workflow_run_id": 36267020431,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10913949340,
+  "artifact_sha256": "81cfc1d24d821b658d21c650d3512cf87db5e7b4562bc98b81ad18df549f2fcd",
+  "findings": {
+    "mia": {
+      "all_before": {
+        "before": 15,
+        "after": 0,
+        "report_effect": -0.04777777777777781,
+        "post_recovery": 0,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.921875
+      },
+      "split_8_7": {
+        "before": 8,
+        "after": 7,
+        "report_effect": -0.056666666666666685,
+        "post_recovery": 0.011111111111111117,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.921875
+      },
+      "all_after": {
+        "before": 0,
+        "after": 15,
+        "report_effect": -0.04222222222222218,
+        "post_recovery": 0.04444444444444442,
+        "net": -0.004444444444444473,
+        "old": 0.8888888888888888,
+        "new": 0.9270833333333333
+      }
+    },
+    "noah": {
+      "all_before": {
+        "before": 15,
+        "after": 0,
+        "report_effect": -0.0533333333333333,
+        "post_recovery": 0,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.9270833333333333
+      },
+      "split_8_7": {
+        "before": 8,
+        "after": 7,
+        "report_effect": -0.04777777777777781,
+        "post_recovery": 0.012222222222222245,
+        "net": -0.00555555555555558,
+        "old": 0.8833333333333333,
+        "new": 0.9270833333333333
+      },
+      "all_after": {
+        "before": 0,
+        "after": 15,
+        "report_effect": -0.057777777777777796,
+        "post_recovery": 0.04555555555555559,
+        "net": -0.0033333333333333435,
+        "old": 0.8944444444444445,
+        "new": 0.9270833333333333
+      }
+    }
+  },
+  "interpretation": {
+    "fixed_budget_rehearsal_placement_can_mitigate_report_interference": true,
+    "moving_all_rehearsal_after_report_improves_old_retention_for_both_subjects": true,
+    "seven_post_report_rehearsal_updates_are_insufficient_for_strong_repair_in_this_frozen_design": true,
+    "report_block_remains_locally_damaging_in_every_arm": true,
+    "post_report_rehearsal_recovers_a_large_fraction_of_local_report_damage_without_extra_updates": true,
+    "plain_speak": "The REPORT block still hurts every time. The difference is whether old-memory rehearsal gets a chance to repair that damage afterward. Seven cleanup updates barely help; putting the whole fixed rehearsal budget after REPORT recovers much more, without spending any extra updates.",
+    "north_star_question": "Demonstrates a budget-neutral repair mechanism for lexical interference, converting the anchor-relative diagnosis into a controllable stability intervention.",
+    "next_stage": "densify the number of the fixed 15 rehearsal updates placed after REPORT to locate the repair-dose curve without changing total rehearsal budget"
+  },
+  "activation_authorized": false
+}
