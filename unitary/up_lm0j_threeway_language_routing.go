@@ -7,6 +7,51 @@ import (
 
 const UPLM0JThreeWayRoutingSchema = "wingless.up-lm0j-threeway-language-routing.v1"
 
+const (
+	uplm0jStore = 0
+	uplm0jObserve = 1
+	uplm0jReport = 2
+)
+
+type uplm0jClassifier struct {
+	w [3][64]float64
+	b [3]float64
+}
+
+func (c *uplm0jClassifier) probs(h [64]float64) [3]float64 {
+	var logits [3]float64
+	maxV := math.Inf(-1)
+	for k := 0; k < 3; k++ {
+		s := c.b[k]
+		for i := 0; i < 64; i++ {
+			s += c.w[k][i] * h[i]
+		}
+		logits[k] = s
+		if s > maxV {
+			maxV = s
+		}
+	}
+	sum := 0.0
+	for k := 0; k < 3; k++ {
+		logits[k] = math.Exp(logits[k] - maxV)
+		sum += logits[k]
+	}
+	for k := 0; k < 3; k++ {
+		logits[k] /= sum
+	}
+	return logits
+}
+
+func uplm0jArgmax(p [3]float64) int {
+	best := 0
+	for k := 1; k < 3; k++ {
+		if p[k] > p[best] {
+			best = k
+		}
+	}
+	return best
+}
+
 type UPLM0JClassifierMetric struct {
 	Split     string  `json:"split"`
 	Label     string  `json:"label"`
@@ -54,9 +99,9 @@ type UPLM0JThreeWayRoutingResult struct {
 
 func uplm0jAnchor(name string, class int) string {
 	switch class {
-	case up97bStore:
+	case uplm0jStore:
 		return name + " stores"
-	case up97bObserve:
+	case uplm0jObserve:
 		return name + " observes"
 	default:
 		return name + " reports"
@@ -66,18 +111,18 @@ func uplm0jAnchor(name string, class int) string {
 func uplm0jTrueClass(verb string) int {
 	switch verb {
 	case "stores":
-		return up97bStore
+		return uplm0jStore
 	case "observes":
-		return up97bObserve
+		return uplm0jObserve
 	case "reports":
-		return up97bReport
+		return uplm0jReport
 	default:
 		return -1
 	}
 }
 
-func uplm0jTrainClassifier() *up97bClassifier {
-	c := &up97bClassifier{}
+func uplm0jTrainClassifier() *uplm0jClassifier {
+	c := &uplm0jClassifier{}
 	names := uplm0gNames()
 	for epoch := 0; epoch < 20; epoch++ {
 		for ni := 0; ni < 4; ni++ {
@@ -100,22 +145,22 @@ func uplm0jTrainClassifier() *up97bClassifier {
 	return c
 }
 
-func uplm0jPredict(c *up97bClassifier, anchor string) int {
-	return up97bArgmax(c.probs(uplm0fEncode(anchor)))
+func uplm0jPredict(c *uplm0jClassifier, anchor string) int {
+	return uplm0jArgmax(c.probs(uplm0fEncode(anchor)))
 }
 
 func uplm0jClassLabel(class int) string {
 	switch class {
-	case up97bStore:
+	case uplm0jStore:
 		return "STORE"
-	case up97bObserve:
+	case uplm0jObserve:
 		return "OBSERVE"
 	default:
 		return "REPORT"
 	}
 }
 
-func uplm0jClassifierEval(c *up97bClassifier, split string, start, end, class int, label string) UPLM0JClassifierMetric {
+func uplm0jClassifierEval(c *uplm0jClassifier, split string, start, end, class int, label string) UPLM0JClassifierMetric {
 	names := uplm0gNames()
 	total, hits, tp, fp, fn := 0, 0, 0, 0, 0
 	for ni := start; ni < end; ni++ {
@@ -157,7 +202,7 @@ func uplm0jClassifierEval(c *up97bClassifier, split string, start, end, class in
 	}
 }
 
-func uplm0jEvaluate(model *uplm0aModel, classifier *up97bClassifier, examples []uplm0fExample, stream4, learned bool, split string) UPLM0JMetric {
+func uplm0jEvaluate(model *uplm0aModel, classifier *uplm0jClassifier, examples []uplm0fExample, stream4, learned bool, split string) UPLM0JMetric {
 	hits, total := 0, 0
 	depHits, depTotal := 0, 0
 	exactParagraphs, paragraphs := 0, 0
@@ -211,13 +256,13 @@ func uplm0jEvaluate(model *uplm0aModel, classifier *up97bClassifier, examples []
 							if routeClass == trueClass {
 								eventHits++
 							}
-							if trueClass == up97bReport {
+							if trueClass == uplm0jReport {
 								reportTotal++
-								if routeClass == up97bReport {
+								if routeClass == uplm0jReport {
 									reportHits++
 								}
 							}
-							if routeClass == up97bReport {
+							if routeClass == uplm0jReport {
 								queryName = fields[0]
 								reportOverridePending = true
 							}
@@ -267,8 +312,8 @@ func uplm0jEvaluate(model *uplm0aModel, classifier *up97bClassifier, examples []
 					if len(fields) >= 3 && trueClass >= 0 {
 						name := fields[0]
 						value := fields[2]
-						predStore := routeKnown && routeClass == up97bStore
-						trueStore := trueClass == up97bStore
+						predStore := routeKnown && routeClass == uplm0jStore
+						trueStore := trueClass == uplm0jStore
 						if predStore {
 							recall.write(name, value)
 							if trueStore {
@@ -392,9 +437,9 @@ func RunUPLM0J() (UPLM0JThreeWayRoutingResult, error) {
 	} {
 		result.ClassifierMetrics = append(result.ClassifierMetrics,
 			uplm0jClassifierEval(classifier, split.name, split.start, split.end, -1, "all"),
-			uplm0jClassifierEval(classifier, split.name, split.start, split.end, up97bStore, "STORE"),
-			uplm0jClassifierEval(classifier, split.name, split.start, split.end, up97bObserve, "OBSERVE"),
-			uplm0jClassifierEval(classifier, split.name, split.start, split.end, up97bReport, "REPORT"),
+			uplm0jClassifierEval(classifier, split.name, split.start, split.end, uplm0jStore, "STORE"),
+			uplm0jClassifierEval(classifier, split.name, split.start, split.end, uplm0jObserve, "OBSERVE"),
+			uplm0jClassifierEval(classifier, split.name, split.start, split.end, uplm0jReport, "REPORT"),
 		)
 	}
 
