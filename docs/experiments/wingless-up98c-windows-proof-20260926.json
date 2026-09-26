@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.up98c-windows-proof.v1",
+  "experiment": "UP-98C-promotion-churn-separation",
+  "status": "qualified-scientific-result",
+  "source_head": "2b9a200ae4af947a9d1689cf838f287a534dd850",
+  "workflow_run_id": 36235553909,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10903688478,
+  "artifact_sha256": "94451cda1f69bc6c3d6eef03690b4ef297ac69d69aa5cdfdc7126f19d7a4843a",
+  "filter_bits": 1024,
+  "hash_count": 2,
+  "generation_interval": 32,
+  "churn_writes": 12288,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "diagnostic_phase_label_used": true,
+  "future_oracle_used": false,
+  "query_labels_used_for_admission": false,
+  "findings": {
+    "continuous_control": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128,
+      "first_false_positive_churn_index": 2402
+    },
+    "clear_phase0": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 256,
+      "first_false_positive_churn_index": 6076
+    },
+    "clear_phase8": {
+      "hot_accuracy": 1,
+      "hot_exact": 1,
+      "false_positive_admissions": 0,
+      "first_false_positive_churn_index": 0
+    },
+    "clear_phase16": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 384,
+      "first_false_positive_churn_index": 111
+    },
+    "clear_phase24": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128,
+      "first_false_positive_churn_index": 2402
+    },
+    "policy_metadata_bytes": 134,
+    "total_bounded_memory_bytes": 390
+  },
+  "interpretation": {
+    "promotion_and_churn_filter_state_roles_are_separable": true,
+    "post_promotion_clear_plus_phase8_is_exact_through_12288_churn_writes": true,
+    "phase8_after_clear_eliminates_false_admissions_without_losing_promoted_hot_entries": true,
+    "explicit_phase_clear_is_diagnostic_not_a_general_online_solution": true,
+    "next_stage": "replace the diagnostic phase label with a one-shot clear triggered only by a fixed count of successful repeat admissions and test whether the same phase8 geometry emerges online"
+  },
+  "activation_authorized": false
+}
