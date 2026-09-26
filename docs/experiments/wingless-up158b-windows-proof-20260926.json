@@ -1,0 +1,94 @@
+{
+  "schema": "wingless.up158b-windows-proof.v1",
+  "experiment": "UP-158B-cleanup-class-order",
+  "status": "qualified-scientific-result",
+  "source_head": "97b7311ccd0a86e9d4da7a25b2efe1fc4424b84f",
+  "workflow_run_id": 36269214334,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10915340555,
+  "artifact_sha256": "294b4cf16a4623df545783ae4021263d418bc21a3d13d09fd6893e78b7467bab",
+  "findings": {
+    "fixed_cleanup_composition": {
+      "store": 5,
+      "observe": 5,
+      "report": 2,
+      "rehearsal_before": 3,
+      "rehearsal_after": 12
+    },
+    "mia": {
+      "STORE_OBSERVE_REPORT": {
+        "old": 0.8888888888888888,
+        "post_recovery": 0.05222222222222219,
+        "new": 0.9270833333333333
+      },
+      "STORE_REPORT_OBSERVE": {
+        "old": 0.8888888888888888,
+        "post_recovery": 0.04888888888888885,
+        "new": 0.9270833333333333
+      },
+      "OBSERVE_STORE_REPORT": {
+        "old": 0.8833333333333333,
+        "post_recovery": 0.056666666666666664,
+        "new": 0.9166666666666666
+      },
+      "OBSERVE_REPORT_STORE": {
+        "old": 0.8888888888888888,
+        "post_recovery": 0.061111111111111116,
+        "new": 0.9166666666666666
+      },
+      "REPORT_STORE_OBSERVE": {
+        "old": 0.8944444444444445,
+        "post_recovery": 0.06000000000000001,
+        "new": 0.9270833333333333
+      },
+      "REPORT_OBSERVE_STORE": {
+        "old": 0.8888888888888888,
+        "post_recovery": 0.057777777777777775,
+        "new": 0.9166666666666666
+      }
+    },
+    "noah": {
+      "STORE_OBSERVE_REPORT": {
+        "old": 0.9166666666666667,
+        "post_recovery": 0.05222222222222226,
+        "new": 0.921875
+      },
+      "STORE_REPORT_OBSERVE": {
+        "old": 0.9166666666666667,
+        "post_recovery": 0.05555555555555558,
+        "new": 0.921875
+      },
+      "OBSERVE_STORE_REPORT": {
+        "old": 0.9055555555555556,
+        "post_recovery": 0.06888888888888886,
+        "new": 0.9166666666666666
+      },
+      "OBSERVE_REPORT_STORE": {
+        "old": 0.9222222222222223,
+        "post_recovery": 0.07888888888888886,
+        "new": 0.9166666666666666
+      },
+      "REPORT_STORE_OBSERVE": {
+        "old": 0.9166666666666667,
+        "post_recovery": 0.06444444444444444,
+        "new": 0.921875
+      },
+      "REPORT_OBSERVE_STORE": {
+        "old": 0.9222222222222223,
+        "post_recovery": 0.07888888888888886,
+        "new": 0.9166666666666666
+      }
+    }
+  },
+  "interpretation": {
+    "within_cleanup_class_order_affects_repair_at_fixed_class_composition_and_budget": true,
+    "no_single_cleanup_order_is_uniformly_best_across_subjects": true,
+    "subject_by_order_interaction_is_material": true,
+    "post_cleanup_recovery_magnitude_and_final_retention_are_related_but_not_identical": true,
+    "class_composition_is_not_the_final_explanation_for_repair_variance": true,
+    "plain_speak": "Even after fixing exactly which cleanup classes are present, their order still changes the amount of repair. But there is no one order that wins for both subjects. The useful mechanism is therefore more specific: cleanup recency interacts with the subject/context being repaired.",
+    "north_star_question": "Shows that lexical stability control depends on context-sensitive ordering within a fixed repair composition, defining the next generalization boundary before any adaptive scheduler can be justified.",
+    "next_stage": "repeat the six fixed cleanup orders across additional preregistered new-family subjects while keeping the same old rehearsal items and REPORT interference block, to test whether the subject-by-order interaction generalizes"
+  },
+  "activation_authorized": false
+}
