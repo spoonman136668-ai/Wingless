@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up-lm2d-windows-proof.v1",
+  "experiment": "UP-LM2D-pername-boundary-interaction",
+  "status": "qualified-scientific-result",
+  "source_head": "fe7a97ea1d549382417ffb05576f7abd6f04a249",
+  "workflow_run_id": 36270188519,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10915048475,
+  "artifact_sha256": "98a78880bc69272537b02a6632837c1d9e6c161bc49597a4b0514836508e1544",
+  "findings": {
+    "structural_exact_all_500_integrated_cells": true,
+    "max_recall_entries": 4,
+    "balanced_minus_canonical_overall": {
+      "prior_integrated_mean": -0.00293778305903448,
+      "fifth_integrated_mean": 0.0004038905374217183,
+      "minimum_family_integrated_mean": 0.003595110131441568
+    },
+    "balanced_minus_canonical_prior_mean_by_group_order": {
+      "forward": -0.0029003171919846247,
+      "rotate_1": -0.0030439963276486905,
+      "rotate_2": -0.002682637858395176,
+      "rotate_3": -0.0030200244671487963,
+      "reverse": -0.0030419394499951124
+    },
+    "balanced_minus_canonical_min_family_by_group_order": {
+      "forward": 0.002808200410232509,
+      "rotate_1": 0.003288798642149815,
+      "rotate_2": 0.0038201647549879203,
+      "rotate_3": 0.0032164907756377925,
+      "reverse": 0.004841896074199803
+    }
+  },
+  "interpretation": {
+    "per_name_prior_mean_penalty_persists_across_all_name_group_permutations": true,
+    "penalty_is_not_explained_by_which_name_group_is_first_or_last": true,
+    "balanced_prior_rotation_continues_to_improve_minimum_family_accuracy_across_all_group_orders": true,
+    "fifth_family_performance_remains_effectively_stable_or_slightly_positive": true,
+    "structural_sequence_memory_and_routing_remain_exact": true,
+    "plain_speak": "Rotating which name comes first, middle, or last does not remove the balanced-training cost under per-name evaluation. The cost follows the name-local grouping pattern itself. At the same time, balancing still helps the weakest family, so the fairness benefit is real even though mean older-family accuracy pays a small locality cost.",
+    "north_star_question": "Identifies per-name locality rather than name-boundary position as the interaction limiting recency equalization, narrowing the language mechanism that must be resolved before general scheduling.",
+    "next_stage": "hold balanced-prior training fixed and break apart per-name locality by selectively interleaving one clause type across names while preserving identical content and update/query structure"
+  },
+  "activation_authorized": false
+}
