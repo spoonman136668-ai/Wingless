@@ -1,0 +1,65 @@
+{
+  "schema": "wingless.up83c-windows-proof.v1",
+  "experiment": "UP-83C-retention-decay",
+  "status": "qualified-scientific-result",
+  "source_head": "cf8578999ead28ef62c686dc9241eb932ecf6ab8",
+  "workflow_run_id": 36204057261,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10892882356,
+  "artifact_sha256": "41db385194feab24ca264259c815757c11b9715b55eb775489c1663a41953524",
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "future_oracle_used": false,
+  "findings": {
+    "active24_two_bit_aging_hot_by_churn": {
+      "0": 0.6666666666666666,
+      "4": 0.6666666666666666,
+      "8": 0.6666666666666666,
+      "12": 0.6666666666666666,
+      "16": 0.3333333333333333,
+      "20": 0.16666666666666666,
+      "24": 0,
+      "32": 0
+    },
+    "active32_two_bit_aging_hot_by_churn": {
+      "0": 0.5,
+      "4": 0.5,
+      "8": 0.5,
+      "12": 0.375,
+      "16": 0.25,
+      "20": 0.125,
+      "24": 0,
+      "32": 0
+    },
+    "active24_lru_hot_by_churn": {
+      "0": 0.6666666666666666,
+      "4": 0.6666666666666666,
+      "8": 0.6666666666666666,
+      "12": 0.3333333333333333,
+      "16": 0,
+      "20": 0,
+      "24": 0,
+      "32": 0
+    },
+    "active32_lru_hot_by_churn": {
+      "0": 0.5,
+      "4": 0.5,
+      "8": 0.5,
+      "12": 0.25,
+      "16": 0,
+      "20": 0,
+      "24": 0,
+      "32": 0
+    },
+    "aging_metadata_bytes": 5,
+    "aging_total_bounded_memory_bytes": 261
+  },
+  "interpretation": {
+    "aging_retention_advantage_extends_beyond_lru": true,
+    "retention_degrades_monotonically_with_churn": true,
+    "hot_retention_reaches_zero_by_24_churn_writes": true,
+    "fixed_capacity_boundary_remains": true,
+    "next_stage": "test online locality with hot-key revisits interleaved through loading and churn rather than batch rehearsal only"
+  },
+  "activation_authorized": false
+}
