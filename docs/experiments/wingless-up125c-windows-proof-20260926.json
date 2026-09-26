@@ -1,0 +1,65 @@
+{
+  "schema": "wingless.up125c-windows-proof.v1",
+  "experiment": "UP-125C-age-eviction-overflow",
+  "status": "qualified-scientific-result",
+  "source_head": "2832935bedea2c4ac28e2ad7c19e2e27c2ce257f",
+  "workflow_run_id": 36256918260,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10911176658,
+  "artifact_sha256": "6a2cf11f9714767cb9241a05bc5f2876e6b1f424cc10211aab240b5b95be267a",
+  "findings": {
+    "q0": {
+      "panic_rate": 0,
+      "total_evictions": 0,
+      "valid_accuracy": 1,
+      "target16_exact": 1,
+      "nonpersistent_retention": 0
+    },
+    "q1": {
+      "panic_rate": 0,
+      "total_evictions": 64,
+      "age2_evictions": 64,
+      "age1_evictions": 0,
+      "age0_evictions": 0,
+      "valid_accuracy": 1,
+      "target16_exact": 1,
+      "nonpersistent_retention": 0,
+      "false_admissions": 0
+    },
+    "q8": {
+      "panic_rate": 0,
+      "total_evictions": 512,
+      "age2_evictions": 512,
+      "age1_evictions": 0,
+      "age0_evictions": 0,
+      "valid_accuracy": 1,
+      "target16_exact": 1,
+      "nonpersistent_retention": 0,
+      "false_admissions": 0
+    },
+    "q16": {
+      "panic_rate": 0,
+      "total_evictions": 1024,
+      "age2_evictions": 1024,
+      "age1_evictions": 0,
+      "age0_evictions": 0,
+      "valid_accuracy": 1,
+      "target16_exact": 1,
+      "nonpersistent_retention": 0,
+      "false_admissions": 0
+    },
+    "admission_memory_bytes": 128,
+    "exact_recall_cap": 16,
+    "history_entries": 32
+  },
+  "interpretation": {
+    "age_only_reclamation_crosses_the_up124c_overflow_boundary": true,
+    "all_replacements_are_confined_to_stalest_age2_evidence": true,
+    "valid_targets_remain_exact_through_full_16_slot_stale_reclamation": true,
+    "no_semantic_or_query_priority_is_needed_for_this_boundary": true,
+    "plain_speak": "The full table does not need to grow. It can make room by discarding only the oldest temporary evidence, and even when all 16 stale slots are recycled the real recurring targets are still remembered perfectly.",
+    "north_star_question": "Establishes a bounded local forgetting mechanism that lets temporal admission remain stable under overflow without increasing state, a prerequisite for longer language streams.",
+    "next_stage": "apply a second overflow wave before valid-target recurrence, after the first wave has consumed all age-2 stale slots, to find when age-only eviction begins displacing still-useful history"
+  },
+  "activation_authorized": false
+}
