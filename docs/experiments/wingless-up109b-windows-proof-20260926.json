@@ -1,0 +1,38 @@
+{
+  "schema": "wingless.up109b-windows-proof.v1",
+  "experiment": "UP-109B-replay-timing",
+  "status": "qualified-scientific-result",
+  "source_head": "68ee0cb6920878b288a3b5a3985cc9d1d4f43819",
+  "workflow_run_id": 36233346358,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10903341356,
+  "artifact_sha256": "56a1e93afd85a921388ada0f22cd191cd6140db0759a475d493f2ed9982876dd",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "findings": {
+    "after_stage3_base": 0.9444444444444443,
+    "after_stage5_acquired": 0.9,
+    "after_final_base": 1,
+    "after_final_acquired": 1,
+    "before_stage3_base": 0.9722222222222223,
+    "before_stage4_acquired": 1,
+    "before_stage5_acquired": 0.9,
+    "before_final_base": 1,
+    "before_final_acquired": 1,
+    "split_stage3_base": 0.9444444444444443,
+    "split_stage5_acquired": 0.9,
+    "split_final_base": 1,
+    "split_final_acquired": 1,
+    "stage5_recurrent_partial_loss": "saves accuracy 0.5 in all three timing arms"
+  },
+  "interpretation": {
+    "replay_placement_alone_does_not_remove_fixed_budget_instability": true,
+    "fifth_acquisition_loss_is_timing_invariant_across_tested_placements": true,
+    "final_recovery_is_robust_but_intermediate_retention_is_not": true,
+    "next_stage": "test class-balanced prior replay at the same six-example budget to isolate class-competition effects"
+  },
+  "activation_authorized": false
+}
