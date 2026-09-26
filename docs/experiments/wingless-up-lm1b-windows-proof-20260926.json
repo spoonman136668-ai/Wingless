@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up-lm1b-windows-proof.v1",
+  "experiment": "UP-LM1B-joint-readout-reintegration",
+  "status": "qualified-scientific-result",
+  "source_head": "d4f5591ce93310854894246521450e2290317f6b",
+  "workflow_run_id": 36238290307,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10905300993,
+  "artifact_sha256": "dd8a9dd3e83202f836c9f58366eb1da6b0f43e56f525817dfedaacf78657ddb6",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_pretrain_epochs": 20,
+  "joint_interleaved_epochs": 20,
+  "learning_rate": 0.08,
+  "findings": {
+    "byte_base_heldout_accuracy": 0.8733075435203095,
+    "byte_base_heldout_perplexity": 1.4762921913292864,
+    "byte_paraphrase_heldout_accuracy": 0.8619324181626188,
+    "byte_paraphrase_heldout_perplexity": 1.5314748630673232,
+    "integrated_top1_accuracy_range": [
+      0.8240056318197818,
+      0.8851547388781431
+    ],
+    "integrated_perplexity_range": [
+      1.433548635604729,
+      1.6226268211486472
+    ],
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "admission_precision_all_cells": 1,
+    "admission_recall_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "jointly_optimized_byte_readout_is_fully_compatible_with_frozen_router_and_exact_memory": true,
+    "base_and_paraphrase_language_quality_remain_jointly_strong": true,
+    "structural_order_variation_does_not_break_integrated_memory_dependent_behavior": true,
+    "language_lane_now_has_an_integrated_joint_adaptation_procedure_rather_than_an_isolated_readout_result": true,
+    "next_stage": "stress integrated joint adaptation on unseen lexical families and larger stream diversity while keeping recurrent state and exact-recall budget fixed"
+  },
+  "activation_authorized": false
+}
