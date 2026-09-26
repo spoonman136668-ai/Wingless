@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up-lm2n-windows-proof.v1",
+  "experiment": "UP-LM2N-recall-loss-lead-time",
+  "status": "qualified-scientific-result",
+  "source_head": "02253618e63fa21ea193fa27e7a84d966d37c975",
+  "workflow_run_id": 36277839781,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10918060539,
+  "artifact_sha256": "54179c6826dc53be8c61424e378a4ddc543ecc87fde673a887d9e89902a85918",
+  "findings": {
+    "arms": 16,
+    "lost_pending_position_all_arms": 7,
+    "loss_event_ordinal_all_arms": 43,
+    "forward_report_event_ordinal": 56,
+    "reverse_report_event_ordinal": 60,
+    "forward_lead_events": 13,
+    "reverse_lead_events": 17,
+    "identity_rotations": [
+      0,
+      7
+    ],
+    "value_shifts": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "exact_recall_cap": 16
+  },
+  "interpretation": {
+    "internal_recall_loss_precedes_later_dependency_request_in_every_arm": true,
+    "warning_lead_is_invariant_to_tested_identity_and_value_remap": true,
+    "report_order_changes_available_warning_window": true,
+    "surface_output_is_not_needed_to_detect_the_internal_loss": true,
+    "plain_speak": "Wingless's memory knows it has dropped the dependency well before the conversation asks for it. In these runs, the loss is visible internally 13 to 17 events before the missing value is needed.",
+    "north_star_question": "This directly demonstrates native-state lead time before an externally visible dependency failure opportunity. It is detection after internal loss, not yet prediction before the internal loss itself.",
+    "next_stage": "test whether capacity slack and recall-order state can forecast the next internal recall eviction before it happens, without using future report identity or output outcomes"
+  },
+  "activation_authorized": false
+}
