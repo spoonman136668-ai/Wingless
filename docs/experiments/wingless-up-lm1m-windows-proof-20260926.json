@@ -1,0 +1,79 @@
+{
+  "schema": "wingless.up-lm1m-windows-proof.v1",
+  "experiment": "UP-LM1M-fourth-byte-isolation",
+  "status": "qualified-scientific-result",
+  "source_head": "97204bca71fc8391b76ab45a678f21550561f8b5",
+  "workflow_run_id": 36249904108,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10908767757,
+  "artifact_sha256": "443e7eecc0424c69d47882d79201499beabc1eab938a4051187ff9a9a93241d2",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_pretrain_epochs": 20,
+  "joint_interleaved_epochs": 20,
+  "three_family_adapt_epochs": 4,
+  "fourth_adapt_epochs": 4,
+  "learning_rate": 0.08,
+  "findings": {
+    "no_fourth_byte_adaptation": {
+      "base_accuracy": 0.8379271437782077,
+      "paraphrase_accuracy": 0.8050862372404083,
+      "third_accuracy": 0.827854938271605,
+      "fourth_accuracy": 0.5576368876080692,
+      "fourth_perplexity": 10.08733685244602,
+      "routing_top1_range": [
+        0.5561159141850784,
+        0.5706051873198847
+      ],
+      "routing_perplexity_range": [
+        9.687890330108797,
+        10.546358741209653
+      ]
+    },
+    "fourth_only_4ep": {
+      "base_accuracy": 0.6390232108317214,
+      "paraphrase_accuracy": 0.6712425202393524,
+      "third_accuracy": 0.6319444444444444,
+      "fourth_accuracy": 0.8816042267050913,
+      "fourth_perplexity": 1.4584178473294451,
+      "routing_top1_range": [
+        0.8623118796029459,
+        0.8932917066922831
+      ],
+      "routing_perplexity_range": [
+        1.4161322865081918,
+        1.5163909024380713
+      ]
+    },
+    "four_family_interleaved_4ep": {
+      "base_accuracy": 0.7925531914893617,
+      "paraphrase_accuracy": 0.758799718409011,
+      "third_accuracy": 0.7985339506172839,
+      "fourth_accuracy": 0.8043547870637208,
+      "fourth_perplexity": 1.846315706105516,
+      "routing_top1_range": [
+        0.7918667947486391,
+        0.8154018571886007
+      ],
+      "routing_perplexity_range": [
+        1.7910455928250113,
+        1.9232235850036532
+      ]
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "admission_precision_all_cells": 1,
+    "admission_recall_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "corrected_fourth_router_fully_removes_semantic_routing_as_the_remaining_failure_source": true,
+    "fourth_only_adaptation_recovers_fourth_byte_quality_but_causes_severe_prior_family_forgetting": true,
+    "four_family_rehearsal_preserves_prior_families_better_while_improving_fourth_family_substantially": true,
+    "remaining_language_limit_is_multi_family_byte_readout_interference_not_router_or_memory_failure": true,
+    "next_stage": "hold the corrected router and recurrent state fixed and test balanced four-family operator scheduling or gradient geometry that improves fourth-family adaptation without the retention loss of fourth-only training"
+  },
+  "activation_authorized": false
+}
