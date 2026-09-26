@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up-lm1k-windows-proof.v1",
+  "experiment": "UP-LM1K-fourth-router-topology",
+  "status": "qualified-scientific-result",
+  "source_head": "3ab6450cbfc6a9dae517a3093967ad014006357e",
+  "workflow_run_id": 36245781677,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10907133122,
+  "artifact_sha256": "5283fea17480909b9aab2ce5aae86b3b2b3b771878b386e562c38238bd6084ca",
+  "state_dimension": 64,
+  "fourth_grounding_epochs": 20,
+  "learning_rate": 0.08,
+  "findings": {
+    "fourth_train_accuracy": 0.8333333333333334,
+    "fourth_heldout_accuracy": 0.6666666666666666,
+    "fourth_unseen_accuracy": 0.7777777777777778,
+    "retains_accuracy_all_splits": 1,
+    "inspects_accuracy_all_splits": 1,
+    "states_train_accuracy": 0.5,
+    "states_heldout_accuracy": 0,
+    "states_unseen_accuracy": 0.3333333333333333,
+    "states_heldout_mean_store_probability": 0.46365211106564747,
+    "states_heldout_mean_report_probability": 0.3351700217468584,
+    "states_unseen_mean_store_probability": 0.43642933066774253,
+    "states_unseen_mean_report_probability": 0.3750850516677307,
+    "base_paraphrase_third_heldout_accuracy": 1
+  },
+  "interpretation": {
+    "fourth_family_failure_is_fully_localized_to_states_report_surface": true,
+    "error_is_report_to_store_geometry": true,
+    "prior_family_rehearsal_is_not_corrupted": true,
+    "next_stage": "test a frozen fourth-family states competitor-orthogonal correction against STORE while leaving other fourth surfaces and grounding unchanged"
+  },
+  "activation_authorized": false
+}
