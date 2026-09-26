@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.up123c-windows-proof.v1",
+  "experiment": "UP-123C-history-saturation",
+  "status": "qualified-scientific-result",
+  "source_head": "16360f6496a340324fe678824303fcf2191190c4",
+  "workflow_run_id": 36256077844,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10910224218,
+  "artifact_sha256": "00ad8fe691abdd6069cfbe4e4ec156e0eb21d4353fa113424e3213a14a331c8f",
+  "findings": {
+    "pressure4": {
+      "history_max": 24,
+      "valid_admission": 1,
+      "valid_accuracy": 1,
+      "exact16": 1,
+      "nonpersistent_retention": 0,
+      "false_admissions": 0
+    },
+    "pressure8": {
+      "history_max": 28,
+      "valid_admission": 1,
+      "valid_accuracy": 1,
+      "exact16": 1,
+      "nonpersistent_retention": 0,
+      "false_admissions": 0
+    },
+    "pressure12": {
+      "history_max": 32,
+      "history_reached_full": true,
+      "valid_admission": 1,
+      "valid_accuracy": 1,
+      "exact16": 1,
+      "nonpersistent_admission": 0,
+      "nonpersistent_retention": 0,
+      "false_admissions": 0
+    },
+    "exact_recall_cap": 16,
+    "admission_memory_bytes": 128,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "exact_age2_history_remains_correct_at_full_representable_occupancy": true,
+    "saturation_itself_does_not_cause_false_admission_or_valid_target_loss": true,
+    "next_boundary_is_overflow_insertion_pressure_beyond_32_history_entries": true,
+    "plain_speak": "The temporary candidate-memory table can be completely full and still remember the right recurring items while rejecting temporary noise. Filling the table is not yet the failure point; the next question is what happens when another qualified candidate arrives after it is already full.",
+    "north_star_question": "Establishes the exact bounded-memory capacity boundary needed for stable temporal admission before integrating the mechanism into longer language sequences.",
+    "next_stage": "hold memory fixed at 128 bytes and test qualified history insertion pressure beyond the 32-entry representable limit without adding replacement capacity"
+  },
+  "activation_authorized": false
+}
