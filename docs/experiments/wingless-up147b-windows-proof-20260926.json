@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up147b-windows-proof.v1",
+  "experiment": "UP-147B-tail-block-permutation",
+  "status": "qualified-scientific-result",
+  "source_head": "aea6c1ce004ba99b507cccdb4bcac3b1fc916f4e",
+  "workflow_run_id": 36257899089,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10911067929,
+  "artifact_sha256": "ef7e5842ce604dbdf3367f0e22354474debc1807f878dcbb4572cc8a0fd6a6fd",
+  "findings": {
+    "shift_mean_tail_damage": {
+      "shift0": -0.021944444444444423,
+      "shift6": 0.0036111111111110984,
+      "shift12": -0.02444444444444442,
+      "shift18": 0.008611111111111102
+    },
+    "block_position_mean_tail_damage": {
+      "position1": -0.0019444444444444374,
+      "position2": -0.003333333333333321,
+      "position3": -0.011666666666666669,
+      "position4": -0.017222222222222215
+    },
+    "final_schedules": {
+      "rotation0": {
+        "old": 0.9166666666666667,
+        "new": 0.9479166666666667,
+        "final_shift": 18
+      },
+      "rotation1": {
+        "old": 0.8777777777777778,
+        "new": 0.9270833333333333,
+        "final_shift": 0
+      },
+      "rotation2": {
+        "old": 0.9166666666666667,
+        "new": 0.9479166666666667,
+        "final_shift": 6
+      },
+      "rotation3": {
+        "old": 0.8611111111111112,
+        "new": 0.921875,
+        "final_shift": 12
+      }
+    }
+  },
+  "interpretation": {
+    "tail_identity_only_explanation_rejected": true,
+    "curriculum_position_only_explanation_rejected": true,
+    "identity_by_position_interaction_supported": true,
+    "shifts_0_and_12_are_consistently_damaging_and_worsen_in_later_positions": true,
+    "shifts_6_and_18_are_neutral_to_positive_across_positions": true,
+    "schedules_ending_in_6_or_18_finish_with_better_old_and_new_scores_than_schedules_ending_in_0_or_12": true,
+    "plain_speak": "Some ending-example sets are inherently much safer than others, and the risky sets become more damaging when they appear late in training. So both what comes last and when it comes last matter. The two schedules that finish with the safer tails keep more old vocabulary and learn more new vocabulary.",
+    "north_star_question": "Identifies a concrete lexical curriculum interaction between example geometry and training position, narrowing how Wingless can sequence new language material without sacrificing prior knowledge.",
+    "next_stage": "hold the first three blocks fixed and swap only the final five-epoch tail identity between a safe tail and a damaging tail to test whether terminal-tail identity causally drives the final retention gap"
+  },
+  "activation_authorized": false
+}
