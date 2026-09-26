@@ -1,0 +1,43 @@
+{
+  "schema": "wingless.up-lm2v-windows-proof.v1",
+  "experiment": "UP-LM2V-response-generalization",
+  "status": "qualified-scientific-result",
+  "source_head": "322d3fc35919cbcc4192352569154156cefd9394",
+  "workflow_run_id": 36280613254,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10918073147,
+  "artifact_sha256": "5a303ebe5054d006f633b098f3d4e0a0ab69e9554a4f6b403c384a4750427a4d",
+  "findings": {
+    "total_arms": 24,
+    "identity_rotations": [
+      3,
+      11
+    ],
+    "value_shifts": [
+      0,
+      2
+    ],
+    "pending_layouts": [
+      "suffix_reported",
+      "alternating_reported"
+    ],
+    "baseline_failed": 96,
+    "guided_failed": 0,
+    "sham_failed": 96,
+    "guided_actions": 96,
+    "sham_actions": 96,
+    "guided_prevented": 96,
+    "sham_prevented": 0,
+    "exact_recall_cap": 16
+  },
+  "interpretation": {
+    "warning_guided_response_generalizes_across_disjoint_identity_and_pending_layouts": true,
+    "matched_sham_remains_ineffective": true,
+    "target_specificity_replicates": true,
+    "guided_action_count_scales_with_number_of_at_risk_dependencies": true,
+    "plain_speak": "The response survived a much harder layout shift. Ninety-six original dependencies would have failed; the guided rule saved all ninety-six. Moving the wrong dependency at the same action count saved none.",
+    "north_star_question": "Moves the bounded corrective mechanism from a single schedule result toward a general rule, while exposing intervention budget as the next practical constraint.",
+    "next_stage": "freeze per-arm action budgets and measure how prevention degrades when Wingless cannot close every endangered dependency, comparing warning-guided prioritization with budget-matched sham"
+  },
+  "activation_authorized": false
+}
