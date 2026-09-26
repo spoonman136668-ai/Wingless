@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.up127b-windows-proof.v1",
+  "experiment": "UP-127B-balanced-store-gate",
+  "status": "qualified-scientific-result",
+  "source_head": "5528e0fd267ce3153b9ac84ac67c858669cc1091",
+  "workflow_run_id": 36245115386,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10906933315,
+  "artifact_sha256": "b29ac0e75d0c30bbc898606738f5740c93bad123ccf90a582b6d8e8c5020d18a",
+  "findings": {
+    "original_unseen": {
+      "accuracy": 0.7555555555555555,
+      "precision": 1,
+      "recall": 0.26666666666666666
+    },
+    "balanced_train": {
+      "accuracy": 0.8833333333333333,
+      "precision": 0.7407407407407407,
+      "recall": 1
+    },
+    "balanced_heldout": {
+      "accuracy": 0.9,
+      "precision": 0.8181818181818182,
+      "recall": 0.9
+    },
+    "balanced_unseen": {
+      "accuracy": 0.9111111111111111,
+      "precision": 0.7894736842105263,
+      "recall": 1
+    },
+    "balanced_unseen_store_positive_rate_all_surfaces": 1,
+    "balanced_heldout_stores_positive_rate": 0.5,
+    "balanced_false_positive_surfaces": [
+      "observes",
+      "tells"
+    ],
+    "balanced_max_non_store_probability": 0.57746041672864
+  },
+  "interpretation": {
+    "positive_weighting_removes_the_broad_store_false_negative_problem": true,
+    "binary_gate_now_overlaps_specific_observe_and_report_surfaces": true,
+    "binary_class_prior_bias_was_real_but_not_the_only_limit": true,
+    "next_stage": "replace binary STORE-vs-rest gating with a balanced three-way STORE OBSERVE REPORT softmax gate and apply the projector only when STORE is argmax"
+  },
+  "activation_authorized": false
+}
