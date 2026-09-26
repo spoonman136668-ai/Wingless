@@ -77,3 +77,15 @@ Success in mixed_gap_clean would show exact3 is insensitive to benign recurrence
 ## Bounds
 
 No admission-memory increase, no capacity increase, no semantic labels, no query-derived admission, no adaptive threshold, no phase labels, no future oracle, no result-informed retry, no live activation, no production authority.
+
+
+## Frozen presentation order addendum
+
+This ordering is fixed before execution:
+
+- mixed_gap_clean: weak keys 100..103 first, then strong keys 200..203.
+- four_hit_distractor: target strong keys 200..203 first, then distractor keys 300..303.
+- candidate keys are presented in ascending numeric order within each group.
+- each candidate begins at a fresh probation generation boundary.
+
+The ordering is deterministic and is not changed after observing results.
