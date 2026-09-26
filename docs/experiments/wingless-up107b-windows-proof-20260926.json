@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.up107b-windows-proof.v1",
+  "experiment": "UP-107B-fixed-replay-budget",
+  "status": "qualified-scientific-result",
+  "source_head": "31bb2ea10b15148706663b772ad30d55416b340e",
+  "workflow_run_id": 36230615743,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10901838139,
+  "artifact_sha256": "cf6d85188162989daf42f1221a3ef71571b38704da52881b503130ecc01a37b3",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "base_replay_subjects": 1,
+  "findings": {
+    "full_control_final": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "fixed2_final": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 0.75
+    },
+    "fixed4_final": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 0.9166666666666666
+    },
+    "fixed6_final": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "fixed6_stage3": {
+      "base_accuracy": 0.9444444444444443,
+      "acquired_accuracy": 1
+    },
+    "fixed6_stage5": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 0.9
+    }
+  },
+  "interpretation": {
+    "constant_total_replay_budget_can_reach_full_final_retention": true,
+    "fixed_six_examples_per_epoch_is_sufficient_at_final_stage": true,
+    "fixed_six_is_not_stable_at_every_intermediate_stage": true,
+    "fixed_two_and_four_are_insufficient_under_current_schedule": true,
+    "allocation_coverage_is_now_a_likely_limit_not_total_budget_alone": true,
+    "next_stage": "hold total replay at six examples and compare deterministic pair-major versus verb-stratified coverage schedules"
+  },
+  "activation_authorized": false
+}
