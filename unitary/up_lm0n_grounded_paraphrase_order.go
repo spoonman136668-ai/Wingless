@@ -28,11 +28,11 @@ func uplm0nAnchor(name, verb string) string { return name+" "+verb }
 
 func uplm0nClassForVerb(verb string) int {
 	switch verb {
-	case "stores","saves":
+	case "stores","saves","archives":
 		return uplm0jStore
-	case "observes","sees":
+	case "observes","sees","notices":
 		return uplm0jObserve
-	case "reports","recalls":
+	case "reports","recalls","recounts":
 		return uplm0jReport
 	default:
 		return -1
