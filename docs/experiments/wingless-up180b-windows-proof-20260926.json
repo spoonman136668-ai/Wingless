@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.up180b-windows-proof.v1",
+  "experiment": "UP-180B-margin-replication",
+  "status": "qualified-scientific-result",
+  "source_head": "358f91ef3554cf1062940abe9d7911a2dd363a7d",
+  "workflow_run_id": 36279701252,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10918631576,
+  "artifact_sha256": "8b89f39d70cf85aaa7ba313d9a682449356a78ed3713a0b0a0c16b0b5fe5d352",
+  "findings": {
+    "heldout_phase": 25,
+    "actual_crossings": 223,
+    "total_slots": 17280,
+    "rank_plus_temporal": {
+      "auroc": 0.9657356986374622,
+      "average_precision": 0.32923212131462487
+    },
+    "rank_plus_temporal_margin_tiebreak": {
+      "auroc": 0.9830264444380764,
+      "average_precision": 0.3591630884778701
+    },
+    "margin_only": {
+      "auroc": 0.9831589466181841,
+      "average_precision": 0.3557793287245095
+    }
+  },
+  "interpretation": {
+    "continuous_margin_discrimination_replicates": true,
+    "margin_only_and_margin_tiebreak_are_nearly_tied_on_auroc": true,
+    "composite_with_margin_tiebreak_has_slightly_higher_average_precision": true,
+    "residual_temporal_value_beyond_exact_margin_remains_unresolved": true,
+    "plain_speak": "The strong margin signal replicated on a fresh phase. Exact margin alone and the composite-with-margin are almost tied in AUROC; the composite has a small AP edge. We still need a conditional test to prove whether history adds information once exact margin is already known.",
+    "north_star_question": "Confirms continuous margin as a robust native warning signal and narrows the next question to residual temporal information beyond exact margin.",
+    "next_stage": "within narrow preregistered absolute-margin bands on a fresh phase, compare crossing density by temporal state without fitting a new predictor"
+  },
+  "activation_authorized": false
+}
