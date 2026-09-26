@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.up178b-windows-proof.v1",
+  "experiment": "UP-178B-score-discrimination",
+  "status": "qualified-scientific-result",
+  "source_head": "f6f7198a60437b9dd8980ce0c744f11d8f30a0e5",
+  "workflow_run_id": 36278763352,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10918725263,
+  "artifact_sha256": "ac35f49db45efd1754bd4f0e1f0f6a2c277ebc4ec792c86c761e422e40a28772",
+  "findings": {
+    "heldout_phase": 23,
+    "base_crossing_rate": 0.012905092592592593,
+    "rank_plus_temporal": {
+      "auroc": 0.9657356986374622,
+      "average_precision": 0.32923212131462487,
+      "predicted_crossings_sum": 221.99999999992792,
+      "actual_crossings": 223
+    },
+    "rank_only": {
+      "auroc": 0.9633096468159648,
+      "average_precision": 0.2758367348894255,
+      "predicted_crossings_sum": 221.99999999993105,
+      "actual_crossings": 223
+    }
+  },
+  "interpretation": {
+    "native_score_has_strong_threshold_free_discrimination": true,
+    "average_precision_is_far_above_base_rate": true,
+    "temporal_history_improves_precision_ranking_over_rank_only": true,
+    "coarse_score_quantization_likely_contributes_to_threshold_tradeoff": true,
+    "plain_speak": "The detector is much better than its threshold results made it look. It ranks failures above non-failures extremely well: AUROC is about 0.966, and average precision is about 25 times the raw failure rate. The problem is now turning that strong ranking into a selective trigger, not finding a signal from scratch.",
+    "north_star_question": "Confirms meaningful native failure-risk ordering on held-out data while preserving the conclusion that current coarse thresholding is not intervention-ready.",
+    "next_stage": "test whether continuous absolute margin can break ties within frozen rank-plus-temporal risk cells and improve average precision on another held-out phase without fitting"
+  },
+  "activation_authorized": false
+}
