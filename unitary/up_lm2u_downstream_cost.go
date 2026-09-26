@@ -61,7 +61,8 @@ func uplm2uRun(d,rot,shift int,mode string,triggers map[int]bool)(completed,fail
 		}
 		r.write(fmt.Sprintf("cost-%s-%d-%d-%d-%d",mode,d,rot,shift,j),"x")
 	}
-	return uplm2uFinish(r,reported,rot)
+	completed,failed=uplm2uFinish(r,reported,rot)
+	return completed,failed,actions
 }
 func RunUPLM2U()(UPLM2UResult,error){
 	levels:=[]int{4,5,6};rots:=[]int{0,7};shifts:=[]int{0,1,2,3}
