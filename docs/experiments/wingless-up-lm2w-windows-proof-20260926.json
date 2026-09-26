@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.up-lm2w-windows-proof.v1",
+  "experiment": "UP-LM2W-budget-frontier",
+  "status": "qualified-scientific-result",
+  "source_head": "5372c24546be3d9041327c93c326a28b6a412275",
+  "workflow_run_id": 36280959138,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10918981556,
+  "artifact_sha256": "841aa191a5ac80dade0ef7be7f08007c30f728de7cf8b23ec0fdcbc0846041d0",
+  "findings": {
+    "baseline_failed": 96,
+    "budgets": {
+      "0": {
+        "guided_failed": 96,
+        "guided_actions": 0,
+        "guided_prevented": 0,
+        "prevented_per_action": 0,
+        "sham_prevented": 0
+      },
+      "1": {
+        "guided_failed": 72,
+        "guided_actions": 24,
+        "guided_prevented": 24,
+        "prevented_per_action": 1,
+        "sham_prevented": 0
+      },
+      "2": {
+        "guided_failed": 48,
+        "guided_actions": 48,
+        "guided_prevented": 48,
+        "prevented_per_action": 1,
+        "sham_prevented": 0
+      },
+      "3": {
+        "guided_failed": 28,
+        "guided_actions": 68,
+        "guided_prevented": 68,
+        "prevented_per_action": 1,
+        "sham_prevented": 0
+      }
+    }
+  },
+  "interpretation": {
+    "guided_action_has_one_for_one_prevention_efficiency_in_tested_regime": true,
+    "sham_actions_have_zero_preventive_value": true,
+    "benefit_scales_linearly_until_budget_or_risk_set_is_exhausted": true,
+    "limited_budget_leaves_predictable_residual_failures": true,
+    "plain_speak": "Each correctly targeted action buys exactly one saved dependency. One action per arm saves 24 total, two save 48, and the available third actions save another 20. There is no hidden multiplier and no benefit from spending the same budget on the wrong target.",
+    "north_star_question": "Establishes an explicit intervention cost curve under fixed resources. The remaining scheduling question is how to allocate a global limited budget across simultaneous risk when not every warning can be acted on.",
+    "next_stage": "compare global-budget prioritization rules across mixed arms—earliest time-to-failure versus fixed-order allocation—using the same total action budget and no future outcomes"
+  },
+  "activation_authorized": false
+}
