@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up118c-windows-proof.v1",
+  "experiment": "UP-118C-crossgeneration-age2",
+  "status": "qualified-scientific-result",
+  "source_head": "1e6683f2a795e3a53d375f197bd7a20e618ec018",
+  "workflow_run_id": 36252639913,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10909707635,
+  "artifact_sha256": "fd6005637a16fcb6b264ce7287bce989da485f9e1c63e56ef9528feec0462873",
+  "hot_keys": 12,
+  "target_candidates": 4,
+  "burst_distractors": 4,
+  "generation_interval": 32,
+  "admission_memory_bytes": 128,
+  "exact_recall_cap": 16,
+  "key_bits": 14,
+  "churn_writes": 12288,
+  "findings": {
+    "previous_control_adjacent": {
+      "target_admission_rate": 1,
+      "burst_admission_rate": 0,
+      "hot_accuracy": 1,
+      "target_accuracy": 1,
+      "target16_exact_accuracy": 1
+    },
+    "age2_adjacent": {
+      "target_admission_rate": 1,
+      "burst_admission_rate": 0,
+      "hot_accuracy": 1,
+      "target_accuracy": 1,
+      "target16_exact_accuracy": 1
+    },
+    "previous_control_skip_one": {
+      "target_admission_rate": 0,
+      "burst_admission_rate": 0,
+      "hot_accuracy": 1,
+      "target_accuracy": 0,
+      "target16_accuracy": 0.75,
+      "target16_exact_accuracy": 0
+    },
+    "age2_skip_one": {
+      "target_admission_rate": 1,
+      "burst_admission_rate": 0,
+      "hot_accuracy": 1,
+      "target_accuracy": 1,
+      "target16_accuracy": 1,
+      "target16_exact_accuracy": 1
+    },
+    "one_shot_false_admissions_all_cells": 0,
+    "recall_entries_used": 16,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "equal_memory_age2_history_extends_persistence_across_one_skipped_generation": true,
+    "adjacent_generation_behavior_is_preserved": true,
+    "one_generation_bursts_remain_rejected": true,
+    "previous_generation_only_control_has_the_expected_one_generation_horizon": true,
+    "next_stage": "stress age2 with adjacent and skipped candidates mixed in the same episode and include a two-skipped-generation negative boundary"
+  },
+  "preregistration_note": "Before execution the churn horizon was corrected from 24576 to 12288 unique writes because the frozen 14-bit exact key encoding cannot represent the larger unique-key range. No data had been run; memory budget, mechanism, recurrence workload, seeds, and interpretation criteria were unchanged.",
+  "activation_authorized": false
+}
