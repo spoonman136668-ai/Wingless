@@ -1,0 +1,54 @@
+{
+  "schema": "wingless.up143b-windows-proof.v1",
+  "experiment": "UP-143B-within-epoch-interference-trajectory",
+  "status": "qualified-scientific-result",
+  "source_head": "453937a0a91b4c62815d68dc1a650b4ab71c9103",
+  "workflow_run_id": 36256513575,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10910631875,
+  "artifact_sha256": "d291ed275b31050a36c8be804fc16aa8492236add9fffd6db6fec11d1fc2a64e",
+  "findings": {
+    "original_diversity1": {
+      "mean_prefix_damage": 0.002222222222222203,
+      "mean_anchor_recovery": 0.01666666666666667,
+      "mean_tail_damage": -0.024999999999999984,
+      "mean_net_epoch_change": -0.006111111111111111,
+      "final_old": 0.8777777777777778,
+      "final_new": 0.9270833333333333
+    },
+    "original_diversity20": {
+      "mean_prefix_damage": -0.01722222222222223,
+      "mean_anchor_recovery": 0.017777777777777788,
+      "mean_tail_damage": -0.003611111111111115,
+      "mean_net_epoch_change": -0.0030555555555555557,
+      "final_old": 0.9388888888888889,
+      "final_new": 0.921875
+    },
+    "replication_diversity1": {
+      "mean_prefix_damage": -0.013333333333333341,
+      "mean_anchor_recovery": 0.011666666666666681,
+      "mean_tail_damage": 0.0011111111111111072,
+      "mean_net_epoch_change": -0.0005555555555555536,
+      "final_old": 0.9888888888888889,
+      "final_new": 0.9114583333333333
+    },
+    "replication_diversity20": {
+      "mean_prefix_damage": -0.008055555555555566,
+      "mean_anchor_recovery": 0.010000000000000009,
+      "mean_tail_damage": -0.0024999999999999966,
+      "mean_net_epoch_change": -0.0005555555555555536,
+      "final_old": 0.9888888888888889,
+      "final_new": 0.9635416666666667
+    }
+  },
+  "interpretation": {
+    "original_family_retention_effect_is_localized_to_post_anchor_tail_damage": true,
+    "broad_diversity_moves_some_interference_into_pre_anchor_prefix_where_rehearsal_can_recover_it": true,
+    "repeated_fixed_tail_causes_large_unrecovered_end_of_epoch_damage_on_original_family": true,
+    "replication_family_has_same_mean_net_epoch_retention_change_under_diversity1_and_diversity20": true,
+    "plain_speak": "For the first vocabulary family, repeatedly finishing with the same four new examples is the damaging step. Rotating which examples come last moves more interference earlier in the epoch, where old-vocabulary rehearsal can repair it, and leaves much less damage after the rehearsal block. The second vocabulary family does not have the same retention problem.",
+    "north_star_question": "Identifies the within-sequence mechanism by which training order changes retention, a prerequisite for designing stable sequential language learning rather than applying one global schedule rule.",
+    "next_stage": "hold tail-identity coverage and frequency fixed while changing only recurrence spacing to test whether repeated temporal clustering, rather than coverage alone, drives post-anchor damage"
+  },
+  "activation_authorized": false
+}
