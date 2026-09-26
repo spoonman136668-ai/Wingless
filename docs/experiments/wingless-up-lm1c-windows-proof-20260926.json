@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.up-lm1c-windows-proof.v1",
+  "experiment": "UP-LM1C-unseen-lexical-integration",
+  "status": "qualified-scientific-result",
+  "source_head": "ab876e63ce01637f8b6f8e7dad91c6188f9b1e41",
+  "workflow_run_id": 36239878642,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10905642369,
+  "artifact_sha256": "205e9bd7db7b0b91c884a994393c01fad2b8909e62b2e6fb379047745584374f",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_pretrain_epochs": 20,
+  "joint_interleaved_epochs": 20,
+  "router_grounding_epochs": 20,
+  "learning_rate": 0.08,
+  "findings": {
+    "heldout_third_family_router_accuracy": 1,
+    "base_block_accuracy": 0.8733075435203095,
+    "base_block_perplexity": 1.4762921913292864,
+    "paraphrase_block_accuracy": 0.8619324181626188,
+    "paraphrase_block_perplexity": 1.5314748630673232,
+    "third_family_top1_accuracy_range": [
+      0.4885030864197531,
+      0.4943672839506173
+    ],
+    "third_family_perplexity_range": [
+      85.9325839841911,
+      90.95793074465922
+    ],
+    "third_family_dependent_first_byte_accuracy_all_cells": 1,
+    "third_family_query_set_exact_accuracy_all_cells": 1,
+    "third_family_admission_precision_all_cells": 1,
+    "third_family_admission_recall_all_cells": 1,
+    "third_family_event_routing_accuracy_all_cells": 1,
+    "third_family_report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "grounded_event_semantics_generalize_to_a_third_lexical_family": true,
+    "exact_memory_behavior_remains_fully_intact": true,
+    "frozen_byte_readout_is_the_dominant_third_family_ood_limit": true,
+    "structural_order_and_stream_size_do_not_change_the_failure_mode": true,
+    "next_stage": "adapt the byte readout to the third lexical family with fixed base-plus-paraphrase replay while freezing router, recurrence, and recall budget"
+  },
+  "activation_authorized": false
+}
