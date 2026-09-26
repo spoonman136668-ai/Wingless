@@ -1,0 +1,39 @@
+{
+  "schema": "wingless.up154c-windows-proof.v1",
+  "experiment": "UP-154C-prewrite-loss-warning",
+  "status": "qualified-scientific-result",
+  "source_head": "48e8d33d31ca3a7a00a9faa403147f85af17e90c",
+  "workflow_run_id": 36278766710,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10918205913,
+  "artifact_sha256": "cd95c5d0b5d714454e638fab4bc6414e6a1a290f2921757c57d451fe45adfbb5",
+  "findings": {
+    "true_positive": 53,
+    "false_positive": 0,
+    "false_negative": 0,
+    "true_negative": 43,
+    "precision": 1,
+    "recall": 1,
+    "accuracy": 1,
+    "starting_hands": [
+      0,
+      4,
+      8,
+      12
+    ],
+    "steps_per_arm": 24,
+    "novel_writes_per_arm": 16,
+    "repeat_writes_per_arm": 8,
+    "predictor_uses_semantic_class": false,
+    "future_oracle_used": false
+  },
+  "interpretation": {
+    "native_prewrite_durable_loss_warning_is_exact_under_mixed_writes": true,
+    "repeat_updates_are_correctly_identified_as_nonreplacement_events": true,
+    "sparse_refresh_does_not_break_warning_accuracy": true,
+    "plain_speak": "Before each mixed write, Wingless could tell perfectly whether that write would erase one of the original durable memories. It caught all 53 destructive writes and raised no false alarms.",
+    "north_star_question": "Upgrades exact slot forecasting into an explicit pre-loss warning signal tied to durable-memory preservation, still without taking any action.",
+    "next_stage": "test the same warning against several preregistered protected cohorts rather than the entire original set, asking whether Wingless can identify capability-specific loss risk without semantic priority"
+  },
+  "activation_authorized": false
+}
