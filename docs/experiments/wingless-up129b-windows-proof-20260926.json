@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up129b-windows-proof.v1",
+  "experiment": "UP-129B-dualview-store-gate",
+  "status": "qualified-scientific-result",
+  "source_head": "dd2a3efeea6ef71eae3f28c78230034c7f4ae847",
+  "workflow_run_id": 36249093833,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10908756684,
+  "artifact_sha256": "fa601354d8904060ae7d42ef1407510c27e43c52c0bea3f0fbc6dbbc537646b1",
+  "state_dimension": 64,
+  "gate_input_dimension": 128,
+  "epochs": 20,
+  "learning_rate": 0.08,
+  "findings": {
+    "train_class_accuracy": 1,
+    "heldout_class_accuracy": 1,
+    "unseen_class_accuracy": 1,
+    "train_store_precision": 1,
+    "train_store_recall": 1,
+    "heldout_store_precision": 1,
+    "heldout_store_recall": 1,
+    "unseen_store_precision": 1,
+    "unseen_store_recall": 1,
+    "stores_accuracy_all_splits": 1,
+    "stores_unseen_mean_store_probability": 0.5960864860912757,
+    "stores_unseen_mean_observe_probability": 0.34577420117175395,
+    "max_non_store_projection_rate": 0,
+    "min_base_original_accuracy_all_points": 1,
+    "min_base_unseen_accuracy_all_points": 1,
+    "min_acquired_accuracy_nonzero_stages": 1
+  },
+  "interpretation": {
+    "generic_dual_view_gate_resolves_stores_vs_observe_ambiguity": true,
+    "frozen_projected_candidate_view_provides_useful_class_evidence_without_explicit_store_membership": true,
+    "non_store_projection_corruption_is_absent_in_the_tested_matrix": true,
+    "downstream_continual_learning_matrix_is_exact_under_the_learned_gate": true,
+    "next_stage": "hold the dual-view mechanism frozen and test completely held-out lexical surfaces and subject families not used in gate training"
+  },
+  "activation_authorized": false
+}
