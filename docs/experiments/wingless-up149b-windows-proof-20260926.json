@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up149b-windows-proof.v1",
+  "experiment": "UP-149B-four-tail-causal-ranking",
+  "status": "qualified-scientific-result",
+  "source_head": "b710f27ac403a6729d6ca42be87bd90005af7738",
+  "workflow_run_id": 36264367993,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10912459809,
+  "artifact_sha256": "9fa3ce961e9a8aca76c8f792b32428d61c5b9300924692e27290da3f6077f5fc",
+  "findings": {
+    "terminal_0": {
+      "shift": 0,
+      "prefix_state_old_retention": 0.9111111111111112,
+      "mean_tail_damage": -0.0533333333333333,
+      "mean_net_epoch_change": -0.006666666666666687,
+      "final_old_retention": 0.8777777777777778,
+      "final_new_accuracy": 0.9270833333333333
+    },
+    "terminal_6": {
+      "shift": 6,
+      "prefix_state_old_retention": 0.9111111111111112,
+      "mean_tail_damage": 0.007777777777777772,
+      "mean_net_epoch_change": 0.0011111111111111072,
+      "final_old_retention": 0.9166666666666667,
+      "final_new_accuracy": 0.9479166666666667
+    },
+    "terminal_12": {
+      "shift": 12,
+      "prefix_state_old_retention": 0.9111111111111112,
+      "mean_tail_damage": -0.05777777777777773,
+      "mean_net_epoch_change": -0.010000000000000009,
+      "final_old_retention": 0.8611111111111112,
+      "final_new_accuracy": 0.921875
+    },
+    "terminal_18": {
+      "shift": 18,
+      "prefix_state_old_retention": 0.9111111111111112,
+      "mean_tail_damage": 0.02222222222222221,
+      "mean_net_epoch_change": 0.0011111111111111072,
+      "final_old_retention": 0.9166666666666667,
+      "final_new_accuracy": 0.9479166666666667
+    }
+  },
+  "interpretation": {
+    "four_tail_response_forms_safe_and_damaging_identity_groups": true,
+    "shifts_6_and_18_are_protective_from_the_common_prefix": true,
+    "shifts_0_and_12_are_damaging_from_the_common_prefix": true,
+    "shift_12_is_the_strongest_damaging_terminal_in_this_frozen_map": true,
+    "post_anchor_tail_effect_tracks_final_stability_and_plasticity": true,
+    "plain_speak": "From exactly the same learned state, two ending-example groups help the model finish stronger and two hurt it. The difference is not just when the block appears: the identity of the final examples themselves determines whether the last updates protect or damage old vocabulary.",
+    "north_star_question": "Establishes a causal lexical-example identity class that controls stability versus forgetting at fixed training budget, narrowing the language-sequencing mechanism toward example geometry.",
+    "next_stage": "measure the frozen update geometry of all four tail identities from the identical 15-epoch state, without additional training, to identify what separates the safe pair from the damaging pair"
+  },
+  "activation_authorized": false
+}
