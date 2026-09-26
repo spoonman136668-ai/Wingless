@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up117c-windows-proof.v1",
+  "experiment": "UP-117C-crossgeneration-confirmation",
+  "status": "qualified-scientific-result",
+  "source_head": "88bbfe748f23da2e05fa5d2792b1c104e397ffec",
+  "workflow_run_id": 36252253110,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10909921534,
+  "artifact_sha256": "103232d36e52b58e2c0f5f47d79af1a76509102d9bd55efa08f6003374b9efa6",
+  "hot_keys": 12,
+  "target_candidates": 4,
+  "burst_distractors": 4,
+  "generation_interval": 32,
+  "admission_memory_bytes": 128,
+  "exact_recall_cap": 16,
+  "findings": {
+    "exact3_control": {
+      "target_admission_rate": 0,
+      "burst_admission_rate": 1,
+      "hot_accuracy": 1,
+      "target_accuracy": 0,
+      "burst_accuracy": 1,
+      "target16_accuracy": 0.75,
+      "target16_exact_accuracy": 0
+    },
+    "crossgen_2x2": {
+      "target_admission_rate": 1,
+      "burst_admission_rate": 0,
+      "hot_accuracy": 1,
+      "target_accuracy": 1,
+      "burst_accuracy": 0,
+      "target16_accuracy": 1,
+      "target16_exact_accuracy": 1
+    },
+    "one_shot_false_admissions_all_arms": 0,
+    "recall_entries_used": 16,
+    "policy_metadata_bytes": 136,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "cross_generation_persistence_resolves_the_one_generation_burst_ambiguity": true,
+    "adjacent_generation_recurrence_is_a_useful_local_confidence_dimension": true,
+    "one_generation_frequency_alone_is_not_sufficient_but_persistence_across_generations_is": true,
+    "target_working_set_is_preserved_exactly_without_semantic_labels_or_more_memory": true,
+    "next_stage": "map the persistence-horizon boundary by introducing candidates that skip one generation before recurring, while keeping the same 128-byte admission budget"
+  },
+  "activation_authorized": false
+}
