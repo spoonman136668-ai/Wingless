@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up-lm1n-windows-proof.v1",
+  "experiment": "UP-LM1N-fourfamily-operator-balance",
+  "status": "qualified-scientific-result",
+  "source_head": "a327b2a7fa14d895f4faa42cf0e391917f380740",
+  "workflow_run_id": 36250743901,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10908734207,
+  "artifact_sha256": "c448013be14690e741dea2d273501bb06068823a0ed8720d5566ef374afc2e62",
+  "state_dimension": 64,
+  "adaptation_epochs": 4,
+  "full_step_learning_rate": 0.08,
+  "half_step_learning_rate": 0.04,
+  "per_family_nominal_lr_per_index": 0.08,
+  "findings": {
+    "cyclic_control": {
+      "min_heldout_accuracy": 0.758799718409011,
+      "mean_heldout_accuracy": 0.7885604118948444,
+      "spread": 0.04555506865470982
+    },
+    "mirrored_by_index": {
+      "min_heldout_accuracy": 0.7828210054434839,
+      "mean_heldout_accuracy": 0.799080105304079,
+      "spread": 0.038665132532015756
+    },
+    "rotating_palindromic_split": {
+      "min_heldout_accuracy": 0.7804470256951778,
+      "mean_heldout_accuracy": 0.8002250883802742,
+      "spread": 0.03741241982384225
+    },
+    "mirrored_base_heldout": 0.8214861379754996,
+    "mirrored_paraphrase_heldout": 0.7841429074269624,
+    "mirrored_third_heldout": 0.8078703703703703,
+    "mirrored_fourth_heldout": 0.7828210054434839,
+    "palindromic_base_heldout": 0.81785944551902,
+    "palindromic_paraphrase_heldout": 0.7804470256951778,
+    "palindromic_third_heldout": 0.8064043209876544,
+    "palindromic_fourth_heldout": 0.7961895613192443
+  },
+  "interpretation": {
+    "four_family_update_order_materially_affects_retention_adaptation_balance": true,
+    "mirrored_order_improves_worst_family_accuracy_over_cyclic_control": true,
+    "rotating_palindromic_order_improves_mean_accuracy_and_reduces_family_spread_over_cyclic_control": true,
+    "equal_nominal_update_mass_does_not_eliminate_recency_interference": true,
+    "next_stage": "reintegrate mirrored and rotating-palindromic four-family byte schedules with the corrected fourth-family router and exact memory before adding a fifth lexical family"
+  },
+  "activation_authorized": false
+}
