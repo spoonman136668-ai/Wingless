@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up-lm0u-windows-proof.v1",
+  "experiment": "UP-LM0U-anchor-interleaved",
+  "status": "qualified-scientific-result",
+  "source_head": "84d6c11f5a1dd0f894305d5e66cf01f531182bed",
+  "workflow_run_id": 36234430601,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10903761956,
+  "artifact_sha256": "5c13eeb6c6f6858868e0339de6228efb4f9768fac401f0717527fab81ecfc447",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_epochs": 20,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "findings": {
+    "no_replay_anchor0": {
+      "base_accuracy": 0.692134107027724,
+      "paraphrase_accuracy": 0.8621964097148891
+    },
+    "no_replay_anchor0001": {
+      "base_accuracy": 0.7322695035460993,
+      "paraphrase_accuracy": 0.8502287926786343
+    },
+    "interleaved_anchor0": {
+      "base_accuracy": 0.8650064474532559,
+      "paraphrase_accuracy": 0.8173178458289335
+    },
+    "interleaved_anchor0001": {
+      "base_accuracy": 0.8695196647324307,
+      "paraphrase_accuracy": 0.7740232312565998
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "weak_anchoring_not_complementary_to_interleaved_replay_at_tested_lambda": true,
+    "interleaved_anchor_base_gain_small": true,
+    "interleaved_anchor_paraphrase_cost_large": true,
+    "interleaved_replay_supplies_most_useful_retention_pressure": true,
+    "routing_and_exact_memory_remain_stable": true,
+    "next_stage": "test parameter-selective anchoring that constrains only byte-readout rows strongly used by the original event verbs while leaving new paraphrase rows unconstrained"
+  },
+  "activation_authorized": false
+}
