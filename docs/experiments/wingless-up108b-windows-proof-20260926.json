@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up108b-windows-proof.v1",
+  "experiment": "UP-108B-stratified-replay",
+  "status": "qualified-scientific-result",
+  "source_head": "1e829502ab9cdbb24e980765eb9d1b83ccb9149d",
+  "workflow_run_id": 36230978921,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10902389041,
+  "artifact_sha256": "9b1926a9853ca653fe051f4da497c5b59cae45e51680e7ec31d2f4ed196a047f",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "findings": {
+    "full_control_all_stages_base_accuracy": 1,
+    "full_control_all_acquired_stages_accuracy": 1,
+    "pair_major_stage3_base_accuracy": 0.9444444444444443,
+    "pair_major_stage5_acquired_accuracy": 0.9,
+    "pair_major_final_base_accuracy": 1,
+    "pair_major_final_acquired_accuracy": 1,
+    "stratified_stage3_base_accuracy": 0.9722222222222223,
+    "stratified_stage5_acquired_accuracy": 0.8,
+    "stratified_final_base_accuracy": 1,
+    "stratified_final_acquired_accuracy": 1
+  },
+  "interpretation": {
+    "simple_verb_stratification_does_not_remove_fixed_budget_instability": true,
+    "coverage_only_hypothesis_not_supported": true,
+    "fixed_six_budget_can_recover_final_state_but_not_preserve_every_intermediate_state": true,
+    "update_recency_and_replay_timing_remain_candidate_mechanisms": true,
+    "next_stage": "hold examples and budget fixed at six and compare replay timing before versus after versus split around current-verb grounding"
+  },
+  "activation_authorized": false
+}
