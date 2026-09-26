@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.up-lm1s-windows-proof.v1",
+  "experiment": "UP-LM1S-fifth-isolation-attribution",
+  "status": "qualified-scientific-result",
+  "source_head": "b899a572f9e4b3b3f1cceaf74b28b7ea06c93028",
+  "workflow_run_id": 36256176941,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10910557654,
+  "artifact_sha256": "405335fb6f090d89c688affcc946d3aa96d5f666feb78ebb4c170f42758db63d",
+  "findings": {
+    "no_adaptation": {
+      "fifth_accuracy": 0.5218430596768876,
+      "fifth_perplexity": 28.883876854015398,
+      "prior_mean_accuracy": 0.8002250883802742
+    },
+    "fifth_only": {
+      "fifth_accuracy": 0.8494889548302011,
+      "fifth_perplexity": 1.5733838504222057,
+      "prior_mean_accuracy": 0.6169071869163014,
+      "min_accuracy": 0.5804514889529299,
+      "mean_accuracy": 0.6634235404990814
+    },
+    "five_family_cyclic": {
+      "fifth_accuracy": 0.7375535773161886,
+      "fifth_perplexity": 2.2893638505995324,
+      "prior_mean_accuracy": 0.7590823187585912,
+      "min_accuracy": 0.7375535773161886,
+      "mean_accuracy": 0.7547765704701107
+    },
+    "fifth_only_minus_cyclic_fifth_accuracy": 0.1119353775140125,
+    "fifth_only_minus_cyclic_prior_mean_accuracy": -0.1421751318422898,
+    "fifth_only_gain_over_no_adaptation": 0.32764589515331355
+  },
+  "interpretation": {
+    "fifth_family_is_not_intrinsically_unlearnable": true,
+    "isolated_fifth_learning_substantially_outperforms_balanced_cyclic_on_fifth": true,
+    "isolated_fifth_learning_causes_large_prior_family_retention_cost": true,
+    "dominant_boundary_is_stability_plasticity_tradeoff": true,
+    "broad_global_gradient_antialignment_is_not_required_for_the_tradeoff": true,
+    "plain_speak": "The fifth vocabulary is learnable. When Wingless trains only on it, fifth-family accuracy rises much higher, but older vocabularies are damaged. Balanced five-family training protects old knowledge by giving up some fifth-family performance. The problem is how to share learning capacity without forgetting, not whether the fifth family can be learned at all.",
+    "north_star_question": "Identifies the limiting mechanism for scaling sequential language capability: balancing new lexical plasticity against retention of prior families under fixed recurrent state and memory.",
+    "next_stage": "map a preregistered fixed-total-update-mass allocation curve between prior-family retention and fifth-family learning without adding budget or capacity"
+  },
+  "activation_authorized": false
+}
