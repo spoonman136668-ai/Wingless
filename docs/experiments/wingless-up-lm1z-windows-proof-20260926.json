@@ -1,0 +1,129 @@
+{
+  "schema": "wingless.up-lm1z-windows-proof.v1",
+  "experiment": "UP-LM1Z-fifth-update-position",
+  "status": "qualified-scientific-result",
+  "source_head": "1a5b9393952a87fc16d79eca41bf5299ea49f1e8",
+  "workflow_run_id": 36266660774,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10913852756,
+  "artifact_sha256": "5767411fefe2d47f9cd26ca3a6752b52b25f6d151925888d568a456f8a856806",
+  "findings": {
+    "structural_exact_all_250_integrated_cells": true,
+    "max_recall_entries": 4,
+    "equal_mass": {
+      "pos1": {
+        "fifth": 0.7301351796900758,
+        "prior": 0.7689188285654381,
+        "all": 0.7611620987903657,
+        "min": 0.7301351796900758
+      },
+      "pos2": {
+        "fifth": 0.7293521266073195,
+        "prior": 0.7681924748963826,
+        "all": 0.76042440523857,
+        "min": 0.7293521266073195
+      },
+      "pos3": {
+        "fifth": 0.7282393669634026,
+        "prior": 0.7682607938076516,
+        "all": 0.7602565084388018,
+        "min": 0.7282393669634026
+      },
+      "pos4": {
+        "fifth": 0.7339268051434223,
+        "prior": 0.7681047159942509,
+        "all": 0.7612691338240852,
+        "min": 0.7339268051434223
+      },
+      "pos5": {
+        "fifth": 0.7486811737553578,
+        "prior": 0.7706616178834755,
+        "all": 0.7662655290578521,
+        "min": 0.7486811737553578
+      }
+    },
+    "fifth_1p25_mass": {
+      "pos1": {
+        "fifth": 0.7536267721727663,
+        "prior": 0.7641584033382576,
+        "all": 0.7620520771051593,
+        "min": 0.7423882435762055
+      },
+      "pos2": {
+        "fifth": 0.7527612924497198,
+        "prior": 0.763569238907182,
+        "all": 0.7614076496156896,
+        "min": 0.7426522351284759
+      },
+      "pos3": {
+        "fifth": 0.7545334652159578,
+        "prior": 0.7642741697255707,
+        "all": 0.7623260288236481,
+        "min": 0.7420802534318902
+      },
+      "pos4": {
+        "fifth": 0.7614160896801847,
+        "prior": 0.7633805843722546,
+        "all": 0.7629876854338407,
+        "min": 0.7447211476466795
+      },
+      "pos5": {
+        "fifth": 0.7739449390042862,
+        "prior": 0.7641609272307367,
+        "all": 0.7661177295854465,
+        "min": 0.7479448742746615
+      }
+    },
+    "fifth_1p5_mass": {
+      "pos1": {
+        "fifth": 0.7741922189251567,
+        "prior": 0.758842354695867,
+        "all": 0.761912327541725,
+        "min": 0.7390443505807813
+      },
+      "pos2": {
+        "fifth": 0.7712660731948566,
+        "prior": 0.7585236181757762,
+        "all": 0.7610721091795922,
+        "min": 0.7390003519887364
+      },
+      "pos3": {
+        "fifth": 0.7760056050115398,
+        "prior": 0.7583392650833916,
+        "all": 0.7618725330690213,
+        "min": 0.7368444209785288
+      },
+      "pos4": {
+        "fifth": 0.7845367622815693,
+        "prior": 0.758083775014637,
+        "all": 0.7633743724680235,
+        "min": 0.7384348807221148
+      },
+      "pos5": {
+        "fifth": 0.7964061984833498,
+        "prior": 0.7576305353143119,
+        "all": 0.7653856679481195,
+        "min": 0.7393214055448099
+      }
+    },
+    "fifth_pos5_minus_pos1_fifth_gain": {
+      "equal_mass": 0.018545994065282,
+      "fifth_1p125_mass": 0.0231206726013847,
+      "fifth_1p25_mass": 0.0203181668315199,
+      "fifth_1p375_mass": 0.0205654467523904,
+      "fifth_1p5_mass": 0.0222139795581931
+    }
+  },
+  "interpretation": {
+    "fifth_family_terminal_position_bonus_is_consistent_across_all_allocations": true,
+    "positions_one_through_three_are_nearly_flat_relative_to_the_terminal_jump": true,
+    "position_four_shows_a_smaller_preterminal_lift": true,
+    "prior_family_mean_is_only_weakly_affected_by_fifth_position": true,
+    "fifth_position_alone_does_not_explain_the_large_prior_family_shift_seen_between_full_canonical_and_reverse_orders": true,
+    "structural_sequence_memory_and_routing_remain_exact_across_all_positions_and_allocations": true,
+    "plain_speak": "Moving the newest vocabulary from first to second or third barely changes it. Moving it near the end helps a little, and making it the final update helps a lot. The older vocabularies barely notice this position change, so the larger old-vocabulary differences from the previous experiment must come from reordering the older families too.",
+    "north_star_question": "Separates terminal-update privilege from broader family-order interactions, giving language adaptation two mechanistically distinct controls: fixed-budget allocation and local terminal recency.",
+    "next_stage": "hold fifth-family update last while varying only the relative order of the four prior families to test whether terminal privilege survives prior-order changes and to isolate the source of the prior-family shift"
+  },
+  "activation_authorized": false
+}
