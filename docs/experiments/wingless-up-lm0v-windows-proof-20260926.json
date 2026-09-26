@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up-lm0v-windows-proof.v1",
+  "experiment": "UP-LM0V-selective-anchor",
+  "status": "qualified-scientific-result",
+  "source_head": "2a4673dadfb0d8687da498b552076d6edde62c4b",
+  "workflow_run_id": 36234809586,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10904245308,
+  "artifact_sha256": "3c1c301f5eaf0119d2529ee2e49a2aab1615ec4ecf247817d57ce30ff4f0acfc",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_epochs": 20,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "anchor_lambda": 0.0001,
+  "selective_anchor_bytes": [
+    98,
+    111,
+    112,
+    116
+  ],
+  "findings": {
+    "interleaved_anchor0": {
+      "base_accuracy": 0.8650064474532559,
+      "base_perplexity": 1.5251789945731868,
+      "paraphrase_accuracy": 0.8173178458289335,
+      "paraphrase_perplexity": 1.718080831488603
+    },
+    "interleaved_full_anchor0001": {
+      "base_accuracy": 0.8695196647324307,
+      "base_perplexity": 1.5202965792421914,
+      "paraphrase_accuracy": 0.7740232312565998,
+      "paraphrase_perplexity": 1.9472852512623828
+    },
+    "interleaved_selective_anchor0001": {
+      "base_accuracy": 0.8643617021276596,
+      "base_perplexity": 1.5279889820366426,
+      "paraphrase_accuracy": 0.8096620908130939,
+      "paraphrase_perplexity": 1.745100232592529
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "selective_anchor_does_not_improve_joint_balance_over_unanchored_interleaving": true,
+    "full_anchor_remains_more_damaging_to_paraphrase_adaptation": true,
+    "readout_anchoring_is_not_supported_as_the_next_retention_mechanism": true,
+    "routing_and_exact_memory_remain_stable": true,
+    "next_stage": "replace sequential pair updates with order-neutral paired gradient averaging at identical example counts"
+  },
+  "activation_authorized": false
+}
