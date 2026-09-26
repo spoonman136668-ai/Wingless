@@ -1,7 +1,5 @@
 package unitary
 
-import "fmt"
-
 const UP131CMixedSchema="wingless.up131c-mixed-phase-selectivity.v1"
 
 type UP131CPoint struct{
