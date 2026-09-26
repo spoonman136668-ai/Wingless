@@ -1,0 +1,86 @@
+{
+  "schema": "wingless.up144c-windows-proof.v1",
+  "experiment": "UP-144C-live-age-stack-replacement",
+  "status": "qualified-scientific-result",
+  "source_head": "0e01d700a84820672d937b4b857ccd5c560e63fe",
+  "workflow_run_id": 36273073741,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10916645078,
+  "artifact_sha256": "5f90a0680c783686a52606fa9f375b64b9ee98cb44012f6d780d8edf5b49727e",
+  "findings": {
+    "assignment_A": {
+      "boundary1": {
+        "oldest1": {
+          "present": true,
+          "age": 1
+        },
+        "oldest2": {
+          "present": true,
+          "age": 0
+        },
+        "younger1": {
+          "present": false
+        },
+        "younger2": {
+          "present": false
+        },
+        "history_entries": 17
+      },
+      "boundary2": {
+        "oldest1": {
+          "present": false
+        },
+        "oldest2": {
+          "present": true,
+          "age": 1
+        },
+        "younger1": {
+          "present": true,
+          "age": 0
+        },
+        "younger2": {
+          "present": true,
+          "age": 0
+        },
+        "history_entries": 32
+      },
+      "boundary3": {
+        "oldest1": {
+          "present": false
+        },
+        "oldest2": {
+          "present": false
+        },
+        "younger1": {
+          "present": true,
+          "age": 1
+        },
+        "younger2": {
+          "present": true,
+          "age": 1
+        },
+        "history_entries": 32
+      },
+      "oldest1_admission": 0,
+      "oldest2_admission": 0,
+      "younger1_admission": 1,
+      "younger2_admission": 1,
+      "hot_accuracy": 1
+    },
+    "assignment_B_same_pattern": true,
+    "age2_evictions_total_per_assignment": 128,
+    "unexpected_manipulation_admissions": 0,
+    "panic_rate": 0
+  },
+  "interpretation": {
+    "live_replacement_follows_ordered_age_stack_across_successive_pressure_events": true,
+    "oldest_trace_is_evicted_first_and_next_oldest_on_next_replacement": true,
+    "younger_traces_survive_and_remain_admissible": true,
+    "target_identity_does_not_change_result": true,
+    "isolated_replacement_line_is_sufficiently_characterized_for_integration": true,
+    "plain_speak": "When pressure keeps arriving, Wingless removes temporary memories in age order: oldest first, then next-oldest, while younger evidence survives. The rule holds across successive replacements and mirrored identities.",
+    "north_star_question": "Closes the isolated bounded-history replacement mechanism and clears the C lane to test temporal consolidation inside mixed lexical/language streams rather than continuing micro-ablations.",
+    "next_stage": "integrate the validated two-stage consolidation and age-ranked replacement rule into a mixed lexical event stream with simultaneous durable, temporary, and new evidence under the same fixed memory bounds"
+  },
+  "activation_authorized": false
+}
