@@ -1,0 +1,63 @@
+{
+  "schema": "wingless.up153b-windows-proof.v1",
+  "experiment": "UP-153B-anchor-side-swap",
+  "status": "qualified-scientific-result",
+  "source_head": "2c737925e27d2c4115322c5c3b36ce86a347eed4",
+  "workflow_run_id": 36266781988,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10913934066,
+  "artifact_sha256": "223043336417a350c650d70de642e3249153d6444ee0b82346931c5a1b92e0cf",
+  "findings": {
+    "mia": {
+      "report_after_anchor": {
+        "pre": -0.006666666666666687,
+        "anchor": 0.05888888888888888,
+        "post": -0.0622222222222222,
+        "net": -0.010000000000000009,
+        "old": 0.8611111111111112,
+        "new": 0.921875
+      },
+      "report_before_anchor": {
+        "pre": -0.06888888888888889,
+        "anchor": 0.04444444444444442,
+        "post": 0.022222222222222233,
+        "net": -0.0022222222222222365,
+        "old": 0.9,
+        "new": 0.921875
+      }
+    },
+    "noah": {
+      "report_after_anchor": {
+        "pre": 0.0011111111111110849,
+        "anchor": 0.04888888888888887,
+        "post": -0.05666666666666664,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.9270833333333333
+      },
+      "report_before_anchor": {
+        "pre": -0.07777777777777775,
+        "anchor": 0.046666666666666655,
+        "post": 0.032222222222222194,
+        "net": 0.0011111111111111072,
+        "old": 0.9166666666666667,
+        "new": 0.921875
+      }
+    },
+    "old_retention_gain_when_report_moves_before_anchor": {
+      "mia": 0.03888888888888886,
+      "noah": 0.03888888888888886
+    }
+  },
+  "interpretation": {
+    "report_interference_is_causally_anchor_relative": true,
+    "same_report_block_is_damaging_after_anchor_but_not_when_moved_before_anchor": true,
+    "same_store_observe_block_is_recovering_when_moved_after_anchor": true,
+    "fixed_example_multiset_and_update_count_rule_out_global_class_frequency_as_the_explanation": true,
+    "old_retention_improves_by_the_same_amount_for_both_subjects_when_report_moves_before_anchor": true,
+    "plain_speak": "The exact same examples produce very different memory effects depending on which side of rehearsal they appear. REPORT examples undo part of the repair when they come after it. Put them before the repair and let STORE+OBSERVE examples finish the epoch, and old memory is substantially better preserved.",
+    "north_star_question": "Establishes causal anchor-relative lexical interference and provides a concrete mechanism that can now be mitigated without increasing total rehearsal budget.",
+    "next_stage": "redistribute the same 15 old-anchor updates around a fixed REPORT tail—before only, split before/after, and after only—to test whether rehearsal placement can neutralize interference without extra updates"
+  },
+  "activation_authorized": false
+}
