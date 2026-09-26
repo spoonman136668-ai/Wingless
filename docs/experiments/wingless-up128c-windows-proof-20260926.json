@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.up128c-windows-proof.v1",
+  "experiment": "UP-128C-consolidation-dose",
+  "status": "qualified-scientific-result",
+  "source_head": "2009760aa5371b66dfee6f8561cd9385e0ba8f58",
+  "workflow_run_id": 36257964788,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10911117890,
+  "artifact_sha256": "391e388abec1eea67a85757ba73fef7955e00006181db23b479bbb98d18b8f8d",
+  "findings": {
+    "dose0": {
+      "valid_admission": 0,
+      "valid_accuracy": 0,
+      "target16_accuracy": 0.75,
+      "target16_exact": 0,
+      "post_first_wave_evictions": 256
+    },
+    "dose1": {
+      "valid_admission": 0,
+      "valid_accuracy": 0,
+      "target16_accuracy": 0.75,
+      "target16_exact": 0,
+      "post_first_wave_evictions": 256
+    },
+    "dose2": {
+      "valid_admission": 1,
+      "valid_accuracy": 1,
+      "target16_accuracy": 1,
+      "target16_exact": 1,
+      "post_first_wave_evictions": 0
+    },
+    "hot_accuracy_all_doses": 1,
+    "nonpersistent_admission_all_doses": 0,
+    "nonpersistent_retention_all_doses": 0,
+    "one_shot_false_admissions_all_doses": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "consolidation_threshold_is_exactly_two_pre_overflow_recurrence_sightings": true,
+    "one_sighting_provides_no_partial_protection": true,
+    "two_sightings_move_all_valid_targets_into_protected_exact_recall": true,
+    "threshold_matches_frozen_two_sighting_qualification_transition": true,
+    "plain_speak": "One reminder is not enough. Two reminders are enough to move the important items out of temporary evidence and into protected exact memory before the overload arrives. The change is all-or-nothing in this mechanism, not gradual.",
+    "north_star_question": "Locates the exact evidence dose needed for temporal consolidation under fixed bounded memory, a concrete mechanism for deciding when repeated language information becomes durable.",
+    "next_stage": "test whether the same two-sighting consolidation threshold holds when target recurrences are temporally separated rather than adjacent, without changing total sightings or memory"
+  },
+  "activation_authorized": false
+}
