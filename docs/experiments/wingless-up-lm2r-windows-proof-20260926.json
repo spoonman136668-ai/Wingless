@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up-lm2r-windows-proof.v1",
+  "experiment": "UP-LM2R-online-countdown",
+  "status": "qualified-scientific-result",
+  "source_head": "8956ce5836dddcbb4cdb17728931327a4c925767",
+  "workflow_run_id": 36278953727,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10918001465,
+  "artifact_sha256": "55787b03bbfdb972701a5b95b7003060a074931861079fbc5de47c7969ce8785",
+  "findings": {
+    "exact_recall_cap": 16,
+    "deferred_levels": [
+      4,
+      5,
+      6
+    ],
+    "identity_rotations": [
+      0,
+      7
+    ],
+    "value_shifts": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "events_per_arm": 16,
+    "exact_predictions": 384,
+    "total_predictions": 384,
+    "exact_prediction_rate": 1,
+    "near_term_threshold": 4,
+    "near_term_warnings": 24,
+    "warning_retractions": 0
+  },
+  "interpretation": {
+    "online_countdown_remains_exact_across_alternating_store_report_events": true,
+    "near_term_warning_is_stable_in_tested_stream": true,
+    "current_state_is_sufficient_without_future_schedule": true,
+    "plain_speak": "Wingless kept the countdown exact after every event in the mixed stream—384 of 384 snapshots. When the countdown entered the four-write warning zone, it stayed valid in this frozen schedule.",
+    "north_star_question": "The LM lane now has exact current-state detection, exact time-to-failure, online updating, and zero false alarms in the tested warning regime. That is enough evidence to justify a first bounded counterfactual response experiment without authorizing live self-maintenance.",
+    "next_stage": "counterfactually move only the endangered pending REPORT immediately before a predicted harmful STORE, preserving capacity and event content, and compare prevented unreported evictions against unnecessary interventions"
+  },
+  "activation_authorized": false
+}
