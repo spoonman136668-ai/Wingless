@@ -1,0 +1,39 @@
+{
+  "schema": "wingless.up-lm0s-windows-proof.v1",
+  "experiment": "UP-LM0S-lexical-loss-mask",
+  "status": "qualified-scientific-result",
+  "source_head": "5f670665f892c973b3c3f84375536a25af5491b7",
+  "workflow_run_id": 36233756483,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10903900401,
+  "artifact_sha256": "c236522dafe6e1f1beba697f123eb0bad81bf4795dd1b52ea46e60b2bc949980",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_epochs": 20,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "base_replay_used": false,
+  "router_retraining_used": false,
+  "findings": {
+    "full_sentence_updates_per_epoch": 22728,
+    "full_sentence_base_accuracy": 0.692134107027724,
+    "full_sentence_base_perplexity": 3.519687497064608,
+    "full_sentence_paraphrase_accuracy": 0.8621964097148891,
+    "full_sentence_paraphrase_perplexity": 1.5217830847033353,
+    "verb_only_updates_per_epoch": 6984,
+    "verb_only_base_accuracy": 0.3894261766602192,
+    "verb_only_base_perplexity": 14.902428402059186,
+    "verb_only_paraphrase_accuracy": 0.4864484336501232,
+    "verb_only_paraphrase_perplexity": 10.578118923276854,
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1
+  },
+  "interpretation": {
+    "naive_verb_target_loss_masking_is_not_a_viable_preservation_mechanism": true,
+    "sparse_updates_damage_both_original_and_paraphrase_byte_model_performance": true,
+    "routing_and_exact_memory_remain_stable_despite_byte_readout_degradation": true,
+    "next_stage": "test quadratic anchoring of byte-readout weights to the pre-adaptation base model during full-sentence paraphrase adaptation"
+  },
+  "activation_authorized": false
+}
