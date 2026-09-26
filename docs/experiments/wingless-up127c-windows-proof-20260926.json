@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up127c-windows-proof.v1",
+  "experiment": "UP-127C-recurrence-timing-protection",
+  "status": "qualified-scientific-result",
+  "source_head": "40fad6320cd5c7b88fa7d60fa273733ba49b05e5",
+  "workflow_run_id": 36257659100,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10910764672,
+  "artifact_sha256": "2833ac655b8b18f3b9eb2d3f1ed6cd88964489797229e3a4b0a34d3c4d8275d5",
+  "findings": {
+    "before_overflow": {
+      "first_wave_evictions": 1024,
+      "second_wave_evictions": 0,
+      "age2_evictions": 1024,
+      "valid_admission_rate": 1,
+      "valid_accuracy": 1,
+      "hot_accuracy": 1,
+      "target16_accuracy": 1,
+      "target16_exact_accuracy": 1,
+      "nonpersistent_admission_rate": 0,
+      "nonpersistent_retention_rate": 0,
+      "false_admissions": 0,
+      "max_history_entries": 32,
+      "recall_entries_used": 16
+    },
+    "after_overflow": {
+      "first_wave_evictions": 1024,
+      "second_wave_evictions": 256,
+      "age2_evictions": 1280,
+      "valid_admission_rate": 0,
+      "valid_accuracy": 0,
+      "hot_accuracy": 1,
+      "target16_accuracy": 0.75,
+      "target16_exact_accuracy": 0,
+      "nonpersistent_admission_rate": 0,
+      "nonpersistent_retention_rate": 0,
+      "false_admissions": 0,
+      "max_history_entries": 32,
+      "recall_entries_used": 16
+    }
+  },
+  "interpretation": {
+    "recurrence_before_overflow_is_sufficient_to_protect_all_four_valid_targets": true,
+    "the_same_two_target_sightings_after_overflow_are_too_late_to_prevent_eviction": true,
+    "observed_recurrence_converts_ambiguous_history_into_protected_exact_memory_without_semantic_labels": true,
+    "failure_after_overflow_is_an_information_timing_boundary_not_a_capacity_or_false_admission_failure": true,
+    "plain_speak": "The memory can protect the useful candidates perfectly if they recur before the table is forced to evict them. If the exact same recurrence happens only afterward, it is too late. The mechanism does not need a label telling it what matters; it needs the useful item to prove itself by recurring before the eviction decision.",
+    "north_star_question": "Shows that bounded temporal memory can use observed recurrence as a causal protection signal, clarifying when useful history becomes identifiable during a language stream.",
+    "next_stage": "hold total target recurrence at two sightings and move zero, one, or two sightings before overflow to locate the minimum pre-eviction recurrence evidence needed for protection"
+  },
+  "activation_authorized": false
+}
