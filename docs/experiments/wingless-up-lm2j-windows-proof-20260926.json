@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.up-lm2j-windows-proof.v1",
+  "experiment": "UP-LM2J-working-set-scheduling",
+  "status": "qualified-scientific-result",
+  "source_head": "71e63bfa62beefd2dfe5b681bb278341ef4158b4",
+  "workflow_run_id": 36274571647,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10917390312,
+  "artifact_sha256": "5a9e4ef1892be08f313a101515f618b5d904db6203a9b77f4fa9fa7e6c62ee8e",
+  "findings": {
+    "global24": {
+      "cells": 50,
+      "recall_hit": 0.6666666666666666,
+      "dependent_first_byte_min": 0.6666666666666666,
+      "dependent_first_byte_max": 0.7916666666666666,
+      "report_set_exact_all": false,
+      "max_recall": 16,
+      "routing_all_exact": true
+    },
+    "chunk16_8": {
+      "cells": 50,
+      "recall_hit": 1,
+      "dependent_first_byte": 1,
+      "report_set_exact_all": true,
+      "max_recall": 16,
+      "routing_all_exact": true
+    },
+    "chunk12x2": {
+      "cells": 50,
+      "recall_hit": 1,
+      "dependent_first_byte": 1,
+      "report_set_exact_all": true,
+      "max_recall": 16,
+      "routing_all_exact": true
+    },
+    "chunk8x3": {
+      "cells": 50,
+      "recall_hit": 1,
+      "dependent_first_byte": 1,
+      "report_set_exact_all": true,
+      "max_recall": 16,
+      "routing_all_exact": true
+    },
+    "all_200_cells_match_preregistered_capacity_expectation": true,
+    "event_multiset_identical_across_schedules": true
+  },
+  "interpretation": {
+    "fixed_nonadaptive_working_set_scheduling_fully_avoids_capacity_overflow": true,
+    "no_memory_or_training_increase_is_needed_when_dependencies_close_within_chunks_of_at_most_16": true,
+    "routing_remains_exact_so_recovery_is_not_a_language_routing_artifact": true,
+    "sequence_organization_can_convert_a_hard_global_capacity_failure_into_exact_local_processing": true,
+    "plain_speak": "The 16-slot memory wall does not require a bigger memory if the task can be organized into bounded working sets. Process and finish at most 16 entities before moving on, and all 24 entities can be handled exactly with the same memory and the same trained model.",
+    "north_star_question": "Shows that sequence intelligence can actively respect a fixed memory bound through static task organization, converting entity concurrency from a hard failure into an exact bounded workflow without extra capacity.",
+    "next_stage": "keep 24 entities and cap16 fixed, but defer preregistered reports across chunk boundaries to map exactly when an unfinished dependency makes working-set scheduling fail"
+  },
+  "activation_authorized": false
+}
