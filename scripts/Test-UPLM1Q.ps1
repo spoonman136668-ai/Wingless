@@ -21,7 +21,7 @@ try{
  if([double]$R.learning_rate-ne 0.08){throw 'UPLM1Q_LR'}
  if($R.recurrent_parameters_trained -or $R.router_used -or $R.exact_recall_used -or $R.adaptive_ordering_used -or $R.sixth_family_used){throw 'UPLM1Q_BOUNDARY'}
  if([int]$R.metrics.Count-ne 25){throw "UPLM1Q_METRIC_COUNT $($R.metrics.Count)"}
- if([int]$R.summaries.Count-ne 5){throw "UPLM1Q_SUMMARY_COUNT $($R.summaries.Count)"}
+ if([int]$R.summaries.Count-ne 5){throw "UPLM1Q_SUMMARY_COUNT $($R.summaries.Count)"}\n $ExpectedArms=@("rotate_0","rotate_1","rotate_2","rotate_3","rotate_4")\n for($i=0;$i-lt 5;$i++){if($R.summaries[$i].arm-cne $ExpectedArms[$i]){throw "UPLM1Q_ARM_LABEL $($R.summaries[$i].arm)"}}\n if((@($R.summaries.arm | Sort-Object -Unique)).Count-ne 5){throw "UPLM1Q_DUPLICATE_ARM_LABEL"}
  foreach($M in $R.metrics){if([int]$M.update_position-lt 0 -or [int]$M.update_position-gt 4){throw 'UPLM1Q_POSITION'}}
  Write-Host $P1
  Write-Host ''
