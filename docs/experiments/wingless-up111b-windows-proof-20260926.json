@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.up111b-windows-proof.v1",
+  "experiment": "UP-111B-current-class-excluded",
+  "status": "qualified-scientific-result",
+  "source_head": "2566ed84478ecf6040b91933d47488dbe9814ce0",
+  "workflow_run_id": 36234076819,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10903084033,
+  "artifact_sha256": "5b71e5930c556cea00cd67fcdf6b5921d61f0a260acc98c47cb7cfd36027dc7b",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "findings": {
+    "pair_major_stage3_base": 0.9444444444444443,
+    "pair_major_stage5_acquired": 0.9,
+    "exposure_control_stage3_base": 0.9444444444444443,
+    "exposure_control_stage5_acquired": 1,
+    "current_excluded_stage3_base": 0.9722222222222223,
+    "current_excluded_stage3_acquired": 1,
+    "current_excluded_stage4_base": 1,
+    "current_excluded_stage4_acquired": 1,
+    "current_excluded_stage5_base": 1,
+    "current_excluded_stage5_acquired": 1,
+    "current_excluded_stage6_base": 1,
+    "current_excluded_stage6_acquired": 1
+  },
+  "interpretation": {
+    "excluding_the_current_class_improves_the_stage3_base_dip": true,
+    "stages4_through6_are_fully_stable_at_fixed_six_replay_examples": true,
+    "one_base_lexicon_error_remains_at_stage3": true,
+    "next_stage": "at fixed total replay count, replace two noncurrent-prior slots with base anchors from the current class to protect the base lexicon during early acquisitions"
+  },
+  "activation_authorized": false
+}
