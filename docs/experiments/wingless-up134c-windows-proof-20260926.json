@@ -1,0 +1,134 @@
+{
+  "schema": "wingless.up134c-windows-proof.v1",
+  "experiment": "UP-134C-multigeneration-reset",
+  "status": "qualified-scientific-result",
+  "source_head": "3369bac61e6c2b2a6c62d448992c9deb54a706ec",
+  "workflow_run_id": 36267255412,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10913548580,
+  "artifact_sha256": "d5cc9a273692fbce93721d7dd231ffbcc02c632b7b3ee3327ee9c3e4ac1731b0",
+  "findings": {
+    "assignment_a": {
+      "isolated_4": {
+        "target": 100,
+        "positions": [
+          5,
+          37,
+          69,
+          101
+        ],
+        "sightings": 4,
+        "admission": 0,
+        "accuracy": 0
+      },
+      "late_pair_g3": {
+        "target": 101,
+        "positions": [
+          10,
+          42,
+          74,
+          75
+        ],
+        "sightings": 4,
+        "admission": 0,
+        "accuracy": 0
+      },
+      "early_pair_then_singles": {
+        "target": 102,
+        "positions": [
+          15,
+          16,
+          50,
+          82
+        ],
+        "sightings": 4,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "pair_after_three_isolated": {
+        "target": 103,
+        "positions": [
+          20,
+          52,
+          84,
+          116,
+          117
+        ],
+        "sightings": 5,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "assignment_b": {
+      "isolated_4": {
+        "target": 102,
+        "positions": [
+          5,
+          37,
+          69,
+          101
+        ],
+        "sightings": 4,
+        "admission": 0,
+        "accuracy": 0
+      },
+      "late_pair_g3": {
+        "target": 103,
+        "positions": [
+          10,
+          42,
+          74,
+          75
+        ],
+        "sightings": 4,
+        "admission": 0,
+        "accuracy": 0
+      },
+      "early_pair_then_singles": {
+        "target": 100,
+        "positions": [
+          15,
+          16,
+          50,
+          82
+        ],
+        "sightings": 4,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "pair_after_three_isolated": {
+        "target": 101,
+        "positions": [
+          20,
+          52,
+          84,
+          116,
+          117
+        ],
+        "sightings": 5,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "hot_accuracy_all_arms": 1,
+    "target16_accuracy_all_arms": 0.8125,
+    "nonpersistent_admission_all_arms": 0,
+    "nonpersistent_retention_all_arms": 0,
+    "one_shot_false_admissions_all_arms": 0,
+    "panic_rate_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "no_cross_generation_count_accumulation": true,
+    "isolated_single_sightings_do_not_refresh_a_qualified_history_trace": true,
+    "an_early_same_generation_pair_can_admit_while_the_preexisting_history_trace_is_still_live": true,
+    "a_late_pair_after_multiple_single_only_generations_does_not_immediately_admit_because_the_required_history_trace_has_aged_out": true,
+    "admission_mechanism_is_two_stage_current_plus_live_history_not_merely_two_sightings_in_one_generation": true,
+    "previous_simple_two_sightings_description_requires_refinement": true,
+    "plain_speak": "The memory rule is stricter than 'two reminders in one window.' A pair can only become durable if it matches a still-living qualified trace from an earlier window. Single reminders do not keep that trace alive. After enough windows, the old trace expires, so a later pair merely rebuilds temporary history instead of becoming durable immediately.",
+    "north_star_question": "Refines bounded consolidation into a two-stage temporal rule with finite history lifetime, which is necessary before integrating it into long language streams without hidden cross-window accumulation.",
+    "next_stage": "test requalification after history expiry by placing a same-generation pair after expiry to rebuild history, followed by another same-generation pair in the next generation to determine whether durability is restored by a fresh two-stage cycle"
+  },
+  "activation_authorized": false
+}
