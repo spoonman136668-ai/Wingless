@@ -1,0 +1,43 @@
+{
+  "schema": "wingless.up81c-windows-proof.v1",
+  "experiment": "UP-81C-two-bit-aging",
+  "status": "qualified-scientific-result",
+  "source_head": "6dcb1b7f92d5158afe749fffd42818493cb9fa28",
+  "workflow_run_id": 36203155169,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10892761475,
+  "artifact_sha256": "ce5bc5967c7032038cc70c0870c357634fd7137fd5def9d7294d39d823d65817",
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "future_oracle_used": false,
+  "metadata_bytes": {
+    "fifo": 16,
+    "lru": 136,
+    "clock_second_chance": 3,
+    "two_bit_aging": 5
+  },
+  "two_bit_aging": {
+    "active24_churn8_hot": 0.6666666666666666,
+    "active24_churn16_hot": 0.3333333333333333,
+    "active32_churn8_hot": 0.5,
+    "active32_churn16_hot": 0.25,
+    "cold_accuracy_all_tested_cells": 0,
+    "total_bounded_memory_bytes": 261
+  },
+  "controls": {
+    "lru_active24_churn8_hot": 0.6666666666666666,
+    "lru_active32_churn8_hot": 0.5,
+    "lru_full_churn_hot": 0,
+    "clock_active24_churn8_hot": 0.3333333333333333,
+    "clock_active32_churn8_hot": 0.25,
+    "clock_full_churn_hot": 0
+  },
+  "interpretation": {
+    "tiny_multilevel_aging_recovers_lru_moderate_churn_locality": true,
+    "tiny_multilevel_aging_exceeds_lru_under_full_churn": true,
+    "five_byte_policy_cost_supported": true,
+    "exact_hot_set_not_preserved": true,
+    "next_stage": "replicate under interleaved churn and rehearsal schedules to test whether the effect depends on the single batch schedule"
+  },
+  "activation_authorized": false
+}
