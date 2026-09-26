@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up-lm1g-windows-proof.v1",
+  "experiment": "UP-LM1G-symmetric-gradient-scale",
+  "status": "qualified-scientific-result",
+  "source_head": "e2b119dd414a2fc509df522d7510fbef0f7165d2",
+  "workflow_run_id": 36241349830,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10905737673,
+  "artifact_sha256": "dbbd76727390f8f26b5aff82e29ef90cb2cb38badf5d22e5a7e1e7b97d916c27",
+  "findings": {
+    "cyclic_by_index": {
+      "base_accuracy": 0.842682140554481,
+      "paraphrase_accuracy": 0.7995424146427315,
+      "third_accuracy": 0.8280864197530864
+    },
+    "symmetric_scale_1over3": {
+      "base_accuracy": 0.8267246937459704,
+      "paraphrase_accuracy": 0.8010383667722633,
+      "third_accuracy": 0.76875
+    },
+    "symmetric_scale_1oversqrt3": {
+      "base_accuracy": 0.8264829142488717,
+      "paraphrase_accuracy": 0.803238296374516,
+      "third_accuracy": 0.8003858024691358
+    },
+    "symmetric_scale_1": {
+      "base_accuracy": 0.8181818181818182,
+      "paraphrase_accuracy": 0.7789510735656459,
+      "third_accuracy": 0.786033950617284
+    },
+    "routing_and_memory_exact_all_cells": 1
+  },
+  "interpretation": {
+    "under_step_magnitude_explains_part_of_lm1f_negative": true,
+    "intermediate_symmetric_scale_recovers_third_family_quality_but_not_to_cyclic_control": true,
+    "full_first_order_sequential_magnitude_overshoots": true,
+    "nonlinear_sequential_updates_retain_a_real_advantage_beyond_simple_gradient_scale": true,
+    "next_stage": "test symmetric operator splitting with recomputed sequential half-steps to preserve nonlinear optimization while reducing triplet recency bias"
+  },
+  "activation_authorized": false
+}
