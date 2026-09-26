@@ -1,0 +1,51 @@
+{
+  "schema": "wingless.up106b-windows-proof.v1",
+  "experiment": "UP-106B-vocabulary-growth",
+  "status": "qualified-scientific-result",
+  "source_head": "29087a464251a1eb10c9039d8fe28114d658a2b4",
+  "workflow_run_id": 36230288220,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10901642981,
+  "artifact_sha256": "3e57b9751d2e33f23a6890a505e4f62356c4179c0c7d451efb811ff114b7824b",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "base_replay_subjects": 1,
+  "prior_replay_subjects": 2,
+  "findings": {
+    "stage1": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "stage2": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "stage3": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "stage4": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "stage5": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "stage6": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "final_all_six_acquired_verbs_accuracy": 1
+  },
+  "interpretation": {
+    "fixed_two_subject_prior_replay_scales_cleanly_to_six_sequential_verbs": true,
+    "no_base_lexicon_forgetting_observed": true,
+    "no_backward_interference_observed_through_stage6": true,
+    "current_cost_scales_linearly_with_number_of_prior_verbs": true,
+    "next_stage": "test whether a fixed total replay budget can preserve the six-verb sequence without replay cost growing with vocabulary"
+  },
+  "activation_authorized": false
+}
