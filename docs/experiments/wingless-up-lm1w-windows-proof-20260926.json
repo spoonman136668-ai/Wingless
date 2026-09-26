@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up-lm1w-windows-proof.v1",
+  "experiment": "UP-LM1W-mild-mass-densification",
+  "status": "qualified-scientific-result",
+  "source_head": "534cf6651688dcc2c6c1160aecd094e032b2444c",
+  "workflow_run_id": 36258186362,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10911422659,
+  "artifact_sha256": "1fe59829d6bff78df16079cdb59ee698437913e47c6dd52631ce0132f66d02e9",
+  "findings": {
+    "equal_mass": {
+      "fifth_integrated_mean": 0.7486811737553578,
+      "prior_integrated_mean": 0.7706616178834755,
+      "all_family_integrated_mean": 0.7662655290578521,
+      "min_family_integrated_mean": 0.7486811737553578
+    },
+    "fifth_1p125_mass": {
+      "fifth_integrated_mean": 0.765125288493241,
+      "prior_integrated_mean": 0.768081702315392,
+      "all_family_integrated_mean": 0.7674904195509618,
+      "min_family_integrated_mean": 0.754110251450677
+    },
+    "fifth_1p25_mass": {
+      "fifth_integrated_mean": 0.7739449390042862,
+      "prior_integrated_mean": 0.7641609272307366,
+      "all_family_integrated_mean": 0.7661177295854464,
+      "min_family_integrated_mean": 0.7479448742746615
+    },
+    "fifth_1p375_mass": {
+      "fifth_integrated_mean": 0.7847840422024398,
+      "prior_integrated_mean": 0.7611557280908365,
+      "all_family_integrated_mean": 0.7658813909131572,
+      "min_family_integrated_mean": 0.7440361057382334
+    },
+    "fifth_1p5_mass": {
+      "fifth_integrated_mean": 0.7964061984833498,
+      "prior_integrated_mean": 0.7576305353143118,
+      "all_family_integrated_mean": 0.7653856679481195,
+      "min_family_integrated_mean": 0.7393214055448099
+    },
+    "structural_exact_all_50_integrated_cells": true,
+    "router_metrics_exact": true,
+    "max_recall_entries": 4,
+    "exact_recall_cap": 16,
+    "total_mass_per_example": 0.4
+  },
+  "interpretation": {
+    "mild_fixed_budget_tradeoff_is_smooth": true,
+    "no_hard_capacity_knee_is_observed_between_equal_and_1p5_mass": true,
+    "fifth_and_prior_integrated_curves_nearly_equalize_at_first_mild_reallocation": true,
+    "first_mild_reallocation_raises_the_minimum_family_mean_relative_to_equal_mass": true,
+    "sequence_memory_and_routing_remain_exact_across_all_preregistered_allocations": true,
+    "plain_speak": "Small shifts of the same learning budget toward the newest vocabulary produce small, predictable gains in that vocabulary and small losses in older vocabulary. The first mild shift nearly balances new and old performance without breaking memory or routing. Nothing here looks like a sudden capacity cliff.",
+    "north_star_question": "Establishes that integrated five-family language plasticity can be tuned continuously under a fixed learning budget, which is needed before scaling language curricula without uncontrolled forgetting.",
+    "next_stage": "carry all five preregistered mild allocation arms across the accepted five sequence orders at stream depths 1 and 4 to test whether the smooth frontier is order-robust rather than specific to block-heldout evaluation"
+  },
+  "activation_authorized": false
+}
