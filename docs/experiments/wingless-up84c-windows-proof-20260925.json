@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.up84c-windows-proof.v1",
+  "experiment": "UP-84C-online-locality",
+  "status": "qualified-scientific-result",
+  "source_head": "f42b7e889c571314d93dd4357a21496b8206b48f",
+  "workflow_run_id": 36205422116,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10892729200,
+  "artifact_sha256": "f692447aa2177837b4a53988f0707577ed1a3b31e70a0eba7753df505d41c79f",
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "future_oracle_used": false,
+  "findings": {
+    "active24_churn16": {
+      "fifo_hot": 0,
+      "lru_hot": 1,
+      "lru_hot_exact": 1,
+      "two_bit_aging_hot": 1,
+      "two_bit_aging_hot_exact": 1
+    },
+    "active24_churn24": {
+      "fifo_hot": 0,
+      "lru_hot": 1,
+      "lru_hot_exact": 1,
+      "two_bit_aging_hot": 1,
+      "two_bit_aging_hot_exact": 1
+    },
+    "active32_churn16": {
+      "fifo_hot": 0,
+      "lru_hot": 0.75,
+      "two_bit_aging_hot": 0.8125
+    },
+    "active32_churn24": {
+      "fifo_hot": 0,
+      "lru_hot": 0.75,
+      "two_bit_aging_hot": 0.8125
+    },
+    "metadata_bytes": {
+      "fifo": 16,
+      "lru": 136,
+      "two_bit_aging": 5
+    },
+    "total_bounded_memory_bytes": {
+      "fifo": 272,
+      "lru": 392,
+      "two_bit_aging": 261
+    }
+  },
+  "interpretation": {
+    "online_locality_mechanism_supported": true,
+    "two_bit_aging_matches_lru_exact_retention_when_hot_working_set_is_12": true,
+    "two_bit_aging_exceeds_lru_hot_accuracy_when_hot_working_set_is_16": true,
+    "churn16_to24_does_not_reduce_online_hot_accuracy": true,
+    "next_stage": "map hot-working-set occupancy threshold under a fixed online workload"
+  },
+  "activation_authorized": false
+}
