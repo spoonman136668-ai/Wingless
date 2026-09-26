@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up-lm1e-windows-proof.v1",
+  "experiment": "UP-LM1E-triplet-order",
+  "status": "qualified-scientific-result",
+  "source_head": "f7fc88cd94bfe383e25a400959276cf6a045b5d8",
+  "workflow_run_id": 36240439354,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10905653145,
+  "artifact_sha256": "eee7ef0bfd6450f56ab7497fc551ed333e500d692ce6b895cae5ea6f33684c62",
+  "findings": {
+    "third_base_para": {
+      "base_accuracy": 0.8334139264990329,
+      "paraphrase_accuracy": 0.8081661386835621,
+      "third_accuracy": 0.8214506172839506
+    },
+    "base_para_third": {
+      "base_accuracy": 0.8221308833010961,
+      "paraphrase_accuracy": 0.7961985216473073,
+      "third_accuracy": 0.8341049382716049
+    },
+    "cyclic_by_index": {
+      "base_accuracy": 0.842682140554481,
+      "paraphrase_accuracy": 0.7995424146427315,
+      "third_accuracy": 0.8280864197530864
+    },
+    "cyclic_by_epoch": {
+      "base_accuracy": 0.8336557059961315,
+      "paraphrase_accuracy": 0.8081661386835621,
+      "third_accuracy": 0.8213734567901234
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1
+  },
+  "interpretation": {
+    "sequential_triplet_order_controls_distribution_specific_quality": true,
+    "no_tested_sequential_order_improves_all_three_distributions_simultaneously": true,
+    "cyclic_by_index_improves_base_and_third_relative_to_third_base_para_but_reduces_paraphrase_accuracy": true,
+    "routing_and_exact_memory_remain_invariant": true,
+    "next_stage": "remove within-triplet recency by applying a symmetric averaged readout gradient over matched base-paraphrase-third examples"
+  },
+  "activation_authorized": false
+}
