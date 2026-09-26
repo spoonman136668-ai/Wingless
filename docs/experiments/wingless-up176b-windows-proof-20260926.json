@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up176b-windows-proof.v1",
+  "experiment": "UP-176B-temporal-predictor-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "49ed004970f94800a3f28eff8c9befc464a4e857",
+  "workflow_run_id": 36277980235,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10916844750,
+  "artifact_sha256": "73782a6bb97a79338ad3c8ed8eec65a81d69c2a235a9b42e4906b8bc2bfb9513",
+  "findings": {
+    "heldout_phase": 21,
+    "actual_crossings": 223,
+    "rank_plus_temporal": {
+      "predicted_sum": 221.99999999992792,
+      "brier": 0.00959153154927584,
+      "precision": 0.3067484662576687,
+      "recall": 0.672645739910314,
+      "tp": 150,
+      "fp": 339,
+      "fn": 73,
+      "tn": 16718
+    },
+    "rank_only": {
+      "predicted_sum": 221.99999999993105,
+      "brier": 0.009906295184073592,
+      "precision": 0.30625,
+      "recall": 0.6591928251121076,
+      "tp": 147,
+      "fp": 333,
+      "fn": 76,
+      "tn": 16724
+    }
+  },
+  "interpretation": {
+    "temporal_history_improves_heldout_brier_over_static_rank_only": true,
+    "temporal_history_improves_recall_slightly_at_shared_threshold": true,
+    "precision_gain_is_negligible": true,
+    "detector_false_warning_problem_remains": true,
+    "plain_speak": "Temporal history really adds information, but it is not a magic fix. It improves calibration and catches three more flips on this held-out phase, while precision stays around 31%.",
+    "north_star_question": "Supports keeping temporal history in the native risk estimate, while showing that trigger selectivity—not basic detectability—is now the main B-lane limitation.",
+    "next_stage": "map a frozen threshold precision-recall frontier on a fresh phase before selecting any future bounded intervention trigger"
+  },
+  "activation_authorized": false
+}
