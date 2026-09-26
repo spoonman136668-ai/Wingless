@@ -1,0 +1,51 @@
+{
+  "schema": "wingless.up173b-windows-proof.v1",
+  "experiment": "UP-173B-risk-transition-hazard",
+  "status": "qualified-scientific-result",
+  "source_head": "a7dc85742703f0eab021d8acdcc2de7b59a6f46f",
+  "workflow_run_id": 36276060262,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10917362498,
+  "artifact_sha256": "f5e653b6da2d61113dd110fe435e0af1e1fe75b1bc3c3308b897311ab72f7c93",
+  "findings": {
+    "context_phase": 18,
+    "all": {
+      "out_of_band": {
+        "slots": 15984,
+        "crossings": 7,
+        "density": 0.00043793793793793793
+      },
+      "current_only": {
+        "slots": 338,
+        "crossings": 64,
+        "density": 0.1893491124260355
+      },
+      "transition_to_persistent": {
+        "slots": 285,
+        "crossings": 81,
+        "density": 0.28421052631578947
+      },
+      "established_persistent": {
+        "slots": 673,
+        "crossings": 91,
+        "density": 0.1352154531946508
+      },
+      "transition_vs_established_ratio": 2.1019086176980917
+    },
+    "store_transition_vs_established_ratio": 1.6788001348163129,
+    "observe_transition_vs_established_ratio": 2.661899313501144,
+    "report_transition_crossings": 0,
+    "total_crossings": 243
+  },
+  "interpretation": {
+    "phase18_reproduces_transition_hazard": true,
+    "transition_to_persistent_is_higher_risk_than_established_persistence_overall": true,
+    "store_and_observe_reproduce_the_pattern": true,
+    "report_does_not_reproduce_the_transition_pattern_in_this_phase": true,
+    "temporal_persistence_is_not_monotonic_risk": true,
+    "plain_speak": "The dangerous moment is the transition into persistent fragility, not simply staying fragile for longer. In a fresh phase, examples entering streak 2 flipped about 28.4% of the time versus 13.5% once fragility was already established. STORE and OBSERVE reproduced the effect; REPORT did not.",
+    "north_star_question": "Strengthens internal self-detection by showing that temporal state carries hazard information across phases, while leaving open whether that information adds predictive value beyond static low-rank margin alone.",
+    "next_stage": "hold static vulnerability rank strata fixed and test whether transition-to-persistent remains more predictive than current-only or established persistence within the same rank bands"
+  },
+  "activation_authorized": false
+}
