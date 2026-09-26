@@ -26,5 +26,5 @@ try{
  Write-Host "original_old_delta20v1=$($R.original_old_retention_delta20_vs_1)"
  Write-Host "replication_old_delta20v1=$($R.replication_old_retention_delta20_vs_1)"
  Write-Host "interaction_delta=$($R.old_retention_interaction_delta)"
- Write-Host 'WINGLESS_UP142B_HARNESS_PASS'
+ Write-Host 'WINGLESS_UP142_HARNESS_PASS'
 }finally{Pop-Location;if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache};if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp};Remove-Item -Recurse -Force $GoCache,$GoTmp -ErrorAction SilentlyContinue}
