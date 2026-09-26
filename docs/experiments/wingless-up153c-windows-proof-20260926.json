@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up153c-windows-proof.v1",
+  "experiment": "UP-153C-hand-state-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "084b6fa4d91a97a4629b499789b56932a642bd4a",
+  "workflow_run_id": 36278360792,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10917856085,
+  "artifact_sha256": "d61e742058e1564f8038ebb4922de6837f6b01cd5e14457d5cf0bf6055dd175c",
+  "findings": {
+    "full_state_correct": 64,
+    "age_only_correct": 36,
+    "total_predictions": 64,
+    "full_state_accuracy": 1,
+    "age_only_accuracy": 0.5625,
+    "heldout_refresh_admissions": [
+      3,
+      7,
+      10,
+      13,
+      16
+    ],
+    "heldout_refresh_keys": [
+      4,
+      8,
+      12,
+      0,
+      6
+    ]
+  },
+  "interpretation": {
+    "hand_state_is_necessary_for_exact_forecast": true,
+    "age_state_alone_is_insufficient": true,
+    "combined_hand_plus_age_state_remains_exact_on_another_disjoint_schedule": true,
+    "combined_with_up152c_both_hand_and_age_are_independently_necessary": true,
+    "plain_speak": "Age counters alone only predict 36 of 64 evictions. Together with the earlier hand-only ablation, we now know neither piece works by itself: the exact warning state is the replacement hand plus the age vector.",
+    "north_star_question": "Pins the minimal demonstrated architecture-native state for exact one-step replacement forecasting under refresh.",
+    "next_stage": "use the frozen hand-plus-age forecast before mixed writes to predict whether an original durable item will be lost, testing an explicit prewrite loss warning without changing memory behavior"
+  },
+  "activation_authorized": false
+}
