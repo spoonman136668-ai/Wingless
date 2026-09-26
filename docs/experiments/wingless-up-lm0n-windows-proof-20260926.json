@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up-lm0n-windows-proof.v1",
+  "experiment": "UP-LM0N-grounded-paraphrase-order",
+  "status": "qualified-scientific-result",
+  "source_head": "b6d368edf8ac08469e37c0153e9ad273960fbb80",
+  "workflow_run_id": 36230164446,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10902367798,
+  "artifact_sha256": "030c8820af5759d1023ffa1f9f294be6439e70353c7a15a9f8e6c1478bc130c1",
+  "repair_provenance": {
+    "initial_run_id": 36229245242,
+    "initial_failure": "compile defect in alphabet index lookup",
+    "repair_commit": "0d53cf32e390cc618aba8243d69199eccfb0ec1c",
+    "scientific_parameters_changed": false
+  },
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "classifier_epochs": 20,
+  "classifier_learning_rate": 0.08,
+  "explicit_type_at_learned_inference": false,
+  "value_bytes_at_classifier_inference": false,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "language_retraining_on_paraphrases": false,
+  "findings": {
+    "heldout_paraphrase_classifier_accuracy": 1,
+    "retained_base_classifier_accuracy": 1,
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_learned_cells": 1,
+    "report_routing_accuracy_all_learned_cells": 1,
+    "admission_precision_all_learned_cells": 1,
+    "admission_recall_all_learned_cells": 1,
+    "max_recall_entries": 4,
+    "top1_accuracy_range": [
+      0.5931890179514255,
+      0.6079725448785639
+    ],
+    "perplexity_range": [
+      14.379152110071717,
+      15.595442304758897
+    ]
+  },
+  "interpretation": {
+    "grounded_lexical_routing_composes_with_structural_order_variation": true,
+    "memory_dependent_language_behavior_remains_exact": true,
+    "routing_generalization_is_not_the_current_bottleneck": true,
+    "generic_byte_language_model_is_strongly_out_of_distribution_on_paraphrase_surfaces": true,
+    "next_stage": "measure bounded paraphrase adaptation of the byte language model with frozen routing and base-corpus replay"
+  },
+  "activation_authorized": false
+}
