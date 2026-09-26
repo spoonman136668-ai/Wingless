@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up-lm1f-windows-proof.v1",
+  "experiment": "UP-LM1F-symmetric-triplet-gradient",
+  "status": "qualified-scientific-result",
+  "source_head": "b37bae7ba6792f4e3d3facf3997b6fe7e790c1e1",
+  "workflow_run_id": 36240835150,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10905604074,
+  "artifact_sha256": "43e8a86984e897108070e0e6abae9be839d919b4d7123d4d1ef900c5635603e5",
+  "findings": {
+    "cyclic_by_index": {
+      "base_accuracy": 0.842682140554481,
+      "paraphrase_accuracy": 0.7995424146427315,
+      "third_accuracy": 0.8280864197530864
+    },
+    "symmetric_triplet_average": {
+      "base_accuracy": 0.8267246937459704,
+      "paraphrase_accuracy": 0.8010383667722633,
+      "third_accuracy": 0.76875
+    },
+    "symmetric_triplet_sum": {
+      "base_accuracy": 0.8267246937459704,
+      "paraphrase_accuracy": 0.8010383667722633,
+      "third_accuracy": 0.76875
+    },
+    "symmetric_implementations_match_exactly": true,
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "admission_precision_recall_all_cells": 1
+  },
+  "interpretation": {
+    "naive_symmetric_gradient_averaging_does_not_improve_three_family_balance": true,
+    "sequential_cyclic_updates_are_materially_better_for_third_family_quality": true,
+    "symmetric_average_and_sum_equivalence_validates_the_implementation": true,
+    "remaining_tradeoff_is_not_explained_by_within_triplet_recency_alone": true,
+    "next_stage": "test symmetric gradient scale to distinguish under_step_optimization from genuine representation_or_readout_capacity_interference"
+  },
+  "activation_authorized": false
+}
