@@ -1,5 +1,7 @@
 package unitary
 
+import "fmt"
+
 const UPLM2PCountdownSchema="wingless.up-lm2p-unreported-eviction-countdown.v1"
 
 type UPLM2PPoint struct{
@@ -36,7 +38,7 @@ func uplm2pRun(d,rot,shift int)UPLM2PPoint{
  for i,n:=range recall.order{if !reported[n]{target=n;idx=i;break}}
  free:=16-len(recall.order);pred:=free+idx+1;actual:=-1
  for j:=1;j<=13;j++{
-  recall.write(uplm2nName(100+j,rot),uplm2nValue(100+j,rot,shift))
+  recall.write(fmt.Sprintf("probe-%d-%d-%d-%d",d,rot,shift,j),"x")
   if _,ok:=recall.values[target];!ok{actual=j;break}
  }
  return UPLM2PPoint{DeferredFirstChunkReports:d,IdentityRotation:rot,ValueShift:shift,TargetName:target,TargetFIFOIndex:idx,FreeSlots:free,PredictedUniqueStores:pred,ActualUniqueStores:actual,Exact:pred==actual}
