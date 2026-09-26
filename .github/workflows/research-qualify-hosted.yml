@@ -63,6 +63,8 @@ jobs:
           cache: false
 
       - name: Run research qualification
+        id: qualify
+        continue-on-error: true
         shell: powershell
         env:
           WINGLESS_EXPECTED_REF: ${{ inputs.research_ref }}
@@ -74,76 +76,53 @@ jobs:
             throw "WINGLESS_HOSTED_QUAL_DISPATCH_ID_INVALID: $env:WINGLESS_DISPATCH_ID"
           }
 
+          $OutputDirectory = "$env:RUNNER_TEMP\wingless-research-qualification"
+          New-Item -ItemType Directory -Force -Path $OutputDirectory | Out-Null
+          $SummaryPath = Join-Path $OutputDirectory 'summary.json'
           $RequestPath = '.wingless/qualification-request.json'
-          if (-not (Test-Path -LiteralPath $RequestPath -PathType Leaf)) {
-            throw "WINGLESS_HOSTED_QUAL_REQUEST_MISSING: $RequestPath"
+          $Request = $null
+          $QualificationError = $null
+
+          try {
+            if (-not (Test-Path -LiteralPath $RequestPath -PathType Leaf)) {
+              throw "WINGLESS_HOSTED_QUAL_REQUEST_MISSING: $RequestPath"
+            }
+
+            $Request = Get-Content -LiteralPath $RequestPath -Raw | ConvertFrom-Json
+            if ($Request.schema -cne 'wingless.research-qualification-request.v1') {
+              throw "WINGLESS_HOSTED_QUAL_REQUEST_SCHEMA_MISMATCH: $($Request.schema)"
+            }
+            if ([string]::IsNullOrWhiteSpace([string]$Request.branch)) {
+              throw 'WINGLESS_HOSTED_QUAL_REQUEST_BRANCH_MISSING'
+            }
+            if ([string]$Request.branch -cne $env:WINGLESS_EXPECTED_REF) {
+              throw "WINGLESS_HOSTED_QUAL_REF_MISMATCH expected=$env:WINGLESS_EXPECTED_REF request=$($Request.branch)"
+            }
+            if ([string]$Request.branch -notlike 'research/wingless-up*') {
+              throw "WINGLESS_HOSTED_QUAL_BRANCH_NOT_AUTOMATION_COMPATIBLE: $($Request.branch)"
+            }
+
+            Remove-Item Env:GITHUB_SHA -ErrorAction SilentlyContinue
+            Remove-Item Env:GITHUB_REF_NAME -ErrorAction SilentlyContinue
+
+            ./scripts/Invoke-ResearchQualification.ps1 `
+              -RequestPath $RequestPath `
+              -OutputDirectory $OutputDirectory `
+              -GuardWaitMinutes 0
+          }
+          catch {
+            $QualificationError = $_.Exception.Message
           }
 
-          $Request = Get-Content -LiteralPath $RequestPath -Raw | ConvertFrom-Json
-          if ($Request.schema -cne 'wingless.research-qualification-request.v1') {
-            throw "WINGLESS_HOSTED_QUAL_REQUEST_SCHEMA_MISMATCH: $($Request.schema)"
-          }
-          if ([string]::IsNullOrWhiteSpace([string]$Request.branch)) {
-            throw 'WINGLESS_HOSTED_QUAL_REQUEST_BRANCH_MISSING'
-          }
-          if ([string]$Request.branch -cne $env:WINGLESS_EXPECTED_REF) {
-            throw "WINGLESS_HOSTED_QUAL_REF_MISMATCH expected=$env:WINGLESS_EXPECTED_REF request=$($Request.branch)"
-          }
-          if ([string]$Request.branch -notlike 'research/wingless-up*') {
-            throw "WINGLESS_HOSTED_QUAL_BRANCH_NOT_AUTOMATION_COMPATIBLE: $($Request.branch)"
-          }
-
-          # workflow_dispatch runs under the workflow control ref (main), while
-          # actions/checkout switches the worktree to the requested research ref.
-          Remove-Item Env:GITHUB_SHA -ErrorAction SilentlyContinue
-          Remove-Item Env:GITHUB_REF_NAME -ErrorAction SilentlyContinue
-
-          ./scripts/Invoke-ResearchQualification.ps1 `
-            -RequestPath $RequestPath `
-            -OutputDirectory "$env:RUNNER_TEMP\wingless-research-qualification" `
-            -GuardWaitMinutes 0
-
-      - name: Deliver canonical result to local plane
-        if: always()
-        shell: powershell
-        env:
-          WINGLESS_EXPECTED_REF: ${{ inputs.research_ref }}
-          WINGLESS_DISPATCH_ID: ${{ inputs.dispatch_id }}
-        run: |
-          $ErrorActionPreference = 'Stop'
-
-          if ($env:WINGLESS_DISPATCH_ID -notmatch '^[0-9a-f]{64}$') {
-            throw "WINGLESS_RESULT_CALLBACK_DISPATCH_ID_INVALID: $env:WINGLESS_DISPATCH_ID"
-          }
-
-          $RequestPath = '.wingless/qualification-request.json'
-          if (-not (Test-Path -LiteralPath $RequestPath -PathType Leaf)) {
-            throw "WINGLESS_RESULT_CALLBACK_REQUEST_MISSING: $RequestPath"
-          }
-          $Request = Get-Content -LiteralPath $RequestPath -Raw | ConvertFrom-Json
-          if ($Request.schema -cne 'wingless.research-qualification-request.v1') {
-            throw "WINGLESS_RESULT_CALLBACK_REQUEST_SCHEMA_INVALID: $($Request.schema)"
-          }
-          if ([string]$Request.branch -cne $env:WINGLESS_EXPECTED_REF) {
-            throw "WINGLESS_RESULT_CALLBACK_REF_MISMATCH expected=$env:WINGLESS_EXPECTED_REF request=$($Request.branch)"
-          }
-
-          $Head = (git rev-parse HEAD).Trim()
-          if ($LASTEXITCODE -ne 0 -or $Head -notmatch '^[0-9a-f]{40}$') {
-            throw 'WINGLESS_RESULT_CALLBACK_HEAD_INVALID'
-          }
-
-          $EvidenceRoot = Join-Path $env:RUNNER_TEMP 'wingless-research-qualification'
-          $SummaryPath = Join-Path $EvidenceRoot 'summary.json'
-          $ProbePath = Join-Path $EvidenceRoot 'probe.json'
-
-          $Summary = $null
           if (Test-Path -LiteralPath $SummaryPath -PathType Leaf) {
             $Summary = Get-Content -LiteralPath $SummaryPath -Raw | ConvertFrom-Json
           }
-
-          if ($null -eq $Summary) {
-            $CanonicalSummary = [ordered]@{
+          elseif ($null -ne $Request) {
+            $Head = (git rev-parse HEAD).Trim()
+            if ($LASTEXITCODE -ne 0 -or $Head -notmatch '^[0-9a-f]{40}$') {
+              throw 'WINGLESS_HOSTED_QUAL_FALLBACK_HEAD_UNAVAILABLE'
+            }
+            $Summary = [ordered]@{
               schema = 'wingless.research-qualification-summary.v1'
               experiment = [string]$Request.experiment
               branch = [string]$Request.branch
@@ -157,58 +136,97 @@ jobs:
               unexpected_dirty = @()
               production_priority_guard = 'not-observed'
               generated_at_utc = [DateTime]::UtcNow.ToString('o')
-              dispatch_id = $env:WINGLESS_DISPATCH_ID
             }
           }
           else {
-            $Classification = [string]$Summary.classification
-            $ProbeParsed = [bool]$Summary.probe_parsed
+            throw 'WINGLESS_HOSTED_QUAL_CANNOT_BIND_FALLBACK_RESULT'
+          }
 
-            if ($Classification -ceq 'qualified-scientific-result' -and
-                -not (Test-Path -LiteralPath $ProbePath -PathType Leaf)) {
+          $Summary | Add-Member -NotePropertyName dispatch_id -NotePropertyValue $env:WINGLESS_DISPATCH_ID -Force
+          $Summary | ConvertTo-Json -Depth 100 | Set-Content -Encoding UTF8 -LiteralPath $SummaryPath
+
+          if (-not [string]::IsNullOrWhiteSpace($QualificationError)) {
+            throw "WINGLESS_HOSTED_QUALIFICATION_FAILED: $QualificationError"
+          }
+
+      - name: Deliver canonical result to local plane
+        if: always()
+        shell: powershell
+        env:
+          WINGLESS_DISPATCH_ID: ${{ inputs.dispatch_id }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $OutputDirectory = "$env:RUNNER_TEMP\wingless-research-qualification"
+          $SummaryPath = Join-Path $OutputDirectory 'summary.json'
+          $ProbePath = Join-Path $OutputDirectory 'probe.json'
+
+          if (-not (Test-Path -LiteralPath $SummaryPath -PathType Leaf)) {
+            Write-Warning 'No bound qualification summary exists; result cannot be delivered.'
+            exit 0
+          }
+
+          $Summary = Get-Content -LiteralPath $SummaryPath -Raw | ConvertFrom-Json
+          if ([string]$Summary.dispatch_id -cne $env:WINGLESS_DISPATCH_ID) {
+            throw 'WINGLESS_RESULT_CALLBACK_DISPATCH_BINDING_MISMATCH'
+          }
+
+          $Classification = [string]$Summary.classification
+          $ProbeParsed = [bool]$Summary.probe_parsed
+          $Normalized = $null
+
+          if ($Classification -ceq 'qualified-scientific-result') {
+            if (-not (Test-Path -LiteralPath $ProbePath -PathType Leaf)) {
               $Classification = 'probe-parse-failure'
               $ProbeParsed = $false
             }
-
-            $CanonicalSummary = [ordered]@{
-              schema = 'wingless.research-qualification-summary.v1'
-              experiment = [string]$Summary.experiment
-              branch = [string]$Summary.branch
-              baseline_sha = [string]$Summary.baseline_sha
-              head_sha = [string]$Summary.head_sha
-              test_script = [string]$Summary.test_script
-              test_exit_code = [int]$Summary.test_exit_code
-              harness_marker = [bool]$Summary.harness_marker
-              probe_parsed = $ProbeParsed
-              classification = $Classification
-              unexpected_dirty = @($Summary.unexpected_dirty)
-              production_priority_guard = [string]$Summary.production_priority_guard
-              generated_at_utc = [string]$Summary.generated_at_utc
-              dispatch_id = $env:WINGLESS_DISPATCH_ID
+            else {
+              $Normalized = Get-Content -LiteralPath $ProbePath -Raw | ConvertFrom-Json
+              if ([string]$Normalized.schema -cne 'wingless.research-scientific-result.v1') {
+                $Classification = 'probe-parse-failure'
+                $ProbeParsed = $false
+                $Normalized = $null
+              }
             }
           }
 
-          $Body = [ordered]@{
+          $CanonicalSummary = [ordered]@{
+            schema = [string]$Summary.schema
+            experiment = [string]$Summary.experiment
+            branch = [string]$Summary.branch
+            baseline_sha = [string]$Summary.baseline_sha
+            head_sha = [string]$Summary.head_sha
+            test_script = [string]$Summary.test_script
+            test_exit_code = [int]$Summary.test_exit_code
+            harness_marker = [bool]$Summary.harness_marker
+            probe_parsed = $ProbeParsed
+            classification = $Classification
+            unexpected_dirty = @($Summary.unexpected_dirty)
+            production_priority_guard = [string]$Summary.production_priority_guard
+            generated_at_utc = [string]$Summary.generated_at_utc
+            dispatch_id = [string]$Summary.dispatch_id
+          }
+
+          # Preserve the dispatch identity and any callback-side artifact downgrade
+          # in uploaded evidence as well as in the canonical plane result.
+          $CanonicalSummary | ConvertTo-Json -Depth 100 |
+            Set-Content -Encoding UTF8 -LiteralPath $SummaryPath
+
+          $Result = [ordered]@{
             schema = 'ckb-plane.wingless-qualification-result.v2'
             summary = $CanonicalSummary
           }
-
-          if ($CanonicalSummary.classification -ceq 'qualified-scientific-result') {
-            $Probe = Get-Content -LiteralPath $ProbePath -Raw | ConvertFrom-Json
-            if ($Probe.schema -cne 'wingless.research-scientific-result.v1') {
-              throw "WINGLESS_RESULT_CALLBACK_PROBE_SCHEMA_INVALID: $($Probe.schema)"
-            }
-            $Body.result = $Probe
+          if ($null -ne $Normalized) {
+            $Result.result = $Normalized
           }
 
-          $Json = $Body | ConvertTo-Json -Depth 100 -Compress
+          $Body = $Result | ConvertTo-Json -Depth 100 -Compress
           $Uri = "http://127.0.0.1:8791/v1/research/wingless/results/$env:WINGLESS_DISPATCH_ID"
           $Response = Invoke-WebRequest `
             -UseBasicParsing `
             -Method Post `
             -Uri $Uri `
             -ContentType 'application/json' `
-            -Body $Json `
+            -Body $Body `
             -TimeoutSec 30
 
           if ($Response.StatusCode -ne 200) {
@@ -224,3 +242,9 @@ jobs:
           path: ${{ runner.temp }}/wingless-research-qualification/
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Preserve qualification failure status
+        if: steps.qualify.outcome != 'success'
+        shell: powershell
+        run: |
+          throw 'WINGLESS_HOSTED_QUALIFICATION_FAILED_AFTER_RESULT_DELIVERY'
