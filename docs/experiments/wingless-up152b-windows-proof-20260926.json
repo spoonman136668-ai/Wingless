@@ -1,0 +1,97 @@
+{
+  "schema": "wingless.up152b-windows-proof.v1",
+  "experiment": "UP-152B-report-tail-dose",
+  "status": "qualified-scientific-result",
+  "source_head": "6faa86207fb791e8a77712468b1447d928f7a7a6",
+  "workflow_run_id": 36266515682,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10913882334,
+  "artifact_sha256": "16035c440b82781a8f2befd8fc19ec4225d18e0b9eaaff28ab4b9934d5e77fa3",
+  "findings": {
+    "mia": [
+      {
+        "report_count": 0,
+        "tail_damage": 0.026666666666666596,
+        "net": 0.0011111111111111072,
+        "old": 0.9166666666666667,
+        "new": 0.921875
+      },
+      {
+        "report_count": 1,
+        "tail_damage": -0.020000000000000063,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.9166666666666666
+      },
+      {
+        "report_count": 2,
+        "tail_damage": -0.028888888888888964,
+        "net": -0.011111111111111117,
+        "old": 0.8555555555555556,
+        "new": 0.921875
+      },
+      {
+        "report_count": 3,
+        "tail_damage": -0.0388888888888889,
+        "net": -0.010000000000000009,
+        "old": 0.8611111111111112,
+        "new": 0.921875
+      },
+      {
+        "report_count": 4,
+        "tail_damage": -0.04777777777777781,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.921875
+      }
+    ],
+    "noah": [
+      {
+        "report_count": 0,
+        "tail_damage": 0.032222222222222194,
+        "net": 0.0011111111111111072,
+        "old": 0.9166666666666667,
+        "new": 0.921875
+      },
+      {
+        "report_count": 1,
+        "tail_damage": -0.00555555555555558,
+        "net": -0.00555555555555558,
+        "old": 0.8833333333333333,
+        "new": 0.921875
+      },
+      {
+        "report_count": 2,
+        "tail_damage": -0.028888888888888943,
+        "net": -0.007777777777777795,
+        "old": 0.8722222222222222,
+        "new": 0.9270833333333333
+      },
+      {
+        "report_count": 3,
+        "tail_damage": -0.046666666666666655,
+        "net": -0.008888888888888901,
+        "old": 0.8666666666666667,
+        "new": 0.9270833333333333
+      },
+      {
+        "report_count": 4,
+        "tail_damage": -0.0533333333333333,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.9270833333333333
+      }
+    ]
+  },
+  "interpretation": {
+    "post_anchor_tail_damage_is_monotonic_with_report_count_for_both_subjects": true,
+    "final_old_retention_is_not_monotonic_with_report_count": true,
+    "final_retention_rebounds_at_four_reports_relative_to_the_intermediate_worst_point": true,
+    "displacement_between_pre_anchor_prefix_and_post_anchor_tail_contributes_to_accumulated_outcome": true,
+    "report_class_harm_is_anchor_relative_not_a_simple_global_frequency_effect": true,
+    "plain_speak": "Each additional REPORT example placed after old-memory rehearsal makes that final block more damaging. But the final score does not keep falling all the way to four REPORTs, because putting more REPORTs after the rehearsal also removes them from the earlier part of the epoch. The harmful effect depends on where the class appears relative to the repair step, not just how many REPORT examples exist.",
+    "north_star_question": "Identifies anchor-relative update position as the next causal variable in lexical stability, refining class-composition interference into a sequencing mechanism.",
+    "next_stage": "swap a fixed REPORT block and a fixed STORE+OBSERVE block across the old-anchor boundary while keeping all 24 examples and update counts identical"
+  },
+  "activation_authorized": false
+}
