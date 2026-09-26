@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up-lm2q-windows-proof.v1",
+  "experiment": "UP-LM2Q-dynamic-pressure-countdown",
+  "status": "qualified-scientific-result",
+  "source_head": "51371435bdddcf2d0ffa83bd2cc9f14e84880e32",
+  "workflow_run_id": 36278581824,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10917852557,
+  "artifact_sha256": "4bf02f0e165b04508dcbe8dc4513e9ada51cbe29504ec65c8d288d564b09595d",
+  "findings": {
+    "exact_recall_cap": 16,
+    "deferred_levels": [
+      4,
+      5,
+      6
+    ],
+    "identity_rotations": [
+      0,
+      7
+    ],
+    "value_shifts": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "snapshots": [
+      "initial",
+      "after_store4_close1",
+      "after_store8_close2"
+    ],
+    "exact_predictions": 72,
+    "total_predictions": 72,
+    "exact_prediction_rate": 1,
+    "representative_countdowns": {
+      "d4": {
+        "initial": 13,
+        "after_store4_close1": 10,
+        "after_store8_close2": 7
+      },
+      "d5": {
+        "initial": 12,
+        "after_store4_close1": 9,
+        "after_store8_close2": 6
+      },
+      "d6": {
+        "initial": 11,
+        "after_store4_close1": 8,
+        "after_store8_close2": 5
+      }
+    }
+  },
+  "interpretation": {
+    "countdown_remains_exact_after_dynamic_dependency_closure": true,
+    "countdown_updates_from_current_state_without_identity_or_value_dependence": true,
+    "future_schedule_not_required_for_snapshot_countdown": true,
+    "plain_speak": "As dependencies close and new writes arrive, Wingless can recompute the remaining write budget exactly from the live recall state. Across 72 controlled snapshots it never missed the countdown.",
+    "north_star_question": "Strengthens the native warning from a static pre-loss countdown into a dynamically updating time-to-failure estimate under changing dependency pressure.",
+    "next_stage": "evaluate the countdown online at every event and test whether it remains exact across alternating STORE and REPORT transitions, then quantify earliest actionable warning horizon without intervention"
+  },
+  "activation_authorized": false
+}
