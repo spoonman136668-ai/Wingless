@@ -1,0 +1,121 @@
+{
+  "schema": "wingless.up133c-windows-proof.v1",
+  "experiment": "UP-133C-postboundary-recovery",
+  "status": "qualified-scientific-result",
+  "source_head": "2aa549c407fb15d3774359e10044a988dd521e13",
+  "workflow_run_id": 36266906789,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10913829348,
+  "artifact_sha256": "2fb685a450d5caef64ab04f8d79b19605652f033bdfdb7d65079c50efc9c7820",
+  "findings": {
+    "assignment_a": {
+      "split_control": {
+        "target": 100,
+        "positions": [
+          5,
+          37
+        ],
+        "sightings": 2,
+        "admission": 0,
+        "accuracy": 0
+      },
+      "pre2_post1": {
+        "target": 101,
+        "positions": [
+          10,
+          20,
+          40
+        ],
+        "sightings": 3,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "pre1_post2": {
+        "target": 102,
+        "positions": [
+          15,
+          45,
+          55
+        ],
+        "sightings": 3,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "edge_post2": {
+        "target": 103,
+        "positions": [
+          30,
+          33,
+          34
+        ],
+        "sightings": 3,
+        "admission": 1,
+        "accuracy": 1
+      }
+    },
+    "assignment_b": {
+      "split_control": {
+        "target": 102,
+        "positions": [
+          5,
+          37
+        ],
+        "sightings": 2,
+        "admission": 0,
+        "accuracy": 0
+      },
+      "pre2_post1": {
+        "target": 103,
+        "positions": [
+          10,
+          20,
+          40
+        ],
+        "sightings": 3,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "pre1_post2": {
+        "target": 100,
+        "positions": [
+          15,
+          45,
+          55
+        ],
+        "sightings": 3,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "edge_post2": {
+        "target": 101,
+        "positions": [
+          30,
+          33,
+          34
+        ],
+        "sightings": 3,
+        "admission": 1,
+        "accuracy": 1
+      }
+    },
+    "hot_accuracy_all_arms": 1,
+    "target16_accuracy_all_arms": 0.9375,
+    "nonpersistent_admission_all_arms": 0,
+    "nonpersistent_retention_all_arms": 0,
+    "one_shot_false_admissions_all_arms": 0,
+    "panic_rate_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "boundary_split_failure_is_recoverable": true,
+    "qualification_restarts_cleanly_after_generation_reset": true,
+    "two_sightings_in_any_single_generation_are_sufficient_even_after_an_earlier_split_failure": true,
+    "mirrored_target_assignment_has_no_effect": true,
+    "durable_recall_once_admitted_survives_later_pressure_in_all_qualified_paths": true,
+    "plain_speak": "Missing the two-reminder window once does not permanently damage an item. The old reminder is discarded at the reset, and the item can start fresh. As soon as two later reminders land in the same window, it becomes durable normally.",
+    "north_star_question": "Establishes a reset-and-recovery rule for bounded temporal consolidation, supporting repeated learning opportunities in long streams without cross-window evidence leakage.",
+    "next_stage": "extend across four consecutive generations to test that isolated single sightings never accumulate across resets while a later same-generation pair still qualifies normally"
+  },
+  "activation_authorized": false
+}
