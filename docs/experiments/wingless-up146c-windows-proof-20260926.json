@@ -1,0 +1,73 @@
+{
+  "schema": "wingless.up146c-windows-proof.v1",
+  "experiment": "UP-146C-durable-access-recency",
+  "status": "qualified-scientific-result",
+  "source_head": "a6d02a51e4195e93ca357db8474b884974593a2a",
+  "workflow_run_id": 36273979105,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10916676269,
+  "artifact_sha256": "87fbbb2124a284e5037d561e7cea9fc5cc11054cc0c0978527b6d52062dbc926",
+  "findings": {
+    "arms": 8,
+    "queried_facts_per_arm": 12,
+    "cold_facts_per_arm": 4,
+    "hot_accuracy_all_arms": 1,
+    "cold_accuracy_all_arms": 0.5,
+    "cold_0_3": {
+      "evicted_keys": [
+        0,
+        1
+      ],
+      "retained_keys": [
+        2,
+        3
+      ]
+    },
+    "cold_4_7": {
+      "evicted_keys": [
+        4,
+        5
+      ],
+      "retained_keys": [
+        6,
+        7
+      ]
+    },
+    "cold_8_11": {
+      "evicted_keys": [
+        8,
+        9
+      ],
+      "retained_keys": [
+        10,
+        11
+      ]
+    },
+    "cold_12_15": {
+      "evicted_keys": [
+        12,
+        13
+      ],
+      "retained_keys": [
+        14,
+        15
+      ]
+    },
+    "temporal_candidate_outcomes_unchanged_across_all_arms": true,
+    "exact_recall_entries": 16,
+    "false_admissions": 0,
+    "panic_rate": 0
+  },
+  "interpretation": {
+    "durable_lexical_retention_is_governed_by_access_recency_reuse_pressure": true,
+    "lexical_class_does_not_determine_eviction": true,
+    "subject_identity_does_not_determine_eviction": true,
+    "all_queried_facts_survive_and_two_of_four_equally_cold_facts_are_displaced_by_two_new_admissions": true,
+    "within_equally_cold_facts_existing_table_order_resolves_the_tie": true,
+    "no_memory_policy_change_was_required": true,
+    "plain_speak": "Move the 'cold' label to a different set of facts and the losses move with it. STORE, OBSERVE, REPORT, quin, or rue do not matter; lack of recent use does. When four facts are equally cold and two slots are needed, the existing table order chooses which two go.",
+    "north_star_question": "Identifies the durable-store retention signal under lexical integration—recent reuse—without adding capacity or semantic priority, providing a mechanistic basis for future bounded memory management.",
+    "next_stage": "stagger last-access time across durable lexical cohorts before identical admissions to map the graded recency ordering and separate recency priority from equal-recency table-order tie breaking"
+  },
+  "activation_authorized": false
+}
