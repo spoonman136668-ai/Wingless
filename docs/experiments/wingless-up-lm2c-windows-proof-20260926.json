@@ -1,0 +1,63 @@
+{
+  "schema": "wingless.up-lm2c-windows-proof.v1",
+  "experiment": "UP-LM2C-balanced-prior-sequence-integration",
+  "status": "qualified-scientific-result",
+  "source_head": "10c9f1e366588451ad8f3f3aa472f0b6d378ced4",
+  "workflow_run_id": 36269373214,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10915480513,
+  "artifact_sha256": "8fe84c70e69f74f1a1755dd66d0591093d0c1d949aa136ac854bacc6f4c1a6b1",
+  "findings": {
+    "structural_exact_all_500_integrated_cells": true,
+    "max_recall_entries": 4,
+    "overall_balanced_minus_canonical": {
+      "fifth_integrated_mean": 0.0004484009231783581,
+      "prior_integrated_mean": 0.00020499868819396917,
+      "all_family_integrated_mean": 0.0002536791351908274,
+      "minimum_family_integrated_mean": 0.007812001584218602
+    },
+    "by_evaluation_order": {
+      "block": {
+        "fifth": 0.0008242664029013858,
+        "prior": 0.0014413873307188353,
+        "all": 0.0013179631451553098,
+        "min": 0.01107995936684265
+      },
+      "per_name": {
+        "fifth": 0.00011539729640617225,
+        "prior": -0.0029003171919846247,
+        "all": -0.0022971742943064923,
+        "min": 0.002808200410232509
+      },
+      "paired_names": {
+        "fifth": 0.0006429277942631151,
+        "prior": 0.00029848613672525117,
+        "all": 0.00036737446823280616,
+        "min": 0.00849376470325558
+      },
+      "stores_then_local_reports": {
+        "fifth": -0.00012363996043520675,
+        "prior": 0.0006731541094251003,
+        "all": 0.0005137952954530567,
+        "min": 0.006202226635854768
+      },
+      "reverse_report_tail": {
+        "fifth": 0.0007830530827563243,
+        "prior": 0.001512283056085284,
+        "all": 0.0013664370614194566,
+        "min": 0.010475856804907502
+      }
+    }
+  },
+  "interpretation": {
+    "position_balancing_improves_worst_family_accuracy_more_reliably_than_mean_accuracy": true,
+    "fifth_terminal_privilege_remains_effectively_stable_under_balanced_prior_rotation": true,
+    "balanced_prior_rotation_is_not_uniformly_mean_improving_across_sequence_orders": true,
+    "per_name_evaluation_exposes_a_negative_prior_mean_interaction": true,
+    "structural_sequence_memory_and_routing_remain_exact": true,
+    "plain_speak": "Giving the older vocabulary families equal chances to occupy late update positions mostly helps the weakest family catch up, without disturbing the newest family. It does not make every average score better: the per-name sentence organization still exposes a cost. So position balancing is a fairness/stability tool, not a universal accuracy boost.",
+    "north_star_question": "Shows that recency equalization survives integrated language streams as a robust worst-family stabilizer while revealing a specific sequence-organization interaction that must be understood before adopting it as a general scheduler.",
+    "next_stage": "hold balanced prior adaptation fixed and isolate why per-name evaluation loses prior mean accuracy by comparing name-group boundary placement against the same family/order content under matched sequence transformations"
+  },
+  "activation_authorized": false
+}
