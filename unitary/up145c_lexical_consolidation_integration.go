@@ -69,7 +69,6 @@ func up145cAt(pos int,cands []up145cLexeme,roles map[int]string)(up145cLexeme,bo
 	return up145cLexeme{},false
 }
 func up145cRun(assignment string)UP145CPoint{
-	defer func(){_ = recover()}()
 	x:=&up125cAgeEvictMachine{maxAge:2}
 	durable:=up145cDurable();cands:=up145cCandidates();roles:=up145cRoles(assignment)
 	truth:=map[int]int{}
