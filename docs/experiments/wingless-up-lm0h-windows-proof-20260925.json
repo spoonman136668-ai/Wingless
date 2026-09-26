@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up-lm0h-windows-proof.v1",
+  "experiment": "UP-LM0H-lexical-family-holdout",
+  "status": "qualified-scientific-result",
+  "source_head": "0265d84320c94434b676a37d86fd4b7386093f76",
+  "workflow_run_id": 36203158527,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10892911288,
+  "artifact_sha256": "10d65d8240a3e3b22b7c9e03efb920dd03490e158d58d8b6a9f9e0de5d84e3cb",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "classifier_epochs": 20,
+  "classifier_learning_rate": 0.08,
+  "classifier_threshold": 0.5,
+  "explicit_type_at_learned_inference": false,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "classifier": {
+    "train_domain": {
+      "accuracy": 0.875,
+      "precision": 1,
+      "recall": 0.75
+    },
+    "heldout_subject_family": {
+      "accuracy": 0.9375,
+      "precision": 1,
+      "recall": 0.875
+    },
+    "heldout_value_family": {
+      "accuracy": 0.75,
+      "precision": 1,
+      "recall": 0.5
+    },
+    "heldout_joint_family": {
+      "accuracy": 0.875,
+      "precision": 1,
+      "recall": 0.75
+    }
+  },
+  "language": {
+    "explicit_heldout_query_set_exact": 1,
+    "explicit_stream4_query_set_exact": 1,
+    "learned_heldout_dependent_accuracy": 0.828125,
+    "learned_heldout_query_set_exact": 0.4375,
+    "learned_stream4_dependent_accuracy": 0.7447916666666666,
+    "learned_stream4_query_set_exact": 0.2708333333333333,
+    "learned_admission_precision": 1,
+    "learned_admission_recall": 0.7282608695652174
+  },
+  "interpretation": {
+    "recombination_success_does_not_extend_to_whole_lexical_families": true,
+    "unseen_values_are_strongest_classifier_failure": true,
+    "failure_is_false_negative_dominant": true,
+    "suffix_content_interferes_with_event_type_readout": true,
+    "next_stage": "test verb-anchored admission readout before value suffix bytes while preserving the same language model and memory budgets"
+  },
+  "activation_authorized": false
+}
