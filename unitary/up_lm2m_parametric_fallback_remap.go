@@ -41,7 +41,7 @@ type UPLM2MResult struct{
 	FutureOracleUsed bool `json:"future_oracle_used"`
 	Metrics []UPLM2MMetric `json:"metrics"`
 }
-func uplm2mText(family string,rot,order,shift int)(string,map[int]bool){
+func uplm2mText(family string,rot int,order string,shift int)(string,map[int]bool){
 	base:=uplm2iNames();values:=uplm0gValues();storeVerb,observeVerb,reportVerb:=uplm2dVerbs(family)
 	nameAt:=func(pos int)string{return base[(pos+rot)%24]}
 	valueAt:=func(pos int)string{return values[((pos+rot)+shift)%len(values)]}
