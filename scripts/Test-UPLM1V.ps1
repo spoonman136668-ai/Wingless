@@ -28,7 +28,6 @@ try{
  foreach($A in @('equal_mass','fifth_1p5_mass','fifth_2x_mass')){
   foreach($F in @('base','paraphrase','third','fourth','fifth')){
    $M=@($R.integrated_metrics|Where-Object{$_.arm-ceq $A -and $_.family-ceq $F})
-   $Mean=($M|Measure-Object -Property { $_.metric.top1_accuracy } -Average).Average
    Write-Host "arm=$A family=$F integrated_cells=$($M.Count)"
   }
  }
