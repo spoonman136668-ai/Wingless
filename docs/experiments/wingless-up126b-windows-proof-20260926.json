@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.up126b-windows-proof.v1",
+  "experiment": "UP-126B-store-gate-topology",
+  "status": "qualified-scientific-result",
+  "source_head": "6b9b9d2511dff76e401613556a14c76ee508852f",
+  "workflow_run_id": 36244670619,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10906503595,
+  "artifact_sha256": "0dca18f63edf32657036ba6f02475fc568deae62d7adf1d3844370a4a4b1942f",
+  "findings": {
+    "train": {
+      "accuracy": 0.75,
+      "precision": 1,
+      "recall": 0.25
+    },
+    "heldout": {
+      "accuracy": 0.7333333333333333,
+      "precision": 1,
+      "recall": 0.2
+    },
+    "unseen": {
+      "accuracy": 0.7555555555555555,
+      "precision": 1,
+      "recall": 0.26666666666666666
+    },
+    "stores_positive_rate_all_splits": 0,
+    "holds_positive_rate_all_splits": 0,
+    "saves_positive_rate_all_splits": 0,
+    "keeps_positive_rate_all_splits": 1,
+    "archives_positive_rate": {
+      "train": 0.25,
+      "heldout": 0,
+      "unseen": 0.3333333333333333
+    },
+    "minimum_store_margin_to_threshold": -0.1611227196157921,
+    "maximum_non_store_probability": 0.42004625042178956
+  },
+  "interpretation": {
+    "low_recall_is_broad_across_multiple_store_surfaces": true,
+    "non_store_false_positives_are_not_the_problem": true,
+    "gate_has_a_conservative_store_prior_or_objective_bias": true,
+    "representation_contains_some_surface_specific_separability_but_current_imbalanced_training_does_not_place_most_store_surfaces_above_fixed_threshold": true,
+    "next_stage": "compare original imbalanced exposure against preregistered class-balanced positive-negative exposure at the same threshold and learning rate"
+  },
+  "activation_authorized": false
+}
