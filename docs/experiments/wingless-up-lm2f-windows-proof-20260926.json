@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up-lm2f-windows-proof.v1",
+  "experiment": "UP-LM2F-store-observe-locality-composition",
+  "status": "qualified-scientific-result",
+  "source_head": "736321becafcc53824f059f1c69171c10bd9b917",
+  "workflow_run_id": 36271534791,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10915797799,
+  "artifact_sha256": "64ca091288061caf41469a1abc8e7bdcf1b974125fdf01581e8977c03699bd9c",
+  "findings": {
+    "structural_exact_all_400_integrated_cells": true,
+    "max_recall_entries": 4,
+    "balanced_minus_canonical_average_by_locality_variant": {
+      "per_name": {
+        "prior": -0.0029003171919846247,
+        "fifth": 0.00011539729640617225,
+        "all": -0.0022971742943064923,
+        "min_family": 0.002808200410232509
+      },
+      "stores_global": {
+        "prior": 0.0006731541094251003,
+        "fifth": -0.00012363996043520675,
+        "all": 0.0005137952954530567,
+        "min_family": 0.006202226635854768
+      },
+      "observes_global": {
+        "prior": -0.00006775422007818666,
+        "fifth": 0.0016485328058028382,
+        "all": 0.00027550318509801387,
+        "min_family": 0.00822486440077832
+      },
+      "stores_observes_global": {
+        "prior": 0.0010717282281394347,
+        "fifth": 0.0014367816091954255,
+        "all": 0.0011447389043506063,
+        "min_family": 0.01016620763950662
+      }
+    },
+    "combined_prior_delta_range_across_allocations": [
+      0.0006979355430942746,
+      0.0015253718391498028
+    ]
+  },
+  "interpretation": {
+    "store_and_observe_locality_effects_are_complementary_not_redundant": true,
+    "combined_delocalization_removes_the_prior_mean_penalty_across_every_tested_allocation": true,
+    "combined_delocalization_also_improves_fifth_mean_and_minimum_family_accuracy_on_average": true,
+    "structural_sequence_memory_and_routing_remain_exact": true,
+    "no_retraining_or_content_change_across_evaluation_variants": true,
+    "plain_speak": "Breaking STORE and OBSERVE locality together works better than breaking either one alone. The older-family mean penalty flips positive across every tested allocation, the newest family also improves slightly, and the weakest family gains the most. The interaction is therefore compositional rather than one clause type merely standing in for the other.",
+    "north_star_question": "Identifies a concrete sequence-organization rule that reconciles balanced adaptation with integrated language accuracy under fixed capacity, without changing training mass or architecture.",
+    "next_stage": "test whether the combined STORE+OBSERVE de-localized evaluation remains robust across the accepted name-group permutations and reverse-report-tail transformations rather than only the canonical group order"
+  },
+  "activation_authorized": false
+}
