@@ -1,0 +1,74 @@
+{
+  "schema": "wingless.up137c-windows-proof.v1",
+  "experiment": "UP-137C-mixed-history-age-selectivity",
+  "status": "qualified-scientific-result",
+  "source_head": "44a29b782c5c6b8e30d70f8004cc1196796ef8ab",
+  "workflow_run_id": 36269298003,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10914997291,
+  "artifact_sha256": "e97d37d1431ca7cbfd6d4775414e9865a0b615656659acfbc4d8052542a7a6ad",
+  "findings": {
+    "assignment_a": {
+      "next_g4": {
+        "target": 100,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "after_two_blank_g6": {
+        "target": 101,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "after_three_blank_g7": {
+        "target": 102,
+        "admission": 0,
+        "accuracy": 0
+      },
+      "rebuild_only": {
+        "target": 103,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "assignment_b": {
+      "next_g4": {
+        "target": 102,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "after_two_blank_g6": {
+        "target": 103,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "after_three_blank_g7": {
+        "target": 100,
+        "admission": 0,
+        "accuracy": 0
+      },
+      "rebuild_only": {
+        "target": 101,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "hot_accuracy_all_arms": 1,
+    "target16_accuracy_all_arms": 0.875,
+    "nonpersistent_admission_all_arms": 0,
+    "nonpersistent_retention_all_arms": 0,
+    "one_shot_false_admissions_all_arms": 0,
+    "panic_rate_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "history_age_is_selective_per_item_under_simultaneous_temporal_states": true,
+    "g4_and_g6_paths_admit_while_g7_and_rebuild_only_paths_fail_in_the_same_stream": true,
+    "mirrored_target_identity_does_not_change_outcome": true,
+    "concurrent_history_traces_do_not_collapse_into_a_global_age_or_mode": true,
+    "plain_speak": "Several items can carry different temporary-memory ages at the same time. Each one follows its own clock: the younger traces still qualify, the expired trace does not, and swapping item identities leaves the pattern unchanged.",
+    "north_star_question": "Shows bounded consolidation supports simultaneous item-specific temporal state, a prerequisite for realistic language streams where many facts recur on different schedules.",
+    "next_stage": "separate admission-counter time from raw event time by interleaving exact-memory hits that do not advance the admission generation counter"
+  },
+  "activation_authorized": false
+}
