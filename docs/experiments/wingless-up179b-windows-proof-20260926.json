@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.up179b-windows-proof.v1",
+  "experiment": "UP-179B-margin-tiebreak",
+  "status": "qualified-scientific-result",
+  "source_head": "c51a7bd83fa14413bfa380251eb2753fbfa7e3e1",
+  "workflow_run_id": 36279078539,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10918282055,
+  "artifact_sha256": "c6616aaa351813070939d8dc2418ccf20899bcea42824ed98e0f74ee985b34db",
+  "findings": {
+    "heldout_phase": 24,
+    "base_crossing_rate": 0.0140625,
+    "rank_plus_temporal": {
+      "auroc": 0.9687080237614043,
+      "average_precision": 0.3292331924255009
+    },
+    "rank_plus_temporal_margin_tiebreak": {
+      "auroc": 0.9825930781008945,
+      "average_precision": 0.3604600895903537
+    },
+    "margin_only": {
+      "auroc": 0.9834062441198543,
+      "average_precision": 0.3809841611031919
+    }
+  },
+  "interpretation": {
+    "continuous_margin_contains_more_failure_ranking_information_than_coarse_rank_cells": true,
+    "within_cell_margin_tiebreak_materially_improves_discrimination": true,
+    "margin_only_is_best_of_tested_scores_on_phase24": true,
+    "temporal_signal_remains_real_but_coarse_composite_is_not_optimal_score_representation": true,
+    "plain_speak": "The closer an example is to the decision boundary, the better the warning. Raw margin beats the coarse rank-plus-history score on this fresh phase. History still matters, but quantizing the signal into a few cells throws away useful detail.",
+    "north_star_question": "Identifies continuous margin as the strongest B-lane native failure-ranking signal so far, but it still needs independent replication before calibration or intervention use.",
+    "next_stage": "replicate margin-only versus frozen composite discrimination unchanged on held-out phase 25 before fitting any calibrated failure probability"
+  },
+  "activation_authorized": false
+}
