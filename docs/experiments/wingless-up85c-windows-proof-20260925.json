@@ -1,0 +1,59 @@
+{
+  "schema": "wingless.up85c-windows-proof.v1",
+  "experiment": "UP-85C-hotset-occupancy",
+  "status": "qualified-scientific-result",
+  "source_head": "fd561fe6341403ef0c5a030912a5756f2096ff1a",
+  "workflow_run_id": 36205826456,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10893334347,
+  "artifact_sha256": "e8d8693240e6d0b717c855256eab85739c2d4ac4a5dd6158d9a19b3c3820ecdc",
+  "active_keys": 32,
+  "churn_writes": 24,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "future_oracle_used": false,
+  "findings": {
+    "fifo_hot_accuracy_by_size": {
+      "4": 0,
+      "8": 0,
+      "12": 0,
+      "16": 0
+    },
+    "lru_hot_accuracy_by_size": {
+      "4": 1,
+      "8": 1,
+      "12": 1,
+      "16": 0.75
+    },
+    "lru_hot_exact_by_size": {
+      "4": 1,
+      "8": 1,
+      "12": 1,
+      "16": 0
+    },
+    "two_bit_aging_hot_accuracy_by_size": {
+      "4": 1,
+      "8": 1,
+      "12": 1,
+      "16": 0.8125
+    },
+    "two_bit_aging_hot_exact_by_size": {
+      "4": 1,
+      "8": 1,
+      "12": 1,
+      "16": 0
+    },
+    "metadata_bytes": {
+      "fifo": 16,
+      "lru": 136,
+      "two_bit_aging": 5
+    }
+  },
+  "interpretation": {
+    "exact_online_hotset_boundary_between_12_and_16": true,
+    "nominal_capacity_16_does_not_imply_exact_survival_of_16_hot_items": true,
+    "two_bit_aging_remains_better_than_lru_at_16": true,
+    "next_stage": "refine the occupancy transition at hot-set sizes 13 through 16 under the identical workload"
+  },
+  "activation_authorized": false
+}
