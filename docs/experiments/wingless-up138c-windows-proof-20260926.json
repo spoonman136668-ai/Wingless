@@ -1,0 +1,78 @@
+{
+  "schema": "wingless.up138c-windows-proof.v1",
+  "experiment": "UP-138C-counter-time-vs-event-time",
+  "status": "qualified-scientific-result",
+  "source_head": "0d51ae2cb26b3b54e4f98339a2e22dab04ff3b5c",
+  "workflow_run_id": 36269865707,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10914768884,
+  "artifact_sha256": "c417110f1837127bd344205119d27a9a6f258775b18b7653ca42ff01b9f1a425",
+  "findings": {
+    "target100": {
+      "write0_query96": {
+        "history_present": 1,
+        "history_age": 0,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "write32_query64": {
+        "history_present": 1,
+        "history_age": 1,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "write64_query32": {
+        "history_present": 1,
+        "history_age": 2,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "write96_query0": {
+        "history_present": 0,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "target103": {
+      "write0_query96": {
+        "history_present": 1,
+        "history_age": 0,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "write32_query64": {
+        "history_present": 1,
+        "history_age": 1,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "write64_query32": {
+        "history_present": 1,
+        "history_age": 2,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "write96_query0": {
+        "history_present": 0,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "raw_operations_all_arms": 96,
+    "hot_accuracy_all_arms": 1,
+    "false_admissions_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "history_age_is_driven_by_candidate_write_counter_not_raw_operation_count": true,
+    "read_only_queries_do_not_age_admission_history": true,
+    "one_and_two_candidate_boundaries_increment_history_age_to_one_and_two_without_destroying_it": true,
+    "third_candidate_boundary_expires_age_two_history": true,
+    "result_replicates_across_two_target_identities": true,
+    "plain_speak": "Temporary history does not get older just because the stream is busy. Read-only activity leaves its age unchanged. What ages it is pressure from new candidate writes: one boundary makes it age 1, two make it age 2, and the third removes it.",
+    "north_star_question": "Defines the temporal clock of bounded consolidation as novelty/candidate pressure rather than raw stream time, which is critical for integrating memory into realistic language streams with many harmless reads or already-known events.",
+    "next_stage": "hold raw process-call count fixed while varying new-candidate writes versus updates to already-durable exact-memory keys, testing whether only novelty pressure advances the consolidation clock"
+  },
+  "activation_authorized": false
+}
