@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.up-lm2s-windows-proof.v1",
+  "experiment": "UP-LM2S-bounded-early-closure",
+  "status": "qualified-scientific-result",
+  "source_head": "3bbf822847a5e5bf7218ed874aaf5c041ab1c64a",
+  "workflow_run_id": 36279236045,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10918646554,
+  "artifact_sha256": "7720f20e273935f87af6ecb7c2addcc53a2706872779e518a944061b2593a5df",
+  "findings": {
+    "exact_recall_cap": 16,
+    "deferred_levels": [
+      4,
+      5,
+      6
+    ],
+    "identity_rotations": [
+      0,
+      7
+    ],
+    "value_shifts": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "counterfactual_only": true,
+    "live_activation": false,
+    "capacity_changed": false,
+    "extra_training_used": false,
+    "baseline_harmful_evictions": 24,
+    "total_interventions": 24,
+    "counterfactual_harmful_evictions": 0,
+    "prevented_evictions": 24,
+    "unnecessary_interventions": 0,
+    "prevented_fraction": 1,
+    "intervention_precision": 1,
+    "intervention_recall": 1
+  },
+  "interpretation": {
+    "bounded_warning_guided_early_closure_prevents_all_tested_harmful_evictions": true,
+    "no_intervention_is_triggered_in_safe_d4_controls": true,
+    "tested_response_uses_existing_event_content_without_capacity_growth": true,
+    "result_is_counterfactual_not_live_self_maintenance": true,
+    "plain_speak": "When the native countdown said an unreported dependency was about to be lost, moving that exact pending report forward prevented every tested loss. Safe D4 streams were left alone. This is the first clean detect-and-correct result, but only inside a frozen counterfactual experiment.",
+    "north_star_question": "Provides the first closed-loop evidence that a frozen native warning can drive a bounded corrective schedule change that prevents the predicted failure under fixed resources.",
+    "next_stage": "run budget-matched sham and downstream-order-cost controls: compare warning-guided early closure against moving a non-endangered report and against baseline, while measuring later recall and language output"
+  },
+  "activation_authorized": false
+}
