@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up87c-windows-proof.v1",
+  "experiment": "UP-87C-seenonce-admission",
+  "status": "qualified-scientific-result",
+  "source_head": "a81c1e7eb39cc88dc348d074c0a0f0097aa64734",
+  "workflow_run_id": 36227795884,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10900994323,
+  "artifact_sha256": "04715a17ebd3eabf0541e0947e8bfc5e284e78bf90a21d2a66d6b8481a2f68eb",
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "future_oracle_used": false,
+  "query_labels_used_for_admission": false,
+  "findings": {
+    "aging_hot13": {
+      "accuracy": 0.9230769230769231,
+      "exact": 0
+    },
+    "aging_hot16": {
+      "accuracy": 0.75,
+      "exact": 0
+    },
+    "seen_once_hot13": {
+      "accuracy": 1,
+      "exact": 1
+    },
+    "seen_once_hot16": {
+      "accuracy": 0.875,
+      "exact": 0
+    },
+    "policy_metadata_bytes": {
+      "aging": 5,
+      "seen_once_plus_aging": 13
+    },
+    "rejected_one_shot_writes_hot13": 4352,
+    "second_write_admissions_hot13": 1408,
+    "rejected_one_shot_writes_hot16": 4352,
+    "second_write_admissions_hot16": 1792
+  },
+  "interpretation": {
+    "admission_control_extends_exact_hotset_boundary_from_12_to_13": true,
+    "fixed_64bit_seen_once_filter_does_not_preserve_16_exactly": true,
+    "partial_hot16_retention_improves_over_aging_alone": true,
+    "next_stage": "ablate seen-once filter width to separate admission-rule value from false-positive collision pressure without changing exact-memory capacity"
+  },
+  "activation_authorized": false
+}
