@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.up181b-windows-proof.v1",
+  "experiment": "UP-181B-margin-conditioned-temporal",
+  "status": "qualified-scientific-result",
+  "source_head": "6b77f224d200940fd807960f84bb3399b4feff3d",
+  "workflow_run_id": 36280027529,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10918832423,
+  "artifact_sha256": "9a820dc28bb90ec975d0104835592732045bf8ceb0d11e528b0c84952a0a44f0",
+  "findings": {
+    "heldout_phase": 26,
+    "tight_margin_band": "m0_005",
+    "all": {
+      "current_only": {
+        "slots": 277,
+        "crossings": 63,
+        "density": 0.22743682310469315
+      },
+      "transition_to_persistent": {
+        "slots": 270,
+        "crossings": 81,
+        "density": 0.3
+      },
+      "established_persistent": {
+        "slots": 609,
+        "crossings": 90,
+        "density": 0.1477832512315271
+      }
+    },
+    "store": {
+      "current_only": 0.19402985074626866,
+      "transition_to_persistent": 0.25757575757575757,
+      "established_persistent": 0.16030534351145037
+    },
+    "observe": {
+      "current_only": 0.26618705035971224,
+      "transition_to_persistent": 0.3643410852713178,
+      "established_persistent": 0.14393939393939395
+    },
+    "report": {
+      "current_only": 0,
+      "transition_to_persistent": 0,
+      "established_persistent": 0.12048192771084337
+    }
+  },
+  "interpretation": {
+    "temporal_history_adds_residual_information_within_exact_margin_band": true,
+    "transition_to_persistent_is_highest_risk_overall_within_m0_005": true,
+    "store_and_observe_show_transition_hazard_within_m0_005": true,
+    "report_remains_class_specific_exception": true,
+    "plain_speak": "Even after holding absolute margin inside the same very narrow 0–0.05 band, the transition into persistent fragility is still the riskiest state overall. Exact margin is the strongest signal, but history adds real residual information.",
+    "north_star_question": "Supports a continuous-margin-plus-temporal native risk model rather than either signal alone, while preserving class-specific calibration.",
+    "next_stage": "freeze a simple continuous-margin-plus-temporal scoring rule from sealed phases 24-26 and test calibration/discrimination on a fresh held-out phase without fitting during evaluation"
+  },
+  "activation_authorized": false
+}
