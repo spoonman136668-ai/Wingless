@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up107c-windows-proof.v1",
+  "experiment": "UP-107C-post-promotion-checkpoint",
+  "status": "qualified-scientific-result",
+  "source_head": "bdab3b4f4c45e5b6cb3e3dc5d3c842264c3d2dd7",
+  "workflow_run_id": 36240789920,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10904904323,
+  "artifact_sha256": "579b1125a73233d8e5e194af322538c0b3b81b52e1914ac098bd4feb377bedae",
+  "findings": {
+    "two_pass_control": {
+      "odds_then_evens_exact": 0,
+      "rotate8_exact": 0,
+      "evens_then_odds_exact": 0,
+      "ascending_exact": 1
+    },
+    "clear_counter0": {
+      "odds_then_evens_exact": 0,
+      "rotate8_exact": 0,
+      "evens_then_odds_exact": 0,
+      "ascending_exact": 0,
+      "false_positive_admissions_per_episode": 2
+    },
+    "clear_counter8": {
+      "odds_then_evens_exact": 1,
+      "rotate8_exact": 1,
+      "evens_then_odds_exact": 1,
+      "ascending_exact": 1,
+      "false_positive_admissions": 0
+    },
+    "resident_hot_before_churn_all_cells": 16
+  },
+  "interpretation": {
+    "stale_post_promotion_filter_state_plus_generation_phase_is_the_residual_failure": true,
+    "filter_clear_without_counter_alignment_is_insufficient": true,
+    "filter_clear_with_counter8_restores_exact_retention_across_all_tested_orders": true,
+    "explicit_phase_checkpoint_is_diagnostic_not_a_final_phase_free_mechanism": true,
+    "next_stage": "derive a phase-free local stability detector that emits the same filter-clear-counter8 transition from resident-write evidence only"
+  },
+  "activation_authorized": false
+}
