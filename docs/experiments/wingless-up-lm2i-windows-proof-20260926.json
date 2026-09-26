@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up-lm2i-windows-proof.v1",
+  "experiment": "UP-LM2I-entity-concurrency-capacity",
+  "status": "qualified-scientific-result",
+  "source_head": "bd24e7b73bae332b2c0f57ed538b9eda3198f2ca",
+  "workflow_run_id": 36273809298,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10916213988,
+  "artifact_sha256": "fedf3580b5bf573e9b3ed1c80ea96508e0263ca2885d1b35c233774824f2adde",
+  "findings": {
+    "exact_recall_cap": 16,
+    "concurrency8": {
+      "recall_hit": 1,
+      "expected": 1,
+      "event_routing": 1,
+      "dependent_accuracy": 1,
+      "max_recall": 8
+    },
+    "concurrency12": {
+      "recall_hit": 1,
+      "expected": 1,
+      "event_routing": 1,
+      "dependent_accuracy": 1,
+      "max_recall": 12
+    },
+    "concurrency16": {
+      "recall_hit": 1,
+      "expected": 1,
+      "event_routing": 1,
+      "dependent_accuracy": 1,
+      "max_recall": 16
+    },
+    "concurrency20": {
+      "recall_hit": 0.8,
+      "expected": 0.8,
+      "event_routing": 1,
+      "dependent_accuracy": 0.831499999999999,
+      "max_recall": 16
+    },
+    "concurrency24": {
+      "recall_hit": 0.6666666666666666,
+      "expected": 0.6666666666666666,
+      "event_routing": 1,
+      "dependent_accuracy": 0.7095833333333335,
+      "max_recall": 16
+    },
+    "routing_accuracy_all_families_orders_allocations": 1,
+    "recall_hit_curve_identical_across_families_orders_allocations": true
+  },
+  "interpretation": {
+    "exact_language_recall_capacity_boundary_is_exactly_16_concurrent_entities": true,
+    "above_capacity_recall_matches_fifo16_prediction_exactly": true,
+    "entity_name_generalization_is_not_the_limiting_factor": true,
+    "routing_remains_perfect_through_24_entities": true,
+    "recurrent_model_can_guess_some_evicted_report_bytes_so_dependent_accuracy_exceeds_memory_hit_rate_above_capacity": true,
+    "no_capacity_increase_occurred": true,
+    "plain_speak": "This is the clean capacity wall. Sixteen simultaneous entities work perfectly. At twenty, exactly four fall out; at twenty-four, exactly eight fall out. The language router still understands every STORE, OBSERVE, and REPORT, so the failures come from the 16-slot memory limit itself—not from unfamiliar names or grammar.",
+    "north_star_question": "Establishes the true fixed-capacity entity-concurrency boundary for integrated language, separating memory capacity from temporal depth and routing generalization.",
+    "next_stage": "keep 24 entities and the 16-entry cap fixed, then compare preregistered nonadaptive working-set schedules that interleave STORE/OBSERVE/REPORT in bounded chunks against the all-stores baseline to test whether sequence organization can avoid overflow without adding memory"
+  },
+  "activation_authorized": false
+}
