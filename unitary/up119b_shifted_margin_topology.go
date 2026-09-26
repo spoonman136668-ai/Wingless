@@ -32,7 +32,6 @@ type UP119BShiftedMarginTopologyResult struct {
 }
 
 func up119bPoint(arm,order,policy string,stage int,c *up97bClassifier,delta [64]float64)UP119BPoint{
-	stores:=up106bVerbSpec{verb:"stores",class:up97bStore}
 	keeps:=up106bVerbSpec{verb:"keeps",class:up97bStore}
 	sumS,sumO,sumR,sumSO,sumSR:=0.0,0.0,0.0,0.0,0.0
 	minSO,minSR:=math.Inf(1),math.Inf(1)
