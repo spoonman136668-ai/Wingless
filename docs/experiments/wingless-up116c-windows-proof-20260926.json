@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up116c-windows-proof.v1",
+  "experiment": "UP-116C-exact3-generality",
+  "status": "qualified-scientific-result",
+  "source_head": "4ae69c6f0e52c849cb0c2bd94be9a72899692f9f",
+  "workflow_run_id": 36251077668,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10908873772,
+  "artifact_sha256": "7f72e5cb839ec3f5e749813b7e2245c808d00d267ea22f2f0dbd4046da590c1b",
+  "hot_keys": 12,
+  "generation_interval": 32,
+  "admission_sightings": 3,
+  "admission_memory_bytes": 128,
+  "exact_recall_cap": 16,
+  "findings": {
+    "mixed_gap_clean": {
+      "weak_admission_rate": 0,
+      "strong_admission_rate": 1,
+      "hot_accuracy": 1,
+      "strong_accuracy": 1,
+      "target16_accuracy": 1,
+      "target16_exact_accuracy": 1,
+      "one_shot_false_admissions": 0
+    },
+    "four_hit_distractor": {
+      "strong_admission_rate": 1,
+      "distractor_admission_rate": 1,
+      "hot_accuracy": 0.6666666666666666,
+      "strong_accuracy": 1,
+      "distractor_accuracy": 1,
+      "target16_accuracy": 0.75,
+      "target16_exact_accuracy": 0,
+      "one_shot_false_admissions": 0
+    }
+  },
+  "interpretation": {
+    "exact3_generalizes_across_benign_mixed_recurrence_timing": true,
+    "recurrence_count_alone_cannot_distinguish_target_strong_items_from_even_stronger_repeated_distractors": true,
+    "four_hit_distractors_force_overcapacity_selection_and_displace_established_hot_items": true,
+    "admission_collisions_remain_absent": true,
+    "next_stage": "test cross-generation recurrence persistence so candidates must recur across separate generations before receiving stronger retention status, without semantic labels or capacity growth"
+  },
+  "activation_authorized": false
+}
