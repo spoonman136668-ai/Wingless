@@ -1,6 +1,9 @@
 package unitary
 
-import (\n\t"fmt"\n\t"math"\n)
+import (
+	"fmt"
+	"math"
+)
 
 const UPLM1RGradientConflictSchema = "wingless.up-lm1r-fivefamily-gradient-conflict.v1"
 
