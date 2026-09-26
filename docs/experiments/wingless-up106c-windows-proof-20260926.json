@@ -1,0 +1,63 @@
+{
+  "schema": "wingless.up106c-windows-proof.v1",
+  "experiment": "UP-106C-second-promotion-pass",
+  "status": "qualified-scientific-result",
+  "source_head": "5ec7292f49010a55b1efaf155b3953a0fe02dd78",
+  "workflow_run_id": 36240402962,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10905294144,
+  "artifact_sha256": "8d1d13f86c087e05e4f1648b0a37feaf6c40a789ee4a4b15f33f165d0a2e9333",
+  "findings": {
+    "ascending_one_and_two_pass": {
+      "resident_after_promotion": 16,
+      "final_accuracy": 1,
+      "final_exact": 1,
+      "false_positive_admissions": 0
+    },
+    "reverse_one_and_two_pass": {
+      "resident_after_promotion": 16,
+      "final_accuracy": 1,
+      "final_exact": 1,
+      "false_positive_admissions": 0
+    },
+    "evens_then_odds_one_and_two_pass": {
+      "resident_after_promotion": 16,
+      "final_accuracy": 0.9375,
+      "final_exact": 0,
+      "false_positive_admissions": 384,
+      "trigger_fired_episodes": 0
+    },
+    "odds_then_evens_one_pass": {
+      "resident_after_promotion": 8,
+      "final_accuracy": 0.5,
+      "final_exact": 0,
+      "false_positive_admissions": 384
+    },
+    "odds_then_evens_two_pass": {
+      "resident_after_promotion": 16,
+      "final_accuracy": 0.9375,
+      "final_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "rotate8_one_pass": {
+      "resident_after_promotion": 14,
+      "final_accuracy": 0.875,
+      "final_exact": 0,
+      "false_positive_admissions": 0
+    },
+    "rotate8_two_pass": {
+      "resident_after_promotion": 16,
+      "final_accuracy": 0.9375,
+      "final_exact": 0,
+      "false_positive_admissions": 128
+    }
+  },
+  "interpretation": {
+    "second_hot_pass_closes_underpromotion_for_odds_then_evens_and_rotate8": true,
+    "final_failure_after_two_pass_is_no_longer_missing_promotion": true,
+    "residual_failure_is_post_promotion_admission_state_collision": true,
+    "evens_then_odds_remains_trigger_blind_and_is_not_helped_by_more_hot_writes": true,
+    "next_stage": "test an explicit post-promotion filter-state checkpoint after the second pass to verify stale admission evidence is the sole residual cause before designing a phase-free equivalent"
+  },
+  "activation_authorized": false
+}
