@@ -1,0 +1,84 @@
+{
+  "schema": "wingless.up-lm1p-windows-proof.v1",
+  "experiment": "UP-LM1P-fifth-family-scale",
+  "status": "qualified-scientific-result",
+  "source_head": "6fc47d273fbf16732f5e9a23d2799326dfbdeb37",
+  "workflow_run_id": 36252758546,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10909648075,
+  "artifact_sha256": "194ffce12a8678963add156ec060a17c58a6830c2a8a68521fe94d40a283e8f3",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "fifth_router_epochs": 20,
+  "adaptation_epochs": 4,
+  "full_step_learning_rate": 0.08,
+  "half_step_learning_rate": 0.04,
+  "findings": {
+    "no_fifth_adaptation": {
+      "min_heldout_accuracy": 0.5218430596768876,
+      "mean_heldout_accuracy": 0.7445486826395968,
+      "spread": 0.2960163858421324,
+      "fifth_heldout_accuracy": 0.5218430596768876,
+      "fifth_heldout_perplexity": 28.883876854015398,
+      "integrated_top1_range": [
+        0.5240685789647214,
+        0.534289482360699
+      ],
+      "integrated_perplexity_range": [
+        27.36997999647424,
+        27.982984210172233
+      ]
+    },
+    "five_family_cyclic": {
+      "min_heldout_accuracy": 0.7375535773161886,
+      "mean_heldout_accuracy": 0.7547765704701107,
+      "spread": 0.03783222515294715,
+      "fifth_heldout_accuracy": 0.7375535773161886,
+      "fifth_heldout_perplexity": 2.2893638505995324,
+      "integrated_top1_range": [
+        0.7356577645895154,
+        0.7499175733597099
+      ],
+      "integrated_perplexity_range": [
+        2.209529528068669,
+        2.324330107473441
+      ]
+    },
+    "five_family_rotating_palindromic": {
+      "min_heldout_accuracy": 0.7293109132871745,
+      "mean_heldout_accuracy": 0.7570726195593107,
+      "spread": 0.04376007436714657,
+      "fifth_heldout_accuracy": 0.7293109132871745,
+      "fifth_heldout_perplexity": 2.3410707033913556,
+      "integrated_top1_range": [
+        0.7287339268051434,
+        0.7417573359709858
+      ],
+      "integrated_perplexity_range": [
+        2.2589636270575117,
+        2.3777394519631674
+      ]
+    },
+    "prior_router_heldout_accuracy_all_families": 1,
+    "fifth_router_train_accuracy": 1,
+    "fifth_router_heldout_accuracy": 1,
+    "fifth_router_unseen_accuracy": 1,
+    "router_class_recalls_all_cells": 1,
+    "dependent_first_byte_accuracy_all_integrated_cells": 1,
+    "query_set_exact_accuracy_all_integrated_cells": 1,
+    "admission_precision_all_integrated_cells": 1,
+    "admission_recall_all_integrated_cells": 1,
+    "event_routing_accuracy_all_integrated_cells": 1,
+    "report_routing_accuracy_all_integrated_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "fifth_family_semantic_routing_scales_cleanly_without_a_new_representation_correction": true,
+    "fifth_family_byte_adaptation_is_the_limiting_factor": true,
+    "cyclic_scheduling_has_the_best_worst_family_floor_and_smallest_spread_at_five_families": true,
+    "rotating_palindromic_scheduling_has_a_slightly_higher_mean_but_worse_minimum_and_spread_than_cyclic": true,
+    "four_family_palindromic_advantage_does_not_simply_scale_to_five_families": true,
+    "next_stage": "hold five-family data and budgets fixed and map five-family update-position geometry before adding a sixth lexical family"
+  },
+  "activation_authorized": false
+}
