@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.up-lm1q-windows-proof.v1",
+  "experiment": "UP-LM1Q-fivefamily-cyclic-position",
+  "status": "qualified-scientific-result-after-artifact-label-repair",
+  "source_head": "d7762b1ec7b2f6d2b54b70dcec3dfabcbf35fcc6",
+  "workflow_run_id": 36254102945,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10909458624,
+  "artifact_sha256": "f21e421f4652a51eb51b0ee78d5618f2e58a10980ee0365f825f66aea5e5b412",
+  "state_dimension": 64,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "findings": {
+    "rotate0": {
+      "min": 0.7375535773161886,
+      "mean": 0.7547765704701107,
+      "spread": 0.03783222515294715,
+      "min_family": "fifth"
+    },
+    "rotate1": {
+      "min": 0.7357401912298055,
+      "mean": 0.7582677179170825,
+      "spread": 0.04617470238721577,
+      "min_family": "fifth"
+    },
+    "rotate2": {
+      "min": 0.7369765908341576,
+      "mean": 0.7577478921855577,
+      "spread": 0.034058225413424625,
+      "min_family": "fifth"
+    },
+    "rotate3": {
+      "min": 0.7308770194526871,
+      "mean": 0.75528031179179,
+      "spread": 0.05345940030039931,
+      "min_family": "fifth"
+    },
+    "rotate4": {
+      "min": 0.7193372898120672,
+      "mean": 0.7494579892801302,
+      "spread": 0.06300340823468265,
+      "min_family": "fifth"
+    },
+    "fifth_accuracy_by_position": {
+      "position0": 0.7193372898120672,
+      "position1": 0.7308770194526871,
+      "position2": 0.7369765908341576,
+      "position3": 0.7357401912298055,
+      "position4": 0.7375535773161886
+    }
+  },
+  "interpretation": {
+    "the_fifth_family_is_the_minimum_accuracy_family_in_all_five_cyclic_rotations": true,
+    "update_recency_position_modulates_fifth_accuracy_but_does_not_explain_its_persistent_disadvantage": true,
+    "rotate2_has_the_smallest_family_spread_while_rotate1_has_the_highest_mean": true,
+    "family_specific_or_introduction_history_interference_dominates_over_simple_final_update_position": true,
+    "next_stage": "measure pairwise readout-gradient conflict at the fixed five-family starting point to determine whether the fifth family is uniquely anti-aligned with prior families before changing training dose"
+  },
+  "infrastructure_note": "The original successful probe had ambiguous arm labels because a legacy integer helper collapsed some rotation names. Two reruns repaired harness syntax and then replaced the label expression exactly. The final rerun passed with unchanged scientific training order, data, and thresholds.",
+  "activation_authorized": false
+}
