@@ -1,0 +1,54 @@
+{
+  "schema": "wingless.up102b-windows-proof.v1",
+  "experiment": "UP-102B-fewshot-lexical-grounding",
+  "status": "qualified-scientific-result",
+  "source_head": "6603ce59cb76cd4dff02f855779f2211a9bbf8a3",
+  "workflow_run_id": 36205822364,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10892944498,
+  "artifact_sha256": "2ae54088ea5a1841e74b43ad380b3b5f167ecc9b7cb5b968eee441dcdc06f571",
+  "state_dimension": 64,
+  "epochs": 20,
+  "learning_rate": 0.08,
+  "grounding_curve": [
+    {
+      "examples_per_verb": 0,
+      "heldout_accuracy": 0.3333333333333333,
+      "store_recall": 0,
+      "observe_recall": 1,
+      "report_recall": 0,
+      "seen_verb_accuracy": 1
+    },
+    {
+      "examples_per_verb": 1,
+      "heldout_accuracy": 0.6666666666666666,
+      "store_recall": 0,
+      "observe_recall": 1,
+      "report_recall": 1,
+      "seen_verb_accuracy": 1
+    },
+    {
+      "examples_per_verb": 2,
+      "heldout_accuracy": 0.8333333333333334,
+      "store_recall": 0.5,
+      "observe_recall": 1,
+      "report_recall": 1,
+      "seen_verb_accuracy": 0.8611111111111112
+    },
+    {
+      "examples_per_verb": 4,
+      "heldout_accuracy": 1,
+      "store_recall": 1,
+      "observe_recall": 1,
+      "report_recall": 1,
+      "seen_verb_accuracy": 0.8611111111111112
+    }
+  ],
+  "interpretation": {
+    "rapid_lexical_grounding_supported": true,
+    "four_examples_per_verb_reaches_perfect_heldout_transfer": true,
+    "adaptation_causes_seen_verb_forgetting_from_two_examples_onward": true,
+    "next_stage": "test fixed rehearsal-stabilized grounding at four examples per verb to preserve old verbs while retaining new-verb transfer"
+  },
+  "activation_authorized": false
+}
