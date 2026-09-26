@@ -1,0 +1,78 @@
+{
+  "schema": "wingless.up155c-windows-proof.v1",
+  "experiment": "UP-155C-protected-cohort-warning",
+  "status": "qualified-scientific-result",
+  "source_head": "bced90651abf4138a0bf76eedaff0478457e9f8a",
+  "workflow_run_id": 36279083394,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10917977495,
+  "artifact_sha256": "1710a462c7ec66850e12f2c3764c4323c3955c3799556f0da6e308cc5da9f1ba",
+  "findings": {
+    "cohorts": {
+      "cohort_A": {
+        "keys": [
+          0,
+          4,
+          8,
+          12
+        ],
+        "tp": 16,
+        "fp": 0,
+        "fn": 0,
+        "tn": 80
+      },
+      "cohort_B": {
+        "keys": [
+          1,
+          5,
+          9,
+          13
+        ],
+        "tp": 16,
+        "fp": 0,
+        "fn": 0,
+        "tn": 80
+      },
+      "cohort_C": {
+        "keys": [
+          2,
+          6,
+          10,
+          14
+        ],
+        "tp": 8,
+        "fp": 0,
+        "fn": 0,
+        "tn": 88
+      },
+      "cohort_D": {
+        "keys": [
+          3,
+          7,
+          11,
+          15
+        ],
+        "tp": 16,
+        "fp": 0,
+        "fn": 0,
+        "tn": 80
+      }
+    },
+    "total_targeted_losses": 56,
+    "total_false_positive": 0,
+    "total_false_negative": 0,
+    "precision": 1,
+    "recall": 1,
+    "predictor_uses_semantic_class": false,
+    "future_oracle_used": false
+  },
+  "interpretation": {
+    "protected_cohort_loss_is_exactly_predictable_prewrite": true,
+    "warning_generalizes_across_interleaved_nonsemantic_cohorts": true,
+    "capability_specific_loss_risk_can_be_identified_without_semantic_priority": true,
+    "plain_speak": "Wingless can now tell not only that some memory will be overwritten, but whether the next write will hit a particular protected set. Across four mixed cohorts it caught every targeted loss with no false alarms.",
+    "north_star_question": "Completes the C-lane detection prerequisite for a bounded response experiment: the warning is exact, pre-loss, cohort-specific, and uses fixed native state.",
+    "next_stage": "counterfactually substitute one already-budgeted refresh to the endangered protected item immediately before a predicted harmful write, comparing no-action, warning-guided, and budget-matched control arms without live activation"
+  },
+  "activation_authorized": false
+}
