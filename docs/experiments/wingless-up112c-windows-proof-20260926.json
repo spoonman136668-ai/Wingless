@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.up112c-windows-proof.v1",
+  "experiment": "UP-112C-probation-recurrence-window",
+  "status": "qualified-scientific-result",
+  "source_head": "3466a17d85e9766825510f80f9ee507617456240",
+  "workflow_run_id": 36245729595,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10907805058,
+  "artifact_sha256": "eb1023af85fbde317705c277b4e3fef24c982fcc940697e5ff556a5a0324cf2d",
+  "generation_interval": 32,
+  "admission_memory_bytes": 128,
+  "counter_bytes": 1,
+  "episodes_per_cell": 64,
+  "findings": {
+    "exact32_repeat_after_1_8_16_24_31_admission_rate": 1,
+    "exact32_repeat_after_32_33_40_admission_rate": 0,
+    "exact32_expected_decision_accuracy_all_cells": 1,
+    "exact32_one_shot_false_admissions_all_cells": 0,
+    "bloom_expected_decision_accuracy_all_cells": 1,
+    "bloom_false_one_shot_cells": {
+      "repeat24": 2,
+      "repeat32": 2,
+      "repeat33": 1,
+      "repeat40": 1
+    },
+    "one_shot_writes_per_cell": 3968
+  },
+  "interpretation": {
+    "exact32_has_the_intended_sharp_local_recurrence_window": true,
+    "exact32_does_not_simply_reject_everything": true,
+    "exact32_eliminates_probabilistic_one_shot_false_admission_at_equal_memory": true,
+    "bloom_collision_leak_is_reproduced_even_in_the_sidecar_only_diagnostic": true,
+    "next_stage": "integrate exact32 with a 12-hot plus 4-legitimate-recurring working set that fits the 16-entry exact memory, then apply long one-shot churn"
+  },
+  "activation_authorized": false
+}
