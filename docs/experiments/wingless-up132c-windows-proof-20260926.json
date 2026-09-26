@@ -1,0 +1,106 @@
+{
+  "schema": "wingless.up132c-windows-proof.v1",
+  "experiment": "UP-132C-staggered-phase-selectivity",
+  "status": "qualified-scientific-result",
+  "source_head": "a46101a0017a0eb42de3de4cb5fa34509b74951e",
+  "workflow_run_id": 36266592303,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10913943594,
+  "artifact_sha256": "67be935cda6b2f24f65444da53f35595bc96e8ff661d8ca519accc8c0bf05c0f",
+  "findings": {
+    "assignment_a": {
+      "same_early": {
+        "target": 100,
+        "positions": [
+          1,
+          16
+        ],
+        "admission": 1,
+        "accuracy": 1
+      },
+      "same_late": {
+        "target": 101,
+        "positions": [
+          17,
+          32
+        ],
+        "admission": 1,
+        "accuracy": 1
+      },
+      "cross_edge": {
+        "target": 102,
+        "positions": [
+          31,
+          33
+        ],
+        "admission": 0,
+        "accuracy": 0
+      },
+      "cross_wide": {
+        "target": 103,
+        "positions": [
+          20,
+          45
+        ],
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "assignment_b": {
+      "same_early": {
+        "target": 102,
+        "positions": [
+          1,
+          16
+        ],
+        "admission": 1,
+        "accuracy": 1
+      },
+      "same_late": {
+        "target": 103,
+        "positions": [
+          17,
+          32
+        ],
+        "admission": 1,
+        "accuracy": 1
+      },
+      "cross_edge": {
+        "target": 100,
+        "positions": [
+          31,
+          33
+        ],
+        "admission": 0,
+        "accuracy": 0
+      },
+      "cross_wide": {
+        "target": 101,
+        "positions": [
+          20,
+          45
+        ],
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "hot_accuracy_all_arms": 1,
+    "target16_accuracy_all_arms": 0.875,
+    "nonpersistent_admission_all_arms": 0,
+    "nonpersistent_retention_all_arms": 0,
+    "one_shot_false_admissions_all_arms": 0,
+    "panic_rate_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "generation_local_consolidation_is_robust_under_staggered_overlapping_item_phases": true,
+    "within_generation_early_and_late_positions_both_consolidate": true,
+    "narrow_and_wide_cross_boundary_paths_both_fail": true,
+    "mirrored_target_assignment_has_no_effect": true,
+    "plain_speak": "Several items can be in different stages at the same time and the rule still holds independently for each one. Two reminders anywhere inside one window work; reminders that straddle the reset fail whether they are almost adjacent or far apart.",
+    "north_star_question": "Completes the boundary characterization for item-selective temporal consolidation under fixed memory and overlapping streams, enabling the next question: recovery after a boundary-split failure.",
+    "next_stage": "give a cross-boundary item a third sighting so that either the pre-boundary or post-boundary side contains two sightings, testing whether failed consolidation can recover once a later generation accumulates enough evidence"
+  },
+  "activation_authorized": false
+}
