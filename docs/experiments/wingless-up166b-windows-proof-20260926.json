@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up166b-windows-proof.v1",
+  "experiment": "UP-166B-margin-vulnerability-rank",
+  "status": "qualified-scientific-result",
+  "source_head": "f9a0f9a6930ed524f78bce7e83d38a6423675332",
+  "workflow_run_id": 36272614528,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10915528997,
+  "artifact_sha256": "ea17f585dfc86eb5d911cd0a4bd921db2363a1614123d410de4a83ba16885b29",
+  "findings": {
+    "old_examples_per_state": 120,
+    "total_crossings": 16,
+    "crossing_rank_range": [
+      1,
+      4
+    ],
+    "maximum_crossing_rank_fraction": 0.03333333333333333,
+    "all_crossings_within_four_most_vulnerable": true,
+    "examples": {
+      "noah_report13_store_observe": {
+        "rank": 1,
+        "abs_margin": 0.00003869038988496554
+      },
+      "opal_report14_store_observe": [
+        {
+          "rank": 3,
+          "abs_margin": 0.006354422872001109
+        },
+        {
+          "rank": 1,
+          "abs_margin": 0.003456317793621655
+        }
+      ],
+      "quin_report13_store_observe": {
+        "rank": 4,
+        "abs_margin": 0.008107680264768824
+      },
+      "rue_report14_observe_store": {
+        "rank": 1,
+        "abs_margin": 0.0003930327508159803
+      }
+    },
+    "noncrossing_mean_absolute_margins_are_approximately_0p46": true
+  },
+  "interpretation": {
+    "absolute_pre_report_margin_rank_is_a_strong_frozen_predictor_of_actual_boundary_crossings": true,
+    "no_fitted_threshold_or_classifier_is_required": true,
+    "crossings_are_concentrated_in_the_bottom_3p33_percent_of_margin_rank": true,
+    "low_margin_is_predictive_but_not_yet_a_validated_autonomous_maintenance_trigger": true,
+    "plain_speak": "Before REPORT happens, the examples that will flip are already the weakest-margin examples in the entire old set. Every observed flip came from the bottom four of 120. That gives Wingless a promising internal warning signal, but it still needs generalization testing before it can be used to trigger any maintenance action.",
+    "north_star_question": "Establishes a candidate internal deficiency signal from existing state geometry, moving toward self-detection while preserving the boundary that no autonomous response is yet authorized.",
+    "next_stage": "test the same pre-margin rank diagnostic against all five frozen old REPORT surfaces as independent one-step probes from both path states to determine whether vulnerability ranking generalizes across interference identity"
+  },
+  "activation_authorized": false
+}
