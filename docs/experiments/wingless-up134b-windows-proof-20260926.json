@@ -1,0 +1,51 @@
+{
+  "schema": "wingless.up134b-windows-proof.v1",
+  "experiment": "UP-134B-terminal-anchor-allocation",
+  "status": "qualified-scientific-result",
+  "source_head": "281d222fa9ee2795d19303013bdce2fac9ecd52b",
+  "workflow_run_id": 36251669332,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10910000385,
+  "artifact_sha256": "ae141face6fdb639b9b675595b8a7015e73ac4ec4a3271ff86cfda7bbfa18616",
+  "state_dimension": 64,
+  "gate_input_dimension": 128,
+  "grounding_epochs": 20,
+  "learning_rate": 0.08,
+  "new_updates_per_epoch": 24,
+  "old_updates_per_epoch": 15,
+  "findings": {
+    "terminal_0": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.8333333333333334,
+      "old_unseen": 0.8666666666666667
+    },
+    "terminal_5": {
+      "primary_new": 0.875,
+      "secondary_new": 0.9166666666666666,
+      "old_heldout": 0.9,
+      "old_unseen": 0.8888888888888888
+    },
+    "terminal_10": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9166666666666666,
+      "old_heldout": 0.9,
+      "old_unseen": 0.8888888888888888
+    },
+    "terminal_15": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9166666666666666,
+      "old_heldout": 0.9333333333333333,
+      "old_unseen": 0.9111111111111111
+    }
+  },
+  "interpretation": {
+    "terminal_old_family_evidence_has_a_quantifiable_retention_effect": true,
+    "full_terminal_15_produces_the_best_old_family_retention_of_the_tested_allocations": true,
+    "terminal_15_preserves_primary_new_family_accuracy_relative_to_terminal_0": true,
+    "partial_terminal_blocks_improve_retention_but_do_not_match_the_full_anchor": true,
+    "remaining_tradeoff_is_small_secondary_new_family_loss_versus_improved_old_retention": true,
+    "next_stage": "hold the full terminal old-family anchor fixed and test whether a small final new-family refresh can recover secondary new-family accuracy without erasing the retention gain"
+  },
+  "activation_authorized": false
+}
