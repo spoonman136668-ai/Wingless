@@ -1,0 +1,65 @@
+{
+  "schema": "wingless.up162b-windows-proof.v1",
+  "experiment": "UP-162B-cleanup-geometry-sign",
+  "status": "qualified-scientific-result",
+  "source_head": "8cbb143ff9b205f13fdb5bf2f362d299bc297cf0",
+  "workflow_run_id": 36270722152,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10915202478,
+  "artifact_sha256": "65f102c05afab3527461de5112a6d1467e88f6d648da0b453ce7ed08cfb3998d",
+  "findings": {
+    "subjects": 6,
+    "store_minus_observe_alignment_sign_matches_parent_retention_sign": {
+      "matches": 5,
+      "total": 6,
+      "exception": "pax"
+    },
+    "commutator_old_reference_cosine_sign_matches_parent_retention_sign": {
+      "matches": 1,
+      "total": 6
+    },
+    "subject_table": {
+      "mia": {
+        "retention_delta": 0.005555555555555536,
+        "store_minus_observe_alignment": 0.06270812818808036,
+        "commutator_cosine": -0.0929590372707356
+      },
+      "noah": {
+        "retention_delta": 0.005555555555555536,
+        "store_minus_observe_alignment": 0.06770316218378991,
+        "commutator_cosine": -0.08944793690403173
+      },
+      "opal": {
+        "retention_delta": -0.011111111111111072,
+        "store_minus_observe_alignment": -0.014087506257092652,
+        "commutator_cosine": -0.04647928725768702
+      },
+      "pax": {
+        "retention_delta": 0.005555555555555536,
+        "store_minus_observe_alignment": -0.01262490018225404,
+        "commutator_cosine": -0.04041686341333962
+      },
+      "quin": {
+        "retention_delta": -0.022222222222222254,
+        "store_minus_observe_alignment": -0.1885614126092341,
+        "commutator_cosine": 0.05216485284528059
+      },
+      "rue": {
+        "retention_delta": -0.011111111111111072,
+        "store_minus_observe_alignment": -0.21664490183124446,
+        "commutator_cosine": 0.07499106334424427
+      }
+    }
+  },
+  "interpretation": {
+    "first_order_store_vs_observe_old_alignment_is_strongly_associated_with_subject_specific_order_sign_but_not_sufficient": true,
+    "pax_is_a_frozen_counterexample_to_a_simple_sign_rule": true,
+    "full_commutator_projection_on_old_reference_does_not_explain_retention_sign": true,
+    "nonlinear_path_or_later_block_interactions_remain_necessary": true,
+    "no_post_result_classifier_or_threshold_was_used": true,
+    "plain_speak": "For five of six subjects, the frozen state already points toward the cleanup class that later preserves old memory better. Pax breaks that rule, so geometry is informative but not enough by itself. The final STORE↔OBSERVE state difference also points the wrong way for most subjects, which means the path through the updates matters more than a single final projection.",
+    "north_star_question": "Narrows context-sensitive rehearsal scheduling to a mostly predictive local geometry plus a nonlinear path exception, without introducing an adaptive scheduler.",
+    "next_stage": "trace both STORE_OBSERVE_REPORT and OBSERVE_STORE_REPORT paths at fixed block checkpoints for all six subjects to locate where the pax sign reversal and other retention differences emerge"
+  },
+  "activation_authorized": false
+}
