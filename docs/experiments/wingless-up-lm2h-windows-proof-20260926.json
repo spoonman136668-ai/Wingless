@@ -1,0 +1,85 @@
+{
+  "schema": "wingless.up-lm2h-windows-proof.v1",
+  "experiment": "UP-LM2H-combined-locality-stream-depth",
+  "status": "qualified-scientific-result",
+  "source_head": "29a255e238de30d333a46a8f0eff096402317e2d",
+  "workflow_run_id": 36272752915,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10916013228,
+  "artifact_sha256": "2f1ca528bb2c2251bae14fba1436416c228e188b912f17a461309b60a432efc7",
+  "findings": {
+    "structural_exact_all_500_cells": true,
+    "max_recall_entries_at_any_depth": 6,
+    "stream_depths": [
+      1,
+      4,
+      8,
+      16,
+      48
+    ],
+    "forward_tail_balanced_minus_canonical": {
+      "stream1": {
+        "prior": 0.0009609768985713307,
+        "fifth": 0.0013847675568743778,
+        "min_family": 0.010016135253185964
+      },
+      "stream4": {
+        "prior": 0.0013191117019429432,
+        "fifth": 0.0013517969007583064,
+        "min_family": 0.010797235160655361
+      },
+      "stream8": {
+        "prior": 0.0013184009844902534,
+        "fifth": 0.0014012528849324246,
+        "min_family": 0.01089899285733118
+      },
+      "stream16": {
+        "prior": 0.0014018245368363047,
+        "fifth": 0.0015825914935707174,
+        "min_family": 0.010961068965051491
+      },
+      "stream48": {
+        "prior": 0.0013924194110760846,
+        "fifth": 0.0015825914935707398,
+        "min_family": 0.01101423397042367
+      }
+    },
+    "reverse_report_tail_balanced_minus_canonical": {
+      "stream1": {
+        "prior": 0.0010221711941604372,
+        "fifth": 0.0006429277942630706,
+        "min_family": 0.010125116306062054
+      },
+      "stream4": {
+        "prior": 0.0020023949180099756,
+        "fifth": 0.0009231783712495778,
+        "min_family": 0.010508786197112641
+      },
+      "stream8": {
+        "prior": 0.0021234666383082466,
+        "fifth": 0.0009396636993076024,
+        "min_family": 0.010316938035687695
+      },
+      "stream16": {
+        "prior": 0.002153535914882476,
+        "fifth": 0.0009231783712496,
+        "min_family": 0.010363813131429311
+      },
+      "stream48": {
+        "prior": 0.002192865943182043,
+        "fifth": 0.0009726343554236738,
+        "min_family": 0.010342308185814386
+      }
+    }
+  },
+  "interpretation": {
+    "combined_store_observe_delocalization_survives_continuous_stream_depth_48": true,
+    "balanced_prior_benefit_remains_positive_at_every_tested_depth_for_both_organizations": true,
+    "structural_language_memory_and_routing_remain_exact_at_every_depth": true,
+    "recall_usage_rises_only_to_six_so_the_exact_recall_cap_is_not_yet_stressed": true,
+    "plain_speak": "Making the stream twelve times longer than the old four-example test does not break the language rule. Accuracy balancing and exact sequence behavior hold through the full 48-example stream. But this still uses only six simultaneous memory entries, so it proves temporal-depth robustness, not the 16-entry capacity boundary.",
+    "north_star_question": "Separates temporal stream length from memory-capacity stress: the integrated language mechanism is robust to long streams, leaving entity concurrency as the next fixed-capacity boundary to test.",
+    "next_stage": "increase simultaneous entity concurrency in the same combined STORE+OBSERVE de-localized language organization until the frozen 16-entry exact-recall cap is approached and crossed, without changing training mass or memory capacity"
+  },
+  "activation_authorized": false
+}
