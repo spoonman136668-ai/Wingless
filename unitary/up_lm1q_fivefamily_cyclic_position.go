@@ -97,7 +97,7 @@ func RunUPLM1Q()(UPLM1QFivePositionResult,error) {
 	}
 
 	for rotation:=0;rotation<5;rotation++ {
-		arm:="rotate_"+itoa(rotation)
+		arm:=[5]string{"rotate_0","rotate_1","rotate_2","rotate_3","rotate_4"}[rotation]
 		model:=uplm0oCloneModel(start)
 		uplm1qTrain(model,families,rotation)
 		for f:=0;f<5;f++ {
