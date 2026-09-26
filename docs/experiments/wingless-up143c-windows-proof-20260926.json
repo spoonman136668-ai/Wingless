@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.up143c-windows-proof.v1",
+  "experiment": "UP-143C-live-mixed-age-replacement",
+  "status": "qualified-scientific-result",
+  "source_head": "36a3ebcb4691b53efd415fa6c57ae121cde6e089",
+  "workflow_run_id": 36272699168,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10915578855,
+  "artifact_sha256": "c1b1729ee10db70ff71bd7315b87e4f459bec763506c166aa7f70a5c9641a123",
+  "findings": {
+    "assignment_100_older_103_younger": {
+      "boundary1": {
+        "older_present": 1,
+        "older_age": 1,
+        "younger_present": 1,
+        "younger_age": 0,
+        "history_entries": 17
+      },
+      "boundary2": {
+        "older_present": 0,
+        "younger_present": 1,
+        "younger_age": 1,
+        "history_entries": 32
+      },
+      "age2_evictions": 64,
+      "older_admission": 0,
+      "younger_admission": 1,
+      "hot_accuracy": 1
+    },
+    "assignment_103_older_100_younger_same_pattern": true,
+    "unexpected_manipulation_admissions": 0,
+    "panic_rate": 0
+  },
+  "interpretation": {
+    "age_first_replacement_generalizes_from_controlled_fixture_to_live_stream": true,
+    "older_age2_trace_is_uniquely_evicted_under_single_replacement_pressure": true,
+    "younger_age1_trace_survives_and_remains_admissible": true,
+    "target_identity_does_not_change_outcome": true,
+    "hot_exact_memory_is_preserved": true,
+    "plain_speak": "In a real running stream, the older temporary memory is the one sacrificed when history fills up. The younger temporary memory survives and still works. The behavior is not an artifact of directly constructing the table.",
+    "north_star_question": "Validates predictable age-ranked consolidation under live bounded pressure, closing the main replacement-policy uncertainty before integration into more language-like streams.",
+    "next_stage": "close the isolated replacement line with a multi-trace live age-stack test, then integrate the validated consolidation rule into mixed lexical-language stream experiments rather than continuing isolated capacity micro-ablations"
+  },
+  "activation_authorized": false
+}
