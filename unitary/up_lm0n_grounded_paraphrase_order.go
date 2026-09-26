@@ -213,7 +213,8 @@ func uplm0nEvaluate(model *uplm0aModel,classifier *uplm0jClassifier,examples []u
 				}
 
 				targetByte:=s[t+1]
-				target,okTarget:=model.index[int(targetByte)]
+				target:=model.index[int(targetByte)]
+				okTarget:=target>=0
 				if !okTarget { target=0 }
 				p:=model.probs(h)
 				pred:=uplm0aArgmax(p)
@@ -222,8 +223,8 @@ func uplm0nEvaluate(model *uplm0aModel,classifier *uplm0jClassifier,examples []u
 				if reportOverridePending&&queryName!="" {
 					if value,ok:=recall.values[queryName];ok&&len(value)>0 {
 						memByte:=value[0]
-						memIndex,okMem:=model.index[int(memByte)]
-						if okMem { pred=memIndex }
+						memIndex:=model.index[int(memByte)]
+						if memIndex>=0 { pred=memIndex }
 						if memByte==targetByte { prob=1 } else { prob=1e-12 }
 					}
 					reportOverridePending=false
