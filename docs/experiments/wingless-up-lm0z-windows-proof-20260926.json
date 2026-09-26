@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up-lm0z-windows-proof.v1",
+  "experiment": "UP-LM0Z-joint-readout",
+  "status": "qualified-scientific-result",
+  "source_head": "b2a4aa6355a007038f223fd5a006d570e2772952",
+  "workflow_run_id": 36236645055,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10903909779,
+  "artifact_sha256": "6ac75ae21132584fc3903dd445fcb96860c871e4ecf7897d9500e4fac150cebd",
+  "state_dimension": 64,
+  "learning_rate": 0.08,
+  "base_only_epochs": 20,
+  "paraphrase_only_epochs": 20,
+  "joint_interleaved_epochs": 20,
+  "joint_fullbatch_epochs": 100,
+  "recurrent_parameters_trained": false,
+  "router_used": false,
+  "exact_recall_used": false,
+  "attention_used": false,
+  "findings": {
+    "base_only": {
+      "base_heldout_accuracy": 0.9020793036750484,
+      "base_heldout_perplexity": 1.3629216959644814,
+      "paraphrase_heldout_accuracy": 0.5900211193241817,
+      "paraphrase_heldout_perplexity": 15.486317495846441
+    },
+    "paraphrase_only": {
+      "base_heldout_accuracy": 0.526434558349452,
+      "base_heldout_perplexity": 19.08932139830811,
+      "paraphrase_heldout_accuracy": 0.8878035902851109,
+      "paraphrase_heldout_perplexity": 1.405547684207434
+    },
+    "joint_interleaved": {
+      "base_heldout_accuracy": 0.8670212765957447,
+      "base_heldout_perplexity": 1.503131197149629,
+      "paraphrase_heldout_accuracy": 0.861316437873988,
+      "paraphrase_heldout_perplexity": 1.543282467910258
+    },
+    "joint_fullbatch": {
+      "base_heldout_accuracy": 0.16835912314635718,
+      "base_heldout_perplexity": 17.194584757462625,
+      "paraphrase_heldout_accuracy": 0.18602604716649068,
+      "paraphrase_heldout_perplexity": 16.655359590150695
+    },
+    "readout_parameter_count": 0
+  },
+  "interpretation": {
+    "frozen_recurrent_representation_can_support_both_base_and_paraphrase_distributions_simultaneously": true,
+    "prior_continual_tradeoff_is_not_a_hard_representation_capacity_limit": true,
+    "fresh_joint_interleaved_readout_substantially_outperforms_single_distribution_cross_generalization": true,
+    "fullbatch_arm_is_not_competitive_under_its_preregistered_update_rule": true,
+    "next_stage": "equalize joint-training budget and compare fresh-zero initialization against the base-pretrained readout under the same interleaved updates to isolate optimization-history versus training-budget effects"
+  },
+  "activation_authorized": false
+}
