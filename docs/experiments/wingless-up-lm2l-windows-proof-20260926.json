@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.up-lm2l-windows-proof.v1",
+  "experiment": "UP-LM2L-five-dependency-boundary",
+  "status": "qualified-scientific-result",
+  "source_head": "fa55fa811eda0b0b0df19ff3f6ce3ca2ba96cdee",
+  "workflow_run_id": 36276063802,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10917278012,
+  "artifact_sha256": "390b31792c79c48cfaf74b91fae15a6567f8fc2f63b626a7d7fbcad4a578ee32",
+  "findings": {
+    "d4_recall_hit_rate": 1,
+    "d5_recall_hit_rate": 0.9583333333333334,
+    "d6_recall_hit_rate": 0.9166666666666666,
+    "d4_expected_recall_hit_rate": 1,
+    "d5_expected_recall_hit_rate": 0.9583333333333334,
+    "d6_expected_recall_hit_rate": 0.9166666666666666,
+    "d5_cells": 200,
+    "d5_report_set_exact_cells": 25,
+    "d5_report_set_exact_fraction": 0.125,
+    "d5_exact_by_family": {
+      "base": 0,
+      "paraphrase": 0,
+      "third": 5,
+      "fourth": 20,
+      "fifth": 0
+    },
+    "event_routing_accuracy_all_cells": 1,
+    "identity_rotations": [
+      0,
+      7
+    ],
+    "deferred_report_orders": [
+      "forward",
+      "reverse"
+    ],
+    "exact_recall_cap": 16
+  },
+  "interpretation": {
+    "first_recall_failure_is_directly_established_at_five_deferred_dependencies": true,
+    "recall_boundary_is_invariant_to_tested_identity_rotation_and_report_order": true,
+    "routing_is_not_the_failure_mode": true,
+    "some_language_cells_mask_the_missing_memory_item_by_parametric_prediction": true,
+    "report_exactness_is_not_a_pure_memory_metric_at_the_boundary": true,
+    "plain_speak": "Four unfinished dependencies fit. Five causes exactly one memory miss in every tested condition, and six causes exactly two. The memory boundary is clean. But 25 of 200 five-dependency language cells still guessed the missing report correctly, mostly in the fourth lexical family, so output accuracy can sometimes hide a real memory failure.",
+    "north_star_question": "Separates sequence-capacity failure from language fallback: fixed-capacity dependency closure is now pinned exactly, but we must determine whether apparent success after a memory miss is genuine generalization or a learned/default guess.",
+    "next_stage": "at D=5, remap held report values with frozen deterministic permutations while preserving the same memory pressure, then test whether the parametric fallback tracks the remapped dependency or collapses"
+  },
+  "activation_authorized": false
+}
