@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.up109c-windows-proof.v1",
+  "experiment": "UP-109C-slot-reuse-confirmation",
+  "status": "qualified-scientific-result",
+  "source_head": "5bb17bb214c7282fd35301cde14797b90ae93087",
+  "workflow_run_id": 36243240486,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10906417080,
+  "artifact_sha256": "22e99cd2cf19ce58d22a0c4a7ef08168207d65145742d04e203aa0c3b3eadbff",
+  "exact_recall_cap": 16,
+  "filter_bits": 1024,
+  "generation_interval": 32,
+  "churn_writes": 12288,
+  "reuse_mask_bytes": 2,
+  "findings": {
+    "ascending_slot_reuse": {
+      "checkpoints_per_episode": 2,
+      "first_checkpoint_index": 24,
+      "false_positive_admissions": 0,
+      "final_exact": 1
+    },
+    "evens_then_odds_slot_reuse": {
+      "checkpoints_per_episode": 2,
+      "first_checkpoint_index": 16,
+      "false_positive_admissions": 0,
+      "final_exact": 1
+    },
+    "odds_then_evens_slot_reuse": {
+      "checkpoints_per_episode": 2,
+      "first_checkpoint_index": 32,
+      "false_positive_admissions": 0,
+      "final_exact": 1
+    },
+    "rotate8_slot_reuse": {
+      "checkpoints_per_episode": 1,
+      "first_checkpoint_index": 28,
+      "false_positive_admissions": 0,
+      "final_exact": 1
+    },
+    "resident_write_mask_rotate8": {
+      "checkpoints_per_episode": 0,
+      "false_positive_admissions": 128,
+      "final_hot_accuracy": 0.9375,
+      "final_exact": 0
+    },
+    "policy_metadata_bytes": 136,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "successful_repeat_admission_is_the_missing_local_reuse_evidence": true,
+    "slot_reuse_confirmation_matches_exact_retention_across_all_tested_orders": true,
+    "phase_labels_queries_and_future_oracles_are_not_required": true,
+    "extra_checkpoint_emissions_occur_in_some_orders_but_are_harmless_in_this_horizon": true,
+    "next_stage": "stress the phase-free slot-reuse detector across broader initial orders and longer churn horizons while tracking redundant checkpoint frequency"
+  },
+  "activation_authorized": false
+}
