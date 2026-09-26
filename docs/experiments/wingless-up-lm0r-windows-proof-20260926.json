@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up-lm0r-windows-proof.v1",
+  "experiment": "UP-LM0R-paired-update-order",
+  "status": "qualified-scientific-result",
+  "source_head": "d8984df73c941d7890c3a10253d9f2db7cb8be3d",
+  "workflow_run_id": 36233351003,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10903611135,
+  "artifact_sha256": "4f6b8f6e6ab4750416f496f751d3d6af38adf59dc0b046e6a79e3801d1f2c942",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_epochs": 20,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "paraphrase_passes_per_epoch": 1,
+  "base_passes_per_epoch": 1,
+  "findings": {
+    "paraphrase_first_pairs": {
+      "base_accuracy": 0.8650064474532559,
+      "base_perplexity": 1.5251789945731868,
+      "paraphrase_accuracy": 0.8173178458289335,
+      "paraphrase_perplexity": 1.7180808314886038
+    },
+    "base_first_pairs": {
+      "base_accuracy": 0.8556576402321083,
+      "base_perplexity": 1.5577912811389845,
+      "paraphrase_accuracy": 0.8316613868356213,
+      "paraphrase_perplexity": 1.6805709122148929
+    },
+    "alternating_pair_order": {
+      "base_accuracy": 0.8583978078658929,
+      "base_perplexity": 1.550299607566983,
+      "paraphrase_accuracy": 0.8302534318901795,
+      "paraphrase_perplexity": 1.688172123858582
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1
+  },
+  "interpretation": {
+    "pair_level_recency_has_a_real_but_small_effect": true,
+    "equal_count_scheduling_does_not_eliminate_the_base_vs_paraphrase_tradeoff": true,
+    "routing_and_exact_memory_remain_decoupled_from_byte_readout_interference": true,
+    "next_stage": "test loss-masked lexical adaptation that updates the byte model only on paraphrase verb targets while preserving full recurrent context"
+  },
+  "activation_authorized": false
+}
