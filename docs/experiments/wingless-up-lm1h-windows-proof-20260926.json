@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.up-lm1h-windows-proof.v1",
+  "experiment": "UP-LM1H-symmetric-operator-split",
+  "status": "qualified-scientific-result",
+  "source_head": "7fd241e9d7dbf5ce61d44a21a83e4b20dfecd8af",
+  "workflow_run_id": 36243242963,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10906990357,
+  "artifact_sha256": "b6376c7b6fa3850ab5ff5b567958b54a70af721ec9caf85f7d25e2ab61a0b5b7",
+  "state_dimension": 64,
+  "base_pretrain_epochs": 20,
+  "joint_interleaved_epochs": 20,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "half_step_learning_rate": 0.04,
+  "findings": {
+    "cyclic_by_index": {
+      "min_heldout_accuracy": 0.7995424146427315,
+      "mean_heldout_accuracy": 0.8234369916500995,
+      "spread": 0.04313972591174953
+    },
+    "strang_split_base": {
+      "min_heldout_accuracy": 0.8050862372404083,
+      "mean_heldout_accuracy": 0.8236227730967404,
+      "spread": 0.032840906537799364
+    },
+    "strang_split_para": {
+      "min_heldout_accuracy": 0.8059662090813094,
+      "mean_heldout_accuracy": 0.8215691942092157,
+      "spread": 0.02607763360083115
+    },
+    "strang_split_third": {
+      "min_heldout_accuracy": 0.8014783526927138,
+      "mean_heldout_accuracy": 0.8213203964444507,
+      "spread": 0.03145201481212179
+    }
+  },
+  "interpretation": {
+    "nonlinear_symmetric_operator_splitting_improves_worst_family_balance": true,
+    "strang_split_base_slightly_improves_both_mean_and_minimum_accuracy_over_cyclic_control": true,
+    "strang_split_para_has_the_best_minimum_and_smallest_spread_but_lower_mean": true,
+    "remaining_tradeoff_is_smaller_but_not_eliminated": true,
+    "next_stage": "reintegrate the best mean-plus-min split with frozen router and exact memory across structural order and stream-size stress"
+  },
+  "activation_authorized": false
+}
