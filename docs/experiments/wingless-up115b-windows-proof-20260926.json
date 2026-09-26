@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.up115b-windows-proof.v1",
+  "experiment": "UP-115B-base-class-diagnostic",
+  "status": "qualified-scientific-result",
+  "source_head": "5dc1992deb84526f9afacde908eb0983e707d9ab",
+  "workflow_run_id": 36235499053,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10903903183,
+  "artifact_sha256": "f987e22587f6ff358035d51b60644460a7caeaf304b21ac6b3b5dbe3b1836c78",
+  "training_changed": false,
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "findings": {
+    "all_acquired_aggregate_accuracies_at_acquired_stages": 1,
+    "all_base_errors_are_store_class": true,
+    "all_base_errors_are_stores_verb_only": true,
+    "keeps_accuracy_at_every_base_error": 1,
+    "observe_class_accuracy_at_every_base_error": 1,
+    "report_class_accuracy_at_every_base_error": 1,
+    "worst_stores_accuracy": 0,
+    "affected_order_stage_pairs": [
+      "SOR/control/stage3",
+      "SRO/control/stage3",
+      "SRO/stage3_anchor2/stage3",
+      "OSR/control/stage1",
+      "OSR/stage3_anchor2/stage1",
+      "ORS/control/stage1",
+      "ORS/control/stage2",
+      "ORS/stage3_anchor2/stage1",
+      "ORS/stage3_anchor2/stage2",
+      "RSO/stage3_anchor2/stage3",
+      "ROS/control/stage2",
+      "ROS/stage3_anchor2/stage2"
+    ]
+  },
+  "interpretation": {
+    "class_level_interference_diagnosis_is_too_coarse": true,
+    "instability_is_localized_to_a_single_base_lexical_surface_stores": true,
+    "generic_store_class_replay_can_help_or_harm_because_keeps_is_not_fragile": true,
+    "next_stage": "measure stores versus keeps prediction margins and wrong-class destinations across orders and stages without changing training"
+  },
+  "activation_authorized": false
+}
