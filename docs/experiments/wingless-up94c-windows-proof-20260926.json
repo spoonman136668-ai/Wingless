@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up94c-windows-proof.v1",
+  "experiment": "UP-94C-hash-count",
+  "status": "qualified-scientific-result",
+  "source_head": "c00440765d7406327c0b6427cda7a317c7455069",
+  "workflow_run_id": 36234078865,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10903193935,
+  "artifact_sha256": "ceb096aadb7bebb8b854fe0dc7f2772961904b542180cfb6f2b1ed8125a3ad59",
+  "filter_bits": 256,
+  "generation_interval": 32,
+  "churn_writes": 1536,
+  "exact_recall_cap": 16,
+  "findings": {
+    "legacy2": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 640
+    },
+    "multi2": {
+      "hot_accuracy": 0.875,
+      "hot_exact": 0,
+      "false_positive_admissions": 2816
+    },
+    "multi4": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 896
+    },
+    "multi6": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 1152
+    },
+    "policy_metadata_bytes": 38
+  },
+  "interpretation": {
+    "increasing_hash_count_does_not_beat_the_legacy_two_hash_geometry": true,
+    "the_new_multi_hash_family_is_not_superior_even_at_higher_k": true,
+    "within_generation_false_positive_pressure_remains_the_limiting_mechanism": true,
+    "next_stage": "hold legacy two-hash geometry and generation interval32 fixed while increasing filter width to test the memory-versus-false-positive frontier"
+  },
+  "activation_authorized": false
+}
