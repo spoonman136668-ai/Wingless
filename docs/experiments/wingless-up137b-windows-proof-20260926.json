@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.up137b-windows-proof.v1",
+  "experiment": "UP-137B-new-order-rotation",
+  "status": "qualified-scientific-result",
+  "source_head": "6ed0ef8cacbf7c04db3f9c5a485aeb83cc68fe82",
+  "workflow_run_id": 36253328137,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10909763440,
+  "artifact_sha256": "325b99b6f485c5afd6e7384ae83bbf0206ae69788e954054196e6eaedbd26ed7",
+  "state_dimension": 64,
+  "gate_input_dimension": 128,
+  "grounding_epochs": 20,
+  "learning_rate": 0.08,
+  "new_updates_per_epoch": 24,
+  "old_updates_per_epoch": 15,
+  "findings": {
+    "fixed_new_order": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9375,
+      "old_heldout": 0.9,
+      "old_unseen": 0.9333333333333333
+    },
+    "rotate_new_by_epoch": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.9,
+      "old_unseen": 0.9333333333333333
+    },
+    "reverse_rotate_new_by_epoch": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9375,
+      "old_heldout": 0.8666666666666667,
+      "old_unseen": 0.9444444444444444
+    }
+  },
+  "interpretation": {
+    "epoch_rotation_alone_does_not_reproduce_the_up135b_refresh4_advantage": true,
+    "forward_rotation_slightly_reduces_secondary_new_accuracy_without_retention_gain": true,
+    "reverse_rotation_changes_split_specific_retention_but_not_the_overall_balance": true,
+    "neither_rotation_nor_fixed_tail4_refresh_alone_explains_up135b_internal_best_arm": true,
+    "evidence_now_points_to_an_interaction_between_rotation_and_refresh_placement": true,
+    "next_stage": "run a single matched 2x2 factorial crossing fixed_vs_rotated_new_order with zero_vs_four final new updates at identical counts"
+  },
+  "activation_authorized": false
+}
