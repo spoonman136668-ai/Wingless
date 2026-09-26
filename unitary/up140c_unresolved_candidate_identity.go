@@ -69,7 +69,6 @@ func up140cSetup(target,base,ep int,outMaxCurrent,outMaxHistory *int)(x *up125cA
 	targets:=[]int{100,101,102,103}
 	setA:=make([]int,16);for i:=range setA{setA[i]=200+i}
 	setB:=make([]int,12);for i:=range setB{setB[i]=220+i}
-	maxC,maxH:=0,0
 	for k:=0;k<32;k++{v:=rng.intn(32);truth[k]=v;up125cProcess(x,k,v,&maxC,&maxH)}
 	for k:=0;k<12;k++{x.process(k,truth[k]);x.mem.query(k)}
 	up125cObserve(x,&maxC,&maxH);if x.counter!=0{up125cFill(x,&next,rng,&maxC,&maxH)}
@@ -91,13 +90,11 @@ func up140cSetup(target,base,ep int,outMaxCurrent,outMaxHistory *int)(x *up125cA
 		}
 	}
 	if x.counter!=0{panic("UP140C_SETUP_NOT_ON_BOUNDARY")}
-	*outMaxCurrent=maxC;*outMaxHistory=maxH
-	return
+	return x,truth,next,rng,maxC,maxH
 }
 func up140cEpisodeRun(arm string,target,base,ep int)(out up140cEpisode){
 	defer func(){if recover()!=nil{out.panicHit=true}}()
-	maxC,maxH:=0,0
-	x,truth,next,rng:=up140cSetup(target,base,ep,&maxC,&maxH)
+	x,truth,next,rng,maxC,maxH:=up140cSetup(target,base,ep)
 	out.maxCurrent=maxC;out.maxHistory=maxH
 	startEv:=x.evictions
 	group:=up140cGroupSize(arm)
