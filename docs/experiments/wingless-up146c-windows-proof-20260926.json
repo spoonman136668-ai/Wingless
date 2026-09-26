@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up146c-windows-proof.v1",
+  "experiment": "UP-146C-durable-reuse-pressure",
+  "status": "qualified-scientific-result",
+  "source_head": "4aa3e74f5c4dbcb97f2a73af5f5526091b406b5c",
+  "workflow_run_id": 36273966390,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10916099559,
+  "artifact_sha256": "2f3deef2e6949ac58db112aa8c23e8821b29b2cfccdf8f4813b99cf104d1da50",
+  "findings": {
+    "protect_quin_store4": {
+      "quin_store4_accuracy": 1,
+      "rue_store4_accuracy": 1,
+      "protected_group_accuracy": 1,
+      "unprotected_matched_group_accuracy": 1,
+      "background_quin_accuracy": 0.75
+    },
+    "protect_rue_store4": {
+      "quin_store4_accuracy": 0.5,
+      "rue_store4_accuracy": 1,
+      "protected_group_accuracy": 1,
+      "unprotected_matched_group_accuracy": 0.5,
+      "background_quin_accuracy": 1
+    },
+    "same_pattern_across_assignments_A_and_B": true,
+    "temporal_candidate_outcomes_unchanged_across_protection_arms": true,
+    "recall_entries_used": 16,
+    "one_shot_false_admissions": 0,
+    "panic_rate": 0
+  },
+  "interpretation": {
+    "repeated_query_access_is_sufficient_to_preserve_the_protected_durable_group": true,
+    "access_is_not_the_only_determinant_of_unprotected_survival": true,
+    "asymmetric_unprotected_survival_implicates_memory_hand_or_initial_slot_layout": true,
+    "temporal_consolidation_behavior_is_separable_from_durable_reuse_protection": true,
+    "plain_speak": "Refreshing a durable group protects it, but the mirror case is not symmetric. Rue survives without refresh when Quin is protected, while unprotected Quin loses half its facts when Rue is protected. Access matters, but the aging-memory slot/hand layout also affects which unrefreshed facts get displaced.",
+    "north_star_question": "Separates reuse-driven durable protection from lexical consolidation timing and exposes replacement-layout asymmetry as the remaining fixed-capacity retention mechanism.",
+    "next_stage": "permute initial durable-fact insertion order while keeping identities, query budget, candidate stream, and protection arm fixed to determine whether the asymmetry follows slot/hand layout rather than lexical identity"
+  },
+  "activation_authorized": false
+}
