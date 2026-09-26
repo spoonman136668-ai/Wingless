@@ -71,7 +71,8 @@ func uplm2vRun(d,rot,shift int,layout,mode string)(completed,failed,actions int)
 		if harm&&mode=="sham"{if t:=uplm2vShamTarget(r,reported,victim);t!=""{reported[t]=true;actions++}}
 		r.write(fmt.Sprintf("v-%s-%s-%d-%d-%d-%d",mode,layout,d,rot,shift,j),"x")
 	}
-	return uplm2vFinish(r,reported,rot)
+	completed,failed=uplm2vFinish(r,reported,rot)
+	return completed,failed,actions
 }
 func RunUPLM2V()(UPLM2VResult,error){
 	levels:=[]int{4,5,6};rots:=[]int{3,11};shifts:=[]int{0,2};layouts:=[]string{"suffix_reported","alternating_reported"}
