@@ -1,0 +1,54 @@
+{
+  "schema": "wingless.up90c-windows-proof.v1",
+  "experiment": "UP-90C-generational-filter",
+  "status": "qualified-scientific-result",
+  "source_head": "c4b39c22ba519727568924f72fe69f85e8557149",
+  "workflow_run_id": 36230617883,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10901668265,
+  "artifact_sha256": "37d98cc49c4e677cf8a54da639d2b335bdf8a1dd2e5454f919e8ce5ce1d010a9",
+  "active_keys": 32,
+  "hot_keys": 16,
+  "filter_bits": 256,
+  "hash_count": 2,
+  "churn_writes": 192,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "findings": {
+    "no_reset": {
+      "hot_accuracy": 0.8125,
+      "hot_exact": 0,
+      "false_positive_admissions": 6144,
+      "resets": 0,
+      "metadata_bytes": 37
+    },
+    "reset32": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128,
+      "resets": 768,
+      "metadata_bytes": 38
+    },
+    "reset64": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 512,
+      "resets": 384,
+      "metadata_bytes": 38
+    },
+    "reset96": {
+      "hot_accuracy": 0.875,
+      "hot_exact": 0,
+      "false_positive_admissions": 1536,
+      "resets": 256,
+      "metadata_bytes": 38
+    }
+  },
+  "interpretation": {
+    "deterministic_generational_reset_strongly_reduces_filter_saturation": true,
+    "reset32_is_best_tested_but_one_false_positive_per_episode_still_breaks_exact_retention": true,
+    "phase_local_reset_timing_leaves_pre_churn_stale_filter_evidence": true,
+    "next_stage": "count generations continuously from the first filtered write rather than starting resets only inside churn"
+  },
+  "activation_authorized": false
+}
