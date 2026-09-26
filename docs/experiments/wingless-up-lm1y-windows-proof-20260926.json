@@ -1,0 +1,86 @@
+{
+  "schema": "wingless.up-lm1y-windows-proof.v1",
+  "experiment": "UP-LM1Y-adaptation-order-robustness",
+  "status": "qualified-scientific-result",
+  "source_head": "3a37ad17422cbb8e3e1d35a9e4ea35c50703ca13",
+  "workflow_run_id": 36265001436,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10913378048,
+  "artifact_sha256": "b4759014bd419833921c191a9907a51cb5303ef00aca8c7f5a0a54e121148254",
+  "findings": {
+    "structural_exact_all_150_integrated_cells": true,
+    "max_recall_entries": 4,
+    "equal_mass": {
+      "canonical": {
+        "fifth": 0.7486811737553578,
+        "prior": 0.7706616178834755,
+        "all": 0.7662655290578521,
+        "min": 0.7486811737553578
+      },
+      "reverse": {
+        "fifth": 0.7370178041543027,
+        "prior": 0.7796226942236544,
+        "all": 0.7711017162097841,
+        "min": 0.7370178041543027
+      },
+      "rotating": {
+        "fifth": 0.7427052423343224,
+        "prior": 0.7727052710555078,
+        "all": 0.7667052653112707,
+        "min": 0.7427052423343224
+      }
+    },
+    "fifth_1p25_mass": {
+      "canonical": {
+        "fifth": 0.7739449390042862,
+        "prior": 0.7641609272307367,
+        "all": 0.7661177295854465,
+        "min": 0.7479448742746615
+      },
+      "reverse": {
+        "fifth": 0.7618694362017804,
+        "prior": 0.7728826844548853,
+        "all": 0.7706800348042643,
+        "min": 0.7618694362017804
+      },
+      "rotating": {
+        "fifth": 0.7653313550939664,
+        "prior": 0.7682189330107487,
+        "all": 0.7676414174273922,
+        "min": 0.7610815602836879
+      }
+    },
+    "fifth_1p5_mass": {
+      "canonical": {
+        "fifth": 0.7964061984833498,
+        "prior": 0.7576305353143119,
+        "all": 0.7653856679481195,
+        "min": 0.7393214055448099
+      },
+      "reverse": {
+        "fifth": 0.777324431256182,
+        "prior": 0.7671207997732366,
+        "all": 0.7691615260698257,
+        "min": 0.7573477648715241
+      },
+      "rotating": {
+        "fifth": 0.7820227497527201,
+        "prior": 0.7621748132029449,
+        "all": 0.7661444005128999,
+        "min": 0.7526998710509349
+      }
+    }
+  },
+  "interpretation": {
+    "fixed_mass_stability_plasticity_direction_is_robust_to_adaptation_family_order": true,
+    "adaptation_order_changes_the_location_of_the_tradeoff_curve": true,
+    "canonical_order_systematically_favors_the_fifth_family_relative_to_reverse_order": true,
+    "reverse_order_systematically_preserves_more_prior_family_accuracy_relative_to_canonical_order": true,
+    "rotating_order_generally_lies_between_canonical_and_reverse": true,
+    "structural_sequence_memory_and_routing_remain_exact_across_all_allocations_and_orders": true,
+    "plain_speak": "The same budget tradeoff survives no matter which family is updated first, but training order moves where the balance lands. Updating the newest family last favors the newest vocabulary; updating it first gives the older families more of the final say. Rotating the order usually lands between those two. The sequence-memory core remains perfect throughout.",
+    "north_star_question": "Separates a stable fixed-budget plasticity mechanism from a second controllable factor—update recency—showing that language retention can be shaped by both allocation and order without breaking sequence intelligence.",
+    "next_stage": "factor update recency directly by moving only the fifth-family update through positions 1 through 5 while holding the relative order of the four prior families fixed"
+  },
+  "activation_authorized": false
+}
