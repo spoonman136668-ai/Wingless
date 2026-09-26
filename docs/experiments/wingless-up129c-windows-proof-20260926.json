@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up129c-windows-proof.v1",
+  "experiment": "UP-129C-consolidation-window",
+  "status": "qualified-scientific-result",
+  "source_head": "7eea72b187536238ccd17d40ef3f29d210a77ffc",
+  "workflow_run_id": 36258322241,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10911003420,
+  "artifact_sha256": "9966dd0ef401b0e06697a0c4a5a7d2776d526270699cced6626734856f14a97a",
+  "findings": {
+    "adjacent_same_generation": {
+      "valid_admission": 1,
+      "valid_accuracy": 1,
+      "target16_accuracy": 1,
+      "target16_exact": 1,
+      "post_first_wave_evictions": 0,
+      "boundary_between_sightings": false
+    },
+    "wide_same_generation": {
+      "valid_admission": 1,
+      "valid_accuracy": 1,
+      "target16_accuracy": 1,
+      "target16_exact": 1,
+      "post_first_wave_evictions": 0,
+      "boundary_between_sightings": false
+    },
+    "boundary_split": {
+      "valid_admission": 0,
+      "valid_accuracy": 0,
+      "target16_accuracy": 0.75,
+      "target16_exact": 0,
+      "post_first_wave_evictions": 0,
+      "boundary_between_sightings": true
+    },
+    "hot_accuracy_all_arms": 1,
+    "nonpersistent_admission_all_arms": 0,
+    "nonpersistent_retention_all_arms": 0,
+    "one_shot_false_admissions_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "two_sighting_consolidation_is_generation_local": true,
+    "within_generation_spacing_can_be_wide_without_loss": true,
+    "crossing_the_generation_boundary_breaks_consolidation": true,
+    "total_sighting_count_and_total_pre_overflow_writes_are_not_sufficient_without_same_generation_cooccurrence": true,
+    "plain_speak": "Two reminders work even when they are spread far apart, as long as both happen before the temporary-evidence generation closes. If a generation boundary falls between them, the first reminder is no longer available to combine with the second, so nothing consolidates.",
+    "north_star_question": "Defines the temporal window over which repeated evidence can become durable under fixed bounded memory: the evidence must co-occur within one admission generation.",
+    "next_stage": "map first- and second-sighting positions near the generation edge to confirm that boundary crossing, rather than absolute spacing, is the causal cutoff"
+  },
+  "activation_authorized": false
+}
