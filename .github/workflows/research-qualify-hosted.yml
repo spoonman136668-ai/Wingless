@@ -18,9 +18,37 @@ permissions:
 
 jobs:
   qualify:
-    runs-on: windows-latest
+    runs-on: [self-hosted, Windows, X64]
     timeout-minutes: 180
     steps:
+      - name: Verify local research runner and plane endpoint
+        shell: powershell
+        env:
+          WINGLESS_DISPATCH_ID: ${{ inputs.dispatch_id }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          if ($env:RUNNER_NAME -notlike 'WINGLESS-UP-*') {
+            throw "WINGLESS_LOCAL_RUNNER_IDENTITY_INVALID: $env:RUNNER_NAME"
+          }
+          if ($env:RUNNER_OS -cne 'Windows' -or $env:RUNNER_ARCH -cne 'X64') {
+            throw "WINGLESS_LOCAL_RUNNER_PLATFORM_INVALID: $env:RUNNER_OS/$env:RUNNER_ARCH"
+          }
+          if ($env:WINGLESS_DISPATCH_ID -notmatch '^[0-9a-f]{64}$') {
+            throw "WINGLESS_LOCAL_DISPATCH_ID_INVALID: $env:WINGLESS_DISPATCH_ID"
+          }
+
+          $Client = [Net.Sockets.TcpClient]::new()
+          try {
+            $Connect = $Client.ConnectAsync('127.0.0.1',8791)
+            if (-not $Connect.Wait([TimeSpan]::FromSeconds(3))) {
+              throw 'WINGLESS_PLANE_LOOPBACK_ENDPOINT_TIMEOUT'
+            }
+          }
+          finally {
+            $Client.Dispose()
+          }
+
       - name: Checkout requested research ref
         uses: actions/checkout@v4
         with:
@@ -65,10 +93,8 @@ jobs:
             throw "WINGLESS_HOSTED_QUAL_BRANCH_NOT_AUTOMATION_COMPATIBLE: $($Request.branch)"
           }
 
-          # workflow_dispatch runs under the workflow control ref (normally main),
-          # while actions/checkout above intentionally switches the worktree to the
-          # research branch. The branch-local qualification script must validate
-          # the checked-out research state, not the workflow control ref.
+          # workflow_dispatch runs under the workflow control ref (main), while
+          # actions/checkout switches the worktree to the requested research ref.
           Remove-Item Env:GITHUB_SHA -ErrorAction SilentlyContinue
           Remove-Item Env:GITHUB_REF_NAME -ErrorAction SilentlyContinue
 
@@ -77,19 +103,124 @@ jobs:
             -OutputDirectory "$env:RUNNER_TEMP\wingless-research-qualification" `
             -GuardWaitMinutes 0
 
-          $SummaryPath = "$env:RUNNER_TEMP\wingless-research-qualification\summary.json"
-          if (-not (Test-Path -LiteralPath $SummaryPath -PathType Leaf)) {
-            throw "WINGLESS_HOSTED_QUAL_SUMMARY_MISSING: $SummaryPath"
+      - name: Deliver canonical result to local plane
+        if: always()
+        shell: powershell
+        env:
+          WINGLESS_EXPECTED_REF: ${{ inputs.research_ref }}
+          WINGLESS_DISPATCH_ID: ${{ inputs.dispatch_id }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          if ($env:WINGLESS_DISPATCH_ID -notmatch '^[0-9a-f]{64}$') {
+            throw "WINGLESS_RESULT_CALLBACK_DISPATCH_ID_INVALID: $env:WINGLESS_DISPATCH_ID"
           }
-          $Summary = Get-Content -LiteralPath $SummaryPath -Raw | ConvertFrom-Json
-          $Summary | Add-Member -NotePropertyName dispatch_id -NotePropertyValue $env:WINGLESS_DISPATCH_ID -Force
-          $Summary | ConvertTo-Json -Depth 100 | Set-Content -Encoding UTF8 -LiteralPath $SummaryPath
+
+          $RequestPath = '.wingless/qualification-request.json'
+          if (-not (Test-Path -LiteralPath $RequestPath -PathType Leaf)) {
+            throw "WINGLESS_RESULT_CALLBACK_REQUEST_MISSING: $RequestPath"
+          }
+          $Request = Get-Content -LiteralPath $RequestPath -Raw | ConvertFrom-Json
+          if ($Request.schema -cne 'wingless.research-qualification-request.v1') {
+            throw "WINGLESS_RESULT_CALLBACK_REQUEST_SCHEMA_INVALID: $($Request.schema)"
+          }
+          if ([string]$Request.branch -cne $env:WINGLESS_EXPECTED_REF) {
+            throw "WINGLESS_RESULT_CALLBACK_REF_MISMATCH expected=$env:WINGLESS_EXPECTED_REF request=$($Request.branch)"
+          }
+
+          $Head = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0 -or $Head -notmatch '^[0-9a-f]{40}$') {
+            throw 'WINGLESS_RESULT_CALLBACK_HEAD_INVALID'
+          }
+
+          $EvidenceRoot = Join-Path $env:RUNNER_TEMP 'wingless-research-qualification'
+          $SummaryPath = Join-Path $EvidenceRoot 'summary.json'
+          $ProbePath = Join-Path $EvidenceRoot 'probe.json'
+
+          $Summary = $null
+          if (Test-Path -LiteralPath $SummaryPath -PathType Leaf) {
+            $Summary = Get-Content -LiteralPath $SummaryPath -Raw | ConvertFrom-Json
+          }
+
+          if ($null -eq $Summary) {
+            $CanonicalSummary = [ordered]@{
+              schema = 'wingless.research-qualification-summary.v1'
+              experiment = [string]$Request.experiment
+              branch = [string]$Request.branch
+              baseline_sha = [string]$Request.baseline_sha
+              head_sha = $Head
+              test_script = [string]$Request.test_script
+              test_exit_code = 1
+              harness_marker = $false
+              probe_parsed = $false
+              classification = 'harness-or-artifact-failure'
+              unexpected_dirty = @()
+              production_priority_guard = 'not-observed'
+              generated_at_utc = [DateTime]::UtcNow.ToString('o')
+              dispatch_id = $env:WINGLESS_DISPATCH_ID
+            }
+          }
+          else {
+            $Classification = [string]$Summary.classification
+            $ProbeParsed = [bool]$Summary.probe_parsed
+
+            if ($Classification -ceq 'qualified-scientific-result' -and
+                -not (Test-Path -LiteralPath $ProbePath -PathType Leaf)) {
+              $Classification = 'probe-parse-failure'
+              $ProbeParsed = $false
+            }
+
+            $CanonicalSummary = [ordered]@{
+              schema = 'wingless.research-qualification-summary.v1'
+              experiment = [string]$Summary.experiment
+              branch = [string]$Summary.branch
+              baseline_sha = [string]$Summary.baseline_sha
+              head_sha = [string]$Summary.head_sha
+              test_script = [string]$Summary.test_script
+              test_exit_code = [int]$Summary.test_exit_code
+              harness_marker = [bool]$Summary.harness_marker
+              probe_parsed = $ProbeParsed
+              classification = $Classification
+              unexpected_dirty = @($Summary.unexpected_dirty)
+              production_priority_guard = [string]$Summary.production_priority_guard
+              generated_at_utc = [string]$Summary.generated_at_utc
+              dispatch_id = $env:WINGLESS_DISPATCH_ID
+            }
+          }
+
+          $Body = [ordered]@{
+            schema = 'ckb-plane.wingless-qualification-result.v2'
+            summary = $CanonicalSummary
+          }
+
+          if ($CanonicalSummary.classification -ceq 'qualified-scientific-result') {
+            $Probe = Get-Content -LiteralPath $ProbePath -Raw | ConvertFrom-Json
+            if ($Probe.schema -cne 'wingless.research-scientific-result.v1') {
+              throw "WINGLESS_RESULT_CALLBACK_PROBE_SCHEMA_INVALID: $($Probe.schema)"
+            }
+            $Body.result = $Probe
+          }
+
+          $Json = $Body | ConvertTo-Json -Depth 100 -Compress
+          $Uri = "http://127.0.0.1:8791/v1/research/wingless/results/$env:WINGLESS_DISPATCH_ID"
+          $Response = Invoke-WebRequest `
+            -UseBasicParsing `
+            -Method Post `
+            -Uri $Uri `
+            -ContentType 'application/json' `
+            -Body $Json `
+            -TimeoutSec 30
+
+          if ($Response.StatusCode -ne 200) {
+            throw "WINGLESS_RESULT_CALLBACK_HTTP_STATUS_$($Response.StatusCode)"
+          }
+          Write-Host "WINGLESS_RESULT_CALLBACK_PASS dispatch=$env:WINGLESS_DISPATCH_ID"
 
       - name: Upload qualification evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: wingless-hosted-${{ github.run_id }}-${{ github.run_attempt }}
+          name: wingless-local-${{ inputs.dispatch_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/wingless-research-qualification/
           if-no-files-found: warn
           retention-days: 30
