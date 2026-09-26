@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.up168b-windows-proof.v1",
+  "experiment": "UP-168B-margin-rank-crossclass",
+  "status": "qualified-scientific-result",
+  "source_head": "22383df8c97febde2221a0c3724f2112ec414b3b",
+  "workflow_run_id": 36273284292,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10916700151,
+  "artifact_sha256": "33298f7ab77b1fc4d214f48183f14a653531db167ccc78850dcfe0bde587a50d",
+  "findings": {
+    "examples_per_state": 120,
+    "total_crossings": 216,
+    "maximum_crossing_rank": 10,
+    "maximum_crossing_rank_fraction": 0.08333333333333333,
+    "by_class": {
+      "STORE": {
+        "probes_with_crossings": 52,
+        "total_crossings": 104,
+        "max_crossing_rank": 10,
+        "max_rank_fraction": 0.08333333333333333,
+        "mean_crossing_rank_across_active_probes": 3.2467948717948727
+      },
+      "OBSERVE": {
+        "probes_with_crossings": 57,
+        "total_crossings": 112,
+        "max_crossing_rank": 10,
+        "max_rank_fraction": 0.08333333333333333,
+        "mean_crossing_rank_across_active_probes": 2.5014619883040936
+      }
+    },
+    "independent_probe_clones": true,
+    "fitted_threshold_used": false,
+    "diagnostic_updates_retained": false
+  },
+  "interpretation": {
+    "low_absolute_margin_rank_generalizes_beyond_report_to_store_and_observe_interference": true,
+    "cross_class_vulnerability_tail_is_broader_than_report_only_vulnerability": true,
+    "report_crossings_were_confined_to_bottom_4_of_120_while_store_observe_extend_to_bottom_10_of_120": true,
+    "margin_rank_remains_informative_but_not_class_invariant_at_one_fixed_rank_cutoff": true,
+    "no_autonomous_maintenance_trigger_is_authorized": true,
+    "plain_speak": "Weak-margin examples remain the ones most likely to flip under STORE and OBSERVE too, so the warning signal is not REPORT-specific. But these classes can reach somewhat farther into the fragile tail—up to rank 10 of 120 instead of rank 4—so one universal hard cutoff would be premature.",
+    "north_star_question": "Generalizes internal deficiency detection across interference classes while exposing class-dependent vulnerability breadth, defining the calibration problem that must be solved before any bounded maintenance trigger.",
+    "next_stage": "test rank-normalized vulnerability calibration across STORE, OBSERVE, and REPORT using only preregistered class-conditional rank bands, without triggering maintenance or fitting on held-out outcomes"
+  },
+  "activation_authorized": false
+}
