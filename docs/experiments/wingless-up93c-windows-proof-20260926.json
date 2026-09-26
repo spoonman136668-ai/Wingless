@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up93c-windows-proof.v1",
+  "experiment": "UP-93C-generation-salted-hash",
+  "status": "qualified-scientific-result",
+  "source_head": "a79cca72581b63225015b4da775ad7414c8463fd",
+  "workflow_run_id": 36233754294,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10903945051,
+  "artifact_sha256": "a92aec56539dae9e824a6814e2c13de3482127d1ff2ad0b0796ce95374a04b8f",
+  "filter_bits": 256,
+  "hash_count": 2,
+  "generation_interval": 32,
+  "exact_recall_cap": 16,
+  "findings": {
+    "static768": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "static1536": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 640
+    },
+    "static3072": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 1536
+    },
+    "salted768": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 768
+    },
+    "salted1536": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 1536
+    },
+    "salted3072": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 2688
+    },
+    "static_metadata_bytes": 38,
+    "salted_metadata_bytes": 39
+  },
+  "interpretation": {
+    "naive_generation_salting_does_not_improve_the_filter": true,
+    "salted_hashing_increases_false_positive_admissions_in_all_tested_horizons": true,
+    "the_remaining_boundary_is_within_generation_membership_false_positives_not_cross_generation_static_geometry": true,
+    "next_stage": "hold width256 and interval32 fixed and ablate hash count with a deterministic multi-hash family"
+  },
+  "activation_authorized": false
+}
