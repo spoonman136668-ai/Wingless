@@ -1,0 +1,93 @@
+{
+  "schema": "wingless.up145c-windows-proof.v1",
+  "experiment": "UP-145C-lexical-consolidation-integration",
+  "status": "qualified-scientific-result",
+  "source_head": "745d2461f3797d2b7217e5ca8b5a1cf283c7f9a0",
+  "workflow_run_id": 36273456013,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10916333136,
+  "artifact_sha256": "0443a4e517789973b0e6fff05e81ddfdda491e05a382fcd490d2e0b41e4c6640",
+  "findings": {
+    "assignment_A": {
+      "two_stage": {
+        "subject": "mia",
+        "verb": "caches",
+        "class": "STORE",
+        "admission": 1,
+        "retained": true
+      },
+      "cross_boundary": {
+        "subject": "noah",
+        "verb": "scans",
+        "class": "OBSERVE",
+        "admission": 0,
+        "retained": false
+      },
+      "delayed_two_stage": {
+        "subject": "opal",
+        "verb": "relays",
+        "class": "REPORT",
+        "admission": 1,
+        "retained": true
+      },
+      "isolated": {
+        "subject": "pax",
+        "verb": "files",
+        "class": "STORE",
+        "admission": 0,
+        "retained": false
+      },
+      "hot_durable_accuracy": 1,
+      "cold_durable_accuracy": 0.5
+    },
+    "assignment_B": {
+      "two_stage": {
+        "subject": "opal",
+        "verb": "relays",
+        "class": "REPORT",
+        "admission": 1,
+        "retained": true
+      },
+      "cross_boundary": {
+        "subject": "pax",
+        "verb": "files",
+        "class": "STORE",
+        "admission": 0,
+        "retained": false
+      },
+      "delayed_two_stage": {
+        "subject": "mia",
+        "verb": "caches",
+        "class": "STORE",
+        "admission": 1,
+        "retained": true
+      },
+      "isolated": {
+        "subject": "noah",
+        "verb": "scans",
+        "class": "OBSERVE",
+        "admission": 0,
+        "retained": false
+      },
+      "hot_durable_accuracy": 1,
+      "cold_durable_accuracy": 0.5
+    },
+    "recall_entries_used": 16,
+    "max_current_table_entries": 29,
+    "max_history_table_entries": 2,
+    "one_shot_false_admissions": 0,
+    "panic_rate": 0
+  },
+  "interpretation": {
+    "temporal_consolidation_roles_generalize_across_lexical_identity_and_class": true,
+    "two_stage_and_delayed_two_stage_admit_while_cross_boundary_and_isolated_do_not": true,
+    "mirrored_role_assignment_does_not_change_outcome": true,
+    "hot_queried_durable_facts_are_preserved": true,
+    "cold_unqueried_durable_facts_are_not_fully_preserved_under_full_store_plus_new_admissions": true,
+    "lexical_integration_exposes_a_durable_retention_pressure_boundary": true,
+    "plain_speak": "The timing rule survives contact with real lexical associations: the same temporal patterns succeed or fail regardless of whether the item is STORE, OBSERVE, or REPORT. But the 16-entry durable store is full, and admitting new durable items displaces half of the cold, unqueried controls while repeatedly queried hot facts stay intact. Integration therefore works, but durable-memory competition is now the limiting mechanism.",
+    "north_star_question": "Integrates temporal consolidation with lexical content while revealing that long-term retention priority under a full durable store—not consolidation timing—is the next fixed-capacity boundary.",
+    "next_stage": "hold the lexical consolidation schedule fixed and compare queried versus unqueried durable lexical controls under identical admissions to isolate whether durable retention is governed by access recency/reuse pressure before any memory policy change is considered"
+  },
+  "activation_authorized": false
+}
