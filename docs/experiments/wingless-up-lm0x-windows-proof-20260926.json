@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.up-lm0x-windows-proof.v1",
+  "experiment": "UP-LM0X-gradient-conflict",
+  "status": "qualified-scientific-result",
+  "source_head": "b9530f9ed76b35fdcb3d49a9fdf786c11d10d212",
+  "workflow_run_id": 36235614276,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10904151794,
+  "artifact_sha256": "ad1fc4c7e71ed061b1a2c663e116bf7f5774c2916c12dc4b00aa1e6d22e0592d",
+  "state_dimension": 64,
+  "base_epochs": 20,
+  "learning_rate": 0.08,
+  "adaptation_used": false,
+  "parameter_updates_after_base": false,
+  "pair_count": 96,
+  "mean_pair_cosine": 0.31122220152753954,
+  "min_pair_cosine": -0.11013058756831495,
+  "max_pair_cosine": 0.5576439384764491,
+  "negative_pair_fraction": 0.020833333333333332,
+  "non_positive_pair_fraction": 0.020833333333333332,
+  "global_cosine": 0.3388749157466093,
+  "derived_gradient_norms": {
+    "base": 92.49642755933229,
+    "paraphrase": 328.52965336363195,
+    "paraphrase_to_base_ratio": 3.551809102604476
+  },
+  "negative_row_bytes": [
+    {
+      "byte": 46,
+      "char": ".",
+      "cosine": -0.3496106673830909
+    },
+    {
+      "byte": 108,
+      "char": "l",
+      "cosine": -0.15460190604304241
+    },
+    {
+      "byte": 114,
+      "char": "r",
+      "cosine": -0.11086565990056192
+    },
+    {
+      "byte": 118,
+      "char": "v",
+      "cosine": -0.17913265994818275
+    }
+  ],
+  "interpretation": {
+    "broad_gradient_conflict_hypothesis_not_supported": true,
+    "most_matched_base_paraphrase_gradients_are_positively_aligned": true,
+    "conflict_is_sparse_and_output_row_localized": true,
+    "paraphrase_gradient_scale_substantially_exceeds_base_gradient_scale": true,
+    "next_stage": "separate gradient-scale imbalance from sparse row conflict by testing preregistered norm balancing with and without projection only on negatively aligned output rows"
+  },
+  "activation_authorized": false
+}
