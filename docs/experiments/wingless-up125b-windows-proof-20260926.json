@@ -1,0 +1,38 @@
+{
+  "schema": "wingless.up125b-windows-proof.v1",
+  "experiment": "UP-125B-learned-store-gate",
+  "status": "qualified-scientific-result",
+  "source_head": "e832bcc5b58230a58e90b72251b7a8e9cd5ddcd1",
+  "workflow_run_id": 36243238993,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10906831582,
+  "artifact_sha256": "b95f906e585c03156c093e2faa87b1ccd4d2bb05fefe3d466eaad6f74a90243a",
+  "state_dimension": 64,
+  "gate_epochs": 20,
+  "gate_learning_rate": 0.08,
+  "gate_threshold": 0.5,
+  "findings": {
+    "heldout_gate_accuracy": 0.7333333333333333,
+    "heldout_gate_precision": 1,
+    "heldout_gate_recall": 0.2,
+    "unseen_gate_accuracy": 0.7555555555555555,
+    "unseen_gate_precision": 1,
+    "unseen_gate_recall": 0.26666666666666666,
+    "learned_gate_stage6_min_base_original_accuracy": 1,
+    "learned_gate_stage6_min_base_unseen_accuracy": 1,
+    "learned_gate_stage6_min_acquired_accuracy": 0.8333333333333334,
+    "learned_gate_stage6_archives_original_accuracy_min": 0.16666666666666666,
+    "learned_gate_stage6_archives_unseen_accuracy_min": 0.3333333333333333,
+    "learned_gate_stage6_archives_original_margin_min": -0.9134461736901048,
+    "learned_gate_stage6_archives_unseen_margin_min": -0.9132492846051607,
+    "learned_gate_non_store_false_positive_rate_max": 0
+  },
+  "interpretation": {
+    "learned_gate_is_overly_conservative": true,
+    "perfect_precision_with_low_recall_localizes_failure_to_store_surface_false_negatives": true,
+    "non_store_corruption_is_not_the_current_problem": true,
+    "frozen_projector_remains_valid_when_gate_fires": true,
+    "next_stage": "diagnose per-surface raw gate logits and probabilities across train heldout and unseen subjects before changing class balance or threshold"
+  },
+  "activation_authorized": false
+}
