@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.up-lm2o-windows-proof.v1",
+  "experiment": "UP-LM2O-unreported-eviction-warning",
+  "status": "qualified-scientific-result",
+  "source_head": "a3ddb5e6e3f49d501119c52c5f1e828c4f6a84ef",
+  "workflow_run_id": 36278100337,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10918060885,
+  "artifact_sha256": "c21694f74787f2348c4656eb42985f327eaa16c5b32f70680694f83e49778fb8",
+  "findings": {
+    "total_store_opportunities": 288,
+    "true_positive": 24,
+    "false_positive": 0,
+    "false_negative": 0,
+    "true_negative": 264,
+    "precision": 1,
+    "recall": 1,
+    "warnings_by_deferred_level": {
+      "D4": 0,
+      "D5": 8,
+      "D6": 16
+    },
+    "actual_unreported_evictions_by_deferred_level": {
+      "D4": 0,
+      "D5": 8,
+      "D6": 16
+    },
+    "identity_rotations": [
+      0,
+      7
+    ],
+    "value_shifts": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "exact_recall_cap": 16
+  },
+  "interpretation": {
+    "native_state_prewrite_warning_is_exact_under_tested_streams": true,
+    "no_future_report_identity_is_used": true,
+    "warning_depends_only_on_current_fifo_state_occupancy_past_report_history_and_incoming_unique_store": true,
+    "one_operation_lead_before_internal_loss": true,
+    "plain_speak": "Before the write happens, Wingless can tell perfectly whether that write will throw away something it has never reported yet. It did this 24 times with no false alarms and missed none.",
+    "north_star_question": "This is a genuine pre-loss native-state warning under fixed resources. It is exact in this FIFO dependency regime, but only one write ahead and has not yet been used to change behavior.",
+    "next_stage": "derive and validate a multi-write conditional countdown to the earliest unreported eviction from current FIFO order and free capacity, without using future report outcomes"
+  },
+  "activation_authorized": false
+}
