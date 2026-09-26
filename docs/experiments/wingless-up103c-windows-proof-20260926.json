@@ -1,0 +1,63 @@
+{
+  "schema": "wingless.up103c-windows-proof.v1",
+  "experiment": "UP-103C-promotion-order",
+  "status": "qualified-scientific-result",
+  "source_head": "0ce6fd63a9a277692f34f5225ffadf1a86c709fe",
+  "workflow_run_id": 36238236700,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10905580122,
+  "artifact_sha256": "6c6bb4dd8d58d50007eab8b0b297ffa1684d0eeda26bc3b7b25735f31904d2b8",
+  "hot_keys": 16,
+  "trigger_threshold": 8,
+  "filter_bits": 1024,
+  "generation_interval": 32,
+  "churn_writes": 12288,
+  "exact_recall_cap": 16,
+  "findings": {
+    "ascending_initial": {
+      "ascending_second": {
+        "resident_hot": 16,
+        "final_exact": 1
+      },
+      "reverse_second": {
+        "resident_hot": 14,
+        "final_exact": 0
+      },
+      "alternating_ends_second": {
+        "resident_hot": 16,
+        "final_exact": 1
+      }
+    },
+    "reverse_initial": {
+      "ascending_second": {
+        "resident_hot": 14,
+        "final_exact": 0
+      },
+      "reverse_second": {
+        "resident_hot": 16,
+        "final_exact": 1
+      },
+      "alternating_ends_second": {
+        "resident_hot": 16,
+        "final_exact": 1
+      }
+    },
+    "evens_then_odds_all_second_orders": {
+      "resident_hot": 16,
+      "final_accuracy": 0.9375,
+      "final_exact": 0,
+      "false_positive_admissions": 384,
+      "trigger_fired_episodes": 0
+    },
+    "trigger_fired_all_ascending_reverse_cells": 128,
+    "false_positive_admissions_all_ascending_reverse_cells": 0
+  },
+  "interpretation": {
+    "hot_second_write_order_is_causal_for_promotion_retention": true,
+    "reinforcing_the_initially_resident_side_before_missing_key_promotion_preserves_all_hot_entries": true,
+    "alternating_ends_is_order_robust_for_ascending_and_reverse_initial_orders": true,
+    "evens_then_odds_remains_a_distinct_trigger_blind_churn_failure": true,
+    "next_stage": "test a fixed alternating-ends promotion schedule across broader initial permutations and then separately address trigger-blind cases where all hot keys begin resident"
+  },
+  "activation_authorized": false
+}
