@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up-lm0i-windows-proof.v1",
+  "experiment": "UP-LM0I-verb-anchor-admission",
+  "status": "qualified-scientific-result",
+  "source_head": "3d3acffab0c54d5dbbc44140055800e772fe0f1c",
+  "workflow_run_id": 36203594237,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10893525251,
+  "artifact_sha256": "131dd53390f010b88d1e13a1093aa31a985d13875b0970c3506673d3c82c5239",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "classifier_epochs": 20,
+  "classifier_learning_rate": 0.08,
+  "classifier_threshold": 0.5,
+  "explicit_type_at_learned_inference": false,
+  "value_bytes_at_classifier_inference": false,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "classifier": {
+    "train_subjects": {
+      "accuracy": 1,
+      "precision": 1,
+      "recall": 1
+    },
+    "heldout_subjects": {
+      "accuracy": 1,
+      "precision": 1,
+      "recall": 1
+    }
+  },
+  "language": {
+    "explicit_heldout_query_set_exact": 1,
+    "explicit_stream4_query_set_exact": 1,
+    "learned_heldout_query_set_exact": 1,
+    "learned_stream4_query_set_exact": 1,
+    "learned_heldout_dependent_accuracy": 1,
+    "learned_stream4_dependent_accuracy": 1,
+    "learned_admission_precision": 1,
+    "learned_admission_recall": 1
+  },
+  "interpretation": {
+    "lm0h_suffix_interference_diagnosis_confirmed": true,
+    "verb_boundary_readout_recovers_full_admission_performance": true,
+    "heldout_subject_generalization_supported": true,
+    "next_stage": "replace hand-coded STORE OBSERVE REPORT routing with a learned prefix-timed three-way event classifier inside the language loop"
+  },
+  "activation_authorized": false
+}
