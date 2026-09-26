@@ -1,0 +1,30 @@
+{
+  "schema": "wingless.up-lm1r-windows-proof.v1",
+  "experiment": "UP-LM1R-fivefamily-gradient-conflict",
+  "status": "qualified-scientific-result",
+  "source_head": "0e96ef35caaf30c1a36b2eaa9c079b58baaa164e",
+  "workflow_run_id": 36255182085,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10910895592,
+  "artifact_sha256": "2fe3422bb434335498034ad59d390e6281fc8ab6f260a200c5e4367c52c8cb6e",
+  "findings": {
+    "fifth_vs_prior_mean_aggregate_cosine": -0.04822037697490994,
+    "prior_vs_prior_mean_aggregate_cosine": -0.08745687926553149,
+    "fifth_vs_prior_min_aggregate_cosine": -0.32150234824677965,
+    "fifth_gradient_norm_relative_to_prior_mean": 1.8874235856613146,
+    "fifth_heldout_accuracy": 0.5218430596768876,
+    "fifth_heldout_perplexity": 28.883876854015398,
+    "fourth_fifth_negative_matched_fraction": 0.9479166666666666
+  },
+  "interpretation": {
+    "systematic_fifth_vs_prior_readout_gradient_antialignment_supported": false,
+    "fifth_mean_conflict_is_not_worse_than_prior_family_mean_conflict": true,
+    "localized_fourth_fifth_conflict_exists": true,
+    "fifth_gradient_norm_is_much_larger_than_prior_mean": true,
+    "evidence_shifts_away_from_broad_direct_gradient_opposition": true,
+    "plain_speak": "The fifth language family is not broadly fighting the first four during learning. One specific fourth-versus-fifth pairing conflicts strongly, but overall the fifth family's gradients are not more opposed than the older families are to each other. Its much larger gradient and very poor starting perplexity point instead toward a harder representation or starting-state problem.",
+    "north_star_question": "Separates direct learning interference from representation/history limits as Wingless scales sequential language capability across more lexical families.",
+    "next_stage": "diagnose frozen hidden-state/readout margin difficulty for the fifth family without parameter updates, to separate representation difficulty from output initialization/history effects"
+  },
+  "activation_authorized": false
+}
