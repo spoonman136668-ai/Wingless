@@ -51,8 +51,7 @@ type up141cEpisode struct{
 }
 func up141cEpisodeRun(q,target,base,ep int)(out up141cEpisode){
 	defer func(){if recover()!=nil{out.panicHit=true}}()
-	maxC,maxH:=0,0
-	x,truth,next,rng:=up140cSetup(target,base,ep,&maxC,&maxH)
+	x,truth,next,rng,maxC,maxH:=up140cSetup(target,base,ep)
 	out.maxCurrent=maxC;out.maxHistory=maxH
 	startEv:=x.evictions
 	for window:=0;window<2;window++{
