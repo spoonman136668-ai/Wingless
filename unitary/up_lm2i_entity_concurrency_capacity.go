@@ -65,7 +65,7 @@ func uplm2iEval(model *uplm0aModel,classifier *uplm0jClassifier,d [64]float64,al
 	hits,total,depHits,depTotal:=0,0,0,0;nll:=0.0;maxEntries:=0
 	eventHits,eventTotal:=0,0;storeHits,storeTotal,observeHits,observeTotal,reportHits,reportTotal:=0,0,0,0,0,0
 	recallHits,recallTotal:=0,0;allReports:=true
-	clause:="";routeKnown:=false;routeClass,trueClass:=-1,-1;queryName:="";reportOverridePending:=false
+	clause:="";routeKnown:=false;routeClass,trueClass:=-1,-1;queryName:="";trueQueryName:="";reportOverridePending:=false
 	for t:=0;t<len(s)-1;t++{
 		b:=s[t];h=uplm0aStep(h,b);clause+=string(b);trim:=strings.TrimSpace(clause)
 		if b==' '&&!routeKnown{
@@ -78,7 +78,7 @@ func uplm2iEval(model *uplm0aModel,classifier *uplm0jClassifier,d [64]float64,al
 					switch trueClass{
 					case uplm0jStore:storeTotal++;if routeClass==trueClass{storeHits++}
 					case uplm0jObserve:observeTotal++;if routeClass==trueClass{observeHits++}
-					case uplm0jReport:reportTotal++;if routeClass==trueClass{reportHits++}
+					case uplm0jReport:reportTotal++;trueQueryName=fields[0];if routeClass==trueClass{reportHits++}
 					}
 					if routeClass==uplm0jReport{queryName=fields[0];reportOverridePending=true}
 				}
@@ -87,11 +87,14 @@ func uplm2iEval(model *uplm0aModel,classifier *uplm0jClassifier,d [64]float64,al
 		targetByte:=s[t+1];target,okTarget:=model.index[int(targetByte)];if !okTarget{target=0}
 		p:=model.probs(h);pred:=uplm0aArgmax(p);prob:=p[target]
 		isDep:=targets[t+1]
-		if reportOverridePending&&queryName!=""{
+		if isDep{
 			recallTotal++
+			if value,ok:=recall.values[trueQueryName];ok&&len(value)>0{recallHits++}
+		}
+		if reportOverridePending&&queryName!=""{
 			if value,ok:=recall.values[queryName];ok&&len(value)>0{
-				recallHits++;memByte:=value[0];mi:=model.index[int(memByte)];if mi>=0{pred=mi};if memByte==targetByte{prob=1}else{prob=1e-12}
-			}else{allReports=false}
+				memByte:=value[0];mi:=model.index[int(memByte)];if mi>=0{pred=mi};if memByte==targetByte{prob=1}else{prob=1e-12}
+			}
 			reportOverridePending=false
 		}
 		if prob<1e-12{prob=1e-12};total++;nll-=math.Log(prob);if okTarget&&pred==target{hits++}
@@ -99,7 +102,7 @@ func uplm2iEval(model *uplm0aModel,classifier *uplm0jClassifier,d [64]float64,al
 		if b=='.'{
 			clean:=strings.TrimSuffix(strings.TrimSpace(clause),".");fields:=strings.Fields(clean)
 			if len(fields)>=3&&trueClass>=0&&routeKnown&&routeClass==uplm0jStore{recall.write(fields[0],fields[2])}
-			clause="";routeKnown=false;routeClass=-1;trueClass=-1;queryName="";reportOverridePending=false
+			clause="";routeKnown=false;routeClass=-1;trueClass=-1;queryName="";trueQueryName="";reportOverridePending=false
 		}
 		if len(recall.order)>maxEntries{maxEntries=len(recall.order)}
 	}
