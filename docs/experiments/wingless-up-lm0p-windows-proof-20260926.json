@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.up-lm0p-windows-proof.v1",
+  "experiment": "UP-LM0P-base-replay-ratio",
+  "status": "qualified-scientific-result",
+  "source_head": "e89096eb3b3a51044a67eec094a699c341bc1eb8",
+  "workflow_run_id": 36230712308,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10901553625,
+  "artifact_sha256": "5e55e5ca1b3f6ce00b32918508ca913b4e3cc24ad7952fecb4bcfda92f45c92b",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_epochs": 20,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "findings": {
+    "replay0": {
+      "base_accuracy": 0.692134107027724,
+      "base_perplexity": 3.519687497064608,
+      "paraphrase_accuracy": 0.8621964097148891,
+      "paraphrase_perplexity": 1.5217830847033353
+    },
+    "replay1": {
+      "base_accuracy": 0.8883784655061251,
+      "base_perplexity": 1.4179618573732233,
+      "paraphrase_accuracy": 0.7263287574797607,
+      "paraphrase_perplexity": 2.5186175903584216
+    },
+    "replay2": {
+      "base_accuracy": 0.8943423597678917,
+      "base_perplexity": 1.383809278732559,
+      "paraphrase_accuracy": 0.7118092221048926,
+      "paraphrase_perplexity": 2.913561833560697
+    },
+    "replay4": {
+      "base_accuracy": 0.9002256608639587,
+      "base_perplexity": 1.3534474449257208,
+      "paraphrase_accuracy": 0.6869060190073918,
+      "paraphrase_perplexity": 3.529086861639257
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1
+  },
+  "interpretation": {
+    "retention_adaptation_tradeoff_is_strong_and_monotonic_in_tested_replay_levels": true,
+    "no_replay_maximizes_paraphrase_adaptation_but_catastrophically_forgets_base_distribution": true,
+    "four_replay_passes_nearly_restore_base_but_substantially_reduce_paraphrase_gain": true,
+    "exact_routing_and_memory_remain_decoupled_from_byte_model_tradeoff": true,
+    "next_stage": "hold update counts fixed and compare para-then-base, base-then-para, and example-interleaved schedules"
+  },
+  "activation_authorized": false
+}
