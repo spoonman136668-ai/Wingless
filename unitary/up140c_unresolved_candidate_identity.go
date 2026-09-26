@@ -63,7 +63,7 @@ func up140cHist(x *up125cAgeEvictMachine,target int)(present,age int){
 	if hi:=up118cFind(&x.history,target);hi>=0{return 1,int(x.history[hi]>>14)}
 	return 0,0
 }
-func up140cSetup(target,base,ep int)(x *up125cAgeEvictMachine,truth map[int]int,next int,rng *sq0RNG,outMaxCurrent,outMaxHistory *int){
+func up140cSetup(target,base,ep int,outMaxCurrent,outMaxHistory *int)(x *up125cAgeEvictMachine,truth map[int]int,next int,rng *sq0RNG){
 	rng=newSQ0RNG(sq0Seed(base,8101+target*13,ep))
 	x=&up125cAgeEvictMachine{maxAge:2};truth=map[int]int{};next=300
 	targets:=[]int{100,101,102,103}
