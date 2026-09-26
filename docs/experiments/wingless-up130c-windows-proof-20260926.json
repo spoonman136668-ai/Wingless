@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up130c-windows-proof.v1",
+  "experiment": "UP-130C-generation-edge-causality",
+  "status": "qualified-scientific-result",
+  "source_head": "515c885cb679276f6dcc6421b8bbeb256730b858",
+  "workflow_run_id": 36264436878,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10913835468,
+  "artifact_sha256": "b7a9062fbf71737ad34ae79b392ddf07cd222e8216fafe6f87f96d0ace7edbbf",
+  "findings": {
+    "early_same_generation": {
+      "boundary": false,
+      "valid_admission": 1,
+      "valid_accuracy": 1,
+      "target16_exact": 1
+    },
+    "edge_same_generation": {
+      "boundary": false,
+      "valid_admission": 1,
+      "valid_accuracy": 1,
+      "target16_exact": 1
+    },
+    "edge_cross_boundary": {
+      "boundary": true,
+      "valid_admission": 0,
+      "valid_accuracy": 0,
+      "target16_accuracy": 0.75,
+      "target16_exact": 0
+    },
+    "hot_accuracy_all_arms": 1,
+    "nonpersistent_admission_all_arms": 0,
+    "nonpersistent_retention_all_arms": 0,
+    "one_shot_false_admissions_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "generation_boundary_is_the_causal_consolidation_cutoff": true,
+    "proximity_to_generation_edge_does_not_hurt_when_both_sightings_remain_inside_the_generation": true,
+    "immediately_crossing_the_boundary_eliminates_consolidation": true,
+    "absolute_inter_sighting_distance_is_not_the_explanation": true,
+    "plain_speak": "The two reminders can happen right at the end of the temporary-memory window and still work. But if the window closes between them—even with the reminders effectively back-to-back—the first reminder is erased and the pair cannot consolidate.",
+    "north_star_question": "Establishes the exact temporal segmentation rule for durable evidence under bounded sequence memory, which is necessary before integrating consolidation into irregular language streams.",
+    "next_stage": "mix same-generation and cross-boundary target recurrence phases in one stream to test whether consolidation remains selective per item rather than becoming a global all-or-none effect"
+  },
+  "activation_authorized": false
+}
