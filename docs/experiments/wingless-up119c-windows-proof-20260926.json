@@ -1,0 +1,66 @@
+{
+  "schema": "wingless.up119c-windows-proof.v1",
+  "experiment": "UP-119C-mixed-persistence-horizon",
+  "status": "qualified-scientific-result",
+  "source_head": "980aac325d4c93ddada6a8562fdc4ef9cc9bae5c",
+  "workflow_run_id": 36253221910,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10909163058,
+  "artifact_sha256": "6c2c893fc06c552185e856cdb19ab2808b1a1acc4e22a7900ecfe2b4e6d08412",
+  "hot_keys": 12,
+  "target_candidates": 4,
+  "burst_distractors": 4,
+  "generation_interval": 32,
+  "admission_memory_bytes": 128,
+  "exact_recall_cap": 16,
+  "key_bits": 14,
+  "churn_writes": 12288,
+  "findings": {
+    "mixed_valid_previous_control": {
+      "adjacent_admission_rate": 1,
+      "skipped_admission_rate": 0,
+      "target_admission_rate": 0.5,
+      "hot_accuracy": 1,
+      "target_accuracy": 0.5,
+      "target16_accuracy": 0.875,
+      "target16_exact_accuracy": 0,
+      "burst_admission_rate": 0
+    },
+    "mixed_valid_age2": {
+      "adjacent_admission_rate": 1,
+      "skipped_admission_rate": 1,
+      "target_admission_rate": 1,
+      "hot_accuracy": 1,
+      "target_accuracy": 1,
+      "target16_accuracy": 1,
+      "target16_exact_accuracy": 1,
+      "burst_admission_rate": 0
+    },
+    "two_skip_previous_control": {
+      "target_admission_rate": 0,
+      "hot_accuracy": 1,
+      "target_accuracy": 0,
+      "target16_accuracy": 0.75,
+      "target16_exact_accuracy": 0
+    },
+    "two_skip_age2": {
+      "target_admission_rate": 0,
+      "hot_accuracy": 1,
+      "target_accuracy": 0,
+      "target16_accuracy": 0.75,
+      "target16_exact_accuracy": 0
+    },
+    "one_shot_false_admissions_all_cells": 0,
+    "recall_entries_used": 16,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "age2_history_supports_adjacent_and_skip_one_persistence_simultaneously": true,
+    "mixed_temporal_patterns_do_not_interfere_at_the_tested_target_capacity": true,
+    "one_generation_bursts_remain_rejected": true,
+    "two_skipped_generations_are_beyond_the_current_age2_horizon": true,
+    "temporal_horizon_not_admission_collision_is_the_observed_failure_boundary": true,
+    "next_stage": "at the same 128-byte admission budget retain qualified history through age2 and test adjacent one-skip two-skip plus a three-skip negative boundary"
+  },
+  "activation_authorized": false
+}
