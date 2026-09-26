@@ -1,0 +1,43 @@
+{
+  "schema": "wingless.up133b-windows-proof.v1",
+  "experiment": "UP-133B-grounding-update-order",
+  "status": "qualified-scientific-result",
+  "source_head": "72ad76cfdde5fff2320b408c0c23144d26e4221d",
+  "workflow_run_id": 36251221638,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10908874009,
+  "artifact_sha256": "3e08a92b5414f72fdd88a2776e6d912d64ca47972dd844e4db426d6a11f7db1b",
+  "state_dimension": 64,
+  "gate_input_dimension": 128,
+  "grounding_epochs": 20,
+  "learning_rate": 0.08,
+  "new_updates_per_epoch": 24,
+  "old_updates_per_epoch": 15,
+  "findings": {
+    "new_then_old": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9375,
+      "old_heldout": 0.9,
+      "old_unseen": 0.9333333333333333
+    },
+    "old_then_new": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.8333333333333334,
+      "old_unseen": 0.9
+    },
+    "alternating_epoch_order": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.8333333333333334,
+      "old_unseen": 0.9
+    }
+  },
+  "interpretation": {
+    "end_of_epoch_recency_materially_controls_old_family_retention": true,
+    "placing_old_rehearsal_last_improves_old_retention_without_reducing_primary_new_family_accuracy": true,
+    "alternating_epoch_order_does_not_cancel_the_final_recency_effect_at_the_end_of_training": true,
+    "next_stage": "hold all examples and counts fixed and vary how many of the 15 old rehearsal updates are reserved as a terminal old-family anchor block"
+  },
+  "activation_authorized": false
+}
