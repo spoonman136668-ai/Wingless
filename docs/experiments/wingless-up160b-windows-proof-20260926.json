@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up160b-windows-proof.v1",
+  "experiment": "UP-160B-cleanup-noncommutativity",
+  "status": "qualified-scientific-result",
+  "source_head": "b6a4ec0078affc05e6582850eeb0e3fa2d8e77ef",
+  "workflow_run_id": 36270126732,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10914799118,
+  "artifact_sha256": "9046cc7f329e831751b72b7df26cbb64094a27d438a67344e4adb663afb82b46",
+  "findings": {
+    "all_18_subject_pair_comparisons_have_nonzero_final_gate_distance": true,
+    "gate_distance_ranges": {
+      "swap_store_observe": {
+        "min": 0.03915459050869772,
+        "max": 0.04057660746998236
+      },
+      "swap_store_report": {
+        "min": 0.005592433660501583,
+        "max": 0.005952645886970822
+      },
+      "swap_observe_report": {
+        "min": 0.007984336136919947,
+        "max": 0.008287453214461197
+      }
+    },
+    "store_observe_retention_delta_by_subject": {
+      "mia": 0.005555555555555536,
+      "noah": 0.005555555555555536,
+      "opal": -0.011111111111111072,
+      "pax": 0.005555555555555536,
+      "quin": -0.022222222222222254,
+      "rue": -0.011111111111111072
+    },
+    "store_report_retention_delta_by_subject": {
+      "mia": -0.01666666666666672,
+      "noah": 0,
+      "opal": -0.016666666666666607,
+      "pax": 0,
+      "quin": -0.005555555555555647,
+      "rue": 0
+    },
+    "observe_report_retention_delta_by_subject": {
+      "mia": 0,
+      "noah": 0,
+      "opal": 0,
+      "pax": -0.005555555555555536,
+      "quin": 0,
+      "rue": 0
+    }
+  },
+  "interpretation": {
+    "chained_cleanup_updates_are_noncommutative": true,
+    "store_observe_order_produces_the_largest_state_separation": true,
+    "subject_specific_sign_changes_in_retention_are_present_for_store_observe_swap": true,
+    "nonzero_state_difference_can_exist_even_when_coarse_retention_is_tied": true,
+    "context_dependent_cleanup_order_preference_has_a_direct_state_space_mechanism": true,
+    "plain_speak": "Applying the same cleanup classes in a different order does not cancel out. It leaves the learner in a measurably different internal state. The biggest effect comes from swapping STORE and OBSERVE, and different subjects prefer opposite sides of that swap. That explains why no universal cleanup order emerged.",
+    "north_star_question": "Explains the fixed-budget cleanup-order generalization boundary as nonlinear, context-dependent update composition rather than measurement noise or mere class counts.",
+    "next_stage": "test a fixed nonadaptive position-balanced cleanup schedule across terminal epochs to see whether averaging class positions reduces subject-specific retention variance without extra updates"
+  },
+  "activation_authorized": false
+}
