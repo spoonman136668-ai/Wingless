@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up115c-windows-proof.v1",
+  "experiment": "UP-115C-recurrence-strength-selection",
+  "status": "qualified-scientific-result",
+  "source_head": "68430d1f99c574fe4cde4e32edf3a8a4f80b4f3b",
+  "workflow_run_id": 36250609800,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10909006348,
+  "artifact_sha256": "0f6353ef3b940c3187041483867bb0c3f22cfd3159393bb2f2db37314ed7d2ad",
+  "hot_keys": 12,
+  "weak_candidates": 4,
+  "strong_candidates": 4,
+  "generation_interval": 32,
+  "admission_memory_bytes": 128,
+  "exact_recall_cap": 16,
+  "findings": {
+    "exact2_control": {
+      "weak_admission_rate": 1,
+      "strong_admission_rate": 1,
+      "hot_accuracy": 0.6666666666666666,
+      "target16_accuracy": 0.75,
+      "target16_exact_accuracy": 0
+    },
+    "exact3_strength": {
+      "weak_admission_rate": 0,
+      "strong_admission_rate": 1,
+      "hot_accuracy": 1,
+      "strong_accuracy": 1,
+      "target16_accuracy": 1,
+      "target16_exact_accuracy": 1
+    },
+    "one_shot_false_admissions_all_arms": 0,
+    "recall_entries_used": 16,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "local_recurrence_strength_resolves_the_overcapacity_selection_failure": true,
+    "third_sighting_threshold_rejects_weaker_two_hit_candidates_without_semantic_priority_labels": true,
+    "established_hot_plus_strong_recurring_target_set_is_preserved_exactly": true,
+    "no_extra_admission_memory_is_required": true,
+    "next_stage": "stress exact3 under mixed recurrence gaps and four-hit distractors to verify that strength rather than presentation timing is controlling selection"
+  },
+  "activation_authorized": false
+}
