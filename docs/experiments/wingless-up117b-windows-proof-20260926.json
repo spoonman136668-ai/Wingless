@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.up117b-windows-proof.v1",
+  "experiment": "UP-117B-stores-geometry",
+  "status": "qualified-scientific-result",
+  "source_head": "f2bad20efca3ac8d23a976945edbafd9a153c755",
+  "workflow_run_id": 36236539906,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10904525397,
+  "artifact_sha256": "594fcf6277a324d2ac97b3c199fba12f465fda51ff3040f67b8420d8739e6359",
+  "state_dimension": 64,
+  "training_changed": false,
+  "findings": {
+    "stores_to_store_centroid_cosine": 0.30501255007864947,
+    "stores_to_observe_centroid_cosine": 0.7056448344803486,
+    "stores_to_report_centroid_cosine": 0.21027162709104255,
+    "keeps_to_store_centroid_cosine": 0.3230093097062214,
+    "keeps_to_observe_centroid_cosine": 0.28430227712751477,
+    "keeps_to_report_centroid_cosine": 0.30845885306467474,
+    "stores_closest_individual_surface": "observes",
+    "stores_to_observes_cosine": 0.5577665383653723,
+    "stores_failure_points": 12,
+    "worst_stores_accuracy": 0,
+    "worst_stores_mean_store_minus_observe_margin": -0.3590421343000602,
+    "keeps_min_mean_store_minus_observe_margin_across_all_dynamic_points": 0.9925057998477219,
+    "keeps_min_mean_margin_at_stores_failure_points": 0.9925057998477219
+  },
+  "interpretation": {
+    "frozen_encoder_geometry_strongly_implicates_stores_observe_proximity": true,
+    "stores_is_more_aligned_with_observe_centroid_than_store_centroid": true,
+    "keeps_does_not_share_the_same_geometry": true,
+    "learned_classifier_bias_can_amplify_the_fragile_stores_geometry": true,
+    "replay_only_interventions_are_below_the_right_resolution": true,
+    "next_stage": "test a preregistered representation-level lexical deconfounding intervention that changes only the stores encoding geometry while preserving all other verbs and training rules"
+  },
+  "activation_authorized": false
+}
