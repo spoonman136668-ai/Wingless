@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up126c-windows-proof.v1",
+  "experiment": "UP-126C-second-overflow-wave",
+  "status": "qualified-scientific-result",
+  "source_head": "fb33a40f462323b666fe8e83c571725864022396",
+  "workflow_run_id": 36257261945,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10910344927,
+  "artifact_sha256": "1240d2fb1cd7bc9f2f76de3329ef50c680177f0b4e7faf06eca2c6ff476a305e",
+  "findings": {
+    "q2_0": {
+      "valid_admission": 1,
+      "valid_accuracy": 1,
+      "target16_accuracy": 1,
+      "target16_exact": 1,
+      "second_wave_evictions": 0
+    },
+    "q2_1": {
+      "valid_admission": 0.75,
+      "valid_accuracy": 0.75,
+      "target16_accuracy": 0.9375,
+      "target16_exact": 0,
+      "second_wave_evictions": 64
+    },
+    "q2_4": {
+      "valid_admission": 0,
+      "valid_accuracy": 0,
+      "target16_accuracy": 0.75,
+      "target16_exact": 0,
+      "second_wave_evictions": 256
+    },
+    "q2_8": {
+      "valid_admission": 0,
+      "valid_accuracy": 0,
+      "target16_accuracy": 0.75,
+      "target16_exact": 0,
+      "second_wave_evictions": 512
+    },
+    "hot_accuracy_all_arms": 1,
+    "nonpersistent_admission_all_arms": 0,
+    "nonpersistent_retention_all_arms": 0,
+    "one_shot_false_admissions_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "first_overflow_wave_is_safe_only_while_stale_age2_reservoir_exists": true,
+    "second_wave_after_stale_pool_exhaustion_is_destructive": true,
+    "one_second_wave_candidate_is_enough_to_lose_one_of_four_pending_valid_targets": true,
+    "four_or_more_second_wave_candidates_remove_all_pending_valid_target_history": true,
+    "exact_hot_memory_remains_protected": true,
+    "age_only_replacement_cannot_distinguish_stale_from_still_useful_equal_age_history": true,
+    "plain_speak": "The memory can safely recycle old temporary records once. After those truly stale records are gone, the next overflow has no way to tell useful pending evidence from junk of the same age. Even one extra qualified item can knock out a real target; four are enough to lose every pending target. The permanent hot memories are still safe.",
+    "north_star_question": "Defines the bounded-memory overload boundary for sequence intelligence: safe forgetting works only while age remains a reliable proxy for usefulness, which matters before language streams can scale under fixed memory.",
+    "next_stage": "hold memory and replacement rule fixed and vary whether valid targets recur before versus after the second overflow wave to test whether recurrence timing alone can protect useful evidence"
+  },
+  "activation_authorized": false
+}
