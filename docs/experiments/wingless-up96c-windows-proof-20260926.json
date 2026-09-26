@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up96c-windows-proof.v1",
+  "experiment": "UP-96C-width1024-horizon",
+  "status": "qualified-scientific-result",
+  "source_head": "0bff18b0274637ac8919773b87c55d71c7b9e49d",
+  "workflow_run_id": 36234806353,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10904245299,
+  "artifact_sha256": "68c4e5f1fc97ab4c7d2179812024337462258170128ea8bd2d8ff91f56213682",
+  "filter_bits": 1024,
+  "hash_count": 2,
+  "generation_interval": 32,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "findings": {
+    "churn1536": {
+      "hot_accuracy": 1,
+      "hot_exact": 1,
+      "false_positive_admissions": 0
+    },
+    "churn3072": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "churn6144": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "churn12288": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "policy_metadata_bytes": 134,
+    "total_bounded_memory_bytes": 390
+  },
+  "interpretation": {
+    "exactness_breaks_between_1536_and3072_unique_churn_writes": true,
+    "one_false_admission_per_episode_is_sufficient_to_break_exact_hotset_retention": true,
+    "no_additional_false_admissions_accumulate_between3072_and12288_in_tested_range": true,
+    "collision_is_consistent_with_generation_alignment_or_specific_key_range_not_cumulative_saturation": true,
+    "next_stage": "hold width1024 and interval32 fixed and test deterministic generation-phase offsets to see whether the isolated collision depends on generation alignment"
+  },
+  "activation_authorized": false
+}
