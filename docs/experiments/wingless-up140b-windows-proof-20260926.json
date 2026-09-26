@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up140b-windows-proof.v1",
+  "experiment": "UP-140B-tail-diversity-dose",
+  "status": "qualified-scientific-result",
+  "source_head": "8b50372fe1b11b38e045d3ab82bdfc163a989500",
+  "workflow_run_id": 36254521994,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10910142218,
+  "artifact_sha256": "72bdacc5e8a08fb69bcf3de546a4b989261b226578b8d9c1fa6d30dc408541cb",
+  "findings": {
+    "diversity1": {
+      "old_mean": 0.8777777777777778,
+      "new_mean": 0.9270833333333333
+    },
+    "diversity2": {
+      "old_mean": 0.8611111111111112,
+      "new_mean": 0.9270833333333333
+    },
+    "diversity4": {
+      "old_mean": 0.9,
+      "new_mean": 0.921875
+    },
+    "diversity8": {
+      "old_mean": 0.9166666666666667,
+      "new_mean": 0.921875
+    },
+    "diversity20": {
+      "old_mean": 0.9388888888888889,
+      "new_mean": 0.921875
+    }
+  },
+  "interpretation": {
+    "broad_tail_identity_diversity_improves_old_family_retention": true,
+    "the_low_diversity_curve_is_not_strictly_monotonic": true,
+    "retention_improves_consistently_from_diversity4_to_diversity8_to_diversity20": true,
+    "the_high_diversity_gain_costs_only_a_small_mean_new_family_reduction_relative_to_diversity1": true,
+    "the_mechanism_is_tail_coverage_breadth_not_a_single_privileged_tail": true,
+    "next_stage": "replicate diversity1_diversity8_and_diversity20 on a second disjoint new lexical family to test whether the scheduling mechanism generalizes beyond the current verb set"
+  },
+  "activation_authorized": false
+}
