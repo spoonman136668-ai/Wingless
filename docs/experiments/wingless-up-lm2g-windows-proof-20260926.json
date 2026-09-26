@@ -1,0 +1,87 @@
+{
+  "schema": "wingless.up-lm2g-windows-proof.v1",
+  "experiment": "UP-LM2G-combined-locality-order-robustness",
+  "status": "qualified-scientific-result",
+  "source_head": "cbf8a5b1905adf04839945b49f77d9b5256d872e",
+  "workflow_run_id": 36272271486,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10916271745,
+  "artifact_sha256": "02c177d159a8310cd6b2da823b93068f0bd5c36b89c16e37e259e410d776a0f8",
+  "findings": {
+    "structural_exact_all_600_integrated_cells": true,
+    "max_recall_entries": 4,
+    "balanced_minus_canonical_average_by_tail_variant": {
+      "forward_tail": {
+        "prior": 0.0011400443002572036,
+        "fifth": 0.0013682822288162866,
+        "all": 0.0011856918859690202,
+        "min_family": 0.010406685206920674,
+        "prior_range": [
+          0.0007956932446538945,
+          0.0015287432990643834
+        ]
+      },
+      "rotate_1_tail": {
+        "prior": 0.0012144363204523723,
+        "fifth": 0.001393010220903368,
+        "all": 0.0012501511005425625,
+        "min_family": 0.011381372925935662,
+        "prior_range": [
+          0.0006076923774110954,
+          0.0015493058454852937
+        ]
+      },
+      "rotate_2_tail": {
+        "prior": 0.0005257477064735561,
+        "fifth": 0.0014836795252225255,
+        "all": 0.0007173340702233633,
+        "min_family": 0.010201961610970445,
+        "prior_range": [
+          -0.00039103845890919864,
+          0.0008954001069362283
+        ]
+      },
+      "rotate_3_tail": {
+        "prior": 0.00042785791546455786,
+        "fifth": 0.0017392021101219957,
+        "all": 0.0006901267543960588,
+        "min_family": 0.010528566038514264,
+        "prior_range": [
+          -0.00035987508438595217,
+          0.0009624335424249786
+        ]
+      },
+      "reverse_tail": {
+        "prior": 0.0009056181353094938,
+        "fifth": 0.0018298714144411754,
+        "all": 0.0010904687911358567,
+        "min_family": 0.01078794299425485,
+        "prior_range": [
+          0.00003436654327848565,
+          0.0014525090222401449
+        ]
+      },
+      "reverse_report_tail": {
+        "prior": 0.001512283056085284,
+        "fifth": 0.0007830530827563243,
+        "all": 0.0013664370614194566,
+        "min_family": 0.010475856804907502,
+        "prior_range": [
+          0.0006940421418504261,
+          0.002119422039807306
+        ]
+      }
+    }
+  },
+  "interpretation": {
+    "combined_store_observe_delocalization_is_robust_in_average_across_all_tested_tail_orders": true,
+    "fifth_and_minimum_family_benefits_remain_positive_for_every_tail_variant": true,
+    "rotate_2_and_rotate_3_have_small_allocation_specific_prior_mean_exceptions": true,
+    "structural_sequence_memory_and_routing_remain_exact": true,
+    "reverse_report_tail_does_not_break_the_combined_locality_benefit": true,
+    "plain_speak": "Once STORE and OBSERVE are spread across names, the earlier balanced-training penalty stays removed on average even when the remaining update/report tail is heavily rearranged. The weakest family consistently benefits. Two rotations expose tiny allocation-specific exceptions, so the mechanism is robust rather than absolute.",
+    "north_star_question": "Promotes combined STORE+OBSERVE de-localization from a single-order fix to a broadly sequence-order-robust integration rule under fixed training mass and memory.",
+    "next_stage": "stress the combined de-localized organization at longer fixed-capacity language stream depths to test whether the integration rule survives additional temporal load without increasing recall capacity"
+  },
+  "activation_authorized": false
+}
