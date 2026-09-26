@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up-lm0q-windows-proof.v1",
+  "experiment": "UP-LM0Q-update-order",
+  "status": "qualified-scientific-result",
+  "source_head": "4277c8f73da409d66b907a36ae53bd23677c9a88",
+  "workflow_run_id": 36230983548,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10902488668,
+  "artifact_sha256": "6fae47bcfbb812781c9ddeaf0f68b035aadeb3cd5d3a28d5f988c2e8892345ec",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_epochs": 20,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "paraphrase_passes_per_epoch": 1,
+  "base_passes_per_epoch": 1,
+  "findings": {
+    "para_then_base": {
+      "base_accuracy": 0.8883784655061251,
+      "base_perplexity": 1.4179618573732233,
+      "paraphrase_accuracy": 0.7263287574797607,
+      "paraphrase_perplexity": 2.5186175903584216
+    },
+    "base_then_para": {
+      "base_accuracy": 0.7686170212765957,
+      "base_perplexity": 2.213312413271199,
+      "paraphrase_accuracy": 0.8577965505103836,
+      "paraphrase_perplexity": 1.5622306644213582
+    },
+    "example_interleaved": {
+      "base_accuracy": 0.8650064474532559,
+      "base_perplexity": 1.5251789945731868,
+      "paraphrase_accuracy": 0.8173178458289335,
+      "paraphrase_perplexity": 1.7180808314886038
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1
+  },
+  "interpretation": {
+    "update_recency_is_a_major_driver_of_the_retention_adaptation_tradeoff": true,
+    "example_level_interleaving_improves_joint_balance_relative_to_either_block_order": true,
+    "routing_and_exact_memory_remain_stable_across_training_schedules": true,
+    "next_stage": "hold update counts fixed and compare paraphrase-first, base-first, and alternating order within each paired example to reduce pair-level recency bias"
+  },
+  "activation_authorized": false
+}
