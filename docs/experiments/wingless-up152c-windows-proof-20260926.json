@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up152c-windows-proof.v1",
+  "experiment": "UP-152C-age-state-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "e906808f8418734aecb05e1bdc2a089bd1d58035",
+  "workflow_run_id": 36277983268,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10916934597,
+  "artifact_sha256": "a67eed9ca6af9ff465db80f6b37d1d59a97f8259cbfe1698764248bf95e33967",
+  "findings": {
+    "full_state_correct": 64,
+    "hand_only_correct": 53,
+    "total_predictions": 64,
+    "full_state_accuracy": 1,
+    "hand_only_accuracy": 0.828125,
+    "heldout_refresh_admissions": [
+      2,
+      5,
+      8,
+      11,
+      14
+    ],
+    "heldout_refresh_keys": [
+      1,
+      5,
+      9,
+      13,
+      2
+    ]
+  },
+  "interpretation": {
+    "age_state_is_necessary_for_exact_forecast_under_refresh": true,
+    "hand_position_alone_is_insufficient": true,
+    "full_native_state_generalizes_exactly_to_disjoint_refresh_schedule": true,
+    "plain_speak": "The replacement hand by itself misses 11 of 64 next evictions once refreshes perturb ages. Add the age counters and every prediction is correct. The age state is not bookkeeping noise; it carries causal forecast information.",
+    "north_star_question": "Narrows the sufficient native forecast state to hand plus ages and rules out hand-only compression.",
+    "next_stage": "ablate hand position on another held-out refresh schedule, comparing full hand-plus-age prediction to an age-only zero-origin scan"
+  },
+  "activation_authorized": false
+}
