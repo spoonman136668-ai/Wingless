@@ -1,0 +1,54 @@
+{
+  "schema": "wingless.up174b-windows-proof.v1",
+  "experiment": "UP-174B-rank-conditioned-transition-hazard",
+  "status": "qualified-scientific-result",
+  "source_head": "e18e0e77961476897c717b075c693d6cbe212106",
+  "workflow_run_id": 36277117366,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10916948679,
+  "artifact_sha256": "2ab9825682e7696ceda93d9cc49158a37c37c30c47ec44de23c604b62f3c6e65",
+  "findings": {
+    "context_phase": 19,
+    "all_rank_1_4": {
+      "current_only": 0.34615384615384615,
+      "transition_to_persistent": 0.4172661870503597,
+      "established_persistent": 0.21727019498607242
+    },
+    "all_rank_5_10": {
+      "current_only": 0.09349593495934959,
+      "transition_to_persistent": 0.12408759124087591,
+      "established_persistent": 0.03560830860534125
+    },
+    "observe_rank_1_4": {
+      "current_only": 0.23333333333333334,
+      "transition_to_persistent": 0.4406779661016949,
+      "established_persistent": 0.2251655629139073
+    },
+    "observe_rank_5_10": {
+      "current_only": 0.10569105691056911,
+      "transition_to_persistent": 0.15384615384615385,
+      "established_persistent": 0.029069767441860465
+    },
+    "store_rank_1_4": {
+      "current_only": 0.4358974358974359,
+      "transition_to_persistent": 0.43478260869565216,
+      "established_persistent": 0.25
+    },
+    "report_rank_1_4": {
+      "current_only": 0.3333333333333333,
+      "transition_to_persistent": 0.18181818181818182,
+      "established_persistent": 0.14473684210526316
+    }
+  },
+  "interpretation": {
+    "temporal_state_adds_predictive_information_beyond_static_rank_overall": true,
+    "effect_is_strongest_for_observe": true,
+    "store_transition_exceeds_established_but_not_current_only": true,
+    "report_does_not_show_transition_hazard": true,
+    "class_specific_calibration_is_required": true,
+    "plain_speak": "Even among examples with the same static vulnerability rank, the transition into persistent fragility is usually more dangerous than already-established fragility. That means history carries real extra warning information. But the effect is class-specific: OBSERVE is strong, STORE is weaker, and REPORT behaves differently.",
+    "north_star_question": "Moves the native warning signal from correlation toward a usable detector by showing temporal history adds information beyond margin rank, while proving that one universal class-blind rule would be too crude.",
+    "next_stage": "freeze a class-aware rank-plus-temporal detector from phases 17-19 and evaluate its precision, recall, false-warning rate, and lead time on a held-out phase without changing any updates"
+  },
+  "activation_authorized": false
+}
