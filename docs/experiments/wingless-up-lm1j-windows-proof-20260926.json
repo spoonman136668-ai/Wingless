@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.up-lm1j-windows-proof.v1",
+  "experiment": "UP-LM1J-fourth-family-boundary",
+  "status": "qualified-scientific-result",
+  "source_head": "48301a9e9f87e4c2a0983c997b175426581f43dc",
+  "workflow_run_id": 36245272727,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10906489332,
+  "artifact_sha256": "7f3f69e51d768381424e0ee1d38a18646a6fbad44da76e29df79c06591450d5f",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_pretrain_epochs": 20,
+  "joint_interleaved_epochs": 20,
+  "three_family_adapt_epochs": 4,
+  "fourth_router_epochs": 20,
+  "findings": {
+    "heldout_fourth_router_accuracy": 0.6666666666666666,
+    "fourth_top1_accuracy_range": [
+      0.5442683317323087,
+      0.5576368876080692
+    ],
+    "fourth_perplexity_range": [
+      10.08733685244602,
+      10.797744915839075
+    ],
+    "fourth_dependent_first_byte_accuracy_range": [
+      0.4427083333333333,
+      0.4479166666666667
+    ],
+    "fourth_query_set_exact_accuracy": 0.020833333333333332,
+    "fourth_admission_precision": 0.6831683168316832,
+    "fourth_admission_recall": 1,
+    "fourth_event_routing_accuracy": 0.806060606060606,
+    "fourth_report_routing_accuracy": 0.3333333333333333,
+    "max_recall_entries": 4,
+    "prior_three_family_control_accuracy_range": [
+      0.8050862372404083,
+      0.8379271437782077
+    ]
+  },
+  "interpretation": {
+    "fourth_family_breaks_semantic_grounding_before_byte_adaptation_can_be_isolated": true,
+    "report_routing_is_the_primary_integrated_semantic_failure": true,
+    "memory_capacity_is_not_the_limit": true,
+    "byte_quality_is_also_out_of_distribution_but_router_failure_must_be_diagnosed_first": true,
+    "next_stage": "freeze the fourth-family router and report per-verb confusion probabilities across train heldout and prior-family rehearsal surfaces before changing grounding"
+  },
+  "activation_authorized": false
+}
