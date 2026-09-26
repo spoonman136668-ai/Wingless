@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up157b-windows-proof.v1",
+  "experiment": "UP-157B-late-rehearsal-position-map",
+  "status": "qualified-scientific-result",
+  "source_head": "162cb883e6b1b8789095503dc124dfdcf2b0eba1",
+  "workflow_run_id": 36268871753,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10914529059,
+  "artifact_sha256": "8933cf1104d7a436501b0bdc8721896ca004eefe4c1b6351b61766fe3530d970",
+  "findings": {
+    "fixed_rehearsal_after": 12,
+    "fixed_rehearsal_before": 3,
+    "class_group_means": {
+      "pre_report_all_report": {
+        "n": 6,
+        "mean_old": 0.9055555555555558,
+        "mean_post_recovery": 0.06148148148148149,
+        "min_old": 0.8944444444444445,
+        "max_old": 0.9166666666666667
+      },
+      "pre_report_all_store": {
+        "n": 6,
+        "mean_old": 0.8824074074074074,
+        "mean_post_recovery": 0.028148148148148155,
+        "min_old": 0.8666666666666667,
+        "max_old": 0.8888888888888888
+      },
+      "pre_report_all_observe": {
+        "n": 6,
+        "mean_old": 0.8768518518518519,
+        "mean_post_recovery": 0.014629629629629671,
+        "min_old": 0.8611111111111112,
+        "max_old": 0.9
+      }
+    },
+    "best_observed_band": {
+      "mia_rotations": [
+        10,
+        11,
+        12
+      ],
+      "mia_old_retention": 0.8944444444444445,
+      "noah_rotations": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "noah_old_retention": 0.9166666666666667
+    }
+  },
+  "interpretation": {
+    "fixed_dose_repair_is_strongly_sensitive_to_which_rehearsal_classes_are_left_after_report": true,
+    "moving_old_report_examples_before_the_new_report_block_produces_the_strongest_mean_repair": true,
+    "leaving_store_and_observe_rehearsal_dominant_in_the_cleanup_tail_is_more_reparative_than_leaving_old_report_rehearsal_late": true,
+    "exact_surface_and_subject_effects_remain_but_class_composition_explains_a_large_share_of_rotation_variance": true,
+    "plain_speak": "At the same cleanup dose, the best repair happens when old REPORT examples are handled before the damaging new REPORT block, leaving mostly STORE and OBSERVE examples for cleanup afterward. So late rehearsal is not interchangeable: the class of the cleanup examples matters strongly.",
+    "north_star_question": "Turns rehearsal-order sensitivity into a class-structured repair mechanism, narrowing language stability control from arbitrary ordering to which semantic operation classes occupy the post-interference cleanup phase.",
+    "next_stage": "hold the same post-REPORT class composition fixed and vary only the within-cleanup class order to separate class composition from recency inside the repair tail"
+  },
+  "activation_authorized": false
+}
