@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.up118b-windows-proof.v1",
+  "experiment": "UP-118B-stores-centroid-shift",
+  "status": "qualified-scientific-result",
+  "source_head": "5fe106affcf7254c68c2d87021a880f0faf40be6",
+  "workflow_run_id": 36236890820,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10904148539,
+  "artifact_sha256": "18b57395d0a2eecfa9544637e3e59e2c166512ed0968bf02216cfb499ee007b9",
+  "state_dimension": 64,
+  "learning_rate": 0.08,
+  "epochs_per_batch": 20,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "adaptive_geometry": false,
+  "findings": {
+    "baseline_static": {
+      "store_centroid_cosine": 0.30501255007864947,
+      "observe_centroid_cosine": 0.7056448344803486,
+      "report_centroid_cosine": 0.21027162709104255
+    },
+    "shifted_static": {
+      "store_centroid_cosine": 1,
+      "observe_centroid_cosine": 0.5149118268081729,
+      "report_centroid_cosine": 0.49450977377968125
+    },
+    "baseline_stores_failure_points": 12,
+    "shifted_stores_failure_points": 12,
+    "baseline_worst_stores_accuracy": 0,
+    "shifted_worst_stores_accuracy": 0.16666666666666666,
+    "baseline_worst_mean_store_observe_margin": -0.3590421343000602,
+    "shifted_worst_mean_store_observe_margin": -0.09039313301041123,
+    "baseline_min_base_lexicon_accuracy": 0.8333333333333334,
+    "shifted_min_base_lexicon_accuracy": 0.8611111111111112,
+    "acquired_aggregate_accuracy_all_nonzero_stages_both_arms": 1
+  },
+  "interpretation": {
+    "stores_observe_mean_geometry_is_causally_relevant_but_not_sufficient": true,
+    "fixed_centroid_shift_reduces_failure_severity_but_does_not_reduce_failure_count": true,
+    "shifted_failures_move_to_different_order_stage_cells": true,
+    "some_shifted_failures_persist_despite_positive_store_observe_margin": true,
+    "remaining_instability_requires_full_three_class_projection_diagnosis_not_more_replay_tuning": true,
+    "next_stage": "measure STORE-vs-OBSERVE and STORE-vs-REPORT margins for shifted and baseline stores at every failure cell, then test a geometry correction constrained against both competing class centroids"
+  },
+  "activation_authorized": false
+}
