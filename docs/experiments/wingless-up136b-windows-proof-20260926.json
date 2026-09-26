@@ -1,0 +1,43 @@
+{
+  "schema": "wingless.up136b-windows-proof.v1",
+  "experiment": "UP-136B-matched-refresh-confirmation",
+  "status": "qualified-scientific-result",
+  "source_head": "0b0957ed5a0429725feea713c93f58fec41ecc5a",
+  "workflow_run_id": 36252944004,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10909767771,
+  "artifact_sha256": "4839292e1716136087ed69684c36372184a009431cce4e6d3a40e95b8e3c7e3c",
+  "state_dimension": 64,
+  "gate_input_dimension": 128,
+  "grounding_epochs": 20,
+  "learning_rate": 0.08,
+  "new_updates_per_epoch": 24,
+  "old_updates_per_epoch": 15,
+  "findings": {
+    "exact_terminal15_control": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9375,
+      "old_heldout": 0.9,
+      "old_unseen": 0.9333333333333333,
+      "primary_worst_surface": 0.5,
+      "secondary_worst_surface": 0.375
+    },
+    "fixed_tail4_refresh": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9375,
+      "old_heldout": 0.8666666666666667,
+      "old_unseen": 0.8888888888888888,
+      "primary_worst_surface": 0.5,
+      "secondary_worst_surface": 0.375
+    }
+  },
+  "interpretation": {
+    "fixed_four_update_refresh_does_not_improve_new_family_accuracy_under_matched_order": true,
+    "fixed_four_update_refresh_reduces_old_family_retention": true,
+    "up135b_apparent_refresh4_advantage_was_not_confirmed_under_exact_order_control": true,
+    "epoch_rotation_was_the_material_difference_behind_up135b_internal_advantage": true,
+    "full_terminal_old_anchor_remains_the_supported_fixed_order_policy": true,
+    "next_stage": "isolate the beneficial rotation mechanism itself by comparing fixed versus rotated new-example ordering with the full terminal old anchor and identical update counts"
+  },
+  "activation_authorized": false
+}
