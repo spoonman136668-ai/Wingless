@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up91c-windows-proof.v1",
+  "experiment": "UP-91C-continuous-generation",
+  "status": "qualified-scientific-result",
+  "source_head": "0ccd418666f64e386aa0a48bda1fea70a073d112",
+  "workflow_run_id": 36230981375,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10902249446,
+  "artifact_sha256": "8be851ae802e610bc90c1d2c42cbbb6ca7587c51d7d1b95e4c01da712427ade5",
+  "active_keys": 32,
+  "hot_keys": 16,
+  "filter_bits": 256,
+  "hash_count": 2,
+  "churn_writes": 192,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "findings": {
+    "phase_local32": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128,
+      "filter_resets": 768
+    },
+    "continuous16": {
+      "hot_accuracy": 0.5,
+      "hot_exact": 0,
+      "cold_accuracy": 0.5,
+      "false_positive_admissions": 0,
+      "filter_resets": 1664
+    },
+    "continuous32": {
+      "hot_accuracy": 1,
+      "hot_exact": 1,
+      "cold_accuracy": 0,
+      "false_positive_admissions": 0,
+      "filter_resets": 768
+    },
+    "continuous64": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 384,
+      "filter_resets": 384
+    },
+    "policy_metadata_bytes": 38,
+    "total_bounded_memory_bytes": 294
+  },
+  "interpretation": {
+    "continuous_generation_timing_solves_the_192_write_exact_retention_case_at_interval32": true,
+    "residual_c90_failure_was_stale_phase_boundary_evidence": true,
+    "interval16_forgets_legitimate_second_write_evidence_too_early": true,
+    "interval64_allows_collisions_before_reset": true,
+    "next_stage": "hold continuous interval at32 and extend unique one-shot churn horizon substantially without resetting exact memory"
+  },
+  "activation_authorized": false
+}
