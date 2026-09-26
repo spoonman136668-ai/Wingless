@@ -32,5 +32,5 @@ try{
  Write-Host ''
  Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
  foreach($M in $R.points){Write-Host "setB=$($M.set_b_count) expected_history=$($M.expected_history_entries) history_max=$($M.max_history_table_entries) full=$($M.history_reached_full) admit=$($M.valid_admission_rate) target=$($M.valid_accuracy) exact=$($M.target16_exact_accuracy) non_admit=$($M.nonpersistent_admission_rate) non_keep=$($M.nonpersistent_retention_rate) fp=$($M.one_shot_false_admissions)"}
- Write-Host 'WINGLESS_UP123C_HARNESS_PASS'
+ Write-Host 'WINGLESS_UP123_HARNESS_PASS'
 }finally{Pop-Location;if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache};if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp};Remove-Item -Recurse -Force $GoCache,$GoTmp -ErrorAction SilentlyContinue}
