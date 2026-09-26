@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.up112b-windows-proof.v1",
+  "experiment": "UP-112B-base-anchor-allocation",
+  "status": "qualified-scientific-result",
+  "source_head": "b545dbb6b5ffddc99430b97dd416a3b3cb8bf095",
+  "workflow_run_id": 36234407300,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10903592332,
+  "artifact_sha256": "c4e161bf120119f6cc2e6fa6f8fc1c206c462831d77005e50c641a053247b8e5",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "findings": {
+    "current_class_excluded_stage3": {
+      "base_accuracy": 0.9722222222222223,
+      "acquired_accuracy": 1
+    },
+    "current_class_excluded_stages4_to6": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "base_anchor2_stage3": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "base_anchor2_stage4": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "base_anchor2_stage5": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 0.8
+    },
+    "base_anchor2_stage6": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 1
+    },
+    "base_anchor4_stage2": {
+      "base_accuracy": 0.8888888888888888,
+      "acquired_accuracy": 1
+    },
+    "base_anchor4_stage3": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 0.6666666666666666
+    },
+    "base_anchor4_stage4": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 0.75
+    },
+    "base_anchor4_stage5": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 0.8
+    },
+    "base_anchor4_stage6": {
+      "base_accuracy": 1,
+      "acquired_accuracy": 0.75
+    }
+  },
+  "interpretation": {
+    "two_current_class_base_anchors_close_the_stage3_base_error": true,
+    "permanent_base_anchor_allocation_reintroduces_acquired_verb_interference": true,
+    "four_anchor_allocation_is_clearly_overconstrained": true,
+    "fixed_six_instability_is_an_allocation_tradeoff_between_base_and_acquired_retention": true,
+    "next_stage": "test deterministic stage-limited base anchors: use two current-class base anchors only during the early three-class acquisition boundary, then revert to current-class-excluded replay"
+  },
+  "activation_authorized": false
+}
