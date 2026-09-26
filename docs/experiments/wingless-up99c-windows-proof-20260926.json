@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up99c-windows-proof.v1",
+  "experiment": "UP-99C-admission-trigger",
+  "status": "qualified-scientific-result",
+  "source_head": "ad24823fbe4c48cd297e9c05f395a59f845b852d",
+  "workflow_run_id": 36235900394,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10904266941,
+  "artifact_sha256": "5892dd34e59d7752b38a753d90ac0f854dcba2bafb997175e86b64e3c23fa204",
+  "filter_bits": 1024,
+  "hash_count": 2,
+  "generation_interval": 32,
+  "post_trigger_counter": 8,
+  "churn_writes": 12288,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "explicit_phase_label_used": false,
+  "future_oracle_used": false,
+  "query_labels_used_for_admission": false,
+  "findings": {
+    "continuous_control": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128,
+      "first_false_positive_churn_index": 2402,
+      "metadata_bytes": 134
+    },
+    "trigger4": {
+      "hot_accuracy": 0.75,
+      "hot_exact": 0,
+      "cold_accuracy": 0.1875,
+      "false_positive_admissions": 128,
+      "first_false_positive_churn_index": 111,
+      "trigger_fired_episodes": 128,
+      "mean_trigger_index": 20,
+      "metadata_bytes": 135
+    },
+    "trigger8": {
+      "hot_accuracy": 1,
+      "hot_exact": 1,
+      "false_positive_admissions": 0,
+      "trigger_fired_episodes": 128,
+      "mean_trigger_index": 24,
+      "metadata_bytes": 135
+    },
+    "trigger12": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128,
+      "trigger_fired_episodes": 0,
+      "metadata_bytes": 135
+    }
+  },
+  "interpretation": {
+    "event_driven_trigger8_reproduces_the_diagnostic_exact_result_without_a_phase_label": true,
+    "firing_early_at4_destroys_useful_promotion_evidence": true,
+    "threshold12_never_fires_in_the_tested_stream": true,
+    "eight_repeat_admissions_is_the_exact_tested_transition_for_this_workload": true,
+    "next_stage": "test the fixed trigger8 rule across smaller hot-set occupancies and alternate initial key orders to distinguish architectural generality from workload-specific coincidence"
+  },
+  "activation_authorized": false
+}
