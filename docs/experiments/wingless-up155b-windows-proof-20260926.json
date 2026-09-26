@@ -1,0 +1,97 @@
+{
+  "schema": "wingless.up155b-windows-proof.v1",
+  "experiment": "UP-155B-postreport-rehearsal-dose",
+  "status": "qualified-scientific-result",
+  "source_head": "ea10bababdaebd6bea02ca131cc8c2d41c221d86",
+  "workflow_run_id": 36267355618,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10914453454,
+  "artifact_sha256": "dd097878268176df92c5eed447a60ea670075e558ac24a2980392f4460df8d56",
+  "findings": {
+    "mia": [
+      {
+        "after": 0,
+        "post_recovery": 0,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.921875
+      },
+      {
+        "after": 4,
+        "post_recovery": -0.00555555555555558,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.9427083333333334
+      },
+      {
+        "after": 8,
+        "post_recovery": 0.018888888888888865,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.921875
+      },
+      {
+        "after": 12,
+        "post_recovery": 0.02666666666666666,
+        "net": -0.00555555555555558,
+        "old": 0.8833333333333333,
+        "new": 0.921875
+      },
+      {
+        "after": 15,
+        "post_recovery": 0.04444444444444442,
+        "net": -0.004444444444444473,
+        "old": 0.8888888888888888,
+        "new": 0.9270833333333333
+      }
+    ],
+    "noah": [
+      {
+        "after": 0,
+        "post_recovery": 0,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.9270833333333333
+      },
+      {
+        "after": 4,
+        "post_recovery": -0.004444444444444429,
+        "net": -0.006666666666666687,
+        "old": 0.8777777777777778,
+        "new": 0.9270833333333333
+      },
+      {
+        "after": 8,
+        "post_recovery": 0.017777777777777802,
+        "net": -0.004444444444444473,
+        "old": 0.8888888888888888,
+        "new": 0.90625
+      },
+      {
+        "after": 12,
+        "post_recovery": 0.03,
+        "net": -0.004444444444444473,
+        "old": 0.8888888888888888,
+        "new": 0.90625
+      },
+      {
+        "after": 15,
+        "post_recovery": 0.04555555555555559,
+        "net": -0.0033333333333333435,
+        "old": 0.8944444444444445,
+        "new": 0.9270833333333333
+      }
+    ]
+  },
+  "interpretation": {
+    "repair_strength_increases_broadly_with_larger_post_report_rehearsal_budgets": true,
+    "four_post_report_updates_do_not_help_and_can_be_locally_negative": true,
+    "eight_to_fifteen_updates_produce_positive_local_recovery_but_final_retention_is_stepwise_and_subject_dependent": true,
+    "a_simple_monotonic_final_retention_dose_curve_is_not_established": true,
+    "ordered_rehearsal_identity_is_confounded_with_dose_because_moving_the_split_also_changes_which_specific_old_examples_occur_after_report": true,
+    "plain_speak": "More cleanup rehearsal after REPORT generally repairs more of the local damage, but the final old-memory score does not rise smoothly with every extra update. Four cleanup updates do nothing; larger cleanup blocks help, with the strongest result at all 15 after REPORT. Because each split also changes which old examples land after REPORT, we still need to separate rehearsal amount from rehearsal-example identity.",
+    "north_star_question": "Shows budget-neutral repair has a real dose component but also exposes rehearsal-order/identity as a remaining confound before the intervention can be treated as a general stability mechanism.",
+    "next_stage": "repeat selected post-REPORT doses under reversed and rotated old-rehearsal order to separate dose from which rehearsal examples occupy the cleanup tail"
+  },
+  "activation_authorized": false
+}
