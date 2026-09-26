@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.up-lm2m-windows-proof.v1",
+  "experiment": "UP-LM2M-parametric-fallback-remap",
+  "status": "qualified-scientific-result",
+  "source_head": "09bbdc268d3e8aa5e93e5c975607b23f134d7aba",
+  "workflow_run_id": 36277607175,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10917796467,
+  "artifact_sha256": "5ca2eb7fc35610da1365580769d6c1a7e281372f9aa529033a28b98fb381df8d",
+  "repair_note": "Initial run failed before science due compiler-only report-order parameter type mismatch; source-only type repair was applied and the frozen preregistered experiment reran unchanged.",
+  "findings": {
+    "recall_hit_rate_all_shifts": 0.9583333333333334,
+    "exact_cells_by_value_shift": {
+      "shift0": 5,
+      "shift1": 4,
+      "shift2": 4,
+      "shift3": 9
+    },
+    "miss_but_exact_cells_by_value_shift": {
+      "shift0": 5,
+      "shift1": 4,
+      "shift2": 4,
+      "shift3": 9
+    },
+    "exact_cell_patterns": {
+      "1000": 5,
+      "0100": 4,
+      "0010": 4,
+      "0001": 9,
+      "0000": 18
+    },
+    "cells_exact_across_all_four_shifts": 0,
+    "total_base_cells": 40,
+    "event_routing_accuracy_all_cells": 1,
+    "exact_by_family_across_all_shifts": {
+      "base": 2,
+      "paraphrase": 4,
+      "third": 6,
+      "fourth": 8,
+      "fifth": 2
+    }
+  },
+  "interpretation": {
+    "parametric_fallback_does_not_robustly_track_value_remap": true,
+    "every_tested_base_cell_is_exact_on_at_most_one_shift": true,
+    "correct_output_after_memory_loss_is_value_specific_or_incidental": true,
+    "surface_accuracy_can_mask_internal_memory_failure": true,
+    "plain_speak": "The model can sometimes guess the missing value correctly after memory has already failed, but the guess does not follow a remapped truth. Change the value mapping and the lucky cells move. Correct output therefore cannot be trusted as proof that the dependency is still remembered.",
+    "north_star_question": "Establishes an important self-monitoring distinction: observable correctness can hide a real internal memory failure, so native recall state is a more faithful health signal than output accuracy at this boundary.",
+    "next_stage": "measure when the missing deferred dependency disappears from recall relative to when its later REPORT is requested, quantifying native-state warning lead time before observable capability loss"
+  },
+  "activation_authorized": false
+}
