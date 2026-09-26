@@ -1,0 +1,43 @@
+{
+  "schema": "wingless.up145b-windows-proof.v1",
+  "experiment": "UP-145B-tail-switch-frequency",
+  "status": "qualified-scientific-result",
+  "source_head": "fc70703c7243fb58818299e4606d3134863a1ede",
+  "workflow_run_id": 36257051824,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10910867211,
+  "artifact_sha256": "739abda45ed7b176ccabe974b8563be7642525ec87f72ecef3c682f8c1a4cf9b",
+  "findings": {
+    "low_switch": {
+      "switches": 3,
+      "tail_damage": -0.0013888888888888896,
+      "net_epoch_change": -0.004166666666666663,
+      "final_old": 0.9166666666666667,
+      "final_new": 0.9479166666666667
+    },
+    "medium_switch": {
+      "switches": 11,
+      "tail_damage": -0.002777777777777768,
+      "net_epoch_change": -0.004999999999999999,
+      "final_old": 0.9,
+      "final_new": 0.921875
+    },
+    "high_switch": {
+      "switches": 19,
+      "tail_damage": -0.002500000000000008,
+      "net_epoch_change": -0.004999999999999999,
+      "final_old": 0.9,
+      "final_new": 0.921875
+    }
+  },
+  "interpretation": {
+    "monotonic_switch_count_dose_not_supported": true,
+    "low_switch_block_persistence_outperforms_medium_and_high_switching": true,
+    "medium_and_high_switching_are_effectively_plateaued_on_final_old_and_new_metrics": true,
+    "benefit_is_consistent_with_within_tail_persistence_or_habituation_rather_than_switch_count_alone": true,
+    "plain_speak": "Longer runs with the same ending examples are better than changing them often, but going from moderately frequent changes to changing every epoch does not make things worse again. That points to a benefit from settling into one tail for a while, not a simple penalty for every switch.",
+    "north_star_question": "Narrows the sequencing mechanism from generic diversity/switching toward local adaptation to repeated lexical tails, which can inform stable language curriculum construction.",
+    "next_stage": "reset from the same starting gate and repeat each tail identity for five consecutive epochs to measure whether its post-anchor damage decays with repetition"
+  },
+  "activation_authorized": false
+}
