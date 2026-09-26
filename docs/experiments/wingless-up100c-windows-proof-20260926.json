@@ -1,0 +1,71 @@
+{
+  "schema": "wingless.up100c-windows-proof.v1",
+  "experiment": "UP-100C-trigger8-generality",
+  "status": "qualified-scientific-result",
+  "source_head": "af69d56c328d925dadad0dbed0b1edf9c13b3818",
+  "workflow_run_id": 36236643344,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10904835137,
+  "artifact_sha256": "0224a4540bafd0ea7e87442e13b1e2c59d92316a8f30dc007dbb01d8b61cb168",
+  "active_keys": 32,
+  "filter_bits": 1024,
+  "hash_count": 2,
+  "generation_interval": 32,
+  "post_trigger_counter": 8,
+  "trigger_threshold": 8,
+  "churn_writes": 12288,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "explicit_phase_label_used": false,
+  "future_oracle_used": false,
+  "query_labels_used_for_admission": false,
+  "findings": {
+    "hot8_all_orders_exact_control": true,
+    "hot8_all_orders_exact_trigger8": true,
+    "hot12_all_orders_exact_control": true,
+    "hot12_all_orders_exact_trigger8": true,
+    "hot16_ascending_control": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "hot16_ascending_trigger8": {
+      "hot_accuracy": 1,
+      "hot_exact": 1,
+      "false_positive_admissions": 0,
+      "trigger_fired_episodes": 128,
+      "mean_trigger_index": 24
+    },
+    "hot16_reverse_control": {
+      "hot_accuracy": 0.875,
+      "hot_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "hot16_reverse_trigger8": {
+      "hot_accuracy": 0.875,
+      "hot_exact": 0,
+      "false_positive_admissions": 0,
+      "trigger_fired_episodes": 128,
+      "mean_trigger_index": 24
+    },
+    "hot16_evens_then_odds_control": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 384
+    },
+    "hot16_evens_then_odds_trigger8": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 384,
+      "trigger_fired_episodes": 0
+    }
+  },
+  "interpretation": {
+    "trigger8_is_not_initial_order_general_at_full_hot_occupancy": true,
+    "trigger8_can_eliminate_churn_false_admissions_without_repairing_promotion_losses": true,
+    "repeat_admission_trigger_can_fail_to_fire_when_hot_keys_are_already_resident": true,
+    "smaller_hot_sets_are_not_diagnostic_because_exact_capacity_slack_masks_admission_errors": true,
+    "next_stage": "separate promotion completeness from churn protection by measuring the exact hot set immediately after second-write promotion under each initial order, then test an online trigger based on promoted-hot occupancy rather than repeat-admission count"
+  },
+  "activation_authorized": false
+}
