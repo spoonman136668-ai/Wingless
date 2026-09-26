@@ -169,7 +169,7 @@ func up128cRun(pre int,seeds []int) UP128CPoint{
 	}}
 	rate:=func(a,b int)float64{if b==0{return 0};return float64(a)/float64(b)}
 	return UP128CPoint{
-		Arm:"pre"+itoa(pre)+"_post"+itoa(2-pre),PreOverflowSightings:pre,PostOverflowSightings:2-pre,
+		Arm:fmt.Sprintf("pre%d_post%d",pre,2-pre),PreOverflowSightings:pre,PostOverflowSightings:2-pre,
 		PanicRate:rate(panicN,total),PanicMessage:msg,FirstWaveEvictions:firstE,SecondWaveEvictions:secondE,
 		Age0Evictions:ev[0],Age1Evictions:ev[1],Age2Evictions:ev[2],
 		ValidAdmissionRate:rate(validAdmit,validTrials),ValidAccuracy:rate(validHits,validTotal),
