@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up-lm1l-windows-proof.v1",
+  "experiment": "UP-LM1L-states-store-orthogonal",
+  "status": "qualified-scientific-result",
+  "source_head": "cc33adcb228c81fd8c34ecf6c421f32fe0cfd6d8",
+  "workflow_run_id": 36249160680,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10907958673,
+  "artifact_sha256": "090464c13fea4f711bdb8edd1ba751b8d35234db3baf06f0bf76095ffee325c1",
+  "state_dimension": 64,
+  "fourth_grounding_epochs": 20,
+  "learning_rate": 0.08,
+  "findings": {
+    "raw_fourth_train_accuracy": 0.8333333333333334,
+    "raw_fourth_heldout_accuracy": 0.6666666666666666,
+    "raw_fourth_unseen_accuracy": 0.7777777777777778,
+    "corrected_fourth_train_accuracy": 1,
+    "corrected_fourth_heldout_accuracy": 1,
+    "corrected_fourth_unseen_accuracy": 1,
+    "corrected_states_accuracy_all_splits": 1,
+    "corrected_states_store_confusion_rate_all_splits": 0,
+    "corrected_states_heldout_mean_report_probability": 0.6508952318831244,
+    "corrected_states_unseen_mean_report_probability": 0.6850703244164874,
+    "prior_base_paraphrase_third_heldout_accuracy_corrected_arm": 1
+  },
+  "interpretation": {
+    "fourth_family_router_failure_was_a_local_states_vs_store_representation_conflict": true,
+    "frozen_store_orthogonal_correction_fully_repairs_report_routing_across_train_heldout_and_unseen_subjects": true,
+    "prior_family_semantics_are_preserved": true,
+    "router_capacity_is_not_the_observed_limit": true,
+    "next_stage": "reintegrate the corrected fourth-family router with the three-family byte model and then isolate fourth-family byte adaptation now that semantic routing is exact"
+  },
+  "infrastructure_note": "initial qualification failed on a local vector helper reference; repaired locally without changing the preregistered scientific mechanism and rerun passed",
+  "activation_authorized": false
+}
