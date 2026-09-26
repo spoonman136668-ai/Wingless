@@ -83,3 +83,23 @@ Third-family byte recovery with retained base/paraphrase quality would establish
 ## Bounds
 
 No router retraining, no recurrent training, no state expansion, no recall-cap increase, no attention, no adaptive replay, no threshold tuning, no result-informed retry, no live activation, no production authority.
+
+
+## Preregistered output-alphabet handling
+
+Before any adaptation arm is run, deterministically extend the byte readout alphabet to the union of:
+- the existing warm20 alphabet; and
+- bytes present in the frozen third-family training/evaluation corpus.
+
+For existing byte classes:
+- preserve all warm20 readout weights and biases exactly.
+
+For newly introduced byte classes:
+- append zero-initialized readout weights and bias.
+
+This is a readout-vocabulary extension only:
+- recurrent state dimension remains 64;
+- recurrent transition remains unchanged;
+- no hidden-state or exact-recall capacity is added.
+
+Record the newly added byte values in the result.
