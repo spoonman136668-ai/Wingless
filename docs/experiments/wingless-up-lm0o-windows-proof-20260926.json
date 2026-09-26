@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.up-lm0o-windows-proof.v1",
+  "experiment": "UP-LM0O-paraphrase-byte-adaptation",
+  "status": "qualified-scientific-result",
+  "source_head": "5ed5bf6cafd054ffa28b1c989928400cf0fe2908",
+  "workflow_run_id": 36230430616,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10901473354,
+  "artifact_sha256": "74c0803027228c06edfdeaca52ad43ff6c9b077517e225b09a1da0f87c544b9f",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_epochs": 20,
+  "learning_rate": 0.08,
+  "router_retraining_used": false,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "base_replay_passes_per_adapt_epoch": 1,
+  "findings": {
+    "adapt0": {
+      "base_accuracy": 0.9020793036750484,
+      "base_perplexity": 1.3629216959644814,
+      "paraphrase_accuracy": 0.5900211193241817,
+      "paraphrase_perplexity": 15.486317495846441
+    },
+    "adapt1": {
+      "base_accuracy": 0.8870889748549323,
+      "base_perplexity": 1.4109185717423518,
+      "paraphrase_accuracy": 0.6759943681802182,
+      "paraphrase_perplexity": 3.414067090933421
+    },
+    "adapt2": {
+      "base_accuracy": 0.8863636363636364,
+      "base_perplexity": 1.4187849278588895,
+      "paraphrase_accuracy": 0.7077613516367476,
+      "paraphrase_perplexity": 2.8441139878778823
+    },
+    "adapt4": {
+      "base_accuracy": 0.8883784655061251,
+      "base_perplexity": 1.4179618573732233,
+      "paraphrase_accuracy": 0.7263287574797607,
+      "paraphrase_perplexity": 2.5186175903584216
+    },
+    "dependent_first_byte_accuracy_all_routing_cells": 1,
+    "query_set_exact_accuracy_all_routing_cells": 1,
+    "event_routing_accuracy_all_routing_cells": 1,
+    "report_routing_accuracy_all_routing_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "byte_language_model_adapts_rapidly_to_new_lexical_surfaces": true,
+    "adaptation_reduces_paraphrase_perplexity_by_more_than_sixfold": true,
+    "modest_base_distribution_interference_remains": true,
+    "routing_and_exact_memory_are_not_the_current_bottleneck": true,
+    "next_stage": "at fixed four paraphrase adaptation epochs, vary base replay passes to map the retention-versus-adaptation tradeoff"
+  },
+  "activation_authorized": false
+}
