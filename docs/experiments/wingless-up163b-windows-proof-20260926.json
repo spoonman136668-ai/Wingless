@@ -1,0 +1,88 @@
+{
+  "schema": "wingless.up163b-windows-proof.v1",
+  "experiment": "UP-163B-cleanup-path-curvature",
+  "status": "qualified-scientific-result",
+  "source_head": "f4620c1c5b41021767430f603d609152bec0fe57",
+  "workflow_run_id": 36270931763,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10915801818,
+  "artifact_sha256": "d4dbe2968f71766815aed976158f8886654a8628e85a544ac369e3a0c4b2143e",
+  "findings": {
+    "matched_retention_delta_a_minus_b_by_checkpoint": {
+      "mia": [
+        0.016666666666666607,
+        0.005555555555555536,
+        0.005555555555555536
+      ],
+      "noah": [
+        0.011111111111111183,
+        -0.011111111111111072,
+        0.005555555555555536
+      ],
+      "opal": [
+        0.01666666666666672,
+        0.011111111111111072,
+        -0.011111111111111072
+      ],
+      "pax": [
+        -0.005555555555555647,
+        0.005555555555555536,
+        0.005555555555555536
+      ],
+      "quin": [
+        -0.011111111111111183,
+        0,
+        -0.022222222222222254
+      ],
+      "rue": [
+        -0.03333333333333344,
+        -0.016666666666666607,
+        -0.011111111111111072
+      ]
+    },
+    "matched_gate_distance_by_checkpoint": {
+      "mia": [
+        0.37323899563951596,
+        0.039535361265704574,
+        0.03915459050869772
+      ],
+      "noah": [
+        0.3696983835092502,
+        0.039976030564984555,
+        0.03957312651965619
+      ],
+      "opal": [
+        0.3700406605209888,
+        0.04009003672337932,
+        0.03968936732492226
+      ],
+      "pax": [
+        0.3662340583050606,
+        0.04052782903594132,
+        0.0401018657524072
+      ],
+      "quin": [
+        0.3687856209205506,
+        0.04060755198166838,
+        0.040182354749763484
+      ],
+      "rue": [
+        0.36502441113095485,
+        0.04103100591946628,
+        0.04057660746998236
+      ]
+    }
+  },
+  "interpretation": {
+    "pax_b162_exception_is_created_by_second_block_noncommutative_curvature": true,
+    "pax_final_sign_is_already_positive_before_trailing_report": true,
+    "trailing_report_changes_or_creates_final_sign_for_noah_opal_and_quin": true,
+    "mia_and_rue_keep_the_same_sign_through_the_path": true,
+    "first_block_state_separation_is_large_but_second_block_composition_collapses_paths_to_small_nonzero_commutator_distance": true,
+    "later_report_updates_can_amplify_or_reverse_coarse_retention_without_erasing_state_difference": true,
+    "plain_speak": "Pax proves the first-order geometry can be overturned by the second cleanup block itself. Noah, Opal, and Quin show a second effect: the identical final REPORT cleanup can act differently because it is applied to different path states and can flip the retention winner again. Mia and Rue are comparatively stable through the whole path.",
+    "north_star_question": "Resolves the B162 geometry exception into path-dependent nonlinear composition and identifies REPORT-on-path-state sensitivity as a separate causal mechanism to isolate next.",
+    "next_stage": "from the two fixed post-STORE/OBSERVE states, apply the two REPORT cleanup examples one at a time and measure subject-specific marginal retention and geometry changes to isolate report-mediated sign flips"
+  },
+  "activation_authorized": false
+}
