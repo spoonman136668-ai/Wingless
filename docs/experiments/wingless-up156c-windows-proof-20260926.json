@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up156c-windows-proof.v1",
+  "experiment": "UP-156C-bounded-refresh-counterfactual",
+  "status": "qualified-scientific-result",
+  "source_head": "8069893a402eb93f1a15037b2364eb4e51021c71",
+  "workflow_run_id": 36279708027,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10918451612,
+  "artifact_sha256": "ff2c0e792a286bbadcf56a294e124325a59c7092e20cf9578d1e7b5b97384a86",
+  "findings": {
+    "arms": 16,
+    "baseline_immediate_losses": 16,
+    "guided_immediate_losses": 0,
+    "sham_immediate_losses": 16,
+    "guided_prevented": 16,
+    "sham_prevented": 0,
+    "guided_actions": 16,
+    "sham_actions": 16,
+    "guided_final_retention_gain": 11,
+    "sham_final_retention_gain": -1,
+    "counterfactual_only": true,
+    "live_activation": false
+  },
+  "interpretation": {
+    "warning_guided_refresh_prevents_every_tested_immediate_protected_loss": true,
+    "matched_sham_refresh_has_zero_immediate_preventive_effect": true,
+    "some_guided_saves_are_deferred_not_permanent": true,
+    "final_retention_gain_is_positive_but_smaller_than_immediate_prevention": true,
+    "plain_speak": "Refreshing the exact endangered item works immediately every time; refreshing something else at the same cost does not. But five of the sixteen immediate saves are lost again later, so the response can postpone some failures rather than permanently remove the capacity pressure.",
+    "north_star_question": "Confirms a second bounded detect-and-correct mechanism while exposing the key cost question: protection may redistribute or delay loss under fixed capacity.",
+    "next_stage": "trace where each guided save goes later—permanent preservation, delayed same-item loss, or collateral displacement to another original item—under the same one-action budget"
+  },
+  "activation_authorized": false
+}
