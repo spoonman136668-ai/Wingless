@@ -1,0 +1,59 @@
+{
+  "schema": "wingless.up119b-windows-proof.v1",
+  "experiment": "UP-119B-shifted-margin-topology",
+  "status": "qualified-scientific-result",
+  "source_head": "a14e7950264e6ea6b6443ed887b8ec5db946a65f",
+  "workflow_run_id": 36237300048,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10904039653,
+  "artifact_sha256": "a206bd2c4f0233682c8a2f0fd367381d2419c6088b3b16ba81de52ffdd4bd727",
+  "repair_provenance": {
+    "initial_run_id": 36237245245,
+    "repair_commit": "93949ccb6e4ac93956df783378792b6913ba8e50",
+    "scientific_parameters_changed": false
+  },
+  "state_dimension": 64,
+  "training_changed": false,
+  "findings": {
+    "baseline_failure_points": 12,
+    "baseline_wrong_report_count_all_failures": 0,
+    "baseline_failure_destination": "OBSERVE",
+    "shifted_failure_points": 12,
+    "shifted_rso_stage1": {
+      "stores_accuracy": 0.16666666666666666,
+      "mean_store_observe_margin": 0.896085385365838,
+      "mean_store_report_margin": -0.1492762695534232,
+      "wrong_observe_count": 0,
+      "wrong_report_count": 5
+    },
+    "shifted_ros_stage1": {
+      "stores_accuracy": 0.16666666666666666,
+      "mean_store_observe_margin": 0.896085385365838,
+      "mean_store_report_margin": -0.1492762695534232,
+      "wrong_observe_count": 0,
+      "wrong_report_count": 5
+    },
+    "shifted_ros_stage2": {
+      "stores_accuracy": 0.3333333333333333,
+      "mean_store_observe_margin": 0.048351221184836056,
+      "mean_store_report_margin": -0.131290516807645,
+      "wrong_observe_count": 0,
+      "wrong_report_count": 4
+    },
+    "shifted_ors_stage2": {
+      "stores_accuracy": 0.16666666666666666,
+      "mean_store_observe_margin": -0.09039313301041123,
+      "mean_store_report_margin": 0.002880823049741882,
+      "wrong_observe_count": 4,
+      "wrong_report_count": 1
+    }
+  },
+  "interpretation": {
+    "baseline_collapse_is_exclusively_observe_directed": true,
+    "centroid_shift_repairs_observe_axis_in_some_orders_but_exposes_report_axis": true,
+    "one_axis_mean_shift_is_not_sufficient_for_three_class_robustness": true,
+    "remaining_representation_problem_is_multi_competitor_geometry": true,
+    "next_stage": "test a fixed stores-only mean correction that removes the component of the sibling STORE centroid lying in the span of OBSERVE and REPORT family centroids, with all training/replay rules unchanged"
+  },
+  "activation_authorized": false
+}
