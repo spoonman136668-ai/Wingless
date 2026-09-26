@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up105c-windows-proof.v1",
+  "experiment": "UP-105C-promotion-query-cadence",
+  "status": "qualified-scientific-result",
+  "source_head": "0b2f515887a4484fe163dcdaed396327c75da656",
+  "workflow_run_id": 36240118491,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10904878561,
+  "artifact_sha256": "d5401992c88794dde64b588e4f0987c92eb264e026f2ba029db3689657b8d345",
+  "findings": {
+    "ascending_all_cadences": {
+      "resident_hot": 16,
+      "final_exact": 1
+    },
+    "reverse_all_cadences": {
+      "resident_hot": 16,
+      "final_exact": 1
+    },
+    "evens_then_odds_all_cadences": {
+      "resident_hot": 16,
+      "false_positive_admissions": 384,
+      "final_accuracy": 0.9375,
+      "final_exact": 0
+    },
+    "odds_then_evens_all_cadences": {
+      "resident_hot": 8,
+      "false_positive_admissions": 384,
+      "final_accuracy": 0.5,
+      "final_exact": 0
+    },
+    "rotate8_query_every4": {
+      "resident_hot": 14,
+      "false_positive_admissions": 0,
+      "final_accuracy": 0.875,
+      "final_exact": 0
+    },
+    "rotate8_query_every8_after16_or_none": {
+      "resident_hot": 12,
+      "false_positive_admissions": 128,
+      "final_accuracy": 0.75,
+      "final_exact": 0
+    }
+  },
+  "interpretation": {
+    "promotion_query_cadence_is_not_the_cause_of_odds_then_evens_underpromotion": true,
+    "reducing_promotion_queries_does_not_help_and_can_worsen_rotate8": true,
+    "missing_hot_entries_are_driven_by_write_replacement_topology": true,
+    "evens_then_odds_remains_a_separate_trigger_blind_churn_failure": true,
+    "next_stage": "test whether a second deterministic hot promotion pass can close underpromotion using repeated observed writes rather than extra reads or future labels"
+  },
+  "activation_authorized": false
+}
