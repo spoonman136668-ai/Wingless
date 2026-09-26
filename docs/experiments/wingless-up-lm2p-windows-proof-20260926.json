@@ -1,0 +1,60 @@
+{
+  "schema": "wingless.up-lm2p-windows-proof.v1",
+  "experiment": "UP-LM2P-unreported-eviction-countdown",
+  "status": "qualified-scientific-result",
+  "source_head": "7f9e1f63f0893867262350a8151d01c1b0b23835",
+  "workflow_run_id": 36278340023,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10917737932,
+  "artifact_sha256": "6e7aa6dbd2ddad264fd249f4cbdd41781c7d981c581e61b0aaa25d16452659f8",
+  "findings": {
+    "exact_recall_cap": 16,
+    "deferred_levels": [
+      4,
+      5,
+      6
+    ],
+    "identity_rotations": [
+      0,
+      7
+    ],
+    "value_shifts": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "exact_predictions": 24,
+    "total_predictions": 24,
+    "exact_prediction_rate": 1,
+    "countdown_by_deferred_level": {
+      "d4": {
+        "free_slots": 4,
+        "target_fifo_index": 8,
+        "predicted_unique_stores": 13,
+        "actual_unique_stores": 13
+      },
+      "d5": {
+        "free_slots": 4,
+        "target_fifo_index": 7,
+        "predicted_unique_stores": 12,
+        "actual_unique_stores": 12
+      },
+      "d6": {
+        "free_slots": 4,
+        "target_fifo_index": 6,
+        "predicted_unique_stores": 11,
+        "actual_unique_stores": 11
+      }
+    }
+  },
+  "interpretation": {
+    "native_recall_state_supports_exact_eviction_countdown": true,
+    "countdown_is_invariant_to_tested_identity_and_value_remap": true,
+    "countdown_depends_on_free_slots_plus_fifo_position": true,
+    "plain_speak": "Wingless can do more than say 'this pending memory will be evicted.' From the live recall state alone, it can count exactly how many unique writes remain before that eviction: 13 at D=4, 12 at D=5, and 11 at D=6 in every tested identity/value control.",
+    "north_star_question": "This upgrades the warning channel from binary imminent-risk to exact bounded time-to-failure under fixed capacity.",
+    "next_stage": "test whether the countdown remains exact when pending dependencies are dynamically closed by interleaved REPORT events during the pressure sequence, without future schedule knowledge or intervention"
+  },
+  "activation_authorized": false
+}
