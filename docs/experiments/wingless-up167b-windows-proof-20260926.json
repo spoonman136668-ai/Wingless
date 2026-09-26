@@ -1,0 +1,51 @@
+{
+  "schema": "wingless.up167b-windows-proof.v1",
+  "experiment": "UP-167B-margin-rank-report-generalization",
+  "status": "qualified-scientific-result",
+  "source_head": "52960bb3e5319fe0c0af4265f61e0c44c0be2373",
+  "workflow_run_id": 36272931808,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10915834544,
+  "artifact_sha256": "7552473b6a97a2ed9ecccf2a08d49dd80c072b8ea80997aa32b8efdc0400a8cb",
+  "findings": {
+    "total_crossings": 30,
+    "max_vulnerability_rank_all_crossings": 4,
+    "max_rank_fraction": 0.03333333333333333,
+    "report10": {
+      "crossings": 6,
+      "max_rank": 3,
+      "mean_rank": 1.6666666666666667
+    },
+    "report11": {
+      "crossings": 2,
+      "max_rank": 1,
+      "mean_rank": 1
+    },
+    "report12": {
+      "crossings": 7,
+      "max_rank": 4,
+      "mean_rank": 2
+    },
+    "report13": {
+      "crossings": 8,
+      "max_rank": 4,
+      "mean_rank": 1.875
+    },
+    "report14": {
+      "crossings": 7,
+      "max_rank": 4,
+      "mean_rank": 2
+    },
+    "independent_probe_clones": true
+  },
+  "interpretation": {
+    "low_absolute_pre_step_margin_rank_generalizes_across_all_five_tested_report_surfaces": true,
+    "every_observed_crossing_originates_in_bottom_four_of_120_examples": true,
+    "no_fitted_threshold_or_post_result_classifier_used": true,
+    "interference_identity_changes_crossing_count_but_not_vulnerability_rank_boundary_observed": true,
+    "plain_speak": "Different REPORT examples knock over different old memories, but every one they knock over was already among the four most fragile examples in the old set. The warning signal survives a five-way interference-identity change.",
+    "north_star_question": "Generalizes an internal deficiency signal across REPORT interference identities, strengthening self-detection evidence while still withholding any autonomous maintenance action.",
+    "next_stage": "test the same frozen margin-rank diagnostic against independent STORE and OBSERVE one-step interference probes to determine whether vulnerability rank is cross-class rather than REPORT-specific"
+  },
+  "activation_authorized": false
+}
