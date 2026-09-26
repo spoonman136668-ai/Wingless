@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.up97c-windows-proof.v1",
+  "experiment": "UP-97C-generation-phase",
+  "status": "qualified-scientific-result",
+  "source_head": "10307e5f93c6d4e01464cb56c61a77024341ff13",
+  "workflow_run_id": 36235191866,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10904126059,
+  "artifact_sha256": "293b67eb99ec44afe8f005c08b93bd9e3534ca1ece997a1018dd3a1b55ee8aee",
+  "filter_bits": 1024,
+  "hash_count": 2,
+  "generation_interval": 32,
+  "churn_writes": 12288,
+  "exact_recall_cap": 16,
+  "findings": {
+    "offset0": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128,
+      "first_false_positive_churn_index": 2402
+    },
+    "offset8": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 256,
+      "first_false_positive_churn_index": 6076
+    },
+    "offset16": {
+      "hot_accuracy": 0.5,
+      "hot_exact": 0,
+      "false_positive_admissions": 0,
+      "first_false_positive_churn_index": 0,
+      "cold_accuracy": 0.5
+    },
+    "offset24": {
+      "hot_accuracy": 0.75,
+      "hot_exact": 0,
+      "false_positive_admissions": 384,
+      "first_false_positive_churn_index": 111,
+      "cold_accuracy": 0.0625
+    },
+    "policy_metadata_bytes": 134,
+    "total_bounded_memory_bytes": 390
+  },
+  "interpretation": {
+    "generation_phase_changes_collision_location_and_count": true,
+    "phase_shift_alone_does_not_restore_exact_retention": true,
+    "offset16_eliminates_false_admissions_but_forgets_legitimate_promotion_evidence": true,
+    "promotion_evidence_and_churn_collision_control_are_competing_roles_of_the_same_filter": true,
+    "next_stage": "separate promotion from churn phase experimentally by clearing the filter after hot second-write promotion, then test churn-generation offsets at fixed width1024 and interval32"
+  },
+  "activation_authorized": false
+}
