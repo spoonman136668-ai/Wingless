@@ -68,7 +68,7 @@ func RunUP169B()(UP169BResult,error){
 			}
 		}
 	}
-	res:=UP169BResult{Schema:UP169BCalibrationSchema,Experiment:"UP-169B-margin-rank-class-calibration",SourceUP168BSeal:"research/wingless-up168b-margin-rank-crossclass-r1",CalibrationPhase:16,ParentPhase:15,Subjects:6,Paths:2,ProbeSurfaces:15,ExamplesPerState:120,BandsFrozenBeforeRun:true,AdaptiveBandUsed:false,MaintenanceTriggered:false}
+	res:=UP169BResult{Schema:UP169BCalibrationSchema,Experiment:"UP-169B-margin-rank-class-calibration",SourceUP168BSeal:"5f08682281da1418ae2dc2812ae13d1667d5852f",CalibrationPhase:16,ParentPhase:15,Subjects:6,Paths:2,ProbeSurfaces:15,ExamplesPerState:120,BandsFrozenBeforeRun:true,AdaptiveBandUsed:false,MaintenanceTriggered:false}
 	for _,class:=range []string{"STORE","OBSERVE","REPORT"}{
 		x:=a[class];band:=up169bBand(class);rate:=func(n,d int)float64{if d==0{return 0};return float64(n)/float64(d)}
 		flagged:=x.states*band;u4:=x.states*4
