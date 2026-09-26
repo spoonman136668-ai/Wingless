@@ -1,0 +1,43 @@
+{
+  "schema": "wingless.up148b-windows-proof.v1",
+  "experiment": "UP-148B-terminal-tail-causality",
+  "status": "qualified-scientific-result",
+  "source_head": "f5c8bb8c67260f266b74513a118ab4a09c7dce76",
+  "workflow_run_id": 36258268895,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10911596323,
+  "artifact_sha256": "1194edc08fa077db03722b6c8a4a0f95831449d04331a9c3d894587119362c01",
+  "findings": {
+    "common_prefix_old_retention": 0.9111111111111112,
+    "safe_terminal": {
+      "shift": 18,
+      "mean_prefix_damage": -0.07777777777777772,
+      "mean_anchor_recovery": 0.05666666666666662,
+      "mean_tail_damage": 0.02222222222222221,
+      "mean_net_epoch_change": 0.0011111111111111072,
+      "final_old_retention": 0.9166666666666667,
+      "final_new_accuracy": 0.9479166666666667
+    },
+    "damaging_terminal": {
+      "shift": 12,
+      "mean_prefix_damage": 0.0022222222222221923,
+      "mean_anchor_recovery": 0.04555555555555553,
+      "mean_tail_damage": -0.05777777777777773,
+      "mean_net_epoch_change": -0.010000000000000009,
+      "final_old_retention": 0.8611111111111112,
+      "final_new_accuracy": 0.921875
+    },
+    "safe_minus_damaging_old_delta": 0.05555555555555558,
+    "safe_minus_damaging_new_delta": 0.02604166666666674
+  },
+  "interpretation": {
+    "terminal_tail_identity_is_causal_for_retention": true,
+    "terminal_tail_identity_is_also_causal_for_new_family_accuracy": true,
+    "matched_prefix_eliminates_prior_curriculum_history_as_explanation": true,
+    "dominant_difference_is_post_anchor_tail_effect": true,
+    "plain_speak": "Starting from exactly the same learned state, ending the curriculum with one four-example tail protects old vocabulary and learns new vocabulary better, while another tail actively damages old memory. The identity of the ending examples themselves matters.",
+    "north_star_question": "Establishes a causal lexical-sequencing mechanism that can change stability and plasticity without extra memory or update budget.",
+    "next_stage": "from one identical 15-epoch prefix, compare all four terminal tail identities to establish the full causal identity ranking before analyzing their geometry"
+  },
+  "activation_authorized": false
+}
