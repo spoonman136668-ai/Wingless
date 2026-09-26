@@ -1,0 +1,38 @@
+{
+  "schema": "wingless.up182b-windows-proof.v1",
+  "experiment": "UP-182B-continuous-risk-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "a4c386c02282bea4e07aaa1861b51fe48b2aa497",
+  "workflow_run_id": 36280496628,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10918269169,
+  "artifact_sha256": "c2f64888e07e9d6be89640528dc62d1f52c09266729d19217df894a6b2660add",
+  "findings": {
+    "calibration_phase": 26,
+    "evaluation_phase": 27,
+    "actual_crossings": 223,
+    "predicted_crossings_sum": 285.24718846385804,
+    "predicted_to_actual_ratio": 1.2791353742773903,
+    "brier_score": 0.009535340889520795,
+    "expected_calibration_error": 0.0036022678509194826,
+    "calibrated_margin_temporal": {
+      "auroc": 0.9828952567637237,
+      "average_precision": 0.32461769014633723
+    },
+    "margin_only": {
+      "auroc": 0.9831589466181841,
+      "average_precision": 0.3557793287245095
+    }
+  },
+  "interpretation": {
+    "heldout_discrimination_remains_strong": true,
+    "numeric_probability_mass_overpredicts_failures": true,
+    "low_global_ece_does_not_capture_total_event_mass_drift": true,
+    "calibrated_table_does_not_improve_ranking_over_margin_only": true,
+    "probability_model_not_ready_for_intervention_thresholding": true,
+    "plain_speak": "The model still knows very well which examples are in danger, but its probability numbers are too pessimistic on the fresh phase: it predicts about 285 flips when 223 occur. Ranking is strong; absolute risk calibration is not stable enough yet.",
+    "north_star_question": "Separates discrimination from calibration. Wingless has a strong native danger ordering, but the numerical failure probability needs stability across phases before it can support a cost-aware action rule.",
+    "next_stage": "freeze the phase26 probability model unchanged and evaluate calibration drift across several additional held-out phases, measuring predicted/actual mass, Brier, ECE, AUROC, and AP without refitting"
+  },
+  "activation_authorized": false
+}
