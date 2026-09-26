@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.up175b-windows-proof.v1",
+  "experiment": "UP-175B-heldout-hazard-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "7abefb4dcacde0fbfadd3e30ed47cba4ba2c389b",
+  "workflow_run_id": 36277717338,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10917638750,
+  "artifact_sha256": "4a0dfaf3cbd3f6eab86227290f9a0a99b9929b36f2305f5ce76428d22f451cf6",
+  "findings": {
+    "heldout_phase": 20,
+    "total_slots": 17280,
+    "actual_crossings": 243,
+    "predicted_crossings_sum": 223.50938058108247,
+    "brier_score": 0.010437048873098771,
+    "warning_threshold": 0.2,
+    "true_positive": 164,
+    "false_positive": 320,
+    "false_negative": 79,
+    "true_negative": 16717,
+    "warning_precision": 0.33884297520661155,
+    "warning_recall": 0.6748971193415638,
+    "lead_time_updates": 1,
+    "predictor_frozen_before_run": true
+  },
+  "interpretation": {
+    "frozen_native_state_predictor_has_nontrivial_heldout_signal": true,
+    "recall_is_moderate_high_but_precision_is_not_intervention_grade": true,
+    "aggregate_crossing_count_is_reasonably_calibrated": true,
+    "class_cell_calibration_is_uneven": true,
+    "false_warning_burden_remains_material": true,
+    "plain_speak": "The frozen detector catches about two-thirds of imminent flips one update early, but only about one in three warnings becomes a flip. That is useful evidence that Wingless can see trouble coming, but it is still too noisy to justify acting automatically.",
+    "north_star_question": "This is the first direct held-out test of a calibrated native-state failure-risk estimate. It works above chance in an operational sense, but its precision must improve or its false-warning cost must be shown harmless before bounded intervention.",
+    "next_stage": "run a held-out predictor ablation comparing the frozen rank-plus-temporal model against a static-rank-only model to measure whether temporal history actually improves predictive calibration out of sample"
+  },
+  "activation_authorized": false
+}
