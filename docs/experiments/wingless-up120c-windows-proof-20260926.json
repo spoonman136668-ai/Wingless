@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up120c-windows-proof.v1",
+  "experiment": "UP-120C-crossgeneration-age3",
+  "status": "qualified-scientific-result",
+  "source_head": "573e1030d24a84bcc59b34d82a25e445ae686956",
+  "workflow_run_id": 36253570176,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10909038662,
+  "artifact_sha256": "9d53a51a0d12976e3df48f31ce640844053ab96fc31164f71b6333fdafcfb83e",
+  "hot_keys": 12,
+  "target_candidates": 4,
+  "burst_distractors": 4,
+  "generation_interval": 32,
+  "admission_memory_bytes": 128,
+  "exact_recall_cap": 16,
+  "key_bits": 14,
+  "churn_writes": 12288,
+  "findings": {
+    "age1_control_adjacent": {
+      "target_admission_rate": 1,
+      "target16_exact_accuracy": 1
+    },
+    "age1_control_skip_one": {
+      "target_admission_rate": 1,
+      "target16_exact_accuracy": 1
+    },
+    "age1_control_skip_two": {
+      "target_admission_rate": 0,
+      "target16_exact_accuracy": 0
+    },
+    "age2_extended_adjacent": {
+      "target_admission_rate": 1,
+      "target16_exact_accuracy": 1
+    },
+    "age2_extended_skip_one": {
+      "target_admission_rate": 1,
+      "target16_exact_accuracy": 1
+    },
+    "age2_extended_skip_two": {
+      "target_admission_rate": 1,
+      "target16_exact_accuracy": 1
+    },
+    "age2_extended_skip_three": {
+      "target_admission_rate": 0,
+      "target16_exact_accuracy": 0
+    },
+    "burst_admission_rate_all_cells": 0,
+    "hot_accuracy_all_cells": 1,
+    "one_shot_false_admissions_all_cells": 0,
+    "recall_entries_used": 16,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "the_same_128_byte_sidecar_extends_temporal_persistence_to_two_skipped_generations": true,
+    "adjacent_and_one_skip_behavior_is_preserved": true,
+    "one_generation_bursts_remain_rejected": true,
+    "skip_three_is_the_expected_extended_horizon_boundary": true,
+    "no_memory_growth_or_false_admission_cost_was_observed_at_the_tested_load": true,
+    "next_stage": "mix adjacent one_skip and two_skip valid candidates in a single episode and include skip_three negatives to test heterogeneous horizon sharing at fixed memory"
+  },
+  "activation_authorized": false
+}
