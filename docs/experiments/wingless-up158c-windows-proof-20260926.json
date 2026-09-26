@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up158c-windows-proof.v1",
+  "experiment": "UP-158C-save-durability-signal",
+  "status": "qualified-scientific-result",
+  "source_head": "6cb9a271a16d10ad95c08af3dd9176a18f593735",
+  "workflow_run_id": 36280210957,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10919020306,
+  "artifact_sha256": "72f5af17ca0f6303dfa7297bf2c64d1401bd9588368ac14132c499a5d4d662d8",
+  "findings": {
+    "arms": 16,
+    "permanent_saves": 12,
+    "delayed_losses": 4,
+    "permanent_mean_horizon": 27.833333333333332,
+    "permanent_min_horizon": 25,
+    "permanent_max_horizon": 30,
+    "delayed_mean_horizon": 16,
+    "delayed_min_horizon": 16,
+    "delayed_max_horizon": 16,
+    "horizon_auroc": 1,
+    "future_schedule_used": false,
+    "semantic_class_used": false,
+    "counterfactual_only": true
+  },
+  "interpretation": {
+    "present_native_state_perfectly_separates_permanent_from_delayed_saves_in_tested_stream": true,
+    "unique_write_horizon_is_a_candidate_durability_signal": true,
+    "result_needs_disjoint_stream_replication_before_use": true,
+    "plain_speak": "The same native state that predicts the threatened write also tells us whether the rescue is likely to last. In this stream, a post-refresh horizon of 16 always meant the save would fail later; horizons of 25–30 always meant the save survived to the end.",
+    "north_star_question": "Adds a potential intervention-quality signal: Wingless may be able to distinguish a temporary rescue from a durable one before committing to a bounded response.",
+    "next_stage": "replicate the frozen horizon score on a disjoint mixed-write and sparse-refresh schedule before defining any durability threshold"
+  },
+  "activation_authorized": false
+}
