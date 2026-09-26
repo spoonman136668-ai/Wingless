@@ -1,0 +1,51 @@
+{
+  "schema": "wingless.up131b-windows-proof.v1",
+  "experiment": "UP-131B-fewshot-lexical-grounding",
+  "status": "qualified-scientific-result",
+  "source_head": "df04f3b2336f14073fe1f45a691b53f09f179242",
+  "workflow_run_id": 36250607976,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10909086019,
+  "artifact_sha256": "502a43172f190961b4edeb2bfadf0d504ffdade5295d429c51fb9e38b690ae10",
+  "state_dimension": 64,
+  "gate_input_dimension": 128,
+  "original_gate_epochs": 20,
+  "grounding_epochs": 20,
+  "learning_rate": 0.08,
+  "findings": {
+    "zero_shot": {
+      "primary_new_accuracy": 0.08333333333333333,
+      "secondary_new_accuracy": 0.020833333333333332,
+      "old_heldout_retained": 1,
+      "old_unseen_retained": 1
+    },
+    "one_subject": {
+      "primary_new_accuracy": 0.4583333333333333,
+      "secondary_new_accuracy": 0.5520833333333334,
+      "old_heldout_retained": 1,
+      "old_unseen_retained": 0.9777777777777777
+    },
+    "two_subjects": {
+      "primary_new_accuracy": 0.875,
+      "secondary_new_accuracy": 0.9270833333333334,
+      "old_heldout_retained": 0.8666666666666667,
+      "old_unseen_retained": 0.9
+    },
+    "four_subjects": {
+      "primary_new_accuracy": 1,
+      "secondary_new_accuracy": 0.9791666666666666,
+      "old_heldout_retained": 0.7666666666666667,
+      "old_unseen_retained": 0.7555555555555555
+    },
+    "two_subject_primary_worst_surface_accuracy": 0.5,
+    "four_subject_primary_worst_surface_accuracy": 1
+  },
+  "interpretation": {
+    "new_lexical_families_can_be_grounded_sample_efficiently": true,
+    "two_subjects_are_enough_for_high_new_family_accuracy_but_not_perfect_surface_coverage": true,
+    "increasing_grounding_subjects_improves_new_family_accuracy_while_eroding_old_family_retention": true,
+    "current_limit_is_adaptation_retention_balance_not_raw_new_family_learnability": true,
+    "next_stage": "hold the gate projector and new-family grounding fixed at two subjects and vary only old-family rehearsal coverage to recover retention without sacrificing new-family acquisition"
+  },
+  "activation_authorized": false
+}
