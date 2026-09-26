@@ -1,0 +1,114 @@
+{
+  "schema": "wingless.up159b-windows-proof.v1",
+  "experiment": "UP-159B-cleanup-order-subject-generalization",
+  "status": "qualified-scientific-result",
+  "source_head": "9b7abfa037d630fe280c109839a65d8ba117db94",
+  "workflow_run_id": 36269770823,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10915166437,
+  "artifact_sha256": "507a97d196b27b5cb2815c977fd4999d1c43d9ce695951877e39c7795cc85ec3",
+  "findings": {
+    "subject_old_retention_ranges": {
+      "mia": {
+        "min": 0.8833333333333333,
+        "max": 0.8944444444444445,
+        "spread": 0.011111111111111183,
+        "best": [
+          "REPORT_STORE_OBSERVE"
+        ]
+      },
+      "noah": {
+        "min": 0.9055555555555556,
+        "max": 0.9222222222222223,
+        "spread": 0.01666666666666672,
+        "best": [
+          "OBSERVE_REPORT_STORE",
+          "REPORT_OBSERVE_STORE"
+        ]
+      },
+      "opal": {
+        "min": 0.8944444444444445,
+        "max": 0.9055555555555556,
+        "spread": 0.011111111111111072,
+        "best": [
+          "OBSERVE_STORE_REPORT",
+          "REPORT_OBSERVE_STORE"
+        ]
+      },
+      "pax": {
+        "min": 0.9055555555555556,
+        "max": 0.9222222222222223,
+        "spread": 0.01666666666666672,
+        "best": [
+          "OBSERVE_STORE_REPORT"
+        ]
+      },
+      "quin": {
+        "min": 0.9,
+        "max": 0.9166666666666667,
+        "spread": 0.01666666666666672,
+        "best": [
+          "OBSERVE_STORE_REPORT",
+          "OBSERVE_REPORT_STORE",
+          "REPORT_OBSERVE_STORE"
+        ]
+      },
+      "rue": {
+        "min": 0.9,
+        "max": 0.9166666666666667,
+        "spread": 0.01666666666666672,
+        "best": [
+          "STORE_REPORT_OBSERVE",
+          "OBSERVE_STORE_REPORT",
+          "OBSERVE_REPORT_STORE",
+          "REPORT_STORE_OBSERVE",
+          "REPORT_OBSERVE_STORE"
+        ]
+      }
+    },
+    "mean_old_retention_by_order": {
+      "STORE_OBSERVE_REPORT": 0.901851851851852,
+      "STORE_REPORT_OBSERVE": 0.9046296296296298,
+      "OBSERVE_STORE_REPORT": 0.9083333333333333,
+      "OBSERVE_REPORT_STORE": 0.9101851851851853,
+      "REPORT_STORE_OBSERVE": 0.9055555555555558,
+      "REPORT_OBSERVE_STORE": 0.9092592592592593
+    },
+    "mean_post_report_recovery_by_order": {
+      "STORE_OBSERVE_REPORT": 0.04888888888888889,
+      "STORE_REPORT_OBSERVE": 0.05037037037037038,
+      "OBSERVE_STORE_REPORT": 0.06314814814814816,
+      "OBSERVE_REPORT_STORE": 0.06481481481481481,
+      "REPORT_STORE_OBSERVE": 0.054444444444444455,
+      "REPORT_OBSERVE_STORE": 0.06444444444444444
+    },
+    "matched_training_pairs": [
+      [
+        "mia",
+        "noah"
+      ],
+      [
+        "opal",
+        "pax"
+      ],
+      [
+        "quin",
+        "rue"
+      ]
+    ],
+    "exact_new_updates_per_epoch": 24,
+    "exact_old_updates_per_epoch": 15
+  },
+  "interpretation": {
+    "cleanup_order_sensitivity_generalizes_across_all_three_matched_subject_pairs": true,
+    "no_single_cleanup_order_is_best_for_all_six_subjects": true,
+    "subject_context_changes_which_order_preserves_old_retention_best": true,
+    "observe_heavy_late_orders_have_higher_mean_recovery_but_not_universal_dominance": true,
+    "corrected_matched_pair_design_preserves_the_frozen_24_update_new_family_budget": true,
+    "heldout_new_accuracy_remains_high_but_shows_some_pair_and_order_dependence": true,
+    "plain_speak": "The order of cleanup examples matters for every subject pair, but different subjects prefer different orders. There is a broad tendency for OBSERVE-heavy late cleanup to repair more, yet it is not reliable enough to be a universal recipe. The mechanism is genuinely context-sensitive rather than a single magic ordering.",
+    "north_star_question": "Establishes cleanup-order context sensitivity as a real generalization boundary under fixed budget, which must be explained mechanistically before any autonomous replay scheduler can safely choose order.",
+    "next_stage": "measure subject-specific cleanup block update geometry and chained-order noncommutativity from the same post-REPORT state to explain why identical class compositions prefer different orders"
+  },
+  "activation_authorized": false
+}
