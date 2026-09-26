@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up120b-windows-proof.v1",
+  "experiment": "UP-120B-competitor-orthogonal",
+  "status": "qualified-scientific-result",
+  "source_head": "482c533701402e5aba021a068058ae59222a3cee",
+  "workflow_run_id": 36237652999,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10904825952,
+  "artifact_sha256": "09a9399be8c98fb38e2fbdcd14206c5c5edc16867f691a2958d0e10c9f51bb8f",
+  "state_dimension": 64,
+  "learning_rate": 0.08,
+  "epochs_per_batch": 20,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "adaptive_geometry": false,
+  "findings": {
+    "baseline_static": {
+      "store_centroid_cosine": 0.30501255007864947,
+      "observe_centroid_cosine": 0.7056448344803486,
+      "report_centroid_cosine": 0.21027162709104255
+    },
+    "centroid_shift_static": {
+      "store_centroid_cosine": 1,
+      "observe_centroid_cosine": 0.5149118268081729,
+      "report_centroid_cosine": 0.49450977377968125
+    },
+    "competitor_orthogonal_static": {
+      "store_centroid_cosine": 0.7612044125629439,
+      "observe_centroid_cosine": 7.178957982966933e-17,
+      "report_centroid_cosine": -1.342179487165958e-16
+    },
+    "baseline_failure_points": 12,
+    "centroid_shift_failure_points": 12,
+    "competitor_orthogonal_failure_points": 0,
+    "competitor_orthogonal_worst_stores_accuracy": 1,
+    "competitor_orthogonal_min_base_lexicon_accuracy": 1,
+    "competitor_orthogonal_min_mean_store_observe_margin": 1.2496738231804498,
+    "competitor_orthogonal_min_mean_store_report_margin": 0.8772146244098079,
+    "acquired_aggregate_accuracy_all_nonzero_stages_competitor_orthogonal": 1
+  },
+  "interpretation": {
+    "multi_competitor_representation_deconfounding_closes_the_observed_stores_failure_matrix": true,
+    "one_axis_centroid_shift_was_insufficient_but_projection_out_of_both_competitor_directions_is_sufficient_in_the_tested_matrix": true,
+    "replay_policy_no_longer_controls_stores_survival_under_the_corrected_geometry": true,
+    "next_stage": "stress the fixed competitor-orthogonal stores representation across unseen subjects and broader acquisition-order/lexical perturbations without changing the correction or training rules"
+  },
+  "activation_authorized": false
+}
