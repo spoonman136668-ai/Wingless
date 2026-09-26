@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up141b-windows-proof.v1",
+  "experiment": "UP-141B-tail-diversity-replication",
+  "status": "qualified-scientific-result",
+  "source_head": "2be5175c3ffc8356c203bafb836e8502d40bd2f4",
+  "workflow_run_id": 36255059735,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10910860010,
+  "artifact_sha256": "724b9aa9e065c0d0561602e240604281469125f48e1947887bc30ecc384aca70",
+  "findings": {
+    "diversity1": {
+      "old_mean": 0.9888888888888889,
+      "new_mean": 0.9114583333333333,
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.90625
+    },
+    "diversity8": {
+      "old_mean": 0.9888888888888889,
+      "new_mean": 0.9635416666666667,
+      "primary_new": 0.9583333333333334,
+      "secondary_new": 0.96875
+    },
+    "diversity20": {
+      "old_mean": 0.9888888888888889,
+      "new_mean": 0.9635416666666667,
+      "primary_new": 0.9583333333333334,
+      "secondary_new": 0.96875
+    }
+  },
+  "interpretation": {
+    "preregistered_old_retention_advantage_replicated": false,
+    "old_retention_identical_across_frozen_arms": true,
+    "broader_tail_diversity_improved_new_family_accuracy": true,
+    "b140_retention_effect_is_not_yet_family_general": true,
+    "plain_speak": "Changing which new examples come last still helped learn this second vocabulary family, but it did not improve old-vocabulary memory because old retention was already equally high in every arm. The earlier retention benefit therefore is not a universal rule across lexical families.",
+    "north_star_question": "Tests whether a scheduling mechanism for sequential lexical learning generalizes across disjoint language families without extra memory or training budget.",
+    "next_stage": "run a paired same-harness family-by-diversity interaction test to distinguish a family-dependent retention effect from run-to-run or implementation differences"
+  },
+  "activation_authorized": false
+}
