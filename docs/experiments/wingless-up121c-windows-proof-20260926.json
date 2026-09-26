@@ -1,0 +1,60 @@
+{
+  "schema": "wingless.up121c-windows-proof.v1",
+  "experiment": "UP-121C-mixed-age3-sharing",
+  "status": "qualified-scientific-result",
+  "source_head": "75ecb6102245e936404c3b4c87b50994acb20486",
+  "workflow_run_id": 36254208317,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10910360116,
+  "artifact_sha256": "21b90e1b522ce0889994d4c6c81e8d18b10ec133fda1a8b608e793e7ea8d6613",
+  "hot_keys": 12,
+  "valid_recurring_candidates": 4,
+  "burst_distractors": 2,
+  "skip_three_negatives": 2,
+  "generation_interval": 32,
+  "admission_memory_bytes": 128,
+  "exact_recall_cap": 16,
+  "key_bits": 14,
+  "churn_writes": 12288,
+  "findings": {
+    "age1_control": {
+      "adjacent_admission_rate": 1,
+      "skip_one_admission_rate": 1,
+      "skip_two_admission_rate": 0,
+      "burst_admission_rate": 0,
+      "skip_three_admission_rate": 0,
+      "hot_accuracy": 1,
+      "adjacent_accuracy": 1,
+      "skip_one_accuracy": 1,
+      "skip_two_accuracy": 0,
+      "target16_accuracy": 0.9375,
+      "target16_exact_accuracy": 0,
+      "negative_retention_rate": 0
+    },
+    "age2_extended": {
+      "adjacent_admission_rate": 1,
+      "skip_one_admission_rate": 1,
+      "skip_two_admission_rate": 1,
+      "burst_admission_rate": 0,
+      "skip_three_admission_rate": 0,
+      "hot_accuracy": 1,
+      "adjacent_accuracy": 1,
+      "skip_one_accuracy": 1,
+      "skip_two_accuracy": 1,
+      "target16_accuracy": 1,
+      "target16_exact_accuracy": 1,
+      "negative_retention_rate": 0
+    },
+    "one_shot_false_admissions_all_arms": 0,
+    "recall_entries_used": 16,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "heterogeneous_temporal_horizons_share_the_same_128_byte_history_without_interference": true,
+    "adjacent_one_skip_and_two_skip_valid_candidates_are_all_preserved_exactly": true,
+    "burst_and_skip_three_negatives_are_rejected_simultaneously": true,
+    "the_current_limit_is_no_longer_temporal_mixing_but_history_sidecar_occupancy_pressure": true,
+    "next_stage": "stress the same age2 history with increasing numbers of qualified but nonpersistent distractors across consecutive generations while preserving four valid skip-one targets"
+  },
+  "activation_authorized": false
+}
