@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.up130b-windows-proof.v1",
+  "experiment": "UP-130B-dualview-zero-shot-lexical",
+  "status": "qualified-scientific-result",
+  "source_head": "cf32298b71e56cc036983050b288e5e745dcbd0e",
+  "workflow_run_id": 36249715110,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10908289614,
+  "artifact_sha256": "a96aa2d602516b6a45a868cb9c357e18e0f444390ebb8f7fd97c70b2a4fe2574",
+  "state_dimension": 64,
+  "gate_input_dimension": 128,
+  "gate_epochs": 20,
+  "learning_rate": 0.08,
+  "findings": {
+    "original_heldout_overall_accuracy": 0.041666666666666664,
+    "prior_unseen_overall_accuracy": 0.013888888888888888,
+    "new_unseen_overall_accuracy": 0.027777777777777776,
+    "store_accuracy_all_splits": 0,
+    "store_recall_all_splits": 0,
+    "original_heldout_observe_accuracy": 0,
+    "original_heldout_report_accuracy": 0.125,
+    "prior_unseen_observe_accuracy": 0.041666666666666664,
+    "prior_unseen_report_accuracy": 0,
+    "new_unseen_observe_accuracy": 0.041666666666666664,
+    "new_unseen_report_accuracy": 0.041666666666666664,
+    "worst_surface_accuracy_all_splits": 0
+  },
+  "interpretation": {
+    "dual_view_gate_does_not_zero_shot_generalize_to_unseen_verb_surfaces": true,
+    "up129b_success_was_lexically_grounded_not_surface_agnostic_semantic_abstraction": true,
+    "projector_mechanism_remains_valid_but_gate_requires_new_surface_grounding": true,
+    "subject_generalization_is_not_the_limiting_factor_relative_to_new_lexical_identity": true,
+    "next_stage": "hold the projector and gate architecture fixed and measure few-shot lexical grounding efficiency on the new 12-surface family using 1 2 and 4 grounding subjects"
+  },
+  "activation_authorized": false
+}
