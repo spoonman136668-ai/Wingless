@@ -1,0 +1,72 @@
+{
+  "schema": "wingless.up140c-windows-proof.v1",
+  "experiment": "UP-140C-unresolved-candidate-identity",
+  "status": "qualified-scientific-result",
+  "source_head": "0258b0f94b256500e08b45e40d1979cd8d864ae5",
+  "workflow_run_id": 36270831832,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10915626826,
+  "artifact_sha256": "13eb2ef55016cc6e10b816970afbbe2b858978920f13f0e8616ede0bfa403e46",
+  "findings": {
+    "unresolved_calls_per_arm": 64,
+    "candidate_boundaries_per_arm": 2,
+    "target100": {
+      "unique_32": {
+        "history_after_b1": 1,
+        "age_b1": 1,
+        "entries_b1": 1,
+        "history_after_b2": 1,
+        "age_b2": 2,
+        "entries_b2": 1,
+        "age2_evictions": 0,
+        "admission": 1
+      },
+      "paired_16": {
+        "history_after_b1": 1,
+        "age_b1": 1,
+        "entries_b1": 17,
+        "history_after_b2": 0,
+        "age_b2": 0,
+        "entries_b2": 32,
+        "age2_evictions": 64,
+        "admission": 0
+      },
+      "quartet_8": {
+        "history_after_b1": 1,
+        "age_b1": 1,
+        "entries_b1": 9,
+        "history_after_b2": 1,
+        "age_b2": 2,
+        "entries_b2": 17,
+        "age2_evictions": 0,
+        "admission": 1
+      },
+      "repeat_1": {
+        "history_after_b1": 1,
+        "age_b1": 1,
+        "entries_b1": 2,
+        "history_after_b2": 1,
+        "age_b2": 2,
+        "entries_b2": 3,
+        "age2_evictions": 0,
+        "admission": 1
+      }
+    },
+    "target103_same_pattern": true,
+    "unexpected_manipulation_admissions_all_arms": 0,
+    "hot_accuracy_all_arms": 1,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "equal_unresolved_event_count_does_not_imply_equal_history_survival": true,
+    "qualified_history_insertion_pressure_can_evict_an_age_two_target_before_nominal_age_expiry": true,
+    "paired_16_is_the_only_tested_topology_that_fills_history_and_evicts_the_target": true,
+    "pure_unique_singles_and_denser_recurrence_with_fewer_qualified_identities_preserve_target_history": true,
+    "identity_topology_affects_history_occupancy_through_number_of_qualified_current_entries": true,
+    "plain_speak": "The clock still advances by unresolved events, but survival also depends on how many of those events turn into qualified history entries. Sixteen paired candidates per window fill the 32-entry history table and push out the age-2 target; 8, 1, or 0 qualified insertions per window do not.",
+    "north_star_question": "Adds bounded-capacity replacement pressure to the temporal consolidation mechanism, separating event-time aging from history-table competition.",
+    "next_stage": "densify qualified insertions per 32-event window around the predicted capacity boundary to locate the exact history-pressure threshold for age-2 target eviction"
+  },
+  "activation_authorized": false
+}
