@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.up103b-windows-proof.v1",
+  "experiment": "UP-103B-rehearsal-grounding",
+  "status": "qualified-scientific-result",
+  "source_head": "4da64853fa78da50afef9b7d1cb18b7641889b8d",
+  "workflow_run_id": 36206165216,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10892974755,
+  "artifact_sha256": "d9050c831a4651613a26a2c3b80f8ddc0ff4af16b782f0395732b624d478970d",
+  "state_dimension": 64,
+  "epochs": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "findings": {
+    "adaptation_only": {
+      "heldout_accuracy": 1,
+      "seen_verb_accuracy": 0.8611111111111112,
+      "store_recall": 1,
+      "observe_recall": 1,
+      "report_recall": 1
+    },
+    "rehearsal_stabilized": {
+      "heldout_accuracy": 1,
+      "seen_verb_accuracy": 1,
+      "store_recall": 1,
+      "observe_recall": 1,
+      "report_recall": 1
+    }
+  },
+  "interpretation": {
+    "tiny_rehearsal_eliminates_observed_forgetting": true,
+    "perfect_new_and_old_verb_accuracy_coexist_in_tested_setting": true,
+    "continual_lexical_interference_not_capacity_is_supported_as_b102_failure": true,
+    "next_stage": "test sequential acquisition of multiple lexical batches with the same fixed rehearsal rule"
+  },
+  "activation_authorized": false
+}
