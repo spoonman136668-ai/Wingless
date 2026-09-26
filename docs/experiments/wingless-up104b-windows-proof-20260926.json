@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.up104b-windows-proof.v1",
+  "experiment": "UP-104B-sequential-lexical-acquisition",
+  "status": "qualified-scientific-result",
+  "source_head": "0c70ca9eb84fb47652414dc3ea6d7bfbb99536d8",
+  "workflow_run_id": 36227794148,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10901153963,
+  "artifact_sha256": "6973ea2b16316f0c17c83e20f8b181dc2521f5dfdded101bf78ccace3e5f0754",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "stages": [
+    {
+      "stage": 0,
+      "base_seen_accuracy": 1,
+      "acquired_aggregate_accuracy": 0,
+      "holds_accuracy": 0,
+      "notes_accuracy": 1,
+      "tells_accuracy": 0
+    },
+    {
+      "stage": 1,
+      "base_seen_accuracy": 1,
+      "acquired_aggregate_accuracy": 1,
+      "holds_accuracy": 1,
+      "notes_accuracy": 0,
+      "tells_accuracy": 0
+    },
+    {
+      "stage": 2,
+      "base_seen_accuracy": 0.9722222222222222,
+      "acquired_aggregate_accuracy": 1,
+      "holds_accuracy": 1,
+      "notes_accuracy": 1,
+      "tells_accuracy": 0
+    },
+    {
+      "stage": 3,
+      "base_seen_accuracy": 1,
+      "acquired_aggregate_accuracy": 0.6666666666666666,
+      "holds_accuracy": 0,
+      "notes_accuracy": 1,
+      "tells_accuracy": 1
+    }
+  ],
+  "interpretation": {
+    "sequential_acquisition_not_stable_under_single_anchor_rehearsal": true,
+    "base_lexicon_recovers_to_perfect_after_final_batch": true,
+    "earliest_acquired_verb_is_forgotten_after_third_batch": true,
+    "backward_interference_between_acquired_verbs_confirmed": true,
+    "next_stage": "measure rehearsal breadth required for previously acquired verbs while keeping grounding, encoder, epochs, and base rehearsal frozen"
+  },
+  "activation_authorized": false
+}
