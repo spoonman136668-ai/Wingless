@@ -5,6 +5,7 @@ import "math"
 const UP165BMarginSchema="wingless.up165b-report-margin-crossings.v1"
 
 type UP165BCrossing struct{
+	Subject string `json:"subject"`
 	Path string `json:"path"`
 	ReportIndex int `json:"report_index"`
 	Split string `json:"split"`
@@ -70,13 +71,13 @@ func up165bStats(before,after []up165bEval)(cti,itc int,meanB,meanA,minB,minA fl
 	}
 	n:=float64(len(before));meanB/=n;meanA/=n;return
 }
-func up165bCross(path string,report int,before,after []up165bEval)[]UP165BCrossing{
+func up165bCross(subject,path string,report int,before,after []up165bEval)[]UP165BCrossing{
 	out:=[]UP165BCrossing{}
 	for i:=range before{
 		dir:=""
 		if before[i].correct&&!after[i].correct{dir="correct_to_incorrect"}
 		if !before[i].correct&&after[i].correct{dir="incorrect_to_correct"}
-		if dir!=""{out=append(out,UP165BCrossing{Path:path,ReportIndex:report,Split:before[i].split,Name:before[i].name,Verb:before[i].verb,TargetClass:before[i].class,BeforeMargin:before[i].margin,AfterMargin:after[i].margin,Direction:dir})}
+		if dir!=""{out=append(out,UP165BCrossing{Subject:subject,Path:path,ReportIndex:report,Split:before[i].split,Name:before[i].name,Verb:before[i].verb,TargetClass:before[i].class,BeforeMargin:before[i].margin,AfterMargin:after[i].margin,Direction:dir})}
 	}
 	return out
 }
@@ -94,8 +95,8 @@ func RunUP165B()(UP165BResult,error){
 			bcti,bitc,bmb,bma,bminb,bmina:=up165bStats(bb,ba)
 			diff:=0;for i:=range aa{if aa[i].correct!=ba[i].correct{diff++}}
 			res.Steps=append(res.Steps,UP165BStep{Subject:subject,ReportIndex:report,PathAOldBefore:aOldBefore,PathAOldAfter:up160bOld(a,o,r),PathBOldBefore:bOldBefore,PathBOldAfter:up160bOld(b,o,r),PathACorrectToIncorrect:acti,PathAIncorrectToCorrect:aitc,PathBCorrectToIncorrect:bcti,PathBIncorrectToCorrect:bitc,PathAMeanMarginBefore:amb,PathAMeanMarginAfter:ama,PathBMeanMarginBefore:bmb,PathBMeanMarginAfter:bma,PathAMinMarginBefore:aminb,PathAMinMarginAfter:amina,PathBMinMarginBefore:bminb,PathBMinMarginAfter:bmina,DifferentCorrectnessAfter:diff})
-			res.Crossings=append(res.Crossings,up165bCross("STORE_OBSERVE",report,ab,aa)...)
-			res.Crossings=append(res.Crossings,up165bCross("OBSERVE_STORE",report,bb,ba)...)
+			res.Crossings=append(res.Crossings,up165bCross(subject,"STORE_OBSERVE",report,ab,aa)...)
+			res.Crossings=append(res.Crossings,up165bCross(subject,"OBSERVE_STORE",report,bb,ba)...)
 		}
 	}
 	return res,nil
