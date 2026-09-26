@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.up149c-windows-proof.v1",
+  "experiment": "UP-149C-hand-rotation-causality",
+  "status": "qualified-scientific-result",
+  "source_head": "4b42450fb3ccae7282c0eb44f00b0d42aed82e11",
+  "workflow_run_id": 36276061927,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10917631239,
+  "artifact_sha256": "f0684fd48d8bdb153835ddb3dff2668d4f95cc8787729e58985927afb45d49b4",
+  "findings": {
+    "target_slots": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "hand0_retained_by_refresh": [
+      4,
+      3,
+      2,
+      1
+    ],
+    "hand4_retained_by_refresh": [
+      4,
+      4,
+      4,
+      4
+    ],
+    "hand8_retained_by_refresh": [
+      4,
+      4,
+      4,
+      4
+    ],
+    "hand12_retained_by_refresh": [
+      4,
+      4,
+      4,
+      4
+    ],
+    "exact_recall_cap": 16,
+    "admissions_per_arm": 4
+  },
+  "interpretation": {
+    "replacement_hand_position_is_causal": true,
+    "fixed_slot_identity_alone_is_not_sufficient": true,
+    "same_target_facts_are_vulnerable_only_when_starting_hand_enters_their_slot_region_before_refresh": true,
+    "plain_speak": "The same four facts in the same four slots fail only when the replacement hand starts on them. Rotate only the hand away and every tested refresh timing preserves all four. The loss follows the hand, not the fact names or fixed slots.",
+    "north_star_question": "Closes the hand-versus-slot causal distinction and makes durable-memory failure predictable from replacement-hand trajectory under fixed capacity.",
+    "next_stage": "map the exact eviction horizon across a full 16-admission cycle for several starting hands, without refresh, to derive the deterministic replacement trajectory before testing any fixed-budget protection schedule"
+  },
+  "activation_authorized": false
+}
