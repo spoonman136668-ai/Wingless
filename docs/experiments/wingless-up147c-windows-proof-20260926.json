@@ -1,0 +1,72 @@
+{
+  "schema": "wingless.up147c-windows-proof.v1",
+  "experiment": "UP-147C-durable-recency-gradient",
+  "status": "qualified-scientific-result",
+  "source_head": "c14569a12eb9c5de5b6bbfd17d928dbfd21eb7a8",
+  "workflow_run_id": 36274833234,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10916796428,
+  "artifact_sha256": "ec2d5ba5fb87030c9b8a3473f03e915cfb42e6219c18f7a2f6ea4c6fcd4bdebb",
+  "findings": {
+    "exact_recall_cap": 16,
+    "four_admissions_per_arm": true,
+    "refresh_attempts_per_arm": 4,
+    "keys_0_3": {
+      "before_1": {
+        "present_before_refresh": 4,
+        "successful_refresh": 4,
+        "final_retained": 4,
+        "accuracy": 1
+      },
+      "before_2": {
+        "present_before_refresh": 3,
+        "successful_refresh": 3,
+        "final_retained": 3,
+        "accuracy": 0.75
+      },
+      "before_3": {
+        "present_before_refresh": 2,
+        "successful_refresh": 2,
+        "final_retained": 2,
+        "accuracy": 0.5
+      },
+      "before_4": {
+        "present_before_refresh": 1,
+        "successful_refresh": 1,
+        "final_retained": 1,
+        "accuracy": 0.25
+      }
+    },
+    "keys_4_7_all_refresh_arms": {
+      "present_before_refresh": 4,
+      "successful_refresh": 4,
+      "final_retained": 4,
+      "accuracy": 1
+    },
+    "keys_8_11_all_refresh_arms": {
+      "present_before_refresh": 4,
+      "successful_refresh": 4,
+      "final_retained": 4,
+      "accuracy": 1
+    },
+    "keys_12_15_all_refresh_arms": {
+      "present_before_refresh": 4,
+      "successful_refresh": 4,
+      "final_retained": 4,
+      "accuracy": 1
+    },
+    "memory_policy_changed": false,
+    "capacity_increased": false
+  },
+  "interpretation": {
+    "simple_global_recency_gradient_is_not_established": true,
+    "first_cohort_gradient_is_explained_by_pre_refresh_eviction": true,
+    "successful_refresh_preserves_surviving_facts_but_cannot_restore_already_evicted_facts": true,
+    "later_table_regions_survive_all_tested_refresh_positions_under_four_admissions": true,
+    "hand_slot_layout_remains_a_major_determinant_of_durable_survival": true,
+    "plain_speak": "Refreshing later looks worse only for the cohort sitting directly in the replacement path: by the time the refresh happens, some of those facts are already gone. The other cohorts survive no matter when they are refreshed. So 'newer access always survives better' is too simple; access recency and the replacement hand/slot layout interact strongly.",
+    "north_star_question": "Rejects a purely scalar durable-recency model and identifies recency×layout interaction as the remaining fixed-capacity durable-retention mechanism.",
+    "next_stage": "rotate the initial durable insertion/hand alignment while preserving the same refresh timing and four admissions, testing whether the vulnerable recency pattern moves with slot/hand position rather than lexical identity"
+  },
+  "activation_authorized": false
+}
