@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.up100b-windows-proof.v1",
+  "experiment": "UP-100B-prefix-timed-routing",
+  "status": "qualified-scientific-result",
+  "source_head": "c8fb35daa66ca27d3790bd422946810505e48306",
+  "workflow_run_id": 36204054655,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10892622852,
+  "artifact_sha256": "295327acaac3cfca2f0f1456bb05b6fd2f0452dc9277184677776051b63586bb",
+  "state_dimension": 64,
+  "epochs": 20,
+  "learning_rate": 0.08,
+  "exact_recall_cap": 16,
+  "explicit_class_at_learned_inference": false,
+  "classifier": {
+    "train_accuracy": 1,
+    "heldout_recombination_accuracy": 1,
+    "store_precision": 1,
+    "store_recall": 1,
+    "observe_precision": 1,
+    "observe_recall": 1,
+    "report_precision": 1,
+    "report_recall": 1,
+    "all_nine_verb_accuracies": 1
+  },
+  "routing": {
+    "explicit_query_accuracy_min": 1,
+    "explicit_exact_set_accuracy_min": 1,
+    "learned_query_accuracy_min": 1,
+    "learned_exact_set_accuracy_min": 1,
+    "tested_total_writes": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "tested_target_keys": [
+      4,
+      8,
+      16
+    ],
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "prefix_timed_threeway_routing_integrates_without_loss": true,
+    "suffix_interference_boundary_bypassed_without_explicit_class": true,
+    "next_stage": "test whole held-out lexical verb families at prefix timing before broader semantic routing claims"
+  },
+  "activation_authorized": false
+}
