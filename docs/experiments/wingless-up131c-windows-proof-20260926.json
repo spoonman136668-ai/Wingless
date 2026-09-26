@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.up131c-windows-proof.v1",
+  "experiment": "UP-131C-mixed-phase-selectivity",
+  "status": "qualified-scientific-result",
+  "source_head": "c7d931ed2850ac0317cc28d398600647b1058cae",
+  "workflow_run_id": 36265104344,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10913283587,
+  "artifact_sha256": "b2de15054814ca1496e8ea346b7c900e839b1437a7d42d32c0af039dbfffca12",
+  "findings": {
+    "assignment_a": {
+      "same_targets": [
+        100,
+        101
+      ],
+      "cross_targets": [
+        102,
+        103
+      ],
+      "same_admission": 1,
+      "cross_admission": 0,
+      "same_accuracy": 1,
+      "cross_accuracy": 0,
+      "target16_accuracy": 0.875,
+      "target16_exact": 0
+    },
+    "assignment_b": {
+      "same_targets": [
+        102,
+        103
+      ],
+      "cross_targets": [
+        100,
+        101
+      ],
+      "same_admission": 1,
+      "cross_admission": 0,
+      "same_accuracy": 1,
+      "cross_accuracy": 0,
+      "target16_accuracy": 0.875,
+      "target16_exact": 0
+    },
+    "hot_accuracy_all_arms": 1,
+    "nonpersistent_admission_all_arms": 0,
+    "nonpersistent_retention_all_arms": 0,
+    "one_shot_false_admissions_all_arms": 0,
+    "panic_rate_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "consolidation_is_selective_per_item": true,
+    "temporal_path_not_target_identity_determines_consolidation": true,
+    "same_generation_targets_consolidate_while_cross_boundary_targets_fail_in_the_same_stream": true,
+    "mirrored_assignment_reproduces_the_effect_exactly": true,
+    "plain_speak": "The memory does not globally switch into a good or bad consolidation mode. Inside the same stream, each item succeeds or fails according to its own timing: two reminders within one window become durable, while two reminders split across the reset do not. Swapping which items get which timing swaps the outcome.",
+    "north_star_question": "Shows that bounded temporal consolidation can operate selectively at item level inside mixed streams, a prerequisite for integrating durable evidence into realistic language sequences.",
+    "next_stage": "test overlapping item phases where different targets enter and leave the same generation at staggered positions, while preserving the two-sighting rule and fixed memory"
+  },
+  "activation_authorized": false
+}
