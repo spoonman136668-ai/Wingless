@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up127c-windows-proof.v1",
+  "experiment": "UP-127C-recurrence-timing",
+  "status": "qualified-scientific-result",
+  "source_head": "9b2bf69bee800ce65b70aaa0154e79083398b0fa",
+  "workflow_run_id": 36257652008,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10911233724,
+  "artifact_sha256": "5bf4fd0cd1b08085a3cc48a89220155c3afc100f3b94d73610ec5b0a6046f3d6",
+  "findings": {
+    "recur_before_second": {
+      "q2_0": {
+        "valid_admission": 1,
+        "valid_accuracy": 1,
+        "target16_exact": 1
+      },
+      "q2_1": {
+        "valid_admission": 1,
+        "valid_accuracy": 1,
+        "target16_exact": 1
+      },
+      "q2_4": {
+        "valid_admission": 1,
+        "valid_accuracy": 1,
+        "target16_exact": 1
+      }
+    },
+    "recur_after_second": {
+      "q2_0": {
+        "valid_admission": 1,
+        "valid_accuracy": 1,
+        "target16_exact": 1
+      },
+      "q2_1": {
+        "valid_admission": 0.75,
+        "valid_accuracy": 0.75,
+        "target16_exact": 0
+      },
+      "q2_4": {
+        "valid_admission": 0,
+        "valid_accuracy": 0,
+        "target16_exact": 0
+      }
+    },
+    "hot_accuracy_all_cells": 1,
+    "nonpersistent_admission_all_cells": 0,
+    "nonpersistent_retention_all_cells": 0,
+    "one_shot_false_admissions_all_cells": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "recurrence_timing_is_causally_sufficient_to_protect_pending_targets": true,
+    "recurring_before_second_overflow_preserves_all_targets_through_q2_4": true,
+    "recurring_after_second_overflow_reproduces_destructive_boundary": true,
+    "no_memory_or_replacement_rule_change_required": true,
+    "plain_speak": "The same tiny memory succeeds or fails depending only on timing. If the real targets repeat before the next overflow, they graduate into protected exact memory and survive. If the overflow arrives first, it can erase their temporary evidence. No extra memory was needed.",
+    "north_star_question": "Shows that bounded sequence memory can protect useful information through timely recurrence alone, identifying a temporal consolidation mechanism needed for sustained language streams under fixed memory.",
+    "next_stage": "hold Q2 at the destructive four-candidate pressure point and vary pre-overflow target recurrence dose to locate the minimum evidence needed for consolidation"
+  },
+  "activation_authorized": false
+}
