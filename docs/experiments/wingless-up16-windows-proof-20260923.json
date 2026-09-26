@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.unitary-composite-state-windows-proof.v1",
+  "experiment": "UP-16-single-composite-recurrent-state",
+  "status": "qualified",
+  "observed_at": "2026-09-23T05:20:37-04:00",
+  "source_head": "91700cdc25e2ac538742ebd95b31010ee6dc1e2a",
+  "baseline_head": "33162a84dfd91e405564f3812303e0d49bf9ed8b",
+  "platform": "windows",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "base_dimension": 16,
+  "composite_dimension": 96,
+  "logical_channels_before_fold": 6,
+  "runtime_state_objects": 1,
+  "frame_side_vectors_materialized_after_pack": false,
+  "channel_subspaces_explicit": true,
+  "runtime_prototype_lookup": false,
+  "explicit_inverse_readout": false,
+  "explicit_depth_provided": false,
+  "memory_only_global_phase_nuisance": true,
+  "memory_noise_amplitude": 0.05,
+  "observable_equivalence": {
+    "pass": true,
+    "max_error": 1.176836406102666e-14
+  },
+  "unitary": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 1.0,
+    "max_norm_drift": 3.175237850427948e-14
+  },
+  "matched_control": {
+    "train_accuracy": 0.8671875,
+    "held_out_accuracy": 0.763427734375,
+    "max_norm_drift": 2211700831922.4956
+  },
+  "unitary_mutable_integration": {
+    "scenarios": 48,
+    "writes_per_scenario": 16,
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "min_value_margin": 0.17822707126915677,
+    "min_relation_margin": 0.9021418701257917,
+    "max_composite_norm_drift": 2.9753977059954195e-14
+  },
+  "diagnosis": {
+    "observable_equivalence_pass": true,
+    "static_fold_pass": true,
+    "mutable_integration_pass": true
+  },
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "The learned memory/reference system can be packed into one 96-dimensional recurrent complex state and evolved without separately materializing frame vectors. Observable semantics match the separate-state formulation to numerical precision, unseen-depth decoding remains perfect, and mutable integration remains perfect. The six internal channel subspaces are still explicit and therefore remain the next research boundary."
+}

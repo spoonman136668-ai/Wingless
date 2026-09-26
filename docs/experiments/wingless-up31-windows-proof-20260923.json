@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.isospectral-misalignment-windows-proof.v1",
+  "experiment": "UP-31-isospectral-hidden-per-copy-misalignment",
+  "status": "qualified-causal-positive",
+  "observed_at": "2026-09-23T14:33:13Z",
+  "source_head": "95d0c7e587cf7b09134af7850983b1aeba8852ba",
+  "parent_up30_seal": "7a8343cd2056033183ff0d374c6eeccc3fcc24e9",
+  "workflow_run_id": 35874862731,
+  "workflow_artifact_id": 10757102802,
+  "workflow_artifact_sha256": "677e80540d20ec7d4a32b777589a03b067e94de57210b076d250d83c329bd78d",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "artifact_repairs_before_result": [
+    "removed unused math import"
+  ],
+  "base_control": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 1.0,
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0
+  },
+  "misaligned_transport": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 0.999755859375,
+    "per_entity_held_out_accuracy": [1.0, 1.0, 1.0, 0.9990234375],
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "min_value_margin": 0.20901919515002848,
+    "min_relation_margin": 0.9184824043396969,
+    "max_norm_drift": 1.840194663316197e-12
+  },
+  "structural_diagnostics": {
+    "orthogonality_error": 1.571908835734659e-14,
+    "isospectral_equivalence_error": 1.3100721734176645e-14,
+    "naive_shift_commutator": 0.13094732886183125,
+    "correct_hidden_shift_commutator": 9.626179587282793e-15,
+    "discovery_commutator_error": 3.0870983776273274e-7,
+    "feature_drift": 0.000022312310713926836,
+    "mixer_participation_ratio": 95.99999999999991
+  },
+  "diagnosis": {
+    "base_control_pass": true,
+    "misaligned_orthogonality_pass": true,
+    "isospectral_equivalence_pass": true,
+    "naive_alignment_break_pass": true,
+    "correct_intertwiner_pass": true,
+    "discovery_commutator_pass": true,
+    "feature_invariance_pass": true,
+    "misaligned_training_pass": true,
+    "misaligned_unseen_depth_pass": true,
+    "misaligned_mutable_pass": true,
+    "alignment_not_required_supported": true
+  },
+  "interpretation": "Exact coordinate-aligned co-evolution across the six historical copies is not required. The six-copy spectrum was preserved exactly while each copy received a different hidden internal basis; the naive aligned intertwiner stopped commuting, but a transport-only discovered observer retained essentially perfect unseen-depth accuracy and perfect mutable behavior. Combined with UP-30, this strengthens the causal hypothesis that repeated-spectrum multiplicity / the associated commutant structure is the important ingredient, rather than shared coordinate alignment.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

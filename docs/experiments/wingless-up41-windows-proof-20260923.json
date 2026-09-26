@@ -1,0 +1,114 @@
+{
+  "schema": "wingless.optimizer-reachability-calibration-windows-proof.v1",
+  "experiment": "UP-41-direct-optimizer-reachability-calibration",
+  "status": "qualified-mechanistic-calibration",
+  "observed_at": "2026-09-23T23:33:15Z",
+  "source_head": "2e5d8fdc0b55dc4ab5a1104974b9a9a88370330c",
+  "parent_up40_seal": "3df8ca932b974e7e12f103820550ad107dd71b91",
+  "target_source": "UP-35-seal-09284aa70203adf8881be42f67084c49b338dabe",
+  "target_groups": [
+    [
+      0,
+      1,
+      2,
+      5
+    ],
+    [
+      3
+    ],
+    [
+      4
+    ]
+  ],
+  "target_capacity": 18,
+  "workflow_run_id": 35934100720,
+  "workflow_artifact_id": 10782760156,
+  "workflow_artifact_sha256": "9f206c52d3032f94cc58a701343d46685c03c1a56062a870efe3b16fd3f57707",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "arms": {
+    "sequential_sticky_current": {
+      "initial_target_cosine": 0.44721359549995804,
+      "best_target_cosine": 0.5972570107705036,
+      "final_target_group_max_spread": 0.1297495074425781,
+      "entered_target_fusion_basin": false,
+      "exact_target_grouping_ever": false,
+      "wrong_cross_target_fusion_ever": true,
+      "final_groups": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ]
+    },
+    "sequential_no_sticky": {
+      "initial_target_cosine": 0.44721359549995804,
+      "best_target_cosine": 0.6715712791297879,
+      "final_target_group_max_spread": 0.12057930057991473,
+      "entered_target_fusion_basin": false,
+      "wrong_cross_target_fusion_ever": false
+    },
+    "analytic_reference_sticky": {
+      "initial_target_cosine": 0.44721359549995804,
+      "best_target_cosine": 0.868637844454198,
+      "final_target_group_max_spread": 0.07719720714501295,
+      "entered_target_fusion_basin": false,
+      "wrong_cross_target_fusion_ever": true,
+      "final_groups": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4
+        ]
+      ]
+    },
+    "analytic_reference_no_sticky": {
+      "initial_target_cosine": 0.44721359549995804,
+      "best_target_cosine": 0.8805670712125754,
+      "final_target_group_max_spread": 0.07413747148400111,
+      "entered_target_fusion_basin": false,
+      "wrong_cross_target_fusion_ever": false
+    }
+  },
+  "diagnosis": {
+    "current_optimizer_enters_target_basin": false,
+    "current_optimizer_exact_target_grouping": false,
+    "analytic_reference_enters_target_basin": false,
+    "sequential_estimator_trails_analytic_reference": true,
+    "sticky_projection_cross_target_fusion": true,
+    "twelve_step_reachability_limited": true,
+    "sequential_no_sticky_best_cosine": 0.6715712791297879,
+    "analytic_no_sticky_best_cosine": 0.8805670712125754,
+    "estimator_best_cosine_delta": 0.2089957920827875,
+    "optimizer_mechanics_implicated": true
+  },
+  "interpretation": "The direct optimizer is limited by more than the task surrogate. Even an exact gradient cannot enter the known-good target fusion basin in 12 updates; the sequential one-direction estimator travels materially less far than the exact-gradient reference; and sticky snapping can irreversibly fuse cross-target coordinates. The next calibration should remove sticky projection and test an efficient rolling full-rank gradient reconstruction across a preregistered horizon sweep.",
+  "calibration_only": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

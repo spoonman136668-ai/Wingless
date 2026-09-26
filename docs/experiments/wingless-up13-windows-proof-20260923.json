@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.unitary-learned-phase-frame-windows-proof.v1",
+  "experiment": "UP-13-task-learned-phase-frame",
+  "status": "qualified",
+  "observed_at": "2026-09-23T04:37:14-04:00",
+  "source_head": "e4d831bab9d170299b825d08e2d05426a5c1ef07",
+  "baseline_head": "20ae7845042af43f60634926c96347d80e214265",
+  "platform": "windows",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "code_rank": 4,
+  "pilot_states": 5,
+  "pilot_complex_scalars": 80,
+  "features_per_entity": 2,
+  "runtime_prototype_lookup": false,
+  "explicit_inverse_readout": false,
+  "explicit_depth_provided": false,
+  "global_phase_nuisance": true,
+  "phase_alphabet_learned": true,
+  "entity_support_learned": false,
+  "anchor_learned": false,
+  "memory_noise_amplitude": 0.05,
+  "initial_phases": [0,0.12,0.24,0.36],
+  "learned_phases": [0,-1.7700278912430298,1.1656136621055615,2.5917033093902164],
+  "initial_loss": 1.3565302298634854,
+  "final_loss": 0.009349958179460495,
+  "initial_capacity_accuracy": 0.3046875,
+  "initial_min_phase_separation": 0.12,
+  "learned_min_phase_separation": 1.1656136621055615,
+  "unitary": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 1.0
+  },
+  "matched_control": {
+    "train_accuracy": 0.8837890625,
+    "held_out_accuracy": 0.7802734375
+  },
+  "unitary_mutable_integration": {
+    "scenarios": 48,
+    "writes_per_scenario": 16,
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "min_value_margin": 0.924336004903164,
+    "min_relation_margin": 0.9625404347406539,
+    "max_norm_drift": 6.794564910705958e-14
+  },
+  "diagnosis": {
+    "phase_learning_pass": true,
+    "unseen_depth_pass": true,
+    "mutable_integration_pass": true
+  },
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "Task loss learned a useful four-value phase alphabet from a deliberately clustered initialization without target phase angles. With entity-local supports and anchor still fixed, the learned unitary frame generalized perfectly to unseen depths and mutable integration. This removes manual phase-code selection but does not yet learn pilot supports or the anchor."
+}

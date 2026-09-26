@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.rolling-gradient-horizon-windows-proof.v1",
+  "experiment": "UP-42-rolling-full-rank-gradient-horizon-calibration",
+  "status": "qualified-positive-optimizer-calibration",
+  "observed_at": "2026-09-23T23:39:09Z",
+  "source_head": "416032419c1189b5b6d2a5e19ca86300957cba3e",
+  "parent_up41_seal": "d5c622da08b3a13b7df3c4d3fd8ade45d2cc961a",
+  "target_source": "UP-35-seal-09284aa70203adf8881be42f67084c49b338dabe",
+  "workflow_run_id": 35934585631,
+  "workflow_artifact_id": 10782776086,
+  "workflow_artifact_sha256": "ca66934470383cd9fd2eb5a71d30fc7963d218c9227f1f2c9a62a6f05626b38a",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "horizons": [
+    12,
+    24,
+    48,
+    96
+  ],
+  "rolling_buffer_size": 7,
+  "sticky_projection_used": false,
+  "diagnosis": {
+    "sequential_minimum_tested_horizon": 0,
+    "rolling_minimum_tested_horizon": 48,
+    "analytic_minimum_tested_horizon": 48,
+    "sequential_first_basin_step": -1,
+    "rolling_first_basin_step": 30,
+    "analytic_first_basin_step": 38,
+    "rolling_matches_analytic_horizon": true,
+    "rolling_beats_sequential_at_max": true,
+    "sequential_max_best_cosine": 0.9961184309672584,
+    "rolling_max_best_cosine": 0.9999999863645984,
+    "analytic_max_best_cosine": 0.9999999999934922,
+    "rolling_efficient_candidate": true
+  },
+  "horizon48": {
+    "sequential": {
+      "best_target_cosine": 0.944806369535757,
+      "final_target_group_max_spread": 0.05330348453521714,
+      "entered_target_fusion_basin": false
+    },
+    "rolling": {
+      "best_target_cosine": 0.9999999686567316,
+      "final_target_group_max_spread": 0.00003708767395040058,
+      "entered_target_fusion_basin": true,
+      "first_target_basin_step": 30,
+      "full_rank_reconstruction_steps": 44
+    },
+    "analytic": {
+      "best_target_cosine": 0.9999939795259204,
+      "final_target_group_max_spread": 0.0005372671720079089,
+      "entered_target_fusion_basin": true,
+      "first_target_basin_step": 38
+    }
+  },
+  "interpretation": "A seven-observation rolling full-rank reconstruction preserves the low per-update probe cost while recovering enough tangent information to reach the independently known-good symmetry basin at the same minimum tested horizon as an exact-gradient reference. Extending the old one-direction estimator alone is insufficient through 96 updates. This qualifies rolling directional memory as the next task-side optimizer repair, with sticky fusion remaining disabled.",
+  "calibration_only": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

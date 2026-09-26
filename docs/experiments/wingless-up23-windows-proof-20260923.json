@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.unitary-spectral-invariants-windows-proof.v1",
+  "experiment": "UP-23-full-latent-transport-spectral-invariants",
+  "status": "qualified-scientific-negative",
+  "observed_at": "2026-09-23T13:01:52Z",
+  "source_head": "fb663a9a885a1dc8337e8792b2d8ad19fa021348",
+  "parent_up22_seal": "e25b0312c1ee15ecda95cd56a105efa3a73bf060",
+  "workflow_run_id": 35864220728,
+  "workflow_artifact_id": 10751234736,
+  "workflow_artifact_sha256": "ed409f42784a09379f2b4a23947c34a5fb3233c12e622a17dffdfd93562ea271",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "representation": {
+    "latent_dimension": 96,
+    "runtime_state_objects": 1,
+    "visible_channel_blocks": false,
+    "full_coordinate_mixing": true,
+    "transport_operator_used_as_reference": true,
+    "spectral_moment_count": 16,
+    "spectral_feature_dimension": 32
+  },
+  "unitary": {
+    "train_accuracy": 0.4091796875,
+    "held_out_accuracy": 0.3720703125,
+    "mean_phase_cosine": 0.2467355217800392,
+    "max_norm_drift": 1.6160406346443779e-12
+  },
+  "matched_control": {
+    "train_accuracy": 0.4560546875,
+    "held_out_accuracy": 0.25,
+    "max_norm_drift": 2201078893378.103
+  },
+  "invariance": {
+    "pass": true,
+    "max_moment_drift": 1.5197149094703377e-12
+  },
+  "mutable_integration": {
+    "commit_decode_accuracy": 0.005208333333333333,
+    "exact_final_table_accuracy": 0.020833333333333332,
+    "relational_query_accuracy": 0.16666666666666666,
+    "min_value_margin": 0.00003797214512440972,
+    "min_relation_margin": 0.00015449565047759295,
+    "max_norm_drift": 1.1393108678703356e-12
+  },
+  "interpretation": "Scalar transport moments are genuinely depth-invariant, but they collapse the repeated-eigenvalue multiplicity spaces to total spectral weight. The current full-latent transport inherits six-fold multiplicity from I6 tensor U, so task-relevant orientation inside those degenerate subspaces is discarded. The next experiment should add a generic transport-commuting observable algebra that resolves multiplicity-space orientation without restoring visible runtime blocks or applying the hidden unmix.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.unitary-blind-channel-windows-proof.v1",
+  "experiment": "UP-17-blind-anonymous-channel-recovery",
+  "status": "qualified-scientific-negative",
+  "observed_at": "2026-09-23T10:03:07Z",
+  "source_head": "f50d0656c6458cf0102e21296d066372916b9db7",
+  "baseline_head": "d60c993b8d98b2af05f3aa66c9cab8042d829b3f",
+  "platform": "windows-self-hosted",
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "workflow_run_id": 35846369957,
+  "artifact_id": 10743677638,
+  "harness_pass": true,
+  "automation_qualification_pass": true,
+  "scientific_gates": {
+    "channel_learning_pass": false,
+    "unseen_depth_pass": false,
+    "mutable_integration_pass": false
+  },
+  "initial_capacity_accuracy": 0.42578125,
+  "initial_loss": 1.2455451194780893,
+  "final_loss": 1.182344267859216,
+  "demixer_l2_shift": 1.4117056793980443,
+  "mean_role_alignment": 0.16618402487488318,
+  "minimum_role_alignment": 0.000321463516866842,
+  "unitary": {
+    "train_accuracy": 0.38972981770833337,
+    "held_out_accuracy": 0.379150390625,
+    "max_norm_drift": 3.219646771412954e-14
+  },
+  "matched_control": {
+    "train_accuracy": 0.37841796875,
+    "held_out_accuracy": 0.3681640625,
+    "max_norm_drift": 2211700831922.4907
+  },
+  "unitary_mutable_integration": {
+    "scenarios": 48,
+    "writes_per_scenario": 16,
+    "commit_decode_accuracy": 0.006510416666666667,
+    "exact_final_table_accuracy": 0.041666666666666664,
+    "relational_query_accuracy": 0.20833333333333334,
+    "min_value_margin": 5.520435956141156e-7,
+    "min_relation_margin": 0.000014740485217379362,
+    "max_norm_drift": 2.9753977059954195e-14
+  },
+  "interpretation": "The anonymous channel scramble preserved unitary norm but the row-normalized 6x6 task-learned readout projection did not recover the hidden semantic channel roles. The learner moved substantially from identity and reduced loss modestly, yet role alignment remained poor and unseen-depth/mutable behavior collapsed. This is a scientific negative for the tested learning formulation, not evidence that anonymous mixing destroys information or that semantic recovery is impossible.",
+  "next_question": "Does the failure come from information loss or from the unconstrained demixer optimization geometry? Test oracle transpose recoverability and a task-learned orthogonal Givens-parameterized demixer before increasing scrambling dimensionality.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

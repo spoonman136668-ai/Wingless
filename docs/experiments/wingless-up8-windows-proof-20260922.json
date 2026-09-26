@@ -1,0 +1,31 @@
+{
+  "schema": "wingless.unitary-observer-ablation-windows-proof.v1",
+  "experiment": "UP-8-confound-controlled-observer-ablation",
+  "status": "qualified",
+  "observed_at": "2026-09-22T21:11:39-04:00",
+  "source_head": "d4ec92378407e46b2d38577a0ef096c2d0f526d0",
+  "baseline_head": "c9522ed665e4d1edfaa2d6c5001b00e15f9e3e47",
+  "platform": "windows",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "balanced_split_valid": true,
+  "min_train_marginal_count": 14,
+  "min_held_out_marginal_count": 13,
+  "unitary_magnitude_fixed_heldout_accuracy": 0.62109375,
+  "unitary_coherence_fixed_heldout_accuracy": 1.0,
+  "unitary_magnitude_unseen_depth_heldout_accuracy": 0.294921875,
+  "unitary_coherence_unseen_depth_heldout_accuracy": 0.373046875,
+  "control_coherence_fixed_heldout_accuracy": 1.0,
+  "control_coherence_unseen_depth_heldout_accuracy": 0.3896484375,
+  "diagnosis": {
+    "measurement_loss_supported": true,
+    "fixed_coherence_pass": true,
+    "cross_depth_coherence_pass": false,
+    "frame_ambiguity_supported": true,
+    "fixed_coherence_advantage": 0.37890625
+  },
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "After correcting the UP-7 split and query-conditioning confounds, phase/coherence-aware observation perfectly decoded unseen table combinations at a fixed transport frame, while magnitude-only observation did not. Neither unitary nor matched non-unitary coherence observers generalized across unseen transport depths. This supports both measurement-information loss and transport-frame ambiguity as distinct effects."
+}

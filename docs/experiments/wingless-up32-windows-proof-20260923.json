@@ -1,0 +1,71 @@
+{
+  "schema": "wingless.multiplicity-dose-windows-proof.v1",
+  "experiment": "UP-32-repeated-spectrum-multiplicity-dose-response",
+  "status": "qualified-ordered-dose-trend-material-endpoint-gate-negative",
+  "observed_at": "2026-09-23T14:41:22Z",
+  "source_head": "278f5b719d744be15b68a39f21f0120d9bb0a3c0",
+  "parent_up31_seal": "601ac75b827d239b1dbdce1df16f6627877b31d4",
+  "workflow_run_id": 35875796731,
+  "workflow_artifact_id": 10757960800,
+  "workflow_artifact_sha256": "097f4b0d647eb1e9fc77d931eb33c20546428c176103c80930768a8b178405fc",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "structural_validity_pass": true,
+  "base_control_pass": true,
+  "arms": [
+    {
+      "partition": "6",
+      "max_multiplicity": 6,
+      "held_out_accuracy": 1.0,
+      "commit_decode_accuracy": 1.0,
+      "exact_final_table_accuracy": 1.0,
+      "relational_query_accuracy": 1.0
+    },
+    {
+      "partition": "4+2",
+      "max_multiplicity": 4,
+      "held_out_accuracy": 0.996826171875,
+      "commit_decode_accuracy": 0.9908854166666666,
+      "exact_final_table_accuracy": 1.0,
+      "relational_query_accuracy": 1.0
+    },
+    {
+      "partition": "3+3",
+      "max_multiplicity": 3,
+      "held_out_accuracy": 0.994873046875,
+      "commit_decode_accuracy": 0.9947916666666666,
+      "exact_final_table_accuracy": 0.9375,
+      "relational_query_accuracy": 0.9583333333333334
+    },
+    {
+      "partition": "2+2+2",
+      "max_multiplicity": 2,
+      "held_out_accuracy": 0.986328125,
+      "commit_decode_accuracy": 0.96484375,
+      "exact_final_table_accuracy": 0.875,
+      "relational_query_accuracy": 0.9583333333333334
+    },
+    {
+      "partition": "1+1+1+1+1+1",
+      "max_multiplicity": 1,
+      "held_out_accuracy": 0.90185546875,
+      "commit_decode_accuracy": 0.34375,
+      "exact_final_table_accuracy": 0.375,
+      "relational_query_accuracy": 0.5625
+    }
+  ],
+  "diagnosis": {
+    "held_ordered_steps": 4,
+    "commit_ordered_steps": 4,
+    "singleton_material_effect_pass": false,
+    "multiplicity_dose_response_pass": false,
+    "held_endpoint_drop": 0.09814453125,
+    "commit_endpoint_drop": 0.65625,
+    "frozen_endpoint_threshold_each_metric": 0.25
+  },
+  "interpretation": "The multiplicity series is fully ordered under the preregistered +0.03 adjacent-step tolerance for both static held-out accuracy and mutable commit accuracy. The preregistered overall dose-response gate remains negative because it required both endpoint drops to be at least 0.25: mutable commit drops by 0.65625, while static held-out accuracy drops by 0.09814453125. This is therefore ordered graded evidence, not a gate-positive dose-response result. The experiment also confounds maximum multiplicity with total commutant capacity sum(m_i^2). The next experiment should compare different spectral partitions with equal commutant capacity to distinguish those hypotheses.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}
