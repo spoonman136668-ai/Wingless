@@ -1,0 +1,38 @@
+{
+  "schema": "wingless.up144b-windows-proof.v1",
+  "experiment": "UP-144B-tail-recurrence-spacing",
+  "status": "qualified-scientific-result",
+  "source_head": "3f9f514002a8356816c06268835667e6e65cc3ea",
+  "workflow_run_id": 36256832730,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10911201556,
+  "artifact_sha256": "550e736d976b59039d5c448604110feda48ae0ab4f525eadd300fc4e33cfa965",
+  "findings": {
+    "interleaved": {
+      "mean_prefix_damage": -0.020277777777777766,
+      "mean_anchor_recovery": 0.017777777777777774,
+      "mean_tail_damage": -0.002500000000000008,
+      "mean_net_epoch_change": -0.004999999999999999,
+      "final_old": 0.9,
+      "final_new": 0.921875
+    },
+    "blocked": {
+      "mean_prefix_damage": -0.0211111111111111,
+      "mean_anchor_recovery": 0.01833333333333333,
+      "mean_tail_damage": -0.0013888888888888896,
+      "mean_net_epoch_change": -0.004166666666666663,
+      "final_old": 0.9166666666666667,
+      "final_new": 0.9479166666666667
+    }
+  },
+  "interpretation": {
+    "interleaving_advantage_not_supported": true,
+    "blocked_spacing_improves_final_old_and_new_accuracy_under_fixed_coverage": true,
+    "rapid_tail_identity_switching_is_not_required_for_tail_diversity_benefit": true,
+    "coverage_and_switch_geometry_need_to_be_separated": true,
+    "plain_speak": "Changing the ending examples every epoch was not better once the total set of endings and how often each appeared were held fixed. Grouping the same endings into longer blocks actually preserved more old vocabulary and learned more new vocabulary. The benefit comes from which endings get coverage, not simply from switching them as often as possible.",
+    "north_star_question": "Separates lexical coverage from temporal switching cost so stable language sequencing can be designed from mechanism rather than a generic 'more mixing is better' rule.",
+    "next_stage": "map switch-frequency dose at fixed four-tail coverage and exactly five uses per tail set"
+  },
+  "activation_authorized": false
+}
