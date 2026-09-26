@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up141c-windows-proof.v1",
+  "experiment": "UP-141C-history-pressure-threshold",
+  "status": "qualified-scientific-result",
+  "source_head": "d41a9ea5e65b45047a11bb45612244649516d012",
+  "workflow_run_id": 36271456124,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10915362912,
+  "artifact_sha256": "dd687bf7b5fc00ffd4f0e791f9f7b3ae1dc61b0f7888504ca2531cb81b714ee8",
+  "findings": {
+    "unresolved_calls_per_arm": 64,
+    "candidate_boundaries_per_arm": 2,
+    "qualified_levels": [
+      0,
+      12,
+      14,
+      15,
+      16
+    ],
+    "target100": {
+      "q15": {
+        "history_present_after_b2": 1,
+        "history_age_after_b2": 2,
+        "history_entries_after_b2": 31,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "q16": {
+        "history_present_after_b2": 0,
+        "history_entries_after_b2": 32,
+        "age2_evictions": 64,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "target103_same_pattern": true,
+    "all_levels_below_16_preserve_target": true,
+    "hot_accuracy_all_arms": 1,
+    "false_manipulation_admissions_all_arms": 0,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "exact_tested_history_pressure_boundary_is_between_15_and_16_qualified_insertions_per_window": true,
+    "target_survives_at_31_of_32_history_entries_and_is_evicted_when_the_table_fills_and_requires_replacement": true,
+    "eviction_occurs_while_target_is_age_two": true,
+    "result_replicates_across_two_target_identities": true,
+    "plain_speak": "The temporary trace survives right up to 31 occupied history slots. The next qualified insertion fills the table and forces replacement; because the target is the oldest age-2 trace, it is the one evicted. This is a hard capacity boundary in the tested setup.",
+    "north_star_question": "Pins the interaction between temporal aging and finite history-table competition to an exact tested occupancy boundary, making long-stream forgetting predictable rather than merely statistical.",
+    "next_stage": "hold the same full-table pressure fixed while varying the target history age at the replacement event to test whether age rank, rather than target identity or occupancy alone, determines survival"
+  },
+  "activation_authorized": false
+}
