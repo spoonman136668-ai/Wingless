@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.up114c-windows-proof.v1",
+  "experiment": "UP-114C-overcapacity-recurrence",
+  "status": "qualified-scientific-result",
+  "source_head": "5f225e5e45c9441902cbf4bd792c8f3e35b227e6",
+  "workflow_run_id": 36249819852,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10908707830,
+  "artifact_sha256": "8da7a35ba1364a95cd2dc2ddf4303bca663ebf267d917dd5d6ad324ccb1d82fb",
+  "hot_keys": 12,
+  "generation_interval": 32,
+  "repeat_gap": 16,
+  "admission_memory_bytes": 128,
+  "exact_recall_cap": 16,
+  "findings": {
+    "demand16": {
+      "hot_accuracy": 1,
+      "recurring_accuracy": 1,
+      "retained_recurring": 4,
+      "target_accuracy": 1,
+      "whole_exact": 1
+    },
+    "demand17": {
+      "hot_accuracy": 0.9166666666666666,
+      "recurring_accuracy": 1,
+      "retained_recurring": 5,
+      "target_accuracy": 0.9411764705882353,
+      "whole_exact": 0
+    },
+    "demand20": {
+      "hot_accuracy": 0.6666666666666666,
+      "recurring_accuracy": 1,
+      "retained_recurring": 8,
+      "target_accuracy": 0.8,
+      "whole_exact": 0
+    },
+    "recurring_admission_rate_all_cells": 1,
+    "one_shot_false_admissions_all_cells": 0,
+    "recall_entries_used": 16
+  },
+  "interpretation": {
+    "exact_probation_remains_collision_free_beyond_capacity": true,
+    "overcapacity_failure_is_selection_not_admission": true,
+    "newly_legitimate_recurring_candidates_displace_established_hot_residents_when_total_demand_exceeds_16": true,
+    "no_priority_or_confidence_signal_currently_distinguishes_which_legitimate_items_should_survive": true,
+    "next_stage": "test local recurrence-strength selection with a mixed two-hit and three-hit candidate population under the same 16-entry cap, without semantic priority labels"
+  },
+  "activation_authorized": false
+}
