@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up136c-windows-proof.v1",
+  "experiment": "UP-136C-history-lifetime-boundary",
+  "status": "qualified-scientific-result",
+  "source_head": "5a4807401ecba36115e7581d8104671abf56897c",
+  "workflow_run_id": 36268931778,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10914737422,
+  "artifact_sha256": "660ae4ad3c51eff0069e4a606113476c8b4b8664c613d0069a7ff7c6b413eb71",
+  "findings": {
+    "target100": {
+      "g4": 1,
+      "g5": 1,
+      "g6": 1,
+      "g7": 0,
+      "rebuild_only": 0,
+      "live_pair_g1": 1
+    },
+    "target103": {
+      "g4": 1,
+      "g5": 1,
+      "g6": 1,
+      "g7": 0,
+      "rebuild_only": 0,
+      "live_pair_g1": 1
+    },
+    "hot_accuracy_all_arms": 1,
+    "nonpersistent_admission_all_arms": 0,
+    "nonpersistent_retention_all_arms": 0,
+    "one_shot_false_admissions_all_arms": 0,
+    "panic_rate_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "rebuilt_history_trace_supports_admission_through_generation_6": true,
+    "rebuilt_history_trace_is_expired_before_generation_7_pair": true,
+    "two_complete_blank_generations_between_rebuild_and_second_pair_are_tolerated": true,
+    "three_complete_blank_generations_are_not_tolerated": true,
+    "result_replicates_across_two_target_identities": true,
+    "max_age_2_boundary_semantics_are_empirically_confirmed": true,
+    "plain_speak": "After a pair rebuilds temporary history in G3, the learner can still use that trace for a qualifying pair in G4, G5, or G6. By G7 it is gone. In practical terms, the rebuilt trace can survive two completely empty windows between evidence bursts, but not three.",
+    "north_star_question": "Defines the exact temporal lifetime of qualified bounded history, enabling multi-item streams to reason about when evidence remains eligible for later consolidation without hidden persistence.",
+    "next_stage": "place multiple targets with different rebuilt-history ages in the same fixed counter stream to verify that expiration and admission remain selective per item under simultaneous temporal states"
+  },
+  "activation_authorized": false
+}
