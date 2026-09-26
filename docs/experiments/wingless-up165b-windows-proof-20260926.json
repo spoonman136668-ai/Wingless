@@ -1,0 +1,77 @@
+{
+  "schema": "wingless.up165b-windows-proof.v1",
+  "experiment": "UP-165B-report-margin-crossings",
+  "status": "qualified-scientific-result",
+  "source_head": "349f2c932389101dd12c03ad8a0480036c54960b",
+  "workflow_run_id": 36272329909,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10916291632,
+  "artifact_sha256": "8fed4ee99dbc6235c7584b0233205942046650c15eebe1a700cd3dd171c89af8",
+  "findings": {
+    "decision_threshold": "probability_margin_zero",
+    "noah": {
+      "report13": {
+        "path_a_down": 1,
+        "path_a_up": 0,
+        "path_b_down": 1,
+        "path_b_up": 0,
+        "delta_before": -0.011111111111111072,
+        "delta_after": -0.022222222222222143
+      },
+      "report14": {
+        "path_a_down": 1,
+        "path_a_up": 0,
+        "path_b_down": 2,
+        "path_b_up": 0,
+        "delta_before": -0.022222222222222143,
+        "delta_after": 0.005555555555555536
+      }
+    },
+    "opal": {
+      "report13": {
+        "path_a_down": 1,
+        "path_b_down": 1,
+        "delta_before": 0.011111111111111072,
+        "delta_after": 0.022222222222222143
+      },
+      "report14": {
+        "path_a_down": 2,
+        "path_b_down": 0,
+        "delta_before": 0.022222222222222143,
+        "delta_after": -0.011111111111111072
+      }
+    },
+    "quin": {
+      "report13": {
+        "path_a_down": 1,
+        "path_b_down": 0,
+        "delta_before": 0,
+        "delta_after": -0.016666666666666607
+      },
+      "report14": {
+        "path_a_down": 1,
+        "path_b_down": 0,
+        "delta_before": -0.016666666666666607,
+        "delta_after": -0.022222222222222254
+      }
+    },
+    "mia_report13_balanced_crossing": {
+      "path_a_down": 1,
+      "path_a_up": 1,
+      "net_retention_change": 0
+    },
+    "pax_final_preference_preserved_with_report_crossings": true,
+    "rue_no_sign_flip": true,
+    "crossing_rows_include_subject_attribution": true
+  },
+  "interpretation": {
+    "report_mediated_retention_flips_are_explained_by_asymmetric_example_level_margin_crossings": true,
+    "identical_report_examples_have_different_effects_because_path_states_place_different_old_examples_near_margin_zero": true,
+    "mean_margin_changes_are_small_while_boundary_crossings_drive_coarse_accuracy_changes": true,
+    "margin_zero_requires_no_fitted_threshold": true,
+    "plain_speak": "The REPORT examples are not broadly erasing old knowledge. They are nudging a handful of already-fragile old examples across the classifier boundary. Which examples are fragile depends on the path taken through STORE and OBSERVE, so the same REPORT update can flip one path and not the other.",
+    "north_star_question": "Converts context-sensitive rehearsal interference from a coarse accuracy effect into an example-level decision-margin mechanism, a prerequisite for any later internal deficiency signal.",
+    "next_stage": "rank all old examples by absolute pre-REPORT margin before each fixed REPORT step and test whether actual crossing examples concentrate at the most vulnerable ranks without fitting a threshold or changing the schedule"
+  },
+  "activation_authorized": false
+}
