@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.up-lm1t-windows-proof.v1",
+  "experiment": "UP-LM1T-fixed-mass-plasticity-map",
+  "status": "qualified-scientific-result",
+  "source_head": "6dc0f0c71a5d895a90ee85c131415b6698c4611d",
+  "workflow_run_id": 36256658402,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10910284619,
+  "artifact_sha256": "8a526c7e3a40233264dc22f39c949f13e1712b3abc66ae5ba8ed651e1e9542ef",
+  "findings": {
+    "equal_mass": {
+      "fifth_accuracy": 0.7375535773161886,
+      "prior_mean": 0.7590823187585912,
+      "min_accuracy": 0.7375535773161886,
+      "mean_accuracy": 0.7547765704701107,
+      "spread": 0.03783222515294715
+    },
+    "fifth_1p5_mass": {
+      "fifth_accuracy": 0.786020441806792,
+      "prior_mean": 0.7458866837530982,
+      "min_accuracy": 0.7285622179239201,
+      "mean_accuracy": 0.7539134353638369,
+      "spread": 0.05745822388287192,
+      "fifth_delta": 0.048466864490603334,
+      "prior_delta": -0.013195635005493034,
+      "min_delta": -0.008991359392268583
+    },
+    "fifth_2x_mass": {
+      "fifth_accuracy": 0.8114902736564458,
+      "prior_mean": 0.7322718963112473,
+      "min_accuracy": 0.7130077369439072,
+      "mean_accuracy": 0.7481155717802871,
+      "spread": 0.0984825367125386,
+      "fifth_delta": 0.07393669634025712,
+      "prior_delta": -0.026810422447343885,
+      "min_delta": -0.02454584037228147
+    },
+    "total_mass_per_example": 0.4
+  },
+  "interpretation": {
+    "fixed_budget_stability_plasticity_frontier_is_controllable": true,
+    "fifth_learning_improves_monotonically_with_preregistered_mass_reallocation": true,
+    "prior_retention_cost_increases_monotonically": true,
+    "five_family_system_is_not_at_a_hard_readout_capacity_wall": true,
+    "plain_speak": "Without adding any training budget, Wingless can give the newest vocabulary more of the existing learning effort and improve it substantially. Older vocabularies lose some accuracy as that share grows, but the change is gradual rather than catastrophic. This is a tunable sharing problem, not yet a hard capacity limit.",
+    "north_star_question": "Maps how fixed learning resources can be shared between new lexical plasticity and prior-language stability, a core mechanism for scaling sequential language capability.",
+    "next_stage": "carry all three preregistered allocation arms into the full router-plus-memory integrated sequence evaluation to test whether the readout tradeoff survives integration"
+  },
+  "activation_authorized": false
+}
