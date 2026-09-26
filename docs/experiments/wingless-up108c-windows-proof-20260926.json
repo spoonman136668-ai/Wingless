@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up108c-windows-proof.v1",
+  "experiment": "UP-108C-phasefree-reuse-checkpoint",
+  "status": "qualified-scientific-result",
+  "source_head": "c0be40db95776e778d76138dec5bb208772a331a",
+  "workflow_run_id": 36241306253,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10905961070,
+  "artifact_sha256": "0a271c34b3e7cc51f3924a37593a04597db8828ccefb8028b60a7c53c6b041c0",
+  "findings": {
+    "ascending_phasefree": {
+      "checkpoints_per_episode": 1,
+      "first_filtered_write_index": 24,
+      "final_exact": 1,
+      "false_positive_admissions": 0
+    },
+    "evens_then_odds_phasefree": {
+      "checkpoints_per_episode": 2,
+      "first_filtered_write_index": 16,
+      "final_exact": 1,
+      "false_positive_admissions": 0
+    },
+    "odds_then_evens_phasefree": {
+      "checkpoints_per_episode": 0,
+      "final_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "rotate8_phasefree": {
+      "checkpoints_per_episode": 0,
+      "final_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "explicit_checkpoint_all_orders_exact": 1,
+    "no_checkpoint_odds_then_evens_exact": 0,
+    "no_checkpoint_rotate8_exact": 0
+  },
+  "interpretation": {
+    "resident_existing_write_mask_is_sufficient_when_all_final_residents_are_refreshed_in_place": true,
+    "detector_misses_orders_where_final_residents_enter_via_successful_repeat_admission": true,
+    "phasefree_failure_is_detector_evidence_semantics_not_checkpoint_action": true,
+    "next_stage": "mark a slot as reuse-confirmed on either an existing-key write or a successful seen-before repeat admission, while clearing its bit on replacement"
+  },
+  "activation_authorized": false
+}
