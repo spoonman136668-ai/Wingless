@@ -1,0 +1,54 @@
+{
+  "schema": "wingless.up-lm0t-windows-proof.v1",
+  "experiment": "UP-LM0T-readout-anchor",
+  "status": "qualified-scientific-result",
+  "source_head": "bf88737f4fbdc705655c12433cb68e81283980e2",
+  "workflow_run_id": 36234081073,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10903766540,
+  "artifact_sha256": "6e5b19f4db2f86f00b6313211313d4ddd1048c7cd406feb768d9a61c546d576d",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_epochs": 20,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "base_replay_used": false,
+  "router_retraining_used": false,
+  "findings": {
+    "lambda0": {
+      "base_accuracy": 0.692134107027724,
+      "base_perplexity": 3.5196874970646044,
+      "paraphrase_accuracy": 0.8621964097148891,
+      "paraphrase_perplexity": 1.5217830847033356
+    },
+    "lambda_0_0001": {
+      "base_accuracy": 0.7322695035460993,
+      "base_perplexity": 2.686406065310218,
+      "paraphrase_accuracy": 0.8502287926786343,
+      "paraphrase_perplexity": 1.6034170292562944
+    },
+    "lambda_0_001": {
+      "base_accuracy": 0.7936814958091554,
+      "base_perplexity": 1.8806563513165038,
+      "paraphrase_accuracy": 0.7067933826117564,
+      "paraphrase_perplexity": 2.5190524041380353
+    },
+    "lambda_0_01": {
+      "base_accuracy": 0.8714539007092199,
+      "base_perplexity": 1.468303627028045,
+      "paraphrase_accuracy": 0.6231080605420627,
+      "paraphrase_perplexity": 8.444697100996079
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1
+  },
+  "interpretation": {
+    "weak_readout_anchoring_improves_base_retention_with_small_paraphrase_cost": true,
+    "stronger_anchoring_trades_adaptation_for_retention_monotonically_in_the_tested_ladder": true,
+    "routing_and_exact_memory_remain_stable": true,
+    "next_stage": "test whether weak anchoring composes with example-interleaved base replay rather than merely shifting the no-replay tradeoff"
+  },
+  "activation_authorized": false
+}
