@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up-lm2b-windows-proof.v1",
+  "experiment": "UP-LM2B-prior-position-map",
+  "status": "qualified-scientific-result",
+  "source_head": "84d829f31baae04a79a91bec389f7177c0c16463",
+  "workflow_run_id": 36268710040,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10915210828,
+  "artifact_sha256": "4fadcff9547fe2074f37fdfb5c1207595a7b1e1a99701496d9c668436835802e",
+  "findings": {
+    "structural_exact_all_cells": true,
+    "max_recall_entries": 4,
+    "mean_integrated_accuracy_by_prior_position": {
+      "base": {
+        "pos1": 0.7485090264345583,
+        "pos2": 0.7522646679561574,
+        "pos3": 0.7648936170212767,
+        "pos4": 0.7722920696324952
+      },
+      "paraphrase": {
+        "pos1": 0.7513023583245336,
+        "pos2": 0.7538190777895106,
+        "pos3": 0.7583861316437874,
+        "pos4": 0.7649243224216825
+      },
+      "third": {
+        "pos1": 0.7719907407407408,
+        "pos2": 0.7745293209876543,
+        "pos3": 0.7799922839506174,
+        "pos4": 0.7819367283950618
+      },
+      "fourth": {
+        "pos1": 0.7606388088376562,
+        "pos2": 0.7636967659301953,
+        "pos3": 0.7685078450208133,
+        "pos4": 0.7750320204931156
+      }
+    },
+    "fifth_rotation_spread_by_allocation": {
+      "equal_mass": 0.0016897461259479662,
+      "fifth_1p125_mass": 0.0028025057698648492,
+      "fifth_1p25_mass": 0.0015248928453676092,
+      "fifth_1p375_mass": 0.0024315858885591846,
+      "fifth_1p5_mass": 0.0019370260468182243
+    }
+  },
+  "interpretation": {
+    "all_four_prior_families_show_a_consistent_later_position_advantage": true,
+    "terminal_recency_is_a_general_family_level_effect_not_unique_to_fifth": true,
+    "fifth_terminal_privilege_is_stable_while_prior_positions_rotate": true,
+    "prior_order_changes_family_balance_more_than_it_changes_fifth_performance": true,
+    "structural_sequence_memory_and_routing_remain_exact": true,
+    "plain_speak": "Whichever older vocabulary family is updated later tends to score better. Moving a family toward the end helps it, while the newest fifth family remains stable because it always owns the final slot. This means update recency is a general competition rule, not a special property of the newest vocabulary.",
+    "north_star_question": "Maps family-level recency transfer directly, giving the language system a mechanistic scheduling rule that can now be integrated with balanced rotation rather than treated as an unexplained order effect.",
+    "next_stage": "combine position-balanced prior rotation with fifth fixed last and re-evaluate across the accepted sequence-order transformations to test whether recency equalization survives integrated language streams"
+  },
+  "activation_authorized": false
+}
