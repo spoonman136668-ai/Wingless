@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.up89c-windows-proof.v1",
+  "experiment": "UP-89C-filter-saturation",
+  "status": "qualified-scientific-result",
+  "source_head": "e7d3331c75ad4b37bad281c0ff2d614e3562d086",
+  "workflow_run_id": 36230289466,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10901697870,
+  "artifact_sha256": "26a38395f2e8580d669fe2da98f9a4fb2e15be956ef0ba25d677d11d85eaf077",
+  "active_keys": 32,
+  "hot_keys": 16,
+  "filter_bits": 256,
+  "hash_count": 2,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "future_oracle_used": false,
+  "query_labels_used_for_admission": false,
+  "findings": {
+    "churn24": {
+      "hot_accuracy": 1,
+      "hot_exact": 1,
+      "false_positive_admissions": 0
+    },
+    "churn48": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "churn96": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 768
+    },
+    "churn192": {
+      "hot_accuracy": 0.8125,
+      "hot_exact": 0,
+      "false_positive_admissions": 6144
+    },
+    "policy_metadata_bytes": 37,
+    "total_bounded_memory_bytes": 293
+  },
+  "interpretation": {
+    "saturation_boundary_lies_between_24_and_48_unique_churn_writes": true,
+    "first_false_positive_admissions_are_sufficient_to_break_exact_hotset_retention": true,
+    "persistent_seen_once_state_accumulates_stale_evidence": true,
+    "next_stage": "test deterministic generational reset intervals that forget stale seen-once evidence without using queries or future information"
+  },
+  "activation_authorized": false
+}
