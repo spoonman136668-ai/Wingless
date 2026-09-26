@@ -1,0 +1,168 @@
+package unitary
+
+const UPLM2DPerNameSchema="wingless.up-lm2d-pername-boundary-interaction.v1"
+
+type UPLM2DMetric struct{
+	Allocation string `json:"allocation"`
+	TrainingSchedule string `json:"training_schedule"`
+	GroupOrder string `json:"group_order"`
+	Family string `json:"family"`
+	Stream int `json:"stream"`
+	Metric UPLM0JMetric `json:"metric"`
+}
+type UPLM2DFamilySummary struct{
+	Allocation string `json:"allocation"`
+	TrainingSchedule string `json:"training_schedule"`
+	GroupOrder string `json:"group_order"`
+	Family string `json:"family"`
+	IntegratedMeanTop1Accuracy float64 `json:"integrated_mean_top1_accuracy"`
+	IntegratedMinTop1Accuracy float64 `json:"integrated_min_top1_accuracy"`
+	IntegratedMeanPerplexity float64 `json:"integrated_mean_perplexity"`
+	StructuralExactAllCells bool `json:"structural_exact_all_cells"`
+	MaxRecallEntries int `json:"max_recall_entries"`
+}
+type UPLM2DOrderSummary struct{
+	Allocation string `json:"allocation"`
+	TrainingSchedule string `json:"training_schedule"`
+	GroupOrder string `json:"group_order"`
+	FifthIntegratedMean float64 `json:"fifth_integrated_mean"`
+	PriorIntegratedMean float64 `json:"prior_integrated_mean"`
+	AllFamilyIntegratedMean float64 `json:"all_family_integrated_mean"`
+	MinFamilyIntegratedMean float64 `json:"min_family_integrated_mean"`
+	StructuralExactAllFamilies bool `json:"structural_exact_all_families"`
+}
+type UPLM2DResult struct{
+	Schema string `json:"schema"`
+	Experiment string `json:"experiment"`
+	SourceUPLM2CSeal string `json:"source_up_lm2c_seal"`
+	StateDimension int `json:"state_dimension"`
+	ExactRecallCap int `json:"exact_recall_cap"`
+	AdaptationEpochs int `json:"adaptation_epochs"`
+	TotalMassPerExample float64 `json:"total_mass_per_example"`
+	Allocations int `json:"allocations"`
+	TrainingSchedules int `json:"training_schedules"`
+	GroupOrders int `json:"group_orders"`
+	Families int `json:"families"`
+	StreamDepths []int `json:"stream_depths"`
+	FifthAlwaysLast bool `json:"fifth_always_last"`
+	EvaluationRetrainingUsed bool `json:"evaluation_retraining_used"`
+	RecurrentParametersTrained bool `json:"recurrent_parameters_trained"`
+	RecallCapChanged bool `json:"recall_cap_changed"`
+	RouterModified bool `json:"router_modified"`
+	AttentionUsed bool `json:"attention_used"`
+	FutureOracleUsed bool `json:"future_oracle_used"`
+	RouterMetrics []UPLM1PRouterMetric `json:"router_metrics"`
+	Metrics []UPLM2DMetric `json:"metrics"`
+	FamilySummaries []UPLM2DFamilySummary `json:"family_summaries"`
+	OrderSummaries []UPLM2DOrderSummary `json:"order_summaries"`
+}
+
+func uplm2dPermutation(name string)[4]int{
+	switch name{
+	case "forward":return [4]int{0,1,2,3}
+	case "rotate_1":return [4]int{1,2,3,0}
+	case "rotate_2":return [4]int{2,3,0,1}
+	case "rotate_3":return [4]int{3,0,1,2}
+	default:return [4]int{3,2,1,0}
+	}
+}
+func uplm2dVerbs(family string)(store,observe,report string){
+	switch family{
+	case "base":return "stores","observes","reports"
+	case "paraphrase":return "saves","sees","recalls"
+	case "third":return "archives","notices","recounts"
+	case "fourth":return "retains","inspects","states"
+	default:return "banks","surveys","declares"
+	}
+}
+func uplm2dExample(n,v,p int,family,groupOrder string)uplm0fExample{
+	names:=uplm0gNames();values:=uplm0gValues()
+	ns:=[4]string{names[n],names[(n+1)%6],names[(n+2)%6],names[(n+3)%6]}
+	initial:=[4]string{values[v],values[(v+1)%6],values[(v+2)%6],values[(v+3)%6]}
+	latest:=initial
+	uc:=uplm0eUpdateCount(p)
+	storeVerb,observeVerb,reportVerb:=uplm2dVerbs(family)
+	s:="";var targets [4]int
+	storeInitial:=func(i int){s+=ns[i]+" "+storeVerb+" "+initial[i]+". "}
+	observe:=func(i int){obs:=values[(v+i+3)%6];s+=ns[(i+p)%4]+" "+observeVerb+" "+obs+". "}
+	update:=func(i int){if i>=uc{return};latest[i]=values[(v+i+2)%6];s+=ns[i]+" "+storeVerb+" "+latest[i]+". "}
+	report:=func(i int,last bool){s+=ns[i]+" "+reportVerb+" ";targets[i]=len(s);s+=latest[i]+".";if !last{s+=" "}}
+	perm:=uplm2dPermutation(groupOrder)
+	for j,i:=range perm{storeInitial(i);observe(i);update(i);report(i,j==3)}
+	s+="\n"
+	return uplm0fExample{text:s,targetPos:targets,updateCount:uc}
+}
+func uplm2dHeldout(family,groupOrder string)[]uplm0fExample{
+	out:=[]uplm0fExample{}
+	for n:=0;n<6;n++{for v:=0;v<6;v++{for p:=0;p<4;p++{
+		if (n+2*v+p)%3!=2{continue}
+		out=append(out,uplm2dExample(n,v,p,family,groupOrder))
+	}}}
+	return out
+}
+func uplm2dFamilySummary(allocation,schedule,groupOrder,family string,metrics []UPLM2DMetric)UPLM2DFamilySummary{
+	sumAcc,sumPpl:=0.0,0.0;minAcc:=1.0;count,maxRecall:=0,0;exact:=true
+	for _,x:=range metrics{
+		if x.Allocation!=allocation||x.TrainingSchedule!=schedule||x.GroupOrder!=groupOrder||x.Family!=family{continue}
+		count++;sumAcc+=x.Metric.Top1Accuracy;sumPpl+=x.Metric.Perplexity
+		if x.Metric.Top1Accuracy<minAcc{minAcc=x.Metric.Top1Accuracy}
+		if x.Metric.MaxRecallEntries>maxRecall{maxRecall=x.Metric.MaxRecallEntries}
+		if !uplm1wStructuralExact(x.Metric){exact=false}
+	}
+	return UPLM2DFamilySummary{Allocation:allocation,TrainingSchedule:schedule,GroupOrder:groupOrder,Family:family,IntegratedMeanTop1Accuracy:sumAcc/float64(count),IntegratedMinTop1Accuracy:minAcc,IntegratedMeanPerplexity:sumPpl/float64(count),StructuralExactAllCells:exact,MaxRecallEntries:maxRecall}
+}
+func uplm2dOrderSummary(allocation,schedule,groupOrder string,s []UPLM2DFamilySummary)UPLM2DOrderSummary{
+	sum,prior,fifth,min:=0.0,0.0,0.0,1.0;count,priorN:=0,0;exact:=true
+	for _,x:=range s{
+		if x.Allocation!=allocation||x.TrainingSchedule!=schedule||x.GroupOrder!=groupOrder{continue}
+		count++;sum+=x.IntegratedMeanTop1Accuracy
+		if x.IntegratedMeanTop1Accuracy<min{min=x.IntegratedMeanTop1Accuracy}
+		if x.Family=="fifth"{fifth=x.IntegratedMeanTop1Accuracy}else{prior+=x.IntegratedMeanTop1Accuracy;priorN++}
+		if !x.StructuralExactAllCells{exact=false}
+	}
+	return UPLM2DOrderSummary{Allocation:allocation,TrainingSchedule:schedule,GroupOrder:groupOrder,FifthIntegratedMean:fifth,PriorIntegratedMean:prior/float64(priorN),AllFamilyIntegratedMean:sum/float64(count),MinFamilyIntegratedMean:min,StructuralExactAllFamilies:exact}
+}
+
+func RunUPLM2D()(UPLM2DResult,error){
+	start,baseTrain,_,paraTrain,_,thirdTrain,_,fourthTrain,_,err:=uplm1mStartModel()
+	if err!=nil{return UPLM2DResult{},err}
+	four:=[4][]uplm0fExample{baseTrain,paraTrain,thirdTrain,fourthTrain}
+	uplm1nTrainArm(start,"rotating_palindromic_split",four)
+	fifthTrain,fifthHeld:=uplm1pCorpus()
+	start,_=uplm1dExtendAlphabet(start,fifthTrain,fifthHeld)
+	d:=uplm1lStoreDirection();classifier:=uplm1pTrainClassifier(d);names:=uplm0gNames()
+	res:=UPLM2DResult{
+		Schema:UPLM2DPerNameSchema,Experiment:"UP-LM2D-pername-boundary-interaction",SourceUPLM2CSeal:"b1b4dec076ca63765b31b12e99a53ffbf5f89921",
+		StateDimension:64,ExactRecallCap:16,AdaptationEpochs:4,TotalMassPerExample:0.40,
+		Allocations:5,TrainingSchedules:2,GroupOrders:5,Families:5,StreamDepths:[]int{1,4},FifthAlwaysLast:true,
+		EvaluationRetrainingUsed:false,RecurrentParametersTrained:false,RecallCapChanged:false,RouterModified:false,AttentionUsed:false,FutureOracleUsed:false,
+	}
+	res.RouterMetrics=append(res.RouterMetrics,
+		uplm1pRouterEval(classifier,d,"base","heldout",names[4:6],[]string{"stores","observes","reports"}),
+		uplm1pRouterEval(classifier,d,"paraphrase","heldout",names[4:6],[]string{"saves","sees","recalls"}),
+		uplm1pRouterEval(classifier,d,"third","heldout",names[4:6],[]string{"archives","notices","recounts"}),
+		uplm1pRouterEval(classifier,d,"fourth","heldout",names[4:6],[]string{"retains","inspects","states"}),
+		uplm1pRouterEval(classifier,d,"fifth","heldout",names[4:6],uplm1pFifthVerbs),
+	)
+	families:=[5][]uplm0fExample{baseTrain,paraTrain,thirdTrain,fourthTrain,fifthTrain}
+	familyNames:=[]string{"base","paraphrase","third","fourth","fifth"}
+	allocations:=[]string{"equal_mass","fifth_1p125_mass","fifth_1p25_mass","fifth_1p375_mass","fifth_1p5_mass"}
+	schedules:=[]string{"canonical_prior","balanced_prior"}
+	groupOrders:=[]string{"forward","rotate_1","rotate_2","rotate_3","reverse"}
+	for _,allocation:=range allocations{
+		for _,schedule:=range schedules{
+			model:=uplm0oCloneModel(start);uplm2cTrain(model,allocation,schedule,families)
+			for _,groupOrder:=range groupOrders{
+				for _,family:=range familyNames{
+					held:=uplm2dHeldout(family,groupOrder)
+					for _,stream:=range []int{1,4}{
+						res.Metrics=append(res.Metrics,UPLM2DMetric{Allocation:allocation,TrainingSchedule:schedule,GroupOrder:groupOrder,Family:family,Stream:stream,Metric:uplm1mEvaluate(model,classifier,d,held,stream,family+"_"+groupOrder+"_stream"+itoa(stream))})
+					}
+					res.FamilySummaries=append(res.FamilySummaries,uplm2dFamilySummary(allocation,schedule,groupOrder,family,res.Metrics))
+				}
+				res.OrderSummaries=append(res.OrderSummaries,uplm2dOrderSummary(allocation,schedule,groupOrder,res.FamilySummaries))
+			}
+		}
+	}
+	return res,nil
+}
