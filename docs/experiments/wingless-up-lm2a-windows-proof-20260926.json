@@ -1,0 +1,86 @@
+{
+  "schema": "wingless.up-lm2a-windows-proof.v1",
+  "experiment": "UP-LM2A-terminal-fifth-prior-order",
+  "status": "qualified-scientific-result",
+  "source_head": "d86656a1eeb88a39e20712ba22d159a115c1ab61",
+  "workflow_run_id": 36267140088,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10914047992,
+  "artifact_sha256": "70637a39bc2f392532c6e12b1fa06ceccf48770ea451911b4a647a0df81ed61c",
+  "findings": {
+    "structural_exact_all_150_integrated_cells": true,
+    "max_recall_entries": 4,
+    "equal_mass": {
+      "canonical": {
+        "fifth": 0.7486811737553578,
+        "prior": 0.7706616178834755,
+        "all": 0.7662655290578521,
+        "min": 0.7486811737553578
+      },
+      "reverse": {
+        "fifth": 0.7499175733597099,
+        "prior": 0.7731771821129395,
+        "all": 0.7685252603622936,
+        "min": 0.7499175733597099
+      },
+      "rotating": {
+        "fifth": 0.7510715463237718,
+        "prior": 0.7715716976659692,
+        "all": 0.7674716673975297,
+        "min": 0.7510715463237718
+      }
+    },
+    "fifth_1p25_mass": {
+      "canonical": {
+        "fifth": 0.7739449390042862,
+        "prior": 0.7641609272307367,
+        "all": 0.7661177295854465,
+        "min": 0.7479448742746615
+      },
+      "reverse": {
+        "fifth": 0.7760468183316849,
+        "prior": 0.7660227998342476,
+        "all": 0.768027603533735,
+        "min": 0.7587117212249208
+      },
+      "rotating": {
+        "fifth": 0.7760056050115397,
+        "prior": 0.7657396146323274,
+        "all": 0.7677928127081699,
+        "min": 0.7623636043646603
+      }
+    },
+    "fifth_1p5_mass": {
+      "canonical": {
+        "fifth": 0.7964061984833498,
+        "prior": 0.7576305353143119,
+        "all": 0.7653856679481195,
+        "min": 0.7393214055448099
+      },
+      "reverse": {
+        "fifth": 0.7962825585229146,
+        "prior": 0.7590430929631425,
+        "all": 0.766490986075097,
+        "min": 0.7521559310102077
+      },
+      "rotating": {
+        "fifth": 0.7962001318826244,
+        "prior": 0.7598742780839811,
+        "all": 0.7671394488437098,
+        "min": 0.7542311411992263
+      }
+    }
+  },
+  "interpretation": {
+    "fifth_terminal_position_privilege_is_robust_to_prior_family_order": true,
+    "fifth_family_scores_change_only_slightly_when_prior_order_changes": true,
+    "prior_family_mean_and_minimum_family_score_are_sensitive_to_prior_order": true,
+    "reverse_and_rotating_prior_order_often_improve_the_minimum_family_score_relative_to_canonical": true,
+    "terminal_fifth_bonus_and_prior_order_interaction_are_separable_mechanisms": true,
+    "structural_sequence_memory_and_routing_remain_exact_across_all_orders_and_allocations": true,
+    "plain_speak": "Keeping the newest vocabulary last preserves its terminal-update advantage no matter how the older vocabularies are ordered. Reordering the older families mainly redistributes accuracy among the older families themselves, and reverse or rotating order often raises the weakest family without costing the newest family much.",
+    "north_star_question": "Separates terminal plasticity privilege from intra-prior ordering, giving the language system distinct controllable mechanisms for newest-family learning and older-family balance while sequence intelligence remains exact.",
+    "next_stage": "use four cyclic prior-family rotations with fifth fixed last to test whether each prior family benefits from occupying the latest preterminal position and to map the per-family recency transfer directly"
+  },
+  "activation_authorized": false
+}
