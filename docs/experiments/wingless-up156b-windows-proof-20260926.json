@@ -1,0 +1,64 @@
+{
+  "schema": "wingless.up156b-windows-proof.v1",
+  "experiment": "UP-156B-rehearsal-order-robustness",
+  "status": "qualified-scientific-result",
+  "source_head": "50c1f1a3709e930f7006221aed47faf711681b6b",
+  "workflow_run_id": 36268513331,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10913619823,
+  "artifact_sha256": "b476e9a430ab868c54fd558a85e000dd55082df167ac4d0405591b449aab6dd8",
+  "findings": {
+    "mia": {
+      "canonical": {
+        "after0": 0.8777777777777778,
+        "after8": 0.8777777777777778,
+        "after12": 0.8833333333333333,
+        "after15": 0.8888888888888888
+      },
+      "reverse": {
+        "after0": 0.8722222222222222,
+        "after8": 0.8833333333333333,
+        "after12": 0.8888888888888888,
+        "after15": 0.8888888888888888
+      },
+      "rotating": {
+        "after0": 0.8611111111111112,
+        "after8": 0.8888888888888888,
+        "after12": 0.8888888888888888,
+        "after15": 0.8944444444444445
+      }
+    },
+    "noah": {
+      "canonical": {
+        "after0": 0.8777777777777778,
+        "after8": 0.8888888888888888,
+        "after12": 0.8888888888888888,
+        "after15": 0.8944444444444445
+      },
+      "reverse": {
+        "after0": 0.8611111111111112,
+        "after8": 0.9055555555555556,
+        "after12": 0.9055555555555556,
+        "after15": 0.9055555555555556
+      },
+      "rotating": {
+        "after0": 0.8833333333333333,
+        "after8": 0.8944444444444445,
+        "after12": 0.9166666666666667,
+        "after15": 0.9166666666666667
+      }
+    }
+  },
+  "interpretation": {
+    "post_report_rehearsal_benefit_is_robust_in_direction_but_not_order_invariant": true,
+    "rehearsal_order_can_shift_final_old_retention_as_much_as_or_more_than_dose_changes": true,
+    "rotating_order_produces_the_strongest_observed_old_retention_for_noah_at_12_and_15_after": true,
+    "reverse_order_reaches_a_plateau_by_eight_after_for_noah": true,
+    "subject_specific_interactions_remain": true,
+    "cleanup_tail_example_identity_and_position_are_causal_remaining_variables": true,
+    "plain_speak": "Putting rehearsal after REPORT generally helps, but the number of cleanup updates is only half the story. The order of the old examples changes how much repair you get from the same budget. Some late-example arrangements repair far more than others, so the next job is to identify which old-example positions carry the repair rather than just adding more rehearsal.",
+    "north_star_question": "Refines budget-neutral interference repair into an order-sensitive mechanism, narrowing lexical stability control toward which old evidence occupies the late repair positions.",
+    "next_stage": "hold post-REPORT rehearsal dose fixed and cyclically rotate the old-rehearsal sequence so every old example occupies every late position, mapping position-specific repair contribution without changing coverage or budget"
+  },
+  "activation_authorized": false
+}
