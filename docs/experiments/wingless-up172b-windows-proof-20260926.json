@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up172b-windows-proof.v1",
+  "experiment": "UP-172B-persistent-risk-shadow",
+  "status": "qualified-scientific-result",
+  "source_head": "9f692fc696f1a02ae9052e2879ed17a09114ceaa",
+  "workflow_run_id": 36275363369,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10917585789,
+  "artifact_sha256": "622349c02e7f450305abec862bf8c4d87d5903ba0cbd7ca54a047bf98c361028",
+  "findings": {
+    "true_total_crossings": 223,
+    "one_step": {
+      "flagged_slots": 1296,
+      "covered_crossings": 215,
+      "crossing_density": 0.16589506172839505,
+      "true_crossing_coverage": 0.9641255605381166
+    },
+    "persistent_2plus": {
+      "flagged_slots": 972,
+      "covered_crossings": 165,
+      "crossing_density": 0.1697530864197531,
+      "true_crossing_coverage": 0.7399103139013453
+    },
+    "streak_bins": {
+      "current_only": {
+        "slots": 324,
+        "crossings": 50,
+        "density": 0.15432098765432098
+      },
+      "persistent_2": {
+        "slots": 276,
+        "crossings": 75,
+        "density": 0.2717391304347826
+      },
+      "persistent_3plus": {
+        "slots": 696,
+        "crossings": 90,
+        "density": 0.12931034482758622
+      },
+      "out_of_band": {
+        "slots": 15984,
+        "crossings": 8,
+        "density": 0.0005005005005005005
+      }
+    },
+    "report_persistent_2plus_density": 0.14942528735632185,
+    "report_one_step_density": 0.16666666666666666
+  },
+  "interpretation": {
+    "two_step_persistence_as_a_merged_2plus_signal_only_marginally_improves_global_precision": true,
+    "merged_persistence_loses_substantial_crossing_coverage": true,
+    "exact_streak_length_two_is_the_highest_risk_bin": true,
+    "persistent_three_plus_is_less_risky_than_newly_persistent_two": true,
+    "persistence_is_not_monotonic_with_streak_length": true,
+    "report_class_does_not_benefit_from_merged_persistence": true,
+    "note_on_output": "The probe field named crossing_coverage used total example slots as its denominator; proof coverage is recomputed against the 223 observed crossings from the frozen bin counts.",
+    "plain_speak": "Staying fragile for exactly two steps is much more dangerous than being fragile for one step, but staying fragile for three or more steps becomes less dangerous again. Lumping all persistent cases together barely improves precision and misses many real flips. The useful signal is therefore a transition into persistence, not 'the longer fragile, the worse.'",
+    "north_star_question": "Refines internal deficiency detection from static risk and generic persistence into a temporal hazard shape, while still providing no basis for autonomous intervention.",
+    "next_stage": "in shadow mode, test whether transition from streak 1 to streak 2 predicts next-step crossing better than already-established streak 3+ and stable low-rank membership, without changing any updates"
+  },
+  "activation_authorized": false
+}
