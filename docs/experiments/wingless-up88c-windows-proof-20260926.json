@@ -1,0 +1,51 @@
+{
+  "schema": "wingless.up88c-windows-proof.v1",
+  "experiment": "UP-88C-filter-width",
+  "status": "qualified-scientific-result",
+  "source_head": "7e1ba8357bd0885d03b982397b90e64828721ea9",
+  "workflow_run_id": 36229241989,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10901641671,
+  "artifact_sha256": "924956c7efdf5fcdd52453254493cff1f37523003f6bca9f29d116e0fc892d33",
+  "active_keys": 32,
+  "hot_keys": 16,
+  "churn_writes": 24,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "future_oracle_used": false,
+  "query_labels_used_for_admission": false,
+  "hash_count": 2,
+  "findings": {
+    "filter64": {
+      "hot_accuracy": 0.875,
+      "hot_exact": 0,
+      "metadata_bytes": 13,
+      "total_bytes": 269,
+      "rejected_one_shot_writes": 2304,
+      "second_write_admissions": 1024
+    },
+    "filter128": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "metadata_bytes": 21,
+      "total_bytes": 277,
+      "rejected_one_shot_writes": 2816,
+      "second_write_admissions": 1024
+    },
+    "filter256": {
+      "hot_accuracy": 1,
+      "hot_exact": 1,
+      "metadata_bytes": 37,
+      "total_bytes": 293,
+      "rejected_one_shot_writes": 3072,
+      "second_write_admissions": 1024
+    }
+  },
+  "interpretation": {
+    "filter_collision_pressure_confirmed_as_up87c_limit": true,
+    "admission_rule_can_preserve_full_16_item_hot_set_under_tested_workload": true,
+    "filter256_restores_exact_retention_at_37_policy_metadata_bytes": true,
+    "next_stage": "hold filter width at 256 bits and sweep longer one-shot churn to measure saturation lifetime without resetting the filter"
+  },
+  "activation_authorized": false
+}
