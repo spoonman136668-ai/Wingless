@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up151c-windows-proof.v1",
+  "experiment": "UP-151C-state-eviction-forecast",
+  "status": "qualified-scientific-result",
+  "source_head": "d064aeb31ab817af1f00a922fd23c8fb6ae00517",
+  "workflow_run_id": 36277718943,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10917549368,
+  "artifact_sha256": "78fcb8aef7b8771f265a64808a37a7ee73cbc2da0949967b6e7b3d3076aad990",
+  "findings": {
+    "correct_predictions": 64,
+    "total_predictions": 64,
+    "prediction_accuracy": 1,
+    "starting_hands": [
+      0,
+      4,
+      8,
+      12
+    ],
+    "sparse_refresh_admissions": [
+      3,
+      6,
+      9,
+      12,
+      15
+    ],
+    "sparse_refresh_keys": [
+      3,
+      7,
+      11,
+      15,
+      0
+    ],
+    "predictor_uses_hand": true,
+    "predictor_uses_ages": true,
+    "predictor_uses_identity": false,
+    "future_oracle_used": false
+  },
+  "interpretation": {
+    "current_hand_plus_two_bit_age_state_is_sufficient_for_exact_next_eviction_prediction_under_tested_sparse_refresh": true,
+    "semantic_identity_is_not_needed": true,
+    "refresh_events_change_trajectory_but_are_fully_reflected_in_native_age_state": true,
+    "plain_speak": "Even after refreshes bend the replacement path, Wingless can tell exactly which slot the next admission will evict by looking only at the hand and age counters. Names and lexical classes are unnecessary.",
+    "north_star_question": "Provides an exact architecture-native failure forecast for the durable store. The remaining question is which parts of that state are necessary and whether a cheaper summary preserves the forecast.",
+    "next_stage": "ablate the age counters with a held-out sparse-refresh schedule, comparing hand-only prediction against hand-plus-age prediction"
+  },
+  "activation_authorized": false
+}
