@@ -1,0 +1,67 @@
+{
+  "schema": "wingless.up-lm1u-windows-proof.v1",
+  "experiment": "UP-LM1U-integrated-fixed-mass",
+  "status": "qualified-scientific-result",
+  "source_head": "9faff90f4f8618842f72e046c00af0603647c58b",
+  "workflow_run_id": 36257194658,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10910354698,
+  "artifact_sha256": "c41da76028fae8fdad848f1a9f258b3913e00c62913d2d92c518c6b88dffbd72",
+  "findings": {
+    "equal_mass": {
+      "prior_lr": 0.08,
+      "fifth_lr": 0.08,
+      "total_mass": 0.4,
+      "min_accuracy": 0.7375535773161886,
+      "mean_accuracy": 0.7547765704701107,
+      "fifth_accuracy": 0.7375535773161886,
+      "fifth_perplexity": 2.2893638505995324,
+      "prior_mean": 0.7590823187585912
+    },
+    "fifth_1p5_mass": {
+      "prior_lr": 0.07,
+      "fifth_lr": 0.12,
+      "total_mass": 0.4,
+      "min_accuracy": 0.7285622179239201,
+      "mean_accuracy": 0.7539134353638369,
+      "fifth_accuracy": 0.786020441806792,
+      "fifth_perplexity": 1.9811965526693738,
+      "prior_mean": 0.7458866837530982,
+      "fifth_delta_vs_equal": 0.048466864490603334,
+      "prior_delta_vs_equal": -0.013195635005493034,
+      "min_delta_vs_equal": -0.008991359392268583
+    },
+    "fifth_2x_mass": {
+      "prior_lr": 0.06,
+      "fifth_lr": 0.16,
+      "total_mass": 0.4,
+      "min_accuracy": 0.7130077369439072,
+      "mean_accuracy": 0.7481155717802871,
+      "fifth_accuracy": 0.8114902736564458,
+      "fifth_perplexity": 1.8276291033304657,
+      "prior_mean": 0.7322718963112473,
+      "fifth_delta_vs_equal": 0.07393669634025712,
+      "prior_delta_vs_equal": -0.026810422447343885,
+      "min_delta_vs_equal": -0.02454584037228147
+    },
+    "router_accuracy_all_reported_splits": 1,
+    "integrated_dependent_first_byte_accuracy_all_cells": 1,
+    "integrated_query_set_exact_accuracy_all_cells": 1,
+    "integrated_admission_precision_all_cells": 1,
+    "integrated_admission_recall_all_cells": 1,
+    "integrated_event_routing_accuracy_all_cells": 1,
+    "integrated_report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "fixed_mass_tradeoff_survives_full_router_memory_integration": true,
+    "fifth_family_improves_as_preregistered_mass_share_increases": true,
+    "prior_family_floor_and_balance_decline_as_fifth_share_increases": true,
+    "integration_introduces_no_new_routing_or_exact_memory_failure": true,
+    "the_boundary_remains_readout_allocation_not_sequence_memory_or_semantic_routing": true,
+    "plain_speak": "The same fixed training budget can be shifted toward the newest vocabulary and that vocabulary improves inside the full language-plus-memory task too. The older vocabularies pay for it, but the memory and routing machinery stay exact. So the bottleneck is still how learning effort is shared across vocabularies, not a hidden failure in sequence memory or routing.",
+    "north_star_question": "Shows that a controllable stability-versus-plasticity mechanism remains composable with bounded sequence memory and semantic routing, which is required before scaling language breadth safely.",
+    "next_stage": "map a denser fixed-mass allocation frontier around the mild reweighting region to determine whether a better balance point exists without adding training budget"
+  },
+  "activation_authorized": false
+}
