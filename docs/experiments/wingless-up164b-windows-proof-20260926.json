@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up164b-windows-proof.v1",
+  "experiment": "UP-164B-report-path-sensitivity",
+  "status": "qualified-scientific-result",
+  "source_head": "1d2c2ba6e1db1c60c39843633d9047de37e37674",
+  "workflow_run_id": 36271281295,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10916245159,
+  "artifact_sha256": "c3b0941c56ac82a2944c3f1559e11216dfcd0cd76d724789f7da8cfe9d045e65",
+  "findings": {
+    "mia": {
+      "pre": 0.005555555555555536,
+      "after13": 0.005555555555555536,
+      "after14": 0.005555555555555536
+    },
+    "noah": {
+      "pre": -0.011111111111111072,
+      "after13": -0.022222222222222143,
+      "after14": 0.005555555555555536
+    },
+    "opal": {
+      "pre": 0.011111111111111072,
+      "after13": 0.022222222222222143,
+      "after14": -0.011111111111111072
+    },
+    "pax": {
+      "pre": 0.005555555555555536,
+      "after13": 0,
+      "after14": 0.005555555555555536
+    },
+    "quin": {
+      "pre": 0,
+      "after13": -0.016666666666666607,
+      "after14": -0.022222222222222254
+    },
+    "rue": {
+      "pre": -0.016666666666666607,
+      "after13": -0.016666666666666607,
+      "after14": -0.011111111111111072
+    },
+    "report_update_cosines_are_similar_across_path_states": true
+  },
+  "interpretation": {
+    "report_item_14_causes_final_sign_reversal_for_noah_and_opal": true,
+    "report_item_13_creates_quins_negative_path_preference": true,
+    "pax_final_preference_is_not_report_created": true,
+    "mia_and_rue_do_not_undergo_report_sign_reversal": true,
+    "similar_report_update_direction_can_have_different_coarse_retention_effects_from_different_path_states": true,
+    "simple_report_vector_cosine_is_insufficient_to_explain_thresholded_accuracy_changes": true,
+    "plain_speak": "The same REPORT cleanup example can hurt one path much more than the other because the two paths arrive at different internal states. Noah and Opal flip specifically on the second REPORT example; Quin diverges on the first. The update vectors look almost the same geometrically, so the important difference is likely which old examples are sitting near a decision boundary when REPORT arrives.",
+    "north_star_question": "Separates path curvature from report-on-state sensitivity and points to per-example decision margins as the missing mechanism behind coarse retention flips.",
+    "next_stage": "measure old-surface correct-class margins before and after each REPORT cleanup step on both fixed path states to identify exactly which examples cross decision boundaries"
+  },
+  "activation_authorized": false
+}
