@@ -1,0 +1,78 @@
+{
+  "schema": "wingless.up139c-windows-proof.v1",
+  "experiment": "UP-139C-novelty-pressure-clock",
+  "status": "qualified-scientific-result",
+  "source_head": "465cb0483d858a437b35a2908ab2451bada39e25",
+  "workflow_run_id": 36270248111,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10915676025,
+  "artifact_sha256": "1048386e32aeb32ae5390432ba1667a1f3a354291d922417192ba246897f6916",
+  "findings": {
+    "target100": {
+      "novel0_exact96": {
+        "history_present": 1,
+        "history_age": 0,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "novel32_exact64": {
+        "history_present": 1,
+        "history_age": 1,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "novel64_exact32": {
+        "history_present": 1,
+        "history_age": 2,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "novel96_exact0": {
+        "history_present": 0,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "target103": {
+      "novel0_exact96": {
+        "history_present": 1,
+        "history_age": 0,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "novel32_exact64": {
+        "history_present": 1,
+        "history_age": 1,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "novel64_exact32": {
+        "history_present": 1,
+        "history_age": 2,
+        "admission": 1,
+        "accuracy": 1
+      },
+      "novel96_exact0": {
+        "history_present": 0,
+        "admission": 0,
+        "accuracy": 0
+      }
+    },
+    "process_calls_all_arms": 96,
+    "checkpoints_all_arms": 0,
+    "hot_accuracy_all_arms": 1,
+    "false_admissions_all_arms": 0,
+    "max_history_entries": 32,
+    "max_recall_entries": 16
+  },
+  "interpretation": {
+    "consolidation_clock_is_unresolved_candidate_pressure_not_generic_process_call_count": true,
+    "exact_memory_updates_do_not_age_history": true,
+    "candidate_boundaries_age_history_zero_to_one_to_two_then_expire_on_third": true,
+    "result_replicates_across_two_target_identities": true,
+    "plain_speak": "Busy work on already-known durable memories does not consume the temporary consolidation lifetime. Only unresolved candidate evidence advances the clock. Thirty-two candidate calls age the trace once, sixty-four age it twice, and ninety-six expire it.",
+    "north_star_question": "Defines bounded temporal consolidation in terms of unresolved novelty pressure rather than wall-clock activity or generic writes, enabling realistic long streams to preserve temporary evidence through harmless known-state traffic.",
+    "next_stage": "hold unresolved candidate-call count fixed while varying unique first sightings versus repeated unresolved candidates, testing whether clock pressure depends on novelty identity count or every unresolved candidate event"
+  },
+  "activation_authorized": false
+}
