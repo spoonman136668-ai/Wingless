@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up161b-windows-proof.v1",
+  "experiment": "UP-161B-balanced-cleanup-schedule",
+  "status": "qualified-scientific-result",
+  "source_head": "1b1896f6309cbd327a26cd04b80a8bd6541d5576",
+  "workflow_run_id": 36270379157,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10915291823,
+  "artifact_sha256": "bb2855eb5486da297c703fd64ad20be3040ddb6b7b81c3c865ecba278f8b81dc",
+  "findings": {
+    "canonical_fixed": {
+      "mean_old": 0.901851851851852,
+      "min_old": 0.8888888888888888,
+      "max_old": 0.9166666666666667,
+      "spread": 0.0277777777777779
+    },
+    "balanced_forward": {
+      "mean_old": 0.9037037037037039,
+      "min_old": 0.8722222222222222,
+      "max_old": 0.9166666666666667,
+      "spread": 0.04444444444444451
+    },
+    "balanced_reverse": {
+      "mean_old": 0.9037037037037039,
+      "min_old": 0.8722222222222222,
+      "max_old": 0.9166666666666667,
+      "spread": 0.04444444444444451
+    },
+    "subject_effects": {
+      "mia": {
+        "canonical": 0.8888888888888888,
+        "balanced_forward": 0.8722222222222222,
+        "balanced_reverse": 0.8722222222222222
+      },
+      "quin": {
+        "canonical": 0.9,
+        "balanced_forward": 0.9166666666666667,
+        "balanced_reverse": 0.9166666666666667
+      },
+      "rue": {
+        "canonical": 0.9,
+        "balanced_forward": 0.9166666666666667,
+        "balanced_reverse": 0.9166666666666667
+      }
+    }
+  },
+  "interpretation": {
+    "simple_fixed_position_balancing_does_not_reduce_subject_specific_variance": true,
+    "balanced_schedules_slightly_raise_mean_retention_but_lower_the_worst_subject_and_widen_spread": true,
+    "forward_and_reverse_balanced_cycles_are_effectively_equivalent_on_summary_metrics": true,
+    "naive_universal_cleanup_cycling_is_rejected_as_a_general_stability_solution": true,
+    "context_sensitive_noncommutativity_cannot_be_averaged_away_by_simple_fixed_rotation": true,
+    "plain_speak": "Rotating cleanup orders sounds like it should be fair, but it is not. It helps some subjects and hurts others badly enough that the weakest case gets worse, even though the overall mean rises a little. A one-size-fits-all fixed cycle is therefore not the solution.",
+    "north_star_question": "Falsifies a simple universal fixed scheduler and sharpens the requirement: any future context-sensitive maintenance rule must be justified by an internal state mechanism, not by averaging schedules or post-hoc selection.",
+    "next_stage": "diagnostically test whether frozen post-REPORT state geometry predicts the sign of STORE-vs-OBSERVE order preference across subjects, without adapting schedules or retaining diagnostic updates"
+  },
+  "activation_authorized": false
+}
