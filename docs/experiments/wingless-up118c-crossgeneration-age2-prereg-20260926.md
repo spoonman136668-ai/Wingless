@@ -53,7 +53,7 @@ Each generation is completed to exactly 32 filtered writes with one-shot fillers
 ## Churn
 
 After the target recurrence generation:
-- 24,576 unique one-shot churn writes;
+- 12,288 unique one-shot churn writes;
 - hot, target, and burst keys queried every four churn writes;
 - 32 episodes per seed;
 - seeds 223M and 224M.
@@ -77,3 +77,7 @@ If age2_history preserves skip-one-generation targets while rejecting one-genera
 ## Bounds
 
 No admission-memory increase, no exact-memory capacity increase, no semantic labels, no query-derived admission, no adaptive horizon, no future oracle, no result-informed retry, no live activation, no production authority.
+
+## Pre-execution feasibility correction
+
+Before any qualification run, the churn horizon was corrected from 24,576 to 12,288 unique writes because the preregistered 14-bit exact key encoding can represent at most 16,383 nonzero key codes. The recurrence mechanism, equal 128-byte budget, generation timing, seeds, candidate workload, and interpretation criteria are unchanged.
