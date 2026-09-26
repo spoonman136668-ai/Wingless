@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up157c-windows-proof.v1",
+  "experiment": "UP-157C-loss-redistribution",
+  "status": "qualified-scientific-result",
+  "source_head": "3249f23b94750b9d3328d955fa69aa0fc0aab945",
+  "workflow_run_id": 36279956967,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10918033877,
+  "artifact_sha256": "170a7d57fa2bb7a7a3aa710f848c48b13d0f6115da547557d3cae1acd12e7337",
+  "findings": {
+    "arms": 16,
+    "permanent_saves": 12,
+    "delayed_losses": 4,
+    "permanent_save_fraction": 0.75,
+    "guided_final_protected_gain": 11,
+    "guided_final_original_gain": 8,
+    "guided_final_noncohort_original_delta": -3,
+    "delayed_loss_steps": [
+      22,
+      22,
+      20,
+      19
+    ],
+    "delayed_loss_cohort": "cohort_A",
+    "counterfactual_only": true,
+    "live_activation": false,
+    "exact_recall_cap": 16
+  },
+  "interpretation": {
+    "most_warning_guided_immediate_saves_persist_to_final_state": true,
+    "some_saves_only_delay_the_same_item_loss": true,
+    "guided_protection_can_displace_loss_onto_noncohort_originals": true,
+    "total_original_retention_still_improves_in_aggregate": true,
+    "intervention_benefit_is_not_free_under_fixed_capacity": true,
+    "plain_speak": "Twelve of sixteen endangered memories stay saved through the end. Four are only postponed, and protecting the target shifts three losses onto other original memories. The action still improves total original retention overall, but it redistributes pressure rather than making capacity pressure disappear.",
+    "north_star_question": "Defines the first real cost boundary for bounded self-maintenance: a correct warning and successful immediate rescue do not guarantee permanent or collateral-free benefit.",
+    "next_stage": "test whether a frozen present-state durability signal can distinguish permanent saves from delayed-only saves before action, without using future schedule information or changing memory behavior"
+  },
+  "activation_authorized": false
+}
