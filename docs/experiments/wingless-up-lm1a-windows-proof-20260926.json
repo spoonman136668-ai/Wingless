@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.up-lm1a-windows-proof.v1",
+  "experiment": "UP-LM1A-initialization-history",
+  "status": "qualified-scientific-result",
+  "source_head": "bfeb198411b6bab62f2a122dc80f39ce4eae14cb",
+  "workflow_run_id": 36237249406,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10904448103,
+  "artifact_sha256": "0a00c08b179922c2e4299e7b327ef37d950b7fed07909c20b7b60ac5a63fe67d",
+  "state_dimension": 64,
+  "learning_rate": 0.08,
+  "base_pretrain_epochs": 20,
+  "readout_parameter_count": 1430,
+  "recurrent_parameters_trained": false,
+  "findings": {
+    "fresh4": {
+      "base_heldout_accuracy": 0.8286589297227596,
+      "base_perplexity": 1.7111374937511308,
+      "paraphrase_heldout_accuracy": 0.8211897219288983,
+      "paraphrase_perplexity": 1.7645317559369802
+    },
+    "warm4": {
+      "base_heldout_accuracy": 0.8556576402321083,
+      "base_perplexity": 1.5577912811389845,
+      "paraphrase_heldout_accuracy": 0.8316613868356213,
+      "paraphrase_perplexity": 1.6805709122148929
+    },
+    "fresh20": {
+      "base_heldout_accuracy": 0.8670212765957447,
+      "base_perplexity": 1.503131197149629,
+      "paraphrase_heldout_accuracy": 0.861316437873988,
+      "paraphrase_perplexity": 1.543282467910258
+    },
+    "warm20": {
+      "base_heldout_accuracy": 0.8733075435203095,
+      "base_perplexity": 1.4762921913292864,
+      "paraphrase_heldout_accuracy": 0.8619324181626188,
+      "paraphrase_perplexity": 1.5314748630673232
+    }
+  },
+  "interpretation": {
+    "base_pretraining_history_is_not_the_primary_joint_learning障碍": false,
+    "warm_start_outperforms_fresh_at_four_joint_epochs_on_both_distributions": true,
+    "warm_and_fresh_nearly_converge_by_twenty_joint_epochs": true,
+    "insufficient_joint_optimization_time_explains_much_of_the_prior_continual_gap": true,
+    "frozen_recurrent_representation_remains_adequate_for_joint_byte_readout": true,
+    "next_stage": "reintegrate the warm20 jointly trained readout with the frozen learned router and exact recall, then verify base and paraphrase/order behavior together"
+  },
+  "activation_authorized": false
+}
