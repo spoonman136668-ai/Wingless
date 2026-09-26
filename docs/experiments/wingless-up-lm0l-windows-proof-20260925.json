@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.up-lm0l-windows-proof.v1",
+  "experiment": "UP-LM0L-interleaved-clauses",
+  "status": "qualified-scientific-result",
+  "source_head": "4d56db51b4a95518caf887e24cbf811780d3e95a",
+  "workflow_run_id": 36206173532,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10894060721,
+  "artifact_sha256": "d5fade7c5ec144f2ae7fc497def720d0e592a46a644d9926344f0daaa5be674f",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "classifier_epochs": 20,
+  "classifier_learning_rate": 0.08,
+  "explicit_type_at_learned_inference": false,
+  "value_bytes_at_classifier_inference": false,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "interleaved_retraining_used": false,
+  "findings": {
+    "explicit_stream1": {
+      "top1_accuracy": 0.8785460992907801,
+      "query_set_exact": 1,
+      "dependent_accuracy": 1,
+      "event_routing": 1,
+      "report_routing": 1
+    },
+    "explicit_stream4": {
+      "top1_accuracy": 0.874113475177305,
+      "query_set_exact": 1,
+      "dependent_accuracy": 1,
+      "event_routing": 1,
+      "report_routing": 1
+    },
+    "learned_stream1": {
+      "top1_accuracy": 0.8785460992907801,
+      "query_set_exact": 1,
+      "dependent_accuracy": 1,
+      "event_routing": 1,
+      "report_routing": 1
+    },
+    "learned_stream4": {
+      "top1_accuracy": 0.874113475177305,
+      "query_set_exact": 1,
+      "dependent_accuracy": 1,
+      "event_routing": 1,
+      "report_routing": 1
+    }
+  },
+  "interpretation": {
+    "learned_router_matches_explicit_control_under_interleaved_order": true,
+    "exact_memory_dependent_behavior_survives_structural_order_shift": true,
+    "generic_byte_model_is_order_sensitive_but_routing_is_not": true,
+    "next_stage": "test multiple deterministic clause-order permutations without retraining to separate one-pattern success from structural breadth"
+  },
+  "activation_authorized": false
+}
