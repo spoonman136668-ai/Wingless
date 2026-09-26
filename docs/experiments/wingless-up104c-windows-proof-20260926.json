@@ -1,0 +1,70 @@
+{
+  "schema": "wingless.up104c-windows-proof.v1",
+  "experiment": "UP-104C-alternating-promotion-generality",
+  "status": "qualified-scientific-result",
+  "source_head": "0b546931f63c51b3b82f673f77f0eff32c65c98e",
+  "workflow_run_id": 36239557996,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10904703188,
+  "artifact_sha256": "2c961dde3dcf95615bbe629fbfe4edc13ef726a383f2fb8cc800f01393516c81",
+  "hot_keys": 16,
+  "trigger_threshold": 8,
+  "filter_bits": 1024,
+  "generation_interval": 32,
+  "churn_writes": 12288,
+  "exact_recall_cap": 16,
+  "second_write_order": "alternating_ends",
+  "findings": {
+    "ascending": {
+      "resident_hot": 16,
+      "trigger_fired_episodes": 128,
+      "false_positive_admissions": 0,
+      "final_hot_accuracy": 1,
+      "final_exact": 1
+    },
+    "reverse": {
+      "resident_hot": 16,
+      "trigger_fired_episodes": 128,
+      "false_positive_admissions": 0,
+      "final_hot_accuracy": 1,
+      "final_exact": 1
+    },
+    "evens_then_odds": {
+      "resident_hot": 16,
+      "trigger_fired_episodes": 0,
+      "false_positive_admissions": 384,
+      "final_hot_accuracy": 0.9375,
+      "final_exact": 0
+    },
+    "odds_then_evens": {
+      "resident_hot": 8,
+      "trigger_fired_episodes": 128,
+      "false_positive_admissions": 384,
+      "final_hot_accuracy": 0.5,
+      "final_exact": 0
+    },
+    "interleaved_low_high": {
+      "resident_hot": 16,
+      "trigger_fired_episodes": 128,
+      "false_positive_admissions": 0,
+      "final_hot_accuracy": 1,
+      "final_exact": 1
+    },
+    "rotate8": {
+      "resident_hot": 14,
+      "trigger_fired_episodes": 128,
+      "false_positive_admissions": 0,
+      "final_hot_accuracy": 0.875,
+      "final_exact": 0
+    }
+  },
+  "interpretation": {
+    "alternating_ends_is_not_universally_order_robust": true,
+    "exact_success_holds_for_ascending_reverse_and_interleaved_low_high": true,
+    "odds_then_evens_exposes_underpromotion_plus_churn_collision_failure": true,
+    "rotate8_exposes_incomplete_promotion_even_without_false_positive_churn_admissions": true,
+    "evens_then_odds_remains_trigger_blind_when_all_hot_items_begin_resident": true,
+    "next_stage": "separate pre-churn promotion completeness from post-promotion trigger behavior by testing schedules that explicitly cover initially missing hot keys without querying future demand"
+  },
+  "activation_authorized": false
+}
