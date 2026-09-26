@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.up139b-windows-proof.v1",
+  "experiment": "UP-139B-tail-identity",
+  "status": "qualified-scientific-result",
+  "source_head": "8e5ca231a056f1e119695d348dbc004dad9cd8b1",
+  "workflow_run_id": 36254053295,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10910295509,
+  "artifact_sha256": "d6a7d08b8637ead069df01aac99b4087260f3e24875390525194193fadc746a6",
+  "findings": {
+    "moving_tail_control": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.9333333333333333,
+      "old_unseen": 0.9444444444444444,
+      "mean_old": 0.9388888888888889,
+      "mean_new": 0.921875
+    },
+    "fixed_tail_last4": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9375,
+      "old_heldout": 0.8333333333333334,
+      "old_unseen": 0.8888888888888888,
+      "mean_old": 0.8611111111111112,
+      "mean_new": 0.9270833333333333
+    },
+    "fixed_tail_first4": {
+      "primary_new": 0.9583333333333334,
+      "secondary_new": 0.9166666666666666,
+      "old_heldout": 0.9333333333333333,
+      "old_unseen": 0.9,
+      "mean_old": 0.9166666666666667,
+      "mean_new": 0.9375
+    },
+    "alternating_fixed_tails": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9166666666666666,
+      "old_heldout": 0.9,
+      "old_unseen": 0.9,
+      "mean_old": 0.9,
+      "mean_new": 0.9166666666666666
+    }
+  },
+  "interpretation": {
+    "broad_tail_identity_mobility_is_the_strongest_tested_retention_mechanism": true,
+    "freezing_tail_identity_substantially_reduces_old_family_retention": true,
+    "alternating_between_two_fixed_tails_is_not_sufficient_to_match_full_mobility": true,
+    "fixed_first4_trades_some_retention_for_the_best_mean_new_accuracy": true,
+    "the_b138_rotation_refresh_interaction_is_best_explained_by_epoch_to_epoch_tail_coverage_not_refresh_count_alone": true,
+    "next_stage": "hold four post-anchor updates fixed and vary tail-identity diversity dose across 1 2 4 8 and full-rotation schedules"
+  },
+  "activation_authorized": false
+}
