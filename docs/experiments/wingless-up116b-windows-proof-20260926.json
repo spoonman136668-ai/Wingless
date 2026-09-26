@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up116b-windows-proof.v1",
+  "experiment": "UP-116B-stores-margin",
+  "status": "qualified-scientific-result",
+  "source_head": "2adc148a3a87703223c72fe31eb22e2f4dea8e2a",
+  "workflow_run_id": 36235844115,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10903478927,
+  "artifact_sha256": "b25205f8b7edc021e8b478ed28735af09b7049e1a60a8fbd9a53225ee51261a0",
+  "training_changed": false,
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "findings": {
+    "stores_failure_destination": "OBSERVE",
+    "stores_failure_destination_report_count": 0,
+    "worst_stores_accuracy": 0,
+    "worst_stores_mean_target_margin": -0.1564106223089775,
+    "worst_stores_min_target_margin": -0.2110447229051443,
+    "keeps_accuracy_at_all_stores_failure_points": 1,
+    "minimum_keeps_mean_margin_at_stores_failure_points": 0.337134409811394,
+    "minimum_keeps_min_margin_at_stores_failure_points": 0.2580189499185336
+  },
+  "interpretation": {
+    "stores_failure_is_a_low_margin_lexical_boundary_collapse": true,
+    "wrong_class_direction_is_consistently_observe": true,
+    "sibling_store_verb_keeps_remains_robust": true,
+    "class_level_replay_is_not_the_right_resolution": true,
+    "next_stage": "measure deterministic encoder geometry and classifier projections for stores versus keeps and STORE/OBSERVE verb families to separate representation proximity from learned-weight trajectory"
+  },
+  "activation_authorized": false
+}
