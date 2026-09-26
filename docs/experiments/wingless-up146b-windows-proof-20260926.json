@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up146b-windows-proof.v1",
+  "experiment": "UP-146B-tail-habituation",
+  "status": "qualified-scientific-result",
+  "source_head": "afc5ab3ed6f3bece18a9d6bff60de4d6dfb6c975",
+  "workflow_run_id": 36257514560,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10910169409,
+  "artifact_sha256": "fb3c85b242aab917cf9c372cf183820cd205f81468300cd91c011fdb04f1c353",
+  "findings": {
+    "repetition_1": {
+      "mean_tail_damage": 0.011111111111111072,
+      "mean_net_epoch_change": 0.011111111111111072
+    },
+    "repetition_2": {
+      "mean_tail_damage": -0.00416666666666668,
+      "mean_net_epoch_change": -0.008333333333333331
+    },
+    "repetition_3": {
+      "mean_tail_damage": -0.00416666666666668,
+      "mean_net_epoch_change": -0.005555555555555564
+    },
+    "repetition_4": {
+      "mean_tail_damage": -0.004166666666666652,
+      "mean_net_epoch_change": -0.009722222222222188
+    },
+    "repetition_5": {
+      "mean_tail_damage": -0.005555555555555508,
+      "mean_net_epoch_change": -0.008333333333333304
+    },
+    "final_mean_old_retention": 0.9166666666666667,
+    "final_mean_new_accuracy": 0.9479166666666667
+  },
+  "interpretation": {
+    "simple_monotonic_tail_habituation_not_supported": true,
+    "averaged_first_repetition_is_net_positive_but_later_repetitions_are_mildly_negative": true,
+    "individual_tail_blocks_show_strongly_different_trajectories": true,
+    "tail_identity_is_confounded_with_block_position_in_current_design": true,
+    "plain_speak": "Repeating the same ending examples for five epochs helps overall, but the benefit is not because each repetition steadily becomes safer. Different ending sets behave very differently, and each one was always tested in the same block position. We now need to swap block order to learn whether the behavior belongs to the ending set itself or to when it appears in training.",
+    "north_star_question": "Separates local lexical-tail identity from curriculum position so sequential language scheduling can be based on a stable mechanism rather than an order-specific artifact.",
+    "next_stage": "permute the four five-epoch tail blocks across fixed schedules so each tail identity occupies each block position under identical update counts"
+  },
+  "activation_authorized": false
+}
