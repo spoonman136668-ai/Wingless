@@ -84,7 +84,7 @@ func uplm2iEval(model *uplm0aModel,classifier *uplm0jClassifier,d [64]float64,al
 				}
 			}
 		}
-		targetByte:=s[t+1];target,okTarget:=model.index[int(targetByte)];if !okTarget{target=0}
+		targetByte:=s[t+1];target:=model.index[int(targetByte)];okTarget:=target>=0;if !okTarget{target=0}
 		p:=model.probs(h);pred:=uplm0aArgmax(p);prob:=p[target]
 		isDep:=targets[t+1]
 		if isDep{
