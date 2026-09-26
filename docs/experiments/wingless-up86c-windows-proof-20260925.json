@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up86c-windows-proof.v1",
+  "experiment": "UP-86C-hotset-transition",
+  "status": "qualified-scientific-result",
+  "source_head": "750c026a40d09e4f0e93adb6e6bcc457bd7cc627",
+  "workflow_run_id": 36206167437,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10893821605,
+  "artifact_sha256": "92fc82141baf29b93e16baf1fa48aa4197ae4bc7669d439f42c71ceeccd325f6",
+  "active_keys": 32,
+  "churn_writes": 24,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "future_oracle_used": false,
+  "findings": {
+    "lru_hot_accuracy_by_size": {
+      "13": 0.9230769230769231,
+      "14": 0.8571428571428571,
+      "15": 0.8,
+      "16": 0.75
+    },
+    "two_bit_aging_hot_accuracy_by_size": {
+      "13": 0.9230769230769231,
+      "14": 0.8571428571428571,
+      "15": 0.8666666666666667,
+      "16": 0.8125
+    },
+    "lru_hot_exact_all_13_to_16": 0,
+    "two_bit_aging_hot_exact_all_13_to_16": 0,
+    "fifo_hot_accuracy_all_13_to_16": 0,
+    "metadata_bytes": {
+      "fifo": 16,
+      "lru": 136,
+      "two_bit_aging": 5
+    }
+  },
+  "interpretation": {
+    "exact_online_hotset_threshold_is_12_in_tested_workload": true,
+    "failure_begins_at_13_despite_nominal_capacity_16": true,
+    "two_bit_aging_retains_more_partial_hot_content_than_lru_at_15_and_16": true,
+    "next_stage": "test low-metadata admission gating against one-shot churn because replacement alone does not preserve 13-plus hot items exactly"
+  },
+  "activation_authorized": false
+}
