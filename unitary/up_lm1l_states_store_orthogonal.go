@@ -4,6 +4,16 @@ import "math"
 
 const UPLM1LStatesOrthogonalSchema = "wingless.up-lm1l-states-store-orthogonal.v1"
 
+func uplm1lDot(a,b [64]float64) float64 {
+	s:=0.0
+	for i:=0;i<64;i++ { s+=a[i]*b[i] }
+	return s
+}
+
+func uplm1lNorm(a [64]float64) float64 {
+	return math.Sqrt(uplm1lDot(a,a))
+}
+
 type UPLM1LFamilyMetric struct {
 	Arm           string  `json:"arm"`
 	Family        string  `json:"family"`
@@ -60,7 +70,7 @@ func uplm1lStoreDirection() [64]float64 {
 		}
 	}
 	for i:=0;i<64;i++{d[i]/=count}
-	n:=up120bNorm(d)
+	n:=uplm1lNorm(d)
 	if n>1e-12{for i:=0;i<64;i++{d[i]/=n}}
 	return d
 }
@@ -68,10 +78,10 @@ func uplm1lStoreDirection() [64]float64 {
 func uplm1lEncode(arm,name,surface string,d [64]float64)[64]float64{
 	h:=uplm0fEncode(name+" "+surface)
 	if arm!="states_store_orthogonal" || surface!="states" { return h }
-	dot:=up120bDot(h,d)
+	dot:=uplm1lDot(h,d)
 	var residual [64]float64
 	for i:=0;i<64;i++{residual[i]=h[i]-dot*d[i]}
-	nh,nr:=up120bNorm(h),up120bNorm(residual)
+	nh,nr:=uplm1lNorm(h),uplm1lNorm(residual)
 	if nr>1e-12{
 		s:=nh/nr
 		for i:=0;i<64;i++{residual[i]*=s}
@@ -172,7 +182,7 @@ func RunUPLM1L()(UPLM1LStatesOrthogonalResult,error){
 		Schema:UPLM1LStatesOrthogonalSchema,Experiment:"UP-LM1L-states-store-orthogonal",
 		SourceUPLM1KSeal:"e5944e3a6a52a1e4bd98c5c880c5eca964075fd5",
 		StateDimension:64,FourthGroundingEpochs:20,LearningRate:0.08,
-		CorrectionRecomputed:false,ThresholdChanged:false,ByteModelUsed:false,StoreDirectionNorm:up120bNorm(d),
+		CorrectionRecomputed:false,ThresholdChanged:false,ByteModelUsed:false,StoreDirectionNorm:uplm1lNorm(d),
 	}
 	names:=uplm0gNames()
 	type cell struct{family,split string;names,surfaces []string}
