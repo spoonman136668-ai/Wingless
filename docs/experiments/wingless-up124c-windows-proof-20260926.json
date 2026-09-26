@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.up124c-windows-proof.v1",
+  "experiment": "UP-124C-history-overflow-boundary",
+  "status": "qualified-scientific-result",
+  "source_head": "db368a1510106b8d60cf4e6cb4a8b775d49e70e1",
+  "workflow_run_id": 36256600460,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10911237164,
+  "artifact_sha256": "41bee82f391649bdbc5adb38d016bc1307f20397843ad6557270550bd2c41903",
+  "findings": {
+    "q0": {
+      "overflow_rate": 0,
+      "evaluated_episodes": 64,
+      "valid_admission": 1,
+      "valid_accuracy": 1,
+      "hot_accuracy": 1,
+      "target16_exact": 1,
+      "history_max": 32,
+      "false_admissions": 0
+    },
+    "q1": {
+      "overflow_rate": 1,
+      "overflow_episodes": 64,
+      "total_episodes": 64,
+      "message": "UP118C history table full",
+      "history_max": 32
+    },
+    "q4": {
+      "overflow_rate": 1,
+      "overflow_episodes": 64,
+      "total_episodes": 64,
+      "message": "UP118C history table full",
+      "history_max": 32
+    },
+    "q8": {
+      "overflow_rate": 1,
+      "overflow_episodes": 64,
+      "total_episodes": 64,
+      "message": "UP118C history table full",
+      "history_max": 32
+    },
+    "admission_memory_bytes": 128,
+    "exact_recall_cap": 16,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "representable_history_boundary_is_exactly_32_entries": true,
+    "first_additional_qualified_candidate_causes_hard_overflow": true,
+    "there_is_no_insertion_slack_beyond_saturation": true,
+    "unchanged_control_remains_exact_at_saturation": true,
+    "plain_speak": "The candidate-history table works perfectly when all 32 slots are occupied, but the very next qualified candidate hits a hard stop. The limit is exact: full is safe; full plus one is not.",
+    "north_star_question": "Establishes the first hard bounded-memory failure point that must be handled before temporal admission can support longer and noisier language sequences.",
+    "next_stage": "test one preregistered deterministic age-only eviction rule at the same 128-byte capacity, using stale age-2 evidence as the only replacement signal"
+  },
+  "activation_authorized": false
+}
