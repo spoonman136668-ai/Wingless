@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up159c-windows-proof.v1",
+  "experiment": "UP-159C-durability-horizon-replication",
+  "status": "qualified-scientific-result",
+  "source_head": "e78a29fa6294cbc3ddc4f31edcaeee5b1bdebb26",
+  "workflow_run_id": 36280609632,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10918657332,
+  "artifact_sha256": "848d8df4f0206cca24595d9564c62b5d17c181dd4b1bd9bf8c162a6f9ba2998e",
+  "findings": {
+    "arms": 16,
+    "durability_threshold": 21,
+    "permanent_saves": 13,
+    "delayed_losses": 3,
+    "true_positive": 12,
+    "false_positive": 0,
+    "false_negative": 1,
+    "true_negative": 3,
+    "precision": 1,
+    "recall": 0.9230769230769231,
+    "accuracy": 0.9375,
+    "horizon_auroc": 0.9615384615384616,
+    "false_negative_case": {
+      "cohort": "cohort_A",
+      "initial_hand": 4,
+      "horizon": 16,
+      "actual_durable": true
+    }
+  },
+  "interpretation": {
+    "horizon_score_generalizes_strongly_but_not_perfectly": true,
+    "frozen_threshold_is_conservative": true,
+    "present_scalar_horizon_is_not_sufficient_for_durability": true,
+    "no_false_durable_predictions_in_tested_stream": true,
+    "plain_speak": "The horizon signal still works very well on a different schedule, but it is not the whole story. Every save predicted durable really was durable, yet one horizon-16 case survived anyway. Future stream structure can sometimes rescue a case that looks fragile from the scalar horizon alone.",
+    "north_star_question": "Shows Wingless can estimate intervention durability from native state with high reliability, while proving that one scalar countdown does not fully determine eventual outcome.",
+    "next_stage": "within the horizon-16 cases, test additional present native-state geometry—hand position and full age-vector summaries—to explain the durable exception without future schedule input"
+  },
+  "activation_authorized": false
+}
