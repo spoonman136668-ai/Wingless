@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.up110b-windows-proof.v1",
+  "experiment": "UP-110B-class-allocation-replay",
+  "status": "qualified-scientific-result",
+  "source_head": "37df23dd54b5690c5d4cf50e657c822f14e6fcdf",
+  "workflow_run_id": 36233752220,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10903173411,
+  "artifact_sha256": "add130ca4189e1c6e9d942ca0e9a5fa13ad0de344f94c6f2641f960252221463",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "findings": {
+    "pair_major_stage3_base": 0.9444444444444443,
+    "pair_major_stage5_acquired": 0.9,
+    "equal_prior_stage3_base": 0.9444444444444443,
+    "equal_prior_stage5_base": 0.9722222222222223,
+    "equal_prior_stage5_acquired": 0.8,
+    "exposure_balanced_stage3_base": 0.9444444444444443,
+    "exposure_balanced_stage4_base": 1,
+    "exposure_balanced_stage4_acquired": 1,
+    "exposure_balanced_stage5_base": 1,
+    "exposure_balanced_stage5_acquired": 1,
+    "exposure_balanced_stage6_base": 1,
+    "exposure_balanced_stage6_acquired": 1
+  },
+  "interpretation": {
+    "class_exposure_allocation_solves_the_stage5_acquired_verb_loss": true,
+    "equal_prior_class_allocation_is_worse_than_pair_major_at_stage5": true,
+    "stage3_base_dip_persists_because_the_exposure_balanced_arm_falls_back_before_all_prior_classes_exist": true,
+    "next_stage": "remove the all-classes fallback and always allocate prior replay away from the current acquisition class using available prior classes"
+  },
+  "activation_authorized": false
+}
