@@ -1,0 +1,76 @@
+{
+  "schema": "wingless.up102c-windows-proof.v1",
+  "experiment": "UP-102C-query-aging-timing",
+  "status": "qualified-scientific-result",
+  "source_head": "7b5eb9581aae21f40053022df65bd9191240549f",
+  "workflow_run_id": 36237247599,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10904438359,
+  "artifact_sha256": "e82dd5ccc1a2d8496f03c6be0e13701a869cae7a3b1a75a82925111deaadaa25",
+  "hot_keys": 16,
+  "trigger_threshold": 8,
+  "filter_bits": 1024,
+  "generation_interval": 32,
+  "churn_writes": 12288,
+  "exact_recall_cap": 16,
+  "findings": {
+    "ascending": {
+      "no_extra_reads": {
+        "resident_hot_before_churn": 16,
+        "final_exact": 1
+      },
+      "after_initial": {
+        "resident_hot_before_churn": 16,
+        "final_exact": 1
+      },
+      "after_promotion": {
+        "resident_hot_before_churn": 16,
+        "final_exact": 1
+      },
+      "both": {
+        "resident_hot_before_churn": 16,
+        "final_exact": 1
+      }
+    },
+    "reverse": {
+      "no_extra_reads": {
+        "resident_hot_before_churn": 14,
+        "final_accuracy": 0.875,
+        "final_exact": 0
+      },
+      "after_initial": {
+        "resident_hot_before_churn": 16,
+        "final_accuracy": 1,
+        "final_exact": 1
+      },
+      "after_promotion": {
+        "resident_hot_before_churn": 14,
+        "final_accuracy": 0.875,
+        "final_exact": 0
+      },
+      "both": {
+        "resident_hot_before_churn": 16,
+        "final_accuracy": 1,
+        "final_exact": 1
+      },
+      "false_positive_admissions_all_arms": 0,
+      "trigger_fired_episodes_all_arms": 128
+    },
+    "evens_then_odds": {
+      "resident_hot_before_churn_all_arms": 16,
+      "final_accuracy_all_arms": 0.9375,
+      "final_exact_all_arms": 0,
+      "false_positive_admissions_all_arms": 384,
+      "trigger_fired_episodes_all_arms": 0
+    }
+  },
+  "interpretation": {
+    "reverse_order_failure_occurs_during_promotion_before_churn": true,
+    "initial_read_reinforcement_is_sufficient_to_preserve_all_reverse_order_hot_entries": true,
+    "post_promotion_read_is_too_late": true,
+    "trigger_and_churn_filtering_are_not_responsible_for_reverse_order_failure": true,
+    "evens_then_odds_remains_a_separate_trigger_blind_churn_failure": true,
+    "next_stage": "hold trigger8 fixed and vary the order of hot second writes to test whether reinforcement timing relative to missing-key promotion is the causal reverse-order mechanism"
+  },
+  "activation_authorized": false
+}
