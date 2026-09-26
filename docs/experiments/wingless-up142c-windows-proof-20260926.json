@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up142c-windows-proof.v1",
+  "experiment": "UP-142C-age-rank-replacement",
+  "status": "qualified-scientific-result",
+  "source_head": "e0883004f740e9af2810537ed0b6b30e9d577349",
+  "workflow_run_id": 36272210277,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10915843289,
+  "artifact_sha256": "1c93d0a6efc938979feb8a8572f1ab86aec972ed0b1ccdd67b93b88040e4b3cb",
+  "findings": {
+    "target100": {
+      "age0_index0": {
+        "survives": false,
+        "evicted_index": 0,
+        "age0_evictions": 1
+      },
+      "age0_index31": {
+        "survives": true,
+        "evicted_key": 10000,
+        "evicted_index": 0,
+        "age0_evictions": 1
+      },
+      "age1_index0": {
+        "survives": false,
+        "evicted_index": 0,
+        "age1_evictions": 1
+      },
+      "age1_index31": {
+        "survives": false,
+        "evicted_index": 31,
+        "age1_evictions": 1
+      },
+      "age2_index0": {
+        "survives": false,
+        "evicted_index": 0,
+        "age2_evictions": 1
+      },
+      "age2_index31": {
+        "survives": false,
+        "evicted_index": 31,
+        "age2_evictions": 1
+      }
+    },
+    "target103_same_pattern": true,
+    "full_history_entries_all_arms": 32,
+    "incoming_inserted_all_arms": true
+  },
+  "interpretation": {
+    "replacement_is_age_rank_first": true,
+    "lowest_index_is_only_a_tie_break_when_maximum_ages_are_equal": true,
+    "target_identity_does_not_change_the_result": true,
+    "direct_fixture_matches_the_documented_replacement_rule": true,
+    "plain_speak": "When the history table is full, the oldest trace is removed regardless of where it sits. Slot position matters only when every candidate is equally old; then the lowest slot loses.",
+    "north_star_question": "Closes the replacement-policy mechanism at the controlled-state level, separating temporal priority from implementation tie-breaking under fixed bounded memory.",
+    "next_stage": "return to a live stream and create two concurrently qualified histories with different ages, then force one replacement event to verify that the older live trace is evicted while the younger trace survives"
+  },
+  "activation_authorized": false
+}
