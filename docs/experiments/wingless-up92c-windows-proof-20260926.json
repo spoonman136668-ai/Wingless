@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up92c-windows-proof.v1",
+  "experiment": "UP-92C-continuous32-horizon",
+  "status": "qualified-scientific-result",
+  "source_head": "6ad1c62ae41179470e5468fe264e52392c7628b7",
+  "workflow_run_id": 36233348318,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10903501331,
+  "artifact_sha256": "400da537cb593a0a43bb1431abeb6be4e6c29bc0d36db34925ed64526399a304",
+  "active_keys": 32,
+  "hot_keys": 16,
+  "filter_bits": 256,
+  "hash_count": 2,
+  "generation_interval": 32,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "findings": {
+    "churn192": {
+      "hot_accuracy": 1,
+      "hot_exact": 1,
+      "false_positive_admissions": 0
+    },
+    "churn384": {
+      "hot_accuracy": 1,
+      "hot_exact": 1,
+      "false_positive_admissions": 0
+    },
+    "churn768": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128
+    },
+    "churn1536": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 640
+    },
+    "policy_metadata_bytes": 38,
+    "total_bounded_memory_bytes": 294
+  },
+  "interpretation": {
+    "continuous32_exact_retention_is_stable_through_384_unique_churn_writes": true,
+    "first_failure_occurs_by_768_and_coincides_with_first_false_positive_admission": true,
+    "periodic_clearing_prevents_cumulative_saturation_but_static_hash_collisions_can_recur_with_later_key_ranges": true,
+    "next_stage": "test deterministic generation-salted hashing at fixed interval32 and filter width256 to decorrelate later key ranges"
+  },
+  "activation_authorized": false
+}
