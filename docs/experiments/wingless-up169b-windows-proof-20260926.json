@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.up169b-windows-proof.v1",
+  "experiment": "UP-169B-margin-rank-class-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "30f76b62569e5e1e85472e8d0dcdd4a5373f7252",
+  "workflow_run_id": 36273918217,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10916204193,
+  "artifact_sha256": "9f530c5d8a862fbf6b0d1bc1a133e31a3b41790932f3ec3f4381458bc14ccbf9",
+  "findings": {
+    "calibration_phase": 16,
+    "parent_phase": 15,
+    "store": {
+      "band_max": 10,
+      "total_crossings": 92,
+      "max_rank": 12,
+      "band_coverage": 0.9782608695652174,
+      "universal4_coverage": 0.717391304347826,
+      "crossing_density": 0.15
+    },
+    "observe": {
+      "band_max": 10,
+      "total_crossings": 89,
+      "max_rank": 9,
+      "band_coverage": 1,
+      "universal4_coverage": 0.8202247191011236,
+      "crossing_density": 0.14833333333333334
+    },
+    "report": {
+      "band_max": 4,
+      "total_crossings": 27,
+      "max_rank": 6,
+      "band_coverage": 0.9629629629629629,
+      "universal4_coverage": 0.9629629629629629,
+      "crossing_density": 0.10833333333333334
+    },
+    "bands_frozen_before_run": true,
+    "adaptive_band_used": false,
+    "maintenance_triggered": false
+  },
+  "interpretation": {
+    "low_rank_vulnerability_transfers_to_disjoint_rehearsal_phase": true,
+    "fixed_class_specific_hard_bands_are_high_coverage_but_not_perfect": true,
+    "observe_band_generalizes_fully_in_this_phase": true,
+    "store_and_report_each_have_out_of_band_crossings": true,
+    "universal_rank4_band_is_too_narrow_for_store_and_observe": true,
+    "hard_cutoff_trigger_is_not_justified": true,
+    "plain_speak": "The warning signal transfers to a different rehearsal phase, but fixed hard boundaries do not transfer perfectly. Most flips still come from the fragile tail, yet STORE reaches rank 12 and REPORT rank 6 in a few cases. Wingless can trust 'lower margin means higher risk' more than it can trust one magic cutoff.",
+    "north_star_question": "Rejects brittle hard-band deficiency triggering while preserving the more general continuous vulnerability signal, narrowing the path toward robust internal self-detection.",
+    "next_stage": "on a new phase-17 context, preregister fixed vulnerability-rank bins and test whether crossing rate decreases monotonically with rank without fitting any threshold or triggering maintenance"
+  },
+  "activation_authorized": false
+}
