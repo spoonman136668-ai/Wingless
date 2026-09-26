@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.up177b-windows-proof.v1",
+  "experiment": "UP-177B-threshold-frontier",
+  "status": "qualified-scientific-result",
+  "source_head": "027076dfc32846abfd69e269d1e9628efecf0ee4",
+  "workflow_run_id": 36278355430,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10917837212,
+  "artifact_sha256": "e1c3f20c8ccb8836550c82769880df89d70e398053a54956f2e612c9e9cf9910",
+  "findings": {
+    "heldout_phase": 22,
+    "actual_crossings": 243,
+    "thresholds": {
+      "0.2": {
+        "precision": 0.33884297520661155,
+        "recall": 0.6748971193415638,
+        "tp": 164,
+        "fp": 320,
+        "fn": 79,
+        "tn": 16717,
+        "warnings": 484
+      },
+      "0.3": {
+        "precision": 0.39779005524861877,
+        "recall": 0.2962962962962963,
+        "tp": 72,
+        "fp": 109,
+        "fn": 171,
+        "tn": 16928,
+        "warnings": 181
+      },
+      "0.4": {
+        "precision": 0.4067796610169492,
+        "recall": 0.2962962962962963,
+        "tp": 72,
+        "fp": 105,
+        "fn": 171,
+        "tn": 16932,
+        "warnings": 177
+      }
+    }
+  },
+  "interpretation": {
+    "higher_threshold_improves_precision_only_modestly": true,
+    "recall_collapses_between_0_2_and_0_3": true,
+    "no_tested_threshold_provides_both_high_precision_and_high_recall": true,
+    "simple_thresholding_is_not_sufficient_for_an_intervention_trigger": true,
+    "plain_speak": "Turning the warning threshold up cuts false alarms, but it also throws away most real failures. Precision tops out around 40.7% while recall falls to 29.6%. A single cutoff cannot turn the current score into a safe maintenance trigger.",
+    "north_star_question": "Rules out the simplest trigger design and redirects B toward measuring the score's intrinsic discrimination before adding new native signals.",
+    "next_stage": "on a fresh held-out phase, measure threshold-free discrimination of rank-plus-temporal risk versus rank-only risk using AUROC/AUPRC and enrichment, without intervention"
+  },
+  "activation_authorized": false
+}
