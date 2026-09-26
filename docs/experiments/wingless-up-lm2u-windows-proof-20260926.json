@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up-lm2u-windows-proof.v1",
+  "experiment": "UP-LM2U-downstream-cost",
+  "status": "qualified-scientific-result",
+  "source_head": "37c1bb48c92928dc535830b497685f45ce5effbb",
+  "workflow_run_id": 36280048715,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10918019089,
+  "artifact_sha256": "5851ab4abf566869bbe829014c551d69adb1cf68d0adca183cef948643963743",
+  "repair_note": "Initial run failed before science due a compiler-only source defect; repaired source reran the frozen preregistered design unchanged.",
+  "findings": {
+    "total_arms": 24,
+    "baseline_completed": 264,
+    "guided_completed": 288,
+    "sham_completed": 264,
+    "baseline_failed": 24,
+    "guided_failed": 0,
+    "sham_failed": 24,
+    "guided_actions": 24,
+    "sham_actions": 24,
+    "exact_recall_cap": 16,
+    "capacity_changed": false,
+    "extra_training_used": false
+  },
+  "interpretation": {
+    "guided_early_closure_eliminates_all_tested_downstream_dependency_failures": true,
+    "budget_matched_sham_has_no_downstream_benefit": true,
+    "guided_action_does_not_reduce_total_completed_reports_in_tested_streams": true,
+    "safe_d4_controls_require_no_action": true,
+    "plain_speak": "The guided schedule change does not just save the endangered dependency in isolation. Across the tested streams it restores all 24 otherwise-missing downstream completions, while the same-cost sham move changes nothing.",
+    "north_star_question": "Strengthens the counterfactual detect-and-correct result by showing preserved downstream task completion rather than a local bookkeeping win.",
+    "next_stage": "test the same frozen warning-guided rule under disjoint report-order permutations and dependency identities to verify response generalization before any autonomous activation discussion"
+  },
+  "activation_authorized": false
+}
