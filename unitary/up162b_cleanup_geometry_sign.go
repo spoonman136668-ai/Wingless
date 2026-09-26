@@ -34,7 +34,7 @@ type UP162BResult struct{
 
 func up162bFrozenItemDelta(base *up129bGate,item up156bOldItem,o,r [64]float64)[]float64{
 	g:=*base
-	up129bGateStep(&g,item.name,item.verb,item.class,o,r)
+	up129bGateStep(&g,up121bOriginalNames[item.subjectIndex],item.surface.verb,item.surface.class,o,r)
 	return up150bDelta(base,&g)
 }
 func up162bAggregate(base *up129bGate,indices []int,o,r [64]float64)[]float64{
