@@ -41,7 +41,7 @@ func up113cQueryWorkingSet(x *up111cExactMachine,recurring []int) {
 func up113cFillToGenerationBoundary(x *up111cExactMachine,next *int,rng *sq0RNG)(falseAdmissions int) {
 	for x.counter!=0 {
 		key:=*next
-		*next++
+		(*next)++
 		admitted,_:=x.process(key,rng.intn(32))
 		if admitted { falseAdmissions++ }
 	}
