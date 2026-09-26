@@ -1,0 +1,54 @@
+{
+  "schema": "wingless.up111c-windows-proof.v1",
+  "experiment": "UP-111C-exact-probation-table",
+  "status": "qualified-scientific-result",
+  "source_head": "69b9c50a397aa4f85f7810f210609b2cfee95a20",
+  "workflow_run_id": 36245202154,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10906683987,
+  "artifact_sha256": "69e9157d625584588f2ccba48083b75e7fc559b6426bc559dc96998a695b4a34",
+  "admission_memory_bytes": 128,
+  "policy_metadata_bytes": 136,
+  "exact_recall_cap": 16,
+  "generation_interval": 32,
+  "findings": {
+    "bloom_24576": {
+      "hot_accuracy": 0.9375,
+      "exact": 0,
+      "false_positive_admissions": 64
+    },
+    "bloom_49152": {
+      "hot_accuracy": 0.9375,
+      "exact": 0,
+      "false_positive_admissions": 192
+    },
+    "bloom_98304": {
+      "hot_accuracy": 0.9375,
+      "exact": 0,
+      "false_positive_admissions": 576
+    },
+    "exact32_all_orders_24576": {
+      "hot_accuracy": 1,
+      "exact": 1,
+      "false_positive_admissions": 0
+    },
+    "exact32_all_orders_49152": {
+      "hot_accuracy": 1,
+      "exact": 1,
+      "false_positive_admissions": 0
+    },
+    "exact32_all_orders_98304": {
+      "hot_accuracy": 1,
+      "exact": 1,
+      "false_positive_admissions": 0
+    }
+  },
+  "interpretation": {
+    "equal_memory_exact_probation_eliminates_long_horizon_false_admissions": true,
+    "bounded_memory_was_not_the_long_horizon_limit": true,
+    "bloom_occupancy_collisions_were_the_failure_mechanism": true,
+    "phasefree_slot_reuse_checkpoint_remains_compatible_with_exact_probation": true,
+    "next_stage": "test whether the exact32 probation table correctly admits genuinely repeated non-hot candidates within a generation while rejecting one-shot churn"
+  },
+  "activation_authorized": false
+}
