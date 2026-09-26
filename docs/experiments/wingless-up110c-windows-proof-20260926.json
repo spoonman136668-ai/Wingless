@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up110c-windows-proof.v1",
+  "experiment": "UP-110C-slot-reuse-generality",
+  "status": "qualified-scientific-result",
+  "source_head": "b66adb60e2bc57c660425090568a29f8aa4f5c1c",
+  "workflow_run_id": 36244711139,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10905924651,
+  "artifact_sha256": "c5789f3992cc2693d1197c42c3514556dd1b6cadda1f26be9fbfed8f6a67dd35",
+  "exact_recall_cap": 16,
+  "filter_bits": 1024,
+  "generation_interval": 32,
+  "episodes_per_seed": 32,
+  "findings": {
+    "all_six_orders_12288": {
+      "explicit_exact": 1,
+      "slot_reuse_exact": 1,
+      "false_positive_admissions": 0
+    },
+    "all_six_orders_24576": {
+      "explicit_hot_accuracy": 0.9375,
+      "slot_reuse_hot_accuracy": 0.9375,
+      "explicit_exact": 0,
+      "slot_reuse_exact": 0,
+      "false_positive_admissions_per_arm": 128
+    },
+    "all_six_orders_49152": {
+      "explicit_hot_accuracy": 0.9375,
+      "slot_reuse_hot_accuracy": 0.9375,
+      "explicit_exact": 0,
+      "slot_reuse_exact": 0,
+      "false_positive_admissions_per_arm": 384
+    },
+    "slot_reuse_checkpoint_count": {
+      "rotate8": 1,
+      "other_orders": 2
+    }
+  },
+  "interpretation": {
+    "phasefree_detector_matches_explicit_checkpoint_at_every_tested_horizon": true,
+    "detector_is_not_the_long_horizon_failure": true,
+    "long_horizon_failure_is_cumulative_probabilistic_false_admission": true,
+    "additional_hash_count_was_already_ruled_out_by_up94c": true,
+    "next_stage": "compare the 1024-bit Bloom seen-once filter against an equal-memory 32-entry uint32 exact generational probation table under the same slot-reuse checkpoint and long-horizon workload"
+  },
+  "activation_authorized": false
+}
