@@ -1,0 +1,60 @@
+{
+  "schema": "wingless.up150b-windows-proof.v1",
+  "experiment": "UP-150B-terminal-tail-geometry",
+  "status": "qualified-scientific-result",
+  "source_head": "8da53cdf228ae5188d94c875d1996d357654cb7e",
+  "workflow_run_id": 36264670652,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10913870317,
+  "artifact_sha256": "d069b91687e70a112fccf4ef57c35997b33eaa65078d26e59e7e0bf8b3b2e313",
+  "findings": {
+    "shift0": {
+      "prior_class": "damaging",
+      "tail_update_norm": 0.21688708855183075,
+      "old_anchor_norm": 0.19894427564321585,
+      "cosine_tail_vs_old_anchor": -0.8245542490690567,
+      "mean_correct_prob": 0.5351869233205652
+    },
+    "shift6": {
+      "prior_class": "protective",
+      "tail_update_norm": 0.11583107247819042,
+      "old_anchor_norm": 0.19894427564321585,
+      "cosine_tail_vs_old_anchor": 0.5553882722931119,
+      "mean_correct_prob": 0.5692025125286257
+    },
+    "shift12": {
+      "prior_class": "damaging",
+      "tail_update_norm": 0.2306576993211284,
+      "old_anchor_norm": 0.19894427564321585,
+      "cosine_tail_vs_old_anchor": -0.8200721012499922,
+      "mean_correct_prob": 0.5012010097299839
+    },
+    "shift18": {
+      "prior_class": "protective",
+      "tail_update_norm": 0.1255741660455286,
+      "old_anchor_norm": 0.19894427564321585,
+      "cosine_tail_vs_old_anchor": 0.5827898012621782,
+      "mean_correct_prob": 0.5568736632295769
+    },
+    "pairwise": {
+      "0_6": -0.7372758393559582,
+      "0_12": 0.9808769364368416,
+      "0_18": -0.7826459544967911,
+      "6_12": -0.7505767485835498,
+      "6_18": 0.940205171225657,
+      "12_18": -0.766277218817874
+    }
+  },
+  "interpretation": {
+    "frozen_first_order_update_geometry_cleanly_separates_prior_safe_and_damaging_tail_groups": true,
+    "damaging_tails_are_strongly_anti_aligned_with_old_anchor_correction": true,
+    "protective_tails_are_positively_aligned_with_old_anchor_correction": true,
+    "damaging_pair_forms_a_high_cosine_cluster": true,
+    "protective_pair_forms_a_high_cosine_cluster": true,
+    "damaging_updates_are_also_larger_norm_than_protective_updates": true,
+    "plain_speak": "The safe and harmful ending examples push the learner in opposite directions. The harmful endings push strongly against the direction that old-vocabulary rehearsal is trying to restore, while the safe endings push partly with it. The two harmful endings look almost like the same update direction, and the two safe endings do too.",
+    "north_star_question": "Identifies a concrete first-order geometry mechanism behind lexical scheduling interference, turning a sequencing observation into a measurable stability signal.",
+    "next_stage": "separate whether the geometry split is caused by verb/class composition or subject identity by crossing the same tail verb groups across subjects from the identical frozen prefix"
+  },
+  "activation_authorized": false
+}
