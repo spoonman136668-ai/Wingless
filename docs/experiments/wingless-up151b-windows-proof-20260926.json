@@ -1,0 +1,83 @@
+{
+  "schema": "wingless.up151b-windows-proof.v1",
+  "experiment": "UP-151B-tail-class-composition",
+  "status": "qualified-scientific-result",
+  "source_head": "a16f4eee529a95f28df2aed151983e31207b054b",
+  "workflow_run_id": 36265090581,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10913487345,
+  "artifact_sha256": "a86d730af7b993c54fcb5e3e7eea7f64c1fbd8dd6da5eb75256d5dbe26152445",
+  "findings": {
+    "report_all": {
+      "mia": {
+        "tail_damage": -0.04777777777777781,
+        "old": 0.8777777777777778,
+        "new": 0.921875
+      },
+      "noah": {
+        "tail_damage": -0.0533333333333333,
+        "old": 0.8777777777777778,
+        "new": 0.9270833333333333
+      }
+    },
+    "store_all": {
+      "mia": {
+        "tail_damage": 0.0022222222222221923,
+        "old": 0.9,
+        "new": 0.9375
+      },
+      "noah": {
+        "tail_damage": 0.01222222222222218,
+        "old": 0.9,
+        "new": 0.9166666666666666
+      }
+    },
+    "observe_all": {
+      "mia": {
+        "tail_damage": 0.011111111111111117,
+        "old": 0.9222222222222223,
+        "new": 0.9010416666666667
+      },
+      "noah": {
+        "tail_damage": 0.027777777777777856,
+        "old": 0.9222222222222223,
+        "new": 0.9010416666666667
+      }
+    },
+    "mixed_seen": {
+      "mia": {
+        "tail_damage": 0.026666666666666596,
+        "old": 0.9166666666666667,
+        "new": 0.921875
+      },
+      "noah": {
+        "tail_damage": 0.032222222222222194,
+        "old": 0.9166666666666667,
+        "new": 0.921875
+      }
+    },
+    "mixed_alternate": {
+      "mia": {
+        "tail_damage": 0.025555555555555488,
+        "old": 0.9166666666666667,
+        "new": 0.921875
+      },
+      "noah": {
+        "tail_damage": 0.025555555555555488,
+        "old": 0.9,
+        "new": 0.921875
+      }
+    }
+  },
+  "interpretation": {
+    "report_only_terminal_composition_is_consistently_damaging_across_subjects": true,
+    "store_observe_mixtures_are_consistently_non_damaging_across_disjoint_verb_sets": true,
+    "observe_only_maximizes_old_retention_here_but_reduces_new_family_accuracy": true,
+    "store_only_is_intermediate_and_subject_sensitive_on_new_family_accuracy": true,
+    "class_composition_explains_the_major_safe_vs_damaging_split_but_does_not_explain_all_subject_or_verb_level_variation": true,
+    "plain_speak": "The harmful pattern is mostly about what kind of examples end the epoch, not which subject name they use. Ending with four REPORT examples hurts old memory for both Mia and Noah. STORE+OBSERVE endings protect old memory across two different verb sets. But the exact balance between old and new accuracy still depends somewhat on the individual examples.",
+    "north_star_question": "Narrows lexical sequencing interference from arbitrary example identity to class composition, while preserving a smaller residual verb/subject effect that can now be measured separately.",
+    "next_stage": "map report-tail dose from zero through four REPORT examples at fixed four-example tail size, with mirrored subjects, to test whether old-memory interference scales with REPORT fraction"
+  },
+  "activation_authorized": false
+}
