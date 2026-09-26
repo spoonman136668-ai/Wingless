@@ -1,0 +1,70 @@
+{
+  "schema": "wingless.up-lm2e-windows-proof.v1",
+  "experiment": "UP-LM2E-pername-locality-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "46a3a88a4f1965c895db5a54bf1572c99cbf7eb3",
+  "workflow_run_id": 36270760523,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10915601796,
+  "artifact_sha256": "26d1b54b6fd0ae0fe4b4ecd4cf960e0fbf91f89e5c1764058ebef0027e11c932",
+  "findings": {
+    "structural_exact_all_400_integrated_cells": true,
+    "max_recall_entries": 4,
+    "balanced_minus_canonical_average_by_locality_variant": {
+      "per_name": {
+        "prior_mean": -0.0029003171919846247,
+        "fifth_mean": 0.00011539729640617225,
+        "all_mean": -0.0022971742943064923,
+        "min_family": 0.002808200410232509
+      },
+      "stores_global": {
+        "prior_mean": 0.0006731541094251003,
+        "fifth_mean": -0.00012363996043520675,
+        "all_mean": 0.0005137952954530567,
+        "min_family": 0.006202226635854768
+      },
+      "observes_global": {
+        "prior_mean": -0.00006775422007818666,
+        "fifth_mean": 0.0016485328058028382,
+        "all_mean": 0.00027550318509801387,
+        "min_family": 0.00822486440077832
+      },
+      "reports_global": {
+        "prior_mean": -0.0018019754219495976,
+        "fifth_mean": 0.0004203758654797385,
+        "all_mean": -0.0013575051644636904,
+        "min_family": 0.003042489261324821
+      }
+    },
+    "prior_delta_ranges": {
+      "per_name": [
+        -0.0030883536439956227,
+        -0.0023165808215191985
+      ],
+      "stores_global": [
+        -0.0005144290873638768,
+        0.0024238750747360704
+      ],
+      "observes_global": [
+        -0.0017767835084495642,
+        0.00128170236154046
+      ],
+      "reports_global": [
+        -0.0024041822183525907,
+        -0.0010493493307914825
+      ]
+    }
+  },
+  "interpretation": {
+    "store_locality_is_a_major_driver_of_the_per_name_prior_mean_penalty": true,
+    "observe_locality_also_contributes_and_globalizing_observe_makes_the_average_penalty_nearly_zero": true,
+    "report_locality_alone_does_not_explain_the_penalty": true,
+    "breaking_store_or_observe_locality_preserves_or_improves_the_weakest_family_benefit": true,
+    "no_single_variant_is_uniformly_mean_improving_across_every_allocation": true,
+    "structural_sequence_memory_and_routing_remain_exact": true,
+    "plain_speak": "The balanced-training cost under per-name evaluation mostly comes from keeping STORE and OBSERVE events too locally clustered by name. Moving STORE events across names removes the average penalty; moving OBSERVE events almost removes it. Moving only REPORT events does not. The fairness benefit to the weakest family remains.",
+    "north_star_question": "Localizes the language scheduling interaction to memory-establishing and observation locality rather than generic name order or reporting, narrowing the integration mechanism without adding capacity.",
+    "next_stage": "test combined STORE+OBSERVE de-localization versus each single ablation under the same fixed balanced-prior training to determine whether their effects are additive, redundant, or nonlinear"
+  },
+  "activation_authorized": false
+}
