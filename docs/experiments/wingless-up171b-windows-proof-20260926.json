@@ -1,0 +1,60 @@
+{
+  "schema": "wingless.up171b-windows-proof.v1",
+  "experiment": "UP-171B-shadow-risk-trajectory",
+  "status": "qualified-scientific-result",
+  "source_head": "9024bf3c4a6214fc279d51f5c8cb178d0b430cd4",
+  "workflow_run_id": 36274662459,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10916511652,
+  "artifact_sha256": "4c2a91005bb599c6d1e8592f25217f46a99fc95320a1c2c81bbf9f4353449d1e",
+  "findings": {
+    "total_steps": 144,
+    "total_crossings": 223,
+    "total_covered": 215,
+    "overall_coverage": 0.9641255605381166,
+    "STORE": {
+      "crossings": 109,
+      "covered": 104,
+      "coverage": 0.9541284403669725,
+      "flagged": 600,
+      "crossing_density": 0.17333333333333334
+    },
+    "OBSERVE": {
+      "crossings": 98,
+      "covered": 95,
+      "coverage": 0.9693877551020408,
+      "flagged": 600,
+      "crossing_density": 0.15833333333333333
+    },
+    "REPORT": {
+      "crossings": 16,
+      "covered": 16,
+      "coverage": 1,
+      "flagged": 96,
+      "crossing_density": 0.16666666666666666
+    },
+    "STORE_OBSERVE_REPORT": {
+      "crossings": 129,
+      "covered": 122,
+      "coverage": 0.9457364341085271
+    },
+    "OBSERVE_STORE_REPORT": {
+      "crossings": 94,
+      "covered": 93,
+      "coverage": 0.9893617021276596
+    },
+    "maintenance_triggered": false,
+    "updates_suppressed": false
+  },
+  "interpretation": {
+    "class_calibrated_vulnerability_bands_remain_high_coverage_under_chained_state_evolution": true,
+    "report_band_covers_all_observed_chained_crossings": true,
+    "rare_out_of_band_store_and_observe_crossings_remain": true,
+    "false_warning_rate_is_high_so_shadow_signal_is_not_precise_enough_for_autonomous_action": true,
+    "no_update_was_changed_by_the_warning_signal": true,
+    "plain_speak": "The warning zone keeps finding almost every real flip even while earlier cleanup steps change the state. But most flagged examples still do not flip. Wingless now has a durable early-warning signal, not a reliable action trigger.",
+    "north_star_question": "Validates internal deficiency detection under realistic evolving state while preserving the key boundary that detection quality is not yet sufficient to authorize self-maintenance.",
+    "next_stage": "test whether remaining in the fragile rank band across consecutive chained steps predicts later crossing more precisely than one-step membership, still in shadow mode with no maintenance action"
+  },
+  "activation_authorized": false
+}
