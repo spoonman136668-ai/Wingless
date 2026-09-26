@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.up128b-windows-proof.v1",
+  "experiment": "UP-128B-threeway-store-gate",
+  "status": "qualified-scientific-result",
+  "source_head": "7b42032b0c4f0221774990253adbcf3d1f7eecc7",
+  "workflow_run_id": 36245679280,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10907322136,
+  "artifact_sha256": "43f946c086876ba2d3f37137e63d0287b547b8c5db5559e3dadfa6c2c18a10e2",
+  "findings": {
+    "train": {
+      "class_accuracy": 0.95,
+      "store_precision": 1,
+      "store_recall": 0.85
+    },
+    "heldout": {
+      "class_accuracy": 0.9666666666666667,
+      "store_precision": 1,
+      "store_recall": 0.9
+    },
+    "unseen": {
+      "class_accuracy": 0.9444444444444444,
+      "store_precision": 1,
+      "store_recall": 0.8333333333333334
+    },
+    "failing_surface": "stores",
+    "stores_train_accuracy": 0.25,
+    "stores_heldout_accuracy": 0.5,
+    "stores_unseen_accuracy": 0.16666666666666666,
+    "stores_unseen_mean_store_probability": 0.43072473347978524,
+    "stores_unseen_mean_observe_probability": 0.49880223818614483,
+    "stores_unseen_mean_report_probability": 0.07047302833406992,
+    "all_other_fourteen_surfaces_accuracy": 1
+  },
+  "interpretation": {
+    "three_way_structure_removes_binary_false_positive_problem": true,
+    "remaining_gate_failure_is_fully_localized_to_stores_vs_observe_geometry": true,
+    "global_class_balance_is_no_longer_the_limit": true,
+    "next_stage": "test a generic dual-view gate using both raw representation and the frozen STORE-candidate competitor-orthogonal projection for every surface, with no explicit STORE surface membership"
+  },
+  "activation_authorized": false
+}
