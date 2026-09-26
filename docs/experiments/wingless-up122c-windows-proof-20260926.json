@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up122c-windows-proof.v1",
+  "experiment": "UP-122C-history-occupancy-pressure",
+  "status": "qualified-scientific-result",
+  "source_head": "0d3eaf3c5bc0a9bdfba9da0acce376a98919a42d",
+  "workflow_run_id": 36254607679,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10910565168,
+  "artifact_sha256": "66b9efeb0073e5ef983431b9785e632fe1a2799fdc794a9a73b370be8a688d55",
+  "findings": {
+    "pressure0": {
+      "history_max": 4,
+      "target_exact": 1,
+      "ephemeral_admission": 0
+    },
+    "pressure4": {
+      "history_max": 12,
+      "target_exact": 1,
+      "ephemeral_admission": 0
+    },
+    "pressure8": {
+      "history_max": 20,
+      "target_exact": 1,
+      "ephemeral_admission": 0
+    },
+    "pressure12": {
+      "history_max": 28,
+      "target_exact": 1,
+      "ephemeral_admission": 0
+    },
+    "hot_accuracy_all_cells": 1,
+    "valid_admission_rate_all_cells": 1,
+    "valid_accuracy_all_cells": 1,
+    "ephemeral_retention_all_cells": 0,
+    "one_shot_false_admissions_all_cells": 0,
+    "max_current_table_entries": 31,
+    "recall_entries_used": 16,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "exact_age2_history_remains_stable_at_28_of_32_history_entries": true,
+    "qualified_nonpersistent_pressure_does_not_displace_or_confuse_valid_targets": true,
+    "no_false_admission_or_exact_memory_cost_is_observed_before_near_saturation": true,
+    "current_next_boundary_is_exact_history_table_saturation_not_aging_interference": true,
+    "next_stage": "drive the exact history to 24 28 and 32 occupied entries using asymmetric consecutive-generation pressure and verify valid admission at full saturation"
+  },
+  "activation_authorized": false
+}
