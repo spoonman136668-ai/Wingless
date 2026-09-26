@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up-lm1i-windows-proof.v1",
+  "experiment": "UP-LM1I-operator-split-reintegration",
+  "status": "qualified-scientific-result",
+  "source_head": "dd81f2dc74eda54cd73edcba9ffd5aa542515832",
+  "workflow_run_id": 36244750624,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10906603687,
+  "artifact_sha256": "7dcf1ebb0218cd3be862dd7661ddbb2938bf1f25ba96d6639c104bfeec33ffd4",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_pretrain_epochs": 20,
+  "joint_interleaved_epochs": 20,
+  "adaptation_epochs": 4,
+  "findings": {
+    "cyclic_by_index": {
+      "base_accuracy": 0.842682140554481,
+      "paraphrase_accuracy": 0.7995424146427315,
+      "third_accuracy": 0.8280864197530864,
+      "worst_perplexity": 1.838004290624011
+    },
+    "strang_split_base": {
+      "base_accuracy": 0.8379271437782077,
+      "paraphrase_accuracy": 0.8050862372404083,
+      "third_accuracy": 0.827854938271605,
+      "worst_perplexity": 1.8087128195328293
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "admission_precision_all_cells": 1,
+    "admission_recall_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4
+  },
+  "interpretation": {
+    "operator_split_byte_balance_gain_survives_full_router_memory_reintegration": true,
+    "strang_split_base_improves_the_weakest_distribution_and_worst_perplexity": true,
+    "exact_memory_and_grounded_semantic_routing_remain_invariant": true,
+    "strang_split_base_is_the_integrated_three_family_adaptation_procedure_for_the_next_breadth_stage": true,
+    "next_stage": "introduce a fourth unseen lexical family with no byte-model training to map the next integrated lexical-breadth boundary before adaptation"
+  },
+  "activation_authorized": false
+}
