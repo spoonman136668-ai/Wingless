@@ -1,0 +1,90 @@
+{
+  "schema": "wingless.up101c-windows-proof.v1",
+  "experiment": "UP-101C-promotion-checkpoint",
+  "status": "qualified-scientific-result",
+  "source_head": "1bd76267eaa29541b793857bb9151fb60fd59c94",
+  "workflow_run_id": 36236941905,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10904855118,
+  "artifact_sha256": "94f06bccf88a2cfd0e4c0b0557f0f3f52fb7a75190271718ce0dad8fecd7b6fa",
+  "active_keys": 32,
+  "hot_keys": 16,
+  "filter_bits": 1024,
+  "hash_count": 2,
+  "generation_interval": 32,
+  "post_trigger_counter": 8,
+  "trigger_threshold": 8,
+  "churn_writes": 12288,
+  "exact_recall_cap": 16,
+  "explicit_phase_label_used": false,
+  "future_oracle_used": false,
+  "query_labels_used_for_admission": false,
+  "findings": {
+    "ascending_control": {
+      "initial_hot": 8,
+      "promotion_hot": 16,
+      "promotion_exact": 1,
+      "final_hot": 15,
+      "final_exact": 0,
+      "mean_repeat_admissions": 9,
+      "false_positive_admissions": 128
+    },
+    "ascending_trigger8": {
+      "initial_hot": 8,
+      "promotion_hot": 16,
+      "promotion_exact": 1,
+      "final_hot": 16,
+      "final_exact": 1,
+      "mean_repeat_admissions": 8,
+      "trigger_fired_episodes": 128,
+      "false_positive_admissions": 0
+    },
+    "reverse_control": {
+      "initial_hot": 8,
+      "promotion_hot": 16,
+      "promotion_exact": 1,
+      "final_hot": 15,
+      "final_exact": 0,
+      "mean_repeat_admissions": 9,
+      "false_positive_admissions": 128
+    },
+    "reverse_trigger8": {
+      "initial_hot": 8,
+      "promotion_hot": 16,
+      "promotion_exact": 1,
+      "final_hot": 16,
+      "final_exact": 1,
+      "mean_repeat_admissions": 8,
+      "trigger_fired_episodes": 128,
+      "false_positive_admissions": 0
+    },
+    "evens_then_odds_control": {
+      "initial_hot": 16,
+      "promotion_hot": 16,
+      "promotion_exact": 1,
+      "final_hot": 15,
+      "final_exact": 0,
+      "mean_repeat_admissions": 3,
+      "false_positive_admissions": 384
+    },
+    "evens_then_odds_trigger8": {
+      "initial_hot": 16,
+      "promotion_hot": 16,
+      "promotion_exact": 1,
+      "final_hot": 15,
+      "final_exact": 0,
+      "mean_repeat_admissions": 3,
+      "trigger_fired_episodes": 0,
+      "false_positive_admissions": 384
+    }
+  },
+  "interpretation": {
+    "promotion_completeness_is_not_the_reverse_order_failure": true,
+    "all_tested_orders_are_exact_immediately_after_promotion_under_checkpoint_workload": true,
+    "diagnostic_hot_queries_change_two_bit_aging_state_and_can_change_final_retention": true,
+    "reverse_order_trigger8_is_query_state_sensitive": true,
+    "evens_then_odds_remains_trigger_blind_because_repeat_admissions_never_reach_eight": true,
+    "next_stage": "isolate which diagnostic read timing changes reverse-order retention by comparing no extra reads, post-initial reads, post-promotion reads, and both, while keeping trigger8 and churn fixed"
+  },
+  "activation_authorized": false
+}
