@@ -43,8 +43,7 @@ func uplm2fCombinedExample(n,v,p int,family string)uplm0fExample{
 	for i:=0;i<4;i++{storeInitial(i)}
 	for i:=0;i<4;i++{observe(i)}
 	for i:=0;i<4;i++{update(i);report(i,i==3)}
-	s+="
-"
+	s+="\\n"
 	return uplm0fExample{text:s,targetPos:targets,updateCount:uc}
 }
 func uplm2fHeldout(family,variant string)[]uplm0fExample{
