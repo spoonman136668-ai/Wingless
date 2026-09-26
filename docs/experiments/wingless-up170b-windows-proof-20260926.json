@@ -1,0 +1,100 @@
+{
+  "schema": "wingless.up170b-windows-proof.v1",
+  "experiment": "UP-170B-margin-rank-monotonic-risk",
+  "status": "qualified-scientific-result",
+  "source_head": "40f0fd38793c5b04004a61e12f717640e3c86a3c",
+  "workflow_run_id": 36274218443,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10916526157,
+  "artifact_sha256": "6e2ef7c8b16fb3951b67d8a22c8d731ce5631fae656d20326743991fe8096bd5",
+  "findings": {
+    "context_phase": 17,
+    "bins": [
+      [
+        1,
+        4
+      ],
+      [
+        5,
+        10
+      ],
+      [
+        11,
+        20
+      ],
+      [
+        21,
+        40
+      ],
+      [
+        41,
+        120
+      ]
+    ],
+    "STORE": {
+      "densities": [
+        0.37916666666666665,
+        0.05,
+        0,
+        0,
+        0
+      ],
+      "crossings": [
+        91,
+        18,
+        0,
+        0,
+        0
+      ],
+      "non_increasing": true
+    },
+    "OBSERVE": {
+      "densities": [
+        0.25,
+        0.03888888888888889,
+        0,
+        0,
+        0
+      ],
+      "crossings": [
+        60,
+        14,
+        0,
+        0,
+        0
+      ],
+      "non_increasing": true
+    },
+    "REPORT": {
+      "densities": [
+        0.0875,
+        0,
+        0,
+        0,
+        0
+      ],
+      "crossings": [
+        21,
+        0,
+        0,
+        0,
+        0
+      ],
+      "non_increasing": true
+    },
+    "threshold_fitted": false,
+    "maintenance_triggered": false,
+    "adaptive_rotation_used": false
+  },
+  "interpretation": {
+    "vulnerability_rank_has_monotonic_risk_ordering_across_store_observe_report": true,
+    "top_rank_bins_concentrate_all_observed_crossings_in_this_disjoint_context": true,
+    "class_specific_crossing_rate_differs_even_when_rank_ordering_is_shared": true,
+    "continuous_rank_risk_is_better_supported_than_a_single_hard_cutoff": true,
+    "this_is_internal_self_detection_evidence_not_an_authorized_maintenance_trigger": true,
+    "plain_speak": "The weakest-margin examples are not merely a little more fragile—they are ordered by risk. The first four ranks are much more likely to flip than ranks five through ten, and no flips occur beyond rank ten in this new context. Wingless can now estimate where danger is concentrated without choosing an intervention.",
+    "north_star_question": "Strengthens internal deficiency detection into a preregistered monotonic risk signal across interference classes, while keeping the response loop open and non-autonomous.",
+    "next_stage": "run the frozen vulnerability bins in shadow mode through actual chained cleanup trajectories, recording whether rising low-rank risk precedes subsequent crossings without changing any update or schedule"
+  },
+  "activation_authorized": false
+}
