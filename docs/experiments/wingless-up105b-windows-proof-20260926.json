@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.up105b-windows-proof.v1",
+  "experiment": "UP-105B-prior-rehearsal-breadth",
+  "status": "qualified-scientific-result",
+  "source_head": "dc4c52708334edfd46b4bb62deb97c1c6632ee44",
+  "workflow_run_id": 36229240480,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10902081078,
+  "artifact_sha256": "ec00ce2beee044e92d6691a6de51a2c54e008f8ae8183445a7e2bd144a6dc16a",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "base_replay_subjects": 1,
+  "findings": {
+    "replay1_final": {
+      "base_seen_accuracy": 1,
+      "acquired_aggregate_accuracy": 0.6666666666666666,
+      "holds": 0,
+      "notes": 1,
+      "tells": 1
+    },
+    "replay2_final": {
+      "base_seen_accuracy": 1,
+      "acquired_aggregate_accuracy": 1,
+      "holds": 1,
+      "notes": 1,
+      "tells": 1
+    },
+    "replay4_final": {
+      "base_seen_accuracy": 0.9722222222222222,
+      "acquired_aggregate_accuracy": 1,
+      "holds": 1,
+      "notes": 1,
+      "tells": 1
+    }
+  },
+  "interpretation": {
+    "one_subject_prior_replay_is_insufficient": true,
+    "two_subject_prior_replay_preserves_base_and_all_three_acquired_verbs": true,
+    "broader_four_subject_replay_is_not_monotonically_better": true,
+    "next_stage": "hold prior replay at two subjects and extend the acquisition sequence beyond three new verbs to test vocabulary-growth stability"
+  },
+  "activation_authorized": false
+}
