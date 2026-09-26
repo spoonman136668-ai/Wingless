@@ -1,0 +1,60 @@
+{
+  "schema": "wingless.up-lm1d-windows-proof.v1",
+  "experiment": "UP-LM1D-third-family-byte-adaptation",
+  "status": "qualified-scientific-result",
+  "source_head": "0a4bdce653fea51922080c49d250d12f65808379",
+  "workflow_run_id": 36240170204,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10905068469,
+  "artifact_sha256": "e2b50472a6b94632e5e6d7324e2cf9e139899f20d735ac1dc62204c51f2ea27c",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_pretrain_epochs": 20,
+  "joint_interleaved_epochs": 20,
+  "learning_rate": 0.08,
+  "output_alphabet_extended": true,
+  "new_output_bytes": [
+    104
+  ],
+  "findings": {
+    "adapt0": {
+      "base_accuracy": 0.8733075435203095,
+      "paraphrase_accuracy": 0.8619324181626188,
+      "third_accuracy": 0.4927469135802469,
+      "third_perplexity": 61.52501422983877
+    },
+    "adapt1": {
+      "base_accuracy": 0.8330915538362347,
+      "paraphrase_accuracy": 0.8051742344244984,
+      "third_accuracy": 0.7179012345679012,
+      "third_perplexity": 2.407326707069183
+    },
+    "adapt2": {
+      "base_accuracy": 0.8317214700193424,
+      "paraphrase_accuracy": 0.8067581837381204,
+      "third_accuracy": 0.7871913580246913,
+      "third_perplexity": 1.9061720943289793
+    },
+    "adapt4": {
+      "base_accuracy": 0.8334139264990329,
+      "paraphrase_accuracy": 0.8081661386835621,
+      "third_accuracy": 0.8214506172839506,
+      "third_perplexity": 1.728207404385888
+    },
+    "third_order_accuracy_range_at_adapt4": [
+      0.8070987654320988,
+      0.8214506172839506
+    ],
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1
+  },
+  "interpretation": {
+    "bounded_readout_adaptation_recovers_most_third_family_byte_quality": true,
+    "base_and_paraphrase_distributions_show_moderate_interference": true,
+    "routing_and_exact_memory_remain_decoupled_from_byte_readout_adaptation": true,
+    "next_stage": "hold three-family update counts fixed and compare symmetric triplet orderings to reduce recency interference"
+  },
+  "activation_authorized": false
+}
