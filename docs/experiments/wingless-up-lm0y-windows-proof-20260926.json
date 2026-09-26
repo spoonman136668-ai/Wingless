@@ -1,0 +1,70 @@
+{
+  "schema": "wingless.up-lm0y-windows-proof.v1",
+  "experiment": "UP-LM0Y-delta-balance",
+  "status": "qualified-scientific-result",
+  "source_head": "106319d1a735a21bc400d1cc23b642f3a06927d5",
+  "workflow_run_id": 36235964149,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10904197296,
+  "artifact_sha256": "a7af08ede20dd2b04252ebb8219ecd5fd740dd87f93a7f31e3d49c3fd5029c78",
+  "state_dimension": 64,
+  "exact_recall_cap": 16,
+  "base_epochs": 20,
+  "adaptation_epochs": 4,
+  "learning_rate": 0.08,
+  "router_retraining_used": false,
+  "attention_used": false,
+  "future_oracle_used": false,
+  "anchoring_used": false,
+  "findings": {
+    "paired_delta_sum": {
+      "base_accuracy": 0.8617021276595744,
+      "base_perplexity": 1.541000051625857,
+      "paraphrase_accuracy": 0.824181626187962,
+      "paraphrase_perplexity": 1.6984899835431646
+    },
+    "norm_balanced_delta": {
+      "base_accuracy": 0.8651676337848537,
+      "base_perplexity": 1.5279479416096176,
+      "paraphrase_accuracy": 0.8079021471314125,
+      "paraphrase_perplexity": 1.7753068830368963
+    },
+    "norm_balanced_row_projected": {
+      "base_accuracy": 0.8902321083288242,
+      "base_perplexity": 1.410699786973168,
+      "paraphrase_accuracy": 0.7072333685191838,
+      "paraphrase_perplexity": 2.65233407544493
+    },
+    "dependent_first_byte_accuracy_all_cells": 1,
+    "query_set_exact_accuracy_all_cells": 1,
+    "event_routing_accuracy_all_cells": 1,
+    "report_routing_accuracy_all_cells": 1,
+    "max_recall_entries": 4,
+    "diagnostics": {
+      "paired_delta_sum": {
+        "mean_raw_para_to_base_norm_ratio": 1.13009,
+        "pair_row_projections": 0,
+        "pairs_processed": 384
+      },
+      "norm_balanced_delta": {
+        "mean_raw_para_to_base_norm_ratio": 1.70164,
+        "pair_row_projections": 0,
+        "pairs_processed": 384
+      },
+      "norm_balanced_row_projected": {
+        "mean_raw_para_to_base_norm_ratio": 3.98169,
+        "pair_row_projections": 4482,
+        "pairs_processed": 384
+      }
+    }
+  },
+  "interpretation": {
+    "norm_balancing_does_not_improve_joint_base_paraphrase_balance": true,
+    "row_projection_strongly_overcorrects_toward_base_retention": true,
+    "sparse_negative_row_conflict_should_not_be_aggressively_removed": true,
+    "pairwise_readout_gradient_correction_is_not_supported_as_the_next_mechanism": true,
+    "routing_and_exact_memory_remain_stable": true,
+    "next_stage": "test whether a freshly trained joint readout on the frozen recurrent representation can represent base and paraphrase distributions simultaneously, separating representation capacity from continual-optimization interference"
+  },
+  "activation_authorized": false
+}
