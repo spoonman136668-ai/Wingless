@@ -17,12 +17,16 @@ try{
  if($P1-cne $P2){throw 'UP159B_NONDETERMINISTIC_OUTPUT'}
  $R=$P1|ConvertFrom-Json
  if($R.schema-cne 'wingless.up159b-cleanup-order-subject-generalization.v1'){throw 'UP159B_SCHEMA_MISMATCH'}
- if([int]$R.subjects-ne 6 -or [int]$R.orders-ne 6 -or [int]$R.arms-ne 36 -or [int]$R.metrics.Count-ne 36){throw 'UP159B_DESIGN'}
- if([int]$R.rehearsal_before-ne 3 -or [int]$R.rehearsal_after-ne 12 -or [int]$R.cleanup_store-ne 5 -or [int]$R.cleanup_observe-ne 5 -or [int]$R.cleanup_report-ne 2){throw 'UP159B_COMPOSITION'}
+ if([int]$R.metrics.Count-ne 36 -or [int]$R.subjects-ne 6 -or [int]$R.orders-ne 6 -or [int]$R.training_pairs-ne 3){throw 'UP159B_DESIGN'}
+ if([int]$R.new_updates_per_epoch-ne 24 -or [int]$R.old_updates_per_epoch-ne 15 -or [int]$R.rehearsal_before-ne 3 -or [int]$R.rehearsal_after-ne 12){throw 'UP159B_BUDGET'}
+ foreach($M in $R.metrics){
+  if([int]$M.training_pair.Count-ne 2 -or [int]$M.heldout_new_names.Count-ne 4){throw 'UP159B_PAIR_OR_HOLDOUT_COUNT'}
+  if($M.training_pair -notcontains $M.subject){throw 'UP159B_SUBJECT_NOT_IN_PAIR'}
+ }
  if($R.extra_updates_used -or $R.adaptive_ordering_used){throw 'UP159B_BOUNDARY_LEAK'}
  Write-Host $P1
  Write-Host ''
  Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
- foreach($M in $R.metrics){Write-Host "subject=$($M.subject) order=$($M.cleanup_order) post=$($M.mean_post_report_cleanup_recovery) old=$($M.final_mean_old_retention) new=$($M.final_mean_new_accuracy)"}
+ foreach($M in $R.metrics){Write-Host "subject=$($M.subject) order=$($M.cleanup_order) recovery=$($M.mean_post_report_cleanup_recovery) old=$($M.final_mean_old_retention) heldout_new=$($M.final_heldout_new_accuracy)"}
  Write-Host 'WINGLESS_UP159_HARNESS_PASS'
 }finally{Pop-Location;if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache};if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp};Remove-Item -Recurse -Force $GoCache,$GoTmp -ErrorAction SilentlyContinue}
