@@ -26,5 +26,5 @@ try{
  Write-Host "fifth_only_minus_cyclic_fifth=$($R.fifth_only_minus_cyclic_fifth_accuracy)"
  Write-Host "fifth_only_minus_cyclic_prior_mean=$($R.fifth_only_minus_cyclic_prior_mean_accuracy)"
  Write-Host "fifth_only_gain_over_no_adaptation=$($R.fifth_only_gain_over_no_adaptation)"
- Write-Host 'WINGLESS_UPLM1S_HARNESS_PASS'
+ Write-Host 'WINGLESS_UP151_HARNESS_PASS'
 }finally{Pop-Location;if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache};if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp};Remove-Item -Recurse -Force $GoCache,$GoTmp -ErrorAction SilentlyContinue}
