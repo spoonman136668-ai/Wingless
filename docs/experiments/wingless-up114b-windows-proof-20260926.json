@@ -1,0 +1,120 @@
+{
+  "schema": "wingless.up114b-windows-proof.v1",
+  "experiment": "UP-114B-class-order-generalization",
+  "status": "qualified-scientific-result",
+  "source_head": "ee85b3a173a88e10cf66b5fd3d458f3c63c25ff5",
+  "workflow_run_id": 36235189719,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10904001377,
+  "artifact_sha256": "5257f3bc2c90cc5914a0a6e1aa4feaa97c398967a77b67acaadd3cff641323a0",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "findings": {
+    "acquired_accuracy_all_orders_all_stages": 1,
+    "SOR": {
+      "control_min_base": 0.9722222222222223,
+      "control_dips": [
+        [
+          3,
+          0.9722222222222223
+        ]
+      ],
+      "anchor_min_base": 1,
+      "anchor_dips": []
+    },
+    "SRO": {
+      "control_min_base": 0.8888888888888888,
+      "control_dips": [
+        [
+          3,
+          0.8888888888888888
+        ]
+      ],
+      "anchor_min_base": 0.8611111111111112,
+      "anchor_dips": [
+        [
+          3,
+          0.8611111111111112
+        ]
+      ]
+    },
+    "OSR": {
+      "control_min_base": 0.8611111111111112,
+      "control_dips": [
+        [
+          1,
+          0.8611111111111112
+        ]
+      ],
+      "anchor_min_base": 0.8611111111111112,
+      "anchor_dips": [
+        [
+          1,
+          0.8611111111111112
+        ]
+      ]
+    },
+    "ORS": {
+      "control_min_base": 0.8333333333333334,
+      "control_dips": [
+        [
+          1,
+          0.8611111111111112
+        ],
+        [
+          2,
+          0.8333333333333334
+        ]
+      ],
+      "anchor_min_base": 0.8333333333333334,
+      "anchor_dips": [
+        [
+          1,
+          0.8611111111111112
+        ],
+        [
+          2,
+          0.8333333333333334
+        ]
+      ]
+    },
+    "RSO": {
+      "control_min_base": 1,
+      "control_dips": [],
+      "anchor_min_base": 0.9722222222222223,
+      "anchor_dips": [
+        [
+          3,
+          0.9722222222222223
+        ]
+      ]
+    },
+    "ROS": {
+      "control_min_base": 0.8333333333333334,
+      "control_dips": [
+        [
+          2,
+          0.8333333333333334
+        ]
+      ],
+      "anchor_min_base": 0.8333333333333334,
+      "anchor_dips": [
+        [
+          2,
+          0.8333333333333334
+        ]
+      ]
+    }
+  },
+  "interpretation": {
+    "stage3_anchor_rule_is_not_order_general": true,
+    "acquired_verb_retention_is_stable_across_all_six_orders": true,
+    "base_lexicon_interference_moves_to_order_dependent_early_stages": true,
+    "stage3_anchor_can_help_harm_or_be_irrelevant_depending_on_class_order": true,
+    "next_stage": "diagnose base-class-specific accuracy at every early acquisition stage across all six class orders before adding another replay intervention"
+  },
+  "activation_authorized": false
+}
