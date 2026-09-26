@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up138b-windows-proof.v1",
+  "experiment": "UP-138B-rotation-refresh-factorial",
+  "status": "qualified-scientific-result",
+  "source_head": "6d6c3a1c8cb4d8edefb66de54d390b1034b5e81d",
+  "workflow_run_id": 36253646679,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10909724098,
+  "artifact_sha256": "89a0195d68abe7ae319d92093460f61e0f74e2cef79fa57d435717a81e32dbe4",
+  "state_dimension": 64,
+  "gate_input_dimension": 128,
+  "grounding_epochs": 20,
+  "learning_rate": 0.08,
+  "new_updates_per_epoch": 24,
+  "old_updates_per_epoch": 15,
+  "findings": {
+    "fixed_refresh0": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9375,
+      "old_heldout": 0.9,
+      "old_unseen": 0.9333333333333333
+    },
+    "fixed_refresh4": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9375,
+      "old_heldout": 0.8666666666666667,
+      "old_unseen": 0.8888888888888888
+    },
+    "rotated_refresh0": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.9,
+      "old_unseen": 0.9333333333333333
+    },
+    "rotated_refresh4": {
+      "primary_new": 0.9166666666666666,
+      "secondary_new": 0.9270833333333334,
+      "old_heldout": 0.9333333333333333,
+      "old_unseen": 0.9444444444444444
+    },
+    "interaction_old_heldout": 0.06666666666666665,
+    "interaction_old_unseen": 0.05555555555555558,
+    "rotation_main_old_heldout": 0.03333333333333344,
+    "rotation_main_old_unseen": 0.02777777777777779,
+    "refresh_main_old_heldout": 0,
+    "refresh_main_old_unseen": -0.01666666666666672
+  },
+  "interpretation": {
+    "rotation_and_final_refresh_have_a_positive_interaction_on_old_family_retention": true,
+    "fixed_refresh4_alone_is_harmful": true,
+    "rotation_alone_does_not_improve_retention": true,
+    "combined_rotated_refresh4_produces_the_best_old_retention_in_the_factorial": true,
+    "new_family_accuracy_does_not_improve_from_the_interaction_and_secondary_new_accuracy_is_slightly_lower_under_rotation": true,
+    "up135b_internal_advantage_is_explained_by_a_real_rotation_refresh_interaction_for_retention": true,
+    "next_stage": "hold rotated_refresh4 fixed and isolate which four tail examples create the retention interaction by rotating the tail identity while preserving counts"
+  },
+  "activation_authorized": false
+}
