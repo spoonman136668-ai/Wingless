@@ -1,0 +1,121 @@
+{
+  "schema": "wingless.up-lm1x-windows-proof.v1",
+  "experiment": "UP-LM1X-mild-mass-order-robustness",
+  "status": "qualified-scientific-result",
+  "source_head": "c613171497fa11b3f13056e96ffa2cba52868809",
+  "workflow_run_id": 36264557486,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10913425979,
+  "artifact_sha256": "4f541d71c703bc5cfb2c056cee99c56b1159ec96de38d70cdd057ce998725bdc",
+  "findings": {
+    "structural_exact_all_250_integrated_cells": true,
+    "max_recall_entries": 4,
+    "equal_mass": {
+      "block": {
+        "fifth": 0.7486811737553578,
+        "prior": 0.7706616178834755,
+        "all": 0.7662655290578521,
+        "min": 0.7486811737553578
+      },
+      "per_name": {
+        "fifth": 0.7368941641938676,
+        "prior": 0.7569595391442602,
+        "all": 0.7529464641541816,
+        "min": 0.7368941641938676
+      },
+      "paired_names": {
+        "fifth": 0.7427876689746126,
+        "prior": 0.7654448655356628,
+        "all": 0.7609134262234527,
+        "min": 0.7427876689746126
+      },
+      "stores_then_local_reports": {
+        "fifth": 0.7376360039564787,
+        "prior": 0.7570262489463776,
+        "all": 0.7531481999483978,
+        "min": 0.7376360039564787
+      },
+      "reverse_report_tail": {
+        "fifth": 0.7444774151005604,
+        "prior": 0.7676596557732026,
+        "all": 0.7630232076386742,
+        "min": 0.7444774151005604
+      }
+    },
+    "fifth_1p125_mass": {
+      "block": {
+        "fifth": 0.765125288493241,
+        "prior": 0.7680817023153919,
+        "all": 0.7674904195509618,
+        "min": 0.754110251450677
+      },
+      "per_name": {
+        "fifth": 0.7462495878667985,
+        "prior": 0.7539942692826329,
+        "all": 0.752445332999466,
+        "min": 0.7407162970784935
+      },
+      "paired_names": {
+        "fifth": 0.7565117045829213,
+        "prior": 0.7620145690847144,
+        "all": 0.7609139961843558,
+        "min": 0.747662798194713
+      },
+      "stores_then_local_reports": {
+        "fifth": 0.7486399604352126,
+        "prior": 0.7542706548378881,
+        "all": 0.753144515957353,
+        "min": 0.7373724040830694
+      },
+      "reverse_report_tail": {
+        "fifth": 0.7602209033959776,
+        "prior": 0.7656786911442657,
+        "all": 0.7645871335946081,
+        "min": 0.7512894906511928
+      }
+    },
+    "fifth_1p5_mass": {
+      "block": {
+        "fifth": 0.7964061984833498,
+        "prior": 0.7576305353143119,
+        "all": 0.7653856679481195,
+        "min": 0.7393214055448099
+      },
+      "per_name": {
+        "fifth": 0.7745631388064622,
+        "prior": 0.7452739660153709,
+        "all": 0.7511318005735891,
+        "min": 0.7302546744036105
+      },
+      "paired_names": {
+        "fifth": 0.7863913616880975,
+        "prior": 0.7521984416286548,
+        "all": 0.7590370256405434,
+        "min": 0.737669245647969
+      },
+      "stores_then_local_reports": {
+        "fifth": 0.7770771513353115,
+        "prior": 0.7439137699169103,
+        "all": 0.7505464462005905,
+        "min": 0.7308166138683563
+      },
+      "reverse_report_tail": {
+        "fifth": 0.7911721068249258,
+        "prior": 0.7552471094351038,
+        "all": 0.7624321089130681,
+        "min": 0.7372259832366215
+      }
+    }
+  },
+  "interpretation": {
+    "mild_fixed_mass_frontier_is_sequence_order_robust": true,
+    "fifth_family_gain_and_prior_family_cost_have_the_same_direction_across_all_orders": true,
+    "no_sequence_order_introduces_a_structural_memory_or_routing_failure": true,
+    "first_mild_reallocation_often_improves_the_minimum_family_score_but_not_uniformly_across_every_order": true,
+    "sequence_order_changes_absolute_language_scores_but_not_the_underlying_stability_plasticity_mechanism": true,
+    "plain_speak": "Changing sentence organization changes the exact prediction scores, but it does not change the underlying tradeoff. Giving a little more of the same learning budget to the newest vocabulary helps it across every sentence order, while older vocabulary gives up a little. The memory and routing core stays perfectly correct throughout.",
+    "north_star_question": "Shows that fixed-budget language plasticity is a stable mechanism across multiple sequence organizations rather than a block-order artifact, strengthening the language-capability foundation before adding more breadth.",
+    "next_stage": "hold the same five allocation arms and test adaptation-family update order itself—canonical, reverse, and rotating—before increasing lexical-family count"
+  },
+  "activation_authorized": false
+}
