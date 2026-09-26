@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up95c-windows-proof.v1",
+  "experiment": "UP-95C-filter-width-generational",
+  "status": "qualified-scientific-result",
+  "source_head": "a0f5d052b82081779fe5b89ccce2e1f4005bc671",
+  "workflow_run_id": 36234429087,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10903637358,
+  "artifact_sha256": "2f51cfb4338624c7cea56a7381585b30189682f8797320a0d485d283587bd9d6",
+  "active_keys": 32,
+  "hot_keys": 16,
+  "hash_count": 2,
+  "generation_interval": 32,
+  "churn_writes": 1536,
+  "exact_recall_cap": 16,
+  "entry_payload_bytes": 16,
+  "findings": {
+    "filter256": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 640,
+      "metadata_bytes": 38,
+      "total_bytes": 294
+    },
+    "filter512": {
+      "hot_accuracy": 0.9375,
+      "hot_exact": 0,
+      "false_positive_admissions": 128,
+      "metadata_bytes": 70,
+      "total_bytes": 326
+    },
+    "filter1024": {
+      "hot_accuracy": 1,
+      "hot_exact": 1,
+      "false_positive_admissions": 0,
+      "metadata_bytes": 134,
+      "total_bytes": 390
+    }
+  },
+  "interpretation": {
+    "wider_filters_reduce_within_generation_false_positives_monotonically": true,
+    "first_tested_exact_width_bits": 1024,
+    "remaining_boundary": "filter memory pressure rather than hash count",
+    "next_stage": "hold width1024 and interval32 fixed and extend churn horizon to test whether exactness persists or later deterministic collisions recur"
+  },
+  "activation_authorized": false
+}
