@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up113b-windows-proof.v1",
+  "experiment": "UP-113B-stage-limited-anchor",
+  "status": "qualified-scientific-result",
+  "source_head": "ddc940b94f04f362fbc78cb6f024981dbcfd44f2",
+  "workflow_run_id": 36234803625,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10904065713,
+  "artifact_sha256": "55a6f86dbb5e4b75e56c72eff5d7d11d37dfe677f82c11d9cd2add89eecc445e",
+  "state_dimension": 64,
+  "epochs_per_batch": 20,
+  "learning_rate": 0.08,
+  "grounding_per_verb": 4,
+  "fixed_budget": 6,
+  "findings": {
+    "current_class_excluded_stage3": {
+      "base_accuracy": 0.9722222222222223,
+      "acquired_accuracy": 1
+    },
+    "stage3_anchor2_all_stages_base_accuracy": 1,
+    "stage3_anchor2_all_acquired_stages_accuracy": 1,
+    "stages2_3_anchor2_all_stages_base_accuracy": 1,
+    "stages2_3_anchor2_all_acquired_stages_accuracy": 1
+  },
+  "interpretation": {
+    "stage_limited_base_anchor_allocation_closes_fixed_six_instability": true,
+    "stage3_only_anchor_is_sufficient_in_tested_sequence": true,
+    "extra_stage2_anchor_is_unnecessary": true,
+    "replay_cost_remains_constant_at_six_additional_examples": true,
+    "next_stage": "test whether the stage3 anchor rule generalizes across different semantic-class acquisition orders rather than being specific to STORE-OBSERVE-REPORT order"
+  },
+  "activation_authorized": false
+}
