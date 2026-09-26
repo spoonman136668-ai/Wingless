@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.up113c-windows-proof.v1",
+  "experiment": "UP-113C-exact-probation-mixedset",
+  "status": "qualified-scientific-result",
+  "source_head": "4f18a93cde669361e8b0b3dec73be58313b8b3bf",
+  "workflow_run_id": 36249095649,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10908696834,
+  "artifact_sha256": "1d5ce5a6ade0d9a62bc056e0fcd80323755e75843b6b7d09c31cd3dad2f559c4",
+  "hot_keys": 12,
+  "recurring_keys": 4,
+  "target_working_set": 16,
+  "generation_interval": 32,
+  "admission_memory_bytes": 128,
+  "exact_recall_cap": 16,
+  "findings": {
+    "recurring_admission_rate_all_cells": 1,
+    "recurring_value_accuracy_all_cells": 1,
+    "hot_query_accuracy_all_cells": 1,
+    "mixed_set_exact_accuracy_all_cells": 1,
+    "one_shot_false_admissions_all_cells": 0,
+    "max_churn_writes": 98304,
+    "repeat_gaps": [
+      8,
+      16,
+      24,
+      31
+    ],
+    "recall_entries_used": 16,
+    "mean_checkpoints_per_episode": 1,
+    "policy_metadata_bytes": 136,
+    "total_bounded_memory_bytes": 392
+  },
+  "interpretation": {
+    "exact32_is_a_selective_recurrence_detector_not_a_blanket_rejection_filter": true,
+    "legitimate_recurring_candidates_are_admitted_while_one_shot_churn_is_rejected": true,
+    "full_16_entry_mixed_working_set_remains_exact_at_the_longest_tested_horizon": true,
+    "probabilistic_bloom_collisions_are_not_required_for_useful_probation_behavior": true,
+    "next_stage": "increase legitimate recurring demand beyond the 16-entry exact-memory working-set capacity to map replacement behavior without increasing the cap"
+  },
+  "activation_authorized": false
+}
