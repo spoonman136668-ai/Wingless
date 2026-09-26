@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.up183b-windows-proof.v1",
+  "experiment": "UP-183B-calibration-drift",
+  "status": "qualified-scientific-result",
+  "source_head": "906d4d049db79ef994fa8e52ebffd6b3b5fedc8d",
+  "workflow_run_id": 36280888247,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10919080594,
+  "artifact_sha256": "907ac60a37452a24a641c469c0494c22aab09d9c5a8b64fb7c83ec621151014c",
+  "findings": {
+    "calibration_phase": 26,
+    "evaluation_phases": [
+      28,
+      29,
+      30
+    ],
+    "phase28": {
+      "actual": 243,
+      "predicted": 281.10366173597964,
+      "ratio": 1.1568051923291343,
+      "brier": 0.009388793834197275,
+      "ece": 0.0022209008107357845,
+      "auroc": 0.9870568559207012,
+      "average_precision": 0.42494585146424396
+    },
+    "phase29": {
+      "actual": 223,
+      "predicted": 285.24718846385804,
+      "ratio": 1.2791353742773903,
+      "brier": 0.009535340889520795,
+      "ece": 0.0036022678509194826,
+      "auroc": 0.9828952567637237,
+      "average_precision": 0.32461769014633723
+    },
+    "phase30": {
+      "actual": 243,
+      "predicted": 281.10366173597964,
+      "ratio": 1.1568051923291343,
+      "brier": 0.009388793834197275,
+      "ece": 0.0022209008107357845,
+      "auroc": 0.9870568559207012,
+      "average_precision": 0.42494585146424396
+    }
+  },
+  "interpretation": {
+    "discrimination_is_stably_strong": true,
+    "single_phase_numeric_calibration_is_not_stable": true,
+    "probability_mass_overpredicts_every_tested_phase": true,
+    "phase28_and_phase30_repeat_exactly": true,
+    "drift_is_structured_not_monotonic": true,
+    "low_global_ece_masks_material_total_event_mass_error": true,
+    "plain_speak": "Wingless keeps ranking danger very well, but the probability number is too pessimistic. Depending on the held-out phase it predicts roughly 16% to 28% more flips than actually occur. The repeating phase-28/30 result suggests structured state variation rather than simple random noise.",
+    "north_star_question": "The native danger ordering is robust, but a single-phase probability table is not stable enough for cost-aware action. Calibration needs to absorb known cross-phase variation without fitting on the evaluation phase.",
+    "next_stage": "pool several already sealed prior phases into one frozen calibration table, then compare that pooled model against the phase-26-only model on untouched phases 31-33"
+  },
+  "activation_authorized": false
+}
