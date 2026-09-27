@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up175c-windows-proof.v1",
+  "experiment": "UP-175C-delayed-rule-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "5666a140813802bb1d4719f5eefc2bb7298be48b",
+  "workflow_run_id": 36287194273,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920896508,
+  "artifact_sha256": "0f9390b3d09fa4a6bc6a6ce808736736a97b10587313138876e185bedb4fa32c",
+  "findings": {
+    "no_refresh_cadence2": {
+      "prevented_losses": 47,
+      "actions": 128,
+      "prevented_per_action": 0.3671875
+    },
+    "no_refresh_cadence4": {
+      "prevented_losses": 47,
+      "actions": 128,
+      "prevented_per_action": 0.3671875
+    },
+    "alternating_shield": {
+      "prevented_losses": 0
+    },
+    "fixed_offset_refresh": {
+      "prevented_losses": 0,
+      "mean_delay_cadence2": 19.78125,
+      "mean_delay_cadence4": 18.109375
+    },
+    "hostile_shield": {
+      "prevented_losses": 0,
+      "actions": 0
+    },
+    "sham_prevented_losses_all_cells": 0
+  },
+  "interpretation": {
+    "one_interval_delay_rule_transfers_across_monitoring_cadence_under_no_refresh": true,
+    "prevention_does_not_transfer_across_pressure_policies": true,
+    "fixed_offset_policy_still_allows_large_delay_without_survival": true,
+    "hostile_policy_closes_window_before_delayed_action": true,
+    "plain_speak": "The one-interval delay is not a cadence artifact: it saves the same 47 of 64 cases at cadence 2 and cadence 4 under no-refresh. But it still cannot convert survival under the other pressure policies. The next issue is whether requiring a fresh warning before the second action is unnecessarily withholding the bounded second refresh.",
+    "next_stage": "after the first delayed warning-triggered action, compare a second action that requires a new warning against an unconditional second action one monitoring interval later"
+  },
+  "activation_authorized": false
+}
