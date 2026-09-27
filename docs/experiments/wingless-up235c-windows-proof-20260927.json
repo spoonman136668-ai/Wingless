@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up235c-windows-proof.v1",
+  "experiment": "UP-235C-risk-gated-action9",
+  "status": "qualified-scientific-result",
+  "source_head": "f86ef79d15f1ea964eda9b018d661157f76f0ab7",
+  "workflow_run_id": 36334953729,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10936712733,
+  "artifact_sha256": "2ed3bf00c5df1dc92cf49ac169f246dd389845fb04e994dbea52e408979f0522",
+  "findings": {
+    "cap8_failures": 36,
+    "single_critical": {
+      "losses": 0,
+      "ninth_actions": 72,
+      "rescues": 36,
+      "unnecessary": 36
+    },
+    "hamming_risk": {
+      "losses": 2,
+      "ninth_actions": 35,
+      "rescues": 34,
+      "unnecessary": 1
+    },
+    "residual_cell": {
+      "schedule": "fixed_alternating",
+      "phase_advance": 2,
+      "cap8_failures": 18,
+      "risk_losses": 2,
+      "risk_ninth_actions": 16
+    }
+  },
+  "interpretation": {
+    "native_risk_gating_is_highly_selective": true,
+    "most_single_critical_overintervention_is_removed": true,
+    "two_false_negative_rescues_remain": true,
+    "plain_speak": "The native risk state now controls a real correction effectively: it preserves 34 of 36 rescues while eliminating 35 of 36 unnecessary ninth actions. The remaining problem is two failures whose first critical event was not classified high-risk.",
+    "next_stage": "keep the frozen classifier and re-evaluate later critical events after an initially rejected event, permitting the same single action9 only if risk later becomes high"
+  },
+  "activation_authorized": false
+}
