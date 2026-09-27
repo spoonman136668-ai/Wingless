@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.up-lm4b-windows-proof.v1",
+  "experiment": "UP-LM4B-interior-checkpoint-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "f8c964cbbb00168e111febfe1abe25fdbaa3720e",
+  "workflow_run_id": 36314824188,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10930785648,
+  "artifact_sha256": "7aa04b8643d479d9fb82500322847157c98f0c9be2705bf2b92e7521dcab45dc",
+  "findings": {
+    "reachable_cap2_cap3": {
+      "nonzero_cells": 126,
+      "max_spread": 4
+    },
+    "reachable_cap2_cap4": {
+      "nonzero_cells": 114,
+      "max_spread": 2
+    },
+    "reachable_cap2_cap3_cap4": {
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "cap3_is_required": true,
+    "cap4_is_required": true,
+    "tested_minimal_coordinate_is_reachable_plus_cap2_plus_cap3_plus_cap4": true,
+    "plain_speak": "The resource state cannot be compressed by dropping either middle checkpoint. Early, middle, and later deployability each carry distinct information in the broad topology-resolved regime.",
+    "next_stage": "test an interpretable coverage-horizon coordinate motivated by the corrective-duration result from the C lane, while retaining the exact four-number coordinate as control"
+  },
+  "activation_authorized": false
+}
