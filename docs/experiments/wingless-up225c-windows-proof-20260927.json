@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up225c-windows-proof.v1",
+  "experiment": "UP-225C-residual-stage-localization",
+  "status": "qualified-scientific-result",
+  "source_head": "30acfd2d20104a35b55e52cdcea0dfe7ea5b5aed",
+  "workflow_run_id": 36330172744,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10935318044,
+  "artifact_sha256": "4d6be78d24d2fb4a695c3b7923f4d81863d31fbe254801c1a33311fc75028b8a",
+  "findings": {
+    "stage_counts": {
+      "action4": {
+        "losses": 1,
+        "survivors": 0
+      },
+      "action8": {
+        "losses": 28,
+        "survivors": 35
+      }
+    },
+    "residual_arm": {
+      "cohort": 2,
+      "initial_hand": 6,
+      "endangered_key": 8,
+      "loss_step": 42,
+      "action_steps": [
+        11,
+        19,
+        27,
+        35,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "adversarial_critical_after_action1": true,
+      "min_adversarial_horizon": 1,
+      "min_noquery_horizon": 1,
+      "min_endangered_age": 0,
+      "min_hand_distance": 0,
+      "predicted_endangered_count": 1
+    }
+  },
+  "interpretation": {
+    "residual_is_mid_sequence_not_tail": true,
+    "existing_critical_warning_precedes_loss": true,
+    "committed_spacing_delays_action5_past_loss": true,
+    "plain_speak": "The stubborn arm is not invisible and it is not a tail failure. It warns again after action 4, but the fixed schedule waits until step 43 for action 5 while the arm fails at step 42.",
+    "next_stage": "allow only action5 to advance on a fresh critical warning after action4, keeping the total action budget at eight and all other timing frozen"
+  },
+  "activation_authorized": false
+}
