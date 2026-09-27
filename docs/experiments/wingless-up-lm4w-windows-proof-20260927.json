@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up-lm4w-windows-proof.v1",
+  "experiment": "UP-LM4W-asynchronous-restore-checkpoints",
+  "status": "qualified-scientific-result",
+  "source_head": "91ddd168b59e9f2443ba05d7862b6f86632a5a0a",
+  "workflow_run_id": 36327920579,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10935005567,
+  "artifact_sha256": "b46445f60abeec7965c5bddc9472e1dafdd4615982116ec6a3ca2918ba58b710",
+  "findings": {
+    "final": {
+      "cells": 432,
+      "nonzero_cells": 312,
+      "max_spread": 2
+    },
+    "final_plus_pre_full_restore": {
+      "cells": 432,
+      "nonzero_cells": 48,
+      "max_spread": 1
+    },
+    "final_plus_both_restores": {
+      "cells": 432,
+      "nonzero_cells": 24,
+      "max_spread": 1
+    },
+    "residual_boundary": {
+      "schedules": "budget 3-5; throughput 1-3",
+      "budget_reduction": 2,
+      "throughput_reductions": [
+        1,
+        2
+      ],
+      "deadline_profiles": [
+        "layout_only",
+        "hybrid_min"
+      ],
+      "topology_variants_each_condition": 6,
+      "residual_cells": 24
+    }
+  },
+  "interpretation": {
+    "asynchronous_resource_paths_require_more_than_restore_endpoint_counts": true,
+    "residual_boundary_is_localized_to_overlap_transition": true,
+    "plain_speak": "Remembering both restore checkpoints is almost enough, but it still loses one bit of timing information when throughput comes back exactly as a strong budget cut starts. The missing information appears to be how action delivery is distributed inside that overlap window.",
+    "next_stage": "on the localized boundary only, add cumulative actions after round 3 before round 4 to the frozen both-restore coordinate"
+  },
+  "activation_authorized": false
+}
