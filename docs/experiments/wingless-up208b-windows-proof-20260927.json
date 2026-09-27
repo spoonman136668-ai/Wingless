@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up208b-windows-proof.v1",
+  "experiment": "UP-208B-family-holdout-native-offset",
+  "status": "qualified-scientific-result",
+  "source_head": "8fd605cdc4a3b6babe4f5f605c40fdedccbce377",
+  "workflow_run_id": 36312577880,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10929860773,
+  "artifact_sha256": "00fdd099eb9367b98428474b959a68d06db09c697c432d971381a122414d94a8",
+  "findings": {
+    "mixed4": {
+      "static_mae": 0.017116077702173018,
+      "native_mae": 0.6615730499308132,
+      "oracle_mae": 0.01034205714446049,
+      "native_better": 0,
+      "evaluation_points": 69
+    },
+    "observe4": {
+      "static_mae": 0.026507672848748443,
+      "native_mae": 0.09679627646800762,
+      "oracle_mae": 0.003377726104693124,
+      "native_better": 0,
+      "evaluation_points": 69
+    },
+    "store4": {
+      "static_mae": 0.007691442951322319,
+      "native_mae": 0.016105688420682735,
+      "oracle_mae": 0.005708448095281371,
+      "native_better": 5,
+      "evaluation_points": 69
+    },
+    "cross3": {
+      "static_mae": 0.008904171586159275,
+      "native_mae": 0.011018867905936928,
+      "oracle_mae": 0.007835300158164834,
+      "native_better": 8,
+      "evaluation_points": 15
+    }
+  },
+  "interpretation": {
+    "pooled_static_native_offset_mapping_does_not_transfer_across_unseen_families": true,
+    "native_phase_signal_is_family_dependent_under_current_features": true,
+    "plain_speak": "The native-state signal is real inside known families, but the same static mapping cannot be carried to a completely unseen history family. The next useful test is whether change in native geometry over time is more family-invariant than absolute geometry.",
+    "next_stage": "test leave-one-family-out offset prediction using frozen native feature levels plus one-step native feature deltas"
+  },
+  "activation_authorized": false
+}
