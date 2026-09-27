@@ -1,0 +1,31 @@
+{
+  "schema": "wingless.up201b-windows-proof.v1",
+  "experiment": "UP-201B-permutation-identity-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "9c0de26da5d8355dd7c14b8c8911e8e563cf60ed",
+  "workflow_run_id": 36306964963,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10928160846,
+  "artifact_sha256": "3bbded2c8c10b3748254a9bc29080a4d9decd02a1e4c567b42d80c4923a9dd6f",
+  "findings": {
+    "mixed4": {
+      "baseline_mae": 0.025277775363129803,
+      "identity_mae": 0.021091878556955195,
+      "identity_better": 43,
+      "evaluation_points": 72
+    },
+    "observe4": {
+      "baseline_mae": 0.03328349244635346,
+      "identity_mae": 0.03328349244635341,
+      "identity_better": 36,
+      "evaluation_points": 72
+    }
+  },
+  "interpretation": {
+    "mixed4_has_stable_exact_history_signature": true,
+    "observe4_exact_history_identity_does_not_transfer": true,
+    "plain_speak": "For mixed histories, the exact sequence itself remains predictive across later phases even when our compressed encodings miss some of the signal. For observe-only histories, even exact sequence identity does not transfer, so that calibration relationship is changing with phase.",
+    "next_stage": "fit a frozen per-permutation linear training-phase trajectory and test extrapolation on untouched phases to determine whether observe4 is drifting systematically rather than randomly"
+  },
+  "activation_authorized": false
+}
