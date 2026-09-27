@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up207b-windows-proof.v1",
+  "experiment": "UP-207B-native-offset-proxy",
+  "status": "qualified-scientific-result",
+  "source_head": "1d8d2f5b1d9c5b8a1865773682a3a67885138d1d",
+  "workflow_run_id": 36311977441,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10929319038,
+  "artifact_sha256": "74e111775a8ce0c30dd5966f268c06aa67c0a8aaac24e0efdc205b4c42298eca",
+  "findings": {
+    "mixed4": {
+      "static_mae": 0.021395097127716266,
+      "native_mae": 0.014613544997444878,
+      "oracle_mae": 0.012927571430575626,
+      "native_better": 59,
+      "evaluation_points": 69
+    },
+    "observe4": {
+      "static_mae": 0.03313459106093557,
+      "native_mae": 0.0048926571014817725,
+      "oracle_mae": 0.0042221576308664075,
+      "native_better": 69,
+      "evaluation_points": 69
+    },
+    "store4": {
+      "static_mae": 0.009614303689152906,
+      "native_mae": 0.009201415559522955,
+      "oracle_mae": 0.00713556011910163,
+      "native_better": 52,
+      "evaluation_points": 69
+    },
+    "cross3": {
+      "static_mae": 0.011130214482699094,
+      "native_mae": 0.011002991871636522,
+      "oracle_mae": 0.009794125197706031,
+      "native_better": 10,
+      "evaluation_points": 15
+    }
+  },
+  "interpretation": {
+    "native_geometry_explains_substantial_common_phase_shift": true,
+    "strongest_support_in_observe4_and_mixed4": true,
+    "family_dependence_remains": true,
+    "plain_speak": "Wingless can estimate much of the phase-wide calibration shift from its own native geometry without measuring an anchor history. The effect is strong for observe4 and useful for mixed4, but weaker for store4 and cross3.",
+    "next_stage": "evaluate the same frozen native-offset model under leave-one-family-out training to test whether the relationship generalizes across unseen history families"
+  },
+  "activation_authorized": false
+}
