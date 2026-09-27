@@ -67,7 +67,8 @@ func up208bFit(samples []up208bSample)(mean,std [4]float64,coef [5]float64,ok bo
 		for i:=0;i<5;i++{b[i]+=v[i]*s.y;for j:=0;j<5;j++{a[i][j]+=v[i]*v[j]}}
 	}
 	for i:=1;i<5;i++{a[i][i]+=1e-6}
-	return mean,std,func()[5]float64{c,o:=up193bSolve(a,b);ok=o;return c}(),ok
+	c,o:=up193bSolve(a,b)
+	return mean,std,c,o
 }
 func RunUP208B()(UP208BResult,error){
 	template:=[]int{55,56,57};train:=[]int{58,59,60,61,62,63,64,65,66,67,68,69,70,71,72};eval:=[]int{91,92,93}
