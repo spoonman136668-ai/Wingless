@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.up172c-windows-proof.v1",
+  "experiment": "UP-172C-warning-timing-control",
+  "status": "qualified-scientific-result",
+  "source_head": "ff749cf7bfe61d7d0a966d19cffb1c57672db275",
+  "workflow_run_id": 36286537153,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920068835,
+  "artifact_sha256": "e054d9561956cc808df268061e2cb0512f743c6b5ddd4a08b5e7f0e64a1c536f",
+  "findings": {
+    "warning_targeted": {
+      "arms": 64,
+      "actions": 128,
+      "losses": 35,
+      "prevented_losses": 29,
+      "prevented_per_action": 0.2265625,
+      "mean_loss_delay_writes": 31.02857142857143
+    },
+    "fixed_early_targeted": {
+      "arms": 64,
+      "actions": 128,
+      "losses": 64,
+      "prevented_losses": 0,
+      "prevented_per_action": 0,
+      "mean_loss_delay_writes": 6
+    },
+    "warning_sham": {
+      "arms": 64,
+      "actions": 99,
+      "losses": 64,
+      "prevented_losses": 0
+    },
+    "paired": {
+      "warning_only_prevents": 29,
+      "fixed_only_prevents": 0,
+      "both_prevent": 0,
+      "neither_prevent": 35
+    }
+  },
+  "interpretation": {
+    "warning_timing_contributes_causal_value": true,
+    "equal_budget_fixed_early_targeting_does_not_reproduce_prevention": true,
+    "target_identity_alone_is_not_sufficient": true,
+    "plain_speak": "The corrective effect is not just 'refresh the endangered item twice.' The same two targeted refreshes at fixed early times saved nothing, while using Wingless's warning to choose when to spend them saved 29 of 64 cases.",
+    "north_star_question": "This is the strongest evidence so far that Wingless can use its own native state to time a bounded corrective response before observable failure.",
+    "next_stage": "challenge warning timing against a preregistered sweep of fixed two-shot schedules across the horizon to rule out a simple global timing window"
+  },
+  "activation_authorized": false
+}
