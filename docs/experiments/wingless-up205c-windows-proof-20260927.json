@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up205c-windows-proof.v1",
+  "experiment": "UP-205C-repeated-switch-failure-localization",
+  "status": "qualified-scientific-result",
+  "source_head": "f06cdde87fb8b8cf762def969fbe65701390f0b1",
+  "workflow_run_id": 36318474797,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10931199086,
+  "artifact_sha256": "d3e5b8ba2d51bf93d33ae5f6aaea3b79cbacc4f32fb48fe178ade7c1fc1c7d74",
+  "findings": {
+    "no_hostile_repeated": {
+      "treated_failures": 0
+    },
+    "hostile_no_repeated": {
+      "treated_failures": 0
+    },
+    "alternating_fixed_repeated": {
+      "treated_failures": 0
+    },
+    "fixed_alternating_repeated": {
+      "treated_failures": 1,
+      "failures_at_action_cap": 0,
+      "mean_failure_actions": 4,
+      "mean_last_action_to_failure": 7,
+      "failing_arm": {
+        "cohort_index": 2,
+        "initial_hand": 6,
+        "endangered_key": 8,
+        "baseline_loss_step": 11,
+        "treated_loss_step": 42,
+        "trigger_onset": 11,
+        "actions": 4,
+        "last_action_write": 35,
+        "cap_reached": false,
+        "loss_delay": 31
+      }
+    }
+  },
+  "interpretation": {
+    "boundary_failure_is_not_budget_exhaustion": true,
+    "failure_occurs_one_write_before_next_scheduled_refresh_opportunity": true,
+    "phase_lock_timing_is_primary_hypothesis": true,
+    "plain_speak": "The one repeated-switch failure still had half of its action budget unused. Its last refresh was at write 35, it failed at 42, and the next scheduled refresh would have occurred at 43. The problem is timing alignment, not lack of available actions.",
+    "next_stage": "trace current native critical-warning state at every monitoring boundary on the unchanged repeated-switch trajectories, especially immediately before the failing arm is lost"
+  },
+  "activation_authorized": false
+}
