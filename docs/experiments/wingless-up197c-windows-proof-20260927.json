@@ -1,0 +1,90 @@
+{
+  "schema": "wingless.up197c-windows-proof.v1",
+  "experiment": "UP-197C-hostile-horizon-selectivity",
+  "status": "qualified-scientific-result",
+  "source_head": "54f9e96713ab104019ad6913ef779c51267214bf",
+  "workflow_run_id": 36315821198,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10929998133,
+  "artifact_sha256": "7b538c36f2db4c4220ef5fc62c7309170f8784d9941acd745a39c858847bcd0c",
+  "findings": {
+    "horizon8": {
+      "baseline_failures": 38,
+      "baseline_survivors": 26,
+      "treated_failures": 0,
+      "prevented": 38,
+      "actions": 38,
+      "true_unnecessary": 0
+    },
+    "horizon12": {
+      "baseline_failures": 64,
+      "baseline_survivors": 0,
+      "treated_failures": 0,
+      "prevented": 64,
+      "actions": 64,
+      "true_unnecessary": 0
+    },
+    "horizon16": {
+      "prevented": 64,
+      "actions": 102,
+      "true_unnecessary": 0
+    },
+    "horizon20": {
+      "prevented": 64,
+      "actions": 128,
+      "true_unnecessary": 0
+    },
+    "horizon24": {
+      "prevented": 64,
+      "actions": 166,
+      "true_unnecessary": 0
+    },
+    "horizon28": {
+      "prevented": 64,
+      "actions": 192,
+      "true_unnecessary": 0
+    },
+    "horizon32": {
+      "prevented": 64,
+      "actions": 230,
+      "true_unnecessary": 0
+    },
+    "horizon36": {
+      "prevented": 64,
+      "actions": 256,
+      "true_unnecessary": 0
+    },
+    "horizon40": {
+      "prevented": 64,
+      "actions": 294,
+      "true_unnecessary": 0
+    },
+    "horizon44": {
+      "prevented": 64,
+      "actions": 320,
+      "true_unnecessary": 0
+    },
+    "horizon48": {
+      "prevented": 64,
+      "actions": 358,
+      "true_unnecessary": 0
+    },
+    "horizon52": {
+      "prevented": 64,
+      "actions": 384,
+      "true_unnecessary": 0
+    },
+    "horizon56": {
+      "prevented": 64,
+      "actions": 422,
+      "true_unnecessary": 0
+    }
+  },
+  "interpretation": {
+    "sparse_hostile_schedule_is_selective_on_heldout_cohorts": true,
+    "action_burden_grows_with_horizon_despite_zero_treated_failures": true,
+    "plain_speak": "The hostile rescue schedule is not firing on healthy long-lived survivors in this test; it prevents every baseline failure. The remaining question is efficiency: once rescue starts, scheduled refreshes continue accumulating with horizon.",
+    "next_stage": "compare the same sparse schedule against a fresh-critical-warning-gated version to test whether later actions can be skipped without losing protection"
+  },
+  "activation_authorized": false
+}
