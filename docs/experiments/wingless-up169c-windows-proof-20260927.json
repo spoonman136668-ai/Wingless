@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.up169c-windows-proof.v1",
+  "experiment": "UP-169C-delay-benefit",
+  "status": "qualified-scientific-result",
+  "source_head": "a0ec525056264be9e2e389982751d3f7a2438a6e",
+  "workflow_run_id": 36285530012,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10919708383,
+  "artifact_sha256": "9ec0bc85e42d562e7dde06d463eea15406e4bb6c7cd03247e14e519950f7cec4",
+  "findings": {
+    "targeted_delay_all_tested_arms": true,
+    "targeted_mean_delay_range_writes": [
+      7.0625,
+      17.1875
+    ],
+    "sham_mean_delay_range_writes": [
+      -1,
+      -0.1875
+    ],
+    "targeted_accelerated_arms": 0,
+    "targeted_unchanged_arms": 0
+  },
+  "interpretation": {
+    "one_shot_targeted_refresh_has_specific_causal_delay_value": true,
+    "binary_survival_metric_in_up168c_hid_this_effect": true,
+    "sham_refresh_does_not_explain_delay": true,
+    "plain_speak": "One refresh does not save the memory forever, but it reliably buys time. Every targeted arm lasted longer, often by roughly 7 to 17 writes, while the sham action generally made things slightly worse. The warning-to-action link is therefore real; the one-action budget was simply too small for permanent survival.",
+    "north_star_question": "A bounded corrective response can measurably postpone failure. The next minimal escalation is two warning-triggered targeted actions, not an unbounded maintenance loop.",
+    "next_stage": "test at most two targeted refreshes per arm, each triggered by a fresh warning after the previous action, against a same-budget sham control"
+  },
+  "activation_authorized": false
+}
