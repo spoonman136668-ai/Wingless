@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up210c-windows-proof.v1",
+  "experiment": "UP-210C-tail-cap-phase-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "cd1d9bc9e8fc20f1c404038014f7eb731a8e67fc",
+  "workflow_run_id": 36323265303,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10933046914,
+  "artifact_sha256": "8f244c1ba777872597882a0d262ee9e30ab0be4cb081aa688e620835599f7a98",
+  "findings": {
+    "cap7_matches_cap8_all_32_cells": true,
+    "no_accelerated_failures": true,
+    "residual_failures_shared_by_both_caps": [
+      {
+        "schedule": "fixed_alternating",
+        "phase_advance": 0,
+        "prevented": 63
+      },
+      {
+        "schedule": "fixed_alternating",
+        "phase_advance": 2,
+        "prevented": 63
+      }
+    ]
+  },
+  "interpretation": {
+    "seventh_opportunity_cap_is_phase_robust_through_horizon56": true,
+    "eighth_opportunity_does_not_explain_residual_switch_failures": true,
+    "plain_speak": "Seven and eight actions behave exactly the same across every tested switch phase. The occasional remaining failure is a timing/state issue, not a missing eighth refresh.",
+    "next_stage": "hold the seven-action cap fixed and compare it with cap8 over longer horizons to measure durability"
+  },
+  "activation_authorized": false
+}
