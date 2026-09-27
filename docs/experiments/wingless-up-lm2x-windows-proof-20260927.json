@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up-lm2x-windows-proof.v1",
+  "experiment": "UP-LM2X-global-budget-allocation",
+  "status": "qualified-scientific-result",
+  "source_head": "54bc024ed8de3657dee7d97a9e225febf28550bd",
+  "workflow_run_id": 36281449552,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10918912845,
+  "artifact_sha256": "2fdfcfe4b32eaf4cf8ac6047bf3a79bee843dc64e5e74f14edbab976b3b63c75",
+  "findings": {
+    "scenarios": [
+      3,
+      11
+    ],
+    "arms_per_scenario": 6,
+    "global_rounds": 12,
+    "actions_per_active_policy": 12,
+    "baseline_failed_per_scenario": 24,
+    "earliest_deadline_failed_per_scenario": 13,
+    "fixed_order_failed_per_scenario": 20,
+    "earliest_deadline_prevented_per_scenario": 11,
+    "fixed_order_prevented_per_scenario": 4
+  },
+  "interpretation": {
+    "native_countdown_has_allocation_value_under_global_budget_constraint": true,
+    "earliest_deadline_materially_outperforms_fixed_order_at_identical_action_throughput": true,
+    "result_replicates_across_both_identity_rotations": true,
+    "finite_budget_still_leaves_unavoidable_failures": true,
+    "plain_speak": "When Wingless cannot save everything, spending the next action on the dependency with the shortest time-to-failure matters. With the same 12 actions, countdown scheduling prevents 11 failures per scenario; fixed-order prevents only 4.",
+    "north_star_question": "Moves bounded self-maintenance from 'does a corrective action work?' to 'can native risk state allocate scarce corrective capacity intelligently?' The answer is positive in this frozen counterfactual regime.",
+    "next_stage": "replicate countdown-guided global allocation across several action budgets and permuted arm indices to verify the advantage is not tied to one budget or fixed tie/order structure"
+  },
+  "activation_authorized": false
+}
