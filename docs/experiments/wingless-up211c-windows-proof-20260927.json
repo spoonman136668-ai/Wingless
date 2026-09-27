@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.up211c-windows-proof.v1",
+  "experiment": "UP-211C-tail-cap-horizon-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "591a8f11b15106fa608b8e21d5211eca154edf35",
+  "workflow_run_id": 36323448046,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10933830501,
+  "artifact_sha256": "797de325edf34fe4eecd8a71c3cc040d1f1b60768f81bc07eef5743a0a9e255a",
+  "findings": {
+    "horizon56": {
+      "cap7_matches_cap8": true
+    },
+    "horizon64": {
+      "cap7_matches_cap8_survival": true
+    },
+    "horizon72": {
+      "cap7_diverges_from_cap8": true
+    },
+    "examples": {
+      "no_hostile_advance4": {
+        "cap7_prevented": 44,
+        "cap8_prevented": 64
+      },
+      "hostile_no_advance0": {
+        "cap7_prevented": 9,
+        "cap8_prevented": 64
+      },
+      "fixed_alternating_advance4": {
+        "cap7_prevented": 10,
+        "cap8_prevented": 64
+      }
+    }
+  },
+  "interpretation": {
+    "seven_action_cap_has_a_durability_boundary_after_64_writes": true,
+    "eighth_action_becomes_causally_important_by_72_writes": true,
+    "plain_speak": "Seven actions are enough for the original window and through 64 writes, but the eighth refresh becomes essential soon afterward. The tail reduction is real but horizon-limited.",
+    "next_stage": "densely sample horizons 64,66,68,70,72 to locate the durability transition"
+  },
+  "activation_authorized": false
+}
