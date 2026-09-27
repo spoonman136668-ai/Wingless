@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up204c-windows-proof.v1",
+  "experiment": "UP-204C-repeated-policy-switch-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "cc02a17501316fe412fb556ac37d7c4751acf4bc",
+  "workflow_run_id": 36318221706,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10931387786,
+  "artifact_sha256": "32898cdcdcf3acedf59251492083969fb1d9c8fc63f3c5a5a27842255fea65ba",
+  "findings": {
+    "no_hostile_repeated": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 375,
+      "accelerated": 0
+    },
+    "hostile_no_repeated": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 422,
+      "accelerated": 0
+    },
+    "alternating_fixed_repeated": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 388,
+      "accelerated": 0
+    },
+    "fixed_alternating_repeated": {
+      "baseline_losses": 64,
+      "treated_losses": 1,
+      "prevented": 63,
+      "actions": 406,
+      "accelerated": 0,
+      "mean_failure_extension": 31
+    }
+  },
+  "interpretation": {
+    "repeated_policy_switching_is_nearly_but_not_fully_robust": true,
+    "one_boundary_failure_occurs_in_fixed_to_alternating_schedule": true,
+    "plain_speak": "The frozen rule survives three repeated-switch schedules perfectly. One arm fails under fixed-to-alternating switching, but the intervention still delays that failure by 31 writes. Before changing budget or timing, we need to identify exactly why that one trajectory escapes.",
+    "next_stage": "record per-arm trigger, action, cap-exhaustion, and failure timing for the repeated-switch schedules without changing the rule"
+  },
+  "activation_authorized": false
+}
