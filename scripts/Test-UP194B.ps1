@@ -24,5 +24,5 @@ try{
  Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
  foreach($M in $R.metrics){Write-Host "pair=$($M.pair) phase=$($M.phase) count_delta=$($M.absolute_native_count_difference) same_count=$($M.same_native_correct_count) factor_delta=$($M.absolute_factor_difference)"}
  Write-Host "mean_factor_delta=$($R.summary.mean_absolute_factor_difference) max_factor_delta=$($R.summary.max_absolute_factor_difference) same_count_pairs=$($R.summary.same_count_pairs) same_count_nonzero=$($R.summary.same_count_nonzero_factor_pairs)"
- Write-Host 'WINGLESS_UP194B_HARNESS_PASS'
+ Write-Host 'WINGLESS_UP194_HARNESS_PASS'
 }finally{Pop-Location;if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache};if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp};Remove-Item -Recurse -Force $GoCache,$GoTmp -ErrorAction SilentlyContinue}
