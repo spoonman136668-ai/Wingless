@@ -1,0 +1,30 @@
+{
+  "schema": "wingless.up176c-windows-proof.v1",
+  "experiment": "UP-176C-second-action-gate",
+  "status": "qualified-scientific-result",
+  "source_head": "673fac994221502ede84a86630154be9b8e4dca5",
+  "workflow_run_id": 36287370521,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920876838,
+  "artifact_sha256": "b236dd75a79aac826a48fe991d04d9839f4d8348c13e58b4854aa2e176ef13a3",
+  "findings": {
+    "no_refresh_rewarning_gated": {
+      "cadence2_prevented": 47,
+      "cadence4_prevented": 47
+    },
+    "no_refresh_forced_second": {
+      "cadence2_prevented": 0,
+      "cadence4_prevented": 0
+    },
+    "other_policies_forced_second_prevented": 0,
+    "sham_prevented_all_cells": 0
+  },
+  "interpretation": {
+    "fresh_warning_gate_is_part_of_effective_second_action_timing": true,
+    "unconditional_second_action_destroys_prevention_in_no_refresh": true,
+    "forced_second_does_not_rescue_cross_policy_transfer": true,
+    "plain_speak": "The second refresh cannot simply be spent because budget remains. It has to wait for Wingless to warn again. Removing that second warning gate wipes out all 47 prevented failures under no-refresh and does not help under the harder policies.",
+    "next_stage": "with the one-interval delay and rewarning gate frozen, compare a maximum of one versus two targeted actions to quantify the marginal causal contribution of the second warning-triggered action"
+  },
+  "activation_authorized": false
+}
