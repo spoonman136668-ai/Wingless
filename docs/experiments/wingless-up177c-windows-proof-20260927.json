@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up177c-windows-proof.v1",
+  "experiment": "UP-177C-delayed-action-count",
+  "status": "qualified-scientific-result",
+  "source_head": "306ceaa8a87dcfbb0a3f2516c8696f5698a2a32c",
+  "workflow_run_id": 36287611225,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920789099,
+  "artifact_sha256": "96ef2a62aa301e2a9b74ec175c0d1d80b461d618726c7165b86a8ec6291b7325",
+  "findings": {
+    "cadence2_cap1": {
+      "prevented_losses": 0,
+      "actions": 64,
+      "mean_loss_delay_writes": 17.25
+    },
+    "cadence2_cap2": {
+      "prevented_losses": 47,
+      "actions": 128,
+      "prevented_per_action": 0.3671875
+    },
+    "cadence4_cap1": {
+      "prevented_losses": 0,
+      "actions": 64,
+      "mean_loss_delay_writes": 17.25
+    },
+    "cadence4_cap2": {
+      "prevented_losses": 47,
+      "actions": 128,
+      "prevented_per_action": 0.3671875
+    },
+    "sham_prevented_losses": 0
+  },
+  "interpretation": {
+    "one_action_is_insufficient_for_survival": true,
+    "second_warning_action_cycle_is_necessary_for_observed_prevention": true,
+    "first_action_alone_still_creates_substantial_delay": true,
+    "plain_speak": "One well-timed refresh buys about 17 writes of extra life but saves nobody. The second separately warning-gated refresh is what turns delay into survival for 47 of 64 cases.",
+    "next_stage": "compare first-only, second-warning-only, and both warning-triggered actions to determine whether prevention requires cumulative reinforcement or primarily the second action's timing"
+  },
+  "activation_authorized": false
+}
