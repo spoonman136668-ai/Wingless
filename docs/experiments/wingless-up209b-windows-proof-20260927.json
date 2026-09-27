@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up209b-windows-proof.v1",
+  "experiment": "UP-209B-family-holdout-native-delta",
+  "status": "qualified-scientific-result",
+  "source_head": "06595d4626164f0d1ad5761f3e5815204fe6155a",
+  "workflow_run_id": 36314054319,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10930660309,
+  "artifact_sha256": "7ec797ddb880f4a4b6c514fd433dd213fbc7b79df8e5a0b99f2838559593ba4e",
+  "findings": {
+    "mixed4": {
+      "static_mae": 0.021395097127716266,
+      "native_delta_mae": 0.03287024389721587,
+      "oracle_mae": 0.012927571430575626,
+      "native_better": 0,
+      "evaluation_points": 69
+    },
+    "observe4": {
+      "static_mae": 0.03313459106093557,
+      "native_delta_mae": 0.01069647608387159,
+      "oracle_mae": 0.0042221576308664075,
+      "native_better": 46,
+      "evaluation_points": 69
+    },
+    "store4": {
+      "static_mae": 0.009614303689152906,
+      "native_delta_mae": 0.0053555877993810225,
+      "oracle_mae": 0.00713556011910163,
+      "native_better": 63,
+      "evaluation_points": 69
+    },
+    "cross3": {
+      "static_mae": 0.011130214482699094,
+      "native_delta_mae": 0.01892914018283786,
+      "oracle_mae": 0.009794125197706031,
+      "native_better": 2,
+      "evaluation_points": 15
+    }
+  },
+  "interpretation": {
+    "short_native_deltas_are_not_universal_absolute_offset_predictors": true,
+    "family_structure_remains_material": true,
+    "plain_speak": "Native change helps some unseen history families and hurts others. The common part may be the direction of calibration drift rather than the absolute calibration level. We should test drift directly instead of adding more static features.",
+    "next_stage": "predict phase-to-phase canonical calibration drift from native feature deltas under leave-one-family-out training, using zero-drift as the frozen comparator"
+  },
+  "activation_authorized": false
+}
