@@ -1,0 +1,18 @@
+$ErrorActionPreference='Stop'
+$Repo=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+Push-Location $Repo
+try{
+ go env -w GOFLAGS=-buildvcs=false;if($LASTEXITCODE-ne 0){throw 'UPLM3V_GO_ENV_FAILED'}
+ go clean -cache -testcache;if($LASTEXITCODE-ne 0){throw 'UPLM3V_GO_CLEAN_FAILED'}
+ go test ./unitary ./cmd/unitary-up-lm3v-resource-grid-transfer -count=1;if($LASTEXITCODE-ne 0){throw 'UPLM3V_FOCUSED_TEST_FAILED'}
+ go test ./... -count=1;if($LASTEXITCODE-ne 0){throw 'UPLM3V_FULL_REGRESSION_FAILED'}
+ $P1=((go run ./cmd/unitary-up-lm3v-resource-grid-transfer)|Out-String).Trim();if($LASTEXITCODE-ne 0){throw 'UPLM3V_PROBE1_FAILED'}
+ $P2=((go run ./cmd/unitary-up-lm3v-resource-grid-transfer)|Out-String).Trim();if($P1-cne $P2){throw 'UPLM3V_NONDETERMINISTIC_OUTPUT'}
+ $R=$P1|ConvertFrom-Json
+ if($R.schema-cne 'wingless.up-lm3v-resource-grid-transfer.v1' -or [int]$R.resource_configurations-ne 80 -or [int]$R.metrics.Count-ne 80 -or [int]$R.summaries.Count-ne 2){throw 'UPLM3V_DESIGN'}
+ if(-not $R.counterfactual_only -or $R.live_activation -or $R.adaptive_resource_selection_used -or $R.adaptive_coordinate_search_used){throw 'UPLM3V_BOUNDARY_LEAK'}
+ Write-Host $P1;Write-Host '';Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
+ Write-Host "global_range=$($R.global_outcome_range) distinct=$($R.distinct_outcomes)"
+ foreach($S in $R.summaries){Write-Host "coordinate=$($S.coordinate) groups=$($S.groups) nonzero=$($S.nonzero_spread_groups) max_spread=$($S.max_failure_spread) mean_spread=$($S.mean_failure_spread)"}
+ Write-Host 'WINGLESS_UP233_HARNESS_PASS'
+}finally{Pop-Location}
