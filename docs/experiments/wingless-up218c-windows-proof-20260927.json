@@ -1,0 +1,39 @@
+{
+  "schema": "wingless.up218c-windows-proof.v1",
+  "experiment": "UP-218C-fresh-critical-ninth-action",
+  "status": "qualified-scientific-result",
+  "source_head": "b1d344bf5a5fbfa92c667f70b2a1341e3065d1c9",
+  "workflow_run_id": 36328040267,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10935105450,
+  "artifact_sha256": "7d81deb937061714b7d8111581f19347f029f3c7bb9484c941a20964b2e11dd5",
+  "findings": {
+    "cells": 32,
+    "cap8_losses": 88,
+    "cap9_losses": 4,
+    "ninth_actions": 119,
+    "ninth_rescues": 84,
+    "unnecessary_ninth": 35,
+    "necessary_ninth_attempts": 84,
+    "ineffective_ninth": 0,
+    "residual_boundary": {
+      "schedule": "alternating_fixed",
+      "advance": 8,
+      "residual_loss_per_horizon": 1,
+      "horizons": [
+        74,
+        76,
+        78,
+        80
+      ]
+    }
+  },
+  "interpretation": {
+    "bounded_iterative_repair_is_supported": true,
+    "every_ninth_action_attempt_on_a_cap8_failure_succeeded": true,
+    "residual_failures_are_no_action_cases_not_failed_ninth_actions": true,
+    "plain_speak": "A second tail correction, allowed only after danger reappears, rescues 84 of 88 late failures. When action 9 actually fires on a failing arm, it works; the four remaining failures are warning-lead misses.",
+    "next_stage": "on the residual alternating/fixed boundary, compare critical versus near native warning for action 9 while keeping actions 1-8 unchanged"
+  },
+  "activation_authorized": false
+}
