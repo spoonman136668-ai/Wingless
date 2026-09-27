@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm4h-windows-proof.v1",
+  "experiment": "UP-LM4H-preaction-pressure-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "08ef2ec082d1d83092f236e6c4dd65d378f3c67f",
+  "workflow_run_id": 36317069941,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10931455794,
+  "artifact_sha256": "1dfc45e09fab086b3e23a2baad697abb68ebe262a4d3673f551bdd9c9e741019",
+  "findings": {
+    "primary": {
+      "coordinate": "reachable_budget+throughput+coverage_end_round",
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 1080
+    },
+    "comparator": {
+      "coordinate": "reachable_budget+capacity_by_round2+capacity_by_round3+capacity_by_round4",
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 1404
+    }
+  },
+  "interpretation": {
+    "compact_resource_law_is_invariant_to_pre_vs_post_action_burst_ordering": true,
+    "coarse_intra_round_side_of_action_boundary_adds_no_state": true,
+    "plain_speak": "The same resource state remains sufficient whether the pressure shock lands just before or just after the scheduler gets its round-level action opportunity. The next meaningful timing test is a shock inserted between action slots when throughput allows multiple actions in one round.",
+    "next_stage": "inject pressure after the first action slot and before remaining throughput slots"
+  },
+  "activation_authorized": false
+}
