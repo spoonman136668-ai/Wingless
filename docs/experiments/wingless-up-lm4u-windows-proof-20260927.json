@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.up-lm4u-windows-proof.v1",
+  "experiment": "UP-LM4U-throughput-revoke-restore-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "657e6311f26d1c33554cb378d4ea4f5864ff3291",
+  "workflow_run_id": 36324444619,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10932869528,
+  "artifact_sha256": "1c531290e4d6430cbab4c40b9970db58572fbebc242475b11ac9f04a4f3cbfab",
+  "findings": {
+    "final": {
+      "cells": 108,
+      "nonzero_cells": 48,
+      "max_spread": 2
+    },
+    "final_plus_prerestore": {
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "pre_restore_deliverability_generalizes_across_resource_dimensions": true,
+    "final_resource_state_is_insufficient_under_temporary_throughput_loss": true,
+    "plain_speak": "The same one-checkpoint path memory works when the temporary constraint is rate, not total budget. What matters is how much action capacity had actually become usable by restoration.",
+    "next_stage": "apply simultaneous temporary budget and throughput reductions and test the frozen final+pre-restore coordinate unchanged"
+  },
+  "activation_authorized": false
+}
