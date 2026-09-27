@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up165c-windows-proof.v1",
+  "experiment": "UP-165C-robust-warning-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "841649737297d88149eee2c75c02a96e283ecd66",
+  "workflow_run_id": 36284031266,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920325414,
+  "artifact_sha256": "30da93020adb09b546ec20e6a7bca8280005f08af7b738b92073d7ac9ef62b12",
+  "findings": {
+    "policies": [
+      "no_refresh",
+      "alternating_shield",
+      "fixed_offset_refresh",
+      "hostile_shield"
+    ],
+    "cadences": [
+      2,
+      4
+    ],
+    "warning_recall_all_policy_cadence_cells": 1,
+    "missed_losses_total": 0,
+    "expired_warning_intervals": {
+      "no_refresh": {
+        "cadence2": 16,
+        "cadence4": 16
+      },
+      "alternating_shield": {
+        "cadence2": 4,
+        "cadence4": 1
+      },
+      "fixed_offset_refresh": {
+        "cadence2": 15,
+        "cadence4": 13
+      },
+      "hostile_shield": {
+        "cadence2": 0,
+        "cadence4": 0
+      }
+    },
+    "future_real_policy_schedule_used_by_warning": false
+  },
+  "interpretation": {
+    "current_state_warning_transfers_across_tested_future_pressure_policies": true,
+    "perfect_recall_does_not_imply_low_false_alarm_burden": true,
+    "warning_burden_varies_strongly_by_real_policy": true,
+    "plain_speak": "The same current-state warning rule caught every tested loss even when the future pressure policy changed. But outside the hostile policy it sometimes warned too early or for intervals that expired safely, so the next problem is precision and warning burden, not recall.",
+    "north_star_question": "Shows robust pre-failure warning from native state across policy shift; calibration now requires quantifying false alarms and lead time before any bounded corrective rule is considered.",
+    "next_stage": "freeze the warning rule and measure interval-level precision, false-alarm burden, and lead time on a mixed-risk cohort without allowing warnings to alter memory"
+  },
+  "activation_authorized": false
+}
