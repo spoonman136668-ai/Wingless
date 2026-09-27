@@ -1,0 +1,59 @@
+{
+  "schema": "wingless.up213b-windows-proof.v1",
+  "experiment": "UP-213B-native-routed-offset-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "fa7d5924b5aa8ba4d5f56b80ced8129102c07e70",
+  "workflow_run_id": 36315648440,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10930637030,
+  "artifact_sha256": "ef698b5b2dcc9474ea78887eb15e041ee97cfddb67a51ff57cc635f4139d86b6",
+  "findings": {
+    "mixed4": {
+      "route_correct": 2,
+      "route_total": 3,
+      "static_mae": 0.017116077702173018,
+      "routed_mae": 0.012150805246223528,
+      "oracle_family_mae": 0.010342057191521942,
+      "oracle_anchor_mae": 0.01034205714446049,
+      "routed_better": 60,
+      "evaluation_points": 69
+    },
+    "observe4": {
+      "route_correct": 3,
+      "route_total": 3,
+      "static_mae": 0.026507672848748443,
+      "routed_mae": 0.0033777253638635333,
+      "oracle_family_mae": 0.0033777253638635333,
+      "oracle_anchor_mae": 0.003377726104693124,
+      "routed_better": 69,
+      "evaluation_points": 69
+    },
+    "store4": {
+      "route_correct": 3,
+      "route_total": 3,
+      "static_mae": 0.007691442951322319,
+      "routed_mae": 0.005708448994609422,
+      "oracle_family_mae": 0.005708448994609422,
+      "oracle_anchor_mae": 0.005708448095281371,
+      "routed_better": 66,
+      "evaluation_points": 69
+    },
+    "cross3": {
+      "route_correct": 3,
+      "route_total": 3,
+      "static_mae": 0.008904171586159275,
+      "routed_mae": 0.007835293556659795,
+      "oracle_family_mae": 0.007835293556659795,
+      "oracle_anchor_mae": 0.007835300158164834,
+      "routed_better": 6,
+      "evaluation_points": 15
+    }
+  },
+  "interpretation": {
+    "native_state_can_route_to_family_specific_calibrators": true,
+    "mixed4_retains_a_localized_routing_ambiguity": true,
+    "plain_speak": "Wingless can mostly infer which calibration regime it is in from its own state and then use the right family-specific correction. Eleven of twelve regime-phase decisions were correct; only mixed4 produced one routing miss.",
+    "next_stage": "freeze router and calibrators unchanged and test routing/calibration stability across a longer later-phase holdout"
+  },
+  "activation_authorized": false
+}
