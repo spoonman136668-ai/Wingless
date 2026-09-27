@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.up202c-windows-proof.v1",
+  "experiment": "UP-202C-policy-horizon-selectivity",
+  "status": "qualified-scientific-result",
+  "source_head": "eaa7e5489d0701d8fadba1299d90589ab676ad3a",
+  "workflow_run_id": 36317688612,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10931317464,
+  "artifact_sha256": "18098867d197be6a26ec7ecfc26f3e0b4744e8f731ba82e125df448638b11169",
+  "findings": {
+    "true_unnecessary_action_arms_all_policy_horizon_cells": 0,
+    "no_refresh": {
+      "first_baseline_failure_horizon": 16,
+      "full_population_failure_horizon": 28
+    },
+    "alternating_shield": {
+      "first_baseline_failure_horizon": 8,
+      "full_population_failure_horizon": 16
+    },
+    "fixed_offset_refresh": {
+      "first_baseline_failure_horizon": 8,
+      "full_population_failure_horizon": 16
+    },
+    "hostile_shield": {
+      "first_baseline_failure_horizon": 8,
+      "full_population_failure_horizon": 12
+    },
+    "treated_failures_all_cells": 0
+  },
+  "interpretation": {
+    "sparse_rule_is_policy_robust_and_selective": true,
+    "every_apparent_early_action_is_within_fixed_grace_of_baseline_failure": true,
+    "plain_speak": "Across all four pressure policies, the frozen sparse rule prevents every near-horizon failure and never acts on a genuinely long-lived survivor under the fixed 8-write grace definition. Apparent false positives are consistently early warnings of failures that arrive shortly afterward.",
+    "next_stage": "test the same frozen rule under preregistered mid-run policy switches to challenge nonstationary external pressure"
+  },
+  "activation_authorized": false
+}
