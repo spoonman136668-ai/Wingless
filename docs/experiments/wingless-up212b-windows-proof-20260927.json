@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.up212b-windows-proof.v1",
+  "experiment": "UP-212B-native-regime-identification",
+  "status": "qualified-scientific-result",
+  "source_head": "6862ec96b6d0bdace10bb845802afe639c21cca7",
+  "workflow_run_id": 36315449704,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10930143859,
+  "artifact_sha256": "88603cb5d429a7a86617227886810579a4df2963bd4c6fa3a969129939066d30",
+  "findings": {
+    "overall_accuracy": 0.875,
+    "chance_accuracy": 0.25,
+    "mixed4": {
+      "correct": 6,
+      "total": 12,
+      "accuracy": 0.5
+    },
+    "observe4": {
+      "correct": 12,
+      "total": 12,
+      "accuracy": 1
+    },
+    "store4": {
+      "correct": 12,
+      "total": 12,
+      "accuracy": 1
+    },
+    "cross3": {
+      "correct": 12,
+      "total": 12,
+      "accuracy": 1
+    },
+    "mean_confidence_margin": 1.1696442471366815
+  },
+  "interpretation": {
+    "native_state_can_identify_history_regime_without_external_label": true,
+    "mixed4_remains_partially_ambiguous": true,
+    "plain_speak": "Wingless can usually tell which history regime it is in from its own state. Three families are perfectly separated on later phases; mixed histories are the remaining routing ambiguity.",
+    "next_stage": "combine frozen native regime identification with family-specific offset calibrators and compare predicted-regime routing against oracle family routing and static calibration"
+  },
+  "activation_authorized": false
+}
