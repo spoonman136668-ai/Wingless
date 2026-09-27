@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm4g-windows-proof.v1",
+  "experiment": "UP-LM4G-two-burst-pressure-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "27702da7525fd0e2e9306b65230777c48f0c00b5",
+  "workflow_run_id": 36316853003,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10930263856,
+  "artifact_sha256": "f0d81622e7b304816d6e01f117c1553ba90a424bd0e46e743f5c3b4d0d4755f6",
+  "findings": {
+    "primary": {
+      "coordinate": "reachable_budget+throughput+coverage_end_round",
+      "cells": 270,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 2700
+    },
+    "comparator": {
+      "coordinate": "reachable_budget+capacity_by_round2+capacity_by_round3+capacity_by_round4",
+      "cells": 270,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 3510
+    }
+  },
+  "interpretation": {
+    "compact_resource_law_transfers_to_all_distinct_two_burst_timings": true,
+    "repeated_nonstationary_pressure_does_not_require_new_state_in_tested_regime": true,
+    "plain_speak": "Even two separate pressure shocks at any pair of rounds do not break the compact resource law. The next useful stress test is not more bursts, but changing whether pressure arrives before or after the scheduler gets to act.",
+    "next_stage": "test fixed-round pressure injected before the action opportunity rather than after it"
+  },
+  "activation_authorized": false
+}
