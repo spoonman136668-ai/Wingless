@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.up196c-windows-proof.v1",
+  "experiment": "UP-196C-hostile-heldout-cohort-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "8c72b0f13a35c3c2bb69a8d8790ba3a79de7a278",
+  "workflow_run_id": 36315494899,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10931005072,
+  "artifact_sha256": "83925b868dc474ef2cab14304698ec7dddb303fb961ef4879363b645bcaf703d",
+  "findings": {
+    "arms": 64,
+    "baseline_losses": 64,
+    "sparse_primary": {
+      "spacing_intervals": 4,
+      "cap": 8,
+      "prevented": 64,
+      "actions": 486,
+      "accelerated": 0
+    },
+    "dense_comparator": {
+      "spacing_intervals": 1,
+      "cap": 16,
+      "prevented": 0,
+      "actions": 1024,
+      "accelerated": 0
+    }
+  },
+  "interpretation": {
+    "minimal_sparse_hostile_schedule_transfers_to_heldout_cohort_topology": true,
+    "temporal_coverage_result_is_not_discovery_cohort_specific": true,
+    "dense_overconsumption_failure_also_transfers": true,
+    "plain_speak": "The sparse schedule works unchanged on a different initial cohort structure, while the denser schedule still fails despite using more than twice as many actions. Temporal coverage is a transferable causal factor here.",
+    "next_stage": "evaluate the frozen sparse schedule over mixed early horizons on the heldout topology to measure prevention versus unnecessary intervention"
+  },
+  "activation_authorized": false
+}
