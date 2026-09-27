@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.up-lm4d-windows-proof.v1",
+  "experiment": "UP-LM4D-coverage-coordinate-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "89e3a37326d92acaa3c7c0ad5fb4db791738f319",
+  "workflow_run_id": 36315317797,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10930153636,
+  "artifact_sha256": "780d8938db84b5498cea268a02aa8b84393ea9557e209b317a2163ed2a16e48e",
+  "findings": {
+    "drop_reachable": {
+      "coordinate": "c2+tp+end",
+      "nonzero_cells": 162,
+      "max_spread": 6
+    },
+    "drop_cap2": {
+      "coordinate": "r+tp+end",
+      "nonzero_cells": 0,
+      "max_spread": 0
+    },
+    "drop_throughput": {
+      "coordinate": "r+c2+end",
+      "nonzero_cells": 162,
+      "max_spread": 3
+    },
+    "drop_coverage_end": {
+      "coordinate": "r+c2+tp",
+      "nonzero_cells": 162,
+      "max_spread": 4
+    },
+    "control": {
+      "coordinate": "r+c2+tp+end",
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "minimal_interpretable_coordinate_is_reachable_plus_throughput_plus_coverage_end": true,
+    "reachable_throughput_coverage_duration_are_each_necessary": true,
+    "early_cap2_is_redundant": true,
+    "plain_speak": "The scheduler's tested outcome can be captured exactly by only three resource facts: how many actions are reachable, how fast they can be delivered, and how long delivery remains possible. Early capacity is already implied once those three are known.",
+    "next_stage": "test the three-variable coordinate on preregistered resource values outside the original budget/start/throughput ranges"
+  },
+  "activation_authorized": false
+}
