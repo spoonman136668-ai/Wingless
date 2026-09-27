@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up192c-windows-proof.v1",
+  "experiment": "UP-192C-postwarning-commitment",
+  "status": "qualified-scientific-result",
+  "source_head": "074987f9b98d54aff1ba305bc61f8b26ab2a825d",
+  "workflow_run_id": 36314444904,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10929739068,
+  "artifact_sha256": "485ba9df038ffb785c7c143906d81a9cac85783b2b38bae973d205cb57e7a8c9",
+  "findings": {
+    "hostile_shield": {
+      "cadence2": {
+        "cap8_prevented": 0,
+        "cap8_actions": 512,
+        "mean_failure_delay": 23
+      },
+      "cadence4": {
+        "cap8_prevented": 0,
+        "cap8_actions": 512,
+        "mean_failure_delay": 35.75
+      }
+    },
+    "fresh_warning_gating_outperforms_commitment_on_other_policies": true,
+    "accelerated_arms": 0
+  },
+  "interpretation": {
+    "fresh_warning_recurrence_is_not_the_hostile_bottleneck": true,
+    "repeated_targeted_refresh_through_cap8_only_delays_hostile_failure": true,
+    "plain_speak": "Forcing more refreshes after the first warning does not save hostile-pressure arms, even though it can postpone failure by dozens of writes. The problem is no longer the warning gate; either the hostile regime needs still more corrective capacity or targeted refresh is the wrong repair action.",
+    "next_stage": "extend the same hostile-only commitment rule to caps 12 and 16 to test the upper bounded targeted-refresh ceiling"
+  },
+  "activation_authorized": false
+}
