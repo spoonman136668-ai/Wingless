@@ -1,0 +1,38 @@
+{
+  "schema": "wingless.up233c-windows-proof.v1",
+  "experiment": "UP-233C-nearest-signature-risk",
+  "status": "qualified-scientific-result",
+  "source_head": "bb06ab975297fe5012eb361d03cc0b670e3132a2",
+  "workflow_run_id": 36334418310,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10936392755,
+  "artifact_sha256": "e2a6049b655bf70dca86377e02c2308fa364b36eba5fb3a97cb2671f89327b31",
+  "findings": {
+    "arms": 512,
+    "failures": 35,
+    "survivors": 477,
+    "event_failures": 35,
+    "event_survivors": 26,
+    "high_risk": 19,
+    "low_risk": 10,
+    "unknown": 32,
+    "no_event": 451,
+    "high_risk_failures": 19,
+    "high_risk_survivors": 0,
+    "low_risk_failures": 1,
+    "high_risk_failure_recall": 0.5428571428571428,
+    "high_risk_precision": 1,
+    "failure_mean_min_failure_distance": 1.5142857142857142,
+    "failure_mean_min_survivor_distance": 2.6,
+    "survivor_mean_min_failure_distance": 2.923076923076923,
+    "survivor_mean_min_survivor_distance": 1.9615384615384615
+  },
+  "interpretation": {
+    "hamming_similarity_recovers_transfer_beyond_exact_signatures": true,
+    "precision_is_perfect_in_tested_high_risk_class": true,
+    "recall_is_limited_by_ties_and_one_low_risk_failure": true,
+    "plain_speak": "Similarity works much better than exact memorization: every state labeled high-risk really fails, but Hamming distance still leaves many warning states tied and misses about half the failures.",
+    "next_stage": "compare equal-weight Hamming with equal-weight Manhattan distance over the same nine native fields on a new heldout topology and timing"
+  },
+  "activation_authorized": false
+}
