@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up-lm3b-windows-proof.v1",
+  "experiment": "UP-LM3B-bursty-throughput",
+  "status": "qualified-scientific-result",
+  "source_head": "c07d88f114559f4ed7b3e24670858a1559f06f03",
+  "workflow_run_id": 36284035004,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10920111744,
+  "artifact_sha256": "2ddca8ba2f46eb67365fdbb43e95a017f10bebb6e5433365cabb14b9177e5093",
+  "findings": {
+    "total_budget": 6,
+    "throughputs": [
+      1,
+      2,
+      3
+    ],
+    "by_deferred_level": {
+      "earliest_failed": [
+        60,
+        60,
+        60
+      ],
+      "fixed_failed": [
+        72,
+        72,
+        72
+      ],
+      "earliest_advantage": [
+        12,
+        12,
+        12
+      ]
+    },
+    "by_layout": {
+      "earliest_failed": [
+        72,
+        72,
+        72
+      ],
+      "fixed_failed": [
+        82,
+        82,
+        82
+      ],
+      "earliest_advantage": [
+        10,
+        10,
+        10
+      ]
+    },
+    "throughput_changed_earliest_deadline_failures": false
+  },
+  "interpretation": {
+    "bursty_deadline_construction_preserves_earliest_deadline_advantage": true,
+    "throughput_still_does_not_change_outcome": true,
+    "same_arm_action_capture_is_a_candidate_bottleneck": true,
+    "plain_speak": "Even after synchronizing danger, allowing two or three actions per round still did not save more dependencies. The likely reason is that extra actions can pile into the same arm instead of spreading across simultaneously endangered arms, so the scheduler—not raw throughput—may be the bottleneck.",
+    "north_star_question": "Refines the resource story: total action budget matters, and a distribution bottleneck may prevent available per-round throughput from being useful.",
+    "next_stage": "repeat the bursty test with a frozen one-action-per-arm-per-round constraint so extra throughput must spread across distinct endangered arms"
+  },
+  "activation_authorized": false
+}
