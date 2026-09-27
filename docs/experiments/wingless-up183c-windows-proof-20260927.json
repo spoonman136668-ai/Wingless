@@ -1,0 +1,60 @@
+{
+  "schema": "wingless.up183c-windows-proof.v1",
+  "experiment": "UP-183C-dense-horizon-selectivity",
+  "status": "qualified-scientific-result",
+  "source_head": "d885b1d38f1c32704144ca730dbb4695a0496ff2",
+  "workflow_run_id": 36309886384,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10929250108,
+  "artifact_sha256": "44d658535552cac63672d2489c5912adb432f77ee71f18b9e2e4db90f910f794",
+  "findings": {
+    "cadence2": {
+      "selective_through_horizon22": true,
+      "h22": {
+        "failures": 18,
+        "survivors": 46,
+        "prevented": 18,
+        "unnecessary": 1,
+        "unnecessary_fraction": 0.021739130434782608
+      },
+      "h23": {
+        "failures": 19,
+        "survivors": 45,
+        "prevented": 19,
+        "unnecessary": 12,
+        "unnecessary_fraction": 0.26666666666666666
+      },
+      "h25": {
+        "failures": 31,
+        "survivors": 33,
+        "prevented": 31,
+        "unnecessary": 30,
+        "unnecessary_fraction": 0.9090909090909091
+      }
+    },
+    "cadence4": {
+      "selective_through_horizon20": true,
+      "h20": {
+        "failures": 17,
+        "survivors": 47,
+        "prevented": 17,
+        "unnecessary": 2,
+        "unnecessary_fraction": 0.0425531914893617
+      },
+      "h21": {
+        "failures": 17,
+        "survivors": 47,
+        "prevented": 17,
+        "unnecessary": 44,
+        "unnecessary_fraction": 0.9361702127659575
+      }
+    }
+  },
+  "interpretation": {
+    "selectivity_transition_is_sharp_and_cadence_dependent": true,
+    "cadence2_retains_selectivity_longer": true,
+    "plain_speak": "The rule does not gradually become noisy. It crosses a sharp horizon boundary: cadence 2 remains highly selective through 22 writes, while cadence 4 loses selectivity at 21. That suggests many apparent false positives may be warnings for failures just beyond the chosen horizon.",
+    "next_stage": "measure how soon baseline-survivor action arms fail after each horizon to distinguish true false positives from early warnings of near-future failure"
+  },
+  "activation_authorized": false
+}
