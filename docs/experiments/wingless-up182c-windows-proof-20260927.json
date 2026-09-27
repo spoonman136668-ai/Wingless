@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.up182c-windows-proof.v1",
+  "experiment": "UP-182C-horizon-selectivity",
+  "status": "qualified-scientific-result",
+  "source_head": "31494eb73445d2f329b36651885d45e49c4bd207",
+  "workflow_run_id": 36309191745,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10928019519,
+  "artifact_sha256": "f503d269fbd5d9e1324429811dfaac3cc0be3958064a8fe5a6a2a2c79bbe1b1f",
+  "findings": {
+    "cadence2_h16": {
+      "baseline_failures": 16,
+      "prevented": 16,
+      "unnecessary_action_arms": 0
+    },
+    "cadence2_h24": {
+      "baseline_failures": 19,
+      "prevented": 19,
+      "unnecessary_action_arms": 12,
+      "prevented_per_unnecessary": 1.5833333333333333
+    },
+    "cadence4_h16": {
+      "baseline_failures": 16,
+      "prevented": 16,
+      "unnecessary_action_arms": 1,
+      "prevented_per_unnecessary": 16
+    },
+    "cadence4_h24": {
+      "baseline_failures": 19,
+      "prevented": 19,
+      "unnecessary_action_arms": 42,
+      "prevented_per_unnecessary": 0.4523809523809524
+    }
+  },
+  "interpretation": {
+    "frozen_rule_can_be_selective_in_mixed_failure_survivor_populations": true,
+    "cadence2_is_more_selective_than_cadence4_in_tested_mixed_horizon": true,
+    "plain_speak": "The correction rule is not simply firing on everyone. At short horizons it rescues true failures with little or no unnecessary intervention, especially at cadence 2. Selectivity degrades as the horizon approaches the population-wide failure transition.",
+    "next_stage": "densely map horizons 16 through 31 at both cadences with the correction rule unchanged"
+  },
+  "activation_authorized": false
+}
