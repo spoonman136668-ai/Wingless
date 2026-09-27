@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up167c-windows-proof.v1",
+  "experiment": "UP-167C-warning-confirmation",
+  "status": "qualified-scientific-result",
+  "source_head": "0895671d55f32eeefa9502282f6abd018bc6f281",
+  "workflow_run_id": 36285138486,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10919993690,
+  "artifact_sha256": "449e3586b958b10ece6ae4240c78a3ea06226d13e177c230ebc8535e4af1346d",
+  "findings": {
+    "confirmation1": {
+      "recall_all_cells": 1,
+      "precision_range": [
+        0.5,
+        1
+      ]
+    },
+    "confirmation2": {
+      "no_refresh_recall": 1,
+      "alternating_shield_recall": {
+        "cadence2": 0.25,
+        "cadence4": 0.0625
+      },
+      "fixed_offset_refresh_recall": {
+        "cadence2": 0.9375,
+        "cadence4": 0.8125
+      },
+      "hostile_shield_recall": 0,
+      "precision_when_triggered": 1
+    },
+    "confirmation3": {
+      "recall_all_cells": 0
+    }
+  },
+  "interpretation": {
+    "repeated_confirmation_eliminates_expired_triggers_when_it_fires": true,
+    "no_single_confirmation_depth_preserves_robust_recall": true,
+    "waiting_for_repeated_warning_is_unsafe_under_fast_hostile_pressure": true,
+    "plain_speak": "Waiting for a second warning removes the early false alarms, but it also waits too long in some regimes. Under hostile pressure there is never a second warning before loss. So Wingless cannot solve the precision problem by simply demanding repeated alarms.",
+    "north_star_question": "The warning frontier is now precise enough to test the actual bounded-correction question directly: whether one frozen action on the first warning prevents more losses than it wastes, with a sham action as control.",
+    "next_stage": "test a one-shot targeted refresh on the first warning versus a same-budget sham refresh and no-action baseline, all counterfactual and policy-agnostic"
+  },
+  "activation_authorized": false
+}
