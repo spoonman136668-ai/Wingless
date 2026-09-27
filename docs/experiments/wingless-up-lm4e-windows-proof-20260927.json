@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm4e-windows-proof.v1",
+  "experiment": "UP-LM4E-out-of-range-resource-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "f172d2d7d9db53924fbe5185a69fe3eec0bf1f09",
+  "workflow_run_id": 36315715013,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10930562169,
+  "artifact_sha256": "4ac43a4c7a219b7660b530edf88545d13d0da8432d3cdc88457cc73140993371",
+  "findings": {
+    "expanded_resource_configs_per_cell": 210,
+    "topology_condition_cells": 54,
+    "coverage_coordinate": {
+      "coordinate": "reachable+throughput+coverage_end",
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 918
+    },
+    "prior_checkpoint_coordinate": {
+      "nonzero_cells": 36,
+      "max_spread": 2,
+      "multi_member_groups": 1566
+    }
+  },
+  "interpretation": {
+    "three_variable_resource_law_extrapolates_beyond_derivation_ranges": true,
+    "result_is_not_unique_key_artifact": true,
+    "old_checkpoint_encoding_does_not_extrapolate": true,
+    "plain_speak": "The compact law survives resource values it was never derived on, and many different raw scheduler settings map to the same three-number state with identical outcomes. That is strong evidence that reachable amount, delivery rate, and coverage duration are the operative resource variables in this scheduler family.",
+    "next_stage": "stop static-coordinate compression and test the frozen three-variable law under dynamic pressure introduced during the action window"
+  },
+  "activation_authorized": false
+}
