@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm3w-windows-proof.v1",
+  "experiment": "UP-LM3W-full-deployment-vector",
+  "status": "qualified-scientific-result",
+  "source_head": "73083825ffa185b6630e24ff25891e3d8fd08e25",
+  "workflow_run_id": 36312105246,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10929218968,
+  "artifact_sha256": "74f51dc54fc4d9203d55c11fc32aadbb35e527819fa672e57813311a682823e8",
+  "findings": {
+    "global_outcome_range": 26,
+    "distinct_outcomes": 9,
+    "prior_rich": {
+      "groups": 35,
+      "nonzero_groups": 6,
+      "max_spread": 6,
+      "mean_spread": 1.0285714285714285
+    },
+    "full_vector": {
+      "groups": 45,
+      "nonzero_groups": 0,
+      "max_spread": 0,
+      "mean_spread": 0
+    }
+  },
+  "interpretation": {
+    "full_temporal_deployment_vector_restores_exact_collapse": true,
+    "omitted_round2_or_round5_capacity_caused_prior_boundary": true,
+    "plain_speak": "The broader grid did not require a new kind of scheduler state. It required seeing deployable capacity across the full timing range. Once rounds 2 through 5 are represented, resource outcomes collapse exactly again.",
+    "next_stage": "ablate the new endpoint checkpoints separately to determine whether early capacity, late capacity, or both are necessary"
+  },
+  "activation_authorized": false
+}
