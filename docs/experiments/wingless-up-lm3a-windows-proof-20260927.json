@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.up-lm3a-windows-proof.v1",
+  "experiment": "UP-LM3A-throughput-scarcity",
+  "status": "qualified-scientific-result",
+  "source_head": "c1b1779003eca3a4129626b320223322e342827c",
+  "workflow_run_id": 36283257075,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10920095476,
+  "artifact_sha256": "258b86ca1df03273321251aa4e5d6490cc331d255b219fcd2fe2f688e24a5d07",
+  "findings": {
+    "budget5": {
+      "throughput1": {
+        "advantage": 4,
+        "earliest_failed": 114,
+        "fixed_failed": 118
+      },
+      "throughput2": {
+        "advantage": 4,
+        "earliest_failed": 114,
+        "fixed_failed": 118
+      },
+      "throughput3": {
+        "advantage": 4,
+        "earliest_failed": 114,
+        "fixed_failed": 118
+      }
+    },
+    "budget6": {
+      "throughput1": {
+        "advantage": 10,
+        "earliest_failed": 108,
+        "fixed_failed": 118
+      },
+      "throughput2": {
+        "advantage": 10,
+        "earliest_failed": 108,
+        "fixed_failed": 118
+      },
+      "throughput3": {
+        "advantage": 8,
+        "earliest_failed": 108,
+        "fixed_failed": 116
+      }
+    }
+  },
+  "interpretation": {
+    "total_budget_scarcity_is_the_dominant_driver_in_this_frozen_regime": true,
+    "increasing_per_round_throughput_does_not_improve_earliest_deadline_outcome": true,
+    "fixed_order_improves_slightly_only_at_budget6_throughput3": true,
+    "current_stream_does_not_create_strong_same_round_deadline_contention": true,
+    "plain_speak": "Giving the scheduler permission to make two or three moves in the same round does not help the countdown policy here. The important limit is how many total corrective moves it owns, not how many it can spend at once.",
+    "north_star_question": "Separates two resource constraints: the present allocation benefit comes from finite total corrective budget, not throughput. A different stream is required to test whether bursty simultaneous danger can make throughput matter.",
+    "next_stage": "construct a frozen staggered-arrival pressure stream with multiple dependencies reaching imminent failure in the same round, then compare throughput1/2/3 at fixed total budget"
+  },
+  "activation_authorized": false
+}
