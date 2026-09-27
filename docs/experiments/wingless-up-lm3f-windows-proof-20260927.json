@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.up-lm3f-windows-proof.v1",
+  "experiment": "UP-LM3F-budget-reachability",
+  "status": "qualified-scientific-result",
+  "source_head": "507aa074c2ff5e69fb49d2341cc05cc0bae8287d",
+  "workflow_run_id": 36285691122,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10920342860,
+  "artifact_sha256": "862f6e2bcdd9c5b258d356fc1cdf60decb22e747afc32d85c764301e97dfe0d0",
+  "findings": {
+    "budgets": [
+      4,
+      5,
+      6
+    ],
+    "start_rounds": [
+      3,
+      4
+    ],
+    "throughputs": [
+      1,
+      2,
+      3
+    ],
+    "reachable_budget_levels": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "by_deferred_level_earliest_failed_by_reachable_budget": {
+      "2": 76,
+      "3": 72,
+      "4": 68,
+      "5": 64,
+      "6": 60
+    },
+    "by_layout_earliest_failed_by_reachable_budget": {
+      "2": 88,
+      "3": 84,
+      "4": 80,
+      "5": 76,
+      "6": 72
+    },
+    "same_reachable_budget_same_earliest_failure_within_profile": true
+  },
+  "interpretation": {
+    "reachable_budget_law_replication_passed_across_nominal_budgets": true,
+    "nominal_budget_start_and_throughput_collapse_to_reachable_budget_for_earliest_deadline": true,
+    "fixed_order_retains_additional_order_sensitivity": true,
+    "plain_speak": "For earliest-deadline scheduling, the nominal knobs collapse to one effective quantity: how many corrective actions are actually reachable before the window closes. Two reachable actions, three reachable actions, and so on give the same failure count no matter which tested budget/onset/throughput combination produced them.",
+    "north_star_question": "Produces a compact fixed-resource law for when bounded correction can physically be deployed in time.",
+    "next_stage": "hold the reachable-budget law fixed and replicate it on held-out rotations and arm permutations to test topology transfer"
+  },
+  "activation_authorized": false
+}
