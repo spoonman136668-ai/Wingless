@@ -1,0 +1,88 @@
+{
+  "schema": "wingless.up222c-windows-proof.v1",
+  "experiment": "UP-222C-noquery-ninth-trigger",
+  "status": "qualified-scientific-result",
+  "source_head": "53e194a41aedd18c1c2eaec2f788a9d17dd9432f",
+  "workflow_run_id": 36329315661,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10934554787,
+  "artifact_sha256": "fdbe3aec5d35ee8b791d2afbb7d93b7c71d8bb977db2a45f1dbb698c04561b25",
+  "findings": {
+    "adversarial_critical": [
+      {
+        "horizon": 74,
+        "cap8_losses": 1,
+        "cap9_losses": 1,
+        "ninth_actions": 0,
+        "rescues": 0,
+        "unnecessary": 0
+      },
+      {
+        "horizon": 76,
+        "cap8_losses": 2,
+        "cap9_losses": 1,
+        "ninth_actions": 2,
+        "rescues": 1,
+        "unnecessary": 1
+      },
+      {
+        "horizon": 78,
+        "cap8_losses": 19,
+        "cap9_losses": 1,
+        "ninth_actions": 20,
+        "rescues": 18,
+        "unnecessary": 2
+      },
+      {
+        "horizon": 80,
+        "cap8_losses": 29,
+        "cap9_losses": 1,
+        "ninth_actions": 31,
+        "rescues": 28,
+        "unnecessary": 3
+      }
+    ],
+    "noquery_critical": [
+      {
+        "horizon": 74,
+        "cap8_losses": 1,
+        "cap9_losses": 1,
+        "ninth_actions": 0,
+        "rescues": 0,
+        "unnecessary": 0
+      },
+      {
+        "horizon": 76,
+        "cap8_losses": 2,
+        "cap9_losses": 1,
+        "ninth_actions": 1,
+        "rescues": 1,
+        "unnecessary": 0
+      },
+      {
+        "horizon": 78,
+        "cap8_losses": 19,
+        "cap9_losses": 17,
+        "ninth_actions": 2,
+        "rescues": 2,
+        "unnecessary": 0
+      },
+      {
+        "horizon": 80,
+        "cap8_losses": 29,
+        "cap9_losses": 20,
+        "ninth_actions": 9,
+        "rescues": 9,
+        "unnecessary": 0
+      }
+    ]
+  },
+  "interpretation": {
+    "noquery_critical_is_more_selective_but_far_less_sensitive_for_action9": true,
+    "adversarial_critical_remains_preferred_tail_trigger": true,
+    "the_single_adversarial_silent_failure_remains_unresolved": true,
+    "plain_speak": "The no-query signal avoids wasted ninth actions, but it waits too long on many real failures. For action 9, the adversarial warning is much more useful. The one stubborn failure still needs a different native-state explanation.",
+    "next_stage": "trace raw replacement geometry on the silent residual and matched loss/survivor arms with intervention frozen"
+  },
+  "activation_authorized": false
+}
