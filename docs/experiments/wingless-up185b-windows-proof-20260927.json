@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up185b-windows-proof.v1",
+  "experiment": "UP-185B-parity-diagnostic",
+  "status": "qualified-scientific-result",
+  "source_head": "0e71725bd7f6182e079856e5d3e2231acf4fa24e",
+  "workflow_run_id": 36281396444,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10918074041,
+  "artifact_sha256": "cefe7f0c9426e59aa88ef194fa56b00925ae14d7d08be2cf1451f3b978681c94",
+  "findings": {
+    "evaluation_phases": [
+      31,
+      32,
+      33
+    ],
+    "pooled_mean_absolute_mass_ratio_error": 0.07886025797182931,
+    "parity_diagnostic_mean_absolute_mass_ratio_error": 0.08029504496589997,
+    "pooled_phase31_ratio": 1.1131486005280518,
+    "parity_phase31_ratio": 1.0922934391319408,
+    "pooled_phase32_ratio": 0.9897164271406156,
+    "parity_phase32_ratio": 1.0562982566338184,
+    "pooled_phase33_ratio": 1.1131486005280518,
+    "parity_phase33_ratio": 1.0922934391319408
+  },
+  "interpretation": {
+    "external_parity_does_not_explain_residual_calibration_drift": true,
+    "parity_conditioning_improves_odd_phase_mass_error_but_worsens_even_phase_mass_error": true,
+    "aggregate_calibration_is_not_improved": true,
+    "parity_is_not_an_acceptable_native_feature": true,
+    "plain_speak": "The alternating pattern is real, but simply labeling phases odd/even does not solve it. Parity helps phases 31 and 33 a little and makes phase 32 worse. The missing variable must be something more specific in Wingless's internal context.",
+    "north_star_question": "Rules out a superficial external explanation for structured calibration drift and keeps the search focused on native state.",
+    "next_stage": "compare frozen pre-update native context summaries across the repeating low-crossing and high-crossing phase classes to identify an internal correlate before building any new probability model"
+  },
+  "activation_authorized": false
+}
