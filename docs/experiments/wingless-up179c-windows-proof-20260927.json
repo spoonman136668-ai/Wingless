@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up179c-windows-proof.v1",
+  "experiment": "UP-179C-stage-target-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "ecd5187f6bad17cf1c76d071f67023f5348540bc",
+  "workflow_run_id": 36305858608,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10927098078,
+  "artifact_sha256": "47a7924c582430cded545c72e7247c4d14e5f7472556ac44670727cc15ea035c",
+  "findings": {
+    "targeted_targeted": {
+      "prevented_losses": 47,
+      "stage1_actions": 64,
+      "stage2_actions": 64
+    },
+    "targeted_sham": {
+      "prevented_losses": 0,
+      "stage1_actions": 64,
+      "stage2_actions": 64,
+      "mean_loss_delay_writes_cadence2": 17.015625
+    },
+    "sham_targeted": {
+      "prevented_losses": 0,
+      "stage1_actions": 64,
+      "stage2_actions": 0
+    },
+    "sham_sham": {
+      "prevented_losses": 0,
+      "stage1_actions": 64,
+      "stage2_actions": 0
+    }
+  },
+  "interpretation": {
+    "first_targeted_action_is_a_causal_bridge": true,
+    "second_targeted_action_is_required_for_survival": true,
+    "both_stages_must_target_endangered_resident": true,
+    "plain_speak": "The first targeted action keeps the memory alive long enough to reach stage two, but a sham second action cannot finish the rescue. A sham first action never even creates the second opportunity. Both targeted stages are causally necessary.",
+    "next_stage": "hold targets and warning gates fixed and vary the delay independently at stage one and stage two to localize where the one-interval timing benefit comes from"
+  },
+  "activation_authorized": false
+}
