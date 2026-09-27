@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up216b-windows-proof.v1",
+  "experiment": "UP-216B-training-threshold-fallback",
+  "status": "qualified-scientific-result",
+  "source_head": "1687850d16905d46f59f84710bc5198be635e424",
+  "workflow_run_id": 36318416635,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10931229751,
+  "artifact_sha256": "a3fd5b857dca99b887d185d053cded1d998c00fccfef3f5b306fca38879adec9",
+  "findings": {
+    "training_threshold": 0.6640727787188583,
+    "route_accuracy": 0.875,
+    "route_correct": 42,
+    "route_total": 48,
+    "fallback_decisions": 6,
+    "mixed4": {
+      "route_correct": 6,
+      "route_total": 12,
+      "fallback_decisions": 6,
+      "static_mae": 0.01925558741494463,
+      "routed_mae": 0.014347936415608753,
+      "fallback_mae": 0.016715329730356304,
+      "oracle_family_mae": 0.011634814333556377,
+      "oracle_anchor_mae": 0.011634814287518044
+    },
+    "observe4": {
+      "route_correct": 12,
+      "route_total": 12,
+      "fallback_decisions": 0,
+      "routed_mae": 0.0037999411430551717
+    },
+    "store4": {
+      "route_correct": 12,
+      "route_total": 12,
+      "fallback_decisions": 0,
+      "routed_mae": 0.006422004986968954
+    },
+    "cross3": {
+      "route_correct": 12,
+      "route_total": 12,
+      "fallback_decisions": 0,
+      "routed_mae": 0.008814706219941371
+    }
+  },
+  "interpretation": {
+    "training_confidence_detects_the_mixed4_ambiguity": true,
+    "static_fallback_is_not_supported": true,
+    "plain_speak": "Wingless correctly flags the uncertain routes, but falling all the way back to static calibration throws away too much useful signal. The uncertainty detector works better than the fallback policy.",
+    "next_stage": "on training-flagged uncertain routes, blend the two nearest frozen family calibrators instead of dropping to static calibration"
+  },
+  "activation_authorized": false
+}
