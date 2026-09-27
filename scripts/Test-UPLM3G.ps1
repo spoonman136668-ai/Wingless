@@ -23,5 +23,5 @@ try{
  Write-Host ''
  Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
  foreach($S in $R.reach_summaries){Write-Host "profile=$($S.profile) reachable=$($S.reachable_budget) observations=$($S.observations) min_failed=$($S.min_earliest_failed) max_failed=$($S.max_earliest_failed) spread=$($S.failure_spread)"}
- Write-Host 'WINGLESS_UPLM3G_HARNESS_PASS'
+ Write-Host 'WINGLESS_UP195_HARNESS_PASS'
 }finally{Pop-Location;if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache};if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp};Remove-Item -Recurse -Force $GoCache,$GoTmp -ErrorAction SilentlyContinue}
