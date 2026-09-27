@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up207c-windows-proof.v1",
+  "experiment": "UP-207C-warning-pullforward-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "32b5ee527fd464a38baf87409621989662e5b9d6",
+  "workflow_run_id": 36318944030,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10931557290,
+  "artifact_sha256": "59c5e15911b1dcc5bfda1fa7f5b91a9674f6ded08fdcb9fdefbabfe32551ed87",
+  "findings": {
+    "no_hostile_shifted": {
+      "committed_prevented": 64,
+      "pull_forward_prevented": 64,
+      "pullforwards": 0
+    },
+    "hostile_no_shifted": {
+      "committed_prevented": 64,
+      "pull_forward_prevented": 64,
+      "pullforwards": 0
+    },
+    "alternating_fixed_shifted": {
+      "committed_prevented": 64,
+      "pull_forward_prevented": 64,
+      "pullforwards": 0
+    },
+    "fixed_alternating_shifted": {
+      "committed_prevented": 64,
+      "pull_forward_prevented": 64,
+      "pullforwards": 3,
+      "committed_actions": 389,
+      "pull_forward_actions": 392
+    }
+  },
+  "interpretation": {
+    "warning_pullforward_adds_little_under_shifted_transfer": true,
+    "committed_schedule_already_covers_tested_shifted_timing": true,
+    "plain_speak": "The warning almost never fires early enough to move maintenance forward, and where it does, survival was already complete. The next useful question is which committed maintenance slots are actually necessary under switching pressure.",
+    "next_stage": "ablate fixed positions in the committed maintenance sequence under repeated-switch schedules rather than adding warning-driven timing complexity"
+  },
+  "activation_authorized": false
+}
