@@ -1,0 +1,81 @@
+{
+  "schema": "wingless.up-lm3d-windows-proof.v1",
+  "experiment": "UP-LM3D-compressed-window",
+  "status": "qualified-scientific-result",
+  "source_head": "159e194a8426d5f4433ded3164133d3eb6571d23",
+  "workflow_run_id": 36285173273,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10920322232,
+  "artifact_sha256": "5e0e9645e8a92445c0e0ac3dd57d1809b2720f4f927602e00a292296c06d35d9",
+  "findings": {
+    "by_deferred_level": {
+      "start1": {
+        "tp1": {
+          "failed": 64,
+          "actions": 20
+        },
+        "tp2": {
+          "failed": 60,
+          "actions": 24
+        },
+        "tp3": {
+          "failed": 60,
+          "actions": 24
+        }
+      },
+      "start2": {
+        "tp1": {
+          "failed": 68,
+          "actions": 16
+        },
+        "tp2": {
+          "failed": 60,
+          "actions": 24
+        },
+        "tp3": {
+          "failed": 60,
+          "actions": 24
+        }
+      }
+    },
+    "by_layout": {
+      "start1": {
+        "tp1": {
+          "failed": 76,
+          "actions": 20
+        },
+        "tp2": {
+          "failed": 72,
+          "actions": 24
+        },
+        "tp3": {
+          "failed": 72,
+          "actions": 24
+        }
+      },
+      "start2": {
+        "tp1": {
+          "failed": 80,
+          "actions": 16
+        },
+        "tp2": {
+          "failed": 72,
+          "actions": 24
+        },
+        "tp3": {
+          "failed": 72,
+          "actions": 24
+        }
+      }
+    }
+  },
+  "interpretation": {
+    "throughput_is_causal_under_compressed_intervention_windows": true,
+    "throughput2_is_sufficient_to_recover_full_fixed_budget_in_tested_windows": true,
+    "throughput3_adds_no_further_earliest_deadline_benefit_after_budget_reachability_is_restored": true,
+    "plain_speak": "Throughput mattered once time became scarce. With only one action per round, Wingless could not spend all six corrective actions before the window closed and more failures occurred. Two actions per round restored the full budget and the earlier best outcome; a third action added nothing.",
+    "north_star_question": "This identifies a clean resource boundary: total budget controls how much correction is possible, while throughput controls whether that budget is reachable before deadlines.",
+    "next_stage": "measure the minimum throughput required as intervention onset moves later, producing a small reachability curve rather than another single delayed-window point"
+  },
+  "activation_authorized": false
+}
