@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up163c-windows-proof.v1",
+  "experiment": "UP-163C-multiwrite-warning",
+  "status": "qualified-scientific-result",
+  "source_head": "99e14db5c4660bce1846851015cdcbe3a0e687f8",
+  "workflow_run_id": 36282782578,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10919312823,
+  "artifact_sha256": "53d0d1699dd6e2c34297b7a68118a759d690d4739cd7eda9b9c718ca7a15103b",
+  "findings": {
+    "cadence2": {
+      "lookahead": 2,
+      "warned": 16,
+      "missed": 0,
+      "false_warnings": 0,
+      "recall": 1
+    },
+    "cadence4": {
+      "lookahead": 4,
+      "warned": 16,
+      "missed": 0,
+      "false_warnings": 0,
+      "recall": 1
+    }
+  },
+  "interpretation": {
+    "bounded_interval_forecast_recovers_full_warning_recall_at_sparse_checks": true,
+    "known_pressure_policy_simulation_can_trade_compute_for_sampling_frequency": true,
+    "result_depends_on_known_frozen_pressure_policy": true,
+    "plain_speak": "Sparse checking was only failing because each check looked one write ahead. When a cadence-4 check forecasts the next four writes under the known pressure rule, it catches all 16 losses with no false alarms.",
+    "north_star_question": "Shows monitoring need not run every write if Wingless can project its own current state across the known interval. The unresolved boundary is robustness when the exact future pressure policy is not known.",
+    "next_stage": "replace exact future pressure simulation with a worst-case bounded horizon derived from current state only and test warning recall at cadence2/4"
+  },
+  "activation_authorized": false
+}
