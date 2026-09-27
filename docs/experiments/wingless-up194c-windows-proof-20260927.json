@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up194c-windows-proof.v1",
+  "experiment": "UP-194C-hostile-spacing-allocation",
+  "status": "qualified-scientific-result",
+  "source_head": "55e1522b32e1e77fcac840b8990b8d1811571946",
+  "workflow_run_id": 36314910759,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10930063368,
+  "artifact_sha256": "6cb41335a1ee838ffe53a4e86f4692d656a59f3a822363cffa1b2de9fd581d97",
+  "findings": {
+    "cadence2_spacing1": {
+      "prevented": 0,
+      "actions": 1024,
+      "mean_extension": 39.3125
+    },
+    "cadence2_spacing2": {
+      "prevented": 64,
+      "actions": 913
+    },
+    "cadence2_spacing3": {
+      "prevented": 64,
+      "actions": 607
+    },
+    "cadence2_spacing4": {
+      "prevented": 64,
+      "actions": 465
+    },
+    "cadence4_spacing1": {
+      "prevented": 64,
+      "actions": 913
+    }
+  },
+  "interpretation": {
+    "hostile_rescue_depends_on_temporal_budget_coverage": true,
+    "cadence2_spacing2_reproduces_cadence4_reference": true,
+    "denser_action_schedule_can_be_worse_despite_equal_or_higher_action_use": true,
+    "plain_speak": "Spending the same corrective budget too quickly causes eventual failure. Spreading refreshes over time restores complete rescue, and sparser schedules can use far fewer actions. The relevant resource is not action count alone but how long that action capacity remains deployable.",
+    "next_stage": "map spacing 2/3/4 against smaller fixed action caps to find the minimum hostile-pressure resource budget that preserves prevention"
+  },
+  "activation_authorized": false
+}
