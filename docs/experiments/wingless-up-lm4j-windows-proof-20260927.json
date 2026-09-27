@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm4j-windows-proof.v1",
+  "experiment": "UP-LM4J-throughput-drop-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "69c07ed14fc691919c0d7d1011f71e250436fb42",
+  "workflow_run_id": 36317751506,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10931148029,
+  "artifact_sha256": "3d73bd96cd26705e9fbaf5fe249300ab8cb3bc3bc38fc4d27e59496145f12871",
+  "findings": {
+    "static": {
+      "coordinate": "static_r+tp+end",
+      "cells": 72,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 432
+    },
+    "dynamic": {
+      "coordinate": "dynamic_r+tp_before+tp_after+end",
+      "cells": 72,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 576
+    }
+  },
+  "interpretation": {
+    "static_compact_resource_law_survives_permanent_throughput_drop": true,
+    "dynamic_coordinate_also_exact": true,
+    "plain_speak": "Even when throughput permanently falls by one mid-run, the original compact resource description still groups outcomes perfectly in every tested condition. The next stronger challenge is temporary total unavailability, where delivery stops completely for a round and then recovers.",
+    "next_stage": "test a preregistered one-round throughput outage with recovery"
+  },
+  "activation_authorized": false
+}
