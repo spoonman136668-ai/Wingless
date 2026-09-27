@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up212c-windows-proof.v1",
+  "experiment": "UP-212C-dense-tail-cap-boundary",
+  "status": "qualified-scientific-result",
+  "source_head": "75e2274e5b0dc0670a897dd9f26db7e3d01a0d6c",
+  "workflow_run_id": 36323873939,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10933526170,
+  "artifact_sha256": "6f8a7ffdba71e04427c1d2fd456990aa306aec52ca689eca19c228d2c28e3a7c",
+  "findings": {
+    "global_first_cap7_vs_cap8_divergence_horizon": 66,
+    "divergence_at_66": [
+      {
+        "schedule": "alternating_fixed",
+        "phase_advance": 4,
+        "cap7_prevented": 60,
+        "cap8_prevented": 64
+      },
+      {
+        "schedule": "fixed_alternating",
+        "phase_advance": 0,
+        "cap7_prevented": 61,
+        "cap8_prevented": 63
+      }
+    ],
+    "later_examples": [
+      {
+        "schedule": "hostile_no",
+        "phase_advance": 0,
+        "horizon": 68,
+        "cap7_prevented": 63,
+        "cap8_prevented": 64
+      },
+      {
+        "schedule": "no_hostile",
+        "phase_advance": 4,
+        "horizon": 70,
+        "cap7_prevented": 63,
+        "cap8_prevented": 64
+      },
+      {
+        "schedule": "no_hostile",
+        "phase_advance": 0,
+        "horizon": 72,
+        "cap7_prevented": 63,
+        "cap8_prevented": 64
+      }
+    ]
+  },
+  "interpretation": {
+    "seven_action_tail_reduction_is_robust_through_64_writes": true,
+    "first_observed_durability_boundary_is_66_writes": true,
+    "boundary_is_condition_dependent": true,
+    "plain_speak": "Seven actions are reliably enough through 64 writes. The first need for the eighth action appears at 66 writes in the most sensitive switch conditions, then spreads to more conditions as the horizon lengthens.",
+    "next_stage": "hold actions 1-7 fixed and vary only the eighth action by one monitoring interval early, nominal, or late to identify its causal timing window"
+  },
+  "activation_authorized": false
+}
