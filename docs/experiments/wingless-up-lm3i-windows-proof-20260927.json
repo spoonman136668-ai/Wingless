@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.up-lm3i-windows-proof.v1",
+  "experiment": "UP-LM3I-dynamic-pressure",
+  "status": "qualified-scientific-result",
+  "source_head": "8085333477af8ed94cf4b5968f109b31fb39dcfb",
+  "workflow_run_id": 36286889496,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10921050447,
+  "artifact_sha256": "c14640ce86de097a0e335d583071318874b2d69a31398ce97bded7b0b32e1bae",
+  "findings": {
+    "pressure_burst_round": 3,
+    "extra_writes_per_arm": 1,
+    "failure_spread_by_reachable_budget": {
+      "2": 0,
+      "3": 0,
+      "4": 6,
+      "5": 6,
+      "6": 12
+    }
+  },
+  "interpretation": {
+    "dynamic_pressure_breaks_simple_reachable_budget_collapse": true,
+    "timing_relative_to_hazard_transition_matters_beyond_aggregate_reachable_capacity": true,
+    "plain_speak": "The simple resource law holds only while pressure is effectively static. Once every arm gets an extra mid-window hit, two schedules with the same reachable action capacity can produce different failure counts. Timing relative to the hazard transition now matters.",
+    "north_star_question": "Refines fixed-resource correction from a one-number capacity law into a joint capacity-and-hazard-timing problem.",
+    "next_stage": "sweep fixed burst timing across the six global rounds to localize when the reachability collapse first breaks"
+  },
+  "activation_authorized": false
+}
