@@ -1,0 +1,66 @@
+{
+  "schema": "wingless.up-lm3e-windows-proof.v1",
+  "experiment": "UP-LM3E-deployability-equivalence",
+  "status": "qualified-scientific-result",
+  "source_head": "efe1b8d9ec0c2d44464a8b438a7aa474a039f8d5",
+  "workflow_run_id": 36285507956,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10919813043,
+  "artifact_sha256": "fceb35d536d3efcd502f00c29908bfda246f2a11f12de851e564e198b0cd1567",
+  "findings": {
+    "by_deferred_level": {
+      "actions12": {
+        "configurations": 15,
+        "failed": 72,
+        "spread": 0
+      },
+      "actions16": {
+        "configurations": 13,
+        "failed": 68,
+        "spread": 0
+      },
+      "actions20": {
+        "configurations": 11,
+        "failed": 64,
+        "spread": 0
+      },
+      "actions24": {
+        "configurations": 9,
+        "failed": 60,
+        "spread": 0
+      }
+    },
+    "by_layout": {
+      "actions12": {
+        "configurations": 15,
+        "failed": 84,
+        "spread": 0
+      },
+      "actions16": {
+        "configurations": 13,
+        "failed": 80,
+        "spread": 0
+      },
+      "actions20": {
+        "configurations": 11,
+        "failed": 76,
+        "spread": 0
+      },
+      "actions24": {
+        "configurations": 9,
+        "failed": 72,
+        "spread": 0
+      }
+    },
+    "equal_action_count_failure_spread_all_groups": 0
+  },
+  "interpretation": {
+    "actual_deployed_action_count_is_sufficient_for_this_frozen_resource_frontier": true,
+    "budget_onset_throughput_have_no_residual_effect_after_action_count_is_matched": true,
+    "failures_decline_one_for_one_with_additional_aggregate_actions_in_each_profile": true,
+    "plain_speak": "Across many different budgets, start times, and throughputs, configurations that managed to deploy the same number of rescue actions lost exactly the same number of memories. In this test family, the complicated timing variables collapse to one effective resource: how many useful actions can actually be delivered before the window closes.",
+    "north_star_question": "Provides a compact temporal-reachability resource coordinate that can be combined with native failure warnings without giving the correction rule unbounded authority.",
+    "next_stage": "replicate the deployability collapse under a wider reachability envelope or a changed dependency layout before treating the scalar as general"
+  },
+  "activation_authorized": false
+}
