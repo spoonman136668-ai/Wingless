@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm4m-windows-proof.v1",
+  "experiment": "UP-LM4M-budget-revocation-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "eb7fe27d8d601a99390985e0eb05fcf27dafae23",
+  "workflow_run_id": 36318592072,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10932080302,
+  "artifact_sha256": "c7f68ae10a2c9ccfd84f3faa0983659c32a079eae12db1384f5671d896b4119e",
+  "findings": {
+    "static": {
+      "coordinate": "static_r+tp+end",
+      "cells": 108,
+      "nonzero_cells": 108,
+      "max_spread": 2,
+      "multi_member_groups": 1080
+    },
+    "dynamic": {
+      "coordinate": "dynamic_r+tp+end",
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 1044
+    }
+  },
+  "interpretation": {
+    "nominal_initial_resource_state_is_insufficient_under_budget_revocation": true,
+    "actual_schedule_deployability_restores_exact_outcome_collapse": true,
+    "plain_speak": "This is the first clean resource-law break in this series. Once action authority can disappear mid-run, the starting budget is no longer enough to predict outcomes. Recomputing what can actually still be delivered—and by when—restores exact prediction.",
+    "next_stage": "test revoke-then-restore budget schedules to determine whether dynamic reachable amount and coverage summarize the availability path or whether resource history itself matters"
+  },
+  "activation_authorized": false
+}
