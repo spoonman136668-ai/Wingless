@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up-lm4t-windows-proof.v1",
+  "experiment": "UP-LM4T-heterogeneous-revocation-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "16c81b1b2cac9b16adfa5de732d728772720b1ab",
+  "workflow_run_id": 36324204086,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10933935459,
+  "artifact_sha256": "6d4dd7d248c1404e8d51b7b7ed1169c4eada870486ed13eb52b81e01016c34dd",
+  "findings": {
+    "final": {
+      "cells": 216,
+      "nonzero_cells": 216,
+      "max_spread": 1
+    },
+    "final_plus_latestrestore": {
+      "cells": 216,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    },
+    "final_plus_allrestores": {
+      "cells": 216,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "latest_restore_checkpoint_survives_heterogeneous_event_severity": true,
+    "older_restore_history_remains_compressible": true,
+    "plain_speak": "Even when each authority-loss event has a different severity, only the latest restoration checkpoint is needed. The compact path memory is not an artifact of identical revocations.",
+    "next_stage": "change perturbation class from total-budget revocation to temporary throughput loss and test the same pre-restore deliverability law"
+  },
+  "activation_authorized": false
+}
