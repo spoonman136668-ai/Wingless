@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.up-lm5c-windows-proof.v1",
+  "experiment": "UP-LM5C-restore-timing-labels",
+  "status": "qualified-scientific-result",
+  "source_head": "6dce2bed7917980e58b4ea472ef53428e65bccbc",
+  "workflow_run_id": 36329701162,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10935067379,
+  "artifact_sha256": "985adf34e8757dcc2067ed03a75eac5dee6f7f802a3413022c4d171c116d7589",
+  "findings": {
+    "ordered_path": {
+      "pooled_cells": 72,
+      "nonzero_cells": 24,
+      "max_spread": 1
+    },
+    "ordered_path_plus_restore_rounds": {
+      "pooled_cells": 72,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "absolute_restore_timing_resolves_cross_schedule_path_ambiguity": true,
+    "resource_identity_is_not_required_when_ordered_path_and_restore_times_are_known": true,
+    "plain_speak": "The same path counts only become unambiguous once Wingless also knows when the two restoration landmarks occurred. It does not need to know whether those landmarks belonged to budget or throughput.",
+    "next_stage": "freeze the timing-aware ordered-path coordinate and test transfer to asynchronous cut/restore schedules not used in LM5A-LM5C"
+  },
+  "activation_authorized": false
+}
