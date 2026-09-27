@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.up-lm4c-windows-proof.v1",
+  "experiment": "UP-LM4C-coverage-horizon-coordinate",
+  "status": "qualified-scientific-result",
+  "source_head": "116d2e15c20a42e8a80f6fc6c1c7a69c67b2f98b",
+  "workflow_run_id": 36315091081,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10930551499,
+  "artifact_sha256": "a90b7d5bd4aca046783de5fc75535cdd0376076b485ef0a50086d7474829234d",
+  "findings": {
+    "reachable_cap2_end": {
+      "nonzero_cells": 162,
+      "max_spread": 3
+    },
+    "reachable_cap2_throughput_end": {
+      "nonzero_cells": 0,
+      "max_spread": 0
+    },
+    "reachable_cap2_cap3_cap4": {
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "interpretable_coverage_coordinate_is_exact": true,
+    "throughput_is_required": true,
+    "checkpoint_vector_can_be_reexpressed_as_total_early_rate_duration": true,
+    "plain_speak": "The exact resource state does not need explicit round-3 and round-4 checkpoints. It can be described as how much action budget is reachable, how much is available early, how fast actions can be delivered, and how long delivery can continue.",
+    "next_stage": "ablate reachable budget and early cap2 separately from the exact coverage coordinate"
+  },
+  "activation_authorized": false
+}
