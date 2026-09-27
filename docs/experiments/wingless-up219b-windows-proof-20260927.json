@@ -1,0 +1,38 @@
+{
+  "schema": "wingless.up219b-windows-proof.v1",
+  "experiment": "UP-219B-confidence-error-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "16e8cf39d59584d0c2a04ba3c1c3b4804bc65d7b",
+  "workflow_run_id": 36326944390,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10934413536,
+  "artifact_sha256": "e4fa7ccc77acb32611f9d76ae25674729bd854d8c0975224b177d00f08c07a31",
+  "findings": {
+    "threshold": 0.6640727787188583,
+    "uncertain": {
+      "decisions": 12,
+      "misroutes": 12,
+      "misroute_rate": 1,
+      "routed_mae": 0.02093932992376443,
+      "static_mae": 0.025674116553259515,
+      "oracle_mae": 0.01551308575965967
+    },
+    "confident": {
+      "decisions": 84,
+      "misroutes": 0,
+      "misroute_rate": 0,
+      "routed_mae": 0.006547121086769157,
+      "static_mae": 0.015688493556521046,
+      "oracle_mae": 0.006547121086769157
+    },
+    "uncertainty_localized_to_mixed4": true
+  },
+  "interpretation": {
+    "native_route_confidence_is_a_strong_failure_risk_signal": true,
+    "frozen_threshold_perfectly_separates_misroutes_in_this_holdout": true,
+    "uncertain_states_have_materially_higher_calibration_error": true,
+    "plain_speak": "Wingless's own confidence margin tells it when its calibration router is likely wrong. Every low-confidence decision in this holdout was a misroute, while every high-confidence decision was correct.",
+    "next_stage": "freeze multiple confidence strata from training margins and test whether heldout misroute/error risk rises monotonically as native confidence falls"
+  },
+  "activation_authorized": false
+}
