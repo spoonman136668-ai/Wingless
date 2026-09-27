@@ -1,0 +1,31 @@
+{
+  "schema": "wingless.up180c-windows-proof.v1",
+  "experiment": "UP-180C-stage-delay-matrix",
+  "status": "qualified-scientific-result",
+  "source_head": "02e036a9ad6ec6f127a73f32b04d6037da55d287",
+  "workflow_run_id": 36307004538,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10927556954,
+  "artifact_sha256": "a2fbbee4b6940281f1af637792341c3e35b93b39cb43c7d0612e1d43211ab236",
+  "findings": {
+    "cadence2": {
+      "d1=0,d2=0": 29,
+      "d1=0,d2=1": 47,
+      "d1=1,d2=0": 29,
+      "d1=1,d2=1": 47
+    },
+    "cadence4": {
+      "d1=0,d2=0": 1,
+      "d1=0,d2=1": 47,
+      "d1=1,d2=0": 1,
+      "d1=1,d2=1": 47
+    }
+  },
+  "interpretation": {
+    "stage_one_delay_has_no_detectable_effect": true,
+    "one_interval_stage_two_delay_drives_full_prevention_gain": true,
+    "plain_speak": "The timing advantage comes entirely from the second rescue. The first refresh can happen immediately or one interval later with the same outcome. The second refresh needs to wait one interval after its warning; doing it immediately loses most of the benefit.",
+    "next_stage": "freeze stage-one timing and sweep stage-two delay 0,1,2 to define the second-stage timing window"
+  },
+  "activation_authorized": false
+}
