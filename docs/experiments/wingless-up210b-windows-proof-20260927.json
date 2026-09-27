@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up210b-windows-proof.v1",
+  "experiment": "UP-210B-family-holdout-drift",
+  "status": "qualified-scientific-result",
+  "source_head": "f21ac541a1c01da173b430ebde1f1e0f4f05335f",
+  "workflow_run_id": 36314596292,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10929764406,
+  "artifact_sha256": "0f910651766875c0127a1bcb205da1f5b14cfd470ab8a152d6a80a853f3dba78",
+  "findings": {
+    "mixed4": {
+      "zero_mae": 0.025412132573011004,
+      "native_mae": 0.05219886508744343,
+      "native_better": 0,
+      "direction_correct": 0,
+      "direction_total": 12
+    },
+    "observe4": {
+      "zero_mae": 0.06607480375973529,
+      "native_mae": 0.023525984854848886,
+      "native_better": 12,
+      "direction_correct": 12,
+      "direction_total": 12
+    },
+    "store4": {
+      "zero_mae": 0.005039470675782365,
+      "native_mae": 0.005672337575753525,
+      "native_better": 0,
+      "direction_correct": 12,
+      "direction_total": 12
+    },
+    "cross3": {
+      "zero_mae": 0.03630805157236405,
+      "native_mae": 0.02630970891421575,
+      "native_better": 12,
+      "direction_correct": 12,
+      "direction_total": 12
+    }
+  },
+  "interpretation": {
+    "signed_drift_mapping_is_not_family_invariant": true,
+    "three_of_four_heldout_families_have_correct_drift_direction": true,
+    "mixed4_is_directionally_inverted": true,
+    "plain_speak": "Native change can track drift in several unseen history families, but not with one universal signed mapping. Mixed histories invert the relationship. A safer next question is whether native change predicts how unstable calibration is, regardless of direction.",
+    "next_stage": "predict absolute calibration-drift magnitude from absolute native-state deltas under leave-one-family-out evaluation"
+  },
+  "activation_authorized": false
+}
