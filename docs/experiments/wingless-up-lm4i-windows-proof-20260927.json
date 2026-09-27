@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm4i-windows-proof.v1",
+  "experiment": "UP-LM4I-midaction-pressure-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "61b63d9d09361c09906fbc4a8d2d19e9f174dd87",
+  "workflow_run_id": 36317348686,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10931207170,
+  "artifact_sha256": "cf71541c63f7b0c40373e6d77d3f97dfca6660a96396b3d42d2cbbc654341915",
+  "findings": {
+    "primary": {
+      "coordinate": "reachable_budget+throughput+coverage_end_round",
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 1080
+    },
+    "comparator": {
+      "coordinate": "reachable_budget+capacity_by_round2+capacity_by_round3+capacity_by_round4",
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 1404
+    }
+  },
+  "interpretation": {
+    "compact_resource_law_survives_mid_action_pressure": true,
+    "pressure_timing_axis_is_exhausted_for_current_regime": true,
+    "plain_speak": "The resource law survives pressure before actions, after actions, between action slots, and as repeated bursts. More burst-timing permutations are unlikely to add much. The next useful test is whether the law survives when resource delivery itself changes during the window.",
+    "next_stage": "test a frozen mid-window throughput drop and compare static versus dynamic deployability coordinates"
+  },
+  "activation_authorized": false
+}
