@@ -1,0 +1,59 @@
+{
+  "schema": "wingless.up218b-windows-proof.v1",
+  "experiment": "UP-218B-late-confidence-blend-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "becdce93e7706a63e32fdd89fd8171921b4a76b2",
+  "workflow_run_id": 36323713141,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10933817548,
+  "artifact_sha256": "4296f7b7e0d852fe3c63ef2a655c6e864218a393fdb1d0cc3a12b3c2d82fed65",
+  "findings": {
+    "threshold": 0.6640727787188583,
+    "route_correct": 84,
+    "route_total": 96,
+    "blends": 12,
+    "mixed4": {
+      "route_correct": 12,
+      "route_total": 24,
+      "blends": 12,
+      "static_mae": 0.01925558741494463,
+      "routed_mae": 0.014347936415608768,
+      "blend_mae": 0.012631500441802956,
+      "oracle_family_mae": 0.011634814333556377,
+      "blend_better_than_routed": 228,
+      "evaluation_points": 552
+    },
+    "observe4": {
+      "route_correct": 24,
+      "route_total": 24,
+      "blends": 0,
+      "static_mae": 0.02982113195484202,
+      "routed_mae": 0.003799941143055166,
+      "blend_mae": 0.003799941143055166
+    },
+    "store4": {
+      "route_correct": 24,
+      "route_total": 24,
+      "blends": 0,
+      "static_mae": 0.008652873320237611,
+      "routed_mae": 0.006422004986968975,
+      "blend_mae": 0.006422004986968975
+    },
+    "cross3": {
+      "route_correct": 24,
+      "route_total": 24,
+      "blends": 0,
+      "static_mae": 0.010017193034429184,
+      "routed_mae": 0.008814706219941371,
+      "blend_mae": 0.008814706219941371
+    }
+  },
+  "interpretation": {
+    "training_confidence_blend_transfers_to_later_phases": true,
+    "uncertainty_is_localized_to_mixed4": true,
+    "all_blend_decisions_align_with_the_only_routing_ambiguous_regime": true,
+    "plain_speak": "The native confidence signal keeps working later. It only invokes blending in mixed4, the one regime where routing becomes ambiguous, and that blend moves calibration error closer to the correct-family oracle.",
+    "next_stage": "test whether low native route confidence predicts elevated routed-calibration error directly, using frozen training threshold and later heldout phases"
+  },
+  "activation_authorized": false
+}
