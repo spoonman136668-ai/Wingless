@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.up204b-windows-proof.v1",
+  "experiment": "UP-204B-anchor-offset-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "e76b24d034ba9a5356666d418b25738b9535c396",
+  "workflow_run_id": 36309844639,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10929105492,
+  "artifact_sha256": "537723e58938cb5375b59a45d4f64c3417712d21d6d96faadf45f7e3f513ee71",
+  "findings": {
+    "mixed4": {
+      "identity_mae": 0.017116077702173018,
+      "anchor_offset_mae": 0.01034205714446049,
+      "anchor_better_points": 57,
+      "evaluation_points": 69
+    },
+    "observe4": {
+      "identity_mae": 0.026507672848748443,
+      "anchor_offset_mae": 0.003377726104693124,
+      "anchor_better_points": 69,
+      "evaluation_points": 69
+    }
+  },
+  "interpretation": {
+    "low_dimensional_phase_offset_plus_stable_relative_history_geometry_is_supported": true,
+    "observe4_nontransfer_was_largely_global_offset_error": true,
+    "single_anchor_is_sufficient_in_tested_families": true,
+    "plain_speak": "One reference history is enough to recalibrate the whole phase. Once that shared offset is corrected, the old relative order pattern predicts the other histories very well—especially observe4.",
+    "next_stage": "apply the same frozen single-anchor residual-template method to store4 and cross3 composition families"
+  },
+  "activation_authorized": false
+}
