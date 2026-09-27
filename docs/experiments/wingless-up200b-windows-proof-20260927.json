@@ -1,0 +1,31 @@
+{
+  "schema": "wingless.up200b-windows-proof.v1",
+  "experiment": "UP-200B-combined-history-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "593642e0b3e1cea075ac89c928213840a89ebc91",
+  "workflow_run_id": 36305816253,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10927566612,
+  "artifact_sha256": "e155a8aba15fd830d470d609a5c1faa684e3fbeef0b72fa656c2e61b6b0f07cd",
+  "findings": {
+    "mixed4": {
+      "baseline_mae": 0.025476203313285945,
+      "pairwise_mae": 0.01777074543413146,
+      "position_mae": 0.016973516879706368,
+      "combined_mae": 0.01695097479948164
+    },
+    "observe4": {
+      "baseline_mae": 0.026626793957082756,
+      "pairwise_mae": 0.026626793957082784,
+      "position_mae": 0.026626793957082735,
+      "combined_mae": 0.026626793957082784
+    }
+  },
+  "interpretation": {
+    "combined_simple_order_features_add_only_marginal_signal_for_mixed4": true,
+    "observe4_remains_unexplained_by_pairwise_position_or_combination": true,
+    "plain_speak": "Combining local transitions with absolute positions barely improves the mixed history and still explains nothing in the observe-only history. The missing history state is not recoverable from these simple encodings.",
+    "next_stage": "test exact permutation identity transfer across untouched phases to distinguish stable but non-compressible history mapping from phase-specific variation"
+  },
+  "activation_authorized": false
+}
