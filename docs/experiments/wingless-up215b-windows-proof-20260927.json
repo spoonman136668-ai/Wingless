@@ -1,0 +1,54 @@
+{
+  "schema": "wingless.up215b-windows-proof.v1",
+  "experiment": "UP-215B-route-confidence-diagnostic",
+  "status": "qualified-scientific-result",
+  "source_head": "77a34627c0a748612ed2876e0af8529e6e73867c",
+  "workflow_run_id": 36318168542,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10931825006,
+  "artifact_sha256": "c2fa0a8ce4aea7e75446997cc5d8a61f9aef1fe8a00dc6d4dfb1ea98a42c5159",
+  "findings": {
+    "route_accuracy": 0.875,
+    "route_correct": 84,
+    "route_decisions": 96,
+    "mixed4": {
+      "correct": 12,
+      "total": 24,
+      "mean_margin_correct": 0.6640727787188583,
+      "mean_margin_incorrect": 0.03667975363049747,
+      "mean_nearest_correct": 1.6561244214355464,
+      "mean_nearest_incorrect": 1.412429115125606,
+      "min_margin": 0.03667975363049747,
+      "max_margin": 0.6640727787188583
+    },
+    "observe4": {
+      "correct": 24,
+      "total": 24,
+      "mean_margin_correct": 1.7288972430387297
+    },
+    "store4": {
+      "correct": 24,
+      "total": 24,
+      "mean_margin_correct": 0.7564792893778645
+    },
+    "cross3": {
+      "correct": 24,
+      "total": 24,
+      "mean_margin_correct": 1.8428241899554543
+    },
+    "confusion": {
+      "mixed4->mixed4": 12,
+      "mixed4->store4": 12,
+      "observe4->observe4": 24,
+      "store4->store4": 24,
+      "cross3->cross3": 24
+    }
+  },
+  "interpretation": {
+    "mixed4_misroutes_are_low_confidence_in_native_geometry": true,
+    "all_mixed4_errors_route_to_store4": true,
+    "plain_speak": "Wingless can tell when its mixed4 routing decision is shaky: the confidence gap on wrong routes is dramatically smaller than on correct ones. The next test can therefore use a threshold defined only from training data and see whether low-confidence fallback improves heldout calibration.",
+    "next_stage": "derive a confidence threshold from training data only and test static fallback for low-confidence routes on fresh later phases"
+  },
+  "activation_authorized": false
+}
