@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm4k-windows-proof.v1",
+  "experiment": "UP-LM4K-throughput-outage-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "27c4c35e8773ad99311d4c333ccdc552a876456f",
+  "workflow_run_id": 36317954259,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10930944626,
+  "artifact_sha256": "48ad10c4782874ae922a82d4f1de8eaebabda0f8e6d04444b63525d1f842a1d3",
+  "findings": {
+    "static": {
+      "coordinate": "static_r+tp+end",
+      "cells": 72,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 720
+    },
+    "dynamic": {
+      "coordinate": "dynamic_r+tp+end",
+      "cells": 72,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 1134
+    }
+  },
+  "interpretation": {
+    "static_compact_resource_law_survives_single_round_total_outage": true,
+    "dynamic_outage_coordinate_also_exact": true,
+    "plain_speak": "Even losing all scheduler throughput for one whole round does not break the compact resource law in the tested regime. The next stronger stressor is a two-round outage, where temporal coverage is materially interrupted rather than briefly skipped.",
+    "next_stage": "test all preregistered consecutive two-round throughput outages with the same static and dynamic coordinates"
+  },
+  "activation_authorized": false
+}
