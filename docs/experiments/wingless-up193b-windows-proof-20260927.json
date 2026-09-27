@@ -1,0 +1,24 @@
+{
+  "schema": "wingless.up193b-windows-proof.v1",
+  "experiment": "UP-193B-multifeature-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "3aaac07d9ad9fc36bae98b7470ae0cfc24d9b833",
+  "workflow_run_id": 36285647951,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10919933179,
+  "artifact_sha256": "7e6aa8ca1d22bd3b3d2f66977dcfe80a60e8b442e1f35dbde43197c1fd432296",
+  "findings": {
+    "pooled_mean_absolute_mass_ratio_error": 0.05323046355072724,
+    "ridge_mean_absolute_mass_ratio_error": 0.05244333514475689,
+    "pooled_max_absolute_mass_ratio_error": 0.11783510719394563,
+    "ridge_max_absolute_mass_ratio_error": 0.1141789617400144
+  },
+  "interpretation": {
+    "compact_four_feature_ridge_improves_heldout_calibration_only_marginally": true,
+    "low_dimensional_geometry_is_not_sufficiently_predictive": true,
+    "plain_speak": "Combining the four native geometry signals helps a little, but only a little. The held-out error barely moves. That is not enough evidence to promote this as Wingless's failure-risk calibrator.",
+    "north_star_question": "The remaining signal appears to live in history/topology rather than a small bag of scalar state summaries.",
+    "next_stage": "hold perturbation composition fixed while changing only update order, and test whether required calibration factor changes; this directly measures history dependence"
+  },
+  "activation_authorized": false
+}
