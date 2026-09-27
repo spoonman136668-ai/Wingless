@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.up227c-windows-proof.v1",
+  "experiment": "UP-227C-action5-retiming-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "dc09c529a1c2a0e4da744a837817a4868ef53d9a",
+  "workflow_run_id": 36332278499,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10935724551,
+  "artifact_sha256": "af1486ee4f970fa377b54e157b54833c870131d76848294150bd21ca40bae5c2",
+  "findings": {
+    "condition_cells": 16,
+    "comparator_losses_total": 62,
+    "primary_losses_total": 61,
+    "advanced_action5_events": 2,
+    "rescued_losses": 2,
+    "unnecessary_advances": 0,
+    "necessary_advance_attempts": 2,
+    "ineffective_advance_attempts": 0,
+    "active_cells": [
+      {
+        "schedule": "alternating_fixed",
+        "phase_advance": 8,
+        "horizon": 74,
+        "base_losses": 1,
+        "primary_losses": 0,
+        "advance_writes": 2
+      },
+      {
+        "schedule": "alternating_fixed",
+        "phase_advance": 8,
+        "horizon": 80,
+        "base_losses": 29,
+        "primary_losses": 28,
+        "advance_writes": 2
+      }
+    ]
+  },
+  "interpretation": {
+    "retiming_rule_is_sparse_and_selective": true,
+    "transfer_does_not_cause_unnecessary_early_actions": true,
+    "mechanism_remains_specific_to_the_midsequence_boundary": true,
+    "plain_speak": "The retiming rule does not start moving action 5 around everywhere. It fires only in the same kind of alternating/fixed danger state, and every time it fires in this transfer grid it rescues a failure without spending another action.",
+    "next_stage": "compose the frozen action5 retiming rule with the already-qualified fresh-critical action9 tail repair and test for interference or additive rescue"
+  },
+  "activation_authorized": false
+}
