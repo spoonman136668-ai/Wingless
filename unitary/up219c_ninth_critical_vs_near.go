@@ -61,7 +61,7 @@ func RunUP219C()(UP219CResult,error){
 		m:=UP219CMetric{Horizon:h,NinthTrigger:trigger}
 		for _,c:=range cohorts{for _,hand:=range hands{
 			x,e,ok:=up161cTriggerState(hand,c);if !ok{continue};m.Arms++
-			cap8,_,_:=up219cTreated(x,e,h,0)
+			cap8,_,_:=up218cTreated(x,e,8,h,"alternating_shield","fixed_offset_refresh",8)
 			cap9,_,ninth:=up219cTreated(x,e,h,threshold)
 			l8:=cap8<=h;l9:=cap9<=h
 			if l8{m.Cap8Losses++};if l9{m.Cap9Losses++};m.NinthActions+=ninth
