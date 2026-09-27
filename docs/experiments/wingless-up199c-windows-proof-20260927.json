@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.up199c-windows-proof.v1",
+  "experiment": "UP-199C-hostile-commitment-depth-gating",
+  "status": "qualified-scientific-result",
+  "source_head": "7510606806a9ce4d559dae8f60227acb4d01a372",
+  "workflow_run_id": 36316948648,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10930448622,
+  "artifact_sha256": "c51f77407ba5da7ab4bd748e9d57759a66e82c4b94508c1fb18a85ce78ba5f39",
+  "findings": {
+    "depth1": {
+      "h16_prevented": 64,
+      "h24_prevented": 32,
+      "h32_prevented": 18,
+      "h40_prevented": 0,
+      "h56_prevented": 0
+    },
+    "depth2": {
+      "h16_prevented": 64,
+      "h24_prevented": 64,
+      "h32_prevented": 24,
+      "h40_prevented": 0,
+      "h56_prevented": 0
+    },
+    "depth4": {
+      "h16_prevented": 64,
+      "h24_prevented": 64,
+      "h32_prevented": 64,
+      "h40_prevented": 63,
+      "h48_prevented": 11,
+      "h56_prevented": 0
+    },
+    "depth8": {
+      "h16_prevented": 64,
+      "h24_prevented": 64,
+      "h32_prevented": 64,
+      "h40_prevented": 64,
+      "h48_prevented": 64,
+      "h56_prevented": 64
+    }
+  },
+  "interpretation": {
+    "only_full_depth8_commitment_preserves_full_long_horizon_rescue": true,
+    "current_warning_cannot_safely_gate_late_hostile_maintenance": true,
+    "plain_speak": "The rescue needs sustained open-loop coverage after the initial warning. A few committed refreshes buy time, but once later actions are handed back to the warning signal the capability eventually fails. Only the full eight-action commitment remains fully protective through the longest tested horizon.",
+    "next_stage": "quantify the autonomy gap by comparing internal trigger onset with an offline latest-safe-onset oracle under the same spacing4 cap8 schedule"
+  },
+  "activation_authorized": false
+}
