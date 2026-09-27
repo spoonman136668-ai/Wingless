@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.up-lm4y-windows-proof.v1",
+  "experiment": "UP-LM4Y-post-early-restore-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "57edaa3e433496da7c5215be3b84968172341c44",
+  "workflow_run_id": 36328497716,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10934528663,
+  "artifact_sha256": "1aef3bb7f85cad216b2f18a397a95a60e788120bb1279a45e3d47d7c1cc5364c",
+  "findings": {
+    "both_restores": {
+      "cells": 432,
+      "nonzero_cells": 24,
+      "max_spread": 1
+    },
+    "both_restores_plus_post_early_restore": {
+      "cells": 432,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "post_early_restore_delivery_generalizes_across_all_tested_asynchronous_windows": true,
+    "asynchronous_resource_path_can_be_made_exact_with_one_additional_transition_checkpoint": true,
+    "plain_speak": "Across every tested asynchronous budget/rate recovery order, remembering how much work has been delivered immediately after the first restoration removes the remaining ambiguity.",
+    "next_stage": "ablate restoration checkpoints to find the smallest path-memory coordinate that preserves exactness"
+  },
+  "activation_authorized": false
+}
