@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up-lm4s-windows-proof.v1",
+  "experiment": "UP-LM4S-triple-revoke-restore-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "2e4526067117c25241b638640365fd0ec0102f63",
+  "workflow_run_id": 36323964051,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10933347423,
+  "artifact_sha256": "65141f0e9e76b5c74a22f4662475f603242a7b9372f038260a4354ef74e24901",
+  "findings": {
+    "final": {
+      "cells": 108,
+      "nonzero_cells": 108,
+      "max_spread": 1
+    },
+    "final_plus_latestrestore": {
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    },
+    "final_plus_allrestores": {
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "latest_restore_checkpoint_compresses_three_event_history": true,
+    "earlier_restoration_checkpoints_are_redundant_in_tested_triple_windows": true,
+    "plain_speak": "Even with three separate authority-loss cycles, the system only needs its final resource state plus how much capacity had accumulated by the latest restoration. Earlier restoration history does not add predictive information in these tests.",
+    "next_stage": "stop event-count escalation and test whether this compact resource state predicts feasibility of a frozen warning-driven correction under temporary authority loss"
+  },
+  "activation_authorized": false
+}
