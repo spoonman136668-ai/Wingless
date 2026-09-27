@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up-lm3c-windows-proof.v1",
+  "experiment": "UP-LM3C-distinct-arm-throughput",
+  "status": "qualified-scientific-result",
+  "source_head": "22cf011fe95810f62a70b2e3e2f42e284f421e36",
+  "workflow_run_id": 36284890303,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10920625788,
+  "artifact_sha256": "c5ea8ea4a1b52eeb5854f2f1c4fc96f450d1ce135453ab28657bcb773f5eb28f",
+  "findings": {
+    "by_deferred_level": {
+      "throughput1": {
+        "earliest_failed": 60,
+        "fixed_failed": 72,
+        "advantage": 12
+      },
+      "throughput2": {
+        "earliest_failed": 60,
+        "fixed_failed": 62,
+        "advantage": 2
+      },
+      "throughput3": {
+        "earliest_failed": 60,
+        "fixed_failed": 60,
+        "advantage": 0
+      }
+    },
+    "by_layout": {
+      "throughput1": {
+        "earliest_failed": 72,
+        "fixed_failed": 82,
+        "advantage": 10
+      },
+      "throughput2": {
+        "earliest_failed": 72,
+        "fixed_failed": 72,
+        "advantage": 0
+      },
+      "throughput3": {
+        "earliest_failed": 72,
+        "fixed_failed": 72,
+        "advantage": 0
+      }
+    }
+  },
+  "interpretation": {
+    "distinct_arm_distribution_recovers_throughput_value_for_fixed_order": true,
+    "earliest_deadline_outcome_is_still_throughput_invariant": true,
+    "same_arm_action_capture_explains_part_but_not_all_of_lm3b_null": true,
+    "plain_speak": "Forcing same-round actions onto different arms lets fixed-order catch up as throughput rises, so LM3B was partly bottlenecked by where extra actions went. Earliest-deadline was already spending its six actions effectively enough that more same-round capacity did not save additional dependencies.",
+    "north_star_question": "Separates scheduler distribution loss from raw throughput scarcity. The remaining question is whether earliest-deadline throughput matters when the available intervention window is compressed enough that serial spending cannot deploy the fixed budget in time.",
+    "next_stage": "keep the distinct-arm rule and fixed total budget, but freeze a delayed intervention onset so throughput 1 cannot spend the full budget before the pressure window closes while throughput 2 or 3 can"
+  },
+  "activation_authorized": false
+}
