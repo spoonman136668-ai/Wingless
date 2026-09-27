@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up193c-windows-proof.v1",
+  "experiment": "UP-193C-hostile-commitment-ceiling",
+  "status": "qualified-scientific-result",
+  "source_head": "73e1a61a23e4e370ba23043795d3754e82476baf",
+  "workflow_run_id": 36314738197,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10930751029,
+  "artifact_sha256": "49803b51a42436c9429808a36c690468e5830d5f6dd2a9611c712ec2219e28fa",
+  "findings": {
+    "cadence2": {
+      "cap8_prevented": 0,
+      "cap12_prevented": 0,
+      "cap16_prevented": 0,
+      "cap16_mean_extension": 39.3125,
+      "cap16_max_extension": 40
+    },
+    "cadence4": {
+      "cap8_prevented": 0,
+      "cap12_prevented": 0,
+      "cap16_prevented": 64,
+      "cap16_actions": 913
+    }
+  },
+  "interpretation": {
+    "hostile_targeted_refresh_can_prevent_failure_with_sufficient_temporal_coverage": true,
+    "same_nominal_action_cap_has_different_effect_by_cadence": true,
+    "action_budget_duration_is_a_key_state_variable": true,
+    "plain_speak": "Sixteen refreshes are enough under four-write monitoring but not under two-write monitoring. The difference is how quickly the same budget is consumed: denser refreshes run out too early. Rescue depends on how long corrective capacity remains deployable, not just how many actions exist.",
+    "next_stage": "hold cadence2 and cap16 fixed while varying post-warning refresh spacing to test whether extending budget coverage restores prevention"
+  },
+  "activation_authorized": false
+}
