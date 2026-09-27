@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up187b-windows-proof.v1",
+  "experiment": "UP-187B-native-context-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "83084aca977debfa7c98ac6e7befd165c7603cea",
+  "workflow_run_id": 36282780498,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10919492107,
+  "artifact_sha256": "da00bb5b9e3195a54a88ca0b8610d237b5c0fee1ead992a16bbc42e3360b9eb5",
+  "findings": {
+    "heldout_phases": [
+      31,
+      32,
+      33
+    ],
+    "pooled_mean_absolute_mass_ratio_error": 0.07886025797182931,
+    "native_context_mean_absolute_mass_ratio_error": 0.08029504496589997,
+    "native_context_phase31_ratio": 1.0922934391319408,
+    "native_context_phase32_ratio": 1.0562982566338184,
+    "native_context_phase33_ratio": 1.0922934391319408,
+    "phase_input_used": false,
+    "parity_input_used": false
+  },
+  "interpretation": {
+    "native_context_state_tracks_phase_class_but_does_not_improve_numeric_calibration": true,
+    "coarse_two_state_conditioning_overfits_or_fragments_probability_cells": true,
+    "discrimination_improves_slightly_but_mass_calibration_does_not": true,
+    "plain_speak": "Wingless's internal state really does identify the repeating regime, but splitting the probability table on that regime does not make the numbers better. The context label is informative, yet this coarse way of using it is not the right calibration mechanism.",
+    "north_star_question": "Separates useful state identification from useful probability calibration. The next step should test whether context acts as a small continuous correction to pooled risk rather than duplicating the whole cell table.",
+    "next_stage": "freeze pooled calibration and test a single training-only multiplicative mass correction derived from the native correct-count state on untouched later phases"
+  },
+  "activation_authorized": false
+}
