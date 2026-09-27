@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.up202b-windows-proof.v1",
+  "experiment": "UP-202B-permutation-trend-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "4f4e6ee475359e00f397a92391ef23d3735071a2",
+  "workflow_run_id": 36307968983,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10927373460,
+  "artifact_sha256": "3e4ea94a200e2ca6f2d6f6ddada1cb4785d803170bca85c14eaf63672d63808f",
+  "findings": {
+    "mixed4": {
+      "baseline_mae": 0.025476203313286,
+      "identity_mae": 0.016873502845564162,
+      "trend_mae": 0.016873502845564162,
+      "trend_better_than_identity": 0
+    },
+    "observe4": {
+      "baseline_mae": 0.026626793957082697,
+      "identity_mae": 0.02662679395708272,
+      "trend_mae": 0.02662679395708272,
+      "trend_better_than_identity": 0
+    }
+  },
+  "interpretation": {
+    "simple_linear_phase_drift_is_not_present_in_exact_history_mapping": true,
+    "mixed4_exact_history_signature_remains_stable": true,
+    "observe4_nontransfer_is_not_explained_by_linear_phase_trend": true,
+    "plain_speak": "The history mapping is not just sliding steadily with phase. Mixed histories retain a stable exact-sequence signature, while observe-only histories still show no useful sequence-specific transfer even after allowing a linear trend.",
+    "next_stage": "measure within-phase permutation spread and centered residual-template correlation to determine whether observe4 retains any order signal at all on later phases"
+  },
+  "activation_authorized": false
+}
