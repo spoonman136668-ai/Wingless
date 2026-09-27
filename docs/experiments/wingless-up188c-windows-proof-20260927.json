@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.up188c-windows-proof.v1",
+  "experiment": "UP-188C-risk-policy-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "fac34904824002aeae3cc0108557f1e2af72d296",
+  "workflow_run_id": 36312063126,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10929482977,
+  "artifact_sha256": "a768cb11fe55ba2d7fb2f8a2dacc952fc9c29c06143cb294aa2faac834e11cc3",
+  "findings": {
+    "critical_two_cadence_failure_rate_all_policies": 1,
+    "critical_one_cadence_rates": {
+      "no_refresh_c2": 0.5,
+      "no_refresh_c4": 0.5,
+      "alternating_c2": 0.7804878048780488,
+      "alternating_c4": 0.9552238805970149,
+      "fixed_offset_c2": 0.5289256198347108,
+      "fixed_offset_c4": 0.5470085470085471,
+      "hostile_c2": 1,
+      "hostile_c4": 1
+    },
+    "near_two_cadence_rates": {
+      "no_refresh_c2": 0,
+      "no_refresh_c4": 0,
+      "alternating_c2": 0.48936170212765956,
+      "alternating_c4": 0.5041322314049587,
+      "fixed_offset_c2": 0.0875,
+      "fixed_offset_c4": 0.16923076923076924,
+      "hostile_c2": 1,
+      "hostile_c4": 1
+    },
+    "far_two_cadence_failure_rate_all_policies": 0
+  },
+  "interpretation": {
+    "critical_bucket_is_policy_robust_for_two_cadence_failure": true,
+    "far_bucket_is_policy_robust_safe_over_two_cadences": true,
+    "near_bucket_is_policy_dependent": true,
+    "plain_speak": "The strongest warning survives external-policy changes: once Wingless reaches critical state, every tested policy leads to failure within two monitoring intervals. Far states remain safe over that horizon. The middle near-risk state depends strongly on what happens externally.",
+    "next_stage": "apply the frozen two-stage correction rule at the critical warning across all four policies and measure net prevention versus action burden"
+  },
+  "activation_authorized": false
+}
