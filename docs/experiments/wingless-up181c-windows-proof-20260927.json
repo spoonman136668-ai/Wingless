@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.up181c-windows-proof.v1",
+  "experiment": "UP-181C-stage-two-delay-boundary",
+  "status": "qualified-scientific-result",
+  "source_head": "408c95a05ad3ae213cb48c09e08493fb6c91394b",
+  "workflow_run_id": 36308012684,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10928231923,
+  "artifact_sha256": "4dfbf75850707215ef688d7376480f4ea42198909d74b1977c264534bbb3d7e0",
+  "findings": {
+    "cadence2": {
+      "delay0_prevented": 29,
+      "delay1_prevented": 47,
+      "delay2_prevented": 0,
+      "delay2_stage2_actions": 0
+    },
+    "cadence4": {
+      "delay0_prevented": 1,
+      "delay1_prevented": 47,
+      "delay2_prevented": 0,
+      "delay2_stage2_actions": 0
+    }
+  },
+  "interpretation": {
+    "stage_two_delay_one_is_a_bounded_temporal_sweet_spot": true,
+    "immediate_stage_two_action_is_suboptimal": true,
+    "two_interval_delay_exceeds_survival_window": true,
+    "plain_speak": "The second rescue has a narrow timing window. Acting immediately is too early, waiting one interval is best, and waiting two intervals is too late because the memory fails before the second action can happen.",
+    "next_stage": "freeze the best two-stage rule and measure benefit versus unnecessary intervention across multiple evaluation horizons on paired baseline arms"
+  },
+  "activation_authorized": false
+}
