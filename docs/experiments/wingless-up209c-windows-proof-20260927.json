@@ -1,0 +1,86 @@
+{
+  "schema": "wingless.up209c-windows-proof.v1",
+  "experiment": "UP-209C-committed-tail-cap-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "40077d266f2be26c95521eb178620670b9ddb39c",
+  "workflow_run_id": 36323048061,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10932679964,
+  "artifact_sha256": "3ee660afb5cbe2bf335b3d7b862e1c0c8ee4fb2bf17c5d1c8cccf64ff47e7feb",
+  "findings": {
+    "cap6": {
+      "no_hostile_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 384
+      },
+      "hostile_no_shifted": {
+        "prevented": 63,
+        "treated_losses": 1,
+        "actions": 384
+      },
+      "alternating_fixed_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 384
+      },
+      "fixed_alternating_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 384
+      }
+    },
+    "cap7": {
+      "no_hostile_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 384
+      },
+      "hostile_no_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 395
+      },
+      "alternating_fixed_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 390
+      },
+      "fixed_alternating_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 389
+      }
+    },
+    "cap8": {
+      "no_hostile_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 384
+      },
+      "hostile_no_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 395
+      },
+      "alternating_fixed_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 390
+      },
+      "fixed_alternating_shifted": {
+        "prevented": 64,
+        "treated_losses": 0,
+        "actions": 389
+      }
+    }
+  },
+  "interpretation": {
+    "cap7_matches_cap8_on_all_shifted_schedules": true,
+    "cap6_has_one_boundary_failure": true,
+    "eighth_opportunity_is_redundant_in_tested_shifted_schedules": true,
+    "plain_speak": "Seven committed action opportunities are enough across every shifted switch schedule tested. Six is almost enough but misses one hostile-to-no-refresh case, so seven is the current robust minimum.",
+    "next_stage": "compare frozen cap7 versus cap8 across preregistered switch-phase offsets 0,2,4,6"
+  },
+  "activation_authorized": false
+}
