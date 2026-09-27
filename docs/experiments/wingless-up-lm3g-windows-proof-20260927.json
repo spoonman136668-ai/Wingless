@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up-lm3g-windows-proof.v1",
+  "experiment": "UP-LM3G-heldout-topology",
+  "status": "qualified-scientific-result",
+  "source_head": "20125f453338b880d975872a5eed81f1155ef3c5",
+  "workflow_run_id": 36286445346,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10919609886,
+  "artifact_sha256": "0c920793cbd0cdd637d49b378345152e59a419a67b8d7b30ae8ad09801785d1f",
+  "findings": {
+    "heldout_rotations": [
+      5,
+      13
+    ],
+    "permutations": [
+      "identity",
+      "reverse",
+      "rotate2"
+    ],
+    "reachable_budget_levels": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "failure_spread_at_each_reachable_budget_within_profile": 0,
+    "by_deferred_level_failures": {
+      "2": 114,
+      "3": 108,
+      "4": 102,
+      "5": 96,
+      "6": 90
+    },
+    "by_layout_failures": {
+      "2": 132,
+      "3": 126,
+      "4": 120,
+      "5": 114,
+      "6": 108
+    }
+  },
+  "interpretation": {
+    "reachable_budget_law_transfers_to_heldout_scheduler_topology": true,
+    "nominal_resource_controls_still_collapse_to_reachable_budget": true,
+    "profile_offset_remains_but_within_profile_law_is_exact": true,
+    "plain_speak": "Changing rotations and adding a new arm permutation did not break the law. Within each deadline profile, failure count is still determined exactly by how many corrective actions are reachable before the window closes.",
+    "north_star_question": "Strengthens reachable action capacity as a compact fixed-resource constraint for bounded correction.",
+    "next_stage": "test the same law under a new preregistered deadline-shape profile rather than more scheduler permutations"
+  },
+  "activation_authorized": false
+}
