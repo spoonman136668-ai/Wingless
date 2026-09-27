@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up197b-windows-proof.v1",
+  "experiment": "UP-197B-directed-transition-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "944abd0f3a8e330afe0111f833a2cd3093665eec",
+  "workflow_run_id": 36287155928,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10921020572,
+  "artifact_sha256": "7d7b85365d8d7aef2231497165470fe408311c0dbc0b7a2497a6645f33dc638e",
+  "findings": {
+    "mixed4": {
+      "transition_mae": 0.021607031146156794,
+      "baseline_mae": 0.02527777536312966,
+      "transition_max": 0.05361666455448,
+      "baseline_max": 0.06436433264669794,
+      "better_points": 43,
+      "evaluation_points": 72
+    },
+    "observe4": {
+      "transition_mae": 0.03328349244635337,
+      "baseline_mae": 0.03328349244635339,
+      "transition_max": 0.046713533507227956,
+      "baseline_max": 0.04809521206258505,
+      "better_points": 38,
+      "evaluation_points": 72
+    }
+  },
+  "interpretation": {
+    "directed_pairwise_transition_features_capture_part_of_sensitive_history_signal": true,
+    "pairwise_transition_representation_does_not_generalize_equally_across_compositions": true,
+    "plain_speak": "Knowing which local transitions occurred helps predict the history effect in the mixed sequence, but it does essentially nothing for the observe-only sequence. Pairwise order is useful but incomplete.",
+    "next_stage": "add a fixed higher-order adjacent-triplet representation and test held-out phases without feature selection"
+  },
+  "activation_authorized": false
+}
