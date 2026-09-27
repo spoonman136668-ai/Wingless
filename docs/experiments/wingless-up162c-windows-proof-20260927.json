@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up162c-windows-proof.v1",
+  "experiment": "UP-162C-periodic-recheck",
+  "status": "qualified-scientific-result",
+  "source_head": "713f9c2566f329ec9d8bc9f4b902327db0ae9b39",
+  "workflow_run_id": 36282399590,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10918184906,
+  "artifact_sha256": "a5397004e40ecbe5bf1f8549569b69e72807f372d14ea6d2776b353be8321afe",
+  "findings": {
+    "cadence1": {
+      "warned": 16,
+      "missed": 0,
+      "false_warnings": 0,
+      "recall": 1
+    },
+    "cadence2": {
+      "warned": 9,
+      "missed": 7,
+      "false_warnings": 0,
+      "recall": 0.5625
+    },
+    "cadence4": {
+      "warned": 1,
+      "missed": 15,
+      "false_warnings": 0,
+      "recall": 0.0625
+    }
+  },
+  "interpretation": {
+    "one_step_native_warning_is_exact_when_recomputed_every_write": true,
+    "sparse_point_checks_miss_most_dynamic_losses": true,
+    "false_warning_rate_remains_zero_at_all_tested_cadences": true,
+    "monitoring_cadence_is_a_real_resource_requirement": true,
+    "plain_speak": "The warning itself is exact, but it is short-lived. Check every write and all 16 losses are caught. Check every other write and almost half slip through; every fourth write misses 15 of 16.",
+    "north_star_question": "Defines the observability cost of dynamic memory danger: exact state is available, but a system that samples too slowly will not see it in time.",
+    "next_stage": "test whether a warning horizon that persists between checks can recover high recall at cadence2/4 by forecasting multiple writes ahead from current native state, still shadow-only"
+  },
+  "activation_authorized": false
+}
