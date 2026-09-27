@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.up-lm4v-windows-proof.v1",
+  "experiment": "UP-LM4V-budget-throughput-revoke-restore",
+  "status": "qualified-scientific-result",
+  "source_head": "18052be0364a60b0346784b6fac28d0514d0a01a",
+  "workflow_run_id": 36327053445,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10933864088,
+  "artifact_sha256": "936d89adbe9e33efd4cff01e0365676ad489e6035140f0fd92d0ff2d41099034",
+  "findings": {
+    "final": {
+      "cells": 216,
+      "nonzero_cells": 96,
+      "max_spread": 2
+    },
+    "final_plus_prerestore": {
+      "cells": 216,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "pre_restore_deliverability_generalizes_to_combined_budget_and_throughput_loss": true,
+    "final_state_alone_is_insufficient": true,
+    "plain_speak": "Even when total budget and delivery rate are both temporarily reduced, the same path-memory idea still works exactly: final capacity plus how much was delivered before restoration fully separates tested outcomes.",
+    "next_stage": "separate budget and throughput restoration times and test whether one checkpoint remains sufficient or whether both restoration checkpoints are required"
+  },
+  "activation_authorized": false
+}
