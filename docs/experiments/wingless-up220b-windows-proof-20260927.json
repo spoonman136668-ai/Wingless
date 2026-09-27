@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.up220b-windows-proof.v1",
+  "experiment": "UP-220B-confidence-risk-strata",
+  "status": "qualified-scientific-result",
+  "source_head": "2d5dc2d6890ac3e86b57223a6d9483b9f4b2cb06",
+  "workflow_run_id": 36328403565,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10935760943,
+  "artifact_sha256": "1559d9bc563858a2ea5728da933d4e6d84552f7afa9831c7f9e45597d10e1caf",
+  "findings": {
+    "training_boundaries": {
+      "n": 52,
+      "min": 0.6640727787188583,
+      "q25": 0.7230761280240325,
+      "q50": 1.3231023458256945,
+      "q75": 2.0758195073416035
+    },
+    "below_training_min": {
+      "decisions": 16,
+      "misroutes": 16,
+      "misroute_rate": 1,
+      "routed_mae": 0.020939329923764422
+    },
+    "training_low": {
+      "decisions": 16,
+      "misroutes": 0,
+      "misroute_rate": 0,
+      "routed_mae": 0.007756542907453079
+    },
+    "training_mid": {
+      "decisions": 32,
+      "misroutes": 0,
+      "misroute_rate": 0,
+      "routed_mae": 0.006422004986968956
+    },
+    "training_high": {
+      "decisions": 32,
+      "misroutes": 0,
+      "misroute_rate": 0,
+      "routed_mae": 0.005471528355363363
+    },
+    "training_top": {
+      "decisions": 32,
+      "misroutes": 0,
+      "misroute_rate": 0,
+      "routed_mae": 0.007143119007633175
+    }
+  },
+  "interpretation": {
+    "binary_below_training_min_gate_is_strong": true,
+    "graded_confidence_risk_is_not_monotonic": true,
+    "plain_speak": "The native confidence signal is excellent as a hard warning boundary, but the higher-confidence bands do not form a clean probability-like risk curve. Treat confidence as a binary unsafe/acceptable gate rather than pretending it is a calibrated scalar risk.",
+    "next_stage": "freeze the below-training-min gate and test whether it rejects harmful forced routing on preregistered unseen history families"
+  },
+  "activation_authorized": false
+}
