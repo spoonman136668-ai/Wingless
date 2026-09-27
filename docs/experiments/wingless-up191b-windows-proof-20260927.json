@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up191b-windows-proof.v1",
+  "experiment": "UP-191B-native-response-curve",
+  "status": "qualified-scientific-result",
+  "source_head": "d72c6411d003bb7cc5e639e53d6591dac263428b",
+  "workflow_run_id": 36285217173,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10920765563,
+  "artifact_sha256": "00e574dac7d906d80a0edeee4799549d06d7a304479ae7c71fe90a0a89d02883",
+  "findings": {
+    "pearson_native_count_required_factor": 0.22711737521711142,
+    "max_within_count_factor_spread": 0.12787809138993345,
+    "repeated_count_examples": {
+      "633": {
+        "observations": 5,
+        "spread": 0.12787809138993345
+      },
+      "635": {
+        "observations": 3,
+        "spread": 0.1268549785328451
+      },
+      "637": {
+        "observations": 6,
+        "spread": 0.08633701651753967
+      },
+      "638": {
+        "observations": 3,
+        "spread": 0.025412132573011004
+      }
+    }
+  },
+  "interpretation": {
+    "native_correct_count_alone_is_not_a_sufficient_calibration_coordinate": true,
+    "perturbation_history_or_additional_state_geometry_matters_at_matched_count": true,
+    "plain_speak": "Two Wingless states can have the same number of currently-correct items yet require materially different probability corrections. The scalar count is carrying some signal, but it throws away too much of the internal geometry.",
+    "north_star_question": "The risk estimator needs richer native state than a single count. The next diagnostic should test low-dimensional margin geometry before considering any new fitted correction.",
+    "next_stage": "on the same frozen state profiles, measure native margin geometry such as near-zero margin mass and mean absolute margin and test whether those features explain required calibration factor better than correct count"
+  },
+  "activation_authorized": false
+}
