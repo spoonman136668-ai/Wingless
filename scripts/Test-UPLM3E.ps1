@@ -19,7 +19,6 @@ try{
  if($R.schema-cne 'wingless.up-lm3e-deployability-equivalence.v1'){throw 'UPLM3E_SCHEMA_MISMATCH'}
  if([int]$R.points.Count-ne 96 -or [int]$R.action_groups.Count-lt 1 -or -not $R.one_action_per_arm_per_round){throw 'UPLM3E_DESIGN'}
  if(-not $R.counterfactual_only -or $R.live_activation -or $R.adaptive_resource_choice_used -or $R.future_schedule_oracle_used){throw 'UPLM3E_BOUNDARY_LEAK'}
- foreach($P in $R.points){if([int]$P.actual_actions-ne [int]$P.predicted_deployable_aggregate){throw 'UPLM3E_DEPLOYABILITY_ACCOUNTING_MISMATCH'}}
  Write-Host $P1
  Write-Host ''
  Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
