@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.up234c-windows-proof.v1",
+  "experiment": "UP-234C-distance-metric-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "f5b5f3e60cfa1761ced2ddaafe3b6a0edac063d3",
+  "workflow_run_id": 36334694092,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10936503690,
+  "artifact_sha256": "91ed24b0aafc31b39aa7db7f16aee7641ca102537deb4ecc0e169898adfaaa15",
+  "findings": {
+    "hamming": {
+      "failures": 33,
+      "survivors": 479,
+      "event_failures": 33,
+      "event_survivors": 37,
+      "high_risk": 34,
+      "low_risk": 34,
+      "unknown": 2,
+      "no_event": 442,
+      "high_risk_failures": 32,
+      "high_risk_survivors": 2,
+      "low_risk_failures": 1,
+      "recall": 0.9696969696969697,
+      "precision": 0.9411764705882353
+    },
+    "manhattan": {
+      "failures": 33,
+      "survivors": 479,
+      "event_failures": 33,
+      "event_survivors": 37,
+      "high_risk": 35,
+      "low_risk": 18,
+      "unknown": 17,
+      "no_event": 442,
+      "high_risk_failures": 32,
+      "high_risk_survivors": 3,
+      "low_risk_failures": 1,
+      "recall": 0.9696969696969697,
+      "precision": 0.9142857142857143
+    }
+  },
+  "interpretation": {
+    "hamming_geometry_transfers_strongly": true,
+    "manhattan_magnitude_adds_no_recall_and_reduces_selectivity": true,
+    "plain_speak": "On a new topology and timing, the simple Hamming geometry flags 32 of 33 failures with only two survivor false positives. Treating numeric differences as magnitudes does not help.",
+    "next_stage": "freeze the Hamming classifier and use high-risk post-action8 critical events as the only permission for action 9 on fresh heldout conditions"
+  },
+  "activation_authorized": false
+}
