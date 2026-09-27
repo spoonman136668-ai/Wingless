@@ -1,0 +1,39 @@
+{
+  "schema": "wingless.up189b-windows-proof.v1",
+  "experiment": "UP-189B-mass-correction-replication",
+  "status": "qualified-scientific-result",
+  "source_head": "c15b772ed78ba473b237fdf79567eeb6c07bda1f",
+  "workflow_run_id": 36284026970,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10920380224,
+  "artifact_sha256": "6a0dce77ec088d3cac415f117f0504f6a6e57045dde40d32867d8127a1b38df4",
+  "findings": {
+    "evaluation_phases": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42
+    ],
+    "pooled_mean_absolute_mass_ratio_error": 0.061716086693718086,
+    "pooled_max_absolute_mass_ratio_error": 0.11314860052805176,
+    "corrected_mean_absolute_mass_ratio_error": 4.107825191113079e-13,
+    "corrected_max_absolute_mass_ratio_error": 6.856737400084967e-13,
+    "observed_native_correct_counts": [
+      620,
+      623
+    ],
+    "heldout_fitting_used": false
+  },
+  "interpretation": {
+    "frozen_native_mass_correction_replicated_across_longer_phase_range": true,
+    "aggregate_mass_match_is_near_machine_precision": true,
+    "longer_range_still_repeats_the_same_two_native_context_states": true,
+    "this_is_not_yet_out_of_distribution_calibration": true,
+    "plain_speak": "The frozen native correction keeps aggregate failure mass almost exactly calibrated across six more phases, but those phases still alternate between the same two internal states. The correction is stable inside this regime; it has not yet proved that it survives a genuinely new native-state regime.",
+    "north_star_question": "Strengthens the calibrated native failure-risk estimate, while exposing that current evidence is still regime-repetition rather than out-of-distribution transfer.",
+    "next_stage": "hold the correction factors fixed and evaluate them under a frozen endogenous context shift that preserves resource limits but produces native states outside the repeating 620/623 pattern"
+  },
+  "activation_authorized": false
+}
