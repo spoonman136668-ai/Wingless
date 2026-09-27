@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up222b-windows-proof.v1",
+  "experiment": "UP-222B-absolute-distance-ood-rejection",
+  "status": "qualified-scientific-result",
+  "source_head": "2d243a04cf93da39ab443de18b375d3eaf887631",
+  "workflow_run_id": 36333044192,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10936768221,
+  "artifact_sha256": "865996b2df83252cb761b7d190c1d77abd506b95b2ca04a542f6c3b2998a1806",
+  "findings": {
+    "training_margin_threshold": 0.6640727787188583,
+    "training_distance_threshold": 1.656124421435547,
+    "margin_gate": {
+      "harmful_rejection_rate": 0.6666666666666666,
+      "benign_rejection_rate": 0.5
+    },
+    "distance_gate": {
+      "harmful_rejection_rate": 0.5,
+      "benign_rejection_rate": 0.5
+    },
+    "union_gate": {
+      "harmful_rejection_rate": 0.8333333333333334,
+      "benign_rejection_rate": 0.5
+    },
+    "remaining_harmful_accepted": 16,
+    "remaining_alias": "all 16 are store3 routed to store4"
+  },
+  "interpretation": {
+    "centroid_distance_adds_partial_ood_detection": true,
+    "margin_plus_centroid_union_still_misses_a_specific_store3_alias": true,
+    "plain_speak": "The union gate catches five-sixths of harmful forced routes, but every remaining miss is the same store3-to-store4 alias. That points to a hole inside the centroid envelope rather than a general threshold problem.",
+    "next_stage": "derive a nearest-training-exemplar distance gate from correctly routed training states and test it on fresh unseen-family phases without fitting on B222 outcomes"
+  },
+  "activation_authorized": false
+}
