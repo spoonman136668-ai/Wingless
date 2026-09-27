@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up190c-windows-proof.v1",
+  "experiment": "UP-190C-two-action-oracle-ceiling",
+  "status": "qualified-scientific-result",
+  "source_head": "2bdccdf9303a7fb9a65f5395569c78afb7f1c027",
+  "workflow_run_id": 36314116229,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10929857677,
+  "artifact_sha256": "68c589b52bef2391bc3045c63178510b0a846360d606e824f832554e60f1dd54",
+  "findings": {
+    "no_refresh": {
+      "oracle_preventable": 47,
+      "frozen_prevented": 47,
+      "not_preventable": 17
+    },
+    "alternating_shield": {
+      "oracle_preventable": 0,
+      "not_preventable": 64,
+      "mean_best_extension": 25.203125,
+      "max_best_extension": 27
+    },
+    "fixed_offset_refresh_c2": {
+      "oracle_preventable": 0,
+      "not_preventable": 64,
+      "mean_best_extension": 23.125,
+      "max_best_extension": 25
+    },
+    "fixed_offset_refresh_c4": {
+      "oracle_preventable": 0,
+      "not_preventable": 64,
+      "mean_best_extension": 21.953125,
+      "max_best_extension": 25
+    },
+    "hostile_shield_c2": {
+      "oracle_preventable": 0,
+      "not_preventable": 64,
+      "mean_best_extension": 18.234375,
+      "max_best_extension": 19
+    },
+    "hostile_shield_c4": {
+      "oracle_preventable": 0,
+      "not_preventable": 64,
+      "mean_best_extension": 16.390625,
+      "max_best_extension": 19
+    }
+  },
+  "interpretation": {
+    "two_action_policy_transfer_failure_is_not_timing_limited": true,
+    "two_action_budget_is_insufficient_under_three_external_policies": true,
+    "frozen_rule_reaches_two_action_oracle_ceiling_under_no_refresh": true,
+    "plain_speak": "No smarter placement of the same two refreshes can rescue the other three policies. Two refreshes can buy substantial time, but the corrective budget itself is too small there. Under no_refresh, the frozen rule is already as good as any two-action schedule on the tested grid.",
+    "next_stage": "sweep larger preregistered bounded targeted-refresh caps under a single frozen critical-warning rule to locate whether and where prevention becomes possible"
+  },
+  "activation_authorized": false
+}
