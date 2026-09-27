@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up236c-windows-proof.v1",
+  "experiment": "UP-236C-risk-recheck-action9",
+  "status": "qualified-scientific-result",
+  "source_head": "4a6e640c9c456cf70062b619ceb51f80d15bde52",
+  "workflow_run_id": 36335149567,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10936548123,
+  "artifact_sha256": "17c26fcab08f3a33beaa433730e307e3f0b2ef860bf0a957eb6ffa0f56fe72a5",
+  "findings": {
+    "cap8_failures": 32,
+    "single_critical": {
+      "losses": 0,
+      "rescues": 32
+    },
+    "hamming_first": {
+      "losses": 11,
+      "rescues": 21,
+      "unnecessary": 0
+    },
+    "hamming_recheck": {
+      "losses": 11,
+      "rescues": 21,
+      "unnecessary": 0,
+      "delayed_authorizations": 0
+    },
+    "residual_cell": {
+      "schedule": "alternating_fixed",
+      "phase_advance": 22,
+      "cap8_failures": 13,
+      "hamming_losses": 11
+    }
+  },
+  "interpretation": {
+    "repeated_risk_recheck_adds_no_recovery": true,
+    "false_negative_failures_do_not_enter_frozen_high_risk_geometry_before_loss": true,
+    "plain_speak": "Keeping watch after a rejected first event does not help: none of the missed failures later cross into the frozen high-risk state before they die. The missing information is not persistence; the static event snapshot itself is incomplete on this timing.",
+    "next_stage": "diagnose one-step native trajectory into the first critical event, comparing current versus immediately previous monitoring state on failures and survivors"
+  },
+  "activation_authorized": false
+}
