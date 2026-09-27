@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up201c-windows-proof.v1",
+  "experiment": "UP-201C-sparse-schedule-policy-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "d80c7434ae13b76be9a3e59322c1c422fd7e7576",
+  "workflow_run_id": 36317483541,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10930309509,
+  "artifact_sha256": "0182ba5fbc83aa715d5ffa11a34fe1da70e3eda095ecebdac6f3db82843a8d7d",
+  "findings": {
+    "no_refresh": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 344,
+      "accelerated": 0
+    },
+    "alternating_shield": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 388,
+      "accelerated": 0
+    },
+    "fixed_offset_refresh": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 408,
+      "accelerated": 0
+    },
+    "hostile_shield": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 422,
+      "accelerated": 0
+    }
+  },
+  "interpretation": {
+    "sparse_temporal_coverage_rule_transfers_across_all_four_policies": true,
+    "action_burden_increases_with_pressure_severity": true,
+    "plain_speak": "The hostile-derived rescue rule generalizes unchanged: every tested failure is prevented under all four pressure policies. Harsher policies require more of the available scheduled actions, but no policy-specific timing rule was needed.",
+    "next_stage": "evaluate the same frozen rule across mixed failure/survivor horizons for all four policies to measure selectivity and true unnecessary intervention"
+  },
+  "activation_authorized": false
+}
