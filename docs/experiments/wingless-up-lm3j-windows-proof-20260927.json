@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up-lm3j-windows-proof.v1",
+  "experiment": "UP-LM3J-burst-timing-sweep",
+  "status": "qualified-scientific-result",
+  "source_head": "26bd6fef3fa16e1653733aee545e47ecc7b97405",
+  "workflow_run_id": 36287035641,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10921345015,
+  "artifact_sha256": "cf5b8d3c14a75c4a039d10fab14c8b72ebce57f01121c2541c592e201ab628f2",
+  "findings": {
+    "bursts_0_to_4_failure_spread": {
+      "2": 0,
+      "3": 0,
+      "4": 6,
+      "5": 6,
+      "6": 12
+    },
+    "burst_5_failure_spread": {
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0
+    }
+  },
+  "interpretation": {
+    "break_is_not_sensitive_to_exact_early_or_mid_burst_round": true,
+    "final_round_burst_does_not_break_reachability_collapse": true,
+    "equivalent_total_pressure_is_now_a_live_confound": true,
+    "plain_speak": "Moving the extra pressure hit anywhere from the first through fifth pressure opportunity gives the same break, but placing it in the very last round does not. That suggests the key may be whether the extra load arrives before corrective deployment is effectively over—not the exact burst time itself.",
+    "next_stage": "compare no extra pressure, one equivalent static pre-window write, a round-3 burst, and a round-5 burst under the same resource grid"
+  },
+  "activation_authorized": false
+}
