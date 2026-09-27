@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up170c-windows-proof.v1",
+  "experiment": "UP-170C-two-shot-correction",
+  "status": "qualified-scientific-result",
+  "source_head": "645cfad78c01282313bdf05e959560afa5892976",
+  "workflow_run_id": 36285770601,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920199202,
+  "artifact_sha256": "d00afd887cf4af97ad900493a4d39a2d4bce341dbd3a8b5a90bc6a0a7594cfec",
+  "findings": {
+    "no_refresh_cadence2_targeted": {
+      "baseline_losses": 16,
+      "treated_losses": 9,
+      "prevented_losses": 7,
+      "actions": 32,
+      "prevented_per_action": 0.21875,
+      "mean_loss_delay_writes": 31
+    },
+    "all_other_targeted_cells_prevented_losses": 0,
+    "targeted_delay_positive_all_tested_cells": true,
+    "sham_prevented_losses_all_tested_cells": 0,
+    "sham_mean_delay_nonpositive_all_tested_cells": true
+  },
+  "interpretation": {
+    "two_shot_targeted_refresh_can_prevent_failure_in_one_tested_regime": true,
+    "prevention_does_not_yet_transfer_across_pressure_policies_or_cadence": true,
+    "targeted_refresh_has_large_delay_effect_even_where_eventual_loss_remains": true,
+    "sham_control_does_not_reproduce_targeted_effect": true,
+    "plain_speak": "Two targeted warning-triggered refreshes finally changed the outcome: under no-refresh pressure with cadence 2, 7 of 16 losses were prevented. The same rule did not prevent eventual loss in the other tested regimes, although it delayed failure substantially. Sham refresh never helped. This is a real corrective signal, but it is not robust enough to call a general rule yet.",
+    "north_star_question": "Demonstrates bounded native-warning-driven correction can work, while showing its present benefit is regime-sensitive.",
+    "next_stage": "replicate the frozen two-shot rule across a wider initial hand/state space without changing trigger, budget, policies, or thresholds"
+  },
+  "activation_authorized": false
+}
