@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up217c-windows-proof.v1",
+  "experiment": "UP-217C-critical-tail-late-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "8e4c4569a195285fc9ea32f045a2bf80593a3574",
+  "workflow_run_id": 36327853887,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10934133050,
+  "artifact_sha256": "4c8473b0b783aec54ae8cf6693d3f122ee819b40115a720b5c853ccba7949674",
+  "findings": {
+    "cells": 32,
+    "cap7_losses": 1881,
+    "critical_tail_losses": 88,
+    "eighth_actions": 1902,
+    "rescues": 1793,
+    "unnecessary_eighth": 25,
+    "necessary_eighth_attempts": 1877,
+    "ineffective_eighth": 84,
+    "late_boundary_examples": [
+      {
+        "schedule": "alternating_fixed",
+        "advance": 8,
+        "horizon": 80,
+        "critical_losses": 29,
+        "ineffective_eighth": 28
+      },
+      {
+        "schedule": "fixed_alternating",
+        "advance": 12,
+        "horizon": 80,
+        "critical_losses": 28,
+        "ineffective_eighth": 28
+      }
+    ]
+  },
+  "interpretation": {
+    "critical_tail_trigger_remains_highly_selective": true,
+    "rescue_durability_breaks_at_later_horizons_for_specific_policy_sequences": true,
+    "most_boundary_failures_occur_after_action8_fired": true,
+    "plain_speak": "The critical trigger stays selective, but one tail refresh is not durable enough in a few later policy sequences. The warning fires and action 8 happens; the capability then fails later anyway.",
+    "next_stage": "allow exactly one additional tail action, action 9, only after a fresh later critical warning following action 8"
+  },
+  "activation_authorized": false
+}
