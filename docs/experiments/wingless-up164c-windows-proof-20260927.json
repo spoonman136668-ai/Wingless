@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up164c-windows-proof.v1",
+  "experiment": "UP-164C-robust-horizon-warning",
+  "status": "qualified-scientific-result",
+  "source_head": "fd9076e14d8572e1e28e3ebfb8db507a53da9677",
+  "workflow_run_id": 36283255150,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10920140338,
+  "artifact_sha256": "1afd7a8dda13bbc83da4c4425039cd3102087bb1f17215e18a4db627dcf4c820",
+  "findings": {
+    "cadence2": {
+      "warned": 16,
+      "missed": 0,
+      "expired_warning_intervals": 0,
+      "recall": 1
+    },
+    "cadence4": {
+      "warned": 16,
+      "missed": 0,
+      "expired_warning_intervals": 0,
+      "recall": 1
+    },
+    "exact_future_schedule_used": false,
+    "current_state_robust_horizon_used": true
+  },
+  "interpretation": {
+    "current_state_robust_horizon_supports_sparse_exact_warning_in_the_tested_pressure_regime": true,
+    "exact_real_future_keys_are_not_required": true,
+    "result_still_relies_on_a_frozen_adversarial_pressure_model_for_horizon_computation": true,
+    "plain_speak": "Wingless no longer needs to know the exact next few writes to monitor sparsely in this regime. From current memory state alone, the robust horizon tells it whether danger falls inside the next 2- or 4-write interval, and it caught all 16 losses.",
+    "north_star_question": "Shows a current-state forecast can replace per-write monitoring under a known bounded pressure model. Transfer across different future pressure rules is the remaining robustness boundary.",
+    "next_stage": "freeze the same robust-horizon warning and evaluate it against several different real pressure policies without changing the horizon model"
+  },
+  "activation_authorized": false
+}
