@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.up-lm3e-windows-proof.v1",
+  "experiment": "UP-LM3E-reachability-curve",
+  "status": "qualified-scientific-result",
+  "source_head": "6e85f05298ca2cef94d1ed9cfd973be8acd6e554",
+  "workflow_run_id": 36285434636,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10920241968,
+  "artifact_sha256": "a028d07fbca7489ae78775d86531876873609b9831148166918f72d1883576c6",
+  "findings": {
+    "full_budget_reachable": {
+      "by_deferred_level_earliest_failed": 60,
+      "by_layout_earliest_failed": 72
+    },
+    "reachable5": {
+      "by_deferred_level_earliest_failed": 64,
+      "by_layout_earliest_failed": 76
+    },
+    "reachable4": {
+      "by_deferred_level_earliest_failed": 68,
+      "by_layout_earliest_failed": 80
+    },
+    "reachable3": {
+      "by_deferred_level_earliest_failed": 72,
+      "by_layout_earliest_failed": 84
+    },
+    "reachable2": {
+      "by_deferred_level_earliest_failed": 76,
+      "by_layout_earliest_failed": 88
+    },
+    "aggregate_failure_cost_per_missing_reachable_action": 4
+  },
+  "interpretation": {
+    "earliest_deadline_outcome_is_a_simple_function_of_reachable_budget_in_tested_grid": true,
+    "timing_and_throughput_reduce_to_budget_reachability_here": true,
+    "full_six_action_reachability_restores_best_observed_outcome": true,
+    "plain_speak": "The scheduler now obeys a simple resource law. What matters is not throughput by itself; it is how many of the six corrective actions can actually be deployed before the window closes. Each unreachable action costs four aggregate failures in both tested deadline profiles.",
+    "north_star_question": "This gives Wingless a compact resource-pressure quantity that can be computed before acting: reachable corrective budget under remaining time and throughput.",
+    "next_stage": "replicate the reachability law across different total budgets before treating it as a general resource-pressure primitive"
+  },
+  "activation_authorized": false
+}
