@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up161c-windows-proof.v1",
+  "experiment": "UP-161C-bounded-protection-horizon",
+  "status": "qualified-scientific-result",
+  "source_head": "07a8fab70562831f243728628b177762583625ce",
+  "workflow_run_id": 36281443915,
+  "runner_name": "WINGLESS-UP-C",
+  "artifact_id": 10919345563,
+  "artifact_sha256": "697ce1b5a7afffa0c7f022fa6954e92e42a556c0d36c89aa592fc5b8b329e023",
+  "findings": {
+    "arms": 16,
+    "no_query_horizon_range": [
+      16,
+      29
+    ],
+    "adversarial_shield_horizon_range": [
+      8,
+      11
+    ],
+    "tested_robust_horizon_min": 8,
+    "tested_robust_horizon_mean": 9.9375,
+    "tested_robust_horizon_max": 11
+  },
+  "interpretation": {
+    "future_query_pattern_can_materially_shorten_rescue_durability": true,
+    "present_no_query_horizon_is_not_a_guarantee": true,
+    "bounded_adversarial_testing_establishes_a_smaller_empirical_robust_floor": true,
+    "plain_speak": "A rescue that looks safe for 16–29 unique writes can be forced back into danger after only 8–11 writes if later refreshes protect competing memories. The original horizon is a forecast for one future regime, not a universal guarantee.",
+    "north_star_question": "Separates one-step exact failure prediction from long-run robustness: future workload can reshape how long a correction lasts even when immediate native state is known exactly.",
+    "next_stage": "test a frozen periodic re-check rule that takes no action, asking whether recomputing the native pre-loss warning every few writes can detect the shortened horizon before the rescued item is actually lost"
+  },
+  "activation_authorized": false
+}
