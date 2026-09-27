@@ -1,0 +1,31 @@
+{
+  "schema": "wingless.up191b-native-state-response-curve-windows-proof.v1",
+  "experiment": "UP-191B-native-state-response-curve",
+  "status": "qualified-scientific-result",
+  "source_head": "e6a97ba0f920aa498a455d4ac736c4e06bdde4e9",
+  "workflow_run_id": 36285296070,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10920327316,
+  "artifact_sha256": "769ce7c8e62498e08936719ebf0cf17659524e9cde7941f6456bd144d2ba94e4",
+  "findings": {
+    "pearson_native_count_required_factor": -0.810132339330392,
+    "repeated_count_factor_spreads": {
+      "635": 0.015803374123716907,
+      "637": 0.017626336918135976,
+      "638": 0.04600558181355452,
+      "641": 0.0007344334189063328,
+      "647": 0.00230144411872224
+    },
+    "max_repeated_count_factor_spread": 0.04600558181355452,
+    "fitted_correction_used": false
+  },
+  "interpretation": {
+    "native_correct_count_has_strong_association_in_this_fixed_history_family": true,
+    "same_count_history_effect_remains_nonzero": true,
+    "result_conflicts_with_broader_up191b_profile_family_where_count_association_was_weak": true,
+    "plain_speak": "Within this tighter forward/reverse history family, native correct-count tracks the needed calibration correction fairly strongly. But another fixed profile family produced a much weaker relationship and larger same-count spread. So count is informative, but not sufficient across history families.",
+    "north_star_question": "Suggests a useful scalar risk coordinate exists, but it needs at least one additional native topology or trajectory feature to transfer across history families.",
+    "next_stage": "combine the two fixed UP-191B diagnostic families without fitting and test which endogenous margin-geometry feature explains residual correction differences at matched or similar native counts"
+  },
+  "activation_authorized": false
+}
