@@ -1,0 +1,30 @@
+{
+  "schema": "wingless.up200c-windows-proof.v1",
+  "experiment": "UP-200C-hostile-trigger-oracle-gap",
+  "status": "qualified-scientific-result",
+  "source_head": "c8941372f731a3d4485dab03c32d7a665eb168b1",
+  "workflow_run_id": 36317231826,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10930708406,
+  "artifact_sha256": "da79acb12b151520924bcc753b83be28895419fc27d2c57d8b8b2113eb9e4eea",
+  "findings": {
+    "arms": 64,
+    "baseline_losses": 64,
+    "internal_prevented": 64,
+    "internal_actions": 422,
+    "oracle_safe_arms": 64,
+    "oracle_actions": 422,
+    "mean_internal_onset": 8.0625,
+    "mean_oracle_latest_safe_onset": 8.0625,
+    "mean_onset_headroom": 0,
+    "oracle_action_savings": 0,
+    "internal_equals_latest_safe": 64
+  },
+  "interpretation": {
+    "internal_critical_warning_is_latest_safe_onset_for_all_tested_arms": true,
+    "oracle_has_no_timing_or_action_efficiency_advantage_under_same_schedule": true,
+    "plain_speak": "Wingless is not warning prematurely in this hostile rescue regime. An oracle with future knowledge cannot safely start later on any tested arm or save a single action while keeping the same spacing and budget. The action burden comes from sustaining protection, not from an overly early trigger.",
+    "next_stage": "freeze the hostile-derived spacing4 cap8 schedule and test it unchanged across no_refresh, alternating_shield, fixed_offset_refresh, and hostile_shield"
+  },
+  "activation_authorized": false
+}
