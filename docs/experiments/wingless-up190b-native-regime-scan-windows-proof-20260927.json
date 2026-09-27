@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up190b-native-regime-scan-windows-proof.v1",
+  "experiment": "UP-190B-native-regime-scan",
+  "status": "qualified-scientific-result",
+  "source_head": "8d63520caf026a0d26989c9a6ee70d02f702c3bb",
+  "workflow_run_id": 36284983929,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10920177963,
+  "artifact_sha256": "7a0a6e977605426d6980c66ce4a6a17a7fcbfd1c14a450730df88cff0c8724ad",
+  "findings": {
+    "scan_phases": [
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58
+    ],
+    "unique_native_correct_counts": [
+      620,
+      623
+    ],
+    "pooled_mean_absolute_mass_ratio_error": 0.061716086693718086,
+    "pooled_max_absolute_mass_ratio_error": 0.11314860052805176,
+    "corrected_mean_absolute_mass_ratio_error": 4.107825191113079e-13,
+    "corrected_max_absolute_mass_ratio_error": 6.856737400084967e-13
+  },
+  "interpretation": {
+    "unshifted_generator_remains_two_state_through_phase58": true,
+    "frozen_correction_remains_stable_inside_that_repeating_regime": true,
+    "this_does_not_establish_out_of_distribution_transfer": true,
+    "plain_speak": "Sixteen more untouched unshifted phases still produce only the same 620/623 native states, and the old correction remains essentially exact there. This confirms in-regime stability, not broader generalization.",
+    "north_star_question": "Confirms that calibration failure seen under endogenous shifts is a regime boundary rather than ordinary later-phase drift.",
+    "next_stage": "use the endogenous-shift lineage to map required calibration factor against native state without fitting a new correction"
+  },
+  "activation_authorized": false
+}
