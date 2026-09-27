@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up198b-windows-proof.v1",
+  "experiment": "UP-198B-triplet-transition-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "69b6f5ae5363ed5125687dcf4d56078e6b395b8d",
+  "workflow_run_id": 36287571600,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10920769404,
+  "artifact_sha256": "c198672999496b4a88fe518d91ac7a2e992d8b18370e2baccf77c4a198f6e74e",
+  "findings": {
+    "mixed4": {
+      "baseline_mae": 0.025476203313285945,
+      "pairwise_mae": 0.01777074543413146,
+      "triplet_mae": 0.01894887773295513,
+      "triplet_better_than_pairwise": 33,
+      "evaluation_points": 72
+    },
+    "observe4": {
+      "baseline_mae": 0.026626793957082756,
+      "pairwise_mae": 0.026626793957082784,
+      "triplet_mae": 0.026626793957082756,
+      "triplet_better_than_pairwise": 36,
+      "evaluation_points": 72
+    }
+  },
+  "interpretation": {
+    "triplet_local_history_does_not_improve_over_pairwise_on_heldout_phases": true,
+    "local_ngram_history_is_not_sufficient_for_observe4": true,
+    "pairwise_representation_remains_best_tested_for_mixed4": true,
+    "plain_speak": "Adding three-step local history did not improve prediction. For the sensitive mixed sequence, pairwise transitions still work better; for observe-only history, neither pairwise nor triplets help. The missing state is likely more global than short local transition patterns.",
+    "next_stage": "test a fixed global positional identity representation against pairwise and constant baselines on untouched phases"
+  },
+  "activation_authorized": false
+}
