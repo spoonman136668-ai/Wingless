@@ -1,0 +1,25 @@
+{
+  "schema": "wingless.up185c-windows-proof.v1",
+  "experiment": "UP-185C-grace-window-selectivity",
+  "status": "qualified-scientific-result",
+  "source_head": "4d07e7692791bc4e3e83275ad938612aff52d5e0",
+  "workflow_run_id": 36310556830,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10928384140,
+  "artifact_sha256": "a8e13277fa23392f868b49db685a2e004e73e9b56c091fe9e8391033b21f9316",
+  "findings": {
+    "cadence2": {
+      "grace4_eliminates_true_unnecessary_across_h16_h29": true
+    },
+    "cadence4": {
+      "grace8_eliminates_true_unnecessary_across_h16_h29": true
+    }
+  },
+  "interpretation": {
+    "all_apparent_false_positives_are_within_two_monitoring_intervals_of_baseline_failure": true,
+    "bounded_warning_lead_time_supported": true,
+    "plain_speak": "Across every tested mixed horizon, the rule never acted on a genuinely long-lived survivor once we allowed two monitoring intervals of lead time. What looked like false positives were consistently early warnings of imminent baseline failure.",
+    "next_stage": "measure the first native warning time directly against no-action baseline loss to quantify lead-time calibration"
+  },
+  "activation_authorized": false
+}
