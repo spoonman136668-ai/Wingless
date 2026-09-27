@@ -1,0 +1,51 @@
+{
+  "schema": "wingless.up-lm2z-windows-proof.v1",
+  "experiment": "UP-LM2Z-budget-onset",
+  "status": "qualified-scientific-result",
+  "source_head": "a04d4f398d3fcbbca87f84f735d0089fe58a7fb9",
+  "workflow_run_id": 36282786155,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10919492113,
+  "artifact_sha256": "5399d5df3563c5040b07b26e4729ac76711ff4340981b76dcc7480529b6789de",
+  "findings": {
+    "first_aggregate_advantage_budget": 5,
+    "budget4": {
+      "advantage": 0,
+      "strictly_better_scenarios": 0,
+      "ties": 6
+    },
+    "budget5": {
+      "advantage": 4,
+      "strictly_better_scenarios": 4,
+      "ties": 2,
+      "earliest_prevented_per_action": 1,
+      "fixed_prevented_per_action": 0.8666666666666667
+    },
+    "budget6": {
+      "advantage": 10,
+      "strictly_better_scenarios": 6,
+      "ties": 0,
+      "earliest_prevented_per_action": 1,
+      "fixed_prevented_per_action": 0.7222222222222222
+    },
+    "budget7": {
+      "advantage": 16,
+      "strictly_better_scenarios": 6,
+      "ties": 0
+    },
+    "budget8": {
+      "advantage": 22,
+      "strictly_better_scenarios": 6,
+      "ties": 0
+    }
+  },
+  "interpretation": {
+    "countdown_priority_first_has_aggregate_value_at_budget5": true,
+    "countdown_priority_is_strictly_better_in_all_tested_scenarios_from_budget6_upward": true,
+    "low_budget4_has_no_ordering_value_because_every_action_serves_an_immediately_useful_target": true,
+    "plain_speak": "With four actions, order does not matter because every move is useful. The fifth action is where bad ordering first wastes opportunity. By six actions, earliest-deadline beats fixed order in every tested scenario.",
+    "north_star_question": "Pins the resource regime where native countdown changes from mere warning information into a scheduling advantage.",
+    "next_stage": "hold total budget at the onset region and vary per-round action throughput to separate total-budget scarcity from timing/throughput scarcity"
+  },
+  "activation_authorized": false
+}
