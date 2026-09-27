@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up195c-windows-proof.v1",
+  "experiment": "UP-195C-hostile-spacing-budget-frontier",
+  "status": "qualified-scientific-result",
+  "source_head": "faef6bc3c369ac40294b659e53859a87179131e4",
+  "workflow_run_id": 36315180067,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10929673768,
+  "artifact_sha256": "ceed0a3f49250c12623b6c289e02d7cd79cf89b1f0e9c878d8a8f72e50217520",
+  "findings": {
+    "spacing2": {
+      "first_prevention_cap": 12,
+      "cap12_prevented": 33,
+      "full_rescue_cap": 16,
+      "cap16_actions": 913
+    },
+    "spacing3": {
+      "first_prevention_cap": 10,
+      "full_rescue_cap": 10,
+      "cap10_actions": 607
+    },
+    "spacing4": {
+      "first_prevention_cap": 8,
+      "full_rescue_cap": 8,
+      "cap8_actions": 465
+    }
+  },
+  "interpretation": {
+    "hostile_full_rescue_boundary_depends_on_temporal_coverage": true,
+    "sparsest_tested_schedule_is_most_resource_efficient": true,
+    "plain_speak": "The same hostile failure can be fully prevented with fewer actions when correction is spread over a longer interval. Eight well-spaced refreshes outperform sixteen densely spent refreshes. Corrective resource quality depends on temporal coverage, not raw count.",
+    "next_stage": "freeze the minimal full-rescue schedule (cadence2, spacing4, cap8) and test it on a heldout cohort topology without retuning"
+  },
+  "activation_authorized": false
+}
