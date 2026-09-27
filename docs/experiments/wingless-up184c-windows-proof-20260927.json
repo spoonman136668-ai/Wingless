@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up184c-windows-proof.v1",
+  "experiment": "UP-184C-posthorizon-failure-distance",
+  "status": "qualified-scientific-result",
+  "source_head": "efcdcde698c3df98edcc24d369be2e9da06ad45c",
+  "workflow_run_id": 36310306444,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10928403331,
+  "artifact_sha256": "48cdeeea7fe3471a944e0cb6a02a03b7f3d9660f60da8e98a01d6431b73bcbcd",
+  "findings": {
+    "cadence2": {
+      "max_posthorizon_distance": 3,
+      "unnecessary_survivors_beyond64": 0
+    },
+    "cadence4": {
+      "max_posthorizon_distance": 7,
+      "unnecessary_survivors_beyond64": 0
+    },
+    "horizon23_cadence2": {
+      "unnecessary": 12,
+      "all_fail_within2": true
+    },
+    "horizon21_cadence4": {
+      "unnecessary": 44,
+      "all_fail_within8": true
+    }
+  },
+  "interpretation": {
+    "apparent_false_positives_are_near_future_failures": true,
+    "no_arbitrary_long_lived_false_positive_was_observed": true,
+    "plain_speak": "The rule is often early, not wrong. Arms counted as unnecessary at a short horizon all fail soon afterward—within three writes at cadence 2 and within seven at cadence 4.",
+    "next_stage": "recalculate intervention burden with preregistered grace windows so near-future failures are separated from true unnecessary interventions"
+  },
+  "activation_authorized": false
+}
