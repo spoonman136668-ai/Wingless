@@ -1,0 +1,27 @@
+{
+  "schema": "wingless.up229c-windows-proof.v1",
+  "experiment": "UP-229C-interleaved-cohort-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "ae5d9804234c0cbcababe3ed0bb0c5f18b8a0d5b",
+  "workflow_run_id": 36333112580,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10936930569,
+  "artifact_sha256": "8d35d6e1bd1db7406235a1eb04f8f536405a70c2addc573ffe936cbd49735b95",
+  "findings": {
+    "condition_cells": 16,
+    "baseline_losses_total": 42,
+    "combined_losses_total": 0,
+    "action5_advance_events": 0,
+    "ninth_actions_total": 68,
+    "rescued_baseline_failures": 42,
+    "intervention_bearing_baseline_survivors": 26
+  },
+  "interpretation": {
+    "combined_policy_transfers_to_interleaved_cohort_topology": true,
+    "tail_repair_is_the_active_mechanism_on_this_topology": true,
+    "tail_selectivity_remains_imperfect": true,
+    "plain_speak": "The combined policy generalizes cleanly to a very different cohort layout and prevents every tested loss. On this topology action 5 never needs retiming; action 9 does all the rescue, but it also fires on 26 arms that would have survived without it.",
+    "next_stage": "compare the frozen single-critical action9 trigger with a two-consecutive-critical-warning hysteresis gate on the same interleaved topology"
+  },
+  "activation_authorized": false
+}
