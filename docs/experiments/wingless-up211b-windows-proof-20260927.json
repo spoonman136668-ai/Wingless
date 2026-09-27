@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.up211b-windows-proof.v1",
+  "experiment": "UP-211B-family-holdout-instability-magnitude",
+  "status": "qualified-scientific-result",
+  "source_head": "fd174fe24906dfb785a4d009d0d8116a62f3c443",
+  "workflow_run_id": 36315039103,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10930596612,
+  "artifact_sha256": "d21c54a4d624fecba5f0fd5b2d9eff1b70fc2a984b35923343028fa8c6b31fd9",
+  "findings": {
+    "mixed4": {
+      "zero_mae": 0.025412132573011004,
+      "training_mean_mae": 0.010395309429616265,
+      "native_mae": 0.012660138055769043,
+      "native_better_than_mean": 0
+    },
+    "observe4": {
+      "zero_mae": 0.06607480375973529,
+      "training_mean_mae": 0.04382158548601616,
+      "native_mae": 0.052134351675069746,
+      "native_better_than_mean": 0
+    },
+    "store4": {
+      "zero_mae": 0.005039470675782365,
+      "training_mean_mae": 0.037558858625921114,
+      "native_mae": 0.02482849129696182,
+      "native_better_than_mean": 12
+    },
+    "cross3": {
+      "zero_mae": 0.03630805157236405,
+      "training_mean_mae": 0.004132582569521169,
+      "native_mae": 0.004093936502892782,
+      "native_better_than_mean": 12
+    },
+    "pearson_correlations_all_folds": 0
+  },
+  "interpretation": {
+    "pooled_native_instability_magnitude_is_not_family_invariant": true,
+    "further_generic_feature_stacking_is_not_supported": true,
+    "regime_identification_is_now_a_prerequisite": true,
+    "plain_speak": "Even ignoring drift direction, the same pooled native mapping does not generalize cleanly across history families. The next question is whether Wingless can recognize which internal history regime it is in from native state alone; if it can, regime-specific calibration could still be autonomous rather than externally labeled.",
+    "next_stage": "test frozen nearest-centroid history-regime identification from native geometry on later untouched phases"
+  },
+  "activation_authorized": false
+}
