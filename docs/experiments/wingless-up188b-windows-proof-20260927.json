@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up188b-windows-proof.v1",
+  "experiment": "UP-188B-native-mass-correction",
+  "status": "qualified-scientific-result",
+  "source_head": "10c21bca43c16f87ff19a426ac0295406bbc496f",
+  "workflow_run_id": 36283252716,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10919123979,
+  "artifact_sha256": "3b2a0189f56593ba68225190bb44cc94a4906b171be50ff751d5e3adf94a0d52",
+  "findings": {
+    "heldout_phases": [
+      34,
+      35,
+      36
+    ],
+    "context_A_factor": 1.0103904235372925,
+    "context_B_factor": 0.8983526543771945,
+    "pooled_mean_absolute_mass_ratio_error": 0.044571915415606865,
+    "corrected_mean_absolute_mass_ratio_error": 3.191521121455783e-13,
+    "corrected_phase34_ratio": 1.000000000000136,
+    "corrected_phase35_ratio": 1.0000000000006857,
+    "corrected_phase36_ratio": 1.000000000000136
+  },
+  "interpretation": {
+    "low_dimensional_native_mass_correction_matches_heldout_event_mass_nearly_exactly": true,
+    "ranking_is_unchanged_because_correction_is_context_wide": true,
+    "result_requires_longer_range_replication_because_tested_phases_repeat_the_known_two_state_regime": true,
+    "exact_mass_match_does_not_mean_individual_event_probability_is_perfect": true,
+    "plain_speak": "A tiny correction based on Wingless's own native context removes essentially all aggregate over/under-prediction on three new phases. That is a much better use of the context signal than splitting the whole probability table. But the phases still come from the same repeating regime, so this needs a longer untouched replication before we trust the correction.",
+    "north_star_question": "Provides the strongest calibrated native failure-risk estimate so far, but only at aggregate event-mass level within the current repeating regime.",
+    "next_stage": "freeze the same two correction factors and evaluate unchanged on a longer untouched phase range 37-42, reporting both aggregate calibration and per-phase stability"
+  },
+  "activation_authorized": false
+}
