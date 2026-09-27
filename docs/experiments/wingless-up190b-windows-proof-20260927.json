@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up190b-windows-proof.v1",
+  "experiment": "UP-190B-endogenous-context-shift",
+  "status": "qualified-scientific-result",
+  "source_head": "2182ed2ca495e8111b493b7b54dd194a90b09cb0",
+  "workflow_run_id": 36284886784,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10920501240,
+  "artifact_sha256": "483ea7e2323526b733cc443f46d35ff77495ec5e1fedc72e51df31ab6743db48",
+  "findings": {
+    "known_unshifted_native_correct_counts": [
+      620,
+      623
+    ],
+    "shifted_native_correct_count_range": [
+      635,
+      647
+    ],
+    "all_shifted_evaluations_outside_known_counts": true,
+    "pooled_mean_absolute_mass_ratio_error": 0.04778598302543185,
+    "corrected_mean_absolute_mass_ratio_error": 0.12580168575118192,
+    "pooled_max_absolute_mass_ratio_error": 0.09963271547593489,
+    "corrected_max_absolute_mass_ratio_error": 0.19115266003339382
+  },
+  "interpretation": {
+    "frozen_two_factor_correction_does_not_transfer_out_of_regime": true,
+    "correction_can_be_worse_than_uncorrected_pooled_model": true,
+    "binary_native_context_is_not_sufficient_for_general_calibration": true,
+    "plain_speak": "The earlier near-perfect correction was real inside the repeating 620/623 regime, but it does not generalize once Wingless's own state moves to 635-647. In these new native states the old correction over-corrects and is substantially worse than leaving the pooled probabilities alone.",
+    "north_star_question": "This precisely identifies a calibration boundary: native state is predictive, but a two-state correction is too coarse outside its calibration regime.",
+    "next_stage": "map a frozen native-state response curve without fitting a new correction, testing whether required calibration factor varies systematically with native correct count or also depends on perturbation history"
+  },
+  "activation_authorized": false
+}
