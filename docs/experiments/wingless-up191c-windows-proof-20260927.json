@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up191c-windows-proof.v1",
+  "experiment": "UP-191C-critical-refresh-budget-sweep",
+  "status": "qualified-scientific-result",
+  "source_head": "4b52d4e4750a071bb7679ddf53d7d3d81712e77c",
+  "workflow_run_id": 36314251069,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10929723780,
+  "artifact_sha256": "223047f2d4da20181f444d17e1496cbcca29a5409f87db5e4d91d7a4e92844d5",
+  "findings": {
+    "no_refresh": {
+      "first_full_prevention_cap": 4,
+      "cap4_prevented_c2": 64,
+      "cap4_prevented_c4": 64
+    },
+    "alternating_shield": {
+      "first_prevention_cap": 4,
+      "cap6_prevented_c2": 47,
+      "cap6_prevented_c4": 52
+    },
+    "fixed_offset_refresh": {
+      "first_prevention_cap": 6,
+      "cap6_prevented_c2": 60,
+      "cap6_prevented_c4": 40,
+      "cap8_prevented_c4": 43
+    },
+    "hostile_shield": {
+      "prevented_through_cap16": 0,
+      "actions_per_arm_across_caps": 1
+    }
+  },
+  "interpretation": {
+    "corrective_capacity_boundary_varies_by_policy": true,
+    "hostile_failure_is_not_resolved_by_larger_fresh_warning_gated_cap": true,
+    "fresh_warning_recurrence_disappears_after_first_hostile_refresh": true,
+    "plain_speak": "More bounded refresh capacity helps three policies, but hostile pressure is different: after the first rescue action the fresh warning never reappears, so higher caps are never used. That points to a post-intervention warning-gating problem rather than simple lack of budget.",
+    "next_stage": "test a bounded post-warning commitment rule that begins at the first critical warning and continues targeted refreshes on subsequent monitoring intervals without requiring fresh warning recurrence"
+  },
+  "activation_authorized": false
+}
