@@ -1,0 +1,39 @@
+{
+  "schema": "wingless.up217b-windows-proof.v1",
+  "experiment": "UP-217B-two-nearest-confidence-blend",
+  "status": "qualified-scientific-result",
+  "source_head": "5903b941b2864c22626b3768aa915143f36540a3",
+  "workflow_run_id": 36322827108,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10932947651,
+  "artifact_sha256": "7cd594fc830b2b883e02dd337641a6a5181a779ffaf9d90fc8a63daf4fcd9306",
+  "findings": {
+    "threshold": 0.6640727787188583,
+    "route_accuracy": 0.875,
+    "blend_decisions": 6,
+    "mixed4": {
+      "static_mae": 0.01925558741494463,
+      "routed_mae": 0.014347936415608753,
+      "blend_mae": 0.01263150044180292,
+      "oracle_family_mae": 0.011634814333556377,
+      "blend_better_than_routed_points": 114,
+      "evaluation_points": 276
+    },
+    "observe4": {
+      "blend_mae": 0.0037999411430551717
+    },
+    "store4": {
+      "blend_mae": 0.006422004986968954
+    },
+    "cross3": {
+      "blend_mae": 0.008814706219941371
+    }
+  },
+  "interpretation": {
+    "native_uncertainty_can_improve_model_routing_without_evaluation_tuning": true,
+    "two_nearest_blend_is_supported_for_uncertain_mixed4_routes": true,
+    "plain_speak": "Wingless can use its own routing uncertainty to soften ambiguous decisions instead of committing to one family or falling back to static calibration. That recovers most of the remaining mixed4 error.",
+    "next_stage": "freeze threshold/router/calibrators/blend unchanged and transfer to a longer fresh later-phase holdout"
+  },
+  "activation_authorized": false
+}
