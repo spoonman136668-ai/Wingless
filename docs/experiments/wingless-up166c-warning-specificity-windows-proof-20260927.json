@@ -1,0 +1,68 @@
+{
+  "schema": "wingless.up166c-warning-specificity-windows-proof.v1",
+  "experiment": "UP-166C-warning-specificity",
+  "status": "qualified-scientific-result",
+  "source_head": "cb735f8c0082c01489561fbd8fc84488dba4b0d3",
+  "workflow_run_id": 36284976400,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920496350,
+  "artifact_sha256": "8fa408368e8e8172a38a8061ad4d4436b1d42460f7832affc393bfc6a9222471",
+  "findings": {
+    "recall_all_failing_policy_cells": 1,
+    "interval_precision": {
+      "no_refresh": {
+        "cadence2": 0.5,
+        "cadence4": 0.5
+      },
+      "alternating_shield": {
+        "cadence2": 0.8,
+        "cadence4": 0.9411764705882353
+      },
+      "fixed_offset_refresh": {
+        "cadence2": 0.5161290322580645,
+        "cadence4": 0.5517241379310345
+      },
+      "hostile_shield": {
+        "cadence2": 1,
+        "cadence4": 1
+      }
+    },
+    "protected_endangered": {
+      "cadence2": {
+        "eventual_losses": 0,
+        "warning_intervals": 0
+      },
+      "cadence4": {
+        "eventual_losses": 0,
+        "warning_intervals": 0
+      }
+    },
+    "mean_first_warning_lead_writes": {
+      "no_refresh": {
+        "cadence2": 3.5,
+        "cadence4": 7
+      },
+      "alternating_shield": {
+        "cadence2": 1.8125,
+        "cadence4": 3.0625
+      },
+      "fixed_offset_refresh": {
+        "cadence2": 3.5625,
+        "cadence4": 5.8125
+      },
+      "hostile_shield": {
+        "cadence2": 1.4375,
+        "cadence4": 2.9375
+      }
+    }
+  },
+  "interpretation": {
+    "warning_signal_is_specific_to_risk_in_the_protected_control": true,
+    "warning_burden_remains_policy_dependent": true,
+    "perfect_recall_does_not_justify_acting_on_every_first_warning": true,
+    "plain_speak": "Wingless stays completely quiet when the endangered memory is continuously protected, so the warning is not firing indiscriminately. In risky regimes it still warns early at different rates, which is why the next test should require repeated evidence before a shadow trigger.",
+    "north_star_question": "Supports a bounded confirmation rule as the next step toward reducing unnecessary corrective triggers without yet allowing any intervention.",
+    "next_stage": "evaluate a frozen two-consecutive-warning confirmation rule against the existing one-warning rule and measure recall versus trigger burden"
+  },
+  "activation_authorized": false
+}
