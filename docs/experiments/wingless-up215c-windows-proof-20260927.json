@@ -1,0 +1,63 @@
+{
+  "schema": "wingless.up215c-windows-proof.v1",
+  "experiment": "UP-215C-native-tail-selectivity",
+  "status": "qualified-scientific-result",
+  "source_head": "98d7347773f872b1b8a8c10f7bd90a77180e6edd",
+  "workflow_run_id": 36324571424,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10932864717,
+  "artifact_sha256": "52b1645e269182eee35b28f703e27dd9904e6d83d608632d0f4a8e5f2f504545",
+  "findings": {
+    "native_tail_losses_are_zero_in_31_of_32_cells": true,
+    "fixed_alternating_advance0_h66": {
+      "cap7_losses": 3,
+      "native_losses": 1,
+      "eighth_actions": 31,
+      "rescues": 2,
+      "unnecessary": 29
+    },
+    "hostile_no_advance0_h72": {
+      "cap7_losses": 55,
+      "native_losses": 0,
+      "eighth_actions": 64,
+      "rescues": 55,
+      "unnecessary": 9,
+      "rescue_to_unnecessary": 6.111111111111111
+    },
+    "no_hostile_advance0_h72": {
+      "cap7_losses": 1,
+      "native_losses": 0,
+      "eighth_actions": 35,
+      "rescues": 1,
+      "unnecessary": 34
+    },
+    "no_hostile_advance4_h72": {
+      "cap7_losses": 20,
+      "native_losses": 0,
+      "eighth_actions": 54,
+      "rescues": 20,
+      "unnecessary": 34
+    },
+    "alternating_fixed_advance0_h72": {
+      "cap7_losses": 45,
+      "native_losses": 0,
+      "eighth_actions": 60,
+      "rescues": 45,
+      "unnecessary": 15
+    },
+    "fixed_alternating_advance4_h72": {
+      "cap7_losses": 54,
+      "native_losses": 0,
+      "eighth_actions": 64,
+      "rescues": 54,
+      "unnecessary": 10
+    }
+  },
+  "interpretation": {
+    "near_risk_tail_trigger_is_highly_effective_but_not_uniformly_selective": true,
+    "unnecessary_action_burden_is_large_when_cap7_failure_prevalence_is_low": true,
+    "plain_speak": "The native tail trigger almost always eliminates cap-7 losses, but it often spends an eighth action on arms that did not need it—especially at early horizons. Effectiveness is strong; selectivity is the unresolved part.",
+    "next_stage": "compare the frozen critical threshold horizon<=2 against the current near threshold horizon<=4 for action-8 triggering across the same schedules and horizons"
+  },
+  "activation_authorized": false
+}
