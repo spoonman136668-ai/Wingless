@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up214c-windows-proof.v1",
+  "experiment": "UP-214C-native-near-tail-trigger",
+  "status": "qualified-scientific-result",
+  "source_head": "41b349e9a6766ad2487a1bd08a38c40a5254a436",
+  "workflow_run_id": 36324317394,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10932917754,
+  "artifact_sha256": "53eb96cdf1a9030506a558b47bf734052bd169e74d5041b85cc52843c09f7117",
+  "findings": {
+    "native_near_never_worse_than_nominal_prevention": true,
+    "native_near_can_reduce_eighth_actions": true,
+    "native_near_can_outperform_nominal": true,
+    "examples": [
+      {
+        "schedule": "no_hostile",
+        "advance": 4,
+        "horizon": 66,
+        "nominal_prevented": 64,
+        "nominal_eighth": 27,
+        "native_prevented": 64,
+        "native_eighth": 1
+      },
+      {
+        "schedule": "no_hostile",
+        "advance": 0,
+        "horizon": 72,
+        "nominal_prevented": 64,
+        "nominal_eighth": 55,
+        "native_prevented": 64,
+        "native_eighth": 35
+      },
+      {
+        "schedule": "alternating_fixed",
+        "advance": 0,
+        "horizon": 72,
+        "nominal_prevented": 63,
+        "nominal_eighth": 64,
+        "native_prevented": 64,
+        "native_eighth": 60
+      },
+      {
+        "schedule": "fixed_alternating",
+        "advance": 0,
+        "horizon": 72,
+        "nominal_prevented": 63,
+        "native_prevented": 63
+      }
+    ]
+  },
+  "interpretation": {
+    "native_near_risk_can_replace_fixed_tail_clock_in_tested_regime": true,
+    "endogenous_tail_timing_is_supported": true,
+    "plain_speak": "After the seven committed maintenance actions, Wingless can use its own near-risk state to decide when the eighth refresh is needed. It preserves protection while often avoiding fixed-clock tail actions, and in one switch condition it beats the fixed schedule.",
+    "next_stage": "measure paired selectivity of the native eighth action relative to the cap7 counterfactual: rescues versus unnecessary eighth actions"
+  },
+  "activation_authorized": false
+}
