@@ -1,0 +1,39 @@
+{
+  "schema": "wingless.up186c-windows-proof.v1",
+  "experiment": "UP-186C-warning-lead-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "db3d2caa667d4a2c04e1be1c4f079edc747ec99c",
+  "workflow_run_id": 36310972795,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10928389583,
+  "artifact_sha256": "3555b311c72dd006e926cb47e1e5234b3bd80c441013ffbe990f89b362a756f1",
+  "findings": {
+    "cadence2": {
+      "arms": 64,
+      "warned_before_loss": 64,
+      "lost_by64": 64,
+      "min_lead": 2,
+      "max_lead": 3,
+      "mean_lead": 2.546875,
+      "within_two_cadences": 64,
+      "warnings_after_loss": 0
+    },
+    "cadence4": {
+      "arms": 64,
+      "warned_before_loss": 64,
+      "lost_by64": 64,
+      "min_lead": 4,
+      "max_lead": 7,
+      "mean_lead": 6.046875,
+      "within_two_cadences": 64,
+      "warnings_after_loss": 0
+    }
+  },
+  "interpretation": {
+    "native_warning_precedes_loss_in_all_tested_arms": true,
+    "lead_time_is_tightly_bounded": true,
+    "plain_speak": "The warning is genuinely predictive rather than coincident with failure. Every tested arm warned before loss, and the lead time stayed inside a tight two-cadence window.",
+    "next_stage": "sample native-state checkpoints before failure and estimate observed failure rates over one- and two-cadence horizons by frozen warning-risk bucket"
+  },
+  "activation_authorized": false
+}
