@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm4n-windows-proof.v1",
+  "experiment": "UP-LM4N-budget-revoke-restore-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "236f8bedb50f8aa3eab52bc7295e8b5e080a608b",
+  "workflow_run_id": 36318827865,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10931368671,
+  "artifact_sha256": "3ca815991b5544b7de2867ac748a3f4e965fa1a79a6b34d8e354aa1586748643",
+  "findings": {
+    "static": {
+      "coordinate": "static_r+tp+end",
+      "cells": 108,
+      "nonzero_cells": 36,
+      "max_spread": 1,
+      "multi_member_groups": 1080
+    },
+    "dynamic": {
+      "coordinate": "dynamic_r+tp+end",
+      "cells": 108,
+      "nonzero_cells": 72,
+      "max_spread": 1,
+      "multi_member_groups": 1872
+    }
+  },
+  "interpretation": {
+    "nonmonotonic_resource_availability_is_path_dependent": true,
+    "total_dynamic_reachable_and_final_coverage_are_insufficient": true,
+    "plain_speak": "When budget disappears and later returns, knowing only how many actions can ultimately be delivered and the final coverage endpoint loses important information. Two schedules with the same totals can still produce different outcomes because the early availability path differs.",
+    "next_stage": "add preregistered path checkpoints for deliverable actions before revocation and before restoration, without searching arbitrary coordinates"
+  },
+  "activation_authorized": false
+}
