@@ -1,0 +1,76 @@
+{
+  "schema": "wingless.up166c-windows-proof.v1",
+  "experiment": "UP-166C-warning-precision",
+  "status": "qualified-scientific-result",
+  "source_head": "133fc5e1abd11ae3baad339a0e34981edbdcd339",
+  "workflow_run_id": 36284888439,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920765103,
+  "artifact_sha256": "904e9ca0f2c5f3076c9651e17fa704bbcb4b7cab94a75c83def396b8ffba34a2",
+  "findings": {
+    "recall_all_cells": 1,
+    "interval_precision": {
+      "no_refresh": {
+        "cadence2": 0.5,
+        "cadence4": 0.5
+      },
+      "alternating_shield": {
+        "cadence2": 0.8,
+        "cadence4": 0.9411764705882353
+      },
+      "fixed_offset_refresh": {
+        "cadence2": 0.5161290322580645,
+        "cadence4": 0.5517241379310345
+      },
+      "hostile_shield": {
+        "cadence2": 1,
+        "cadence4": 1
+      }
+    },
+    "warning_intervals_per_loss": {
+      "no_refresh": {
+        "cadence2": 2,
+        "cadence4": 2
+      },
+      "alternating_shield": {
+        "cadence2": 1.25,
+        "cadence4": 1.0625
+      },
+      "fixed_offset_refresh": {
+        "cadence2": 1.9375,
+        "cadence4": 1.8125
+      },
+      "hostile_shield": {
+        "cadence2": 1,
+        "cadence4": 1
+      }
+    },
+    "mean_first_warning_lead_writes": {
+      "no_refresh": {
+        "cadence2": 3.5,
+        "cadence4": 7
+      },
+      "alternating_shield": {
+        "cadence2": 1.8125,
+        "cadence4": 3.0625
+      },
+      "fixed_offset_refresh": {
+        "cadence2": 3.5625,
+        "cadence4": 5.8125
+      },
+      "hostile_shield": {
+        "cadence2": 1.4375,
+        "cadence4": 2.9375
+      }
+    }
+  },
+  "interpretation": {
+    "perfect_recall_is_robust_but_precision_is_policy_dependent": true,
+    "conservative_warning_burden_is_largest_for_no_refresh_and_fixed_offset_refresh": true,
+    "warning_has_nonzero_lead_time_before_loss": true,
+    "plain_speak": "Wingless is catching every tested loss, but it is sometimes early. Under the hostile policy every warning interval ends in loss; under no-refresh only half do. That means the internal warning is useful, but a corrective rule should not blindly act on every first warning.",
+    "north_star_question": "The warning signal is now strong enough to study a bounded trigger policy: the next step is to reduce unnecessary triggers without sacrificing too much recall before allowing a shadow corrective action.",
+    "next_stage": "freeze a confirmation rule requiring repeated warning evidence and measure the recall-versus-trigger-burden tradeoff before any intervention is allowed"
+  },
+  "activation_authorized": false
+}
