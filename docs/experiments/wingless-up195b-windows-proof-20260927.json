@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up195b-windows-proof.v1",
+  "experiment": "UP-195B-adjacent-swap-history",
+  "status": "qualified-scientific-result",
+  "source_head": "1c624c29e2e479d9d3ac880bde4007bacedfaa08",
+  "workflow_run_id": 36286627582,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10920950567,
+  "artifact_sha256": "ac753e1c4231c871af64392503b634596b89aaead5c074c3e7c148bfe9a25883",
+  "findings": {
+    "same_count_swap_observations": 30,
+    "same_count_nonzero_factor_observations": 30,
+    "composition_mean_factor_delta": {
+      "cross3": 0.0070559889907145235,
+      "mixed4": 0.01677093214433096,
+      "observe4": 0.0034158453013746204,
+      "store4": 0.006537999174150272
+    },
+    "swap_position_mean_factor_delta": {
+      "0": 0.010981349037572483,
+      "1": 0.006524485420384474,
+      "2": 0.008087656669722923
+    },
+    "max_factor_delta": 0.03331689404280924
+  },
+  "interpretation": {
+    "local_order_sensitivity_is_distributed": true,
+    "no_single_adjacent_boundary_explains_history_effect": true,
+    "mixed_composition_is_most_sensitive_in_this_test": true,
+    "plain_speak": "Even swapping just one neighboring pair changes the required risk correction, and it happens at every tested swap position. The history signal is distributed through sequence order rather than living at one special boundary.",
+    "next_stage": "enumerate full permutations for contrasting compositions and test whether calibration difference is explained by permutation distance from canonical order"
+  },
+  "activation_authorized": false
+}
