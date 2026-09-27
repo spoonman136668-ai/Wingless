@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up-lm3l-windows-proof.v1",
+  "experiment": "UP-LM3L-temporal-resource-coordinate",
+  "status": "qualified-scientific-result",
+  "source_head": "ba538c40663037298a6cd27c593832d6d4d8a83e",
+  "workflow_run_id": 36287652716,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10921770243,
+  "artifact_sha256": "ef8bf3f3c90b383fa92c469647f6217f1d41d3801a3447d9db7e74c20c362be7",
+  "findings": {
+    "reachable_budget": {
+      "groups": 5,
+      "nonzero_spread_groups": 3,
+      "max_failure_spread": 12,
+      "mean_failure_spread": 4.8
+    },
+    "reachable_budget_plus_start": {
+      "groups": 8,
+      "nonzero_spread_groups": 2,
+      "max_failure_spread": 6,
+      "mean_failure_spread": 1.5
+    },
+    "reachable_budget_plus_throughput": {
+      "groups": 8,
+      "nonzero_spread_groups": 3,
+      "max_failure_spread": 12,
+      "mean_failure_spread": 3
+    },
+    "reachable_budget_plus_start_plus_throughput": {
+      "groups": 12,
+      "nonzero_spread_groups": 0,
+      "max_failure_spread": 0,
+      "mean_failure_spread": 0
+    }
+  },
+  "interpretation": {
+    "full_temporal_resource_coordinate_is_required_in_tested_grid": true,
+    "onset_contains_more_information_than_throughput_alone": true,
+    "reachable_budget_is_not_sufficient_under_heavier_pressure": true,
+    "plain_speak": "Under heavier pressure, 'how many actions can I still perform?' is not enough. Wingless also needs to know when actions can begin and how quickly they can be delivered. Those three quantities together fully determine the tested outcomes.",
+    "next_stage": "test whether a derived deployment-profile coordinate can compress onset and throughput without losing deterministic collapse"
+  },
+  "activation_authorized": false
+}
