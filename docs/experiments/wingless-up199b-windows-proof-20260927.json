@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up199b-windows-proof.v1",
+  "experiment": "UP-199B-global-position-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "5ecb95868a8e46f2833c663af24f7a440b9fe500",
+  "workflow_run_id": 36304227933,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10926399568,
+  "artifact_sha256": "a1d2b56f285700761274db145bf2ffc7ff9d43a6b179c31881fe8516eda9b27a",
+  "findings": {
+    "mixed4": {
+      "baseline_mae": 0.02527777536312966,
+      "pairwise_mae": 0.021607031146156794,
+      "position_mae": 0.02139897935460888,
+      "position_better_than_pairwise": 39,
+      "evaluation_points": 72
+    },
+    "observe4": {
+      "baseline_mae": 0.03328349244635339,
+      "pairwise_mae": 0.03328349244635337,
+      "position_mae": 0.0332834924463534,
+      "position_better_than_pairwise": 37,
+      "evaluation_points": 72
+    }
+  },
+  "interpretation": {
+    "global_position_adds_small_signal_for_mixed4": true,
+    "global_position_does_not_help_observe4": true,
+    "neither_simple_local_nor_absolute_position_representation_explains_observe4": true,
+    "plain_speak": "Absolute position carries a little extra information in the mixed history, but it still does not solve the observe-only family. The useful history state seems distributed across multiple order cues rather than captured by one simple encoding.",
+    "next_stage": "freeze a combined pairwise-plus-position representation and test it on untouched phases without feature selection"
+  },
+  "activation_authorized": false
+}
