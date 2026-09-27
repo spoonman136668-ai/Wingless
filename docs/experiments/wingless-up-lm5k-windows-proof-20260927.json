@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.up-lm5k-windows-proof.v1",
+  "experiment": "UP-LM5K-restore-round1-extrapolation",
+  "status": "qualified-scientific-result",
+  "source_head": "efe245f547db5249d61780d9f8c541c0f7dc08f8",
+  "workflow_run_id": 36334488732,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10936952483,
+  "artifact_sha256": "b31802fef51c7415001d2fa15bbfb8f1371e7f203fb9b8a4033395a062902c37",
+  "findings": {
+    "frozen": {
+      "cells": 72,
+      "nonzero_cells": 24,
+      "max_spread": 1
+    },
+    "frozen_plus_deployment_onset": {
+      "cells": 72,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "enriched_coordinate_extrapolates_to_restore_round1": true,
+    "restore_timing_axis_is_now_exact_across_tested_round1_and_round2_domains": true,
+    "plain_speak": "Even when one resource restores as early as round 1, the same enriched path state remains exact. Deployment onset appears to capture the missing deployability information rather than merely patching a specific restore schedule.",
+    "next_stage": "freeze the enriched coordinate and test out-of-range budget/start/throughput magnitudes rather than extending restore timing again"
+  },
+  "activation_authorized": false
+}
