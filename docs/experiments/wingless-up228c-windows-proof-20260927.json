@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.up228c-windows-proof.v1",
+  "experiment": "UP-228C-bounded-correction-composition",
+  "status": "qualified-scientific-result",
+  "source_head": "637b2ec80fca9b25fb1b853abc7823404438e2d6",
+  "workflow_run_id": 36332521523,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10935849285,
+  "artifact_sha256": "f64834d03914c13e0dc1173b420b326cead2cd6d5bbc749eb1b501723878e15c",
+  "findings": {
+    "condition_cells": 16,
+    "baseline": {
+      "losses": 62,
+      "actions": 8092
+    },
+    "retime_only": {
+      "losses": 60,
+      "actions": 8100,
+      "advance_events": 2
+    },
+    "tail9_only": {
+      "losses": 2,
+      "actions": 8181,
+      "ninth_actions": 89
+    },
+    "combined": {
+      "losses": 0,
+      "actions": 8189,
+      "advance_events": 2,
+      "ninth_actions": 89
+    },
+    "combined_never_worse_than_components": true
+  },
+  "interpretation": {
+    "bounded_midsequence_and_tail_corrections_compose_cleanly": true,
+    "mechanisms_are_complementary": true,
+    "complete_rescue_observed_across_transfer_grid": true,
+    "plain_speak": "The two corrections solve different failure stages and do not fight each other. Tail action 9 removes nearly all failures; the sparse action-5 retiming closes the two failures that happen too early for tail repair. Together they eliminated every tested loss.",
+    "next_stage": "freeze the combined policy and transfer it to disjoint interleaved cohort topology without retuning"
+  },
+  "activation_authorized": false
+}
