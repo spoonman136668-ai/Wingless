@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.up206c-windows-proof.v1",
+  "experiment": "UP-206C-repeated-switch-warning-trace",
+  "status": "qualified-scientific-result",
+  "source_head": "479fb48bc13079eb9f77fc14f0a21e755695cc92",
+  "workflow_run_id": 36318724849,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10931945395,
+  "artifact_sha256": "83b8b556c04b2e39f125efbd006c0149e54edb9123e062e88ed4337e27f2015e",
+  "findings": {
+    "fixed_alternating_repeated": {
+      "treated_failures": 1,
+      "failures_critical_at_final_monitor": 1,
+      "failures_with_post_trigger_critical": 1,
+      "failing_arm": {
+        "cohort_index": 2,
+        "initial_hand": 6,
+        "baseline_loss_step": 11,
+        "treated_loss_step": 42,
+        "trigger_onset": 11,
+        "last_monitor_before_loss": 41,
+        "horizon_at_last_monitor": 2,
+        "last_critical_before_loss": 41,
+        "critical_lead_writes": 1
+      }
+    },
+    "other_schedules_treated_failures": 0
+  },
+  "interpretation": {
+    "native_warning_detects_phase_miss_before_loss": true,
+    "critical_warning_reappears_one_write_before_escape": true,
+    "plain_speak": "The warning signal sees the exact maintenance miss: at write 41 the arm is critical, and it fails one write later. That means the warning is useful as an emergency phase-correction signal even though earlier experiments showed it cannot replace the committed maintenance schedule.",
+    "next_stage": "test a bounded pull-forward rule on fresh phase-shifted repeated-switch schedules, consuming rather than adding the next scheduled action"
+  },
+  "activation_authorized": false
+}
