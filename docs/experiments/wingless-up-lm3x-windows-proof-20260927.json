@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up-lm3x-windows-proof.v1",
+  "experiment": "UP-LM3X-endpoint-checkpoint-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "9c34941ef08181b6a68461f49b044f0b33b99cad",
+  "workflow_run_id": 36312666616,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10929670903,
+  "artifact_sha256": "8743d9f82d0988d47f4501eecc228cf1dd24568b09026b477f697d8886bb1869",
+  "findings": {
+    "prior_rich": {
+      "nonzero_groups": 6,
+      "max_spread": 6,
+      "mean_spread": 1.0285714285714285
+    },
+    "add_round2": {
+      "nonzero_groups": 0,
+      "max_spread": 0,
+      "mean_spread": 0
+    },
+    "add_round5": {
+      "nonzero_groups": 6,
+      "max_spread": 6,
+      "mean_spread": 1.0285714285714285
+    },
+    "full": {
+      "nonzero_groups": 0,
+      "max_spread": 0,
+      "mean_spread": 0
+    }
+  },
+  "interpretation": {
+    "round2_capacity_is_the_missing_state": true,
+    "round5_capacity_is_redundant_in_tested_grid": true,
+    "minimal_candidate_is_reachable_plus_cap2_plus_cap3_plus_cap4": true,
+    "plain_speak": "The broader-grid failure was entirely caused by not representing early deployable capacity. Round 2 fixes the ambiguity by itself; round 5 adds no information.",
+    "next_stage": "transfer the minimal reachable+cap2+cap3+cap4 coordinate across deferred-only, layout-only, and hybrid deadline profiles on the broader resource grid"
+  },
+  "activation_authorized": false
+}
