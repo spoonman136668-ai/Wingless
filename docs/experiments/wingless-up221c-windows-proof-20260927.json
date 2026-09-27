@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up221c-windows-proof.v1",
+  "experiment": "UP-221C-residual-dual-horizon-diagnostic",
+  "status": "qualified-scientific-result",
+  "source_head": "2032881b373341fe15cf0fe8e2c1ce3e0990361e",
+  "workflow_run_id": 36328932539,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10935370905,
+  "artifact_sha256": "fd9f5a00ed80aaee43419d98b0910b32778adc887213a8beafef1b102b2dbda8",
+  "findings": {
+    "cap8_losses": 29,
+    "cap8_survivors": 35,
+    "silent_failures_under_adversarial_critical": 1,
+    "silent_caught_by_noquery_critical": 0,
+    "silent_caught_by_noquery_near": 0,
+    "loss": {
+      "adversarial_critical": 28,
+      "noquery_critical": 28,
+      "noquery_near": 28
+    },
+    "survive": {
+      "adversarial_critical": 10,
+      "noquery_critical": 3,
+      "noquery_near": 10
+    }
+  },
+  "interpretation": {
+    "noquery_critical_matches_adversarial_failure_sensitivity": true,
+    "noquery_critical_has_lower_survivor_warning_burden": true,
+    "both_signals_miss_the_same_single_silent_failure": true,
+    "plain_speak": "The no-query critical horizon catches the same 28 of 29 failing arms as the adversarial critical horizon, but warns on only 3 survivors instead of 10. It is a cleaner trigger on this boundary, though neither signal sees the one stubborn silent failure.",
+    "next_stage": "compare adversarial-critical and no-query-critical as action-9 triggers with timing and action budget frozen"
+  },
+  "activation_authorized": false
+}
