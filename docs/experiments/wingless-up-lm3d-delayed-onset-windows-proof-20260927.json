@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.up-lm3d-delayed-onset-windows-proof.v1",
+  "experiment": "UP-LM3D-delayed-onset-throughput",
+  "status": "qualified-scientific-result",
+  "source_head": "40b2d07552ef094b60eb0428af1d7c45a086676e",
+  "workflow_run_id": 36285128627,
+  "artifact_id": 10920626204,
+  "artifact_sha256": "9c63e5df0ed6f9e2e375f8808c828c79d9427a882053c7f233b744b7a8770c8d",
+  "findings": {
+    "start_round": 4,
+    "budget": 6,
+    "deferred": [
+      [
+        1,
+        12,
+        72,
+        80
+      ],
+      [
+        2,
+        24,
+        60,
+        72
+      ],
+      [
+        3,
+        24,
+        60,
+        66
+      ]
+    ],
+    "layout": [
+      [
+        1,
+        12,
+        84,
+        90
+      ],
+      [
+        2,
+        24,
+        72,
+        80
+      ],
+      [
+        3,
+        24,
+        72,
+        74
+      ]
+    ]
+  },
+  "interpretation": {
+    "throughput_matters_when_the_window_limits_budget_deployment": true,
+    "throughput2_restores_the_full_window_earliest_deadline_result": true,
+    "throughput3_adds_no_further_earliest_deadline_gain_after_full_budget_deployment": true,
+    "plain_speak": "With only three rounds left, throughput one cannot deploy the whole fixed rescue budget and more failures occur. Throughput two can deploy the same budget in time and restores the prior earliest-deadline result.",
+    "next_stage": "test whether equal effective deployed-action counts produce equal failure counts across different fixed budgets, onset rounds, and throughputs"
+  },
+  "activation_authorized": false
+}
