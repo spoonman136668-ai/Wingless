@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.up-lm3s-windows-proof.v1",
+  "experiment": "UP-LM3S-pressure-saturation-diagnostic",
+  "status": "qualified-scientific-result",
+  "source_head": "ec5973eba7f8ecef54f2eddd1d2a3d36af10c659",
+  "workflow_run_id": 36310346038,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10929060906,
+  "artifact_sha256": "d381388e447030408a339377ddcf2677f153dff4f10ad6ddc8370cd8a38df205",
+  "findings": {
+    "pressure0": {
+      "range": 24,
+      "distinct": 5
+    },
+    "pressure4": {
+      "range": 20,
+      "distinct": 7
+    },
+    "pressure8": {
+      "range": 6,
+      "distinct": 4
+    },
+    "pressure9": {
+      "range": 0,
+      "distinct": 1
+    },
+    "pressure10_through16": {
+      "range": 0,
+      "distinct": 1
+    }
+  },
+  "interpretation": {
+    "informative_resource_sensitive_regime_is_pressure0_through8": true,
+    "pressure9_and_above_is_saturated": true,
+    "high_pressure_zero_spread_is_trivial": true,
+    "plain_speak": "Resource settings still matter through pressure 8. At pressure 9 and above, every resource configuration collapses to the same outcome, so further high-pressure coordinate tests would not teach us anything.",
+    "next_stage": "leave saturated pressure regime and test the rich deployment profile on a distinct deadline structure within the informative pressure range"
+  },
+  "activation_authorized": false
+}
