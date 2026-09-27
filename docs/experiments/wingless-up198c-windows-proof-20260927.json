@@ -1,0 +1,85 @@
+{
+  "schema": "wingless.up198c-windows-proof.v1",
+  "experiment": "UP-198C-hostile-fresh-warning-gating",
+  "status": "qualified-scientific-result",
+  "source_head": "eeff1a70990ca73d708150d3b916c278389c9756",
+  "workflow_run_id": 36316801105,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10930727804,
+  "artifact_sha256": "3b0e94de74c081779510dd14f85a6bdd914149db923c84c7b03114248db27a94",
+  "findings": {
+    "horizon16": {
+      "committed": {
+        "prevented": 64,
+        "actions": 102
+      },
+      "gated": {
+        "prevented": 64,
+        "actions": 85,
+        "skipped": 17
+      }
+    },
+    "horizon24": {
+      "committed": {
+        "prevented": 64,
+        "actions": 166
+      },
+      "gated": {
+        "prevented": 32,
+        "actions": 115,
+        "skipped": 34
+      }
+    },
+    "horizon32": {
+      "committed": {
+        "prevented": 64,
+        "actions": 230
+      },
+      "gated": {
+        "prevented": 18,
+        "actions": 115,
+        "skipped": 64
+      }
+    },
+    "horizon40": {
+      "committed": {
+        "prevented": 64,
+        "actions": 294
+      },
+      "gated": {
+        "prevented": 0,
+        "actions": 115,
+        "skipped": 64
+      }
+    },
+    "horizon48": {
+      "committed": {
+        "prevented": 64,
+        "actions": 358
+      },
+      "gated": {
+        "prevented": 0,
+        "actions": 115,
+        "skipped": 64
+      }
+    },
+    "horizon56": {
+      "committed": {
+        "prevented": 64,
+        "actions": 422
+      },
+      "gated": {
+        "prevented": 0,
+        "actions": 115,
+        "skipped": 64
+      }
+    }
+  },
+  "interpretation": {
+    "fresh_warning_is_not_a_safe_gate_for_all_later_maintenance": true,
+    "committed_actions_are_proactively_stabilizing_before_warning_recurrence": true,
+    "plain_speak": "Waiting for a fresh critical warning before every later refresh cuts action cost, but eventually waits too long. The successful sparse schedule is partly preventive maintenance, not just repeated emergency response.",
+    "next_stage": "vary the number of post-trigger scheduled actions that remain unconditional before switching to fresh-warning gating"
+  },
+  "activation_authorized": false
+}
