@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up171c-windows-proof.v1",
+  "experiment": "UP-171C-two-shot-state-space",
+  "status": "qualified-scientific-result",
+  "source_head": "bd91c8a84dc0e906814f876de25d2eeb6b702ebd",
+  "workflow_run_id": 36286124005,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920533181,
+  "artifact_sha256": "739402ded044117acd39efe3d76fb7d0b7648abef28425e7ded024336f724bd2",
+  "findings": {
+    "no_refresh_cadence2_targeted": {
+      "arms": 64,
+      "baseline_losses": 64,
+      "treated_losses": 35,
+      "prevented_losses": 29,
+      "prevented_per_action": 0.2265625,
+      "mean_loss_delay_writes": 31.02857142857143
+    },
+    "no_refresh_cadence4_targeted": {
+      "arms": 64,
+      "prevented_losses": 1,
+      "prevented_per_action": 0.0078125
+    },
+    "other_pressure_policies_targeted_prevented_losses": 0,
+    "sham_prevented_losses_all_tested_cells": 0,
+    "original_hands_no_refresh_cadence2": {
+      "arms": 16,
+      "prevented_losses": 7
+    },
+    "expanded_hands_no_refresh_cadence2": {
+      "arms": 48,
+      "prevented_losses": 22
+    }
+  },
+  "interpretation": {
+    "two_shot_correction_generalizes_beyond_original_hand_positions": true,
+    "correction_remains_regime_sensitive": true,
+    "sham_control_does_not_reproduce_prevention": true,
+    "plain_speak": "The bounded two-refresh rule is not an artifact of the original four hand positions: it prevented 22 additional losses across 48 new starting hands, for 29 prevented losses out of 64 total under no-refresh pressure at cadence 2. It still does not generalize to the other pressure policies.",
+    "north_star_question": "Establishes state-space transfer of a bounded corrective effect; the next unresolved issue is whether Wingless's warning timing is itself useful or whether any two early targeted refreshes would do the same job.",
+    "next_stage": "compare warning-triggered two-shot targeted refresh against an equal-budget fixed-early targeted schedule and sham control on the expanded state space"
+  },
+  "activation_authorized": false
+}
