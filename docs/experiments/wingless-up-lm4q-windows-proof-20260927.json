@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.up-lm4q-windows-proof.v1",
+  "experiment": "UP-LM4Q-heldout-revoke-restore-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "8048c3343399b44ead4b3c40f37f45c08a3b9786",
+  "workflow_run_id": 36323358659,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10932892672,
+  "artifact_sha256": "9bfe3c1457278f8a00ed2ecb9415ed25a10ef6a1cd196ff169fcc6c2a5609210",
+  "findings": {
+    "final": {
+      "cells": 216,
+      "nonzero_cells": 72,
+      "max_spread": 1
+    },
+    "final_plus_prerestore": {
+      "cells": 216,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "pre_restore_checkpoint_transfers_to_heldout_schedules": true,
+    "compact_path_law_is_not_schedule_specific": true,
+    "plain_speak": "The same one-checkpoint path law works on revoke/restore timings it never saw during derivation. Final totals still lose information, but adding capacity accumulated by restoration resolves every tested case.",
+    "next_stage": "test two revoke/restore windows and ask whether one checkpoint per restoration event remains sufficient"
+  },
+  "activation_authorized": false
+}
