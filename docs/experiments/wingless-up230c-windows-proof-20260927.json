@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up230c-windows-proof.v1",
+  "experiment": "UP-230C-action9-hysteresis",
+  "status": "qualified-scientific-result",
+  "source_head": "c7a647313ee4c160a4bf640fc81a46b66450cc33",
+  "workflow_run_id": 36333459506,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10936761785,
+  "artifact_sha256": "8d4ced1603fdd9eb431630c7c0199403fb23ef4aa4a02712bf0c4c41089c90e1",
+  "findings": {
+    "condition_cells": 8,
+    "cap8_losses": 42,
+    "single_critical": {
+      "losses": 0,
+      "ninth_actions": 68,
+      "rescues": 42,
+      "unnecessary_ninth": 26
+    },
+    "two_consecutive_critical": {
+      "losses": 40,
+      "ninth_actions": 2,
+      "rescues": 2,
+      "unnecessary_ninth": 0
+    }
+  },
+  "interpretation": {
+    "persistence_hysteresis_is_too_conservative_for_action9": true,
+    "single_critical_sensitivity_is_required_for_tail_rescue": true,
+    "plain_speak": "Requiring two consecutive critical warnings removes wasted ninth actions, but almost all real rescue disappears with them. The second warning usually arrives too late, so persistence is not the right selectivity mechanism here.",
+    "next_stage": "freeze intervention logic and diagnose the first post-action8 adversarial-critical event on cap8 failures versus survivors using existing native replacement geometry"
+  },
+  "activation_authorized": false
+}
