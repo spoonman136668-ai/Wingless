@@ -1,0 +1,31 @@
+{
+  "schema": "wingless.up-lm3p-windows-proof.v1",
+  "experiment": "UP-LM3P-pressure4-coordinate-refinement",
+  "status": "qualified-scientific-result",
+  "source_head": "d17e6c4c16c5976177c33e36e69983ac3bd25eb7",
+  "workflow_run_id": 36308057169,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10927149132,
+  "artifact_sha256": "f67ef39faaf796c6b58212d665260623f35140d124eb780a99f472e6909ecfd3",
+  "findings": {
+    "reachable_plus_c4": {
+      "nonzero_spread_groups": 1,
+      "max_failure_spread": 2
+    },
+    "reachable_plus_c3_plus_c4": {
+      "nonzero_spread_groups": 0,
+      "max_failure_spread": 0
+    },
+    "reachable_plus_raw_start_throughput": {
+      "nonzero_spread_groups": 0,
+      "max_failure_spread": 0
+    }
+  },
+  "interpretation": {
+    "richer_checkpoint_profile_restores_deterministic_collapse_at_pressure4": true,
+    "raw_scheduler_parameters_are_not_required": true,
+    "plain_speak": "At the first pressure boundary, one extra checkpoint is enough. Total reachable actions plus deployable capacity by rounds 3 and 4 fully determines the tested outcomes again.",
+    "next_stage": "freeze the richer deployment profile and sweep stronger static pressure levels to locate its next boundary"
+  },
+  "activation_authorized": false
+}
