@@ -1,0 +1,38 @@
+{
+  "schema": "wingless.up174c-windows-proof.v1",
+  "experiment": "UP-174C-warning-delay-tolerance",
+  "status": "qualified-scientific-result",
+  "source_head": "d83dda62e7974b9d24098bc498e2f84015dacacd",
+  "workflow_run_id": 36286963084,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920183982,
+  "artifact_sha256": "527c9b3c4d34a68398c933a7698e417bc3bca7fccfddd8a4a8c0914202ff1fa8",
+  "findings": {
+    "delay0": {
+      "actions": 128,
+      "losses": 35,
+      "prevented_losses": 29,
+      "prevented_per_action": 0.2265625
+    },
+    "delay1": {
+      "actions": 128,
+      "losses": 17,
+      "prevented_losses": 47,
+      "prevented_per_action": 0.3671875
+    },
+    "delay2": {
+      "actions": 0,
+      "losses": 64,
+      "prevented_losses": 0
+    }
+  },
+  "interpretation": {
+    "best_tested_action_timing_is_one_monitoring_interval_after_warning": true,
+    "warning_has_useful_lead_time_not_only_last_moment_signal": true,
+    "two_interval_delay_exceeds_available_window": true,
+    "plain_speak": "The warning is early enough to support a better-timed response. Acting immediately saves 29 of 64 cases, but waiting exactly one monitoring interval saves 47. Waiting two intervals is too late—the failures arrive before either action can execute.",
+    "north_star_question": "Shows the native warning carries actionable lead-time structure, not merely imminent-failure detection.",
+    "next_stage": "freeze the one-interval-delayed two-shot rule and test transfer across the other pressure policies and monitoring cadences"
+  },
+  "activation_authorized": false
+}
