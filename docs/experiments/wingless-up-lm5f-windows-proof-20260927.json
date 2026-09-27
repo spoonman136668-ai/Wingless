@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.up-lm5f-windows-proof.v1",
+  "experiment": "UP-LM5F-restore-time-resource-identity",
+  "status": "qualified-scientific-result",
+  "source_head": "550334cd01ee548f7de6ba9e4cf82c0341d54848",
+  "workflow_run_id": 36332348951,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10936290712,
+  "artifact_sha256": "23d934e134541fdfc6ecf2f6429cb5116738e64f7a6cd54741bfdcb71ad47dcc",
+  "findings": {
+    "timing_aware": {
+      "cells": 72,
+      "nonzero_cells": 36,
+      "max_spread": 1
+    },
+    "timing_aware_plus_early_resource": {
+      "cells": 72,
+      "nonzero_cells": 24,
+      "max_spread": 1
+    },
+    "residual_boundary": {
+      "deadline_profiles": [
+        "layout_only",
+        "hybrid_min"
+      ],
+      "budget_reduction": 2,
+      "throughput_reductions": [
+        1,
+        2
+      ],
+      "topology_variants_per_reduction_profile": 6,
+      "residual_cells": 24
+    }
+  },
+  "interpretation": {
+    "restore_time_resource_identity_interaction_is_real_but_incomplete": true,
+    "remaining_boundary_is_specific_to_strong_budget_reduction": true,
+    "plain_speak": "Telling Wingless which resource restored first removes one-third of the round-2 ambiguity, but strong temporary budget loss still aliases different delivery paths. The remaining missing state is likely at the later restoration transition itself.",
+    "next_stage": "add only cumulative actions immediately after the later restore round to the frozen timing-aware+early-resource coordinate"
+  },
+  "activation_authorized": false
+}
