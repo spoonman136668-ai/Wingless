@@ -24,5 +24,5 @@ try{
  Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
  Write-Host "unique_native_correct_counts=$([string]::Join(',',@($R.unique_native_correct_counts)))"
  foreach($S in $R.summaries){Write-Host "model=$($S.model) mean_abs_mass_error=$($S.mean_absolute_mass_ratio_error) max_abs_mass_error=$($S.max_absolute_mass_ratio_error)"}
- Write-Host 'WINGLESS_UP190B_HARNESS_PASS'
+ Write-Host 'WINGLESS_UP190_HARNESS_PASS'
 }finally{Pop-Location;if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache};if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp};Remove-Item -Recurse -Force $GoCache,$GoTmp -ErrorAction SilentlyContinue}
