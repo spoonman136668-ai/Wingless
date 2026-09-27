@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.up-lm3k-windows-proof.v1",
+  "experiment": "UP-LM3K-pressure-placement-control",
+  "status": "qualified-scientific-result",
+  "source_head": "f3de092822a399f2a2559c2a18c6295ab5009c78",
+  "workflow_run_id": 36287285095,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10919999803,
+  "artifact_sha256": "902b0f13343a15550b47e717a83d2820e21c828c692785c0936e34e1e1b4c915",
+  "findings": {
+    "none_spread": {
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0
+    },
+    "static_pre_spread": {
+      "2": 0,
+      "3": 0,
+      "4": 6,
+      "5": 6,
+      "6": 12
+    },
+    "dynamic_r3_spread": {
+      "2": 0,
+      "3": 0,
+      "4": 6,
+      "5": 6,
+      "6": 12
+    },
+    "dynamic_r5_spread": {
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0
+    }
+  },
+  "interpretation": {
+    "static_extra_pressure_reproduces_midwindow_break_exactly": true,
+    "nonstationarity_is_not_required_for_law_break": true,
+    "pressure_arriving_after_effective_deployment_does_not_break_law": true,
+    "plain_speak": "The extra load does not need to arrive dynamically. Putting the same extra write in before the action window causes exactly the same breakdown as the mid-window burst, while placing it in the final round does not. Under higher effective load, total reachable action count is no longer enough; deployment timing also matters.",
+    "next_stage": "under static extra pressure, group outcomes by reachable budget plus onset and throughput to identify the minimal temporal resource coordinate that restores collapse"
+  },
+  "activation_authorized": false
+}
