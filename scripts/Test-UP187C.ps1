@@ -1,5 +1,9 @@
 $ErrorActionPreference='Stop'
 $Repo=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$PriorGoCache=$env:GOCACHE;$PriorGoTmp=$env:GOTMPDIR
+$GoCache=Join-Path $env:TEMP ("wingless-up187c-gocache-"+$PID);$GoTmp=Join-Path $env:TEMP ("wingless-up187c-gotmp-"+$PID)
+New-Item -ItemType Directory -Force -Path $GoCache|Out-Null;New-Item -ItemType Directory -Force -Path $GoTmp|Out-Null
+$env:GOCACHE=$GoCache;$env:GOTMPDIR=$GoTmp
 Push-Location $Repo
 try{
  go env -w GOFLAGS=-buildvcs=false;if($LASTEXITCODE-ne 0){throw 'UP187C_GO_ENV_FAILED'}
@@ -14,4 +18,9 @@ try{
  Write-Host $P1;Write-Host '';Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
  foreach($M in $R.metrics){Write-Host "cadence=$($M.cadence) bucket=$($M.risk_bucket) checkpoints=$($M.checkpoints) one_fail=$($M.failures_within_one_cadence) one_rate=$($M.one_cadence_failure_rate) two_fail=$($M.failures_within_two_cadences) two_rate=$($M.two_cadence_failure_rate) mean_native_horizon=$($M.mean_adversarial_shield_horizon) mean_remaining=$($M.mean_writes_remaining_to_loss)"}
  Write-Host 'WINGLESS_UP232_HARNESS_PASS'
-}finally{Pop-Location}
+}finally{
+ Pop-Location
+ if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache}
+ if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp}
+ Remove-Item -Recurse -Force $GoCache,$GoTmp -ErrorAction SilentlyContinue
+}
