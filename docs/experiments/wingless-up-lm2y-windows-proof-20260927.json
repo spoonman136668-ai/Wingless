@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.up-lm2y-windows-proof.v1",
+  "experiment": "UP-LM2Y-budget-allocation-replication",
+  "status": "qualified-scientific-result",
+  "source_head": "ab96c5046eb9f72f5e4a8750bad5069fd1873fd6",
+  "workflow_run_id": 36282401192,
+  "runner_name": "WINGLESS-LINKDEADKB",
+  "artifact_id": 10918444597,
+  "artifact_sha256": "a11edeaebae45a76f6172b446ccb0ac57ea84e2ad5f7ecef8e93abc9c4e21454",
+  "findings": {
+    "budget4": {
+      "baseline_failed": 144,
+      "earliest_failed": 120,
+      "fixed_failed": 120,
+      "earliest_advantage": 0,
+      "earliest_prevented_per_action": 1,
+      "fixed_prevented_per_action": 1
+    },
+    "budget8": {
+      "baseline_failed": 144,
+      "earliest_failed": 96,
+      "fixed_failed": 118,
+      "earliest_advantage": 22,
+      "earliest_prevented_per_action": 1,
+      "fixed_prevented_per_action": 0.5416666666666666
+    },
+    "budget12": {
+      "baseline_failed": 144,
+      "earliest_failed": 78,
+      "fixed_failed": 118,
+      "earliest_advantage": 40,
+      "earliest_prevented_per_action": 0.9166666666666666,
+      "fixed_prevented_per_action": 0.3611111111111111
+    },
+    "identity_rotations": [
+      3,
+      11
+    ],
+    "permutations": [
+      "identity",
+      "reverse",
+      "rotate2"
+    ]
+  },
+  "interpretation": {
+    "earliest_deadline_advantage_replication_is_budget_dependent": true,
+    "at_budget4_any_targeted_action_is_equally_useful": true,
+    "at_budget8_and_12_countdown_priority_materially_outperforms_fixed_order": true,
+    "arm_permutation_does_not_remove_the_advantage": true,
+    "plain_speak": "When only four actions are available, every action saves one dependency no matter which endangered arm gets it first. Once the budget is large enough that bad ordering can waste opportunities, countdown priority matters a lot: 22 fewer failures at budget 8 and 40 fewer at budget 12.",
+    "north_star_question": "Shows native countdown is not merely a warning signal; it becomes a useful scarce-resource scheduler once the action regime is large enough for sequencing choices to matter.",
+    "next_stage": "map budgets 4 through 8 one action at a time to locate the first budget where earliest-deadline scheduling gains a reproducible advantage"
+  },
+  "activation_authorized": false
+}
