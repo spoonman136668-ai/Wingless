@@ -1,0 +1,26 @@
+{
+  "schema": "wingless.up194b-windows-proof.v1",
+  "experiment": "UP-194B-order-history-effect",
+  "status": "qualified-scientific-result",
+  "source_head": "6d160b6cafc971e7d6e8bd873f4c046f423f183b",
+  "workflow_run_id": 36286443741,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10920018748,
+  "artifact_sha256": "0b5e5353797f01f28df14eb5ca8bd4723a237b523672dc4764b6b6306f60b4f9",
+  "findings": {
+    "mean_absolute_factor_difference": 0.009427032389464712,
+    "max_absolute_factor_difference": 0.019139689610681243,
+    "same_native_count_pairs": 9,
+    "same_native_count_nonzero_factor_pairs": 9,
+    "mean_same_count_absolute_factor_difference": 0.008715619831860607
+  },
+  "interpretation": {
+    "update_order_changes_required_calibration_with_composition_fixed": true,
+    "native_correct_count_cannot_summarize_history_effect": true,
+    "history_dependence_is_directly_demonstrated": true,
+    "plain_speak": "Wingless can finish with the same native correct-count after seeing the same updates, yet require a different failure-risk correction solely because those updates arrived in a different order. That is direct evidence that memory-risk state depends on developmental history, not just final scalar state.",
+    "north_star_question": "Moves failure prediction toward a history-sensitive state representation rather than a bag of current-state summaries.",
+    "next_stage": "localize the order effect with preregistered adjacent swaps to determine whether sensitivity is broadly distributed or concentrated at particular transitions"
+  },
+  "activation_authorized": false
+}
