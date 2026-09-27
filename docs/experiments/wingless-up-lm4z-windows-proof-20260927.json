@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up-lm4z-windows-proof.v1",
+  "experiment": "UP-LM4Z-path-memory-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "f61666dc20d7d9e6460a81424ae2b23564cc1364",
+  "workflow_run_id": 36328727378,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10934648494,
+  "artifact_sha256": "4d42e4cb90daa1c21cc65172788c5582bf681f0871bf347556639777c885f6e8",
+  "findings": {
+    "final_plus_post_early": {
+      "cells": 432,
+      "nonzero_cells": 168,
+      "max_spread": 2
+    },
+    "final_plus_post_early_plus_pre_late": {
+      "cells": 432,
+      "nonzero_cells": 24,
+      "max_spread": 1
+    },
+    "full": {
+      "cells": 432,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "both_early_transition_sides_and_late_restore_state_are_needed_in_tested_grid": true,
+    "one_or_two_ordered_transition_counts_are_insufficient": true,
+    "plain_speak": "For asynchronous recovery, Wingless needs to remember the path on both sides of the first restoration and again before the second restoration. Dropping any of those timing landmarks reintroduces ambiguity.",
+    "next_stage": "pool across asynchronous schedule identities and test an ordered pre-early/post-early/pre-late path coordinate without encoding which resource restored first"
+  },
+  "activation_authorized": false
+}
