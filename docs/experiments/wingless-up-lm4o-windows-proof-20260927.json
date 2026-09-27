@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm4o-windows-proof.v1",
+  "experiment": "UP-LM4O-revoke-restore-path-checkpoints",
+  "status": "qualified-scientific-result",
+  "source_head": "85090dbbb049ff8a63f0bb116d7ea3cc460cb8d4",
+  "workflow_run_id": 36322959025,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10932802878,
+  "artifact_sha256": "44d6a5405e87ebb9e05d9b258f7039497d50f9eeacafaefd0b0f74c09c9b45a2",
+  "findings": {
+    "comparator": {
+      "coordinate": "dynamic_r+tp+end",
+      "cells": 108,
+      "nonzero_cells": 72,
+      "max_spread": 1,
+      "multi_member_groups": 1872
+    },
+    "path": {
+      "coordinate": "path_r+tp+end+precut+prerestore",
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 1728
+    }
+  },
+  "interpretation": {
+    "bounded_causal_path_checkpoints_are_sufficient": true,
+    "final_resource_totals_are_not_sufficient_under_temporary_revocation": true,
+    "plain_speak": "Temporary resource loss becomes predictable again once Wingless knows how much action capacity existed before the cut and before restoration. It does not need the entire history in this test—two causal checkpoints are enough.",
+    "next_stage": "ablate the pre-cut and pre-restore checkpoints separately to identify the minimal path coordinate"
+  },
+  "activation_authorized": false
+}
