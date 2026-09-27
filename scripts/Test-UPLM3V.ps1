@@ -1,5 +1,9 @@
 $ErrorActionPreference='Stop'
 $Repo=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$PriorGoCache=$env:GOCACHE;$PriorGoTmp=$env:GOTMPDIR
+$GoCache=Join-Path $env:TEMP ("wingless-uplm3v-gocache-"+$PID);$GoTmp=Join-Path $env:TEMP ("wingless-uplm3v-gotmp-"+$PID)
+New-Item -ItemType Directory -Force -Path $GoCache|Out-Null;New-Item -ItemType Directory -Force -Path $GoTmp|Out-Null
+$env:GOCACHE=$GoCache;$env:GOTMPDIR=$GoTmp
 Push-Location $Repo
 try{
  go env -w GOFLAGS=-buildvcs=false;if($LASTEXITCODE-ne 0){throw 'UPLM3V_GO_ENV_FAILED'}
@@ -15,4 +19,9 @@ try{
  Write-Host "global_range=$($R.global_outcome_range) distinct=$($R.distinct_outcomes)"
  foreach($S in $R.summaries){Write-Host "coordinate=$($S.coordinate) groups=$($S.groups) nonzero=$($S.nonzero_spread_groups) max_spread=$($S.max_failure_spread) mean_spread=$($S.mean_failure_spread)"}
  Write-Host 'WINGLESS_UP233_HARNESS_PASS'
-}finally{Pop-Location}
+}finally{
+ Pop-Location
+ if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache}
+ if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp}
+ Remove-Item -Recurse -Force $GoCache,$GoTmp -ErrorAction SilentlyContinue
+}
