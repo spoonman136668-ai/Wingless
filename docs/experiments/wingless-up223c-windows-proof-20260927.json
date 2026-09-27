@@ -1,0 +1,43 @@
+{
+  "schema": "wingless.up223c-windows-proof.v1",
+  "experiment": "UP-223C-residual-replacement-geometry",
+  "status": "qualified-scientific-result",
+  "source_head": "f9c20b00465e26a0355c6956b714ed48668ab95a",
+  "workflow_run_id": 36329557188,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10935650697,
+  "artifact_sha256": "943721baa754f220391e4400be1710030dfba6856230d36cf5f5ad828229cbb6",
+  "findings": {
+    "silent_loss": {
+      "arms": 1,
+      "cohort": 2,
+      "initial_hand": 6,
+      "endangered_key": 8,
+      "loss_step": 42,
+      "action8_step": -1,
+      "post_action8_snapshots": 0
+    },
+    "warned_loss_arms": 28,
+    "survivor_arms": 35,
+    "group_ranges": {
+      "warned_loss": {
+        "min_age": "0..0",
+        "min_hand_distance": "0..2",
+        "predicted_endangered_count": "0..1"
+      },
+      "survive": {
+        "min_age": "0..1",
+        "min_hand_distance": "0..5",
+        "predicted_endangered_count": "0..0"
+      }
+    }
+  },
+  "interpretation": {
+    "residual_failure_occurs_before_action8_ever_fires": true,
+    "action9_cannot_address_the_residual_without_an_action8_trigger": true,
+    "post_action8_geometry_was_the_wrong_observation_window_for_the_silent_arm": true,
+    "plain_speak": "The stubborn failure dies before the tail-repair sequence even reaches action 8. That is why every action-9 variant left one failure behind. We need to look earlier, from action 7 onward, at the raw replacement state that the current warning is missing.",
+    "next_stage": "trace existing hand/age/replacement geometry from action 7 until action 8, loss, or horizon, retaining the full silent-arm trajectory"
+  },
+  "activation_authorized": false
+}
