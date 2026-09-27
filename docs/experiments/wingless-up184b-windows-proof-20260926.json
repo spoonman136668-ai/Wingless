@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.up184b-windows-proof.v1",
+  "experiment": "UP-184B-pooled-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "464c2b65f40fa4f0a9a052500f808f1d61d50f9b",
+  "workflow_run_id": 36281066289,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10918867710,
+  "artifact_sha256": "e7bc91f5895ae399b96f9ea9e16e0290f9df8b9f712e33c1ea25bdc5e4011a53",
+  "findings": {
+    "single_phase_mean_absolute_mass_ratio_error": 0.23835864696130496,
+    "pooled_mean_absolute_mass_ratio_error": 0.07886025797182931,
+    "pooled_phase31": {
+      "actual": 223,
+      "predicted": 248.23213791775552,
+      "ratio": 1.1131486005280518,
+      "brier": 0.008892399490236584,
+      "ece": 0.0017208244091303808,
+      "auroc": 0.9865285506706477,
+      "average_precision": 0.40977755146004347
+    },
+    "pooled_phase32": {
+      "actual": 243,
+      "predicted": 240.5010917951696,
+      "ratio": 0.9897164271406156,
+      "brier": 0.009399373265883708,
+      "ece": 0.0008852267879074312,
+      "auroc": 0.9873822189468527,
+      "average_precision": 0.4111770153255715
+    },
+    "pooled_phase33": {
+      "actual": 223,
+      "predicted": 248.23213791775552,
+      "ratio": 1.1131486005280518,
+      "brier": 0.008892399490236584,
+      "ece": 0.0017208244091303808,
+      "auroc": 0.9865285506706477,
+      "average_precision": 0.40977755146004347
+    }
+  },
+  "interpretation": {
+    "multi_phase_pooling_materially_improves_numeric_calibration": true,
+    "discrimination_remains_strong": true,
+    "residual_calibration_drift_remains_structured": true,
+    "phase31_and_phase33_repeat_exactly": true,
+    "phase32_is_nearly_mass_calibrated": true,
+    "plain_speak": "Using several past phases instead of one makes the probability estimate much better. Average mass error drops from about 23.8% to 7.9%. But the remaining error still alternates: phases 31 and 33 match each other while phase 32 is almost exact.",
+    "north_star_question": "Shows calibrated native risk is feasible in principle, but the remaining structured context drift must be explained by an internal state variable before using probabilities for cost-aware action.",
+    "next_stage": "use phase parity only as a diagnostic control—fit separate already-known even/odd calibration tables from phases26-30 and test on phases31-33—to determine whether the residual tracks a repeating context class; parity itself is not an acceptable deployment feature"
+  },
+  "activation_authorized": false
+}
