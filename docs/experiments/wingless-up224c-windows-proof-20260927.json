@@ -1,0 +1,31 @@
+{
+  "schema": "wingless.up224c-windows-proof.v1",
+  "experiment": "UP-224C-pre-action8-geometry",
+  "status": "qualified-scientific-result",
+  "source_head": "65e8020f2bc5eff23a9dec82a0a79c4a57941c6a",
+  "workflow_run_id": 36329878812,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10935740751,
+  "artifact_sha256": "0994a0bb52b27c471cace495189797340f60e09915a9950024ed2e8c0cda1a3d",
+  "findings": {
+    "pre_action8_loss": {
+      "arms": 1,
+      "cohort": 2,
+      "initial_hand": 6,
+      "endangered_key": 8,
+      "loss_step": 42,
+      "action7_step": -1,
+      "action8_step": -1,
+      "observations_after_action7": 0
+    },
+    "action8_reached_arms": 63,
+    "no_action8_survive_arms": 0
+  },
+  "interpretation": {
+    "residual_failure_occurs_before_action7_as_well_as_action8": true,
+    "moving_the_geometry_window_one_action_earlier_is_not_sufficient": true,
+    "plain_speak": "The one stubborn arm dies before action 7 is ever reached. It is not a tail-action problem at all; it is a mid-sequence correction failure hidden inside a test that mostly exercises later tail behavior.",
+    "next_stage": "record all correction action steps and native geometry from action1 onward on the residual environment to localize the failing stage in one diagnostic"
+  },
+  "activation_authorized": false
+}
