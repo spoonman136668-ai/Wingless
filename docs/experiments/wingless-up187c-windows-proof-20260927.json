@@ -1,0 +1,65 @@
+{
+  "schema": "wingless.up187c-windows-proof.v1",
+  "experiment": "UP-187C-native-risk-calibration",
+  "status": "qualified-scientific-result",
+  "source_head": "9fd43ef177313a222c764b4d1004ffa5db39de98",
+  "workflow_run_id": 36311653219,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10929053599,
+  "artifact_sha256": "0fe482a2934ad98488ed2bcf2f26905dcb60820f3c8e7797bc082172d2aa9eec",
+  "findings": {
+    "cadence2": {
+      "far": {
+        "checkpoints": 526,
+        "one_rate": 0,
+        "two_rate": 0,
+        "mean_native_horizon": 7.942965779467681,
+        "mean_remaining": 17.482889733840302
+      },
+      "near": {
+        "checkpoints": 128,
+        "one_rate": 0,
+        "two_rate": 0,
+        "mean_native_horizon": 3.5,
+        "mean_remaining": 6.546875
+      },
+      "critical": {
+        "checkpoints": 128,
+        "one_rate": 0.5,
+        "two_rate": 1,
+        "mean_native_horizon": 1.5,
+        "mean_remaining": 2.546875
+      }
+    },
+    "cadence4": {
+      "far": {
+        "checkpoints": 126,
+        "one_rate": 0,
+        "two_rate": 0,
+        "mean_native_horizon": 9.904761904761905,
+        "mean_remaining": 23.5
+      },
+      "near": {
+        "checkpoints": 145,
+        "one_rate": 0,
+        "two_rate": 0,
+        "mean_native_horizon": 6.882758620689655,
+        "mean_remaining": 13.551724137931034
+      },
+      "critical": {
+        "checkpoints": 128,
+        "one_rate": 0.5,
+        "two_rate": 1,
+        "mean_native_horizon": 2.75,
+        "mean_remaining": 5.046875
+      }
+    }
+  },
+  "interpretation": {
+    "ordinal_native_failure_risk_is_strongly_calibrated_in_tested_regime": true,
+    "critical_bucket_is_fully_predictive_within_two_cadences": true,
+    "plain_speak": "Wingless now has a native-state risk stratification that cleanly separates safe-near-term states from imminent failure states in this regime. Far and near never failed within two cadences; critical always failed within two cadences, and half failed within one.",
+    "next_stage": "test the same frozen risk buckets across distinct fixed pressure policies without changing thresholds"
+  },
+  "activation_authorized": false
+}
