@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.up-lm3v-windows-proof.v1",
+  "experiment": "UP-LM3V-resource-grid-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "66b3f728bb38d892c750b2040215f8b5ccb4d3f3",
+  "workflow_run_id": 36311685671,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10929610604,
+  "artifact_sha256": "02eae8e173143ac2ba24ca5c6ac563826b0f91af4b544f8b5d0888725034acfb",
+  "findings": {
+    "resource_configurations": 80,
+    "global_outcome_range": 26,
+    "distinct_outcomes": 9,
+    "simple": {
+      "groups": 19,
+      "nonzero_groups": 9,
+      "max_spread": 12,
+      "mean_spread": 3.473684210526316
+    },
+    "rich": {
+      "groups": 35,
+      "nonzero_groups": 6,
+      "max_spread": 6,
+      "mean_spread": 1.0285714285714285
+    }
+  },
+  "interpretation": {
+    "rich_coordinate_improves_but_does_not_fully_transfer_to_broader_resource_grid": true,
+    "original_three_number_profile_is_incomplete_when_start_round_extends_2_through5": true,
+    "plain_speak": "The richer resource profile still captures much more than the simpler one, but it stops being exact once the scheduler can start as early as round 2 or as late as round 5. That exposes the missing information: our checkpoints only describe rounds 3 and 4.",
+    "next_stage": "test a preregistered full deployment vector using capacity by rounds 2,3,4,5 plus reachable budget"
+  },
+  "activation_authorized": false
+}
