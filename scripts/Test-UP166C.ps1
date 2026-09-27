@@ -22,5 +22,5 @@ try{
  Write-Host ''
  Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
  foreach($M in $R.metrics){Write-Host "policy=$($M.policy) cadence=$($M.cadence) precision=$($M.interval_precision) warnings_per_loss=$($M.warning_intervals_per_loss) mean_lead=$($M.mean_first_warning_lead_writes) expired=$($M.expired_warning_intervals)"}
- Write-Host 'WINGLESS_UP166C_HARNESS_PASS'
+ Write-Host 'WINGLESS_UP166_HARNESS_PASS'
 }finally{Pop-Location;if($null-eq $PriorGoCache){Remove-Item Env:GOCACHE -ErrorAction SilentlyContinue}else{$env:GOCACHE=$PriorGoCache};if($null-eq $PriorGoTmp){Remove-Item Env:GOTMPDIR -ErrorAction SilentlyContinue}else{$env:GOTMPDIR=$PriorGoTmp};Remove-Item -Recurse -Force $GoCache,$GoTmp -ErrorAction SilentlyContinue}
