@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.up-lm5g-windows-proof.v1",
+  "experiment": "UP-LM5G-post-late-restore-checkpoint",
+  "status": "qualified-scientific-result",
+  "source_head": "d360d38664e09f50ebf26c65135adef71ae3a0ef",
+  "workflow_run_id": 36332756748,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10936511384,
+  "artifact_sha256": "6d6ab91791538215c75fd8fe0053598b759bda4bf96a64227eb2f2c27426275b",
+  "findings": {
+    "comparator": {
+      "cells": 72,
+      "nonzero_cells": 24,
+      "max_spread": 1
+    },
+    "post_late_checkpoint": {
+      "cells": 72,
+      "nonzero_cells": 24,
+      "max_spread": 1
+    }
+  },
+  "interpretation": {
+    "post_late_transition_count_does_not_explain_residual_ambiguity": true,
+    "targeted_checkpoint_hypothesis_rejected": true,
+    "plain_speak": "The missing information is not simply how many actions were available immediately after the later resource restoration. Adding that checkpoint does not resolve a single remaining ambiguous cell.",
+    "next_stage": "hold the failed coordinate fixed and emit exact colliding resource configurations to identify which scheduler state differs inside each ambiguous group"
+  },
+  "activation_authorized": false
+}
