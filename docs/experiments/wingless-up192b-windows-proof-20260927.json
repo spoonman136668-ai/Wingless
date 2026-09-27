@@ -1,0 +1,27 @@
+{
+  "schema": "wingless.up192b-windows-proof.v1",
+  "experiment": "UP-192B-native-margin-geometry",
+  "status": "qualified-scientific-result",
+  "source_head": "5c3fa4be3720d61587bdeb2a9595782585c17c64",
+  "workflow_run_id": 36285396925,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10919793124,
+  "artifact_sha256": "e2b6901d33c6b89358f048f27bc50e88d751ae03089e5b639357e2e2a3adf0e0",
+  "findings": {
+    "correlations": {
+      "native_correct_count": 0.22711737521711142,
+      "mean_absolute_margin": 0.19134511360602424,
+      "near_zero_margin_count": -0.27741481106377514,
+      "min_absolute_margin": 0.33541297774409407
+    }
+  },
+  "interpretation": {
+    "no_tested_single_scalar_margin_feature_is_strong": true,
+    "min_absolute_margin_is_best_of_tested_scalars_but_still_modest": true,
+    "low_dimensional_state_may_require_multiple_features_or_topology": true,
+    "plain_speak": "The richer margin summaries help only a little. The strongest single feature, minimum absolute margin, still explains the needed correction only weakly. Wingless's calibration state is not collapsing cleanly to one obvious scalar.",
+    "north_star_question": "A useful native failure-risk estimate likely needs a compact combination of state features or explicit history/topology, not one threshold or one margin statistic.",
+    "next_stage": "fit a small preregistered multi-feature calibration model on the sealed states and evaluate it on disjoint new perturbation profiles and phases"
+  },
+  "activation_authorized": false
+}
