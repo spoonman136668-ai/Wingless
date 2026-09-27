@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.up189c-windows-proof.v1",
+  "experiment": "UP-189C-correction-policy-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "be123db8f8085a8051e88fbd31ace6ed84d3f938",
+  "workflow_run_id": 36312622348,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10929414264,
+  "artifact_sha256": "20fa340c3bae85597108939e73b7ccf878422d66195193cf71ce2d8472c22c67",
+  "findings": {
+    "no_refresh": {
+      "cadence2_prevented": 47,
+      "cadence4_prevented": 47
+    },
+    "alternating_shield": {
+      "cadence2_prevented": 0,
+      "cadence4_prevented": 0,
+      "cadence2_failure_delay": 21.765625,
+      "cadence4_failure_delay": 22.640625
+    },
+    "fixed_offset_refresh": {
+      "cadence2_prevented": 0,
+      "cadence4_prevented": 0,
+      "cadence2_failure_delay": 22.234375,
+      "cadence4_failure_delay": 15.171875
+    },
+    "hostile_shield": {
+      "cadence2_prevented": 0,
+      "cadence4_prevented": 0,
+      "cadence2_failure_delay": 8.859375,
+      "cadence4_failure_delay": 8.8125
+    }
+  },
+  "interpretation": {
+    "warning_transfers_but_two_stage_correction_does_not_transfer": true,
+    "correction_still_delays_loss_under_all_failed_transfer_policies": true,
+    "plain_speak": "Wingless can still tell that failure is coming under the other pressure policies, but the same two refreshes are no longer enough to save the capability. The interventions buy time, which means the warning is useful, but prevention needs either different timing or more corrective capacity.",
+    "next_stage": "compute an offline exhaustive two-action targeted-refresh oracle ceiling per policy and cadence to distinguish timing failure from insufficient two-action budget"
+  },
+  "activation_authorized": false
+}
