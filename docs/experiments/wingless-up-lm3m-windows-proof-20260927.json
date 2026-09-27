@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.up-lm3m-windows-proof.v1",
+  "experiment": "UP-LM3M-deployment-profile",
+  "status": "qualified-scientific-result",
+  "source_head": "cd2e33fb13c0c1a04284a62031f167b43fb933c1",
+  "workflow_run_id": 36304315235,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10925954149,
+  "artifact_sha256": "8a500fea27066d2a2bbdc41e1b9042a91f3871f21f23a1d62af35af5e2281fd3",
+  "findings": {
+    "reachable_budget": {
+      "nonzero_spread_groups": 3,
+      "max_failure_spread": 12
+    },
+    "reachable_budget_plus_capacity_by_round3": {
+      "nonzero_spread_groups": 1,
+      "max_failure_spread": 6
+    },
+    "reachable_budget_plus_capacity_by_round4": {
+      "nonzero_spread_groups": 0,
+      "max_failure_spread": 0
+    },
+    "reachable_budget_plus_capacity_by_round3_plus_round4": {
+      "nonzero_spread_groups": 0,
+      "max_failure_spread": 0
+    }
+  },
+  "interpretation": {
+    "reachable_budget_plus_round4_capacity_is_sufficient_in_tested_heavy_pressure_grid": true,
+    "round3_capacity_is_insufficient": true,
+    "compressed_temporal_resource_coordinate_found": true,
+    "plain_speak": "We can compress the full onset/throughput description. Under this heavier load, outcomes are fully determined by two numbers: total reachable actions and how many of those can be delivered by round 4.",
+    "next_stage": "hold this two-number coordinate fixed and validate it under two static extra writes per arm"
+  },
+  "activation_authorized": false
+}
