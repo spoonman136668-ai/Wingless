@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up208c-windows-proof.v1",
+  "experiment": "UP-208C-committed-slot-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "1f77d800272c16d30193bafd7777c785d3a7bc23",
+  "workflow_run_id": 36322890399,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10933300328,
+  "artifact_sha256": "9f1a241f46e9f475037164d19d597e80eefcef13a31dc5100386bdb26b446d39",
+  "findings": {
+    "slot2_min_prevented_across_schedules": 2,
+    "slot3_min_prevented_across_schedules": 0,
+    "slot4_min_prevented_across_schedules": 0,
+    "slot5_min_prevented_across_schedules": 1,
+    "slot6_min_prevented_across_schedules": 8,
+    "slot7": {
+      "full_rescue_schedules": 3,
+      "hostile_no_shifted_prevented": 63
+    },
+    "slot8": {
+      "full_rescue_all_schedules": true
+    },
+    "no_accelerated_failures": true
+  },
+  "interpretation": {
+    "early_and_mid_committed_slots_2_through6_are_causally_important": true,
+    "slot8_is_redundant_in_tested_shifted_schedules": true,
+    "slot7_is_nearly_redundant_but_has_one_schedule_boundary": true,
+    "plain_speak": "The rescue cannot be made reactive by simply deleting maintenance in the middle. Actions 2 through 6 carry the protection. The only plausible savings are at the very tail: action 8 is unnecessary here, and action 7 is almost unnecessary.",
+    "next_stage": "compare fixed total committed opportunity caps 6,7,8 under the same shifted switch schedules"
+  },
+  "activation_authorized": false
+}
