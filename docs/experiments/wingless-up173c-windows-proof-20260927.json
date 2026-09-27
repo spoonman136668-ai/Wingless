@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up173c-windows-proof.v1",
+  "experiment": "UP-173C-fixed-schedule-sweep",
+  "status": "qualified-scientific-result",
+  "source_head": "b07cfdba7d75e5b3422103cb35276b788e325996",
+  "workflow_run_id": 36286744341,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920148946,
+  "artifact_sha256": "6fd05d66ed7a6d031735069da1dc15e45b8bd30b9b207328e5ee695475ed8044",
+  "findings": {
+    "warning_targeted_prevented_losses": 29,
+    "fixed_schedule_prevented_losses": {
+      "01_03": 0,
+      "09_11": 0,
+      "17_19": 0,
+      "25_27": 0,
+      "33_35": 0,
+      "41_43": 0,
+      "49_51": 0,
+      "57_59": 0
+    },
+    "best_fixed_schedule": "fixed_01_03",
+    "best_fixed_prevented_losses": 0
+  },
+  "interpretation": {
+    "no_global_fixed_two_shot_window_reproduces_warning_benefit": true,
+    "warning_timing_is_state_dependent_in_this_test": true,
+    "plain_speak": "The benefit is not hiding in a globally lucky time window. Eight fixed two-shot schedules spread across the whole horizon saved nothing, while Wingless's state-dependent warning timing again saved 29 of 64 cases.",
+    "north_star_question": "Strongly supports native-state timing as the useful signal for bounded correction.",
+    "next_stage": "hold the warning rule and two-action budget fixed while delaying each warning-triggered action by 0, 1, or 2 monitoring intervals to map the correction timing tolerance"
+  },
+  "activation_authorized": false
+}
