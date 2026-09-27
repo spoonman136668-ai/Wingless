@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.up214b-windows-proof.v1",
+  "experiment": "UP-214B-late-routed-offset-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "dac745dcfdb0d5ac729d3e435e7baaf99163016c",
+  "workflow_run_id": 36316751499,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10930738992,
+  "artifact_sha256": "c6f6335b30144fb6500de611c4be51ec624b4db962678839d69248ac8f9b6626",
+  "findings": {
+    "route_accuracy": 0.875,
+    "route_correct": 84,
+    "route_decisions": 96,
+    "mixed4": {
+      "route_correct": 12,
+      "route_total": 24,
+      "static_mae": 0.01925558741494463,
+      "routed_mae": 0.014347936415608768,
+      "oracle_family_mae": 0.011634814333556377,
+      "oracle_anchor_mae": 0.011634814287518048,
+      "routed_better": 492,
+      "evaluation_points": 552
+    },
+    "observe4": {
+      "route_correct": 24,
+      "route_total": 24,
+      "static_mae": 0.02982113195484202,
+      "routed_mae": 0.003799941143055166,
+      "routed_better": 552,
+      "evaluation_points": 552
+    },
+    "store4": {
+      "route_correct": 24,
+      "route_total": 24,
+      "static_mae": 0.008652873320237611,
+      "routed_mae": 0.006422004986968975,
+      "routed_better": 528,
+      "evaluation_points": 552
+    },
+    "cross3": {
+      "route_correct": 24,
+      "route_total": 24,
+      "static_mae": 0.010017193034429184,
+      "routed_mae": 0.008814706219941371,
+      "routed_better": 48,
+      "evaluation_points": 120
+    }
+  },
+  "interpretation": {
+    "late_phase_router_is_stable_for_three_of_four_regimes": true,
+    "mixed4_has_persistent_localized_route_ambiguity": true,
+    "routed_calibration_still_beats_static_for_mixed4": true,
+    "plain_speak": "The routing problem is no longer system-wide. Observe4, store4, and cross3 route perfectly across 24 later phases. Mixed4 is ambiguous half the time, but even those route errors do not erase the benefit of native-routed calibration.",
+    "next_stage": "measure frozen nearest-centroid confidence margins and confusion structure on a fresh later holdout to determine whether mixed4 misroutes are detectable as low-confidence states"
+  },
+  "activation_authorized": false
+}
