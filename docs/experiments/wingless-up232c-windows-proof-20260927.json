@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up232c-windows-proof.v1",
+  "experiment": "UP-232C-signature-risk-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "ccf8e9d2e09ed526c444098d45f63bd85b6c6919",
+  "workflow_run_id": 36334007101,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10936662919,
+  "artifact_sha256": "d16f01ce40ae4f400a63a86ff748898be8b2bf74a7793a799a19f6d6e4c62b20",
+  "findings": {
+    "arms": 512,
+    "failures": 33,
+    "survivors": 479,
+    "event_failures": 33,
+    "event_survivors": 34,
+    "high_risk": 1,
+    "low_risk": 0,
+    "unknown": 66,
+    "no_event": 445,
+    "high_risk_failures": 1,
+    "high_risk_survivors": 0,
+    "unknown_failures": 32,
+    "failure_recall": 0.030303030303030304,
+    "precision": 1,
+    "exact_signature_coverage": 0.014925373134328358
+  },
+  "interpretation": {
+    "exact_signature_transfer_fails": true,
+    "precision_remains_high_but_coverage_collapses": true,
+    "native_geometry_requires_abstraction_beyond_exact_state_identity": true,
+    "plain_speak": "The exact C231 failure signatures are too brittle to transfer. They almost never fire on the new topology/timing even though failures still occur. The geometry signal may generalize, but only through similarity or abstraction—not exact memorized signatures.",
+    "next_stage": "freeze a nearest-signature Hamming classifier over the same C231 geometry fields and test the same heldout conditions without refitting"
+  },
+  "activation_authorized": false
+}
