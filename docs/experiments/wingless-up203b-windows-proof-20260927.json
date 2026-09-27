@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up203b-windows-proof.v1",
+  "experiment": "UP-203B-order-signal-persistence",
+  "status": "qualified-scientific-result",
+  "source_head": "98896adf869c71a105175594d5fa2682a17fb38b",
+  "workflow_run_id": 36309145761,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10928626022,
+  "artifact_sha256": "0d0aece5b100681d081887ee459e793ef263660151505c82d2b37bea8cd59a93",
+  "findings": {
+    "mixed4": {
+      "template_spread": 0.0630578916095107,
+      "mean_residual_correlation": 0.7301186177204495,
+      "min_correlation": 0.5976727233076699,
+      "max_correlation": 0.9950104065460088,
+      "heldout_spread": 0.04489833411294827
+    },
+    "observe4": {
+      "template_spread": 0.009063721371250222,
+      "mean_residual_correlation": 0.6372021841717816,
+      "min_correlation": 0.5125602184643703,
+      "max_correlation": 0.6995231670254872,
+      "heldout_spread": 0.018505694786539444
+    }
+  },
+  "interpretation": {
+    "both_history_families_retain_relative_order_structure": true,
+    "observe4_nontransfer_is_consistent_with_phase_wide_offset_masking": true,
+    "plain_speak": "Observe-only history was not losing its order structure. Its relative permutation pattern persists, but the whole calibration surface shifts enough across phases that an old absolute level no longer predicts well.",
+    "next_stage": "use one frozen anchor permutation per phase to estimate a global offset and apply the training residual template to all other permutations"
+  },
+  "activation_authorized": false
+}
