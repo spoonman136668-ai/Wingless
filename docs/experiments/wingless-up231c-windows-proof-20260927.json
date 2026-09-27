@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.up231c-windows-proof.v1",
+  "experiment": "UP-231C-first-critical-geometry",
+  "status": "qualified-scientific-result",
+  "source_head": "39d8940e3f623d60cee2c6a983cfdaab49683ee8",
+  "workflow_run_id": 36333759199,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10936052495,
+  "artifact_sha256": "96b7e391bbd12931b666f8bf23dd18b3e8922f46512284e49026f6d47e802484",
+  "findings": {
+    "arms": 512,
+    "failures": 42,
+    "survivors": 470,
+    "event_bearing_failures": 42,
+    "event_bearing_survivors": 26,
+    "silent_failures": 0,
+    "noevent_survivors": 444,
+    "distinct_failure_signatures": 12,
+    "distinct_survivor_signatures": 6,
+    "shared_signatures": 0
+  },
+  "interpretation": {
+    "existing_native_geometry_separates_failure_and_survivor_critical_events": true,
+    "persistence_hysteresis_failed_because_event_geometry_not_event_count_is_informative": true,
+    "plain_speak": "The first critical warning after action 8 is not enough by itself, but Wingless's native state at that warning is. All 42 failures warned, and none of the 12 failure-state signatures were shared by the 26 warned survivors.",
+    "next_stage": "freeze a deterministic risk classifier from C231 event signatures and test it without refitting on disjoint policy/phase/horizon conditions"
+  },
+  "activation_authorized": false
+}
