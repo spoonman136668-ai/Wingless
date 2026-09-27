@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.up-lm4x-windows-proof.v1",
+  "experiment": "UP-LM4X-overlap-transition-checkpoint",
+  "status": "qualified-scientific-result",
+  "source_head": "33c8fad62a94cafb6114dc56ed0a9b34cbdf825b",
+  "workflow_run_id": 36328171099,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10934154916,
+  "artifact_sha256": "9f068f99c3473b71de57687560fd72eab8aa5ee0245db0530fdd5edf8d8f1041",
+  "findings": {
+    "both_restores": {
+      "cells": 24,
+      "nonzero_cells": 24,
+      "max_spread": 1
+    },
+    "both_restores_plus_post_round3": {
+      "cells": 24,
+      "nonzero_cells": 0,
+      "max_spread": 0
+    }
+  },
+  "interpretation": {
+    "residual_asynchronous_boundary_is_explained_by_within_window_delivery_timing": true,
+    "one_post_transition_checkpoint_restores_exactness": true,
+    "plain_speak": "The missing information was exactly how much work got delivered immediately after the early restoration. Once that one transition checkpoint is remembered, the previously ambiguous cases become fully determined.",
+    "next_stage": "generalize the new checkpoint as cumulative actions immediately after the earlier restoration round and test it across every asynchronous restore schedule"
+  },
+  "activation_authorized": false
+}
