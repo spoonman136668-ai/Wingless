@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.up221b-windows-proof.v1",
+  "experiment": "UP-221B-unseen-family-confidence-rejection",
+  "status": "qualified-scientific-result",
+  "source_head": "a458337e4e935e77e86111769d9c23a61b6b83c5",
+  "workflow_run_id": 36331218109,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10936640874,
+  "artifact_sha256": "6a3a77bd00d9ab0c3daf5014f3f68585858af48200aca64697db9823a47d3fad",
+  "findings": {
+    "threshold": 0.6640727787188583,
+    "overall": {
+      "decisions": 128,
+      "rejected": 80,
+      "harmful_forced_routes": 96,
+      "harmful_rejected": 64,
+      "harmful_accepted": 32,
+      "benign_rejected": 16,
+      "harmful_rejection_rate": 0.6666666666666666
+    },
+    "mixed4b": {
+      "rejected": 0,
+      "harmful": 16,
+      "harmful_rejected": 0
+    },
+    "observe3": {
+      "rejected": 32,
+      "harmful": 16,
+      "harmful_rejected": 16,
+      "benign_rejected": 16
+    },
+    "store3": {
+      "rejected": 16,
+      "harmful": 32,
+      "harmful_rejected": 16
+    },
+    "cross4": {
+      "rejected": 32,
+      "harmful": 32,
+      "harmful_rejected": 32
+    }
+  },
+  "interpretation": {
+    "margin_gate_is_not_sufficient_for_unseen_family_abstention": true,
+    "high_relative_confidence_can_still_be_out_of_distribution": true,
+    "plain_speak": "The in-distribution confidence gate is not a universal novelty detector. Some unseen families sit far outside the known regimes but still look relatively closer to one centroid than the others, so the margin stays high and harmful forced routing is accepted.",
+    "next_stage": "add a training-frozen absolute nearest-centroid distance gate and compare margin-only, distance-only, and union abstention on new unseen-family phases"
+  },
+  "activation_authorized": false
+}
