@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.up206b-windows-proof.v1",
+  "experiment": "UP-206B-two-anchor-affine-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "5df4dae1ac2c60166bc20e16ba212bf9b2c6cdca",
+  "workflow_run_id": 36310937812,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10929272307,
+  "artifact_sha256": "ca6556afab5440c4a4ed461f6c79259f4017d9c61613370eadd73ce9f2c702ce",
+  "findings": {
+    "mixed4": {
+      "one_anchor_mae": 0.010396121373440141,
+      "affine_mae": 0.042845737738814296,
+      "affine_better": 0,
+      "evaluation_points": 66
+    },
+    "observe4": {
+      "one_anchor_mae": 0.003469928250105873,
+      "affine_mae": 0.004820561888894671,
+      "affine_better": 15,
+      "evaluation_points": 66
+    },
+    "store4": {
+      "one_anchor_mae": 0.005292575310888041,
+      "affine_mae": 0.016136022260534497,
+      "affine_better": 6,
+      "evaluation_points": 66
+    },
+    "cross3": {
+      "one_anchor_mae": 0.006973145171505084,
+      "affine_mae": 0.055142358094093576,
+      "affine_better": 0,
+      "evaluation_points": 12
+    },
+    "scale_instability": true
+  },
+  "interpretation": {
+    "shared_scale_is_not_supported": true,
+    "one_anchor_common_offset_remains_preferred": true,
+    "plain_speak": "The relative history pattern does not behave like a clean stretch-and-shift. Using two anchors to infer a scale makes predictions much worse, especially when the anchor residuals are close together. The simpler common-offset model is more stable.",
+    "next_stage": "test whether the phase-wide offset can be predicted from frozen native state aggregates rather than requiring an anchor history measurement"
+  },
+  "activation_authorized": false
+}
