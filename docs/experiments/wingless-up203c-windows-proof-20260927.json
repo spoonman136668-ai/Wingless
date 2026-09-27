@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.up203c-windows-proof.v1",
+  "experiment": "UP-203C-policy-switch-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "99127fc70caea53d837e416cdfae8597fcafc8ee",
+  "workflow_run_id": 36317859676,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10930918014,
+  "artifact_sha256": "c0182716ec0e206cfddcd27a99b8e61e72f0a4a157034c03a8db899e0c821e6a",
+  "findings": {
+    "no_to_hostile": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 344,
+      "accelerated": 0
+    },
+    "hostile_to_no": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 422,
+      "accelerated": 0
+    },
+    "alternating_to_fixed": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 388,
+      "accelerated": 0
+    },
+    "fixed_to_alternating": {
+      "baseline_losses": 64,
+      "treated_losses": 0,
+      "prevented": 64,
+      "actions": 408,
+      "accelerated": 0
+    }
+  },
+  "interpretation": {
+    "sparse_rule_survives_midrun_policy_switches": true,
+    "future_policy_schedule_is_not_required_by_warning": true,
+    "plain_speak": "The same frozen warning-and-maintenance rule rescues every tested arm even when the external pressure regime changes mid-run. Wingless did not need to know the future switch.",
+    "next_stage": "test repeated deterministic policy switching under the same frozen correction rule"
+  },
+  "activation_authorized": false
+}
