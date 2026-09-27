@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.up178c-windows-proof.v1",
+  "experiment": "UP-178C-warning-stage-ablation",
+  "status": "qualified-scientific-result",
+  "source_head": "d13b5a64658d2d24fe6bd8c500ec1f7217770248",
+  "workflow_run_id": 36304272467,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10926089051,
+  "artifact_sha256": "a6ce3fba00a6a64263d598fbb59a456e81e950eea411fcb76067ee4644a4ee41",
+  "findings": {
+    "first_only": {
+      "prevented_losses": 0,
+      "actions": 64,
+      "mean_loss_delay_writes": 17.25
+    },
+    "second_warning_only": {
+      "prevented_losses": 0,
+      "actions": 0
+    },
+    "both": {
+      "prevented_losses": 47,
+      "actions": 128
+    },
+    "sham_both": {
+      "prevented_losses": 0,
+      "actions": 64
+    }
+  },
+  "interpretation": {
+    "first_targeted_action_is_required_to_reach_second_warning_action": true,
+    "second_action_is_not_reachable_without_first_action_bridge": true,
+    "prevention_requires_two_stage_warning_action_sequence": true,
+    "plain_speak": "The first targeted refresh does not save the memory by itself, but it extends life enough for Wingless to reach a second warning and use the second refresh. If the first action is skipped, the second warning/action never becomes reachable.",
+    "next_stage": "swap targeted and sham interventions independently at action one and action two to isolate each stage's causal role"
+  },
+  "activation_authorized": false
+}
