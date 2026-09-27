@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.up-lm4f-windows-proof.v1",
+  "experiment": "UP-LM4F-dynamic-pressure-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "2d6d6bb8d513ccd3bf00843ec3aace5d48d55045",
+  "workflow_run_id": 36315953530,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10930419019,
+  "artifact_sha256": "bf541e187ea6e7cbb297d894ae449ed76b029dc615aac5b870af09007afc26fe",
+  "findings": {
+    "primary": {
+      "coordinate": "reachable_budget+throughput+coverage_end_round",
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 1080
+    },
+    "comparator": {
+      "coordinate": "reachable_budget+capacity_by_round2+capacity_by_round3+capacity_by_round4",
+      "cells": 108,
+      "nonzero_cells": 0,
+      "max_spread": 0,
+      "multi_member_groups": 1404
+    }
+  },
+  "interpretation": {
+    "minimal_resource_law_transfers_to_single_burst_nonstationary_pressure": true,
+    "checkpoint_coordinate_also_remains_exact": true,
+    "plain_speak": "A single extra pressure event can arrive at any round from 0 through 5 and the compact resource law still predicts outcomes exactly. Burst timing did not add a new scheduler-state variable.",
+    "next_stage": "freeze the same coordinates and test two dynamic pressure bursts at preregistered round pairs"
+  },
+  "activation_authorized": false
+}
