@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.up213c-windows-proof.v1",
+  "experiment": "UP-213C-eighth-action-timing-window",
+  "status": "qualified-scientific-result",
+  "source_head": "ff27d4a9a45e8aa503d7eace61002152dea9f0ee",
+  "workflow_run_id": 36324070087,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10933301591,
+  "artifact_sha256": "2683b4161b97e589b29ce8fcdd2f6f994e7d7ad97e021f14b5efdb7a0ba5ee53",
+  "findings": {
+    "early_never_worse_than_nominal_in_tested_cells": true,
+    "late_can_reduce_protection": true,
+    "examples": [
+      {
+        "schedule": "alternating_fixed",
+        "advance": 4,
+        "horizon": 66,
+        "early_prevented": 64,
+        "nominal_prevented": 64,
+        "late_prevented": 63
+      },
+      {
+        "schedule": "alternating_fixed",
+        "advance": 4,
+        "horizon": 68,
+        "early_prevented": 64,
+        "nominal_prevented": 64,
+        "late_prevented": 62
+      },
+      {
+        "schedule": "alternating_fixed",
+        "advance": 0,
+        "horizon": 70,
+        "early_prevented": 64,
+        "nominal_prevented": 64,
+        "late_prevented": 63
+      },
+      {
+        "schedule": "no_hostile",
+        "advance": 0,
+        "horizon": 72,
+        "early_prevented": 64,
+        "nominal_prevented": 64,
+        "late_prevented": 64
+      }
+    ],
+    "residual_shared_failure": {
+      "schedule": "fixed_alternating",
+      "advance": 0,
+      "early_prevented": 63,
+      "nominal_prevented": 63,
+      "late_prevented": 63
+    }
+  },
+  "interpretation": {
+    "eighth_action_window_is_asymmetric": true,
+    "proactive_or_nominal_timing_is_safer_than_delay": true,
+    "plain_speak": "The eighth refresh does not need a razor-thin exact timestamp, but it cannot safely be postponed in every condition. Acting one monitoring interval early is consistently safe; acting late sometimes misses the rescue window.",
+    "next_stage": "after action7, replace fixed eighth timing with a frozen native near-risk trigger and compare against nominal fixed timing"
+  },
+  "activation_authorized": false
+}
