@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.up-lm5h-windows-proof.v1",
+  "experiment": "UP-LM5H-residual-collision-trace",
+  "status": "qualified-scientific-result",
+  "source_head": "68813273efa235058aecc6abef0afdfede600b0d",
+  "workflow_run_id": 36333284619,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10936007166,
+  "artifact_sha256": "d5b80ee56811a3f2cefda9c8becf9577b15938b38b594f2858a62b1e8b185bb7",
+  "findings": {
+    "collision_groups": 24,
+    "collision_members": 48,
+    "max_spread": 1,
+    "universal_pair": {
+      "budget": 7,
+      "throughput": 5,
+      "member_a": {
+        "action_start": 3,
+        "outcome": 17
+      },
+      "member_b": {
+        "action_start": 4,
+        "outcome": 18
+      }
+    },
+    "all_logged_collisions_differ_only_in_action_start": true
+  },
+  "interpretation": {
+    "residual_alias_is_deployment_onset_timing": true,
+    "raw_budget_and_throughput_are_not_missing": true,
+    "plain_speak": "Every remaining ambiguity is the same: two otherwise identical resource configurations differ only in when delivery can begin. Starting at round 3 versus round 4 changes the outcome, and the current path state forgets that onset time.",
+    "next_stage": "add derived first-deliverable round to the frozen LM5G coordinate and retest the exact 24-cell residual boundary"
+  },
+  "activation_authorized": false
+}
