@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.up-lm5e-windows-proof.v1",
+  "experiment": "UP-LM5E-heldout-restore-time-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "af78bfbb464c5921a20eede47baec2949e2f64e4",
+  "workflow_run_id": 36331466682,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10935663514,
+  "artifact_sha256": "16a0c885da07bca092208ff062f3de91478e0be888e5b9a925f050a57262f47a",
+  "findings": {
+    "ordered_path": {
+      "cells": 72,
+      "nonzero_cells": 36,
+      "max_spread": 1
+    },
+    "ordered_path_plus_restore_rounds": {
+      "cells": 72,
+      "nonzero_cells": 36,
+      "max_spread": 1
+    },
+    "boundary": {
+      "deferred_only_nonzero": 0,
+      "layout_only_nonzero": 18,
+      "hybrid_min_nonzero": 18,
+      "exact_under_budget1_throughput1": true,
+      "ambiguity_when_at_least_one_reduction_is_2": true
+    }
+  },
+  "interpretation": {
+    "timing_aware_path_coordinate_does_not_extrapolate_to_restore_round2": true,
+    "failure_is_strength_and_profile_dependent": true,
+    "restore_round_labels_add_no_information_on_this_new_boundary": true,
+    "plain_speak": "Moving one restoration landmark to round 2 exposes a new ambiguity. Knowing the path counts and the two restore times is no longer enough in layout-sensitive cases when either temporary reduction is strong.",
+    "next_stage": "add only early-restored resource identity to the timing-aware path coordinate to test the interaction of resource identity with early restoration"
+  },
+  "activation_authorized": false
+}
