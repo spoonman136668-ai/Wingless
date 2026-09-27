@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.up186b-windows-proof.v1",
+  "experiment": "UP-186B-native-context-diagnostic",
+  "status": "qualified-scientific-result",
+  "source_head": "bcd1eccc556012f830563723a2615f26adf514b7",
+  "workflow_run_id": 36282396475,
+  "runner_name": "WINGLESS-UP-B",
+  "artifact_id": 10918499390,
+  "artifact_sha256": "273ccf38e88ba007c99b80e6873710b58e2313f824dd03377ec5b029e3f19166",
+  "findings": {
+    "phases_26_33_split_into_two_exact_native_state_classes": true,
+    "high_crossing_class": {
+      "phases": [
+        26,
+        28,
+        30,
+        32
+      ],
+      "crossings": 243,
+      "mean_abs_margin": 0.443656590627295,
+      "near_boundary_count": 65,
+      "correct_count": 620,
+      "gate_weight_l2": 8.873545230571205,
+      "biases": [
+        -0.6824854999641067,
+        -0.29650071890822827,
+        0.9789862188723356
+      ]
+    },
+    "low_crossing_class": {
+      "phases": [
+        27,
+        29,
+        31,
+        33
+      ],
+      "crossings": 223,
+      "mean_abs_margin": 0.4445917278210335,
+      "near_boundary_count": 63,
+      "correct_count": 623,
+      "gate_weight_l2": 8.875007393705527,
+      "biases": [
+        -0.6713569775155636,
+        -0.29450199840972074,
+        0.965858975925285
+      ]
+    }
+  },
+  "interpretation": {
+    "residual_calibration_drift_has_an_exact_native_state_correlate": true,
+    "external_parity_was_only_a_proxy_for_repeating_internal_state": true,
+    "several_native_summaries_co_vary_so_causal_feature_not_yet_isolated": true,
+    "plain_speak": "The alternating calibration pattern is not arbitrary. Wingless itself is in one of two repeatable post-REPORT states, and those states line up exactly with 243 versus 223 later crossings. Odd/even phase number was just tagging those internal states from the outside.",
+    "north_star_question": "Identifies a native context variable family that can explain structured risk drift. The next test can condition calibration on internal state rather than external phase labels.",
+    "next_stage": "freeze a two-state native context classifier using only pre-cleanup summaries from phases26-30, build context-conditioned calibration tables, and evaluate untouched on phases31-33"
+  },
+  "activation_authorized": false
+}
