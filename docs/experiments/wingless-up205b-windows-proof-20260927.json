@@ -1,0 +1,31 @@
+{
+  "schema": "wingless.up205b-windows-proof.v1",
+  "experiment": "UP-205B-anchor-offset-family-transfer",
+  "status": "qualified-scientific-result",
+  "source_head": "eae301ddc8b41cf48d0ee300e9a374a603a78685",
+  "workflow_run_id": 36310444465,
+  "runner_lane": "Windows research qualification lane B",
+  "artifact_id": 10929540401,
+  "artifact_sha256": "5dcc13e1322f1787e0df37ae5b00b29646562f8386bc0f05791d3d41d9b36e17",
+  "findings": {
+    "store4": {
+      "identity_mae": 0.009614303689152906,
+      "anchor_offset_mae": 0.00713556011910163,
+      "better_points": 66,
+      "evaluation_points": 69
+    },
+    "cross3": {
+      "identity_mae": 0.011130214482699094,
+      "anchor_offset_mae": 0.00979412519770606,
+      "better_points": 6,
+      "evaluation_points": 15
+    }
+  },
+  "interpretation": {
+    "offset_plus_relative_history_geometry_transfers_to_store4": true,
+    "cross3_improves_modestly_but_not_uniformly": true,
+    "plain_speak": "The one-anchor offset model generalizes well to another four-item family. Cross3 improves only modestly, which suggests its relative history pattern may also stretch or compress across phases rather than only shifting together.",
+    "next_stage": "test a fixed two-anchor affine transform that allows one shared phase offset and one shared residual scale"
+  },
+  "activation_authorized": false
+}
