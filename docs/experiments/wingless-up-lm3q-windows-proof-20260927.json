@@ -1,0 +1,28 @@
+{
+  "schema": "wingless.up-lm3q-windows-proof.v1",
+  "experiment": "UP-LM3Q-rich-profile-pressure-sweep",
+  "status": "qualified-scientific-result",
+  "source_head": "c1bed91a954d7a1b8e87dc333398d6cdabd2a19f",
+  "workflow_run_id": 36309229802,
+  "runner_lane": "Windows research qualification lane A",
+  "artifact_id": 10928004801,
+  "artifact_sha256": "c42a16d3c327776e315d93329adc7210f6ff86819a7ab61b579ed12e030a88df",
+  "findings": {
+    "pressure4_rich_max_spread": 0,
+    "pressure5_rich_max_spread": 0,
+    "pressure6_rich_max_spread": 0,
+    "pressure7_rich_max_spread": 0,
+    "pressure8_rich_max_spread": 0,
+    "simple_c4_breaks_at_pressures": [
+      4,
+      8
+    ]
+  },
+  "interpretation": {
+    "rich_deployment_profile_validated_through_pressure8": true,
+    "simple_round4_profile_has_nonmonotonic_boundaries": true,
+    "plain_speak": "The richer three-number resource profile remains exact all the way through eight extra pre-window writes. The simpler profile fails at isolated pressure levels, so the earlier capacity checkpoint is carrying real information rather than merely correcting one special case.",
+    "next_stage": "freeze the rich profile and extend the pressure sweep beyond eight to locate its next boundary"
+  },
+  "activation_authorized": false
+}
