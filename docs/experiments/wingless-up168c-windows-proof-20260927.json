@@ -1,0 +1,25 @@
+{
+  "schema": "wingless.up168c-windows-proof.v1",
+  "experiment": "UP-168C-bounded-correction",
+  "status": "qualified-scientific-result",
+  "source_head": "0c1aa4a9cf0e888e1b74074ffbb353a3e661f67d",
+  "workflow_run_id": 36285302050,
+  "runner_lane": "Windows research qualification lane C",
+  "artifact_id": 10920561544,
+  "artifact_sha256": "10b8cd4556b85bed47165e4c3ac4b88b95bb286c11298bed1c1495b56d99fd45",
+  "findings": {
+    "targeted_prevented_losses_all_tested_cells": 0,
+    "sham_prevented_losses_all_tested_cells": 0,
+    "targeted_treated_losses_equal_baseline_losses": true,
+    "one_action_maximum_per_arm": true
+  },
+  "interpretation": {
+    "one_shot_targeted_refresh_does_not_prevent_eventual_loss": true,
+    "targeted_refresh_does_not_outperform_same_budget_sham": true,
+    "permanent_survival_is_too_strict_to_detect_possible_delay_benefit": true,
+    "plain_speak": "A single targeted refresh did not save any arm over the full evaluation horizon, and it performed exactly like a sham refresh. The warning is real, but this particular one-shot correction is not enough to prevent eventual failure. The remaining useful question is whether it buys meaningful time before failure.",
+    "north_star_question": "First bounded correction attempt is negative for eventual survival; corrective value, if any, may be delay rather than prevention.",
+    "next_stage": "freeze the same trigger and interventions and measure time-to-loss shift versus baseline and sham, without repeated maintenance"
+  },
+  "activation_authorized": false
+}
