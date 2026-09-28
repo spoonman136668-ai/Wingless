@@ -161,7 +161,7 @@ func (f ReplayFixture) BuildRequest(repetition int) (Request, error) {
 		FrontierSHA256:              frontierHash,
 		QualificationContractSHA256: contractHash,
 		Context:                     prompt,
-		MaxOutputTokens:             1024,
+		MaxOutputTokens:             8192,
 		TimeoutSeconds:              300,
 		DataClass:                   "public-repository",
 		ResponseJSONSchema: &JSONSchemaConstraint{
