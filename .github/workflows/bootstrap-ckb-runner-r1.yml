@@ -1,0 +1,124 @@
+name: Bootstrap CKB-plane Runner R1
+
+on:
+  push:
+    branches:
+      - ops/bootstrap-ckb-runner-r1
+    paths:
+      - .github/workflows/bootstrap-ckb-runner-r1.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bootstrap-ckb-runner-r1
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    name: Start CKB-plane runner service only
+    runs-on: [self-hosted, Windows, X64]
+    timeout-minutes: 10
+    steps:
+      - name: Verify Wingless runner identity and start exact CKB runner service
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version 2.0
+
+          if ($env:RUNNER_NAME -notlike 'WINGLESS-UP-*') {
+              throw "BOOTSTRAP_REFUSED_NON_WINGLESS_RUNNER name=$env:RUNNER_NAME"
+          }
+          if ($env:RUNNER_OS -cne 'Windows' -or $env:RUNNER_ARCH -cne 'X64') {
+              throw "BOOTSTRAP_REFUSED_PLATFORM $env:RUNNER_OS/$env:RUNNER_ARCH"
+          }
+
+          $Root = 'C:\actions-runner'
+          $RunnerConfig = Join-Path $Root '.runner'
+          $ExpectedExe = [IO.Path]::GetFullPath((Join-Path $Root 'bin\RunnerService.exe'))
+
+          if (-not (Test-Path -LiteralPath $RunnerConfig -PathType Leaf)) {
+              throw "CKB_RUNNER_CONFIG_MISSING path=$RunnerConfig"
+          }
+
+          $Cfg = Get-Content -LiteralPath $RunnerConfig -Raw | ConvertFrom-Json
+          $GitHubUrl = ''
+          if ($Cfg.PSObject.Properties.Name -contains 'gitHubUrl') {
+              $GitHubUrl = [string]$Cfg.gitHubUrl
+          }
+          if (-not [string]::IsNullOrWhiteSpace($GitHubUrl)) {
+              $Normalized = $GitHubUrl.TrimEnd('/').ToLowerInvariant()
+              if ($Normalized -ne 'https://github.com/spoonman136668-ai/ckb-plane') {
+                  throw "CKB_RUNNER_SCOPE_UNEXPECTED github_url=$GitHubUrl"
+              }
+          }
+
+          function Get-ServiceExePath([string]$PathName) {
+              $s = $PathName.Trim()
+              if ($s.StartsWith('"')) {
+                  $end = $s.IndexOf('"',1)
+                  if ($end -le 1) { return '' }
+                  return $s.Substring(1,$end-1)
+              }
+              $space = $s.IndexOf(' ')
+              if ($space -gt 0) { return $s.Substring(0,$space) }
+              return $s
+          }
+
+          $Matches = @(
+              Get-CimInstance Win32_Service |
+              Where-Object {
+                  if (-not $_.PathName) { return $false }
+                  $exe = Get-ServiceExePath ([string]$_.PathName)
+                  if ([string]::IsNullOrWhiteSpace($exe)) { return $false }
+                  try {
+                      return ([IO.Path]::GetFullPath($exe) -ieq $ExpectedExe)
+                  }
+                  catch {
+                      return $false
+                  }
+              }
+          )
+
+          if ($Matches.Count -ne 1) {
+              throw "CKB_RUNNER_SERVICE_IDENTITY_AMBIGUOUS count=$($Matches.Count) expected_exe=$ExpectedExe"
+          }
+
+          $Svc = $Matches[0]
+
+          Write-Host "wingless_bootstrap_runner=$env:RUNNER_NAME"
+          Write-Host "ckb_runner_service=$($Svc.Name)"
+          Write-Host "ckb_runner_display_name=$($Svc.DisplayName)"
+          Write-Host "ckb_runner_start_name=$($Svc.StartName)"
+          Write-Host "ckb_runner_state_before=$($Svc.State)"
+          if (-not [string]::IsNullOrWhiteSpace($GitHubUrl)) {
+              Write-Host "ckb_runner_github_url=$GitHubUrl"
+          }
+
+          if ($Svc.State -ne 'Running') {
+              try {
+                  Start-Service -Name $Svc.Name -ErrorAction Stop
+              }
+              catch {
+                  throw "CKB_RUNNER_SERVICE_START_FAILED service=$($Svc.Name) detail=$($_.Exception.Message)"
+              }
+          }
+
+          $Deadline = (Get-Date).AddSeconds(45)
+          do {
+              Start-Sleep -Seconds 1
+              $Now = Get-CimInstance Win32_Service -Filter "Name='$($Svc.Name.Replace("'","''"))'"
+          } until (
+              $Now.State -eq 'Running' -or
+              (Get-Date) -ge $Deadline
+          )
+
+          if ($Now.State -ne 'Running') {
+              throw "CKB_RUNNER_SERVICE_NOT_RUNNING state=$($Now.State)"
+          }
+
+          Write-Host "ckb_runner_state_after=$($Now.State)"
+          Write-Host 'CKB_RUNNER_BOOTSTRAP=PASS'
+          Write-Host 'ckb_plane_touched=False'
+          Write-Host 'wingless_research_state_touched=False'
+          Write-Host 'accepted_refs_touched=False'
