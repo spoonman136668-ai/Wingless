@@ -1,43 +1,66 @@
 name: Nemotron reasoner qualification
 
 on:
+  push:
+    branches:
+      - research/nemotron-openrouter-reasoner-r1
+    paths:
+      - 'reasoner/**'
+      - 'cmd/research-reasoner/**'
+      - 'cmd/reasoner-replay/**'
+      - '.github/workflows/nemotron-reasoner-qualification.yml'
   workflow_dispatch:
-    inputs:
-      run_remote_smoke:
-        description: Perform one bounded OpenRouter smoke request after local tests
-        required: true
-        default: false
-        type: boolean
 
 permissions:
   contents: read
 
 jobs:
-  qualify:
+  deterministic-qualification:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      WINGLESS_REMOTE_REASONER_ENABLE: "0"
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: research/nemotron-openrouter-reasoner-r1
+          ref: ${{ github.sha }}
           persist-credentials: false
+          fetch-depth: 1
 
       - uses: actions/setup-go@v5
         with:
           go-version: '1.25.5'
           cache: false
 
-      - name: Unit qualification
+      - name: Focused reasoner qualification
         run: |
           set -euo pipefail
-          go test ./reasoner ./cmd/research-reasoner -count=1
+          go test ./reasoner ./cmd/research-reasoner ./cmd/reasoner-replay -count=1
 
-      - name: Verify dedicated secret binding
+      - name: Full Wingless regression
+        run: |
+          set -euo pipefail
+          go test ./... -count=1
+
+  historical-blind-replay:
+    needs: deterministic-qualification
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      WINGLESS_REMOTE_REASONER_ENABLE: "1"
+      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+
+      - name: Verify dedicated research secret binding
         shell: bash
-        env:
-          WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
         run: |
           set -euo pipefail
           if [ -z "${WINGLESS_REASONER_OPENROUTER_API_KEY:-}" ]; then
@@ -46,14 +69,21 @@ jobs:
           fi
           echo "WINGLESS_REASONER_SECRET_BINDING_PASS"
 
-      - name: Remote smoke remains opt-in
-        if: ${{ inputs.run_remote_smoke == true }}
+      - name: Run two-pass historical blind replay
         shell: bash
-        env:
-          WINGLESS_REMOTE_REASONER_ENABLE: "1"
-          WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
         run: |
           set -euo pipefail
-          echo "Remote smoke is deliberately not implemented in this staging workflow."
-          echo "Historical blind-replay qualification must be added first."
-          exit 1
+          mkdir -p evidence
+          go run ./cmd/reasoner-replay \
+            -fixtures reasoner/fixtures/history \
+            -repeats 2 \
+            -out evidence/nemotron-reasoner-replay.json
+
+      - name: Upload replay evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nemotron-reasoner-replay-${{ github.sha }}
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 30
