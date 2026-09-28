@@ -53,13 +53,13 @@ Activation is intentionally separate from setup.
 Required environment variables on a dedicated research runner:
 
 - `WINGLESS_REMOTE_REASONER_ENABLE=1`
-- `OPENROUTER_API_KEY=<secret from runner secret store>`
+- `WINGLESS_REASONER_OPENROUTER_API_KEY=<secret from runner secret store>`
 
 Optional model override:
 
 - `WINGLESS_REASONER_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free`
 
-The API key must never be committed, printed, embedded in evidence, or passed through ckb-plane work-order text.
+The research API key must be distinct from any CKB repair/orchestration OpenRouter credential and must never be committed, printed, embedded in evidence, or passed through ckb-plane work-order text.
 
 Example invocation after qualification and explicit activation authority:
 
