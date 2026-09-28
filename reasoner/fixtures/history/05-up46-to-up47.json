@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.reasoner-replay-fixture.v1",
+  "fixture_id": "up46-to-up47",
+  "project": "Wingless",
+  "historical_frontier": "3a4a5c209818a803b5451d2ca4adf74c62d16680",
+  "question": "UP-46 shows that exact-fused step 29 scores better than sparse-selected step 24, but step 29 was never eligible for selection. What should run next?",
+  "evidence": [
+    "UP-45 only evaluated selection checkpoints at steps 0, 12, 24, and 48.",
+    "UP-46 evaluated frozen states 24 and 29 under the unchanged objective and found step 29 slightly better on the smooth objective and substantially better on hard recurrent metrics.",
+    "The complete UP-45 trajectory already exists, so the checkpoint-scheduling hypothesis can be tested without rerunning optimization."
+  ],
+  "constraints": [
+    "Do not rerun or retune the optimizer.",
+    "Do not privilege step 29 merely because it looked promising after the fact.",
+    "Use the unchanged objective to select before consulting held-out hard capability."
+  ],
+  "candidates": [
+    {
+      "id": "A",
+      "proposal": "Rerun the optimizer with a new checkpoint exactly at step 29 and select it if the hard metrics stay strong."
+    },
+    {
+      "id": "B",
+      "proposal": "Change the objective to reward exact fusion so step 29 becomes eligible and preferred."
+    },
+    {
+      "id": "C",
+      "proposal": "Replay and score every already-recorded UP-45 trajectory state under the unchanged objective, freeze the selected state, and only then evaluate held-out capability."
+    },
+    {
+      "id": "D",
+      "proposal": "Declare step 29 the winner immediately because its hard recurrent metrics already beat step 24."
+    }
+  ],
+  "expected_candidate_id": "C",
+  "expected_why": "Dense replay tests the checkpoint-scheduling hypothesis without optimizer reruns, post-result privileging, or held-out selection leakage."
+}
