@@ -24,9 +24,9 @@ func main() {
 	if *requestPath == "" || *outputPath == "" {
 		die(errors.New("both -request and -out are required"))
 	}
-	key := os.Getenv("OPENROUTER_API_KEY")
+	key := os.Getenv("WINGLESS_REASONER_OPENROUTER_API_KEY")
 	if key == "" {
-		die(errors.New("OPENROUTER_API_KEY is not set"))
+		die(errors.New("WINGLESS_REASONER_OPENROUTER_API_KEY is not set"))
 	}
 
 	raw, err := os.ReadFile(*requestPath)
