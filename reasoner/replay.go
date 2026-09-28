@@ -163,6 +163,7 @@ func (f ReplayFixture) BuildRequest(repetition int) (Request, error) {
 		Context:                     prompt,
 		MaxOutputTokens:             1024,
 		TimeoutSeconds:              300,
+		DataClass:                   "public-repository",
 		ResponseJSONSchema: &JSONSchemaConstraint{
 			Name:   "historical_replay_decision",
 			Schema: schema,
