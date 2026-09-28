@@ -33,7 +33,7 @@ func TestInvokePinsScientificControlsAndCapturesIdentity(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	client.config.Endpoint = srv.URL
+	client.endpoint = srv.URL
 
 	r := Request{
 		Schema:                      RequestSchema,
