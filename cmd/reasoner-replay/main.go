@@ -69,6 +69,17 @@ func main() {
 	if len(fixtures) < 5 {
 		die(fmt.Errorf("at least five blind replay fixtures required, got %d", len(fixtures)))
 	}
+	projects := map[string]bool{"Wingless": false, "Yggdrasil": false}
+	for _, fixture := range fixtures {
+		if _, required := projects[fixture.Project]; required {
+			projects[fixture.Project] = true
+		}
+	}
+	for project, present := range projects {
+		if !present {
+			die(fmt.Errorf("required replay project missing: %s", project))
+		}
+	}
 
 	cfg := reasoner.DefaultConfig()
 	client, err := reasoner.NewClient(key, cfg)
