@@ -69,8 +69,8 @@ func (r Request) Validate() error {
 	if r.ResponseJSONSchema != nil && (r.ResponseJSONSchema.Name == "" || len(r.ResponseJSONSchema.Schema) == 0) {
 		return errors.New("response JSON schema invalid")
 	}
-	if r.DataClass != "public-repository" && r.DataClass != "private" {
-		return errors.New("reasoner data class invalid")
+	if r.DataClass != "public-repository" {
+		return errors.New("reasoner requires public-repository data class")
 	}
 	switch r.Role {
 	case RolePlan, RoleInterpret, RoleCritique:
@@ -117,8 +117,8 @@ func DefaultConfig() Config {
 }
 
 func (c Config) Validate() error {
-	if c.Model == "" || strings.ContainsAny(c.Model, " \t\r\n") {
-		return errors.New("reasoner model invalid")
+	if c.Model != DefaultModel {
+		return errors.New("reasoner model must remain pinned to free Nemotron endpoint")
 	}
 	if c.Endpoint != DefaultEndpoint {
 		return errors.New("reasoner endpoint must be the pinned OpenRouter chat endpoint")
@@ -204,7 +204,7 @@ func (c *Client) Invoke(parent context.Context, r Request) (Result, error) {
 	if err := c.config.Validate(); err != nil {
 		return out, err
 	}
-	if strings.HasSuffix(c.config.Model, ":free") && r.DataClass != "public-repository" {
+	if r.DataClass != "public-repository" {
 		return out, errors.New("free reasoner route requires public-repository data class")
 	}
 
