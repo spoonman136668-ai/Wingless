@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.nemotron-reasoner-qualification.v1",
+  "status": "qualified",
+  "qualified_at_utc": "2026-09-28T21:11:21.29684668Z",
+  "tested_repository": "spoonman136668-ai/Wingless",
+  "tested_branch": "research/nemotron-openrouter-reasoner-r1",
+  "tested_commit": "212ca3031977da808a1416065599f65992f3f17f",
+  "workflow_run_id": 36483722629,
+  "workflow_name": "Nemotron reasoner qualification",
+  "deterministic_qualification": {
+    "focused_reasoner_tests": "pass",
+    "full_wingless_regression": "pass"
+  },
+  "remote_reasoner": {
+    "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "provider": "Nvidia",
+    "dedicated_secret_name": "WINGLESS_REASONER_OPENROUTER_API_KEY",
+    "data_class": "public-repository",
+    "provider_fallbacks": false,
+    "mind_palace_forwarding": "forbidden"
+  },
+  "blind_replay": {
+    "fixture_count": 7,
+    "projects": [
+      "Wingless",
+      "Yggdrasil"
+    ],
+    "repetitions": 2,
+    "total_decisions": 14,
+    "correct": 14,
+    "constraint_violations": 0,
+    "result": "pass"
+  },
+  "evidence_artifact": {
+    "id": 10998885130,
+    "name": "nemotron-reasoner-replay-212ca3031977da808a1416065599f65992f3f17f",
+    "sha256": "19f5943efde3c2169a0b3d3fa1dc8def581dce41afa9e3266f2e335887471073",
+    "retention_expires_at": "2026-10-28T21:11:21Z",
+    "contains_per_decision_qualification_identity": true,
+    "contains_per_decision_response_sha256": true
+  },
+  "qualified_scope": [
+    "advisory planning of next preregistered experiment from bounded public repository evidence",
+    "advisory critique of a proposed experiment before freeze",
+    "advisory interpretation of a deterministically sealed public result"
+  ],
+  "not_authorized": [
+    "execution",
+    "queue submission",
+    "retry authority",
+    "acceptance",
+    "promotion",
+    "deployment",
+    "accepted-ref mutation",
+    "threshold or gate changes after results",
+    "KTRADE runtime changes",
+    "broker or credential access",
+    "transmission of Mind-Palace or other private/local-only context"
+  ],
+  "qualification_reuse_policy": "Reuse only when exact immutable tested source/config/model/qualification-contract identity remains applicable; identity drift requires bounded requalification and final integration regression."
+}
