@@ -215,8 +215,9 @@ func (c *Client) Invoke(parent context.Context, r Request) (Result, error) {
 		TopP        float64             `json:"top_p"`
 		Seed        int64               `json:"seed"`
 		Reasoning   map[string]any      `json:"reasoning"`
-		Provider    map[string]any      `json:"provider"`
-		Stream      bool                `json:"stream"`
+		Provider       map[string]any      `json:"provider"`
+		ResponseFormat map[string]any      `json:"response_format,omitempty"`
+		Stream         bool                `json:"stream"`
 	}{
 		Model: c.config.Model,
 		Messages: []map[string]string{
@@ -238,6 +239,16 @@ func (c *Client) Invoke(parent context.Context, r Request) (Result, error) {
 			"require_parameters": true,
 		},
 		Stream: false,
+	}
+	if r.ResponseJSONSchema != nil {
+		payload.ResponseFormat = map[string]any{
+			"type": "json_schema",
+			"json_schema": map[string]any{
+				"name":   r.ResponseJSONSchema.Name,
+				"strict": true,
+				"schema": r.ResponseJSONSchema.Schema,
+			},
+		}
 	}
 	body, err := json.Marshal(payload)
 	if err != nil {
