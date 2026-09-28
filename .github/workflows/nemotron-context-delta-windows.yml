@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Verify isolated runner
-        shell: powershell
+        shell: powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         run: |
           $ErrorActionPreference = 'Stop'
           if ($env:RUNNER_NAME -notlike 'WINGLESS-UP-*') {
@@ -25,7 +25,7 @@ jobs:
           Write-Host "runner=$env:RUNNER_NAME"
 
       - name: Qualify exact Mind-Palace sidecar delta
-        shell: powershell
+        shell: powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         env:
           MP_EXPECTED_SHA: 7abeb8bf0ccc7c9f11d9163c1d2ec0174dbeb25e
           MP_EXPECTED_BRANCH: research/nemotron-public-context-r1
