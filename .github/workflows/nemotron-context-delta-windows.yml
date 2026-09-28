@@ -32,7 +32,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
 
-          $Live = Join-Path $env:USERPROFILE 'GolandProjects\Mind-Palace'
+          $Live = 'C:\Users\camar\GolandProjects\Mind-Palace'
           if (-not (Test-Path -LiteralPath $Live -PathType Container)) {
             throw "MIND_PALACE_LIVE_ROOT_MISSING: $Live"
           }
