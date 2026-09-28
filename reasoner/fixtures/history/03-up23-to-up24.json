@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.reasoner-replay-fixture.v1",
+  "fixture_id": "up23-to-up24",
+  "project": "Wingless",
+  "historical_frontier": "8e54fba4e58e632c37d580e2d9cf4b58e92ba4f7",
+  "question": "UP-23 produced depth-stable scalar spectral moments, but they failed to decode the task. What is the highest-information next experiment?",
+  "evidence": [
+    "Maximum spectral-moment drift at depth 1024 is near numerical zero, so invariance itself works.",
+    "Training and held-out task accuracy remain poor despite invariant features.",
+    "The transport has repeated eigenspaces inherited from the historical composite structure, so scalar moments can collapse orientation within multiplicity spaces."
+  ],
+  "constraints": [
+    "Keep the recurrent 96-dimensional state fully mixed and block-free at runtime.",
+    "Do not restore visible semantic channel labels or runtime unmixing.",
+    "Test the multiplicity-space diagnosis directly before changing training budgets."
+  ],
+  "candidates": [
+    {
+      "id": "A",
+      "proposal": "Increase the number of scalar spectral moments and training epochs without changing the observable algebra."
+    },
+    {
+      "id": "B",
+      "proposal": "Use a sufficiently rich algebra of observables that commutes with the transport and can resolve orientation inside repeated eigenspaces while leaving the state fully mixed."
+    },
+    {
+      "id": "C",
+      "proposal": "Undo the full-latent mixer at runtime and restore the six historical channel blocks."
+    },
+    {
+      "id": "D",
+      "proposal": "Add held-out depths to training and tune ridge regularization until accuracy improves."
+    }
+  ],
+  "expected_candidate_id": "B",
+  "expected_why": "A transport-commuting observable algebra directly tests whether lost multiplicity-space orientation caused the scalar-moment failure."
+}
