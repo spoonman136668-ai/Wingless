@@ -278,6 +278,7 @@ func (c *Client) Invoke(parent context.Context, r Request) (Result, error) {
 	}
 	httpReq.Header.Set("Authorization", "Bearer "+c.token)
 	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("X-OpenRouter-Metadata", "enabled")
 
 	start := time.Now()
 	resp, err := c.http.Do(httpReq)
@@ -397,6 +398,39 @@ func (c *Client) Invoke(parent context.Context, r Request) (Result, error) {
 		CompletedAtUTC: time.Now().UTC().Format(time.RFC3339Nano),
 	}
 	return out, nil
+}
+
+
+func classifyOpenRouterHTTPError(status int, raw []byte) string {
+	var wire struct {
+		Error struct {
+			Code     any            `json:"code"`
+			Message  string         `json:"message"`
+			Metadata map[string]any `json:"metadata"`
+		} `json:"error"`
+		OpenRouterMetadata map[string]any `json:"openrouter_metadata"`
+	}
+	_ = json.Unmarshal(raw, &wire)
+
+	switch status {
+	case http.StatusUnauthorized:
+		return "auth_failed"
+	case http.StatusPaymentRequired:
+		return "payment_required"
+	case http.StatusForbidden:
+		if len(wire.OpenRouterMetadata) > 0 || len(wire.Error.Metadata) > 0 {
+			return "guardrail_or_runtime_policy_block"
+		}
+		return "forbidden_key_budget_or_allowlist"
+	case http.StatusNotFound:
+		return "model_or_compliant_provider_unavailable"
+	case http.StatusTooManyRequests:
+		return "rate_limited"
+	case http.StatusServiceUnavailable:
+		return "provider_unavailable"
+	default:
+		return "remote_rejected"
+	}
 }
 
 func sha256hex(b []byte) string {
