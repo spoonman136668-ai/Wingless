@@ -12,14 +12,14 @@ permissions:
 
 jobs:
   qualify-mind-palace-sidecar:
-    runs-on: [self-hosted, Windows, X64]
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
     timeout-minutes: 30
     steps:
       - name: Verify isolated runner
         shell: powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         run: |
           $ErrorActionPreference = 'Stop'
-          if ($env:RUNNER_NAME -notlike 'WINGLESS-UP-*') {
+          if ($env:RUNNER_NAME -cne 'WINGLESS-LINKDEADKB') {
             throw "NEMOTRON_CONTEXT_RUNNER_IDENTITY_INVALID: $env:RUNNER_NAME"
           }
           Write-Host "runner=$env:RUNNER_NAME"
