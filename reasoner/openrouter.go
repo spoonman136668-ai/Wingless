@@ -115,8 +115,7 @@ func DefaultConfig() Config {
 }
 
 func (c Config) Validate() error {
-	if c.Model == "" || strings.ContainsAny(c.Model, " 	
-") {
+	if c.Model == "" || strings.ContainsAny(c.Model, " \t\r\n") {
 		return errors.New("reasoner model invalid")
 	}
 	if c.Endpoint != DefaultEndpoint {
