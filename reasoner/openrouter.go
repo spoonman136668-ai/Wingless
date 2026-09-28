@@ -155,9 +155,10 @@ type Result struct {
 }
 
 type Client struct {
-	token  string
-	config Config
-	http   *http.Client
+	token    string
+	config   Config
+	endpoint string
+	http     *http.Client
 }
 
 func NewClient(token string, config Config) (*Client, error) {
@@ -173,8 +174,9 @@ func NewClient(token string, config Config) (*Client, error) {
 		MaxResponseHeaderBytes: 16384,
 	}
 	return &Client{
-		token:  token,
-		config: config,
+		token:    token,
+		config:   config,
+		endpoint: config.Endpoint,
 		http: &http.Client{
 			Transport: transport,
 			Timeout:   15 * time.Minute,
@@ -246,7 +248,7 @@ func (c *Client) Invoke(parent context.Context, r Request) (Result, error) {
 	ctx, cancel := context.WithTimeout(parent, timeout)
 	defer cancel()
 
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, c.config.Endpoint, bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpoint, bytes.NewReader(body))
 	if err != nil {
 		return out, err
 	}
