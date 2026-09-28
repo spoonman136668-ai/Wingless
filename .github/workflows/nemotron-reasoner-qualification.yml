@@ -47,6 +47,7 @@ jobs:
           go test ./... -count=1
 
   historical-blind-replay:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[nemotron-replay]')
     needs: deterministic-qualification
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_remote_replay == true }}
     runs-on: ubuntu-latest
