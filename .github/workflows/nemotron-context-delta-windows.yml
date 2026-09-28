@@ -1,0 +1,107 @@
+name: Nemotron context delta Windows qualification
+
+on:
+  push:
+    branches:
+      - research/nemotron-openrouter-reasoner-r1
+    paths:
+      - '.github/workflows/nemotron-context-delta-windows.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  qualify-mind-palace-sidecar:
+    runs-on: [self-hosted, Windows, X64]
+    timeout-minutes: 30
+    steps:
+      - name: Verify isolated runner
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:RUNNER_NAME -notlike 'WINGLESS-UP-*') {
+            throw "NEMOTRON_CONTEXT_RUNNER_IDENTITY_INVALID: $env:RUNNER_NAME"
+          }
+          Write-Host "runner=$env:RUNNER_NAME"
+
+      - name: Qualify exact Mind-Palace sidecar delta
+        shell: powershell
+        env:
+          MP_EXPECTED_SHA: 7abeb8bf0ccc7c9f11d9163c1d2ec0174dbeb25e
+          MP_EXPECTED_BRANCH: research/nemotron-public-context-r1
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $Live = Join-Path $env:USERPROFILE 'GolandProjects\Mind-Palace'
+          if (-not (Test-Path -LiteralPath $Live -PathType Container)) {
+            throw "MIND_PALACE_LIVE_ROOT_MISSING: $Live"
+          }
+
+          $LiveHeadBefore = (git -C $Live rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0 -or $LiveHeadBefore -notmatch '^[0-9a-f]{40}$') {
+            throw 'MIND_PALACE_LIVE_HEAD_UNAVAILABLE'
+          }
+          $LiveStatusBefore = @(git -C $Live status --porcelain=v1 --untracked-files=no)
+          if ($LASTEXITCODE -ne 0) { throw 'MIND_PALACE_LIVE_STATUS_UNAVAILABLE' }
+
+          git -C $Live fetch --no-tags origin $env:MP_EXPECTED_BRANCH
+          if ($LASTEXITCODE -ne 0) { throw 'MIND_PALACE_SIDE_BRANCH_FETCH_FAILED' }
+
+          $Fetched = (git -C $Live rev-parse FETCH_HEAD).Trim()
+          if ($Fetched -cne $env:MP_EXPECTED_SHA) {
+            throw "MIND_PALACE_SIDE_SHA_DRIFT expected=$env:MP_EXPECTED_SHA observed=$Fetched"
+          }
+
+          $Root = Join-Path $env:RUNNER_TEMP "mp-nemo-$($env:GITHUB_RUN_ID)-$($env:GITHUB_RUN_ATTEMPT)"
+          if (Test-Path -LiteralPath $Root) { Remove-Item -LiteralPath $Root -Recurse -Force }
+          New-Item -ItemType Directory -Path $Root | Out-Null
+          $Candidate = Join-Path $Root 'Mind-Palace'
+
+          git -C $Live worktree add --detach $Candidate $env:MP_EXPECTED_SHA
+          if ($LASTEXITCODE -ne 0) { throw 'MIND_PALACE_SIDE_WORKTREE_ADD_FAILED' }
+
+          try {
+            $Head = (git -C $Candidate rev-parse HEAD).Trim()
+            if ($Head -cne $env:MP_EXPECTED_SHA) {
+              throw "MIND_PALACE_SIDE_WORKTREE_SHA_MISMATCH expected=$env:MP_EXPECTED_SHA observed=$Head"
+            }
+
+            & (Join-Path $Candidate 'tests\Test-PublicEvidenceHints.ps1')
+            if ($LASTEXITCODE -ne 0) { throw 'MIND_PALACE_PUBLIC_EVIDENCE_FOCUSED_FAIL' }
+
+            & (Join-Path $Candidate 'tools\mind.ps1') validate
+            if ($LASTEXITCODE -ne 0) { throw 'MIND_PALACE_STORE_VALIDATE_FAIL' }
+
+            & (Join-Path $Candidate 'tests\Test-All.ps1')
+            if ($LASTEXITCODE -ne 0) { throw 'MIND_PALACE_FULL_REGRESSION_FAIL' }
+
+            $Dirty = @(git -C $Candidate status --porcelain=v1 --untracked-files=no)
+            if ($LASTEXITCODE -ne 0) { throw 'MIND_PALACE_SIDE_STATUS_FAILED' }
+            if ($Dirty.Count -ne 0) {
+              throw "MIND_PALACE_SIDE_UNEXPECTED_DIRTY: $($Dirty -join '; ')"
+            }
+
+            $ToolBlob = (git -C $Candidate rev-parse 'HEAD:tools/public-evidence-hints.ps1').Trim()
+            if ($ToolBlob -cne '8568cf4a77344e34a0d498c3ca08ee46ee7b1a45') {
+              throw "MIND_PALACE_PUBLIC_EVIDENCE_BLOB_DRIFT observed=$ToolBlob"
+            }
+
+            Write-Host 'MIND_PALACE_NEMOTRON_CONTEXT_DELTA_WINDOWS_PASS'
+            Write-Host "mind_palace_sha=$Head"
+            Write-Host "tool_blob=$ToolBlob"
+          }
+          finally {
+            git -C $Live worktree remove --force $Candidate 2>$null
+            Remove-Item -LiteralPath $Root -Recurse -Force -ErrorAction SilentlyContinue
+          }
+
+          $LiveHeadAfter = (git -C $Live rev-parse HEAD).Trim()
+          $LiveStatusAfter = @(git -C $Live status --porcelain=v1 --untracked-files=no)
+          if ($LiveHeadAfter -cne $LiveHeadBefore) {
+            throw "MIND_PALACE_LIVE_HEAD_CHANGED before=$LiveHeadBefore after=$LiveHeadAfter"
+          }
+          if (($LiveStatusBefore -join [Environment]::NewLine) -cne ($LiveStatusAfter -join [Environment]::NewLine)) {
+            throw 'MIND_PALACE_LIVE_WORKTREE_CHANGED'
+          }
+
+          Write-Host 'MIND_PALACE_LIVE_CHECKOUT_UNCHANGED_PASS'
