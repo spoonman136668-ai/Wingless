@@ -42,9 +42,6 @@ func main() {
 	}
 
 	cfg := reasoner.DefaultConfig()
-	if model := os.Getenv("WINGLESS_REASONER_MODEL"); model != "" {
-		cfg.Model = model
-	}
 	client, err := reasoner.NewClient(key, cfg)
 	if err != nil {
 		die(err)
