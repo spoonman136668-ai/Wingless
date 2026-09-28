@@ -74,16 +74,30 @@ Every result records:
 
 Provider/model/config identity changes therefore produce different evidence identity. Cached evidence must not be reused across identity drift.
 
-## Qualification before activation
+## Qualification result
 
-This branch is intentionally unqualified. Before the remote reasoner is allowed into a research loop:
+Qualification run `36483722629` at source head `212ca3031977da808a1416065599f65992f3f17f` passed:
 
-1. Run unit tests for request bounds, privacy controls, model identity and provenance.
-2. Add fixture-only replay tests over historical Wingless/Yggdrasil decision points.
-3. Compare Nemotron proposals blind to future results.
-4. Measure constraint-violation rate, redundant-experiment rate, hypothesis coverage and discriminating value.
-5. Perform final full Wingless regression.
-6. Integrate through the existing ckb-plane research boundary only after explicit authority. **Still pending intentionally.**
+- focused reasoner tests: PASS;
+- full Wingless regression: PASS;
+- seven blind historical decision fixtures across Wingless and Yggdrasil;
+- two identical repetitions per fixture;
+- 14/14 historical next-experiment selections correct;
+- 0 scientific-boundary violations;
+- replay artifact `10998885130`;
+- artifact digest `sha256:19f5943efde3c2169a0b3d3fa1dc8def581dce41afa9e3266f2e335887471073`.
+
+This qualifies the pinned free Nemotron route for bounded advisory reasoning over public-repository evidence. It does not grant execution or acceptance authority.
+
+## Activation before live research
+
+Before the remote reasoner is allowed into a live research loop:
+
+1. Restore and verify the Mind-Palace mailbox/durable-context retrieval path.
+2. Reconstruct every Nemotron packet exclusively from public repository evidence selected with that context.
+3. Preserve the existing deterministic preregistration and experiment-execution authority boundaries.
+4. Integrate through the existing research boundary without altering KTRADE scheduling or accepted refs.
+5. Requalify if model, provider route, prompt contract, fixture contract, or relevant adapter identity changes. **Still pending intentionally.**
 
 KTRADE and current ckb-plane production work must not be paused or modified for this qualification.
 
