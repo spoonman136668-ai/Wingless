@@ -10,6 +10,12 @@ on:
       - 'cmd/reasoner-replay/**'
       - '.github/workflows/nemotron-reasoner-qualification.yml'
   workflow_dispatch:
+    inputs:
+      run_remote_replay:
+        description: Run the OpenRouter historical blind replay
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -42,6 +48,7 @@ jobs:
 
   historical-blind-replay:
     needs: deterministic-qualification
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_remote_replay == true }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
