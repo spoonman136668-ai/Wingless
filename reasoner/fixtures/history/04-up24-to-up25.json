@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.reasoner-replay-fixture.v1",
+  "fixture_id": "up24-to-up25",
+  "project": "Wingless",
+  "historical_frontier": "08acd3e00736069e3682813c4a905691697ed505",
+  "question": "UP-24 restores perfect decoding with a hand-constructed transport-commuting Weyl algebra. What experiment should follow?",
+  "evidence": [
+    "The hand-constructed commuting observable algebra gives perfect training, unseen-depth, and mutable integration performance.",
+    "The algebra was built using known six-fold multiplicity structure, so the decisive representation was supplied by the experimenter.",
+    "The recurrent state remains fully mixed; the unresolved question is whether the useful invariant algebra can be obtained without hidden structural knowledge."
+  ],
+  "constraints": [
+    "Do not claim autonomous discovery from a hand-specified algebra.",
+    "Do not expose the hidden multiplicity factorization or full-state mixer to the discovery procedure.",
+    "Freeze discovered observables before downstream task evaluation."
+  ],
+  "candidates": [
+    {
+      "id": "A",
+      "proposal": "Promote the hand-built Weyl algebra as the final architecture because all current gates passed."
+    },
+    {
+      "id": "B",
+      "proposal": "Tune a smaller subset of the known Weyl operators against held-out task accuracy."
+    },
+    {
+      "id": "C",
+      "proposal": "Discover candidate commuting observables from the full transport itself, without hidden factorization or mixer access, freeze them, and then evaluate task decoding."
+    },
+    {
+      "id": "D",
+      "proposal": "Restore semantic channel labels so the observer can directly identify each historical block."
+    }
+  ],
+  "expected_candidate_id": "C",
+  "expected_why": "The next causal question is autonomous discovery of the useful commutant structure, not another hand-designed observer."
+}
