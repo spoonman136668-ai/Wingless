@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.reasoner-replay-fixture.v1",
+  "fixture_id": "ygg-stab15-to-stab16",
+  "project": "Yggdrasil",
+  "historical_frontier": "5e3d52602ff38fbc2285cff9d495b79cfeb5826e",
+  "question": "STAB-15 cleanly decoupled hidden liveness from visible alpha, but hidden life repeatedly collapsed and never reached maturity. What should run next?",
+  "evidence": [
+    "Hidden life was moved to channel 4 while visible morphology remained channels 0 through 3.",
+    "The hidden-life channel repeatedly expanded locally and then collapsed; mature samples remained 0 of 8.",
+    "The occupancy ceiling was inactive because life was far below its upper bound, and ATTRACT-16 never activated because the maturity floor was not reached.",
+    "Low global visible MSE was a blank-output pathology, not successful morphology.",
+    "The result explicitly narrows the seam to a positive viability-to-morphology coupling for decoupled life."
+  ],
+  "constraints": [
+    "Do not lower the maturity threshold or weaken scientific gates after observing collapse.",
+    "Do not re-conflate visible alpha and hidden life merely to recover viability.",
+    "Do not add a direct hidden-life target mask or exempt hidden life from the existing L2 inside this experiment.",
+    "Preserve the existing occupancy ceiling and visible-morphology attractor unless a separately preregistered mechanism requires otherwise."
+  ],
+  "candidates": [
+    {
+      "id": "A",
+      "proposal": "Lower the maturity threshold until the existing hidden-life dynamics begin activating ATTRACT-16."
+    },
+    {
+      "id": "B",
+      "proposal": "Add a one-sided local minimum-viability floor that rewards enough mechanically reachable hidden life to reach the existing maturity floor without forcing hidden life to match target geometry; preserve the ceiling and visible-morphology attractor."
+    },
+    {
+      "id": "C",
+      "proposal": "Add a direct target-shaped hidden-life supervision mask so life is forced to occupy the visible target foreground."
+    },
+    {
+      "id": "D",
+      "proposal": "Move liveness back onto visible alpha so the original morphology loss once again supplies the survival signal."
+    }
+  ],
+  "expected_candidate_id": "B",
+  "expected_why": "A one-sided viability floor directly tests whether decoupled life can remain viable without restoring visible-alpha conflation or imposing exact target geometry."
+}
