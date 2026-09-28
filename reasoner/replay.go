@@ -111,7 +111,7 @@ func (f ReplayFixture) Prompt() (string, error) {
 	b.WriteString(`\nSelect the single candidate with the highest expected information value while respecting every frozen constraint.
 Set constraint_violation=true only if the candidate you select would violate one or more frozen constraints.
 Do not invent a fifth candidate. Do not assume access to later historical results.
-Return only the JSON object required by the response schema.`)
+Return only one JSON object with exactly these fields and no markdown:\n{"candidate_id":"<one listed candidate ID>","constraint_violation":false,"rationale":"<brief scientific rationale>"}\nDo not add any other keys.`)
 	return b.String(), nil
 }
 
