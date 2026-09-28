@@ -65,6 +65,9 @@ func (r Request) Validate() error {
 	if r.RequestID == "" || r.Project == "" || r.ExperimentID == "" {
 		return errors.New("reasoner request identity missing")
 	}
+	if r.ResponseJSONSchema != nil && (r.ResponseJSONSchema.Name == "" || len(r.ResponseJSONSchema.Schema) == 0) {
+		return errors.New("response JSON schema invalid")
+	}
 	switch r.Role {
 	case RolePlan, RoleInterpret, RoleCritique:
 	default:
