@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Verify Wingless runner identity and start exact CKB runner service
-        shell: powershell
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference = 'Stop'
           Set-StrictMode -Version 2.0
