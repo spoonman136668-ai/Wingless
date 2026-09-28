@@ -18,7 +18,7 @@ import (
 const (
 	RequestSchema        = "wingless.experiment-reasoning-request.v1"
 	ResultSchema         = "wingless.experiment-reasoning-result.v1"
-	DefaultModel         = "nvidia/nemotron-3-ultra-550b-a55b"
+	DefaultModel         = "nvidia/nemotron-3-ultra-550b-a55b:free"
 	DefaultEndpoint      = "https://openrouter.ai/api/v1/chat/completions"
 	MaxContextBytes      = 1 << 20
 	MaxCompletionTokens = 16384
@@ -51,6 +51,7 @@ type Request struct {
 	MaxOutputTokens             int                   `json:"max_output_tokens"`
 	TimeoutSeconds              int                   `json:"timeout_seconds"`
 	ResponseJSONSchema          *JSONSchemaConstraint `json:"response_json_schema,omitempty"`
+	DataClass                   string                `json:"data_class"`
 }
 
 func (r Request) Validate() error {
@@ -67,6 +68,9 @@ func (r Request) Validate() error {
 	}
 	if r.ResponseJSONSchema != nil && (r.ResponseJSONSchema.Name == "" || len(r.ResponseJSONSchema.Schema) == 0) {
 		return errors.New("response JSON schema invalid")
+	}
+	if r.DataClass != "public-repository" && r.DataClass != "private" {
+		return errors.New("reasoner data class invalid")
 	}
 	switch r.Role {
 	case RolePlan, RoleInterpret, RoleCritique:
@@ -95,9 +99,8 @@ type Config struct {
 	ReasoningEffort        string  `json:"reasoning_effort"`
 	Temperature            float64 `json:"temperature"`
 	TopP                   float64 `json:"top_p"`
-	DataCollection         string  `json:"data_collection"`
-	ZeroDataRetention      bool    `json:"zero_data_retention"`
 	AllowProviderFallbacks bool    `json:"allow_provider_fallbacks"`
+	RequireProviderParams  bool    `json:"require_provider_parameters"`
 }
 
 func DefaultConfig() Config {
@@ -108,9 +111,8 @@ func DefaultConfig() Config {
 		ReasoningEffort:        "high",
 		Temperature:            0,
 		TopP:                   0.95,
-		DataCollection:         "deny",
-		ZeroDataRetention:      true,
 		AllowProviderFallbacks: false,
+		RequireProviderParams:  true,
 	}
 }
 
@@ -128,12 +130,6 @@ func (c Config) Validate() error {
 	}
 	if c.Temperature < 0 || c.Temperature > 2 || c.TopP <= 0 || c.TopP > 1 {
 		return errors.New("sampling configuration invalid")
-	}
-	if c.DataCollection != "deny" {
-		return errors.New("data collection must be denied")
-	}
-	if !c.ZeroDataRetention {
-		return errors.New("zero data retention must remain enabled")
 	}
 	return nil
 }
@@ -208,6 +204,9 @@ func (c *Client) Invoke(parent context.Context, r Request) (Result, error) {
 	if err := c.config.Validate(); err != nil {
 		return out, err
 	}
+	if strings.HasSuffix(c.config.Model, ":free") && r.DataClass != "public-repository" {
+		return out, errors.New("free reasoner route requires public-repository data class")
+	}
 
 	reqBytes, err := json.Marshal(r)
 	if err != nil {
@@ -246,14 +245,12 @@ func (c *Client) Invoke(parent context.Context, r Request) (Result, error) {
 			"exclude": true,
 		},
 		Provider: map[string]any{
-			"allow_fallbacks":  c.config.AllowProviderFallbacks,
-			"data_collection":  c.config.DataCollection,
-			"zdr":              c.config.ZeroDataRetention,
-			"require_parameters": true,
+			"allow_fallbacks":    c.config.AllowProviderFallbacks,
+			"require_parameters": c.config.RequireProviderParams,
 		},
 		Stream: false,
 	}
-	if r.ResponseJSONSchema != nil {
+	if r.ResponseJSONSchema != nil && !strings.HasSuffix(c.config.Model, ":free") {
 		payload.ResponseFormat = map[string]any{
 			"type": "json_schema",
 			"json_schema": map[string]any{
