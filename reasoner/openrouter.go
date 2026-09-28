@@ -336,8 +336,11 @@ func (c *Client) Invoke(parent context.Context, r Request) (Result, error) {
 	if wire.Model != c.config.Model {
 		return out, fmt.Errorf("model identity drift: requested=%s returned=%s", c.config.Model, wire.Model)
 	}
-	if len(wire.Choices) != 1 || wire.Choices[0].FinishReason != "stop" {
-		return out, errors.New("incomplete or ambiguous reasoner generation")
+	if len(wire.Choices) != 1 {
+		return out, fmt.Errorf("ambiguous reasoner generation choices=%d", len(wire.Choices))
+	}
+	if wire.Choices[0].FinishReason != "stop" {
+		return out, fmt.Errorf("incomplete reasoner generation finish_reason=%s", wire.Choices[0].FinishReason)
 	}
 	text := wire.Choices[0].Message.Content
 	if text == "" || !utf8.ValidString(text) || len(text) > r.MaxOutputTokens*24 {
