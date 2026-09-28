@@ -24,8 +24,8 @@ The adapter fails closed on:
 - unbounded context/output/time,
 - endpoint drift,
 - missing API key,
-- disabled ZDR,
-- allowed provider data collection,
+- any request not classified as public-repository,
+- model-route drift away from the pinned free endpoint,
 - model identity drift,
 - incomplete generation,
 - oversized or malformed responses.
@@ -36,15 +36,11 @@ No automatic retries are performed.
 
 Default model:
 
-`nvidia/nemotron-3-ultra-550b-a55b`
+`nvidia/nemotron-3-ultra-550b-a55b:free`
 
-The paid model route is the default because actual research frontier packets may be proprietary. The request pins `data_collection=deny`, `zdr=true`, `require_parameters=true`, and provider fallbacks off.
+The free model route is the only staged route for this qualification. Every transmitted request must be classified `public-repository` and derived only from public Wingless or Yggdrasil repository material. Mind-Palace records, local-only evidence, credentials, personal data, and unpublished/private context are forbidden from this route.
 
-The free model can be selected explicitly with:
-
-`WINGLESS_REASONER_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free`
-
-Only use the free route with a sanitized/non-confidential context packet. Do not weaken the request privacy controls in code merely to make a provider eligible.
+The free NVIDIA endpoint is logged by NVIDIA for security and product-improvement purposes. That is acceptable for this staging path only because the transmitted scientific context is already public. Provider fallbacks remain disabled and supported request parameters are required.
 
 ## Activation ceremony
 
@@ -54,10 +50,6 @@ Required environment variables on a dedicated research runner:
 
 - `WINGLESS_REMOTE_REASONER_ENABLE=1`
 - `WINGLESS_REASONER_OPENROUTER_API_KEY=<secret from runner secret store>`
-
-Optional model override:
-
-- `WINGLESS_REASONER_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free`
 
 The research API key must be distinct from any CKB repair/orchestration OpenRouter credential and must never be committed, printed, embedded in evidence, or passed through ckb-plane work-order text.
 
@@ -94,3 +86,12 @@ This branch is intentionally unqualified. Before the remote reasoner is allowed 
 6. Integrate through the existing ckb-plane research boundary only after explicit authority.
 
 KTRADE and current ckb-plane production work must not be paused or modified for this qualification.
+
+
+## Mind-Palace boundary
+
+Mind-Palace remains the durable-context source for historical project context, but its retrieved records are not transmitted to the free Nemotron endpoint. When Mind-Palace is healthy, it may help identify which public repository records should be fetched. The actual reasoner packet must then be reconstructed exclusively from public repository content and bound to its public-source hashes.
+
+This preserves the architecture:
+
+Mind-Palace durable context -> select relevant public evidence -> public-repository reasoner packet -> Nemotron advisory reasoning -> deterministic preregistration/execution authority -> sealed public result -> durable context ingestion.
