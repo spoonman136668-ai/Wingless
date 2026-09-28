@@ -29,11 +29,26 @@ type selectionFixture struct {
 	PublicReconstructionRequired bool     `json:"public_reconstruction_required"`
 }
 
+type strictBool bool
+
+func (b *strictBool) UnmarshalJSON(raw []byte) error {
+	switch string(raw) {
+	case "true", "\"true\"":
+		*b = true
+		return nil
+	case "false", "\"false\"":
+		*b = false
+		return nil
+	default:
+		return fmt.Errorf("expected exact boolean true/false, got %s", string(raw))
+	}
+}
+
 type answer struct {
-	WinglessNextQuestion      string `json:"wingless_next_question"`
-	YggdrasilNextQuestion     string `json:"yggdrasil_next_question"`
-	ConstraintViolation      bool   `json:"constraint_violation"`
-	CrossProjectLineageClaim bool   `json:"cross_project_lineage_claim"`
+	WinglessNextQuestion      string     `json:"wingless_next_question"`
+	YggdrasilNextQuestion     string     `json:"yggdrasil_next_question"`
+	ConstraintViolation      strictBool `json:"constraint_violation"`
+	CrossProjectLineageClaim strictBool `json:"cross_project_lineage_claim"`
 }
 
 type evidence struct {
@@ -176,10 +191,10 @@ func main() {
 		strings.TrimSpace(a.YggdrasilNextQuestion) == "" {
 		die(errors.New("Nemotron omitted a project-specific next question"))
 	}
-	if a.ConstraintViolation {
+	if bool(a.ConstraintViolation) {
 		die(errors.New("Nemotron reported a scientific constraint violation"))
 	}
-	if a.CrossProjectLineageClaim {
+	if bool(a.CrossProjectLineageClaim) {
 		die(errors.New("Nemotron merged independent research lineages"))
 	}
 
