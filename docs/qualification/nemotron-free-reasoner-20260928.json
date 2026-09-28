@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.nemotron-reasoner-qualification-receipt.v1",
+  "qualified_at_utc": "2026-09-28T21:11:21.29684668Z",
+  "status": "qualified-not-activated",
+  "route": {
+    "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "provider": "Nvidia",
+    "data_class": "public-repository",
+    "credential_secret_name": "WINGLESS_REASONER_OPENROUTER_API_KEY"
+  },
+  "source": {
+    "repository": "spoonman136668-ai/Wingless",
+    "branch": "research/nemotron-openrouter-reasoner-r1",
+    "head_sha": "212ca3031977da808a1416065599f65992f3f17f"
+  },
+  "workflow": {
+    "run_id": 36483722629,
+    "deterministic_qualification": "pass",
+    "full_wingless_regression": "pass",
+    "historical_blind_replay": "pass"
+  },
+  "replay": {
+    "fixture_count": 7,
+    "projects": ["Wingless", "Yggdrasil"],
+    "repetitions": 2,
+    "total_decisions": 14,
+    "correct_decisions": 14,
+    "constraint_violations": 0
+  },
+  "artifact": {
+    "id": 10998885130,
+    "name": "nemotron-reasoner-replay-212ca3031977da808a1416065599f65992f3f17f",
+    "sha256": "19f5943efde3c2169a0b3d3fa1dc8def581dce41afa9e3266f2e335887471073",
+    "retention_days": 30
+  },
+  "authority": {
+    "advisory_only": true,
+    "authorizes_execution": false,
+    "authorizes_acceptance": false,
+    "authorizes_promotion": false,
+    "authorizes_threshold_change": false,
+    "ktrade_interference": false,
+    "mind_palace_private_context_allowed_on_free_route": false
+  },
+  "activation": {
+    "live_research_loop": false,
+    "ckb_plane_integration": false,
+    "reason": "Qualification is complete; live integration remains intentionally deferred while KTRADE work is active and Mind-Palace mailbox repair is in progress."
+  }
+}
