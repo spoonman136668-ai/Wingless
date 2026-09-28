@@ -1,6 +1,6 @@
 # Nemotron experiment reasoner
 
-Status: staged only on `research/nemotron-openrouter-reasoner-r1`. It is not wired into ckb-plane, KTRADE, accepted refs, queues, or any automatic research execution path.
+Status: **qualified, not activated** on `research/nemotron-openrouter-reasoner-r1`. It is not wired into ckb-plane, KTRADE, accepted refs, queues, or any automatic research execution path.
 
 ## Purpose
 
@@ -83,7 +83,7 @@ This branch is intentionally unqualified. Before the remote reasoner is allowed 
 3. Compare Nemotron proposals blind to future results.
 4. Measure constraint-violation rate, redundant-experiment rate, hypothesis coverage and discriminating value.
 5. Perform final full Wingless regression.
-6. Integrate through the existing ckb-plane research boundary only after explicit authority.
+6. Integrate through the existing ckb-plane research boundary only after explicit authority. **Still pending intentionally.**
 
 KTRADE and current ckb-plane production work must not be paused or modified for this qualification.
 
