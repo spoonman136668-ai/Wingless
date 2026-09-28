@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.reasoner-replay-fixture.v1",
+  "fixture_id": "up7-to-up8",
+  "project": "Wingless",
+  "historical_frontier": "c9522ed665e4d1edfaa2d6c5001b00e15f9e3e47",
+  "question": "UP-7 was negative, but two post-qualification confounds were found. What experiment should run next to isolate whether the transported state is directly readable?",
+  "evidence": [
+    "UP-7 used a table-index-parity train/held-out split that accidentally withheld different entity-3 values between train and held-out data.",
+    "UP-7 used one linear head over state features plus an entity one-hot selector; that construction changes class biases but cannot make state-feature weights depend on the queried entity.",
+    "The scientific uncertainty is whether measurement loses useful phase/coherence information and whether depth/frame ambiguity remains after correcting those confounds."
+  ],
+  "constraints": [
+    "Repair the identified split and query-conditioning confounds before adding new architectural machinery.",
+    "Keep transport unchanged and report scientific flags independently of harness acceptance.",
+    "Do not tune thresholds or budgets after seeing results."
+  ],
+  "candidates": [
+    {
+      "id": "A",
+      "proposal": "Immediately add an explicit depth clock and inverse transport before repairing the UP-7 split and query-conditioning defects."
+    },
+    {
+      "id": "B",
+      "proposal": "Keep the original magnitude-only observer and simply increase optimizer steps and hidden width."
+    },
+    {
+      "id": "C",
+      "proposal": "Run a balanced combination split, use legitimate entity-conditioned heads, and compare magnitude-only versus phase/coherence-aware observation at fixed and unseen depths."
+    },
+    {
+      "id": "D",
+      "proposal": "Lower the scientific success threshold until the original UP-7 observer qualifies."
+    }
+  ],
+  "expected_candidate_id": "C",
+  "expected_why": "This directly repairs both identified confounds while isolating measurement loss from frame/depth ambiguity."
+}
