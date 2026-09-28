@@ -1,0 +1,89 @@
+name: Discover Runner Registrations R1
+
+on:
+  push:
+    branches:
+      - ops/bootstrap-ckb-runner-r1
+    paths:
+      - .github/workflows/discover-runner-registrations-r1.yml
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    name: Read-only runner registration inventory
+    runs-on: [self-hosted, Windows, X64]
+    timeout-minutes: 10
+    steps:
+      - name: Inventory runner registrations and services
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version 2.0
+
+          if ($env:RUNNER_NAME -notlike 'WINGLESS-*') {
+              throw "DISCOVERY_REFUSED_NON_WINGLESS_RUNNER name=$env:RUNNER_NAME"
+          }
+
+          Write-Host "discovery_runner=$env:RUNNER_NAME"
+          Write-Host "machine=$env:COMPUTERNAME"
+          Write-Host 'read_only=True'
+
+          $Roots = @(
+              Get-ChildItem -LiteralPath 'C:\' -Directory -Force -ErrorAction Stop |
+              Where-Object { $_.Name -like 'actions-runner*' } |
+              Sort-Object FullName
+          )
+
+          foreach ($Root in $Roots) {
+              $CfgPath = Join-Path $Root.FullName '.runner'
+              $SvcExe = Join-Path $Root.FullName 'bin\RunnerService.exe'
+              if (-not (Test-Path -LiteralPath $CfgPath -PathType Leaf)) {
+                  continue
+              }
+
+              try {
+                  $Cfg = Get-Content -LiteralPath $CfgPath -Raw | ConvertFrom-Json
+              }
+              catch {
+                  Write-Host "RUNNER root=$($Root.FullName) config=INVALID"
+                  continue
+              }
+
+              $AgentName = ''
+              $GitHubUrl = ''
+              $WorkFolder = ''
+              if ($Cfg.PSObject.Properties.Name -contains 'agentName') { $AgentName = [string]$Cfg.agentName }
+              if ($Cfg.PSObject.Properties.Name -contains 'gitHubUrl') { $GitHubUrl = [string]$Cfg.gitHubUrl }
+              if ($Cfg.PSObject.Properties.Name -contains 'workFolder') { $WorkFolder = [string]$Cfg.workFolder }
+
+              $Service = @(
+                  Get-CimInstance Win32_Service |
+                  Where-Object {
+                      $_.PathName -and
+                      ([string]$_.PathName -like "*$SvcExe*")
+                  }
+              )
+
+              $SvcSummary = if ($Service.Count -eq 0) {
+                  'none'
+              }
+              else {
+                  (@($Service | ForEach-Object { "$($_.Name):$($_.State):$($_.StartName)" }) -join ';')
+              }
+
+              Write-Host (
+                  "RUNNER root={0} agent={1} github_url={2} work={3} services={4}" -f
+                  $Root.FullName,
+                  $AgentName,
+                  $GitHubUrl,
+                  $WorkFolder,
+                  $SvcSummary
+              )
+          }
+
+          Write-Host 'RUNNER_REGISTRATION_DISCOVERY=PASS'
+          Write-Host 'services_modified=False'
+          Write-Host 'runner_configs_modified=False'
+          Write-Host 'plane_touched=False'
