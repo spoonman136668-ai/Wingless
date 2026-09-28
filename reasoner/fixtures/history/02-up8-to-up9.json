@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.reasoner-replay-fixture.v1",
+  "fixture_id": "up8-to-up9",
+  "project": "Wingless",
+  "historical_frontier": "e357e8bf25b69e838aca9652e8454fe2e83cd97b",
+  "question": "UP-8 corrected the observer confounds. Coherence-aware observation is perfect at a fixed frame but poor at unseen depths. What should run next?",
+  "evidence": [
+    "Fixed-frame coherence-aware held-out accuracy is 1.0 while magnitude-only fixed-frame accuracy is substantially lower.",
+    "Coherence-aware held-out accuracy collapses across unseen propagation depths.",
+    "The transported memory information therefore survives, but its observable representation rotates with the transport frame."
+  ],
+  "constraints": [
+    "Do not expose an explicit depth integer or full inverse transport.",
+    "Do not increase generic observer complexity before testing the isolated frame ambiguity.",
+    "Keep the experiment bounded and include a matched control."
+  ],
+  "candidates": [
+    {
+      "id": "A",
+      "proposal": "Train a much larger generic observer on all held-out depths until it memorizes the frame variation."
+    },
+    {
+      "id": "B",
+      "proposal": "Add a compact co-evolving internal reference frame/pilot bank that experiences the same transport as memory, then test unseen-depth readability without an explicit depth value or inverse."
+    },
+    {
+      "id": "C",
+      "proposal": "Restore a fixed absolute complex phase convention and remove the global-phase nuisance."
+    },
+    {
+      "id": "D",
+      "proposal": "Change the held-out accuracy gate after observing UP-8 so the unseen-depth arm passes."
+    }
+  ],
+  "expected_candidate_id": "B",
+  "expected_why": "A co-evolving reference directly tests the isolated frame ambiguity without leaking depth or inverting the state."
+}
