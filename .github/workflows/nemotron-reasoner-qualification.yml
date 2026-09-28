@@ -8,6 +8,7 @@ on:
       - 'reasoner/**'
       - 'cmd/research-reasoner/**'
       - 'cmd/reasoner-replay/**'
+      - 'cmd/nemotron-context-dryrun/**'
       - '.github/workflows/nemotron-reasoner-qualification.yml'
   workflow_dispatch:
     inputs:
@@ -39,7 +40,7 @@ jobs:
       - name: Focused reasoner qualification
         run: |
           set -euo pipefail
-          go test ./reasoner ./cmd/research-reasoner ./cmd/reasoner-replay -count=1
+          go test ./reasoner ./cmd/research-reasoner ./cmd/reasoner-replay ./cmd/nemotron-context-dryrun -count=1
 
       - name: Full Wingless regression
         run: |
@@ -91,6 +92,56 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nemotron-reasoner-replay-${{ github.sha }}
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 30
+
+
+  reduced-context-dryrun:
+    needs: deterministic-qualification
+    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[nemotron-context-dryrun]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      WINGLESS_REMOTE_REASONER_ENABLE: "1"
+      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+
+      - name: Verify dedicated research secret binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${WINGLESS_REASONER_OPENROUTER_API_KEY:-}" ]; then
+            echo "WINGLESS_REASONER_SECRET_BINDING_FAIL"
+            exit 1
+          fi
+          echo "WINGLESS_REASONER_SECRET_BINDING_PASS"
+
+      - name: Run reduced-context integration dry run
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          go run ./cmd/nemotron-context-dryrun \
+            -selection reasoner/fixtures/context/mind-palace-live-selection-20260928.json \
+            -digests reasoner/digests/history \
+            -out evidence/nemotron-reduced-context-dryrun.json
+
+      - name: Upload reduced-context evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nemotron-reduced-context-${{ github.sha }}
           path: evidence/
           if-no-files-found: warn
           retention-days: 30
