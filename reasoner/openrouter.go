@@ -287,6 +287,22 @@ func (c *Client) Invoke(parent context.Context, r Request) (Result, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
+		var wireErr struct {
+			Error struct {
+				Code    any    `json:"code"`
+				Message string `json:"message"`
+			} `json:"error"`
+		}
+		errRaw, readErr := io.ReadAll(io.LimitReader(resp.Body, 4097))
+		if readErr == nil && len(errRaw) <= 4096 && utf8.Valid(errRaw) && json.Unmarshal(errRaw, &wireErr) == nil {
+			msg := strings.TrimSpace(wireErr.Error.Message)
+			if len(msg) > 300 {
+				msg = msg[:300]
+			}
+			if msg != "" {
+				return out, fmt.Errorf("OpenRouter inference HTTP %d code=%v message=%s", resp.StatusCode, wireErr.Error.Code, msg)
+			}
+		}
 		return out, fmt.Errorf("OpenRouter inference HTTP %d", resp.StatusCode)
 	}
 
