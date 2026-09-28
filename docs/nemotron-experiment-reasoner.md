@@ -109,3 +109,37 @@ Mind-Palace remains the durable-context source for historical project context, b
 This preserves the architecture:
 
 Mind-Palace durable context -> select relevant public evidence -> public-repository reasoner packet -> Nemotron advisory reasoning -> deterministic preregistration/execution authority -> sealed public result -> durable context ingestion.
+
+
+## Reduced-context Mind-Palace integration
+
+Mailbox recovery was reverified end-to-end on 2026-09-28: a fresh ping succeeded, the bridge returned a current authority generation, and one generation-bound `mind-palace-context` local-exec completed successfully under the existing advisory-only contract.
+
+The token-reduction path is deliberately split into two layers:
+
+1. Mind-Palace performs durable historical retrieval and selects relevant durable record IDs.
+2. Private Mind-Palace statement text is not forwarded to the free Nemotron route.
+3. An ID-only sidecar resolves selected records to public experiment identifiers such as `UP-*`, `YGG-*`, or Yggdrasil lineage IDs.
+4. Wingless reconstructs a canonical context pack from public Wingless/Yggdrasil experiment digests only.
+5. The pack is content-addressed and bound into `FrontierSHA256`.
+6. The pack admits at most 8 experiment digests and 65,536 encoded bytes. If the evidence does not fit, selection must narrow; scientific claims are never silently truncated.
+7. Nemo receives that bounded public pack, not the full research history and not Mind-Palace private prose.
+
+Implemented on this branch:
+
+- `reasoner/contextpack.go`: canonical sealed-result digest and bounded context-pack contract;
+- `reasoner/mindpalace.go`: parses the existing Mind-Palace context envelope, consumes durable IDs, and resolves them through a public-evidence index without using `model_context` as prompt material;
+- deterministic tests for ordering, provenance identity, byte bounds, private-source rejection, unavailable-selector failure, and request binding.
+
+The private Mind-Palace sidecar is staged independently on `spoonman136668-ai/Mind-Palace:research/nemotron-public-context-r1`. It extracts experiment IDs and approved public source references from selected durable records while emitting no statements or private model context.
+
+### Current activation blocker
+
+The mailbox itself is no longer the blocker. Live activation remains held until:
+
+- the Mind-Palace public-evidence sidecar receives authoritative Windows qualification;
+- its ckb-plane local-exec exposure is qualified without changing the existing `mind-palace-context` operation;
+- an end-to-end dry run proves Mind-Palace IDs -> public experiment evidence -> reduced context pack -> advisory Nemotron result;
+- final integration/full regression is green under exact immutable identities.
+
+Private-repo hosted Actions are presently failing before runner step 1, so that failure is treated as infrastructure evidence, not as a scientific or sidecar-code result.
