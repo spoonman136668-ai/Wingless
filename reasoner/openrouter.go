@@ -34,20 +34,31 @@ const (
 	RoleCritique  Role = "critique-proposed-experiment"
 )
 
+type JSONSchemaConstraint struct {
+	Name   string         `json:"name"`
+	Schema map[string]any `json:"schema"`
+}
+
 type Request struct {
-	Schema                      string `json:"schema"`
-	RequestID                   string `json:"request_id"`
-	Project                     string `json:"project"`
-	ExperimentID                string `json:"experiment_id"`
-	Role                        Role   `json:"role"`
-	FrontierSHA256              string `json:"frontier_sha256"`
-	QualificationContractSHA256 string `json:"qualification_contract_sha256"`
-	Context                     string `json:"context"`
-	MaxOutputTokens             int    `json:"max_output_tokens"`
-	TimeoutSeconds              int    `json:"timeout_seconds"`
+	Schema                      string                `json:"schema"`
+	RequestID                   string                `json:"request_id"`
+	Project                     string                `json:"project"`
+	ExperimentID                string                `json:"experiment_id"`
+	Role                        Role                  `json:"role"`
+	FrontierSHA256              string                `json:"frontier_sha256"`
+	QualificationContractSHA256 string                `json:"qualification_contract_sha256"`
+	Context                     string                `json:"context"`
+	MaxOutputTokens             int                   `json:"max_output_tokens"`
+	TimeoutSeconds              int                   `json:"timeout_seconds"`
+	ResponseJSONSchema          *JSONSchemaConstraint `json:"response_json_schema,omitempty"`
 }
 
 func (r Request) Validate() error {
+	if r.ResponseJSONSchema != nil {
+		if r.ResponseJSONSchema.Name == "" || len(r.ResponseJSONSchema.Schema) == 0 {
+			return errors.New("response JSON schema invalid")
+		}
+	}
 	if r.Schema != RequestSchema {
 		return errors.New("reasoner request schema mismatch")
 	}
