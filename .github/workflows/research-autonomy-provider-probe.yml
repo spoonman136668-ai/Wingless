@@ -30,7 +30,7 @@ jobs:
 
           $ExpectedBinary='46e4fc8d6344c4f6a554c02aeaf9f3adb8f8c1ee7871d74f70f69f111c5cf3de'
           $ExpectedWingless='c1d35fa339c245b382450a7cfb222c0e92f0154f'
-          $ExpectedPackage='3b322727d95eb0c127156faa27f5dcf955a16a5e'
+          $ExpectedPackage='d92c2b211780d35d5525c2142fd286bc3ec23aa0'
           $Handoff='C:\ProgramData\CKBR\codex\work\research-sidecar-qualified-handoff'
           $Root='C:\ProgramData\CKBR\research-sidecar'
           $TaskName='CKBPlane Research Sidecar'
@@ -64,7 +64,20 @@ jobs:
           }
 
           $Existing=Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
-          if($null-ne$Existing){throw "SIDECAR_TASK_PREEXISTING state=$($Existing.State)"}
+          if($null-ne$Existing){
+              $ExistingAction=@($Existing.Actions)[0]
+              if($Existing.Principal.UserId -notmatch 'NETWORK SERVICE' -or
+                 [string]$ExistingAction.Execute -notmatch 'powershell' -or
+                 [string]$ExistingAction.Arguments -notlike '*C:\ProgramData\CKBR\research-sidecar\ops\Lifecycle.ps1*'){
+                  throw 'SIDECAR_STALE_TASK_IDENTITY_MISMATCH'
+              }
+              if($Existing.State-eq'Running'){throw 'SIDECAR_TASK_ALREADY_RUNNING_DURING_PREFLIGHT'}
+              Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+              Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction Stop
+              Write-Host "stale_task_cleanup=True prior_state=$($Existing.State)"
+          }else{
+              Write-Host 'stale_task_cleanup=False'
+          }
 
           & $Lifecycle -Mode stage -QualifiedBinaryPath $Binary
           if($LASTEXITCODE-ne0){throw "SIDECAR_FINAL_STAGE_FAILED exit=$LASTEXITCODE"}
@@ -95,4 +108,4 @@ jobs:
           Write-Host 'sidecar_started=False'
           Write-Host 'RESEARCH_SIDECAR_FINAL_PREFLIGHT=PASS'
 
-# retry: least-privilege activation package qualified and re-staged
+# recovery: stale queued sidecar task may be removed only after exact identity/action validation
