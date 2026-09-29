@@ -1,0 +1,38 @@
+name: CKB Plane Task Trigger Probe
+
+on:
+  push:
+    branches:
+      - ops/ckb-plane-task-trigger-probe-r1
+    paths:
+      - '.github/workflows/ckb-plane-task-trigger-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - name: Probe controller task trigger permission
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Plane='C:\Users\camar\GolandProjects\ckb-plane'
+          $Token=(Get-Content -LiteralPath (Join-Path $Plane 'state\operator.token') -Raw).Trim()
+          $Headers=@{Authorization="Bearer $Token"}
+          $Before=Invoke-RestMethod -Method Get -Uri 'http://127.0.0.1:8791/api/native' -Headers $Headers -TimeoutSec 5
+          Write-Host "before_authority=$($Before.authority)"
+          Write-Host "before_generation=$($Before.generation)"
+          $Raw=@(& schtasks.exe /Run /TN 'CKB-plane Controller' 2>&1)
+          $Exit=$LASTEXITCODE
+          Write-Host "task_run_exit=$Exit"
+          foreach($Line in $Raw){Write-Host ([string]$Line)}
+          Start-Sleep -Seconds 2
+          $After=Invoke-RestMethod -Method Get -Uri 'http://127.0.0.1:8791/api/native' -Headers $Headers -TimeoutSec 5
+          Write-Host "after_authority=$($After.authority)"
+          Write-Host "after_generation=$($After.generation)"
+          if([string]$After.authority -cne 'plane'){throw 'AUTHORITY_CHANGED'}
+          if([string]$After.generation -cne [string]$Before.generation){throw 'GENERATION_CHANGED'}
+          Write-Host 'TASK_TRIGGER_CAPABILITY_PROBE=PASS'
