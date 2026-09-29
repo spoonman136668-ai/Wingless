@@ -54,7 +54,7 @@ try {
     foreach ($P in $R.partitions) {
         Write-Host "partition=$($P.name) mixed=$($P.mixed_groups) groups=$($P.groups)"
     }
-    Write-Host 'WINGLESS_UP256C_HARNESS_PASS'
+    Write-Host 'WINGLESS_UP387_HARNESS_PASS'
 }
 finally {
     Pop-Location
