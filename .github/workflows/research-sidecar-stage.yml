@@ -16,6 +16,7 @@ jobs:
     timeout-minutes: 15
     env:
       OPENROUTER_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+      BOOTSTRAP_B64: 'ewogICJzY2hlbWEiOiAiY2tiLXBsYW5lLnJlc2VhcmNoLXNpZGVjYXItYm9vdHN0cmFwLnYxIiwKICAibm90aWNlIjogewogICAgInNjaGVtYSI6ICJja2ItcGxhbmUucmVzZWFyY2gtY29tcGxldGlvbi1ub3RpY2UudjEiLAogICAgIm5vdGljZV9pZCI6ICJXSU5HTEVTUy1MTS1MTThDLUFVVE9OT01ZLUJPT1RTVFJBUCIsCiAgICAicHJvamVjdCI6ICJXaW5nbGVzcyIsCiAgICAibGFuZSI6ICJMTSIsCiAgICAiZXhwZXJpbWVudF9pZCI6ICJVUC1MTThDLXBlcm11dGF0aW9uLWZhbWlseS1pbnZhcmlhbmNlIiwKICAgICJiYXNlbGluZV9zaGEiOiAiYWQ1YWQ5ZjA0NGVlMTJlMTk0Y2RiMDliZWU1OWRiNTQxMWJhZjE0MSIsCiAgICAic291cmNlX2hlYWQiOiAiYWQ1YWQ5ZjA0NGVlMTJlMTk0Y2RiMDliZWU1OWRiNTQxMWJhZjE0MSIsCiAgICAicmVzdWx0X2tpbmQiOiAic2NpZW50aWZpYy1yZXN1bHQiLAogICAgIm5vcnRoX3N0YXIiOiB7CiAgICAgICJpZCI6ICJ3aW5nbGVzcy1sbS1ub3J0aC1zdGFyIiwKICAgICAgInBhdGgiOiAicmVzZWFyY2gvYm9vdHN0cmFwL3dpbmdsZXNzLWxtLW5vcnRoLXN0YXIudHh0IiwKICAgICAgInNoYTI1NiI6ICJlZmQ2MTcyNzcyZDc2ZjAzYWMwNGJkYWIwYWY0MDk0MTIzMjMxMWRlZjgyMDJkNmYwZjk1M2QzM2IzZDA1ZGQ4IgogICAgfSwKICAgICJldmlkZW5jZSI6IFsKICAgICAgewogICAgICAgICJpZCI6ICJVUC1MTThDLXJlc3VsdCIsCiAgICAgICAgInBhdGgiOiAicmVzZWFyY2gvYm9vdHN0cmFwL3VwLWxtOGMtcmVzdWx0Lmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiODRlMDIxNDE3OGFjZDIwNDNjNDlhZGY4ZGY2NmY3MzNlNGE4NTM0YTg4ZDhhM2QzODgxMzQ0OTMzMTkxNDYwYiIsCiAgICAgICAgImNvbW1pdCI6ICJhZDVhZDlmMDQ0ZWUxMmUxOTRjZGIwOWJlZTU5ZGI1NDExYmFmMTQxIgogICAgICB9CiAgICBdLAogICAgInNlYWxlZF9hdCI6ICIyMDI2LTA5LTI5VDE0OjM4OjUwWiIKICB9LAogICJwb2xpY3kiOiB7CiAgICAicHJvamVjdCI6ICJXaW5nbGVzcyIsCiAgICAibGFuZSI6ICJMTSIsCiAgICAiY2FwYWJpbGl0eV90YXJnZXRzIjogWwogICAgICAic3Vic3RyYXRlLWludmFyaWFuY2UiLAogICAgICAiZGVmaWNpdC1sYXctZ2VuZXJhbGl6YXRpb24iCiAgICBdLAogICAgImFsbG93ZWRfaGFybmVzc2VzIjogWwogICAgICAid2luZ2xlc3Mtd2luZG93cy1yZXNlYXJjaCIKICAgIF0sCiAgICAiYWxsb3dlZF9yb290cyI6IFsKICAgICAgImRvY3MvZXhwZXJpbWVudHMiLAogICAgICAidW5pdGFyeSIsCiAgICAgICJjbWQiLAogICAgICAic2NyaXB0cyIsCiAgICAgICIud2luZ2xlc3MiCiAgICBdLAogICAgIm1heF9jYW5kaWRhdGVzIjogNCwKICAgICJtYXhfc2VlZHMiOiA4LAogICAgIm1heF9jb21wdXRlX3NlY29uZHMiOiA3MjAwLAogICAgIm1pbl9ldmlkZW5jZV9yZWZzIjogMSwKICAgICJleGVjdXRpb25fcG9saWN5IjogInNlYWxlZC1leHBlcmltZW50IiwKICAgICJjcm9zc19sYW5lX2FsbG93ZWQiOiBmYWxzZQogIH0sCiAgIm1hdGVyaWFscyI6IFsKICAgIHsKICAgICAgInNoYTI1NiI6ICJlZmQ2MTcyNzcyZDc2ZjAzYWMwNGJkYWIwYWY0MDk0MTIzMjMxMWRlZjgyMDJkNmYwZjk1M2QzM2IzZDA1ZGQ4IiwKICAgICAgImNvbnRlbnQiOiAiV2luZ2xlc3MgTE0tbGFuZSBOb3J0aCBTdGFyXG5cbkNoYXJhY3Rlcml6ZSB3aGljaCBib3VuZGVkIHN0YXRlIG9ic2VydmFibGVzIGFuZCByZXNvdXJjZS1yZXNwb25zZSBsYXdzIHJlbWFpbiBpbnZhcmlhbnQgdW5kZXIgY29udHJvbGxlZCBzdWJzdHJhdGUgY2hhbmdlcywgdW5kZXIgZml4ZWQgcmVzb3VyY2VzIGFuZCBwcmVyZWdpc3RlcmVkIHNjaWVudGlmaWMgY29udHJvbHMuIFByZXNlcnZlIGV4YWN0IG5lZ2F0aXZlIHJlc3VsdHMuIENoYW5nZSBvbmUgZXhwZXJpbWVudGFsIGRpbWVuc2lvbiBhdCBhIHRpbWUuIE5vIHBvc3QtcmVzdWx0IHRocmVzaG9sZCwgc2VlZCwgbWV0cmljLCBidWRnZXQsIG9yIGludGVycHJldGF0aW9uIHJldHVuaW5nLiBObyBsaXZlIGFjdGl2YXRpb24sIGJyb2tlciBhY2Nlc3MsIGFjY2VwdGVkLXJlZiBtdXRhdGlvbiwgb3IgY3Jvc3MtbGFuZSBhdXRob3JpdHkuXG4iCiAgICB9LAogICAgewogICAgICAic2hhMjU2IjogIjg0ZTAyMTQxNzhhY2QyMDQzYzQ5YWRmOGRmNjZmNzMzZTRhODUzNGE4OGQ4YTNkMzg4MTM0NDkzMzE5MTQ2MGIiLAogICAgICAiY29udGVudCI6ICJ7XCJhcnRpZmFjdF9kaWdlc3RcIjpcInNoYTI1Njo4NWMyNTQzZGI2ZWJhNTNmNmZiYjk3ZGY0MmUyODhmODQ5MTc5ZDdhNjA5MDA2ZTNjMTkzYTUzMWU2MjM2NjA0XCIsXCJiYXNlbGluZV9wcmVyZWdfc2hhXCI6XCJjNTU0YjU4OWI4MjE0NmE0NTE3Mzk4ODAwNWYwNjcxODIzNmE4ZjNiXCIsXCJib3VuZGFyaWVzXCI6e1wiYWRhcHRpdmVfc2VsZWN0aW9uX3VzZWRcIjpmYWxzZSxcImxpdmVfYWN0aXZhdGlvblwiOmZhbHNlLFwicG9saWN5X2NoYW5nZWRcIjpmYWxzZX0sXCJicmFuY2hcIjpcInJlc2VhcmNoL3dpbmdsZXNzLXVwLWxtOGMtcGVybXV0YXRpb24tZmFtaWx5LWludmFyaWFuY2UtcjFcIixcImRlc2lnblwiOntcInBlcm11dGF0aW9uc1wiOltcImlkZW50aXR5XCIsXCJyb3RhdGUxXCIsXCJyYW5kb21fZml4ZWRcIl0sXCJwcm9maWxlc1wiOltcImRlZmVycmVkX29ubHlcIixcImxheW91dF9vbmx5XCIsXCJoeWJyaWRfbWluXCJdLFwicmFuZG9tX2ZpeGVkXCI6WzMsMCw1LDEsNCwyXSxcInJvdGF0aW9uc1wiOls4LDIxXSxcInJvd3NcIjoxMDh9LFwiZXhwZXJpbWVudF9pZFwiOlwiVVAtTE04Qy1wZXJtdXRhdGlvbi1mYW1pbHktaW52YXJpYW5jZVwiLFwiaW50ZXJwcmV0YXRpb25cIjpcIlRoZSBwcmVyZWdpc3RlcmVkIGRlZmljaXQgbGF3IHRyYW5zZmVycmVkIGV4YWN0bHkgdG8gdGhlIGhlbGQtb3V0IHBlcm11dGF0aW9uIGZhbWlseSB0ZXN0ZWQuIFRoaXMgZG9lcyBub3QgZXN0YWJsaXNoIGludmFyaWFuY2UgdG8gc3Vic3RyYXRlIGRpbWVuc2lvbnMgbm90IHlldCBjaGFuZ2VkLlwiLFwicHJvYmVfc2hhMjU2XCI6XCIwYzEyYjc2OTE4NWZiMjY0ODI4OTUyMTgyMzA1NTZiNmYxNzU1NzdjYzIwMjIyOTAxZTM4OWM0MzM1YWExODc5XCIsXCJxdWFsaWZpZWRfaGVhZFwiOlwiYWQ1YWQ5ZjA0NGVlMTJlMTk0Y2RiMDliZWU1OWRiNTQxMWJhZjE0MVwiLFwicmVzdWx0XCI6e1wiY2xhc3NpZmljYXRpb25cIjpcIlBFUk1VVEFUSU9OX0ZBTUlMWV9FWEFDVF9ERUZJQ0lUX0xBV1wiLFwiZXhhY3RfbGF3X3Jvd3NcIjoxMDgsXCJtYXhfcG9zdF90YXJnZXRfZXJyb3JcIjowLFwibWF4X3dyaXRlX2Vycm9yXCI6MCxcIm1pbl9wb3N0X3RhcmdldF9lcnJvclwiOjAsXCJtaW5fd3JpdGVfZXJyb3JcIjowLFwibWlzbWF0Y2hfcm93c1wiOjB9LFwic2NoZW1hXCI6XCJ3aW5nbGVzcy5zZWFsZWQtcHVibGljLXJlc3VsdC1zdW1tYXJ5LnYxXCIsXCJzdW1tYXJ5X3NoYTI1NlwiOlwiNWRmODM1NWE2NDU2OTVlY2MwMjM3NWU3ZGY2ZTJlMWI0N2FkMDQ3OGJmYzYwNzlhZjNmOWY2ZmRiYmM4NTg0MlwiLFwid29ya2Zsb3dfcnVuX2lkXCI6MzY1ODQxMDk1MzN9XG4iCiAgICB9CiAgXQp9Cg=='
     steps:
       - name: Stage isolated sidecar prerequisites only
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
@@ -109,69 +110,7 @@ wingless:
 "@
           [IO.File]::WriteAllText((Join-Path $Config 'research-runtime.yaml'),$Research,(New-Object Text.UTF8Encoding($false)))
 
-          $Bootstrap=@'
-{
-  "schema": "ckb-plane.research-sidecar-bootstrap.v1",
-  "notice": {
-    "schema": "ckb-plane.research-completion-notice.v1",
-    "notice_id": "WINGLESS-LM-LM8C-AUTONOMY-BOOTSTRAP",
-    "project": "Wingless",
-    "lane": "LM",
-    "experiment_id": "UP-LM8C-permutation-family-invariance",
-    "baseline_sha": "ad5ad9f044ee12e194cdb09bee59db5411baf141",
-    "source_head": "ad5ad9f044ee12e194cdb09bee59db5411baf141",
-    "result_kind": "scientific-result",
-    "north_star": {
-      "id": "wingless-lm-north-star",
-      "path": "research/bootstrap/wingless-lm-north-star.txt",
-      "sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8"
-    },
-    "evidence": [
-      {
-        "id": "UP-LM8C-result",
-        "path": "research/bootstrap/up-lm8c-result.json",
-        "sha256": "84e0214178acd2043c49adf8df66f733e4a8534a88d8a3d3881344933191460b",
-        "commit": "ad5ad9f044ee12e194cdb09bee59db5411baf141"
-      }
-    ],
-    "sealed_at": "2026-09-29T14:38:50Z"
-  },
-  "policy": {
-    "project": "Wingless",
-    "lane": "LM",
-    "capability_targets": [
-      "substrate-invariance",
-      "deficit-law-generalization"
-    ],
-    "allowed_harnesses": [
-      "wingless-windows-research"
-    ],
-    "allowed_roots": [
-      "docs/experiments",
-      "unitary",
-      "cmd",
-      "scripts",
-      ".wingless"
-    ],
-    "max_candidates": 4,
-    "max_seeds": 8,
-    "max_compute_seconds": 7200,
-    "min_evidence_refs": 1,
-    "execution_policy": "sealed-experiment",
-    "cross_lane_allowed": false
-  },
-  "materials": [
-    {
-      "sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
-      "content": "Wingless LM-lane North Star\n\nCharacterize which bounded state observables and resource-response laws remain invariant under controlled substrate changes, under fixed resources and preregistered scientific controls. Preserve exact negative results. Change one experimental dimension at a time. No post-result threshold, seed, metric, budget, or interpretation retuning. No live activation, broker access, accepted-ref mutation, or cross-lane authority.\n"
-    },
-    {
-      "sha256": "84e0214178acd2043c49adf8df66f733e4a8534a88d8a3d3881344933191460b",
-      "content": "{\"artifact_digest\":\"sha256:85c2543db6eba53f6fbb97df42e288f849179d7a609006e3c193a531e6236604\",\"baseline_prereg_sha\":\"c554b589b82146a45173988005f06718236a8f3b\",\"boundaries\":{\"adaptive_selection_used\":false,\"live_activation\":false,\"policy_changed\":false},\"branch\":\"research/wingless-up-lm8c-permutation-family-invariance-r1\",\"design\":{\"permutations\":[\"identity\",\"rotate1\",\"random_fixed\"],\"profiles\":[\"deferred_only\",\"layout_only\",\"hybrid_min\"],\"random_fixed\":[3,0,5,1,4,2],\"rotations\":[8,21],\"rows\":108},\"experiment_id\":\"UP-LM8C-permutation-family-invariance\",\"interpretation\":\"The preregistered deficit law transferred exactly to the held-out permutation family tested. This does not establish invariance to substrate dimensions not yet changed.\",\"probe_sha256\":\"0c12b769185fb26482895218230556b6f175577cc20222901e389c4335aa1879\",\"qualified_head\":\"ad5ad9f044ee12e194cdb09bee59db5411baf141\",\"result\":{\"classification\":\"PERMUTATION_FAMILY_EXACT_DEFICIT_LAW\",\"exact_law_rows\":108,\"max_post_target_error\":0,\"max_write_error\":0,\"min_post_target_error\":0,\"min_write_error\":0,\"mismatch_rows\":0},\"schema\":\"wingless.sealed-public-result-summary.v1\",\"summary_sha256\":\"5df8355a645695ecc02375e7df6e2e1b47ad0478bfc6079af3f9f6fdbbc85842\",\"workflow_run_id\":36584109533}\n"
-    }
-  ]
-}
-'@
+          $Bootstrap=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($env:BOOTSTRAP_B64))
           [IO.File]::WriteAllText((Join-Path $Config 'research-bootstrap.json'),$Bootstrap,(New-Object Text.UTF8Encoding($false)))
 
           $Record=[ordered]@{
