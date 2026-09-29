@@ -27,7 +27,7 @@ try{
  Write-Host ''
  Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
  Write-Host "far_accuracy=$($R.far_accuracy) extreme_accuracy=$($R.extreme_accuracy) classification=$($R.classification)"
- Write-Host 'WINGLESS_UP239B_HARNESS_PASS'
+ Write-Host 'WINGLESS_UP389_HARNESS_PASS'
 }finally{
  Pop-Location
  if($null-eq$PriorGOROOT){Remove-Item Env:GOROOT -ErrorAction SilentlyContinue}else{$env:GOROOT=$PriorGOROOT}
