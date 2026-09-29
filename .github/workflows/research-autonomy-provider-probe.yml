@@ -1,4 +1,4 @@
-name: Research Sidecar Persistence Preflight
+name: Research Sidecar Task Registration Probe
 
 on:
   push:
@@ -15,21 +15,21 @@ jobs:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
     timeout-minutes: 5
     steps:
-      - name: Inspect isolated persistence surfaces
+      - name: Test no-trigger task registration as NETWORK SERVICE
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          $Identity=[System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-          Write-Host "identity=$Identity"
-          $Svc=@(Get-Service -ErrorAction SilentlyContinue | Where-Object { $_.Name -match 'research|sidecar' -or $_.DisplayName -match 'Research|Sidecar' })
-          foreach($S in $Svc){Write-Host "service=$($S.Name)|$($S.Status)|$($S.StartType)"}
+          $Name='CKBPlane Research Sidecar Registration Probe'
+          Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
+          $Action=New-ScheduledTaskAction -Execute 'cmd.exe' -Argument '/c exit 0'
+          $Principal=New-ScheduledTaskPrincipal -UserId 'NT AUTHORITY\NETWORK SERVICE' -LogonType ServiceAccount -RunLevel Limited
+          $Settings=New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Minutes 1)
           try{
-            $Tasks=@(Get-ScheduledTask -ErrorAction Stop | Where-Object { $_.TaskName -match 'research|sidecar' })
-            foreach($T in $Tasks){Write-Host "task=$($T.TaskName)|$($T.State)|$($T.Principal.UserId)"}
-          }catch{
-            Write-Host "scheduled_task_query=UNAVAILABLE"
+            Register-ScheduledTask -TaskName $Name -Action $Action -Principal $Principal -Settings $Settings -ErrorAction Stop | Out-Null
+            $T=Get-ScheduledTask -TaskName $Name -ErrorAction Stop
+            Write-Host "task_registration=PASS"
+            Write-Host "task_principal=$($T.Principal.UserId)"
+          }finally{
+            Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
           }
-          $Root='C:\ProgramData\CKBR\research-sidecar'
-          Write-Host "sidecar_root_present=$([bool](Test-Path -LiteralPath $Root -PathType Container))"
-          Write-Host "secret_present=$([bool](Test-Path -LiteralPath (Join-Path $Root 'secrets\openrouter.dpapi') -PathType Leaf))"
-          Write-Host 'RESEARCH_SIDECAR_PERSISTENCE_PREFLIGHT=PASS'
+          Write-Host 'RESEARCH_SIDECAR_TASK_REGISTRATION_PROBE=PASS'
