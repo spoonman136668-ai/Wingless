@@ -1,4 +1,4 @@
-name: Stage Qualified Research Providers
+name: Read CKB Codex Configuration Paths
 
 on:
   push:
@@ -11,37 +11,26 @@ permissions:
   contents: read
 
 jobs:
-  stage:
+  probe:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: 6ac82c8a195dd44fec2424bb2795dad11d4b4733
-          persist-credentials: false
-          fetch-depth: 1
-
-      - name: Stage exact qualified Codex gateway
+      - name: Read configured Codex paths only
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          $env:GOFLAGS='-buildvcs=false'
-          $Expected='22ec946af12e56b415ed4f3e2dcc3df5a6eb24f8ec14e3c54ddcc0e9b8204ab9'
-          $Plane='C:\Users\camar\GolandProjects\ckb-plane'
-          $BinRoot=Join-Path $Plane 'state\research\bin'
-          New-Item -ItemType Directory -Force -Path $BinRoot | Out-Null
-          $Build=Join-Path $env:RUNNER_TEMP 'ckb-codex-implementation-gateway.exe'
-          go build -trimpath -o $Build ./cmd/ckb-codex-gateway
-          if($LASTEXITCODE-ne0){throw 'CODEX_GATEWAY_BUILD_FAILED'}
-          $Hash=(Get-FileHash -LiteralPath $Build -Algorithm SHA256).Hash.ToLowerInvariant()
-          if($Hash-cne$Expected){throw "CODEX_GATEWAY_HASH_DRIFT observed=$Hash expected=$Expected"}
-          $Dest=Join-Path $BinRoot 'ckb-codex-implementation-gateway.exe'
-          Copy-Item -LiteralPath $Build -Destination $Dest -Force
-          if((Get-FileHash -LiteralPath $Dest -Algorithm SHA256).Hash.ToLowerInvariant()-cne$Expected){throw 'STAGED_CODEX_GATEWAY_HASH_MISMATCH'}
-          $Nemo=Join-Path $BinRoot 'ckb-nemotron-planner-gateway.exe'
-          $NemoExpected='cb7bfdc75659a580cb7288fa9cf28f64a2e26890214b9f335bbb959b67f8efd0'
-          if(-not(Test-Path -LiteralPath $Nemo -PathType Leaf)){throw 'STAGED_NEMO_GATEWAY_MISSING'}
-          if((Get-FileHash -LiteralPath $Nemo -Algorithm SHA256).Hash.ToLowerInvariant()-cne$NemoExpected){throw 'STAGED_NEMO_GATEWAY_HASH_MISMATCH'}
-          Write-Host "codex_gateway_sha256=$Expected"
-          Write-Host "nemo_gateway_sha256=$NemoExpected"
-          Write-Host 'RESEARCH_PROVIDERS_STAGED=PASS'
+          $Config='C:\Users\camar\GolandProjects\ckb-plane\config\autonomy.yaml'
+          if(-not(Test-Path -LiteralPath $Config -PathType Leaf)){throw 'CONFIG_UNAVAILABLE'}
+          $Lines=Get-Content -LiteralPath $Config
+          function GetValue([string]$Key){
+            $L=$Lines | Where-Object {$_ -match ("^\s*"+[regex]::Escape($Key)+":\s*")} | Select-Object -First 1
+            if($null-eq$L){return ''}
+            return (($L -split ':',2)[1].Trim().Trim("'").Trim('"'))
+          }
+          $Codex=GetValue 'codex'
+          $Home=GetValue 'codex_home'
+          if([string]::IsNullOrWhiteSpace($Codex)){throw 'CODEX_PATH_NOT_CONFIGURED'}
+          if([string]::IsNullOrWhiteSpace($Home)){throw 'CODEX_HOME_NOT_CONFIGURED'}
+          Write-Host "codex_path=$Codex"
+          Write-Host "codex_home=$Home"
+          Write-Host 'CODEX_CONFIG_PATH_PROBE=PASS'
