@@ -1,0 +1,52 @@
+name: Nemotron LM7C successor advisory
+
+on:
+  push:
+    branches:
+      - ops/nemotron-lm7c-successor-20260929-r1
+    paths:
+      - 'reasoner/live/20260929/uplm7c-successor.json'
+      - '.github/workflows/nemotron-lm7c-successor-advisory.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  advisory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      WINGLESS_REMOTE_REASONER_ENABLE: "1"
+      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify exact qualified reasoner boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${WINGLESS_REASONER_OPENROUTER_API_KEY:-}"
+          go test ./reasoner ./cmd/research-reasoner -count=1
+      - name: Run frozen LM7C successor advisory
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          go run ./cmd/research-reasoner \
+            -request reasoner/live/20260929/uplm7c-successor.json \
+            -out evidence/uplm7c-successor.json
+      - name: Upload advisory evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nemotron-lm7c-successor-${{ github.sha }}
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 30
