@@ -1,0 +1,20 @@
+schema: ckb-plane.research-native-runtime.v1
+enabled: true
+planner:
+  endpoint: 'http://127.0.0.1:8897/v1/chat/completions'
+  model: 'nvidia/nemotron-3-ultra-550b-a55b:free'
+  max_tokens: 4096
+  timeout_seconds: 600
+implementation:
+  endpoint: 'http://127.0.0.1:8898/v1/chat/completions'
+  model: 'unused-dedicated-codex-cli'
+  max_tokens: 8192
+  timeout_seconds: 600
+wingless:
+  source_root: 'C:\Users\camar\GolandProjects\ckb-plane\state\research-sidecar\wingless-source'
+  workspace_parent: 'C:\Users\camar\GolandProjects\ckb-plane\state\research-sidecar\workspaces'
+  publication_enabled: false
+  workflow_dispatch_enabled: false
+  result_mode: 'disabled'
+  callback_ready: false
+  github_token_env: ''
