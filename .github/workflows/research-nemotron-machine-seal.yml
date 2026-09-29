@@ -26,7 +26,7 @@ jobs:
           Add-Type -AssemblyName System.Security
           $Root='C:\Users\camar\GolandProjects\ckb-plane\state\research\secrets'
           New-Item -ItemType Directory -Force -Path $Root | Out-Null
-          $Path=Join-Path $Root 'nemotron-openrouter.machine.dpapi'
+          $Path=Join-Path $Root 'nemotron-openrouter.machine.v2.dpapi'
           $Entropy=[Text.Encoding]::UTF8.GetBytes('ckb-plane-research-nemotron-v1')
           $Plain=[Text.Encoding]::UTF8.GetBytes($env:WINGLESS_REASONER_OPENROUTER_API_KEY)
           $Round=$null
@@ -54,6 +54,7 @@ jobs:
             Remove-Variable RoundText -ErrorAction SilentlyContinue
           }
 
+          $CipherHash=(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
           & icacls.exe $Path /inheritance:r /grant:r 'LINKDEADKB\camar:R' 'SYSTEM:F' | Out-Null
           if($LASTEXITCODE-ne0){throw "SECRET_ACL_FAILED exit=$LASTEXITCODE"}
 
@@ -68,5 +69,5 @@ jobs:
           }
 
           Write-Host "sealed_path=$Path"
-          Write-Host "cipher_sha256=$((Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant())"
+          Write-Host "cipher_sha256=$CipherHash"
           Write-Host 'NEMOTRON_MACHINE_SECRET_SEAL=PASS'
