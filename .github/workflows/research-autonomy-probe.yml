@@ -27,6 +27,16 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
+      - name: Probe agent credential presence
+        env:
+          OPENAI_PRESENT: ${{ secrets.OPENAI_API_KEY != '' }}
+          CODEX_PRESENT: ${{ secrets.CODEX_API_KEY != '' }}
+          COPILOT_PRESENT: ${{ secrets.COPILOT_GITHUB_TOKEN != '' }}
+        run: |
+          Write-Host "openai_api_key_present=$env:OPENAI_PRESENT"
+          Write-Host "codex_api_key_present=$env:CODEX_PRESENT"
+          Write-Host "copilot_token_present=$env:COPILOT_PRESENT"
+
       - name: Probe Codex CLI
         run: |
           $ErrorActionPreference='Stop'
