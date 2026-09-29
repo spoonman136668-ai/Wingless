@@ -27,6 +27,25 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
+      - name: Probe Codex CLI
+        run: |
+          $ErrorActionPreference='Stop'
+          $Cmd=Get-Command codex -ErrorAction SilentlyContinue
+          $Out=[ordered]@{
+            schema='wingless.research-autonomy-codex-probe.v1'
+            runner=$env:RUNNER_NAME
+            codex_present=[bool]$Cmd
+            version=$null
+            login_status=$null
+          }
+          if($Cmd){
+            $Out.version=((& codex --version 2>&1)|Out-String).Trim()
+            $S=((& codex login status 2>&1)|Out-String).Trim()
+            $Out.login_status=$S
+          }
+          $Out | ConvertTo-Json -Depth 4
+          if(-not $Cmd){ throw 'CODEX_CLI_NOT_FOUND' }
+
       - name: Probe local planner endpoint
         run: |
           $ErrorActionPreference='Stop'
