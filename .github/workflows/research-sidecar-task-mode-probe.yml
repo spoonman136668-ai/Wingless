@@ -15,16 +15,19 @@ jobs:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
     timeout-minutes: 5
     steps:
-      - name: Prove manual-only persistent task registration
+      - name: Prove manual battery-allowed task launch
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           $Name='CKBPlane Research Sidecar Registration Mode Probe'
+          $Marker='C:\ProgramData\CKBR\research-sidecar\task-start-probe.txt'
           $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
           if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "IDENTITY_MISMATCH observed=$Identity"}
           Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
-          $Action=New-ScheduledTaskAction -Execute 'cmd.exe' -Argument '/c exit 0'
-          $Settings=New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit ([TimeSpan]::Zero)
+          Remove-Item -LiteralPath $Marker -Force -ErrorAction SilentlyContinue
+
+          $Action=New-ScheduledTaskAction -Execute 'cmd.exe' -Argument ('/c echo started>"'+$Marker+'"')
+          $Settings=New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit (New-TimeSpan -Minutes 1) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
           $Principal=New-ScheduledTaskPrincipal -UserId 'NT AUTHORITY\NETWORK SERVICE' -LogonType ServiceAccount -RunLevel Limited
           try{
             Register-ScheduledTask -TaskName $Name -Action $Action -Settings $Settings -Principal $Principal -ErrorAction Stop | Out-Null
@@ -32,8 +35,23 @@ jobs:
             Write-Host "identity=$Identity"
             Write-Host "task_principal=$($Task.Principal.UserId)"
             Write-Host "trigger_count=$(@($Task.Triggers).Count)"
-            Write-Host "restart_count=$($Task.Settings.RestartCount)"
-            Write-Host 'RESEARCH_SIDECAR_MANUAL_TASK_REGISTRATION=PASS'
+            Write-Host "disallow_battery=$($Task.Settings.DisallowStartIfOnBatteries)"
+            Write-Host "stop_on_battery=$($Task.Settings.StopIfGoingOnBatteries)"
+
+            Start-ScheduledTask -TaskName $Name -ErrorAction Stop
+            $Started=$false
+            for($i=0;$i-lt20;$i++){
+              if(Test-Path -LiteralPath $Marker -PathType Leaf){$Started=$true;break}
+              Start-Sleep -Milliseconds 250
+            }
+            $Final=Get-ScheduledTask -TaskName $Name -ErrorAction Stop
+            $Info=Get-ScheduledTaskInfo -TaskName $Name -ErrorAction Stop
+            Write-Host "final_state=$($Final.State)"
+            Write-Host "last_result=$($Info.LastTaskResult)"
+            Write-Host "marker_exists=$Started"
+            if(-not$Started){throw "MANUAL_TASK_DID_NOT_EXECUTE state=$($Final.State) result=$($Info.LastTaskResult)"}
+            Write-Host 'RESEARCH_SIDECAR_MANUAL_BATTERY_ALLOWED_START=PASS'
           }finally{
             Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $Marker -Force -ErrorAction SilentlyContinue
           }
