@@ -28,9 +28,9 @@ jobs:
             return (($L -split ':',2)[1].Trim().Trim("'").Trim('"'))
           }
           $Codex=GetValue 'codex'
-          $Home=GetValue 'codex_home'
+          $CodexHome=GetValue 'codex_home'
           if([string]::IsNullOrWhiteSpace($Codex)){throw 'CODEX_PATH_NOT_CONFIGURED'}
-          if([string]::IsNullOrWhiteSpace($Home)){throw 'CODEX_HOME_NOT_CONFIGURED'}
+          if([string]::IsNullOrWhiteSpace($CodexHome)){throw 'CODEX_HOME_NOT_CONFIGURED'}
           Write-Host "codex_path=$Codex"
-          Write-Host "codex_home=$Home"
+          Write-Host "codex_home=$CodexHome"
           Write-Host 'CODEX_CONFIG_PATH_PROBE=PASS'
