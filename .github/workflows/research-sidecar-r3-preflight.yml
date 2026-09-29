@@ -1,0 +1,79 @@
+name: Research Sidecar R3 Final Preflight
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-r3-preflight.yml
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Verify schema-fixed binary and clean reset boundary
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Exe=Join-Path $Root 'bin\research-sidecar.exe'
+          $Config=Join-Path $Root 'config\autonomy.yaml'
+          $Lifecycle=Join-Path $Root 'ops\Lifecycle.ps1'
+          $Secret=Join-Path $Root 'secrets\openrouter.dpapi'
+          $Source='C:\ProgramData\CKBR\codex\work\rs\source\Wingless'
+          $Db=Join-Path $Root 'state\research-sidecar.db'
+          $TaskName='CKBPlane Research Sidecar'
+          $ActivationWorkflow=Join-Path $env:GITHUB_WORKSPACE '.github\workflows\research-sidecar-r3-activate.yml'
+          $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+
+          if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "SIDECAR_R3_PREFLIGHT_IDENTITY_MISMATCH observed=$Identity"}
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne'4c80b5ab543632aa269d5022c8fcca3a544bbbed351cd8ad17e6ef9772bc3a05'){throw 'SIDECAR_R3_PREFLIGHT_BINARY_HASH_MISMATCH'}
+          if((git -C $Source rev-parse HEAD).Trim()-cne'c1d35fa339c245b382450a7cfb222c0e92f0154f'){throw 'SIDECAR_R3_PREFLIGHT_SOURCE_HEAD_MISMATCH'}
+          if(@(git -C $Source status --porcelain --untracked-files=all).Count-ne0){throw 'SIDECAR_R3_PREFLIGHT_SOURCE_DIRTY'}
+          foreach($Path in @($Config,$Lifecycle,$Secret,$ActivationWorkflow)){if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){throw "SIDECAR_R3_PREFLIGHT_MISSING path=$Path"}}
+
+          $Task=Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+          if($null-ne$Task -and $Task.State-eq'Running'){throw 'SIDECAR_R3_PREFLIGHT_EXPECTED_DORMANT_TASK'}
+          if(Test-Path -LiteralPath $Db -PathType Leaf){throw 'SIDECAR_R3_PREFLIGHT_RESET_DB_NOT_CLEAN'}
+
+          $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim()|ConvertTo-SecureString
+          $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+          try{
+            $Plain=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
+            if([string]::IsNullOrWhiteSpace($Plain)){throw 'SIDECAR_R3_PREFLIGHT_SECRET_EMPTY'}
+          }finally{
+            if($null-ne$Ptr){[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+            $Plain=$null;$Secure=$null
+          }
+
+          $WorkflowHash=(Get-FileHash -LiteralPath $ActivationWorkflow -Algorithm SHA256).Hash.ToLowerInvariant()
+          $Receipt=[ordered]@{
+            schema='ckb-plane.research-sidecar-r3-preflight.v1'
+            binary_sha256='4c80b5ab543632aa269d5022c8fcca3a544bbbed351cd8ad17e6ef9772bc3a05'
+            wingless_source_head='c1d35fa339c245b382450a7cfb222c0e92f0154f'
+            activation_workflow_sha256=$WorkflowHash
+            sidecar_running=$false
+            reset_db_absent=$true
+            reset_evidence_archive='C:\ProgramData\CKBR\research-sidecar\evidence\planner-schema-recovery-r1'
+            sealed_at_utc=[DateTimeOffset]::UtcNow.ToString('o')
+          }
+          if(-not(Test-Path -LiteralPath $Receipt.reset_evidence_archive -PathType Container)){throw 'SIDECAR_R3_RESET_ARCHIVE_MISSING'}
+          if(-not(Test-Path -LiteralPath (Join-Path $Receipt.reset_evidence_archive 'recovery-receipt.json') -PathType Leaf)){throw 'SIDECAR_R3_RESET_RECEIPT_MISSING'}
+
+          [IO.File]::WriteAllText((Join-Path $Root 'activation-r3-preflight.json'),($Receipt|ConvertTo-Json -Depth 8),(New-Object Text.UTF8Encoding($false)))
+          Write-Host "binary_sha256=4c80b5ab543632aa269d5022c8fcca3a544bbbed351cd8ad17e6ef9772bc3a05"
+          Write-Host "activation_workflow_sha256=$WorkflowHash"
+          Write-Host "task_state=$(if($null-eq$Task){'UNREGISTERED'}else{$Task.State})"
+          Write-Host 'reset_db_absent=True'
+          Write-Host 'RESEARCH_SIDECAR_R3_FINAL_PREFLIGHT=PASS'
