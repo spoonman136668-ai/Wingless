@@ -57,7 +57,7 @@ func RunUP249C() (UP249CResult, error) {
 	res := UP249CResult{
 		Schema: UP249CQuadPuritySchema,
 		Experiment: "UP-249C-quad-native-coordinate-purity",
-		SourceUP248CSeal: base,
+		SourceUP248CSeal: "f55d8b01a26f4a90edf4e380225cb54ae3a29acb",
 		ConditionA: "schedule2|advance22",
 		ConditionB: "schedule3|advance0",
 		Coordinates: coords,
