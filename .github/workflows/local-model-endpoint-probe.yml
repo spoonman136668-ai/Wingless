@@ -1,0 +1,45 @@
+name: Local model endpoint probe
+
+on:
+  push:
+    branches:
+      - ops/local-model-endpoint-probe-r1
+    paths:
+      - .github/workflows/local-model-endpoint-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 10
+    steps:
+      - name: Probe loopback OpenAI-compatible model endpoints
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "runner=$env:RUNNER_NAME"
+          $Ports = @(
+            Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
+            Where-Object { $_.LocalAddress -in @('127.0.0.1','0.0.0.0','::','::1') } |
+            Select-Object -ExpandProperty LocalPort -Unique |
+            Sort-Object
+          )
+          $Found = @()
+          foreach ($Port in $Ports) {
+            try {
+              $R = Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:$Port/v1/models" -TimeoutSec 1
+              if ($null -ne $R.data -and @($R.data).Count -gt 0) {
+                foreach ($M in @($R.data)) {
+                  $Found += [pscustomobject]@{Port=$Port; Model=[string]$M.id}
+                }
+              }
+            } catch {}
+          }
+          if ($Found.Count -eq 0) {
+            Write-Host 'local_model_found=False'
+          } else {
+            Write-Host 'local_model_found=True'
+            foreach ($F in $Found) { Write-Host "model_port=$($F.Port) model_id=$($F.Model)" }
+          }
