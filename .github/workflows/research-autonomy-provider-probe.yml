@@ -1,39 +1,51 @@
-name: Research Autonomy Nemotron Secret Seal
+name: Research Autonomy Nemotron Gateway Qualification
 
 on:
   push:
     branches:
       - ops/research-autonomy-provider-probe-r1
     paths:
+      - cmd/ckb-planner-gateway/**
+      - reasoner/**
       - .github/workflows/research-autonomy-provider-probe.yml
 
 permissions:
   contents: read
 
 jobs:
-  seal:
+  qualify:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
-    timeout-minutes: 5
-    env:
-      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    timeout-minutes: 20
     steps:
-      - name: Seal Nemotron credential for Network Service provider
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Focused gateway and reasoner tests
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          if([string]::IsNullOrWhiteSpace($env:WINGLESS_REASONER_OPENROUTER_API_KEY)){throw 'REASONER_SECRET_MISSING'}
-          $Root='C:\Users\camar\GolandProjects\ckb-plane\state\research\secrets'
-          New-Item -ItemType Directory -Force -Path $Root | Out-Null
-          $Path=Join-Path $Root 'nemotron-openrouter.dpapi'
-          $Secure=ConvertTo-SecureString $env:WINGLESS_REASONER_OPENROUTER_API_KEY -AsPlainText -Force
-          $Cipher=$Secure | ConvertFrom-SecureString
-          [IO.File]::WriteAllText($Path,$Cipher,(New-Object Text.UTF8Encoding($false)))
-          $RoundTrip=(Get-Content -LiteralPath $Path -Raw).Trim() | ConvertTo-SecureString
-          $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($RoundTrip)
-          try{$Plain=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)}
-          finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
-          if($Plain -cne $env:WINGLESS_REASONER_OPENROUTER_API_KEY){throw 'DPAPI_ROUNDTRIP_FAILED'}
-          Remove-Variable Plain -ErrorAction SilentlyContinue
-          Write-Host "sealed_path=$Path"
-          Write-Host "cipher_sha256=$((Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant())"
-          Write-Host 'NEMOTRON_SECRET_SEAL=PASS'
+          $env:GOFLAGS='-buildvcs=false'
+          go test ./cmd/ckb-planner-gateway ./reasoner -count=1
+          if($LASTEXITCODE -ne 0){throw 'FOCUSED_TEST_FAILED'}
+
+      - name: Full Wingless regression
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $env:GOFLAGS='-buildvcs=false'
+          go test ./... -count=1
+          if($LASTEXITCODE -ne 0){throw 'FULL_REGRESSION_FAILED'}
+
+      - name: Deterministic Windows build
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $env:GOFLAGS='-buildvcs=false'
+          New-Item -ItemType Directory -Force -Path '.qualification' | Out-Null
+          go build -trimpath -o '.qualification\ckb-nemotron-planner-gateway.exe' ./cmd/ckb-planner-gateway
+          if($LASTEXITCODE -ne 0){throw 'BUILD_FAILED'}
+          Write-Host "gateway_sha256=$((Get-FileHash -LiteralPath '.qualification\ckb-nemotron-planner-gateway.exe' -Algorithm SHA256).Hash.ToLowerInvariant())"
+          Write-Host 'NEMOTRON_GATEWAY_WINDOWS_QUALIFICATION=PASS'
