@@ -87,6 +87,11 @@ jobs:
           $Stage=Get-Content -LiteralPath (Join-Path $Root 'stage.json') -Raw | ConvertFrom-Json
           if([bool]$Stage.task_registered -or [bool]$Stage.sidecar_started){throw 'SIDECAR_FINAL_STAGE_NOT_INACTIVE'}
           if($null-ne(Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue)){throw 'SIDECAR_TASK_REGISTERED_DURING_PREFLIGHT'}
+          $NativeConfig=Join-Path $Root 'config\research-runtime.yaml'
+          $LegacyNativeConfig=Join-Path $Root 'state\research\research-runtime.yaml'
+          if(-not(Test-Path -LiteralPath $NativeConfig -PathType Leaf)){throw 'SIDECAR_NATIVE_CONFIG_LOADER_PATH_MISSING'}
+          if(Test-Path -LiteralPath $LegacyNativeConfig -PathType Leaf){throw 'SIDECAR_LEGACY_NATIVE_CONFIG_STILL_PRESENT'}
+          Write-Host "native_config_path=$NativeConfig"
 
           $WorkflowHash=(Get-FileHash -LiteralPath $ActivationWorkflow -Algorithm SHA256).Hash.ToLowerInvariant()
           $Receipt=[ordered]@{
