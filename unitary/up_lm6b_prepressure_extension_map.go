@@ -1,4 +1,6 @@
 package unitary
+
+import "fmt"
 const UPLM6BSchema="wingless.up-lm6b-prepressure-extension-map.v1"
 type UPLM6BRow struct{Profile string `json:"profile"`;Rotation int `json:"rotation"`;Permutation string `json:"permutation"`;Arm int `json:"arm"`;Target int `json:"target"`;PreLength int `json:"pre_length"`;PreCountdown int `json:"pre_countdown"`;Writes int `json:"writes"`;PostLength int `json:"post_length"`;PostCountdown int `json:"post_countdown"`}
 type UPLM6BResult struct{Schema string `json:"schema"`;Experiment string `json:"experiment"`;SourceUPLM6ASeal string `json:"source_up_lm6a_seal"`;ParentClassification string `json:"parent_classification"`;Rows []UPLM6BRow `json:"rows"`;MinWrites int `json:"min_writes"`;MaxWrites int `json:"max_writes"`;DistinctWriteCounts int `json:"distinct_write_counts"`;MinPostLength int `json:"min_post_length"`;MaxPostLength int `json:"max_post_length"`;LiveActivation bool `json:"live_activation"`;PolicyChanged bool `json:"policy_changed"`;Classification string `json:"classification"`}
@@ -12,7 +14,7 @@ func RunUPLM6B()(UPLM6BResult,error){
   for i:=range arms{
    target:=uplm3tTarget(arms[i],profile);preLen:=len(arms[i].r.order);preCD:=0;if _,cd,ok:=uplm2xFirstPending(&arms[i]);ok{preCD=cd}
    writes:=0
-   for n:=0;n<32;n++{_,cd,ok:=uplm2xFirstPending(&arms[i]);if !ok||cd<=target{break};arms[i].r.write("6b-pre","x");writes++}
+   for n:=0;n<32;n++{_,cd,ok:=uplm2xFirstPending(&arms[i]);if !ok||cd<=target{break};arms[i].r.write(fmt.Sprintf("3t-pre-%s-%d-%d-%d",profile,rot,i,n),"x");writes++}
    postLen:=len(arms[i].r.order);postCD:=0;if _,cd,ok:=uplm2xFirstPending(&arms[i]);ok{postCD=cd}
    r.Rows=append(r.Rows,UPLM6BRow{Profile:profile,Rotation:rot,Permutation:perm,Arm:i,Target:target,PreLength:preLen,PreCountdown:preCD,Writes:writes,PostLength:postLen,PostCountdown:postCD})
    counts[writes]=true;if writes<r.MinWrites{r.MinWrites=writes};if writes>r.MaxWrites{r.MaxWrites=writes};if postLen<r.MinPostLength{r.MinPostLength=postLen};if postLen>r.MaxPostLength{r.MaxPostLength=postLen}
