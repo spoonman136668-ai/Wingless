@@ -1,4 +1,4 @@
-name: Research Sidecar Task Registration Probe
+name: Research Sidecar Activation Preflight
 
 on:
   push:
@@ -13,12 +13,70 @@ permissions:
 jobs:
   probe:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
-      - name: Test no-trigger task registration as NETWORK SERVICE
+      - name: Qualify NETWORK SERVICE sidecar prerequisites
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+
+          $Identity=[System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+          if($Identity -cne 'NT AUTHORITY\NETWORK SERVICE'){
+            throw "SIDECAR_IDENTITY_MISMATCH observed=$Identity"
+          }
+          Write-Host "identity=$Identity"
+
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Secret=Join-Path $Root 'secrets\openrouter.dpapi'
+          $CodexRoot='C:\ProgramData\CKBR\codex'
+          $CodexExe=Join-Path $CodexRoot 'bin\codex.exe'
+          $CodexHome=Join-Path $CodexRoot 'home'
+          $CodexWork=Join-Path $CodexRoot 'work'
+
+          foreach($Dir in @($Root,$CodexRoot,$CodexHome,$CodexWork)){
+            if(-not(Test-Path -LiteralPath $Dir -PathType Container)){
+              throw "SIDECAR_DIRECTORY_MISSING path=$Dir"
+            }
+          }
+          if(-not(Test-Path -LiteralPath $Secret -PathType Leaf)){throw 'SIDECAR_SECRET_MISSING'}
+          if(-not(Test-Path -LiteralPath $CodexExe -PathType Leaf)){throw 'SIDECAR_CODEX_MISSING'}
+
+          $ProbeFile=Join-Path $Root ('write-probe-' + [guid]::NewGuid().ToString('N') + '.tmp')
+          try{
+            [IO.File]::WriteAllText($ProbeFile,'probe',(New-Object Text.UTF8Encoding($false)))
+            if(-not(Test-Path -LiteralPath $ProbeFile -PathType Leaf)){throw 'SIDECAR_ROOT_NOT_WRITABLE'}
+          }finally{
+            Remove-Item -LiteralPath $ProbeFile -Force -ErrorAction SilentlyContinue
+          }
+          Write-Host 'sidecar_root_access=PASS'
+
+          $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim() | ConvertTo-SecureString
+          $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+          try{
+            $Token=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
+            if([string]::IsNullOrWhiteSpace($Token) -or $Token.Contains([char]10) -or $Token.Contains([char]13)){
+              throw 'SIDECAR_SECRET_INVALID'
+            }
+            Write-Host 'openrouter_dpapi_decrypt=PASS'
+          }finally{
+            if($null-ne$Ptr){[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+            $Token=$null
+            $Secure=$null
+          }
+
+          $Version=& $CodexExe --version 2>&1
+          if($LASTEXITCODE-ne0){throw "SIDECAR_CODEX_VERSION_FAILED exit=$LASTEXITCODE"}
+          Write-Host ("codex_version=" + (($Version|ForEach-Object{[string]$_}) -join ' ').Trim())
+
+          $CodexProbe=Join-Path $CodexWork ('write-probe-' + [guid]::NewGuid().ToString('N') + '.tmp')
+          try{
+            [IO.File]::WriteAllText($CodexProbe,'probe',(New-Object Text.UTF8Encoding($false)))
+          }finally{
+            Remove-Item -LiteralPath $CodexProbe -Force -ErrorAction SilentlyContinue
+          }
+          Write-Host 'codex_root_access=PASS'
+
           $Name='CKBPlane Research Sidecar Registration Probe'
           Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
           $Action=New-ScheduledTaskAction -Execute 'cmd.exe' -Argument '/c exit 0'
@@ -27,9 +85,11 @@ jobs:
           try{
             Register-ScheduledTask -TaskName $Name -Action $Action -Principal $Principal -Settings $Settings -ErrorAction Stop | Out-Null
             $T=Get-ScheduledTask -TaskName $Name -ErrorAction Stop
-            Write-Host "task_registration=PASS"
+            if($T.Principal.UserId -notmatch 'NETWORK SERVICE'){throw "SIDECAR_TASK_PRINCIPAL_MISMATCH observed=$($T.Principal.UserId)"}
+            Write-Host 'task_registration=PASS'
             Write-Host "task_principal=$($T.Principal.UserId)"
           }finally{
             Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
           }
-          Write-Host 'RESEARCH_SIDECAR_TASK_REGISTRATION_PROBE=PASS'
+
+          Write-Host 'RESEARCH_SIDECAR_ACTIVATION_PREFLIGHT=PASS'
