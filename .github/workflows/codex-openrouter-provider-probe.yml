@@ -1,0 +1,51 @@
+name: Codex OpenRouter provider probe
+
+on:
+  push:
+    branches:
+      - ops/codex-openrouter-provider-probe-r1
+    paths:
+      - '.github/workflows/codex-openrouter-provider-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 10
+    env:
+      OPENROUTER_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    steps:
+      - name: Probe pinned Codex JSON response
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          if([string]::IsNullOrWhiteSpace($env:OPENROUTER_KEY)){throw 'OPENROUTER_KEY_MISSING'}
+          $Body=[ordered]@{
+            model='openai/gpt-5.3-codex'
+            messages=@(
+              @{role='system';content='Return only one JSON object.'},
+              @{role='user';content='Return exactly {"probe":"PASS"}.'}
+            )
+            max_tokens=128
+            stream=$false
+            response_format=@{type='json_object'}
+            reasoning=@{effort='high';exclude=$true}
+            provider=@{allow_fallbacks=$false;require_parameters=$true}
+          } | ConvertTo-Json -Depth 8 -Compress
+          $Headers=@{Authorization="Bearer $env:OPENROUTER_KEY";Accept='application/json'}
+          try{
+            $R=Invoke-RestMethod -Method Post -Uri 'https://openrouter.ai/api/v1/chat/completions' -Headers $Headers -ContentType 'application/json' -Body $Body -TimeoutSec 300
+          }catch{
+            $Status=$null
+            try{$Status=[int]$_.Exception.Response.StatusCode}catch{}
+            throw "CODEX_OPENROUTER_REQUEST_FAILED status=$Status"
+          }
+          if(@($R.choices).Count-ne1){throw 'CODEX_OPENROUTER_CHOICE_INVALID'}
+          $Text=[string]$R.choices[0].message.content
+          $Obj=$Text|ConvertFrom-Json
+          if([string]$Obj.probe-cne 'PASS'){throw 'CODEX_OPENROUTER_CONTENT_INVALID'}
+          Write-Host "returned_model=$($R.model)"
+          Write-Host "finish_reason=$($R.choices[0].finish_reason)"
+          Write-Host 'CODEX_OPENROUTER_PROVIDER_PROBE=PASS'
