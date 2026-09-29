@@ -1,0 +1,36 @@
+name: Research Autonomy Provider Probe
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-autonomy-provider-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 5
+    env:
+      WINGLESS_REMOTE_REASONER_ENABLE: "1"
+      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    steps:
+      - name: Probe dedicated research provider environment
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Write-Host "whoami=$(& whoami.exe)"
+          Write-Host "runner_name=$env:RUNNER_NAME"
+          Write-Host "reasoner_enable=$env:WINGLESS_REMOTE_REASONER_ENABLE"
+          Write-Host "reasoner_secret_present=$([bool](-not [string]::IsNullOrWhiteSpace($env:WINGLESS_REASONER_OPENROUTER_API_KEY)))"
+          $Codex=Get-Command codex.exe -ErrorAction SilentlyContinue
+          if($Codex){
+            Write-Host 'codex_present=True'
+            Write-Host "codex_path=$($Codex.Source)"
+          }else{
+            Write-Host 'codex_present=False'
+          }
+          Write-Host 'RESEARCH_PROVIDER_PROBE=PASS'
