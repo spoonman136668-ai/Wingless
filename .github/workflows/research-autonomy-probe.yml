@@ -1,0 +1,57 @@
+name: Wingless research autonomy probe
+
+on:
+  push:
+    branches:
+      - 'research/wingless-up**'
+    paths:
+      - '.wingless/autonomy-probe.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-research-autonomy-probe-wingless-up-c
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Probe local planner endpoint
+        run: |
+          $ErrorActionPreference='Stop'
+          $Rows=@()
+          $Procs=Get-CimInstance Win32_Process -Filter "Name='llama-server.exe'" -ErrorAction SilentlyContinue
+          foreach($P in @($Procs)){
+            $Cmd=[string]$P.CommandLine
+            $Port=$null
+            if($Cmd -match '(?:--port|-p)\s+(\d{2,5})'){ $Port=[int]$Matches[1] }
+            if(-not $Port){ continue }
+            $Origin="http://127.0.0.1:$Port"
+            try{
+              $M=Invoke-RestMethod -Uri "$Origin/v1/models" -Method Get -TimeoutSec 5 -Proxy $null
+              foreach($D in @($M.data)){
+                $Rows += [pscustomobject]@{pid=[int]$P.ProcessId;port=$Port;model_id=[string]$D.id;healthy=$true}
+              }
+            }catch{
+              $Rows += [pscustomobject]@{pid=[int]$P.ProcessId;port=$Port;model_id=$null;healthy=$false}
+            }
+          }
+          $Out=[ordered]@{
+            schema='wingless.research-autonomy-probe.v1'
+            runner=$env:RUNNER_NAME
+            llama_servers=@($Rows)
+            healthy_count=@($Rows | Where-Object healthy).Count
+          }
+          $Out | ConvertTo-Json -Depth 6
+          if($Out.healthy_count -lt 1){ throw 'NO_HEALTHY_LOOPBACK_LLAMA_SERVER' }
