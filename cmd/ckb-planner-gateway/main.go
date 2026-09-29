@@ -176,9 +176,7 @@ func (g *gateway) chat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var planner plannerRequest
-	dec = json.NewDecoder(strings.NewReader(req.Messages[1].Content))
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&planner); err != nil {
+	if err := json.Unmarshal([]byte(req.Messages[1].Content), &planner); err != nil {
 		http.Error(w, "planner request invalid", http.StatusBadRequest)
 		return
 	}
