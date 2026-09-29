@@ -17,34 +17,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ad5ad9f044ee12e194cdb09bee59db5411baf141
+          ref: c1d35fa339c245b382450a7cfb222c0e92f0154f
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Seed exact LM8C source into sidecar-owned root
+      - name: Seed exact LM9C source into sidecar-owned root
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          $Expected='ad5ad9f044ee12e194cdb09bee59db5411baf141'
+          $Expected='c1d35fa339c245b382450a7cfb222c0e92f0154f'
           $Dest='C:\ProgramData\CKBR\codex\work\rs\source\Wingless'
           $Parent=Split-Path $Dest -Parent
 
-          Write-Host "identity=$(& whoami.exe)"
-          Write-Host "workspace=$env:GITHUB_WORKSPACE"
+          $Identity=& whoami.exe
+          Write-Host "identity=$Identity"
+          if(([string]$Identity).Trim().ToLowerInvariant()-cne'nt authority\network service'){
+            throw "SIDECAR_SEED_IDENTITY_MISMATCH observed=$Identity"
+          }
+
           $Head=(git -C $env:GITHUB_WORKSPACE rev-parse HEAD).Trim()
           if($Head-cne$Expected){throw "SOURCE_HEAD_MISMATCH observed=$Head expected=$Expected"}
           git -C $env:GITHUB_WORKSPACE cat-file -e ($Expected+'^{commit}')
-          if($LASTEXITCODE-ne0){throw 'LM8C_COMMIT_UNAVAILABLE'}
+          if($LASTEXITCODE-ne0){throw 'LM9C_COMMIT_UNAVAILABLE'}
 
           New-Item -ItemType Directory -Force -Path $Parent | Out-Null
           if(Test-Path -LiteralPath $Dest){
-            $Existing=$null
-            try{$Existing=(git -C $Dest rev-parse HEAD 2>$null).Trim()}catch{}
-            if($Existing-cne$Expected){
-              throw "EXISTING_SIDECAR_SOURCE_CHANGED observed=$Existing expected=$Expected"
-            }
             $Dirty=@(git -C $Dest status --porcelain --untracked-files=all)
             if($LASTEXITCODE-ne0 -or $Dirty.Count-ne0){throw 'EXISTING_SIDECAR_SOURCE_DIRTY'}
+            $Origin=(git -C $Dest remote get-url origin).Trim()
+            if($LASTEXITCODE-ne0 -or $Origin-cne'https://github.com/spoonman136668-ai/Wingless.git'){
+              throw "SIDECAR_SOURCE_ORIGIN_MISMATCH observed=$Origin"
+            }
+            git -C $Dest fetch --no-tags origin $Expected
+            if($LASTEXITCODE-ne0){throw 'SIDECAR_SOURCE_BASELINE_FETCH_FAILED'}
+            git -C $Dest checkout --detach $Expected
+            if($LASTEXITCODE-ne0){throw 'SIDECAR_SOURCE_BASELINE_CHECKOUT_FAILED'}
           }else{
             git -c core.longpaths=true clone --no-hardlinks $env:GITHUB_WORKSPACE $Dest
             if($LASTEXITCODE-ne0){throw 'SIDECAR_SOURCE_CLONE_FAILED'}
