@@ -1,0 +1,78 @@
+name: Research Sidecar R2 Final Preflight
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-r2-preflight.yml
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Verify repaired binary and dormant live gate
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Exe=Join-Path $Root 'bin\research-sidecar.exe'
+          $Config=Join-Path $Root 'config\autonomy.yaml'
+          $Lifecycle=Join-Path $Root 'ops\Lifecycle.ps1'
+          $Secret=Join-Path $Root 'secrets\openrouter.dpapi'
+          $Source='C:\ProgramData\CKBR\codex\work\rs\source\Wingless'
+          $TaskName='CKBPlane Research Sidecar'
+          $ActivationWorkflow=Join-Path $env:GITHUB_WORKSPACE '.github\workflows\research-sidecar-r2-activate.yml'
+          $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+          if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "SIDECAR_R2_PREFLIGHT_IDENTITY_MISMATCH observed=$Identity"}
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne'6758be3ef7bd8fce986a527cc8d3078369b4bc88f68c0e4072519c7baca86233'){throw 'SIDECAR_R2_PREFLIGHT_BINARY_HASH_MISMATCH'}
+          if((git -C $Source rev-parse HEAD).Trim()-cne'c1d35fa339c245b382450a7cfb222c0e92f0154f'){throw 'SIDECAR_R2_PREFLIGHT_SOURCE_HEAD_MISMATCH'}
+          if(@(git -C $Source status --porcelain --untracked-files=all).Count-ne0){throw 'SIDECAR_R2_PREFLIGHT_SOURCE_DIRTY'}
+          foreach($Path in @($Config,$Lifecycle,$Secret,$ActivationWorkflow)){if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){throw "SIDECAR_R2_PREFLIGHT_MISSING path=$Path"}}
+
+          $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim()|ConvertTo-SecureString
+          $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+          try{
+            $Plain=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
+            if([string]::IsNullOrWhiteSpace($Plain)){throw 'SIDECAR_R2_PREFLIGHT_SECRET_EMPTY'}
+          }finally{
+            if($null-ne$Ptr){[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+            $Plain=$null;$Secure=$null
+          }
+
+          $StatusRaw=& $Exe -mode status -config $Config 2>&1
+          if($LASTEXITCODE-ne0){throw "SIDECAR_R2_STATUS_READ_FAILED output=$($StatusRaw -join ' ')"}
+          $Status=($StatusRaw -join [Environment]::NewLine)|ConvertFrom-Json
+          $Task=Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+          $Running=($null-ne$Task -and $Task.State-eq'Running')
+          if($Running){throw 'SIDECAR_R2_PREFLIGHT_EXPECTED_DORMANT_TASK'}
+
+          $WorkflowHash=(Get-FileHash -LiteralPath $ActivationWorkflow -Algorithm SHA256).Hash.ToLowerInvariant()
+          $Receipt=[ordered]@{
+            schema='ckb-plane.research-sidecar-r2-preflight.v1'
+            binary_sha256='6758be3ef7bd8fce986a527cc8d3078369b4bc88f68c0e4072519c7baca86233'
+            wingless_source_head='c1d35fa339c245b382450a7cfb222c0e92f0154f'
+            activation_workflow_sha256=$WorkflowHash
+            sidecar_running=$false
+            prior_cycle_count=[int]$Status.cycle_count
+            prior_last_cycle_id=[string]$Status.last_cycle_id
+            prior_last_cycle_status=[string]$Status.last_cycle_status
+            sealed_at_utc=[DateTimeOffset]::UtcNow.ToString('o')
+          }
+          [IO.File]::WriteAllText((Join-Path $Root 'activation-r2-preflight.json'),($Receipt|ConvertTo-Json -Depth 8),(New-Object Text.UTF8Encoding($false)))
+          Write-Host "binary_sha256=6758be3ef7bd8fce986a527cc8d3078369b4bc88f68c0e4072519c7baca86233"
+          Write-Host "status_cycle_count=$($Status.cycle_count)"
+          Write-Host "activation_workflow_sha256=$WorkflowHash"
+          Write-Host 'sidecar_running=False'
+          Write-Host 'RESEARCH_SIDECAR_R2_FINAL_PREFLIGHT=PASS'
