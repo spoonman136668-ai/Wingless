@@ -1,0 +1,72 @@
+name: Research Nemotron machine-scope secret seal
+
+on:
+  push:
+    branches:
+      - ops/research-nemotron-machine-seal-r1
+    paths:
+      - '.github/workflows/research-nemotron-machine-seal.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  seal:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 5
+    env:
+      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    steps:
+      - name: Seal key for user-context research provider
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          if([string]::IsNullOrWhiteSpace($env:WINGLESS_REASONER_OPENROUTER_API_KEY)){throw 'REASONER_SECRET_MISSING'}
+
+          Add-Type -AssemblyName System.Security
+          $Root='C:\Users\camar\GolandProjects\ckb-plane\state\research\secrets'
+          New-Item -ItemType Directory -Force -Path $Root | Out-Null
+          $Path=Join-Path $Root 'nemotron-openrouter.machine.dpapi'
+          $Entropy=[Text.Encoding]::UTF8.GetBytes('ckb-plane-research-nemotron-v1')
+          $Plain=[Text.Encoding]::UTF8.GetBytes($env:WINGLESS_REASONER_OPENROUTER_API_KEY)
+          $Round=$null
+          try{
+            $Cipher=[Security.Cryptography.ProtectedData]::Protect(
+              $Plain,
+              $Entropy,
+              [Security.Cryptography.DataProtectionScope]::LocalMachine
+            )
+            [IO.File]::WriteAllText(
+              $Path,
+              [Convert]::ToBase64String($Cipher),
+              (New-Object Text.UTF8Encoding($false))
+            )
+            $Round=[Security.Cryptography.ProtectedData]::Unprotect(
+              $Cipher,
+              $Entropy,
+              [Security.Cryptography.DataProtectionScope]::LocalMachine
+            )
+            $RoundText=[Text.Encoding]::UTF8.GetString($Round)
+            if($RoundText -cne $env:WINGLESS_REASONER_OPENROUTER_API_KEY){throw 'MACHINE_DPAPI_ROUNDTRIP_FAILED'}
+          }finally{
+            if($null-ne$Plain){[Array]::Clear($Plain,0,$Plain.Length)}
+            if($null-ne$Round){[Array]::Clear($Round,0,$Round.Length)}
+            Remove-Variable RoundText -ErrorAction SilentlyContinue
+          }
+
+          & icacls.exe $Path /inheritance:r /grant:r 'LINKDEADKB\camar:R' 'SYSTEM:F' | Out-Null
+          if($LASTEXITCODE-ne0){throw "SECRET_ACL_FAILED exit=$LASTEXITCODE"}
+
+          $Acl=& icacls.exe $Path
+          if($LASTEXITCODE-ne0){throw 'SECRET_ACL_READ_FAILED'}
+          $AclText=($Acl -join [Environment]::NewLine)
+          if($AclText -notmatch 'LINKDEADKB\\camar:\(R\)' -or $AclText -notmatch 'NT AUTHORITY\\SYSTEM:\(F\)'){
+            throw 'SECRET_ACL_UNEXPECTED'
+          }
+          if($AclText -match 'NETWORK SERVICE'){
+            throw 'SECRET_ACL_NETWORK_SERVICE_RETAINED'
+          }
+
+          Write-Host "sealed_path=$Path"
+          Write-Host "cipher_sha256=$((Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant())"
+          Write-Host 'NEMOTRON_MACHINE_SECRET_SEAL=PASS'
