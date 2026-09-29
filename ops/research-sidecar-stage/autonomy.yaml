@@ -1,0 +1,36 @@
+autonomy:
+  enabled: false
+  poll_seconds: 5
+  retry_seconds: 60
+  max_no_progress_seconds: 900
+  remote_control: false
+  repository: ''
+  repository_id: 0
+  original_workflows: []
+server:
+  bind: 127.0.0.1
+  port: 8896
+state:
+  sqlite_path: state/research-sidecar.db
+profile:
+  name: ''
+repos: {}
+execution:
+  sandbox_syntax: native
+  enabled: false
+  codex_home: 'C:\ProgramData\CKBR\codex\home'
+  timeout_seconds: 1200
+  local_operations_config: ''
+  local_operations_sha256: ''
+tools:
+  git: 'C:\Program Files\Git\cmd\git.exe'
+  go: 'C:\Users\camar\go\pkg\mod\golang.org\toolchain@v0.0.1-go1.25.5.windows-amd64\bin\go.exe'
+  powershell: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+  codex: 'C:\ProgramData\CKBR\codex\bin\codex.exe'
+  node: 'C:\Program Files\nodejs\node.exe'
+  playwright_root: 'C:\ckb-ci-tools'
+policy:
+  accepted_ref_mutation: false
+  runtime_launch_allowed: false
+  arbitrary_shell_from_webui: false
+  max_attempts_per_work_order: 3
