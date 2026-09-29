@@ -145,7 +145,7 @@ func RunUPLM5Y() (UPLM5YResult, error) {
 	res := UPLM5YResult{
 		Schema: UPLM5YOrderLengthSchema,
 		Experiment: "UP-LM5Y-eligible-order-length-spectrum",
-		SourceUPLM5XSeal: base,
+		SourceUPLM5XSeal: "6dfb16f07df2281f5d0e636ae14536e01221111c",
 		DeadlineProfiles: profiles,
 		PooledConditionCells: 72,
 		MatchedConditionsPerCell: 384,
