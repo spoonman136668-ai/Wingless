@@ -1,0 +1,13 @@
+{
+  "schema": "wingless.experiment-reasoning-request.v1",
+  "request_id": "uplm7c-successor-20260929",
+  "project": "Wingless",
+  "experiment_id": "UP-LM7C-heldout-rotation-deficit-law",
+  "role": "plan-next-experiment",
+  "frontier_sha256": "30609c7462fea36f220b0d8c02e13659e30081d32c52f10974802c0415459692",
+  "qualification_contract_sha256": "19f5943efde3c2169a0b3d3fa1dc8def581dce41afa9e3266f2e335887471073",
+  "context": "North Star: characterize which bounded state observables and resource-response laws remain invariant under controlled substrate changes, under fixed resources and no post-result fitting.\n\nSealed public result: UP-LM7C-heldout-rotation-deficit-law qualified HELDOUT_ROTATION_EXACT_DEFICIT_LAW on 108/108 frozen rows. Parent UP-LM6C reproduced EXACT_DEFICIT_LAW. LM7C changed exactly one substrate dimension from parent rotations {5,13} to held-out rotations {8,21}, while profiles={deferred_only,layout_only,hybrid_min}, permutations={identity,reverse,rotate2}, six existing arms, uplm3tTarget, the prepressure write loop, 32-write ceiling, and correction policy remained frozen. Every held-out row had write_error=0 and post_target_error=0; mismatch_rows=0. No policy change or live activation occurred.\n\nInterpretation boundary: this establishes exact transfer of writes=max(0, pre_countdown-target) and post_countdown=target to the held-out rotations tested. It does not establish invariance to other substrate dimensions such as permutation family, arm construction, profile family, or more extreme resource geometry.\n\nSelect exactly one next preregistered experiment with maximal information value. Change one substrate dimension only. Prefer a test that discriminates a genuinely substrate-invariant deficit law from a law that is exact only within the currently tested construction. Preserve the existing law, target function, thresholds, write policy, and all dimensions not explicitly selected. Scientific negatives are valid. Return a concise plan containing: experiment ID/title, question, hypothesis, exact frozen parent/baseline, single changed dimension, frozen controls, measurements, classifications, and boundary conditions. Do not authorize execution.",
+  "max_output_tokens": 4096,
+  "timeout_seconds": 900,
+  "data_class": "public-repository"
+}
