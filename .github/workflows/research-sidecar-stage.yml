@@ -34,6 +34,7 @@ jobs:
 
           Copy-Item -LiteralPath '.\ops\research-sidecar-stage\autonomy.yaml' -Destination (Join-Path $Root 'autonomy.yaml') -Force
           Copy-Item -LiteralPath '.\ops\research-sidecar-stage\research-runtime.yaml' -Destination (Join-Path $Root 'research-runtime.yaml') -Force
+          Copy-Item -LiteralPath '.\ops\research-sidecar-stage\research-sidecar.yaml' -Destination (Join-Path $Root 'research-sidecar.yaml') -Force
           Copy-Item -LiteralPath '.\ops\research-sidecar-stage\research-bootstrap.json' -Destination (Join-Path $Root 'research-bootstrap.json') -Force
 
           $Secure=ConvertTo-SecureString $env:OPENROUTER_KEY -AsPlainText -Force
