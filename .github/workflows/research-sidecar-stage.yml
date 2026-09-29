@@ -13,7 +13,7 @@ permissions:
 jobs:
   stage:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
-    timeout-minutes: 15
+    timeout-minutes: 10
     env:
       OPENROUTER_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
     steps:
@@ -23,67 +23,45 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Stage isolated sidecar prerequisites only
+      - name: Stage encrypted secret and immutable config handoff
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           if([string]::IsNullOrWhiteSpace($env:OPENROUTER_KEY)){throw 'OPENROUTER_KEY_MISSING'}
 
-          $Plane='C:\Users\camar\GolandProjects\ckb-plane'
-          $Root=Join-Path $Plane 'state\research-sidecar'
-          $Config=Join-Path $Root 'config'
-          $Secrets=Join-Path $Root 'secrets'
-          $Workspaces=Join-Path $Root 'workspaces'
-          $Source=Join-Path $Root 'wingless-source'
-          New-Item -ItemType Directory -Force -Path $Root,$Config,$Secrets,$Workspaces | Out-Null
+          $Root='C:\ProgramData\CKBR\codex\work\research-sidecar-stage'
+          New-Item -ItemType Directory -Force -Path $Root | Out-Null
 
-          if(-not(Test-Path -LiteralPath $Source -PathType Container)){
-            git clone --no-tags --no-checkout https://github.com/spoonman136668-ai/Wingless.git $Source
-            if($LASTEXITCODE-ne0){throw 'WINGLESS_SOURCE_CLONE_FAILED'}
-          }
-          $Origin=(git -C $Source remote get-url origin).Trim()
-          if($LASTEXITCODE-ne0 -or $Origin-cnotin@(
-            'https://github.com/spoonman136668-ai/Wingless.git',
-            'https://github.com/spoonman136668-ai/Wingless'
-          )){throw "WINGLESS_SOURCE_ORIGIN_INVALID origin=$Origin"}
-          $Dirty=@(git -C $Source status --porcelain)
-          if($LASTEXITCODE-ne0 -or $Dirty.Count-ne0){throw 'WINGLESS_SOURCE_NOT_CLEAN'}
-
-          Copy-Item -LiteralPath '.\ops\research-sidecar-stage\autonomy.yaml' -Destination (Join-Path $Config 'autonomy.yaml') -Force
-          Copy-Item -LiteralPath '.\ops\research-sidecar-stage\research-runtime.yaml' -Destination (Join-Path $Config 'research-runtime.yaml') -Force
-          Copy-Item -LiteralPath '.\ops\research-sidecar-stage\research-bootstrap.json' -Destination (Join-Path $Config 'research-bootstrap.json') -Force
+          Copy-Item -LiteralPath '.\ops\research-sidecar-stage\autonomy.yaml' -Destination (Join-Path $Root 'autonomy.yaml') -Force
+          Copy-Item -LiteralPath '.\ops\research-sidecar-stage\research-runtime.yaml' -Destination (Join-Path $Root 'research-runtime.yaml') -Force
+          Copy-Item -LiteralPath '.\ops\research-sidecar-stage\research-bootstrap.json' -Destination (Join-Path $Root 'research-bootstrap.json') -Force
 
           $Secure=ConvertTo-SecureString $env:OPENROUTER_KEY -AsPlainText -Force
           $Cipher=ConvertFrom-SecureString $Secure
           [IO.File]::WriteAllText(
-            (Join-Path $Secrets 'openrouter.dpapi'),
+            (Join-Path $Root 'openrouter.dpapi'),
             $Cipher,
             (New-Object Text.UTF8Encoding($false))
           )
 
           $Record=[ordered]@{
-            schema='ckb-plane.research-sidecar-staging.v1'
+            schema='ckb-plane.research-sidecar-handoff.v1'
             staged_at_utc=[DateTimeOffset]::UtcNow.ToString('o')
             identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
-            root=$Root
             source_head='ad5ad9f044ee12e194cdb09bee59db5411baf141'
             north_star_sha256='efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8'
             evidence_sha256='84e0214178acd2043c49adf8df66f733e4a8534a88d8a3d3881344933191460b'
             nemotron_model='nvidia/nemotron-3-ultra-550b-a55b:free'
-            codex_home='C:\ProgramData\CKBR\codex\home'
             codex_default_model='gpt-5.6-luna'
             sidecar_started=$false
-            ktrade_modified=$false
           }
           [IO.File]::WriteAllText(
-            (Join-Path $Root 'staging.json'),
+            (Join-Path $Root 'handoff.json'),
             ($Record|ConvertTo-Json -Depth 8),
             (New-Object Text.UTF8Encoding($false))
           )
 
           Write-Host "identity=$($Record.identity)"
-          Write-Host "sidecar_root=$Root"
-          Write-Host "source_root=$Source"
+          Write-Host "handoff_root=$Root"
           Write-Host 'sidecar_started=False'
-          Write-Host 'ktrade_modified=False'
-          Write-Host 'RESEARCH_SIDECAR_PREREQUISITES=PASS'
+          Write-Host 'RESEARCH_SIDECAR_HANDOFF=PASS'
