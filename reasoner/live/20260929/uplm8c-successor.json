@@ -1,0 +1,13 @@
+{
+  "schema": "wingless.experiment-reasoning-request.v1",
+  "request_id": "uplm8c-successor-20260929",
+  "project": "Wingless",
+  "experiment_id": "UP-LM8C-permutation-family-invariance",
+  "role": "plan-next-experiment",
+  "frontier_sha256": "eb84471522f542082ff2e897603f488b17ebdf5866a76eaf95e961b4d38e2981",
+  "qualification_contract_sha256": "19f5943efde3c2169a0b3d3fa1dc8def581dce41afa9e3266f2e335887471073",
+  "context": "North Star: characterize which bounded state observables and resource-response laws remain invariant under controlled substrate changes, under fixed resources and no post-result fitting.\n\nSealed public result: UP-LM8C-permutation-family-invariance qualified PERMUTATION_FAMILY_EXACT_DEFICIT_LAW on 108/108 frozen rows. Parent UP-LM7C reproduced HELDOUT_ROTATION_EXACT_DEFICIT_LAW. LM8C changed exactly one substrate dimension: the permutation family from {identity,reverse,rotate2} to {identity,rotate1,random_fixed}, with random_fixed frozen literally as [3,0,5,1,4,2]. Rotations remained {8,21}; profiles remained {deferred_only,layout_only,hybrid_min}; the six existing arms, uplm3tTarget, prepressure write loop, 32-write ceiling, and correction policy remained frozen. Every row had write_error=0 and post_target_error=0; mismatch_rows=0. No adaptive selection, policy change, or live activation occurred.\n\nInterpretation boundary: this establishes exact transfer of writes=max(0, pre_countdown-target) and post_countdown=target across the tested held-out rotations and a changed permutation family. It does not establish invariance to changes in arm construction, profile family, target function, resource geometry, or write policy.\n\nSelect exactly one next preregistered experiment with maximal information value. Change one substrate dimension only. Prefer a test that discriminates a genuinely substrate-invariant deficit law from a law that depends on the current six-arm construction or profile family. Preserve the existing law, target function, thresholds, write policy, rotations, and every dimension not explicitly selected. Scientific negatives are valid. Return a concise plan containing: experiment ID/title, question, hypothesis, exact frozen parent/baseline, single changed dimension, frozen controls, measurements, classifications, and boundary conditions. Do not authorize execution.",
+  "max_output_tokens": 4096,
+  "timeout_seconds": 900,
+  "data_class": "public-repository"
+}
