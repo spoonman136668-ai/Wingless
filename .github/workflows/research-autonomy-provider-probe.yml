@@ -1,50 +1,47 @@
-name: Research Autonomy Codex Gateway Qualification
+name: Stage Qualified Research Providers
 
 on:
   push:
     branches:
       - ops/research-autonomy-provider-probe-r1
     paths:
-      - cmd/ckb-codex-gateway/**
       - .github/workflows/research-autonomy-provider-probe.yml
 
 permissions:
   contents: read
 
 jobs:
-  qualify:
+  stage:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: 6ac82c8a195dd44fec2424bb2795dad11d4b4733
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Focused Codex gateway tests
+      - name: Stage exact qualified Codex gateway
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           $env:GOFLAGS='-buildvcs=false'
-          go test ./cmd/ckb-codex-gateway -count=1
-          if($LASTEXITCODE -ne 0){throw 'FOCUSED_TEST_FAILED'}
-
-      - name: Full Wingless regression
-        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
-        run: |
-          $ErrorActionPreference='Stop'
-          $env:GOFLAGS='-buildvcs=false'
-          go test ./... -count=1
-          if($LASTEXITCODE -ne 0){throw 'FULL_REGRESSION_FAILED'}
-
-      - name: Deterministic Windows build
-        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
-        run: |
-          $ErrorActionPreference='Stop'
-          $env:GOFLAGS='-buildvcs=false'
-          New-Item -ItemType Directory -Force -Path '.qualification' | Out-Null
-          go build -trimpath -o '.qualification\ckb-codex-implementation-gateway.exe' ./cmd/ckb-codex-gateway
-          if($LASTEXITCODE -ne 0){throw 'BUILD_FAILED'}
-          Write-Host "gateway_sha256=$((Get-FileHash -LiteralPath '.qualification\ckb-codex-implementation-gateway.exe' -Algorithm SHA256).Hash.ToLowerInvariant())"
-          Write-Host 'CODEX_GATEWAY_WINDOWS_QUALIFICATION=PASS'
+          $Expected='22ec946af12e56b415ed4f3e2dcc3df5a6eb24f8ec14e3c54ddcc0e9b8204ab9'
+          $Plane='C:\Users\camar\GolandProjects\ckb-plane'
+          $BinRoot=Join-Path $Plane 'state\research\bin'
+          New-Item -ItemType Directory -Force -Path $BinRoot | Out-Null
+          $Build=Join-Path $env:RUNNER_TEMP 'ckb-codex-implementation-gateway.exe'
+          go build -trimpath -o $Build ./cmd/ckb-codex-gateway
+          if($LASTEXITCODE-ne0){throw 'CODEX_GATEWAY_BUILD_FAILED'}
+          $Hash=(Get-FileHash -LiteralPath $Build -Algorithm SHA256).Hash.ToLowerInvariant()
+          if($Hash-cne$Expected){throw "CODEX_GATEWAY_HASH_DRIFT observed=$Hash expected=$Expected"}
+          $Dest=Join-Path $BinRoot 'ckb-codex-implementation-gateway.exe'
+          Copy-Item -LiteralPath $Build -Destination $Dest -Force
+          if((Get-FileHash -LiteralPath $Dest -Algorithm SHA256).Hash.ToLowerInvariant()-cne$Expected){throw 'STAGED_CODEX_GATEWAY_HASH_MISMATCH'}
+          $Nemo=Join-Path $BinRoot 'ckb-nemotron-planner-gateway.exe'
+          $NemoExpected='cb7bfdc75659a580cb7288fa9cf28f64a2e26890214b9f335bbb959b67f8efd0'
+          if(-not(Test-Path -LiteralPath $Nemo -PathType Leaf)){throw 'STAGED_NEMO_GATEWAY_MISSING'}
+          if((Get-FileHash -LiteralPath $Nemo -Algorithm SHA256).Hash.ToLowerInvariant()-cne$NemoExpected){throw 'STAGED_NEMO_GATEWAY_HASH_MISMATCH'}
+          Write-Host "codex_gateway_sha256=$Expected"
+          Write-Host "nemo_gateway_sha256=$NemoExpected"
+          Write-Host 'RESEARCH_PROVIDERS_STAGED=PASS'
