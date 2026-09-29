@@ -52,7 +52,7 @@ try {
     Write-Host ''
     Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
     Write-Host "extreme_accuracy=$($R.extreme_accuracy) classification=$($R.classification)"
-    Write-Host 'WINGLESS_UP238B_HARNESS_PASS'
+    Write-Host 'WINGLESS_UP386_HARNESS_PASS'
 }
 finally {
     Pop-Location
