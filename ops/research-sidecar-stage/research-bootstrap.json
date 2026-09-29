@@ -1,0 +1,61 @@
+{
+  "schema": "ckb-plane.research-sidecar-bootstrap.v1",
+  "notice": {
+    "schema": "ckb-plane.research-completion-notice.v1",
+    "notice_id": "WINGLESS-LM-LM8C-AUTONOMY-BOOTSTRAP",
+    "project": "Wingless",
+    "lane": "LM",
+    "experiment_id": "UP-LM8C-permutation-family-invariance",
+    "baseline_sha": "ad5ad9f044ee12e194cdb09bee59db5411baf141",
+    "source_head": "ad5ad9f044ee12e194cdb09bee59db5411baf141",
+    "result_kind": "scientific-result",
+    "north_star": {
+      "id": "wingless-lm-north-star",
+      "path": "research/bootstrap/wingless-lm-north-star.txt",
+      "sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8"
+    },
+    "evidence": [
+      {
+        "id": "UP-LM8C-result",
+        "path": "research/bootstrap/up-lm8c-result.json",
+        "sha256": "84e0214178acd2043c49adf8df66f733e4a8534a88d8a3d3881344933191460b",
+        "commit": "ad5ad9f044ee12e194cdb09bee59db5411baf141"
+      }
+    ],
+    "sealed_at": "2026-09-29T14:38:50Z"
+  },
+  "policy": {
+    "project": "Wingless",
+    "lane": "LM",
+    "capability_targets": [
+      "substrate-invariance",
+      "deficit-law-generalization"
+    ],
+    "allowed_harnesses": [
+      "wingless-windows-research"
+    ],
+    "allowed_roots": [
+      "docs/experiments",
+      "unitary",
+      "cmd",
+      "scripts",
+      ".wingless"
+    ],
+    "max_candidates": 4,
+    "max_seeds": 8,
+    "max_compute_seconds": 7200,
+    "min_evidence_refs": 1,
+    "execution_policy": "sealed-experiment",
+    "cross_lane_allowed": false
+  },
+  "materials": [
+    {
+      "sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
+      "content": "Wingless LM-lane North Star\n\nCharacterize which bounded state observables and resource-response laws remain invariant under controlled substrate changes, under fixed resources and preregistered scientific controls. Preserve exact negative results. Change one experimental dimension at a time. No post-result threshold, seed, metric, budget, or interpretation retuning. No live activation, broker access, accepted-ref mutation, or cross-lane authority.\n"
+    },
+    {
+      "sha256": "84e0214178acd2043c49adf8df66f733e4a8534a88d8a3d3881344933191460b",
+      "content": "{\"artifact_digest\":\"sha256:85c2543db6eba53f6fbb97df42e288f849179d7a609006e3c193a531e6236604\",\"baseline_prereg_sha\":\"c554b589b82146a45173988005f06718236a8f3b\",\"boundaries\":{\"adaptive_selection_used\":false,\"live_activation\":false,\"policy_changed\":false},\"branch\":\"research/wingless-up-lm8c-permutation-family-invariance-r1\",\"design\":{\"permutations\":[\"identity\",\"rotate1\",\"random_fixed\"],\"profiles\":[\"deferred_only\",\"layout_only\",\"hybrid_min\"],\"random_fixed\":[3,0,5,1,4,2],\"rotations\":[8,21],\"rows\":108},\"experiment_id\":\"UP-LM8C-permutation-family-invariance\",\"interpretation\":\"The preregistered deficit law transferred exactly to the held-out permutation family tested. This does not establish invariance to substrate dimensions not yet changed.\",\"probe_sha256\":\"0c12b769185fb26482895218230556b6f175577cc20222901e389c4335aa1879\",\"qualified_head\":\"ad5ad9f044ee12e194cdb09bee59db5411baf141\",\"result\":{\"classification\":\"PERMUTATION_FAMILY_EXACT_DEFICIT_LAW\",\"exact_law_rows\":108,\"max_post_target_error\":0,\"max_write_error\":0,\"min_post_target_error\":0,\"min_write_error\":0,\"mismatch_rows\":0},\"schema\":\"wingless.sealed-public-result-summary.v1\",\"summary_sha256\":\"5df8355a645695ecc02375e7df6e2e1b47ad0478bfc6079af3f9f6fdbbc85842\",\"workflow_run_id\":36584109533}\n"
+    }
+  ]
+}
