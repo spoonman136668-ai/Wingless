@@ -1,0 +1,39 @@
+name: Research Sidecar Task Mode Probe
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-task-mode-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 5
+    steps:
+      - name: Prove manual-only persistent task registration
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Name='CKBPlane Research Sidecar Registration Mode Probe'
+          $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+          if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "IDENTITY_MISMATCH observed=$Identity"}
+          Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
+          $Action=New-ScheduledTaskAction -Execute 'cmd.exe' -Argument '/c exit 0'
+          $Settings=New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit ([TimeSpan]::Zero)
+          $Principal=New-ScheduledTaskPrincipal -UserId 'NT AUTHORITY\NETWORK SERVICE' -LogonType ServiceAccount -RunLevel Limited
+          try{
+            Register-ScheduledTask -TaskName $Name -Action $Action -Settings $Settings -Principal $Principal -ErrorAction Stop | Out-Null
+            $Task=Get-ScheduledTask -TaskName $Name -ErrorAction Stop
+            Write-Host "identity=$Identity"
+            Write-Host "task_principal=$($Task.Principal.UserId)"
+            Write-Host "trigger_count=$(@($Task.Triggers).Count)"
+            Write-Host "restart_count=$($Task.Settings.RestartCount)"
+            Write-Host 'RESEARCH_SIDECAR_MANUAL_TASK_REGISTRATION=PASS'
+          }finally{
+            Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
+          }
