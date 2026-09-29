@@ -1,0 +1,49 @@
+name: Wingless GitHub Models probe
+
+on:
+  push:
+    branches:
+      - 'research/wingless-up**'
+    paths:
+      - '.wingless/github-models-probe.json'
+
+permissions:
+  contents: read
+  models: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call GitHub Models
+        env:
+          GH_MODELS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, urllib.request
+          body = json.dumps({
+              "model": "openai/gpt-4.1-mini",
+              "messages": [{"role":"user","content":"Return exactly this JSON and nothing else: {\"ok\":true}"}],
+              "temperature": 0,
+              "max_tokens": 32
+          }).encode()
+          req = urllib.request.Request(
+              "https://models.github.ai/inference/chat/completions",
+              data=body,
+              headers={
+                  "Authorization": "Bearer " + os.environ["GH_MODELS_TOKEN"],
+                  "Content-Type": "application/json",
+                  "Accept": "application/json"
+              },
+              method="POST"
+          )
+          with urllib.request.urlopen(req, timeout=60) as r:
+              obj=json.load(r)
+          out=obj["choices"][0]["message"]["content"].strip()
+          print(json.dumps({"schema":"wingless.github-models-probe.v1","model":obj.get("model"),"content":out},sort_keys=True))
+          if out != '{"ok":true}':
+              raise SystemExit("MODEL_PROBE_OUTPUT_MISMATCH")
+          PY
