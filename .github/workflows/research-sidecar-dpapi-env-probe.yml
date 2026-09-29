@@ -1,0 +1,56 @@
+name: Research Sidecar DPAPI Environment Probe
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-dpapi-env-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 5
+    steps:
+      - name: Verify child PowerShell inherits sealed secret path
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+          $Secret='C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
+          $PS='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+          $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+          if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "IDENTITY_MISMATCH observed=$Identity"}
+          if(-not(Test-Path -LiteralPath $Secret -PathType Leaf)){throw 'SECRET_MISSING'}
+
+          $Script='$ErrorActionPreference=''Stop'';$path=[Environment]::GetEnvironmentVariable(''CKB_RESEARCH_SIDECAR_SECRET_PATH'',''Process'');if([string]::IsNullOrWhiteSpace($path)){throw ''secret path missing''};$s=(Get-Content -LiteralPath $path -Raw).Trim()|ConvertTo-SecureString;$p=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($s);try{[Console]::Out.Write([Runtime.InteropServices.Marshal]::PtrToStringBSTR($p))}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($p)}'
+          $Tmp=Join-Path $env:RUNNER_TEMP ('dpapi-env-' + [guid]::NewGuid().ToString('N'))
+          New-Item -ItemType Directory -Force -Path $Tmp|Out-Null
+          $Out=Join-Path $Tmp 'stdout.txt'
+          $Err=Join-Path $Tmp 'stderr.txt'
+          $OldSecretPath=$env:CKB_RESEARCH_SIDECAR_SECRET_PATH
+          try{
+            $env:CKB_RESEARCH_SIDECAR_SECRET_PATH=$Secret
+            $Old=$ErrorActionPreference
+            try{
+              $ErrorActionPreference='Continue'
+              & $PS -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command $Script 1> $Out 2> $Err
+              $Exit=$LASTEXITCODE
+            }finally{
+              $ErrorActionPreference=$Old
+            }
+            $StdoutLen=if(Test-Path -LiteralPath $Out){(Get-Item -LiteralPath $Out).Length}else{0}
+            $ErrText=if(Test-Path -LiteralPath $Err){Get-Content -LiteralPath $Err -Raw}else{''}
+            if($Exit-ne0){throw "CHILD_DPAPI_FAILED exit=$Exit stderr=$($ErrText -replace '[\r\n]+',' ')"}
+            if($StdoutLen-le0){throw 'CHILD_DPAPI_EMPTY'}
+            Write-Host "identity=$Identity"
+            Write-Host "child_exit=$Exit"
+            Write-Host "child_stdout_bytes=$StdoutLen"
+            Write-Host 'RESEARCH_SIDECAR_DPAPI_ENV_PROBE=PASS'
+          }finally{
+            $env:CKB_RESEARCH_SIDECAR_SECRET_PATH=$OldSecretPath
+            Remove-Item -LiteralPath $Tmp -Recurse -Force -ErrorAction SilentlyContinue
+          }
