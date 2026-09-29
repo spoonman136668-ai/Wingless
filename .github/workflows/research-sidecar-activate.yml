@@ -1,0 +1,89 @@
+name: Research Sidecar Activate
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/research-sidecar-activate-request.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-research-sidecar-lifecycle
+  cancel-in-progress: false
+
+jobs:
+  activate:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Activate exact qualified research sidecar
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+
+          $ExpectedBinary='46e4fc8d6344c4f6a554c02aeaf9f3adb8f8c1ee7871d74f70f69f111c5cf3de'
+          $ExpectedWingless='c1d35fa339c245b382450a7cfb222c0e92f0154f'
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Lifecycle=Join-Path $Root 'ops\Lifecycle.ps1'
+          $RequestPath=Join-Path $env:GITHUB_WORKSPACE '.github\research-sidecar-activate-request.json'
+          $WorkflowPath=Join-Path $env:GITHUB_WORKSPACE '.github\workflows\research-sidecar-activate.yml'
+
+          $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+          if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "SIDECAR_ACTIVATION_IDENTITY_MISMATCH observed=$Identity"}
+
+          $Request=Get-Content -LiteralPath $RequestPath -Raw | ConvertFrom-Json
+          if([string]$Request.schema-cne'ckb-plane.research-sidecar-activation-request.v1' -or
+             -not[bool]$Request.authorize_activation -or
+             [string]$Request.expected_binary_sha256-cne$ExpectedBinary -or
+             [string]$Request.wingless_source_head-cne$ExpectedWingless){
+              throw 'SIDECAR_ACTIVATION_REQUEST_INVALID'
+          }
+
+          $Preflight=Get-Content -LiteralPath (Join-Path $Root 'activation-preflight.json') -Raw | ConvertFrom-Json
+          $WorkflowHash=(Get-FileHash -LiteralPath $WorkflowPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          if([string]$Preflight.schema-cne'ckb-plane.research-sidecar-activation-preflight.v1' -or
+             [string]$Preflight.qualified_binary_sha256-cne$ExpectedBinary -or
+             [string]$Preflight.wingless_source_head-cne$ExpectedWingless -or
+             [string]$Preflight.activation_workflow_sha256-cne$WorkflowHash -or
+             [bool]$Preflight.task_registered -or
+             [bool]$Preflight.sidecar_started){
+              throw 'SIDECAR_ACTIVATION_PREFLIGHT_BINDING_INVALID'
+          }
+
+          & $Lifecycle -Mode activate -AuthorizeActivation
+          if($LASTEXITCODE-ne0){throw "SIDECAR_ACTIVATION_FAILED exit=$LASTEXITCODE"}
+
+          $StatusRaw=& $Lifecycle -Mode status
+          if($LASTEXITCODE-ne0){throw 'SIDECAR_STATUS_FAILED_AFTER_ACTIVATION'}
+          $Status=($StatusRaw -join [Environment]::NewLine)|ConvertFrom-Json
+          if([string]$Status.task_state-cne'Running' -or [string]$Status.sidecar.authority-cne'plane' -or [string]$Status.sidecar.generation-cne'1' -or [int]$Status.sidecar.cycle_count-lt1){
+              throw 'SIDECAR_POST_ACTIVATION_STATUS_INVALID'
+          }
+
+          $Receipt=[ordered]@{
+              schema='ckb-plane.research-sidecar-activation-receipt.v1'
+              activated_at_utc=[DateTimeOffset]::UtcNow.ToString('o')
+              runtime_identity=$Identity
+              binary_sha256=$ExpectedBinary
+              wingless_source_head=$ExpectedWingless
+              task_state=[string]$Status.task_state
+              cycle_count=[int]$Status.sidecar.cycle_count
+              last_cycle_id=[string]$Status.sidecar.last_cycle_id
+              last_cycle_status=[string]$Status.sidecar.last_cycle_status
+          }
+          [IO.File]::WriteAllText((Join-Path $Root 'activation-receipt.json'),($Receipt|ConvertTo-Json -Depth 6),(New-Object Text.UTF8Encoding($false)))
+          Write-Host "task_state=$($Receipt.task_state)"
+          Write-Host "cycle_count=$($Receipt.cycle_count)"
+          Write-Host "last_cycle_id=$($Receipt.last_cycle_id)"
+          Write-Host "last_cycle_status=$($Receipt.last_cycle_status)"
+          Write-Host 'RESEARCH_SIDECAR_LIVE_ACTIVATION=PASS'

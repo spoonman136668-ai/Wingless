@@ -1,4 +1,4 @@
-name: Research Sidecar Activation Preflight
+name: Research Sidecar Final Activation Preflight
 
 on:
   push:
@@ -6,90 +6,91 @@ on:
       - ops/research-autonomy-provider-probe-r1
     paths:
       - .github/workflows/research-autonomy-provider-probe.yml
+      - .github/workflows/research-sidecar-activate.yml
 
 permissions:
   contents: read
 
 jobs:
-  probe:
+  preflight:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
-      - name: Qualify NETWORK SERVICE sidecar prerequisites
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Stage final isolated root and seal dormant activation workflow
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           Set-StrictMode -Version 2.0
 
-          $Identity=[System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-          if($Identity -cne 'NT AUTHORITY\NETWORK SERVICE'){
-            throw "SIDECAR_IDENTITY_MISMATCH observed=$Identity"
-          }
-          Write-Host "identity=$Identity"
-
+          $ExpectedBinary='46e4fc8d6344c4f6a554c02aeaf9f3adb8f8c1ee7871d74f70f69f111c5cf3de'
+          $ExpectedWingless='c1d35fa339c245b382450a7cfb222c0e92f0154f'
+          $ExpectedPackage='ed257519c45508924bd56d10c695c481e620b613'
+          $Handoff='C:\ProgramData\CKBR\codex\work\research-sidecar-qualified-handoff'
           $Root='C:\ProgramData\CKBR\research-sidecar'
-          $Secret=Join-Path $Root 'secrets\openrouter.dpapi'
-          $CodexRoot='C:\ProgramData\CKBR\codex'
-          $CodexExe=Join-Path $CodexRoot 'bin\codex.exe'
-          $CodexHome=Join-Path $CodexRoot 'home'
-          $CodexWork=Join-Path $CodexRoot 'work'
+          $TaskName='CKBPlane Research Sidecar'
+          $ActivationWorkflow=Join-Path $env:GITHUB_WORKSPACE '.github\workflows\research-sidecar-activate.yml'
 
-          foreach($Dir in @($Root,$CodexRoot,$CodexHome,$CodexWork)){
-            if(-not(Test-Path -LiteralPath $Dir -PathType Container)){
-              throw "SIDECAR_DIRECTORY_MISSING path=$Dir"
-            }
-          }
-          if(-not(Test-Path -LiteralPath $Secret -PathType Leaf)){throw 'SIDECAR_SECRET_MISSING'}
-          if(-not(Test-Path -LiteralPath $CodexExe -PathType Leaf)){throw 'SIDECAR_CODEX_MISSING'}
+          $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+          if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "SIDECAR_IDENTITY_MISMATCH observed=$Identity"}
 
-          $ProbeFile=Join-Path $Root ('write-probe-' + [guid]::NewGuid().ToString('N') + '.tmp')
-          try{
-            [IO.File]::WriteAllText($ProbeFile,'probe',(New-Object Text.UTF8Encoding($false)))
-            if(-not(Test-Path -LiteralPath $ProbeFile -PathType Leaf)){throw 'SIDECAR_ROOT_NOT_WRITABLE'}
-          }finally{
-            Remove-Item -LiteralPath $ProbeFile -Force -ErrorAction SilentlyContinue
-          }
-          Write-Host 'sidecar_root_access=PASS'
-
-          $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim() | ConvertTo-SecureString
-          $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
-          try{
-            $Token=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
-            if([string]::IsNullOrWhiteSpace($Token) -or $Token.Contains([char]10) -or $Token.Contains([char]13)){
-              throw 'SIDECAR_SECRET_INVALID'
-            }
-            Write-Host 'openrouter_dpapi_decrypt=PASS'
-          }finally{
-            if($null-ne$Ptr){[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
-            $Token=$null
-            $Secure=$null
+          $HandoffRecord=Get-Content -LiteralPath (Join-Path $Handoff 'handoff.json') -Raw | ConvertFrom-Json
+          if([string]$HandoffRecord.schema-cne'ckb-plane.research-sidecar-qualified-handoff.v1' -or
+             [string]$HandoffRecord.sidecar_binary_sha256-cne$ExpectedBinary -or
+             [string]$HandoffRecord.activation_package_head-cne$ExpectedPackage -or
+             [bool]$HandoffRecord.activation_authorized){
+              throw 'SIDECAR_HANDOFF_PROVENANCE_INVALID'
           }
 
-          $Version=& $CodexExe --version 2>&1
-          if($LASTEXITCODE-ne0){throw "SIDECAR_CODEX_VERSION_FAILED exit=$LASTEXITCODE"}
-          Write-Host ("codex_version=" + (($Version|ForEach-Object{[string]$_}) -join ' ').Trim())
+          $Binary=Join-Path $Handoff 'research-sidecar.exe'
+          $Package=Join-Path $Handoff 'package'
+          $Lifecycle=Join-Path $Package 'Lifecycle.ps1'
+          $Manifest=Get-Content -LiteralPath (Join-Path $Package 'manifest.json') -Raw | ConvertFrom-Json
+          if((Get-FileHash -LiteralPath $Binary -Algorithm SHA256).Hash.ToLowerInvariant()-cne$ExpectedBinary){throw 'SIDECAR_HANDOFF_BINARY_HASH_MISMATCH'}
+          if([string]$Manifest.qualified_binary_sha256-cne$ExpectedBinary -or [string]$Manifest.wingless_bootstrap_head-cne$ExpectedWingless -or [bool]$Manifest.activation_authorized){throw 'SIDECAR_HANDOFF_PACKAGE_INVALID'}
 
-          $CodexProbe=Join-Path $CodexWork ('write-probe-' + [guid]::NewGuid().ToString('N') + '.tmp')
-          try{
-            [IO.File]::WriteAllText($CodexProbe,'probe',(New-Object Text.UTF8Encoding($false)))
-          }finally{
-            Remove-Item -LiteralPath $CodexProbe -Force -ErrorAction SilentlyContinue
+          if(-not(Test-Path -LiteralPath $ActivationWorkflow -PathType Leaf)){throw 'SIDECAR_ACTIVATION_WORKFLOW_MISSING'}
+          $ActivationText=Get-Content -LiteralPath $ActivationWorkflow -Raw
+          foreach($Required in @('research-sidecar-activate-request.json','AuthorizeActivation','-Mode activate',$ExpectedBinary,$ExpectedWingless,'activation-preflight.json')){
+              if(-not$ActivationText.Contains($Required)){throw "SIDECAR_ACTIVATION_WORKFLOW_BINDING_MISSING token=$Required"}
           }
-          Write-Host 'codex_root_access=PASS'
-
-          $Name='CKBPlane Research Sidecar Registration Probe'
-          Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
-          $Action=New-ScheduledTaskAction -Execute 'cmd.exe' -Argument '/c exit 0'
-          $Principal=New-ScheduledTaskPrincipal -UserId 'NT AUTHORITY\NETWORK SERVICE' -LogonType ServiceAccount -RunLevel Limited
-          $Settings=New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Minutes 1)
-          try{
-            Register-ScheduledTask -TaskName $Name -Action $Action -Principal $Principal -Settings $Settings -ErrorAction Stop | Out-Null
-            $T=Get-ScheduledTask -TaskName $Name -ErrorAction Stop
-            if($T.Principal.UserId -notmatch 'NETWORK SERVICE'){throw "SIDECAR_TASK_PRINCIPAL_MISMATCH observed=$($T.Principal.UserId)"}
-            Write-Host 'task_registration=PASS'
-            Write-Host "task_principal=$($T.Principal.UserId)"
-          }finally{
-            Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
+          foreach($Forbidden in @('CKB-plane Controller','Stop-CKBPlane','Start-CKBPlane','Coinbase','TradeGuard')){
+              if($ActivationText -match [regex]::Escape($Forbidden)){throw "SIDECAR_ACTIVATION_WORKFLOW_FORBIDDEN token=$Forbidden"}
           }
 
-          Write-Host 'RESEARCH_SIDECAR_ACTIVATION_PREFLIGHT=PASS'
+          $Existing=Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+          if($null-ne$Existing){throw "SIDECAR_TASK_PREEXISTING state=$($Existing.State)"}
+
+          & $Lifecycle -Mode stage -QualifiedBinaryPath $Binary
+          if($LASTEXITCODE-ne0){throw "SIDECAR_FINAL_STAGE_FAILED exit=$LASTEXITCODE"}
+
+          $Installed=Join-Path $Root 'bin\research-sidecar.exe'
+          if((Get-FileHash -LiteralPath $Installed -Algorithm SHA256).Hash.ToLowerInvariant()-cne$ExpectedBinary){throw 'SIDECAR_FINAL_BINARY_HASH_MISMATCH'}
+          $Stage=Get-Content -LiteralPath (Join-Path $Root 'stage.json') -Raw | ConvertFrom-Json
+          if([bool]$Stage.task_registered -or [bool]$Stage.sidecar_started){throw 'SIDECAR_FINAL_STAGE_NOT_INACTIVE'}
+          if($null-ne(Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue)){throw 'SIDECAR_TASK_REGISTERED_DURING_PREFLIGHT'}
+
+          $WorkflowHash=(Get-FileHash -LiteralPath $ActivationWorkflow -Algorithm SHA256).Hash.ToLowerInvariant()
+          $Receipt=[ordered]@{
+              schema='ckb-plane.research-sidecar-activation-preflight.v1'
+              qualified_binary_sha256=$ExpectedBinary
+              wingless_source_head=$ExpectedWingless
+              activation_package_head=$ExpectedPackage
+              activation_workflow_sha256=$WorkflowHash
+              runtime_identity=$Identity
+              task_registered=$false
+              sidecar_started=$false
+              sealed_at_utc=[DateTimeOffset]::UtcNow.ToString('o')
+          }
+          [IO.File]::WriteAllText((Join-Path $Root 'activation-preflight.json'),($Receipt|ConvertTo-Json -Depth 6),(New-Object Text.UTF8Encoding($false)))
+          Write-Host "identity=$Identity"
+          Write-Host "binary_sha256=$ExpectedBinary"
+          Write-Host "activation_workflow_sha256=$WorkflowHash"
+          Write-Host 'task_registered=False'
+          Write-Host 'sidecar_started=False'
+          Write-Host 'RESEARCH_SIDECAR_FINAL_PREFLIGHT=PASS'
