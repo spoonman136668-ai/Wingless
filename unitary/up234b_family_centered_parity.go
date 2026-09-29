@@ -126,7 +126,7 @@ func RunUP234B() (UP234BResult, error) {
 	res := UP234BResult{
 		Schema: UP234BFamilyCenteredParitySchema,
 		Experiment: "UP-234B-family-centered-parity",
-		SourceUP233BSeal: base,
+		SourceUP233BSeal: "1ae40d9bb91c4788af66bce6e484885cc7348810",
 		TrainingPhases: train,
 		EvaluationPhases: eval,
 		Features: []string{"native_correct_count", "mean_absolute_margin", "near_zero_margin_count", "min_absolute_margin"},
