@@ -1,51 +1,118 @@
-name: Research Autonomy Nemotron Gateway Qualification
+name: Install Qualified Nemotron Planner Gateway
 
 on:
   push:
     branches:
       - ops/research-autonomy-provider-probe-r1
     paths:
-      - cmd/ckb-planner-gateway/**
-      - reasoner/**
       - .github/workflows/research-autonomy-provider-probe.yml
 
 permissions:
   contents: read
 
 jobs:
-  qualify:
+  install:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
-    timeout-minutes: 20
+    timeout-minutes: 10
+    env:
+      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: 1a254282687d2a45efa2dcbc125bd6ec6e7bbb80
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Focused gateway and reasoner tests
+      - name: Rebuild exact qualified gateway and install
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           $env:GOFLAGS='-buildvcs=false'
-          go test ./cmd/ckb-planner-gateway ./reasoner -count=1
-          if($LASTEXITCODE -ne 0){throw 'FOCUSED_TEST_FAILED'}
+          $Expected='cb7bfdc75659a580cb7288fa9cf28f64a2e26890214b9f335bbb959b67f8efd0'
+          $Plane='C:\Users\camar\GolandProjects\ckb-plane'
+          $BinRoot=Join-Path $Plane 'state\research\bin'
+          $StateRoot=Join-Path $Plane 'state\research\planner-gateway'
+          $Secret=Join-Path $Plane 'state\research\secrets\nemotron-openrouter.dpapi'
+          $Exe=Join-Path $BinRoot 'ckb-nemotron-planner-gateway.exe'
+          $Wrapper=Join-Path $BinRoot 'Start-NemotronPlannerGateway.ps1'
 
-      - name: Full Wingless regression
-        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
-        run: |
-          $ErrorActionPreference='Stop'
-          $env:GOFLAGS='-buildvcs=false'
-          go test ./... -count=1
-          if($LASTEXITCODE -ne 0){throw 'FULL_REGRESSION_FAILED'}
+          if(-not(Test-Path -LiteralPath $Secret -PathType Leaf)){throw 'SEALED_NEMOTRON_SECRET_MISSING'}
+          New-Item -ItemType Directory -Force -Path $BinRoot,$StateRoot | Out-Null
 
-      - name: Deterministic Windows build
-        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
-        run: |
+          $Build=Join-Path $env:RUNNER_TEMP 'ckb-nemotron-planner-gateway.exe'
+          go build -trimpath -o $Build ./cmd/ckb-planner-gateway
+          if($LASTEXITCODE -ne 0){throw 'GATEWAY_BUILD_FAILED'}
+          $Hash=(Get-FileHash -LiteralPath $Build -Algorithm SHA256).Hash.ToLowerInvariant()
+          if($Hash -cne $Expected){throw "QUALIFIED_GATEWAY_HASH_DRIFT observed=$Hash expected=$Expected"}
+          Copy-Item -LiteralPath $Build -Destination $Exe -Force
+
+          $Script=@'
+          [CmdletBinding()]
+          param()
           $ErrorActionPreference='Stop'
-          $env:GOFLAGS='-buildvcs=false'
-          New-Item -ItemType Directory -Force -Path '.qualification' | Out-Null
-          go build -trimpath -o '.qualification\ckb-nemotron-planner-gateway.exe' ./cmd/ckb-planner-gateway
-          if($LASTEXITCODE -ne 0){throw 'BUILD_FAILED'}
-          Write-Host "gateway_sha256=$((Get-FileHash -LiteralPath '.qualification\ckb-nemotron-planner-gateway.exe' -Algorithm SHA256).Hash.ToLowerInvariant())"
-          Write-Host 'NEMOTRON_GATEWAY_WINDOWS_QUALIFICATION=PASS'
+          $Expected='cb7bfdc75659a580cb7288fa9cf28f64a2e26890214b9f335bbb959b67f8efd0'
+          $Plane='C:\Users\camar\GolandProjects\ckb-plane'
+          $Exe=Join-Path $Plane 'state\research\bin\ckb-nemotron-planner-gateway.exe'
+          $Secret=Join-Path $Plane 'state\research\secrets\nemotron-openrouter.dpapi'
+          $State=Join-Path $Plane 'state\research\planner-gateway'
+          New-Item -ItemType Directory -Force -Path $State | Out-Null
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$Expected){throw 'NEMOTRON_GATEWAY_BINARY_HASH_MISMATCH'}
+          $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim() | ConvertTo-SecureString
+          $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+          try{$env:WINGLESS_REASONER_OPENROUTER_API_KEY=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)}
+          finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+          if([string]::IsNullOrWhiteSpace($env:WINGLESS_REASONER_OPENROUTER_API_KEY)){throw 'NEMOTRON_SECRET_DECRYPT_FAILED'}
+          $Stdout=Join-Path $State 'stdout.log'
+          $Stderr=Join-Path $State 'stderr.log'
+          $P=Start-Process -FilePath $Exe -ArgumentList @('-listen','127.0.0.1:18791','-timeout-seconds','600') -PassThru -WindowStyle Hidden -RedirectStandardOutput $Stdout -RedirectStandardError $Stderr
+          if($null-eq$P){throw 'NEMOTRON_GATEWAY_START_FAILED'}
+          $Ready=$false
+          for($i=0;$i-lt60;$i++){
+            try{
+              $M=Invoke-RestMethod -Method Get -Uri 'http://127.0.0.1:18791/v1/models' -TimeoutSec 2
+              if($null-ne$M.data -and @($M.data).Count-eq1 -and [string]@($M.data)[0].id-ceq'nemotron-3-ultra-planner'){$Ready=$true;break}
+            }catch{}
+            $P.Refresh()
+            if($P.HasExited){throw "NEMOTRON_GATEWAY_EXITED exit=$($P.ExitCode)"}
+            Start-Sleep -Milliseconds 500
+          }
+          if(-not$Ready){Stop-Process -Id $P.Id -Force -ErrorAction SilentlyContinue;throw 'NEMOTRON_GATEWAY_READY_TIMEOUT'}
+          $Lease=[ordered]@{
+            schema='ckb-plane.nemotron-planner-gateway-lease.v1'
+            pid=$P.Id
+            endpoint='http://127.0.0.1:18791/v1/chat/completions'
+            model='nemotron-3-ultra-planner'
+            binary_sha256=$Expected
+            started_at_utc=[DateTimeOffset]::UtcNow.ToString('o')
+          }
+          [IO.File]::WriteAllText((Join-Path $State 'lease.json'),($Lease|ConvertTo-Json -Depth 6),(New-Object Text.UTF8Encoding($false)))
+          $P.WaitForExit()
+          exit $P.ExitCode
+          '@
+          $Script=$Script -replace '^ {10}',''
+          [IO.File]::WriteAllText($Wrapper,$Script,(New-Object Text.UTF8Encoding($false)))
+
+          $TaskName='CKB-plane Nemotron Planner'
+          Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+          Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
+          $Action=New-ScheduledTaskAction -Execute 'powershell.exe' -Argument ('-NoProfile -ExecutionPolicy Bypass -File "'+$Wrapper+'"')
+          $Trigger=New-ScheduledTaskTrigger -AtStartup
+          $Settings=New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1)
+          $Principal=New-ScheduledTaskPrincipal -UserId 'NT AUTHORITY\NETWORK SERVICE' -LogonType ServiceAccount -RunLevel Limited
+          Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal | Out-Null
+          Start-ScheduledTask -TaskName $TaskName
+
+          $Ready=$false
+          for($i=0;$i-lt60;$i++){
+            try{
+              $M=Invoke-RestMethod -Method Get -Uri 'http://127.0.0.1:18791/v1/models' -TimeoutSec 2
+              if($null-ne$M.data -and @($M.data).Count-eq1 -and [string]@($M.data)[0].id-ceq'nemotron-3-ultra-planner'){$Ready=$true;break}
+            }catch{}
+            Start-Sleep -Milliseconds 500
+          }
+          if(-not$Ready){throw 'INSTALLED_NEMOTRON_GATEWAY_NOT_READY'}
+          $Task=Get-ScheduledTask -TaskName $TaskName
+          Write-Host "gateway_sha256=$Expected"
+          Write-Host "task_state=$($Task.State)"
+          Write-Host "task_user=$($Task.Principal.UserId)"
+          Write-Host 'NEMOTRON_GATEWAY_INSTALL=PASS'
