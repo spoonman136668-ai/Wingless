@@ -1,0 +1,40 @@
+name: CKB Plane Task XML Probe
+
+on:
+  push:
+    branches:
+      - ops/ckb-plane-task-trigger-probe-r1
+    paths:
+      - '.github/workflows/ckb-plane-task-xml-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - name: Read controller task restart policy
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $TaskFile='C:\Windows\System32\Tasks\CKB-plane Controller'
+          Write-Host "task_file_exists=$(Test-Path -LiteralPath $TaskFile -PathType Leaf)"
+          try {
+            [xml]$Xml=Get-Content -LiteralPath $TaskFile -Raw
+            $Ns=New-Object Xml.XmlNamespaceManager($Xml.NameTable)
+            $Ns.AddNamespace('t','http://schemas.microsoft.com/windows/2004/02/mit/task')
+            $Restart=$Xml.SelectSingleNode('//t:Settings/t:RestartOnFailure',$Ns)
+            $Multiple=$Xml.SelectSingleNode('//t:Settings/t:MultipleInstancesPolicy',$Ns)
+            $Principal=$Xml.SelectSingleNode('//t:Principals/t:Principal/t:UserId',$Ns)
+            Write-Host "xml_readable=True"
+            Write-Host "restart_interval=$($Restart.Interval)"
+            Write-Host "restart_count=$($Restart.Count)"
+            Write-Host "multiple_instances=$($Multiple.InnerText)"
+            if($null-ne$Principal){Write-Host "principal_present=True"}else{Write-Host "principal_present=False"}
+          } catch {
+            Write-Host 'xml_readable=False'
+            Write-Host ("xml_error={0}" -f $_.Exception.GetType().Name)
+          }
+          Write-Host 'TASK_XML_PROBE=PASS'
