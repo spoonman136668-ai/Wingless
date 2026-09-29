@@ -13,8 +13,16 @@ permissions:
 
 jobs:
   advisory:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: up256c
+            request: reasoner/live/20260929/up256c-successor.json
+          - key: uplm6c
+            request: reasoner/live/20260929/uplm6c-successor.json
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     env:
       WINGLESS_REMOTE_REASONER_ENABLE: "1"
       WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
@@ -37,20 +45,18 @@ jobs:
           test -n "${WINGLESS_REASONER_OPENROUTER_API_KEY:-}"
           go test ./reasoner ./cmd/research-reasoner -count=1
 
-      - name: Run three bounded successor advisories
+      - name: Run frozen successor advisory
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p evidence
-          go run ./cmd/research-reasoner             -request reasoner/live/20260929/up238b-successor.json             -out evidence/up238b-successor.json
-          go run ./cmd/research-reasoner             -request reasoner/live/20260929/up256c-successor.json             -out evidence/up256c-successor.json
-          go run ./cmd/research-reasoner             -request reasoner/live/20260929/uplm6c-successor.json             -out evidence/uplm6c-successor.json
+          go run ./cmd/research-reasoner             -request "${{ matrix.request }}"             -out "evidence/${{ matrix.key }}-successor.json"
 
       - name: Upload advisory evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: nemotron-live-successor-${{ github.sha }}
+          name: nemotron-live-successor-${{ matrix.key }}-${{ github.sha }}
           path: evidence/
           if-no-files-found: warn
           retention-days: 30
