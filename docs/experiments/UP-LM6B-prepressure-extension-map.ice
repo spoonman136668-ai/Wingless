@@ -9,7 +9,7 @@ Evaluate every profile × rotation × permutation × arm exactly once:
 profiles={deferred_only,layout_only,hybrid_min}
 rotations={5,13}
 permutations={identity,reverse,rotate2}
-12 arms each = 216 rows.
+6 arms each = 108 rows.
 
 For each row record:
 - prepressure target;
@@ -29,3 +29,5 @@ ANCHOR_NOT_REPRODUCED if LM6A does not reproduce PREPRESSURE_CREATES_LENGTH16_FL
 OTHER_VALID_PATTERN otherwise.
 
 Observational mechanism map only. No policy change, no live activation, no post-result tuning.
+
+FIXA (pre-result structural correction): the inherited uplm2xArms substrate contains exactly 6 arms per scenario (depths {4,5,6} × layouts {suffix_reported,alternating_reported}). The earlier 12-arm/216-row statement was a preregistration transcription error. No scientific output was inspected before this correction; all profiles, rotations, permutations, transform logic, measurements, and classifications remain unchanged.
