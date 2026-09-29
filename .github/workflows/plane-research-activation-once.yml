@@ -25,7 +25,8 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
 
-          $PlaneRoot = "$env:USERPROFILE\GolandProjects\ckb-plane"
+          $PlaneRoot = 'C:\Users\camar\GolandProjects\ckb-plane'
+          $InteractiveProfile = 'C:\Users\camar'
           $SealedSha = '1496b0af4a947cec2aa5eb6354de453672173231'
           $SealedBranch = 'hardening/research-activation-guarded-cutover-r1'
           $TempRoot = Join-Path $env:RUNNER_TEMP ("ckb-plane-cutover-" + $env:GITHUB_RUN_ID)
@@ -33,6 +34,17 @@ jobs:
           if (-not (Test-Path -LiteralPath $PlaneRoot -PathType Container)) {
               throw "LIVE_PLANE_ROOT_MISSING path=$PlaneRoot"
           }
+
+          $ControllerTask = Get-ScheduledTask -TaskName 'CKB-plane Controller' -ErrorAction Stop
+          Write-Host "runner_identity=$([Security.Principal.WindowsIdentity]::GetCurrent().Name)"
+          Write-Host "runner_userprofile=$env:USERPROFILE"
+          Write-Host "controller_task_user=$($ControllerTask.Principal.UserId)"
+          Write-Host "controller_task_logon=$($ControllerTask.Principal.LogonType)"
+
+          $ExpectedServer = Join-Path $InteractiveProfile 'Downloads\K_MODELQUAL_RUNTIME_B10809_20260913_051910\runtime\llama-server.exe'
+          $ExpectedModel = Join-Path $InteractiveProfile 'Downloads\K_QWEN3CODER_30BA3B_Q3KM_PROBE_R1_20260913_184341\model\Qwen3-Coder-30B-A3B-Instruct-Q3_K_M.gguf'
+          if (-not (Test-Path -LiteralPath $ExpectedServer -PathType Leaf)) { throw "PINNED_LLAMA_SERVER_MISSING path=$ExpectedServer" }
+          if (-not (Test-Path -LiteralPath $ExpectedModel -PathType Leaf)) { throw "PINNED_QWEN_MODEL_MISSING path=$ExpectedModel" }
 
           $Remote = (git -C $PlaneRoot remote get-url origin).Trim()
           if ($LASTEXITCODE -ne 0 -or $Remote -notmatch 'spoonman136668-ai/ckb-plane') {
@@ -61,6 +73,11 @@ jobs:
               $Script = Join-Path $TempRoot 'implementations\research-activation-guarded-cutover-v1\Cutover-ResearchController-Guarded.ps1'
               if (-not (Test-Path -LiteralPath $Script -PathType Leaf)) {
                   throw 'GUARDED_CUTOVER_SCRIPT_MISSING'
+              }
+
+              if ($env:USERPROFILE -cne $InteractiveProfile) {
+                  Write-Host 'SERVICE_CONTEXT_DETECTED=True'
+                  throw 'CUTOVER_REQUIRES_INTERACTIVE_USER_CONTEXT'
               }
 
               & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $Script -PlaneRoot $PlaneRoot -AuthorizeCutover
