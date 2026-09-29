@@ -1,0 +1,64 @@
+name: Research Sidecar Startup Diagnostic
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-startup-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 5
+    steps:
+      - name: Capture isolated sidecar startup error
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+          $Live='C:\ProgramData\CKBR\research-sidecar'
+          $Diag=Join-Path 'C:\ProgramData\CKBR\codex\work' ('research-sidecar-diag-' + $env:GITHUB_RUN_ID)
+          $Expected='46e4fc8d6344c4f6a554c02aeaf9f3adb8f8c1ee7871d74f70f69f111c5cf3de'
+          $Task=Get-ScheduledTask -TaskName 'CKBPlane Research Sidecar' -ErrorAction SilentlyContinue
+          if($null-ne$Task -and $Task.State-eq'Running'){throw 'LIVE_SIDECAR_RUNNING_DIAGNOSTIC_FORBIDDEN'}
+          if(Test-Path -LiteralPath $Diag){Remove-Item -LiteralPath $Diag -Recurse -Force}
+          foreach($Rel in @('bin','config','state\research','secrets')){New-Item -ItemType Directory -Force -Path (Join-Path $Diag $Rel)|Out-Null}
+          Copy-Item -LiteralPath (Join-Path $Live 'bin\research-sidecar.exe') -Destination (Join-Path $Diag 'bin\research-sidecar.exe') -Force
+          Copy-Item -LiteralPath (Join-Path $Live 'config\autonomy.yaml') -Destination (Join-Path $Diag 'config\autonomy.yaml') -Force
+          Copy-Item -LiteralPath (Join-Path $Live 'config\research-sidecar.yaml') -Destination (Join-Path $Diag 'config\research-sidecar.yaml') -Force
+          Copy-Item -LiteralPath (Join-Path $Live 'config\research-bootstrap.json') -Destination (Join-Path $Diag 'config\research-bootstrap.json') -Force
+          Copy-Item -LiteralPath (Join-Path $Live 'state\research\research-runtime.yaml') -Destination (Join-Path $Diag 'state\research\research-runtime.yaml') -Force
+          Copy-Item -LiteralPath (Join-Path $Live 'secrets\openrouter.dpapi') -Destination (Join-Path $Diag 'secrets\openrouter.dpapi') -Force
+          $Exe=Join-Path $Diag 'bin\research-sidecar.exe'
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$Expected){throw 'DIAG_BINARY_HASH_MISMATCH'}
+          $Out=Join-Path $Diag 'stdout.txt'
+          $Err=Join-Path $Diag 'stderr.txt'
+          $env:CKB_RESEARCH_CODEX_ROOT='C:\ProgramData\CKBR\codex'
+          $P=Start-Process -FilePath $Exe -ArgumentList @('-mode','run','-config',(Join-Path $Diag 'config\autonomy.yaml')) -WorkingDirectory $Diag -RedirectStandardOutput $Out -RedirectStandardError $Err -PassThru
+          $Exited=$P.WaitForExit(8000)
+          if(-not$Exited){
+            Stop-Process -Id $P.Id -Force -ErrorAction SilentlyContinue
+            Start-Sleep -Milliseconds 500
+            Write-Host 'diagnostic_result=STARTUP_REMAINED_RUNNING'
+          }else{
+            Write-Host "diagnostic_exit=$($P.ExitCode)"
+            Write-Host '---STDERR---'
+            if(Test-Path -LiteralPath $Err){Get-Content -LiteralPath $Err | ForEach-Object{Write-Host ([string]$_)}}
+            Write-Host '---END_STDERR---'
+            Write-Host '---STDOUT---'
+            if(Test-Path -LiteralPath $Out){Get-Content -LiteralPath $Out | ForEach-Object{Write-Host ([string]$_)}}
+            Write-Host '---END_STDOUT---'
+          }
+          $DB=Join-Path $Diag 'state\research-sidecar.db'
+          if(Test-Path -LiteralPath $DB -PathType Leaf){
+            $Raw=& $Exe -mode status -config (Join-Path $Diag 'config\autonomy.yaml') 2>&1
+            Write-Host '---DIAG_STATUS---'
+            $Raw|ForEach-Object{Write-Host ([string]$_)}
+            Write-Host '---END_DIAG_STATUS---'
+          }
+          Remove-Item -LiteralPath $Diag -Recurse -Force -ErrorAction SilentlyContinue
+          Write-Host 'RESEARCH_SIDECAR_STARTUP_DIAGNOSTIC=COMPLETE'
