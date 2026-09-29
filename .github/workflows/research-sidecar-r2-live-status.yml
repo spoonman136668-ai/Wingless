@@ -1,0 +1,47 @@
+name: Research Sidecar R2 Live Status
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-r2-live-status.yml
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 5
+    steps:
+      - name: Read isolated sidecar state
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Lifecycle=Join-Path $Root 'ops\Lifecycle.ps1'
+          $Exe=Join-Path $Root 'bin\research-sidecar.exe'
+          $Config=Join-Path $Root 'config\autonomy.yaml'
+          $ExpectedBinary='6758be3ef7bd8fce986a527cc8d3078369b4bc88f68c0e4072519c7baca86233'
+
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$ExpectedBinary){throw 'SIDECAR_R2_STATUS_BINARY_MISMATCH'}
+          $LifecycleRaw=& $Lifecycle -Mode status
+          if($LASTEXITCODE-ne0){throw 'SIDECAR_R2_LIFECYCLE_STATUS_FAILED'}
+          $LifecycleStatus=($LifecycleRaw -join [Environment]::NewLine)|ConvertFrom-Json
+          $Raw=& $Exe -mode status -config $Config 2>&1
+          if($LASTEXITCODE-ne0){throw "SIDECAR_R2_NATIVE_STATUS_FAILED output=$($Raw -join ' ')"}
+          $Status=($Raw -join [Environment]::NewLine)|ConvertFrom-Json
+
+          Write-Host "task_state=$($LifecycleStatus.task_state)"
+          Write-Host "authority=$($Status.authority)"
+          Write-Host "generation=$($Status.generation)"
+          Write-Host "cycle_count=$($Status.cycle_count)"
+          Write-Host "last_cycle_id=$($Status.last_cycle_id)"
+          Write-Host "last_cycle_status=$($Status.last_cycle_status)"
+          Write-Host "blocked_cycle_count=$($Status.blocked_cycle_count)"
+          Write-Host "status=$($Status.status)"
+          if([string]$LifecycleStatus.task_state-cne'Running'){throw 'SIDECAR_R2_TASK_NOT_RUNNING'}
+          if([string]$Status.authority-cne'plane' -or [string]$Status.generation-cne'1'){throw 'SIDECAR_R2_AUTHORITY_DRIFT'}
+          Write-Host 'RESEARCH_SIDECAR_R2_LIVE_STATUS=PASS'
