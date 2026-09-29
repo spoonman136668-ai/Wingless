@@ -1,4 +1,4 @@
-name: Research Sidecar Secret Provisioning Preflight
+name: Research Sidecar Planner Secret Provision
 
 on:
   push:
@@ -11,22 +11,52 @@ permissions:
   contents: read
 
 jobs:
-  probe:
+  provision:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
     timeout-minutes: 5
     env:
       OPENROUTER_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
     steps:
-      - name: Verify identity and isolated sidecar path access
+      - name: Seal planner credential for NETWORK SERVICE
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
+          if([string]::IsNullOrWhiteSpace($env:OPENROUTER_KEY)){throw 'OPENROUTER_SECRET_MISSING'}
           $Identity=[System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-          $HasSecret=-not [string]::IsNullOrWhiteSpace($env:OPENROUTER_KEY)
+          if($Identity-cne 'NT AUTHORITY\NETWORK SERVICE'){throw "IDENTITY_MISMATCH observed=$Identity"}
+
           $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Secrets=Join-Path $Root 'secrets'
+          $Target=Join-Path $Secrets 'openrouter.dpapi'
+          New-Item -ItemType Directory -Force -Path $Secrets | Out-Null
+
+          $Secure=ConvertTo-SecureString -String $env:OPENROUTER_KEY -AsPlainText -Force
+          $Cipher=ConvertFrom-SecureString -SecureString $Secure
+          if([string]::IsNullOrWhiteSpace($Cipher)){throw 'DPAPI_ENCRYPT_FAILED'}
+          [IO.File]::WriteAllText($Target,$Cipher,(New-Object Text.UTF8Encoding($false)))
+
+          $RoundTripSecure=(Get-Content -LiteralPath $Target -Raw).Trim() | ConvertTo-SecureString
+          $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($RoundTripSecure)
+          try{$RoundTrip=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)}
+          finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+          if($RoundTrip-cne$env:OPENROUTER_KEY){throw 'DPAPI_ROUNDTRIP_MISMATCH'}
+
+          $Acl=Get-Acl -LiteralPath $Secrets
+          $Acl.SetAccessRuleProtection($true,$false)
+          foreach($Rule in @($Acl.Access)){$Acl.RemoveAccessRuleAll($Rule)}
+          foreach($Spec in @(
+            @('NT AUTHORITY\SYSTEM','FullControl'),
+            @('BUILTIN\Administrators','FullControl'),
+            @('NT AUTHORITY\NETWORK SERVICE','Modify')
+          )){
+            $Rule=New-Object Security.AccessControl.FileSystemAccessRule(
+              $Spec[0],$Spec[1],'ContainerInherit,ObjectInherit','None','Allow'
+            )
+            $Acl.AddAccessRule($Rule)
+          }
+          Set-Acl -LiteralPath $Secrets -AclObject $Acl
+
           Write-Host "identity=$Identity"
-          Write-Host "openrouter_secret_present=$HasSecret"
-          Write-Host "programdata_ckbr_present=$([bool](Test-Path -LiteralPath 'C:\ProgramData\CKBR' -PathType Container))"
-          Write-Host "sidecar_root_present=$([bool](Test-Path -LiteralPath $Root -PathType Container))"
-          if(-not $HasSecret){throw 'WINGLESS_OPENROUTER_SECRET_MISSING'}
-          Write-Host 'RESEARCH_SIDECAR_SECRET_PREFLIGHT=PASS'
+          Write-Host "secret_file_present=$([bool](Test-Path -LiteralPath $Target -PathType Leaf))"
+          Write-Host "cipher_sha256=$((Get-FileHash -LiteralPath $Target -Algorithm SHA256).Hash.ToLowerInvariant())"
+          Write-Host 'RESEARCH_SIDECAR_PLANNER_SECRET=SEALED'
