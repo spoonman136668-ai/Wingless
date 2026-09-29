@@ -45,7 +45,7 @@ try{
     Write-Host ''
     Write-Host '=== SCIENTIFIC DIAGNOSIS (does not control harness acceptance) ==='
     Write-Host "exact=$($R.exact_law_rows) mismatch=$($R.mismatch_rows) classification=$($R.classification)"
-    Write-Host 'WINGLESS_UPLM6C_HARNESS_PASS'
+    Write-Host 'WINGLESS_UP388_HARNESS_PASS'
 }finally{
     Pop-Location
     if($null -eq $PriorGOROOT){Remove-Item Env:GOROOT -ErrorAction SilentlyContinue}else{$env:GOROOT=$PriorGOROOT}
