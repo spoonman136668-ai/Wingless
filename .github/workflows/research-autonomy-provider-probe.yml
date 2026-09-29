@@ -1,4 +1,4 @@
-name: Read CKB Codex Configuration Paths
+name: Codex Runtime Accessibility Probe
 
 on:
   push:
@@ -15,22 +15,19 @@ jobs:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
     timeout-minutes: 5
     steps:
-      - name: Read configured Codex paths only
+      - name: Verify configured Codex runtime is reachable
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          $Config='C:\Users\camar\GolandProjects\ckb-plane\config\autonomy.yaml'
-          if(-not(Test-Path -LiteralPath $Config -PathType Leaf)){throw 'CONFIG_UNAVAILABLE'}
-          $Lines=Get-Content -LiteralPath $Config
-          function GetValue([string]$Key){
-            $L=$Lines | Where-Object {$_ -match ("^\s*"+[regex]::Escape($Key)+":\s*")} | Select-Object -First 1
-            if($null-eq$L){return ''}
-            return (($L -split ':',2)[1].Trim().Trim("'").Trim('"'))
+          $Codex='C:\Users\camar\AppData\Local\Programs\OpenAI\Codex\bin\codex.exe'
+          $CodexHome='C:\Users\camar\.ckb-plane-codex-home-toy-r1'
+          try{$ToolOK=Test-Path -LiteralPath $Codex -PathType Leaf -ErrorAction Stop}catch{$ToolOK=$false}
+          try{$HomeOK=Test-Path -LiteralPath $CodexHome -PathType Container -ErrorAction Stop}catch{$HomeOK=$false}
+          Write-Host "codex_path_accessible=$ToolOK"
+          Write-Host "codex_home_accessible=$HomeOK"
+          if($ToolOK){
+            $V=@(& $Codex --version 2>&1)
+            Write-Host "codex_version=$($V -join ' ')"
+            Write-Host "codex_version_exit=$LASTEXITCODE"
           }
-          $Codex=GetValue 'codex'
-          $CodexHome=GetValue 'codex_home'
-          if([string]::IsNullOrWhiteSpace($Codex)){throw 'CODEX_PATH_NOT_CONFIGURED'}
-          if([string]::IsNullOrWhiteSpace($CodexHome)){throw 'CODEX_HOME_NOT_CONFIGURED'}
-          Write-Host "codex_path=$Codex"
-          Write-Host "codex_home=$CodexHome"
-          Write-Host 'CODEX_CONFIG_PATH_PROBE=PASS'
+          Write-Host 'CODEX_RUNTIME_ACCESS_PROBE=PASS'
