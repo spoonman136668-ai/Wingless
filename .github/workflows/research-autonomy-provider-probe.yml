@@ -1,4 +1,4 @@
-name: Research Autonomy Provider Probe
+name: Research Autonomy Nemotron Secret Seal
 
 on:
   push:
@@ -11,26 +11,29 @@ permissions:
   contents: read
 
 jobs:
-  probe:
+  seal:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
     timeout-minutes: 5
     env:
-      WINGLESS_REMOTE_REASONER_ENABLE: "1"
       WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
     steps:
-      - name: Probe dedicated research provider environment
+      - name: Seal Nemotron credential for Network Service provider
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          Write-Host "whoami=$(& whoami.exe)"
-          Write-Host "runner_name=$env:RUNNER_NAME"
-          Write-Host "reasoner_enable=$env:WINGLESS_REMOTE_REASONER_ENABLE"
-          Write-Host "reasoner_secret_present=$([bool](-not [string]::IsNullOrWhiteSpace($env:WINGLESS_REASONER_OPENROUTER_API_KEY)))"
-          $Codex=Get-Command codex.exe -ErrorAction SilentlyContinue
-          if($Codex){
-            Write-Host 'codex_present=True'
-            Write-Host "codex_path=$($Codex.Source)"
-          }else{
-            Write-Host 'codex_present=False'
-          }
-          Write-Host 'RESEARCH_PROVIDER_PROBE=PASS'
+          if([string]::IsNullOrWhiteSpace($env:WINGLESS_REASONER_OPENROUTER_API_KEY)){throw 'REASONER_SECRET_MISSING'}
+          $Root='C:\Users\camar\GolandProjects\ckb-plane\state\research\secrets'
+          New-Item -ItemType Directory -Force -Path $Root | Out-Null
+          $Path=Join-Path $Root 'nemotron-openrouter.dpapi'
+          $Secure=ConvertTo-SecureString $env:WINGLESS_REASONER_OPENROUTER_API_KEY -AsPlainText -Force
+          $Cipher=$Secure | ConvertFrom-SecureString
+          [IO.File]::WriteAllText($Path,$Cipher,(New-Object Text.UTF8Encoding($false)))
+          $RoundTrip=(Get-Content -LiteralPath $Path -Raw).Trim() | ConvertTo-SecureString
+          $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($RoundTrip)
+          try{$Plain=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)}
+          finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+          if($Plain -cne $env:WINGLESS_REASONER_OPENROUTER_API_KEY){throw 'DPAPI_ROUNDTRIP_FAILED'}
+          Remove-Variable Plain -ErrorAction SilentlyContinue
+          Write-Host "sealed_path=$Path"
+          Write-Host "cipher_sha256=$((Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant())"
+          Write-Host 'NEMOTRON_SECRET_SEAL=PASS'
