@@ -1,0 +1,13 @@
+{
+  "schema": "wingless.experiment-reasoning-request.v1",
+  "request_id": "uplm6c-successor-20260929",
+  "project": "Wingless",
+  "experiment_id": "UP-LM6C-prepressure-deficit-law",
+  "role": "plan-next-experiment",
+  "frontier_sha256": "fc8a85f52220173737e7b835b23bb9347db2f39d806c3528fe175e0d746e0d3c",
+  "qualification_contract_sha256": "19f5943efde3c2169a0b3d3fa1dc8def581dce41afa9e3266f2e335887471073",
+  "context": "North Star: derive compact mechanistic laws for recurrent state correction under bounded resources, and test whether those laws transport across controlled profile/layout conditions without hidden retuning.\n\nSealed public result: UP-LM6C-prepressure-deficit-law qualified as EXACT_DEFICIT_LAW over all 108 frozen rows. For profiles {deferred_only, layout_only, hybrid_min}, rotations {5,13}, permutations {identity, reverse, rotate2}, and six arms each, writes equaled max(0, pre_countdown-target) exactly and post_countdown equaled target exactly. mismatch_rows=0, write_error range=[0,0], post_target_error range=[0,0]. No policy change or live activation occurred.\n\nInterpretation boundary: the algebraic law is exact on the frozen LM6B substrate. This does not yet establish whether the law is structural under an out-of-support target/countdown regime or whether it relies on the particular arm construction that generated the 108 rows.\n\nSelect one next experiment with maximal information value. Prefer an out-of-support or controlled construction test that changes exactly one substrate dimension while leaving the correction policy untouched. Do not change the law after seeing results. Provide: question, exact frozen extension, controls, primary residuals, preregistered classifications, and what would falsify structural-law interpretation.",
+  "max_output_tokens": 4096,
+  "timeout_seconds": 900,
+  "data_class": "public-repository"
+}
