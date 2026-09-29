@@ -1,0 +1,109 @@
+name: One-shot plane research activation
+
+on:
+  push:
+    branches:
+      - ops/plane-research-activation-once-r1
+    paths:
+      - .github/workflows/plane-research-activation-once.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: one-shot-plane-research-activation
+  cancel-in-progress: false
+
+jobs:
+  activate:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 90
+
+    steps:
+      - name: Run sealed plane cutover
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $PlaneRoot = "$env:USERPROFILE\GolandProjects\ckb-plane"
+          $SealedSha = '1496b0af4a947cec2aa5eb6354de453672173231'
+          $SealedBranch = 'hardening/research-activation-guarded-cutover-r1'
+          $TempRoot = Join-Path $env:RUNNER_TEMP ("ckb-plane-cutover-" + $env:GITHUB_RUN_ID)
+
+          if (-not (Test-Path -LiteralPath $PlaneRoot -PathType Container)) {
+              throw "LIVE_PLANE_ROOT_MISSING path=$PlaneRoot"
+          }
+
+          $Remote = (git -C $PlaneRoot remote get-url origin).Trim()
+          if ($LASTEXITCODE -ne 0 -or $Remote -notmatch 'spoonman136668-ai/ckb-plane') {
+              throw "PLANE_ORIGIN_INVALID observed=$Remote"
+          }
+
+          git -C $PlaneRoot fetch origin $SealedBranch
+          if ($LASTEXITCODE -ne 0) { throw 'SEALED_CUTOVER_FETCH_FAILED' }
+
+          $Fetched = (git -C $PlaneRoot rev-parse FETCH_HEAD).Trim()
+          if ($Fetched -cne $SealedSha) {
+              throw "SEALED_CUTOVER_SHA_MISMATCH expected=$SealedSha observed=$Fetched"
+          }
+
+          if (Test-Path -LiteralPath $TempRoot) {
+              Remove-Item -LiteralPath $TempRoot -Recurse -Force
+          }
+
+          git -C $PlaneRoot worktree add --detach $TempRoot $SealedSha
+          if ($LASTEXITCODE -ne 0) { throw 'SEALED_CUTOVER_WORKTREE_FAILED' }
+
+          try {
+              $Head = (git -C $TempRoot rev-parse HEAD).Trim()
+              if ($Head -cne $SealedSha) { throw "SEALED_WORKTREE_HEAD_MISMATCH observed=$Head" }
+
+              $Script = Join-Path $TempRoot 'implementations\research-activation-guarded-cutover-v1\Cutover-ResearchController-Guarded.ps1'
+              if (-not (Test-Path -LiteralPath $Script -PathType Leaf)) {
+                  throw 'GUARDED_CUTOVER_SCRIPT_MISSING'
+              }
+
+              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $Script -PlaneRoot $PlaneRoot -AuthorizeCutover
+              if ($LASTEXITCODE -ne 0) {
+                  throw "GUARDED_RESEARCH_CUTOVER_FAILED exit=$LASTEXITCODE"
+              }
+
+              $TokenPath = Join-Path $PlaneRoot 'state\operator.token'
+              $PrepPath = Join-Path $PlaneRoot 'state\research\activation-preparation.json'
+              $RuntimePath = Join-Path $PlaneRoot 'state\research\research-runtime.yaml'
+
+              foreach ($P in @($TokenPath,$PrepPath,$RuntimePath)) {
+                  if (-not (Test-Path -LiteralPath $P -PathType Leaf)) {
+                      throw "ACTIVATION_VERIFY_FILE_MISSING path=$P"
+                  }
+              }
+
+              $Token = (Get-Content -LiteralPath $TokenPath -Raw).Trim()
+              $Status = Invoke-RestMethod -Method Get -Uri 'http://127.0.0.1:8791/api/native' -Headers @{Authorization="Bearer $Token"} -TimeoutSec 5
+              if ([string]$Status.authority -cne 'plane') {
+                  throw "LIVE_AUTHORITY_INVALID observed=$($Status.authority)"
+              }
+
+              $Prep = Get-Content -LiteralPath $PrepPath -Raw | ConvertFrom-Json
+              if (-not [bool]$Prep.dispatch_enabled) {
+                  throw 'RESEARCH_DISPATCH_NOT_ENABLED'
+              }
+
+              $ModelsUri = ([string]$Prep.model_endpoint) -replace '/v1/chat/completions$','/v1/models'
+              $Models = Invoke-RestMethod -Method Get -Uri $ModelsUri -TimeoutSec 5
+              if (@($Models.data).Count -ne 1 -or [string]@($Models.data)[0].id -cne 'qwen3-coder-30ba3b-q3km') {
+                  throw 'RESEARCH_MODEL_IDENTITY_INVALID'
+              }
+
+              Write-Host ''
+              Write-Host 'PLANE_RESEARCH_CONTINUOUS_ACTIVATION_PASS'
+              Write-Host "authority=$($Status.authority)"
+              Write-Host "generation=$($Status.generation)"
+              Write-Host "model_endpoint=$($Prep.model_endpoint)"
+              Write-Host "dispatch_enabled=$($Prep.dispatch_enabled)"
+              Write-Host "sealed_cutover_sha=$SealedSha"
+          }
+          finally {
+              git -C $PlaneRoot worktree remove --force $TempRoot 2>$null
+              git -C $PlaneRoot worktree prune 2>$null
+          }
