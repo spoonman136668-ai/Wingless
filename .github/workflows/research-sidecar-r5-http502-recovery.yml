@@ -30,7 +30,7 @@ jobs:
           $Config=Join-Path $Root 'config\autonomy.yaml'
           $State=Join-Path $Root 'state'
           $Db=Join-Path $State 'research-sidecar.db'
-          $Archive=Join-Path $Root 'evidence\planner-http502-recovery-r5-1'
+          $Archive=Join-Path $Root 'evidence\planner-http502-recovery-r5-2'
           $Expected='807ed051e05eb3dbdf9860103b0f605540543714ba51a947e2c58e5070b88128'
           $Bootstrap='WINGLESS-LM-LM9C-AUTONOMY-BOOTSTRAP'
 
@@ -48,7 +48,7 @@ jobs:
             throw 'RECOVERY_BOUNDARY_STATUS_CHANGED'
           }
 
-          # Immutable read-only proof run 36651327968 observed terminal
+          # Immutable read-only proof run 36651892311 observed terminal
           # RESEARCH_LOOPBACK_HTTP_STATUS_502 and zero results/bundles/freezes.
           & $Lifecycle -Mode stop
           if($LASTEXITCODE-ne0){throw "RECOVERY_STOP_FAILED exit=$LASTEXITCODE"}
@@ -81,7 +81,7 @@ jobs:
           $Receipt=[ordered]@{
             schema='ckb-plane.research-sidecar-transport-recovery.v1'
             reason='planner transport failed before preregistration or execution: RESEARCH_LOOPBACK_HTTP_STATUS_502'
-            live_probe_run_id=36651327968
+            live_probe_run_id=36651892311
             live_probe_result_count=0
             live_probe_implementation_bundle_count=0
             live_probe_implementation_freeze_count=0
@@ -104,4 +104,4 @@ jobs:
           Write-Host "openrouter_dns_count=$($Addresses.Count)"
           Write-Host 'openrouter_tcp_443=True'
           Write-Host 'exact_replay_authorized=True'
-          Write-Host 'RESEARCH_SIDECAR_R5_HTTP502_RECOVERY=PASS'
+          Write-Host 'RESEARCH_SIDECAR_R5_HTTP502_RECOVERY_REPLAY2=PASS'
