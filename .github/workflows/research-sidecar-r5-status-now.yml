@@ -1,0 +1,53 @@
+name: Research Sidecar R5 Status Now
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-r5-status-now.yml
+      - .github/research-sidecar-r5-status-now-request.json
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 5
+    steps:
+      - name: Read current sidecar status and latest controller event
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Exe=Join-Path $Root 'bin\research-sidecar.exe'
+          $Config=Join-Path $Root 'config\autonomy.yaml'
+          $Db=Join-Path $Root 'state\research-sidecar.db'
+          $Task=Get-ScheduledTask -TaskName 'CKBPlane Research Sidecar' -ErrorAction Stop
+          Write-Host "task_state=$($Task.State)"
+          $Raw=& $Exe -mode status -config $Config 2>&1
+          if($LASTEXITCODE-ne0){throw "STATUS_FAILED output=$($Raw -join ' ')"}
+          $Raw|ForEach-Object{Write-Host ([string]$_)}
+          $Py=(Get-Command python.exe -ErrorAction SilentlyContinue)
+          if($null-eq$Py){$Py=(Get-Command py.exe -ErrorAction SilentlyContinue)}
+          if($null-ne$Py){
+            $Script=Join-Path $env:RUNNER_TEMP 'r5_status_now.py'
+            @'
+import sqlite3, sys
+db=sqlite3.connect("file:"+sys.argv[1]+"?mode=ro", uri=True)
+cur=db.cursor()
+rows=cur.execute("select id,cycle_id,cause_key,state,raw from research_controller_events order by created,id").fetchall()
+for row in rows:
+    print("event", *row[:4], row[4].decode() if isinstance(row[4], bytes) else row[4])
+for table in ("research_sidecar_results","research_implementation_bundles","research_implementation_freezes"):
+    exists=cur.execute("select count(*) from sqlite_master where type='table' and name=?",(table,)).fetchone()[0]
+    n=cur.execute("select count(*) from "+table).fetchone()[0] if exists else 0
+    print(f"{table}_count={n}")
+'@ | Set-Content -LiteralPath $Script -Encoding UTF8
+            if($Py.Name -ieq 'py.exe'){& $Py.Source -3 $Script $Db}else{& $Py.Source $Script $Db}
+            if($LASTEXITCODE-ne0){throw "PYTHON_DB_PROBE_FAILED exit=$LASTEXITCODE"}
+          }else{
+            Write-Host 'python_db_probe=UNAVAILABLE'
+          }
+          Write-Host 'RESEARCH_SIDECAR_R5_STATUS_NOW=PASS'
