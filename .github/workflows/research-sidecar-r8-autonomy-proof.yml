@@ -1,0 +1,57 @@
+name: Research Sidecar R8 Autonomous Cycle Proof
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/research-sidecar-r8-autonomy-proof-request.json
+
+permissions:
+  contents: read
+
+jobs:
+  prove:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 30
+    steps:
+      - name: Wait for package-valid autonomous successor cycle
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Exe=Join-Path $Root 'bin\research-sidecar.exe'
+          $Config=Join-Path $Root 'config\autonomy.yaml'
+          $TaskName='CKBPlane Research Sidecar'
+          $Bootstrap='WINGLESS-LM-LM9C-AUTONOMY-BOOTSTRAP'
+          $ExpectedBinary='3163dceb34383b93a1e012368889575b11e158b29573107f36b08f6e96a24e84'
+          $Request=Get-Content -LiteralPath '.\.github\research-sidecar-r8-autonomy-proof-request.json' -Raw|ConvertFrom-Json
+          if([string]$Request.schema-cne'ckb-plane.research-sidecar-r8-autonomy-proof-request.v1' -or
+             [string]$Request.expected_binary_sha256-cne$ExpectedBinary -or
+             [string]$Request.bootstrap_cycle-cne$Bootstrap){
+            throw 'AUTONOMY_R8_REQUEST_INVALID'
+          }
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$ExpectedBinary){throw 'AUTONOMY_R8_BINARY_HASH_MISMATCH'}
+
+          $Last=$null
+          for($i=0;$i-lt180;$i++){
+            $Task=Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+            if($null-eq$Task){throw 'AUTONOMY_R8_TASK_MISSING'}
+            if($Task.State-ne'Running'){throw "AUTONOMY_R8_TASK_NOT_RUNNING state=$($Task.State)"}
+            $Raw=& $Exe -mode status -config $Config 2>&1
+            if($LASTEXITCODE-ne0){throw "AUTONOMY_R8_STATUS_FAILED output=$($Raw -join ' ')"}
+            $Last=($Raw -join [Environment]::NewLine)|ConvertFrom-Json
+            Write-Host "sample=$i cycle_count=$($Last.cycle_count) last_cycle_id=$($Last.last_cycle_id) last_cycle_status=$($Last.last_cycle_status) blocked=$($Last.blocked_cycle_count) status=$($Last.status)"
+            if([string]$Last.authority-cne'plane' -or [string]$Last.generation-cne'1'){throw 'AUTONOMY_R8_AUTHORITY_DRIFT'}
+            if([int]$Last.blocked_cycle_count-gt0){throw "AUTONOMY_R8_BLOCKED count=$($Last.blocked_cycle_count) status=$($Last.status)"}
+            if([int]$Last.cycle_count-ge2 -and -not[string]::IsNullOrWhiteSpace([string]$Last.last_cycle_id) -and [string]$Last.last_cycle_id-cne$Bootstrap){
+              Write-Host "successor_cycle_id=$($Last.last_cycle_id)"
+              Write-Host "successor_cycle_status=$($Last.last_cycle_status)"
+              Write-Host "cycle_count=$($Last.cycle_count)"
+              Write-Host 'RESEARCH_SIDECAR_R8_AUTONOMOUS_SUCCESSOR=PASS'
+              exit 0
+            }
+            Start-Sleep -Seconds 10
+          }
+          throw "AUTONOMY_R8_TIMEOUT cycle_count=$($Last.cycle_count) last_cycle_id=$($Last.last_cycle_id) last_cycle_status=$($Last.last_cycle_status) status=$($Last.status)"
