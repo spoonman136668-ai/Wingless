@@ -1,4 +1,4 @@
-name: Research Sidecar Planner Schema Recovery Prep
+name: Research Sidecar R3 Execution-Request Recovery
 
 on:
   push:
@@ -19,29 +19,41 @@ jobs:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
     timeout-minutes: 8
     steps:
-      - name: Stop sidecar and archive failed planner-attempt state
+      - name: Archive and clear pre-execution r3 failure
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           Set-StrictMode -Version 2.0
           $Root='C:\ProgramData\CKBR\research-sidecar'
           $Lifecycle=Join-Path $Root 'ops\Lifecycle.ps1'
+          $Exe=Join-Path $Root 'bin\research-sidecar.exe'
+          $Config=Join-Path $Root 'config\autonomy.yaml'
           $State=Join-Path $Root 'state'
           $Db=Join-Path $State 'research-sidecar.db'
-          $Archive=Join-Path $Root 'evidence\planner-schema-recovery-r1'
+          $Archive=Join-Path $Root 'evidence\planner-execution-request-recovery-r3'
+          $ExpectedBinary='4c80b5ab543632aa269d5022c8fcca3a544bbbed351cd8ad17e6ef9772bc3a05'
+          $Bootstrap='WINGLESS-LM-LM9C-AUTONOMY-BOOTSTRAP'
+
           $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
           if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "RECOVERY_IDENTITY_MISMATCH observed=$Identity"}
-          if(-not(Test-Path -LiteralPath $Lifecycle -PathType Leaf)){throw 'RECOVERY_LIFECYCLE_MISSING'}
+          foreach($Path in @($Lifecycle,$Exe,$Config,$Db)){if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){throw "RECOVERY_PREREQUISITE_MISSING path=$Path"}}
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$ExpectedBinary){throw 'RECOVERY_BINARY_HASH_MISMATCH'}
+
+          $Raw=& $Exe -mode status -config $Config 2>&1
+          if($LASTEXITCODE-ne0){throw "RECOVERY_STATUS_FAILED output=$($Raw -join ' ')"}
+          $Status=($Raw -join [Environment]::NewLine)|ConvertFrom-Json
+          if([string]$Status.authority-cne'plane' -or [string]$Status.generation-cne'1'){throw 'RECOVERY_AUTHORITY_DRIFT'}
+          if([int]$Status.cycle_count-ne1 -or [string]$Status.last_cycle_id-cne$Bootstrap -or [string]$Status.last_cycle_status-cne'PLANNING_REQUIRED' -or [int]$Status.blocked_cycle_count-ne0){
+            throw 'RECOVERY_BOUNDARY_STATUS_CHANGED'
+          }
 
           & $Lifecycle -Mode stop
           if($LASTEXITCODE-ne0){throw "RECOVERY_STOP_FAILED exit=$LASTEXITCODE"}
           Start-Sleep -Seconds 2
           if(Get-Process -Name 'research-sidecar' -ErrorAction SilentlyContinue){throw 'RECOVERY_SIDECAR_PROCESS_STILL_RUNNING'}
 
-          if(-not(Test-Path -LiteralPath $Db -PathType Leaf)){throw 'RECOVERY_DB_MISSING'}
           if(Test-Path -LiteralPath $Archive){throw 'RECOVERY_ARCHIVE_ALREADY_EXISTS'}
           New-Item -ItemType Directory -Force -Path $Archive|Out-Null
-
           $Files=@('research-sidecar.db','research-sidecar.db-wal','research-sidecar.db-shm')
           $Hashes=[ordered]@{}
           foreach($Name in $Files){
@@ -55,19 +67,19 @@ jobs:
 
           $Receipt=[ordered]@{
             schema='ckb-plane.research-sidecar-planner-schema-recovery.v1'
-            reason='planner output rejected before experiment execution: unknown top-level experiment_id'
-            controller_db_probe_run_id=36645173607
-            bootstrap_cycle='WINGLESS-LM-LM9C-AUTONOMY-BOOTSTRAP'
+            reason='planner proposal rejected before preregistration binding or experiment execution: RESEARCH_PLANNER_EXECUTION_REQUEST_REFUSED'
+            live_probe_run_id=36648128575
+            bootstrap_cycle=$Bootstrap
+            observed_cycle_status=[string]$Status.last_cycle_status
             experiment_executed=$false
             result_sealed=$false
+            implementation_generated=$false
             db_hashes=$Hashes
             archived_at_utc=[DateTimeOffset]::UtcNow.ToString('o')
           }
           [IO.File]::WriteAllText((Join-Path $Archive 'recovery-receipt.json'),($Receipt|ConvertTo-Json -Depth 8),(New-Object Text.UTF8Encoding($false)))
 
-          foreach($Name in $Files){
-            Remove-Item -LiteralPath (Join-Path $State $Name) -Force -ErrorAction SilentlyContinue
-          }
+          foreach($Name in $Files){Remove-Item -LiteralPath (Join-Path $State $Name) -Force -ErrorAction SilentlyContinue}
           if(Test-Path -LiteralPath $Db){throw 'RECOVERY_DB_CLEAR_FAILED'}
 
           $Task=Get-ScheduledTask -TaskName 'CKBPlane Research Sidecar' -ErrorAction SilentlyContinue
@@ -76,4 +88,5 @@ jobs:
           Write-Host "task_state=$(if($null-eq$Task){'UNREGISTERED'}else{$Task.State})"
           Write-Host 'experiment_executed=False'
           Write-Host 'result_sealed=False'
-          Write-Host 'RESEARCH_SIDECAR_PLANNER_SCHEMA_RECOVERY_PREP=PASS'
+          Write-Host 'implementation_generated=False'
+          Write-Host 'RESEARCH_SIDECAR_R3_EXECUTION_REQUEST_RECOVERY=PASS'
