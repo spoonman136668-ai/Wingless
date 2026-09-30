@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Verify retry-capable r5 binary and clean replay boundary
+      - name: Verify retry-capable r5 exact-replay boundary
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
@@ -35,7 +35,7 @@ jobs:
           $Db=Join-Path $Root 'state\research-sidecar.db'
           $TaskName='CKBPlane Research Sidecar'
           $ActivationWorkflow=Join-Path $env:GITHUB_WORKSPACE '.github\workflows\research-sidecar-r5-activate.yml'
-          $Archive=Join-Path $Root 'evidence\planner-comparator-recovery-r4'
+          $Archive=Join-Path $Root 'evidence\planner-http502-recovery-r5-1'
           $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
 
           if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "SIDECAR_R5_PREFLIGHT_IDENTITY_MISMATCH observed=$Identity"}
