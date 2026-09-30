@@ -1,0 +1,100 @@
+name: Research Sidecar R8 Final Preflight
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/research-sidecar-r8-preflight-request.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-research-sidecar-lifecycle
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Verify r8 package-retry replay boundary
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Exe=Join-Path $Root 'bin\research-sidecar.exe'
+          $Config=Join-Path $Root 'config\autonomy.yaml'
+          $Lifecycle=Join-Path $Root 'ops\Lifecycle.ps1'
+          $Secret=Join-Path $Root 'secrets\openrouter.dpapi'
+          $Source='C:\ProgramData\CKBR\codex\work\rs\source\Wingless'
+          $Db=Join-Path $Root 'state\research-sidecar.db'
+          $TaskName='CKBPlane Research Sidecar'
+          $ActivationWorkflow=Join-Path $env:GITHUB_WORKSPACE '.github\workflows\research-sidecar-r8-activate.yml'
+          $Archive=Join-Path $Root 'evidence\planner-package-recovery-r7-1'
+          $Request=Get-Content -LiteralPath '.\.github\research-sidecar-r8-preflight-request.json' -Raw|ConvertFrom-Json
+          $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+
+          if([string]$Request.schema-cne'ckb-plane.research-sidecar-r8-preflight-request.v1' -or
+             -not[bool]$Request.authorize_preflight -or
+             [long]$Request.recovery_run_id-ne36657150272 -or
+             [string]$Request.expected_binary_sha256-cne'3163dceb34383b93a1e012368889575b11e158b29573107f36b08f6e96a24e84'){
+            throw 'SIDECAR_R8_PREFLIGHT_REQUEST_INVALID'
+          }
+          if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "SIDECAR_R8_PREFLIGHT_IDENTITY_MISMATCH observed=$Identity"}
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne'3163dceb34383b93a1e012368889575b11e158b29573107f36b08f6e96a24e84'){throw 'SIDECAR_R8_PREFLIGHT_BINARY_HASH_MISMATCH'}
+          if((git -C $Source rev-parse HEAD).Trim()-cne'c1d35fa339c245b382450a7cfb222c0e92f0154f'){throw 'SIDECAR_R8_PREFLIGHT_SOURCE_HEAD_MISMATCH'}
+          if(@(git -C $Source status --porcelain --untracked-files=all).Count-ne0){throw 'SIDECAR_R8_PREFLIGHT_SOURCE_DIRTY'}
+          foreach($Path in @($Config,$Lifecycle,$Secret,$ActivationWorkflow)){if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){throw "SIDECAR_R8_PREFLIGHT_MISSING path=$Path"}}
+
+          $Task=Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+          if($null-ne$Task -and $Task.State-eq'Running'){throw 'SIDECAR_R8_PREFLIGHT_EXPECTED_DORMANT_TASK'}
+          if(Test-Path -LiteralPath $Db -PathType Leaf){throw 'SIDECAR_R8_PREFLIGHT_RESET_DB_NOT_CLEAN'}
+          $RecoveryPath=Join-Path $Archive 'recovery-receipt.json'
+          if(-not(Test-Path -LiteralPath $RecoveryPath -PathType Leaf)){throw 'SIDECAR_R8_RECOVERY_RECEIPT_MISSING'}
+          $Recovery=Get-Content -LiteralPath $RecoveryPath -Raw|ConvertFrom-Json
+          if([string]$Recovery.schema-cne'ckb-plane.research-sidecar-package-recovery.v1' -or
+             [long]$Recovery.live_probe_run_id-ne36656827020 -or
+             -not[bool]$Recovery.exact_replay_authorized -or
+             [bool]$Recovery.experiment_executed -or
+             [bool]$Recovery.result_sealed -or
+             [bool]$Recovery.implementation_generated){
+            throw 'SIDECAR_R8_RECOVERY_RECEIPT_INVALID'
+          }
+
+          $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim()|ConvertTo-SecureString
+          $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+          try{
+            $Plain=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
+            if([string]::IsNullOrWhiteSpace($Plain)){throw 'SIDECAR_R8_PREFLIGHT_SECRET_EMPTY'}
+          }finally{
+            if($null-ne$Ptr){[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+            $Plain=$null;$Secure=$null
+          }
+
+          $WorkflowHash=(Get-FileHash -LiteralPath $ActivationWorkflow -Algorithm SHA256).Hash.ToLowerInvariant()
+          $Receipt=[ordered]@{
+            schema='ckb-plane.research-sidecar-r8-preflight.v1'
+            binary_sha256='3163dceb34383b93a1e012368889575b11e158b29573107f36b08f6e96a24e84'
+            wingless_source_head='c1d35fa339c245b382450a7cfb222c0e92f0154f'
+            activation_workflow_sha256=$WorkflowHash
+            stage_run_id=[long]$Request.stage_run_id
+            recovery_run_id=[long]$Request.recovery_run_id
+            sidecar_running=$false
+            reset_db_absent=$true
+            reset_evidence_archive=$Archive
+            sealed_at_utc=[DateTimeOffset]::UtcNow.ToString('o')
+          }
+          [IO.File]::WriteAllText((Join-Path $Root 'activation-r8-preflight.json'),($Receipt|ConvertTo-Json -Depth 8),(New-Object Text.UTF8Encoding($false)))
+          Write-Host "binary_sha256=3163dceb34383b93a1e012368889575b11e158b29573107f36b08f6e96a24e84"
+          Write-Host "activation_workflow_sha256=$WorkflowHash"
+          Write-Host "task_state=$(if($null-eq$Task){'UNREGISTERED'}else{$Task.State})"
+          Write-Host 'reset_db_absent=True'
+          Write-Host 'RESEARCH_SIDECAR_R8_FINAL_PREFLIGHT=PASS'
