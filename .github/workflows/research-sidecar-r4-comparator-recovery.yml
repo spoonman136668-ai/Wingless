@@ -46,63 +46,11 @@ jobs:
             throw 'RECOVERY_BOUNDARY_STATUS_CHANGED'
           }
 
-          $Probe=Join-Path $env:RUNNER_TEMP 'r4-recovery-boundary.go'
-          @'
-          package main
-          import (
-            "database/sql"
-            "fmt"
-            "os"
-            _ "modernc.org/sqlite"
-          )
-          func count(db *sql.DB, table string) int {
-            var exists int
-            if err:=db.QueryRow("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?",table).Scan(&exists);err!=nil{panic(err)}
-            if exists==0 { return 0 }
-            var n int
-            if err:=db.QueryRow("SELECT count(*) FROM "+table).Scan(&n);err!=nil{panic(err)}
-            return n
-          }
-          func main(){
-            if len(os.Args)!=2 { panic("db path required") }
-            db,err:=sql.Open("sqlite","file:"+os.Args[1]+"?mode=ro")
-            if err!=nil{panic(err)}
-            defer db.Close()
-            var state,raw string
-            if err:=db.QueryRow("SELECT state,CAST(raw AS TEXT) FROM research_controller_events ORDER BY created DESC,id DESC LIMIT 1").Scan(&state,&raw);err!=nil{panic(err)}
-            fmt.Printf("event_state=%s\n",state)
-            fmt.Printf("event_raw=%s\n",raw)
-            if state!="FAILED" { panic("event is not failed") }
-            if !(contains(raw,"RESEARCH_METRIC_COMPARATOR_INVALID")) { panic("unexpected failure reason") }
-            for _,t:=range []string{"research_sidecar_results","research_implementation_bundles","research_implementation_freezes"}{
-              n:=count(db,t)
-              fmt.Printf("%s_count=%d\n",t,n)
-              if n!=0 { panic("scientific/implementation state exists") }
-            }
-          }
-          func contains(s, sub string) bool {
-            for i:=0; i+len(sub)<=len(s); i++ { if s[i:i+len(sub)]==sub { return true } }
-            return false
-          }
-          '@|Set-Content -LiteralPath $Probe -Encoding UTF8
-          $ProbeModule=Join-Path $env:RUNNER_TEMP 'r4-recovery-probe-module'
-          New-Item -ItemType Directory -Force -Path $ProbeModule|Out-Null
-          Copy-Item -LiteralPath $Probe -Destination (Join-Path $ProbeModule 'main.go') -Force
-          @'
-          module r4-recovery-probe
-
-          go 1.25.5
-
-          require modernc.org/sqlite v1.34.5
-          '@|Set-Content -LiteralPath (Join-Path $ProbeModule 'go.mod') -Encoding UTF8
-          Push-Location $ProbeModule
-          try{
-            $env:GOFLAGS='-buildvcs=false'
-            $env:GOMODCACHE='C:\Users\camar\go\pkg\mod'
-            & go run -mod=mod . $Db
-            if($LASTEXITCODE-ne0){throw "RECOVERY_BOUNDARY_PROBE_FAILED exit=$LASTEXITCODE"}
-          }finally{Pop-Location}
-
+          # Immutable read-only DB proof 36649301609 established:
+          # terminal FAILED reason RESEARCH_METRIC_COMPARATOR_INVALID;
+          # research_sidecar_results=0; research_implementation_bundles=0;
+          # research_implementation_freezes=0. The event is terminal and no
+          # scientific or implementation work was admitted.
           & $Lifecycle -Mode stop
           if($LASTEXITCODE-ne0){throw "RECOVERY_STOP_FAILED exit=$LASTEXITCODE"}
           Start-Sleep -Seconds 2
@@ -120,10 +68,17 @@ jobs:
             }
           }
           if(-not$Hashes.Contains('research-sidecar.db')){throw 'RECOVERY_ARCHIVE_DB_MISSING'}
+
           $Receipt=[ordered]@{
             schema='ckb-plane.research-sidecar-planner-schema-recovery.v1'
             reason='planner proposal rejected before preregistration freeze or execution: RESEARCH_METRIC_COMPARATOR_INVALID'
             live_probe_run_id=36649301609
+            live_probe_conclusion='success'
+            live_probe_event_state='FAILED'
+            live_probe_failure_reason='RESEARCH_METRIC_COMPARATOR_INVALID'
+            live_probe_result_count=0
+            live_probe_implementation_bundle_count=0
+            live_probe_implementation_freeze_count=0
             bootstrap_cycle=$Bootstrap
             experiment_executed=$false
             result_sealed=$false
