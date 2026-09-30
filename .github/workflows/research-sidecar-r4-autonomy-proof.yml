@@ -1,0 +1,52 @@
+name: Research Sidecar R4 Autonomous Cycle Proof
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/research-sidecar-r4-autonomy-proof-request.json
+
+permissions:
+  contents: read
+
+jobs:
+  prove:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 30
+    steps:
+      - name: Wait for autonomous successor cycle
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Exe=Join-Path $Root 'bin\research-sidecar.exe'
+          $Config=Join-Path $Root 'config\autonomy.yaml'
+          $TaskName='CKBPlane Research Sidecar'
+          $Bootstrap='WINGLESS-LM-LM9C-AUTONOMY-BOOTSTRAP'
+          $ExpectedBinary='f602885fb792eb10ee8c965a6feaa108212a2a82e0ca524680871394bc329b84'
+
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$ExpectedBinary){throw 'AUTONOMY_R4_BINARY_HASH_MISMATCH'}
+
+          $Last=$null
+          for($i=0;$i-lt180;$i++){
+            $Task=Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+            if($null-eq$Task){throw 'AUTONOMY_R4_TASK_MISSING'}
+            if($Task.State-ne'Running'){throw "AUTONOMY_R4_TASK_NOT_RUNNING state=$($Task.State)"}
+            $Raw=& $Exe -mode status -config $Config 2>&1
+            if($LASTEXITCODE-ne0){throw "AUTONOMY_R4_STATUS_FAILED output=$($Raw -join ' ')"}
+            $Last=($Raw -join [Environment]::NewLine)|ConvertFrom-Json
+            Write-Host "sample=$i cycle_count=$($Last.cycle_count) last_cycle_id=$($Last.last_cycle_id) last_cycle_status=$($Last.last_cycle_status) blocked=$($Last.blocked_cycle_count) status=$($Last.status)"
+            if([string]$Last.authority-cne'plane' -or [string]$Last.generation-cne'1'){throw 'AUTONOMY_R4_AUTHORITY_DRIFT'}
+            if([int]$Last.blocked_cycle_count-gt0){throw "AUTONOMY_R4_BLOCKED count=$($Last.blocked_cycle_count) status=$($Last.status)"}
+            if([int]$Last.cycle_count-ge2 -and -not[string]::IsNullOrWhiteSpace([string]$Last.last_cycle_id) -and [string]$Last.last_cycle_id-cne$Bootstrap){
+              Write-Host "successor_cycle_id=$($Last.last_cycle_id)"
+              Write-Host "successor_cycle_status=$($Last.last_cycle_status)"
+              Write-Host "cycle_count=$($Last.cycle_count)"
+              Write-Host 'RESEARCH_SIDECAR_R4_AUTONOMOUS_SUCCESSOR=PASS'
+              exit 0
+            }
+            Start-Sleep -Seconds 10
+          }
+          throw "AUTONOMY_R4_TIMEOUT cycle_count=$($Last.cycle_count) last_cycle_id=$($Last.last_cycle_id) last_cycle_status=$($Last.last_cycle_status) status=$($Last.status)"
