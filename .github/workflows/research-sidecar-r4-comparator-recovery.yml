@@ -85,10 +85,21 @@ jobs:
             return false
           }
           '@|Set-Content -LiteralPath $Probe -Encoding UTF8
-          Push-Location 'C:\ProgramData\CKBR\codex\work\rs\source\Wingless'
+          $ProbeModule=Join-Path $env:RUNNER_TEMP 'r4-recovery-probe-module'
+          New-Item -ItemType Directory -Force -Path $ProbeModule|Out-Null
+          Copy-Item -LiteralPath $Probe -Destination (Join-Path $ProbeModule 'main.go') -Force
+          @'
+          module r4-recovery-probe
+
+          go 1.25.5
+
+          require modernc.org/sqlite v1.34.5
+          '@|Set-Content -LiteralPath (Join-Path $ProbeModule 'go.mod') -Encoding UTF8
+          Push-Location $ProbeModule
           try{
             $env:GOFLAGS='-buildvcs=false'
-            & go run $Probe $Db
+            $env:GOMODCACHE='C:\Users\camar\go\pkg\mod'
+            & go run -mod=mod . $Db
             if($LASTEXITCODE-ne0){throw "RECOVERY_BOUNDARY_PROBE_FAILED exit=$LASTEXITCODE"}
           }finally{Pop-Location}
 
