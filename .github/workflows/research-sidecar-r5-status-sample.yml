@@ -1,0 +1,33 @@
+name: Research Sidecar R5 Status Sample
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-r5-status-sample.yml
+
+permissions:
+  contents: read
+
+jobs:
+  sample:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 3
+    steps:
+      - name: Read r5 status without mutation
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Exe=Join-Path $Root 'bin\research-sidecar.exe'
+          $Config=Join-Path $Root 'config\autonomy.yaml'
+          $Expected='807ed051e05eb3dbdf9860103b0f605540543714ba51a947e2c58e5070b88128'
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$Expected){throw 'R5_STATUS_BINARY_MISMATCH'}
+          $Task=Get-ScheduledTask -TaskName 'CKBPlane Research Sidecar' -ErrorAction Stop
+          Write-Host "task_state=$($Task.State)"
+          Write-Host "task_principal=$($Task.Principal.UserId)"
+          $Raw=& $Exe -mode status -config $Config 2>&1
+          if($LASTEXITCODE-ne0){throw "R5_STATUS_FAILED output=$($Raw -join ' ')"}
+          $Raw|ForEach-Object{Write-Host ([string]$_)}
+          Write-Host 'RESEARCH_SIDECAR_R5_STATUS_SAMPLE=PASS'
