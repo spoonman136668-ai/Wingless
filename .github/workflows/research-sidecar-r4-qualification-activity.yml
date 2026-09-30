@@ -1,0 +1,37 @@
+name: Research Sidecar R4 Qualification Activity
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-r4-qualification-activity.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 3
+    steps:
+      - name: Sample qualification processes
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Names=@('go','compile','link')
+          $Before=@{}
+          foreach($P in @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $Names -contains $_.ProcessName })){
+            $Before[$P.Id]=[double]$P.CPU
+            Write-Host "before name=$($P.ProcessName) pid=$($P.Id) cpu=$($P.CPU)"
+          }
+          Start-Sleep -Seconds 5
+          $Active=0
+          foreach($P in @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $Names -contains $_.ProcessName })){
+            $Prior=if($Before.ContainsKey($P.Id)){$Before[$P.Id]}else{0}
+            $Delta=[double]$P.CPU-$Prior
+            Write-Host "after name=$($P.ProcessName) pid=$($P.Id) cpu=$($P.CPU) delta=$Delta"
+            if($Delta-gt0){$Active++}
+          }
+          Write-Host "active_cpu_processes=$Active"
+          Write-Host 'RESEARCH_SIDECAR_R4_QUALIFICATION_ACTIVITY=PASS'
