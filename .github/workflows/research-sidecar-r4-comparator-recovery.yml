@@ -1,0 +1,130 @@
+name: Research Sidecar R4 Comparator Recovery
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-r4-comparator-recovery.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-research-sidecar-lifecycle
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 8
+    steps:
+      - name: Archive and clear pre-execution comparator failure
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Lifecycle=Join-Path $Root 'ops\Lifecycle.ps1'
+          $Exe=Join-Path $Root 'bin\research-sidecar.exe'
+          $Config=Join-Path $Root 'config\autonomy.yaml'
+          $State=Join-Path $Root 'state'
+          $Db=Join-Path $State 'research-sidecar.db'
+          $Archive=Join-Path $Root 'evidence\planner-comparator-recovery-r4'
+          $ExpectedBinary='f602885fb792eb10ee8c965a6feaa108212a2a82e0ca524680871394bc329b84'
+          $Bootstrap='WINGLESS-LM-LM9C-AUTONOMY-BOOTSTRAP'
+          $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+          if($Identity-cne'NT AUTHORITY\NETWORK SERVICE'){throw "RECOVERY_IDENTITY_MISMATCH observed=$Identity"}
+          foreach($Path in @($Lifecycle,$Exe,$Config,$Db)){if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){throw "RECOVERY_PREREQUISITE_MISSING path=$Path"}}
+          if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$ExpectedBinary){throw 'RECOVERY_BINARY_HASH_MISMATCH'}
+
+          $Raw=& $Exe -mode status -config $Config 2>&1
+          if($LASTEXITCODE-ne0){throw "RECOVERY_STATUS_FAILED output=$($Raw -join ' ')"}
+          $Status=($Raw -join [Environment]::NewLine)|ConvertFrom-Json
+          if([string]$Status.authority-cne'plane' -or [string]$Status.generation-cne'1'){throw 'RECOVERY_AUTHORITY_DRIFT'}
+          if([int]$Status.cycle_count-ne1 -or [string]$Status.last_cycle_id-cne$Bootstrap -or [string]$Status.last_cycle_status-cne'PLANNING_REQUIRED' -or [int]$Status.blocked_cycle_count-ne0){
+            throw 'RECOVERY_BOUNDARY_STATUS_CHANGED'
+          }
+
+          $Probe=Join-Path $env:RUNNER_TEMP 'r4-recovery-boundary.go'
+          @'
+          package main
+          import (
+            "database/sql"
+            "fmt"
+            "os"
+            _ "modernc.org/sqlite"
+          )
+          func count(db *sql.DB, table string) int {
+            var exists int
+            if err:=db.QueryRow("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?",table).Scan(&exists);err!=nil{panic(err)}
+            if exists==0 { return 0 }
+            var n int
+            if err:=db.QueryRow("SELECT count(*) FROM "+table).Scan(&n);err!=nil{panic(err)}
+            return n
+          }
+          func main(){
+            if len(os.Args)!=2 { panic("db path required") }
+            db,err:=sql.Open("sqlite","file:"+os.Args[1]+"?mode=ro")
+            if err!=nil{panic(err)}
+            defer db.Close()
+            var state,raw string
+            if err:=db.QueryRow("SELECT state,CAST(raw AS TEXT) FROM research_controller_events ORDER BY created DESC,id DESC LIMIT 1").Scan(&state,&raw);err!=nil{panic(err)}
+            fmt.Printf("event_state=%s\n",state)
+            fmt.Printf("event_raw=%s\n",raw)
+            if state!="FAILED" { panic("event is not failed") }
+            if !(contains(raw,"RESEARCH_METRIC_COMPARATOR_INVALID")) { panic("unexpected failure reason") }
+            for _,t:=range []string{"research_sidecar_results","research_implementation_bundles","research_implementation_freezes"}{
+              n:=count(db,t)
+              fmt.Printf("%s_count=%d\n",t,n)
+              if n!=0 { panic("scientific/implementation state exists") }
+            }
+          }
+          func contains(s, sub string) bool {
+            for i:=0; i+len(sub)<=len(s); i++ { if s[i:i+len(sub)]==sub { return true } }
+            return false
+          }
+          '@|Set-Content -LiteralPath $Probe -Encoding UTF8
+          Push-Location 'C:\ProgramData\CKBR\codex\work\rs\source\Wingless'
+          try{
+            $env:GOFLAGS='-buildvcs=false'
+            & go run $Probe $Db
+            if($LASTEXITCODE-ne0){throw "RECOVERY_BOUNDARY_PROBE_FAILED exit=$LASTEXITCODE"}
+          }finally{Pop-Location}
+
+          & $Lifecycle -Mode stop
+          if($LASTEXITCODE-ne0){throw "RECOVERY_STOP_FAILED exit=$LASTEXITCODE"}
+          Start-Sleep -Seconds 2
+          if(Get-Process -Name 'research-sidecar' -ErrorAction SilentlyContinue){throw 'RECOVERY_SIDECAR_PROCESS_STILL_RUNNING'}
+
+          if(Test-Path -LiteralPath $Archive){throw 'RECOVERY_ARCHIVE_ALREADY_EXISTS'}
+          New-Item -ItemType Directory -Force -Path $Archive|Out-Null
+          $Files=@('research-sidecar.db','research-sidecar.db-wal','research-sidecar.db-shm')
+          $Hashes=[ordered]@{}
+          foreach($Name in $Files){
+            $Source=Join-Path $State $Name
+            if(Test-Path -LiteralPath $Source -PathType Leaf){
+              Copy-Item -LiteralPath $Source -Destination (Join-Path $Archive $Name) -Force
+              $Hashes[$Name]=(Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash.ToLowerInvariant()
+            }
+          }
+          if(-not$Hashes.Contains('research-sidecar.db')){throw 'RECOVERY_ARCHIVE_DB_MISSING'}
+          $Receipt=[ordered]@{
+            schema='ckb-plane.research-sidecar-planner-schema-recovery.v1'
+            reason='planner proposal rejected before preregistration freeze or execution: RESEARCH_METRIC_COMPARATOR_INVALID'
+            live_probe_run_id=36649301609
+            bootstrap_cycle=$Bootstrap
+            experiment_executed=$false
+            result_sealed=$false
+            implementation_generated=$false
+            db_hashes=$Hashes
+            archived_at_utc=[DateTimeOffset]::UtcNow.ToString('o')
+          }
+          [IO.File]::WriteAllText((Join-Path $Archive 'recovery-receipt.json'),($Receipt|ConvertTo-Json -Depth 8),(New-Object Text.UTF8Encoding($false)))
+          foreach($Name in $Files){Remove-Item -LiteralPath (Join-Path $State $Name) -Force -ErrorAction SilentlyContinue}
+          if(Test-Path -LiteralPath $Db){throw 'RECOVERY_DB_CLEAR_FAILED'}
+          Write-Host "archive=$Archive"
+          Write-Host 'experiment_executed=False'
+          Write-Host 'result_sealed=False'
+          Write-Host 'implementation_generated=False'
+          Write-Host 'RESEARCH_SIDECAR_R4_COMPARATOR_RECOVERY=PASS'
