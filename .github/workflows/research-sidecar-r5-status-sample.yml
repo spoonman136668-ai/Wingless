@@ -30,4 +30,14 @@ jobs:
           $Raw=& $Exe -mode status -config $Config 2>&1
           if($LASTEXITCODE-ne0){throw "R5_STATUS_FAILED output=$($Raw -join ' ')"}
           $Raw|ForEach-Object{Write-Host ([string]$_)}
+          $Procs=@(Get-Process -Name 'research-sidecar' -ErrorAction SilentlyContinue)
+          Write-Host "sidecar_process_count=$($Procs.Count)"
+          foreach($P in $Procs){
+            Write-Host "sidecar_pid=$($P.Id)"
+            $Conns=@(Get-NetTCPConnection -OwningProcess $P.Id -ErrorAction SilentlyContinue)
+            Write-Host "sidecar_tcp_connection_count=$($Conns.Count)"
+            foreach($Conn in $Conns){
+              Write-Host "tcp state=$($Conn.State) remote=$($Conn.RemoteAddress):$($Conn.RemotePort)"
+            }
+          }
           Write-Host 'RESEARCH_SIDECAR_R5_STATUS_SAMPLE=PASS'
