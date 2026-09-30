@@ -13,25 +13,28 @@ permissions:
 jobs:
   probe:
     runs-on: [self-hosted, Windows, X64, wingless-research-safe]
-    timeout-minutes: 3
+    timeout-minutes: 4
     steps:
-      - name: Sample qualification processes
+      - name: Diagnose qualification process tree
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          $Names=@('go','compile','link')
-          $Before=@{}
-          foreach($P in @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $Names -contains $_.ProcessName })){
-            $Before[$P.Id]=[double]$P.CPU
-            Write-Host "before name=$($P.ProcessName) pid=$($P.Id) cpu=$($P.CPU)"
+          $Targets=@(Get-CimInstance Win32_Process -ErrorAction Stop | Where-Object { $_.Name -in @('go.exe','compile.exe','link.exe','git.exe','powershell.exe') })
+          foreach($P in $Targets){
+            Write-Host "proc pid=$($P.ProcessId) ppid=$($P.ParentProcessId) name=$($P.Name) cmd=$($P.CommandLine)"
           }
-          Start-Sleep -Seconds 5
-          $Active=0
-          foreach($P in @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $Names -contains $_.ProcessName })){
-            $Prior=if($Before.ContainsKey($P.Id)){$Before[$P.Id]}else{0}
-            $Delta=[double]$P.CPU-$Prior
-            Write-Host "after name=$($P.ProcessName) pid=$($P.Id) cpu=$($P.CPU) delta=$Delta"
-            if($Delta-gt0){$Active++}
+
+          $Go=@(Get-Process -Name go -ErrorAction SilentlyContinue)
+          foreach($P in $Go){
+            $Cpu1=[double]$P.CPU
+            $Start=$P.StartTime.ToString('o')
+            Start-Sleep -Seconds 10
+            $P2=Get-Process -Id $P.Id -ErrorAction SilentlyContinue
+            if($null-eq$P2){
+              Write-Host "go_exit pid=$($P.Id) start=$Start"
+              continue
+            }
+            $Cpu2=[double]$P2.CPU
+            Write-Host "go_sample pid=$($P.Id) start=$Start cpu_before=$Cpu1 cpu_after=$Cpu2 delta=$($Cpu2-$Cpu1) responding=$($P2.Responding)"
           }
-          Write-Host "active_cpu_processes=$Active"
-          Write-Host 'RESEARCH_SIDECAR_R4_QUALIFICATION_ACTIVITY=PASS'
+          Write-Host 'RESEARCH_SIDECAR_R4_QUALIFICATION_DIAGNOSTIC=PASS'
