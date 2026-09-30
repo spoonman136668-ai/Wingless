@@ -1,0 +1,36 @@
+name: Research Sidecar Alternate Runner Identity Probe
+
+on:
+  push:
+    branches:
+      - ops/research-autonomy-provider-probe-r1
+    paths:
+      - .github/workflows/research-sidecar-alt-runner-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe-b:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - name: Report identity
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+          Write-Host "runner=B identity=$Identity"
+          Write-Host 'ALT_RUNNER_B_PROBE=PASS'
+
+  probe-c:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 5
+    steps:
+      - name: Report identity
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Identity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+          Write-Host "runner=C identity=$Identity"
+          Write-Host 'ALT_RUNNER_C_PROBE=PASS'
