@@ -1,0 +1,43 @@
+name: CKB Plane Provider Audit B R1
+
+on:
+  push:
+    branches:
+      - diagnostic/ckb-plane-role-swap-watch-r1
+    paths:
+      - '.github/ckb-plane-provider-audit-b-r1-request.json'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Read current provider audits only
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $R=Get-Content -LiteralPath '.\.github\ckb-plane-provider-audit-b-r1-request.json' -Raw|ConvertFrom-Json
+          if([string]$R.schema-cne'ckb-plane.provider-audit-b-r1.v1' -or -not[bool]$R.read_only){throw 'PROVIDER_AUDIT_REQUEST_INVALID'}
+          $Cycle=[string]$R.cycle_id
+          if($Cycle-notmatch'^RSL-[0-9a-f]{32}$'){throw 'PROVIDER_AUDIT_CYCLE_INVALID'}
+          $Audit='C:\ProgramData\CKBR\codex\work\audit'
+          foreach($Name in @("$Cycle-nemotron.json","$Cycle.json")){
+            $P=Join-Path $Audit $Name
+            Write-Host "AUDIT_FILE=$P"
+            if(Test-Path -LiteralPath $P -PathType Leaf){
+              Get-Content -LiteralPath $P -Raw
+            }else{
+              Write-Host 'AUDIT_MISSING=True'
+            }
+          }
+          Write-Host 'sidecar_mutation=False'
+          Write-Host 'research_state_mutation=False'
+          Write-Host 'CKB_PLANE_PROVIDER_AUDIT_B_R1=PASS'
