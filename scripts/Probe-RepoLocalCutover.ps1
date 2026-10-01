@@ -57,9 +57,79 @@ finally:
         $RawProp=$Row.PSObject.Properties['raw']
         if($null-eq$RawProp){continue}
         $R=([string]$RawProp.Value)|ConvertFrom-Json
-        Write-Host "LATEST label=$Name table=$Table cycle_id=$($R.cycle_id) status=$($R.status) experiment_id=$($R.experiment_id) baseline_sha=$($R.baseline_sha) source_head=$($R.source_head) source_commit=$($R.source_commit)"
-        foreach($Sha in @([string]$R.source_head,[string]$R.source_commit,[string]$R.baseline_sha)){
-            if($Sha -match '^[0-9a-f]{40}$' -and -not$Targets.Contains($Sha)){$Targets.Add($Sha)}
+        function Get-OptionalValue([object]$Object,[string]$Property){
+            $P=$Object.PSObject.Properties[$Property]
+            if($null-eq$P){return ''}
+            return [string]$P.Value
+        }
+        $Cycle=Get-OptionalValue $R 'cycle_id'
+        $Status=Get-OptionalValue $R 'status'
+        $Experiment=Get-OptionalValue $R 'experiment_id'
+        $Baseline=Get-OptionalValue $R 'baseline_sha'
+        $SourceHead=Get-OptionalValue $R 'source_head'
+        $SourceCommit=Get-OptionalValue $R 'source_commit'
+        Write-Host "LATEST label=$Name table=$Table cycle_id=$Cycle status=$Status experiment_id=$Experiment baseline_sha=$Baseline source_head=$SourceHead source_commit=$SourceCommit"
+        foreach($Sha in @($SourceHead,$SourceCommit,$Baseline)){
+            if($Sha -match '^[0-9a-f]{40}
+    }
+    return @($Targets)
+}
+
+function Get-RepoMarkers {
+    param([string[]]$Roots)
+    $Repos=New-Object Collections.Generic.HashSet[string] ([StringComparer]::OrdinalIgnoreCase)
+    foreach($Root in $Roots){
+        if(-not(Test-Path -LiteralPath $Root -PathType Container)){continue}
+        Write-Host "SCAN_ROOT path=$Root"
+        foreach($Mark in @(Get-ChildItem -LiteralPath $Root -Force -Recurse -ErrorAction SilentlyContinue | Where-Object {$_.Name -eq '.git'})){
+            $Repo=if($Mark.PSIsContainer){$Mark.Parent.FullName}else{$Mark.DirectoryName}
+            if(-not[string]::IsNullOrWhiteSpace($Repo)){[void]$Repos.Add($Repo)}
+        }
+    }
+    Write-Host "SCAN_REPO_COUNT count=$($Repos.Count)"
+    return @($Repos)
+}
+
+function Find-Targets {
+    param([string]$Label,[string[]]$Targets,[string[]]$Roots)
+    $Repos=@(Get-RepoMarkers -Roots $Roots)
+    foreach($Repo in $Repos){
+        $HeadOut=@(& git -C $Repo rev-parse HEAD 2>$null)
+        if($LASTEXITCODE -ne 0 -or $HeadOut.Count -eq 0){continue}
+        $Head=([string]$HeadOut[0]).Trim()
+        $LogOut=@(& git -C $Repo log -1 --pretty='format:%ct|%H|%s' 2>$null)
+        $Latest=if($LogOut.Count){[string]$LogOut[0]}else{''}
+        Write-Host "REPO label=$Label path=$Repo head=$Head latest=$Latest"
+        foreach($Target in $Targets){
+            & git -C $Repo cat-file -e "$Target^{commit}" 2>$null
+            if($LASTEXITCODE -eq 0){Write-Host "TARGET_FOUND label=$Label sha=$Target repo=$Repo"}
+        }
+    }
+}
+
+foreach($S in $Sidecars){
+    Write-Host "=== SIDECAR $($S.Name) ==="
+    $Cfg=Join-Path $S.Root 'config\autonomy.yaml'
+    $Exe=Join-Path $S.Root 'bin\research-sidecar.exe'
+    $Task=Get-ScheduledTask -TaskName $S.Task -ErrorAction SilentlyContinue
+    Write-Host "TASK state=$(if($null-eq$Task){'MISSING'}else{[string]$Task.State})"
+    if((Test-Path -LiteralPath $Exe -PathType Leaf) -and (Test-Path -LiteralPath $Cfg -PathType Leaf)){
+        $Raw=& $Exe -mode status -config $Cfg 2>$null
+        if($LASTEXITCODE -eq 0){
+            $State=(($Raw|ForEach-Object{[string]$_})-join[Environment]::NewLine)|ConvertFrom-Json
+            Write-Host "STATUS status=$($State.status) cycle_count=$($State.cycle_count) blocked=$($State.blocked_cycle_count) last_cycle_id=$($State.last_cycle_id) last_cycle_status=$($State.last_cycle_status)"
+        }
+    }
+    if(Test-Path -LiteralPath $S.Source -PathType Container){
+        $Head=((& git -C $S.Source rev-parse HEAD 2>$null)|Select-Object -First 1)
+        Write-Host "SOURCE label=$($S.Name) path=$($S.Source) head=$Head"
+    }
+    $Targets=@(Read-LatestRows -Name $S.Name -Root $S.Root)
+    Find-Targets -Label $S.Name -Targets $Targets -Roots $S.SearchRoots
+}
+
+Write-Host 'REPO_LOCAL_CUTOVER_PROBE=PASS'
+ -and -not$Targets.Contains($Sha)){$Targets.Add($Sha)}
         }
     }
     return @($Targets)
