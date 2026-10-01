@@ -1,135 +1,76 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Read-SidecarState {
-    param([string]$Name,[string]$Root)
-
-    Write-Host "=== SIDECAR $Name ==="
-    $Cfg = Join-Path $Root 'config\autonomy.yaml'
-    $Exe = Join-Path $Root 'bin\research-sidecar.exe'
-    $Py  = Join-Path $Root 'python312\python.exe'
-
-    foreach($P in @(
-        (Join-Path $Root 'config\autonomy.yaml'),
-        (Join-Path $Root 'config\research-sidecar.yaml'),
-        (Join-Path $Root 'config\research-runtime.yaml')
-    )){
-        if(-not(Test-Path -LiteralPath $P -PathType Leaf)){continue}
-        Write-Host "CONFIG=$P"
-        foreach($Line in Get-Content -LiteralPath $P){
-            if($Line -match '(?i)(secret|token|password|api[_-]?key|credential)'){continue}
-            if($Line -match '(?i)^\s*(sqlite_path|repo|repo_path|repository|repository_path|source|source_path|source_root|workspace|workspace_root|work_root|checkout|checkout_root|branch|north_star|project|planner_model|model):'){
-                Write-Host "CFG $($Line.Trim())"
-            }
-        }
+$Sidecars = @(
+    [pscustomobject]@{
+        Name='wing'
+        Root='C:\ProgramData\CKBR\research-sidecar'
+        Source='C:\ProgramData\CKBR\codex\work\rs\source\Wingless'
+        Task='CKBPlane Research Sidecar'
+    },
+    [pscustomobject]@{
+        Name='ygg'
+        Root='C:\ProgramData\CKBR\research-sidecar-yggdrasil'
+        Source='C:\ProgramData\CKBR\research-sidecar-yggdrasil\source\Yggdrasil'
+        Task='CKBPlane Research Sidecar Yggdrasil'
     }
+)
+
+foreach($S in $Sidecars){
+    Write-Host "=== SIDECAR $($S.Name) ==="
+    $Cfg=Join-Path $S.Root 'config\autonomy.yaml'
+    $Exe=Join-Path $S.Root 'bin\research-sidecar.exe'
+    $Task=Get-ScheduledTask -TaskName $S.Task -ErrorAction SilentlyContinue
+    Write-Host "TASK state=$(if($null -eq $Task){'MISSING'}else{[string]$Task.State})"
 
     if((Test-Path -LiteralPath $Exe -PathType Leaf) -and (Test-Path -LiteralPath $Cfg -PathType Leaf)){
-        $Raw = & $Exe -mode status -config $Cfg 2>$null
+        $Raw=& $Exe -mode status -config $Cfg 2>$null
         if($LASTEXITCODE -eq 0){
-            $S = (($Raw | ForEach-Object {[string]$_}) -join [Environment]::NewLine) | ConvertFrom-Json
-            Write-Host "STATUS status=$($S.status) cycle_count=$($S.cycle_count) blocked=$($S.blocked_cycle_count) last_cycle_id=$($S.last_cycle_id) last_cycle_status=$($S.last_cycle_status)"
+            $State=(($Raw|ForEach-Object{[string]$_}) -join [Environment]::NewLine)|ConvertFrom-Json
+            Write-Host "STATUS status=$($State.status) cycle_count=$($State.cycle_count) blocked=$($State.blocked_cycle_count) last_cycle_id=$($State.last_cycle_id) last_cycle_status=$($State.last_cycle_status)"
+        } else {
+            Write-Host "STATUS exit=$LASTEXITCODE"
         }
     }
 
-    if((Test-Path -LiteralPath $Cfg -PathType Leaf) -and (Test-Path -LiteralPath $Py -PathType Leaf)){
-        $CfgRaw=[IO.File]::ReadAllText($Cfg)
-        $M=[regex]::Match($CfgRaw,"(?m)^\s*sqlite_path:\s*['""]?([^\r\n'"" ]+)['""]?\s*$")
-        if($M.Success){
-            $Db=$M.Groups[1].Value.Trim()
-            if(-not[IO.Path]::IsPathRooted($Db)){$Db=Join-Path $Root ($Db -replace '/','\')}
-            $Db=[IO.Path]::GetFullPath($Db)
-            Write-Host "DB=$Db"
-            $Probe=Join-Path $env:RUNNER_TEMP ("cutover-db-"+$Name+".py")
-            $Python = @'
-import json, sqlite3, sys
-p=sys.argv[1]
-db=sqlite3.connect("file:"+p.replace("\\","/")+"?mode=ro", uri=True, timeout=5)
-def decode(v):
-    if isinstance(v,(bytes,bytearray)):
-        return v.decode("utf-8")
-    return v
-try:
-    out={}
-    for table in ("research_sidecar_results","research_implementation_freezes","research_cycles","settings"):
-        cols=[r[1] for r in db.execute("pragma table_info("+table+")")]
-        if not cols:
-            continue
-        if table=="settings":
-            rows=db.execute("select * from settings order by key").fetchall()
-            out[table]=[{cols[i]:decode(row[i]) for i in range(len(cols))} for row in rows]
-        else:
-            row=db.execute("select * from "+table+" order by rowid desc limit 1").fetchone()
-            if row is not None:
-                out[table]={cols[i]:decode(row[i]) for i in range(len(cols))}
-    print(json.dumps(out,sort_keys=True))
-finally:
-    db.close()
-'@
-            [IO.File]::WriteAllText($Probe,$Python,(New-Object Text.UTF8Encoding($false)))
-            $Json = & $Py $Probe $Db
-            if($LASTEXITCODE -ne 0){throw "$Name DB probe failed"}
-            $Obj = $Json | ConvertFrom-Json
-
-            foreach($RowName in @('research_sidecar_results','research_implementation_freezes','research_cycles')){
-                $Row=$Obj.$RowName
-                if($null -eq $Row){continue}
-                $RawText=[string]$Row.raw
-                if([string]::IsNullOrWhiteSpace($RawText)){continue}
-                try{
-                    $R=$RawText|ConvertFrom-Json
-                    Write-Host "$RowName cycle_id=$($R.cycle_id) status=$($R.status) experiment_id=$($R.experiment_id) baseline_sha=$($R.baseline_sha) source_head=$($R.source_head) source_commit=$($R.source_commit)"
-                } catch {
-                    Write-Host "$RowName raw_parse_failed=true"
-                }
-            }
-
-            if($null -ne $Obj.settings){
-                foreach($S in @($Obj.settings)){
-                    if([string]$S.key -in @('autonomy_authority','autonomy_generation','autonomy_status','paused','research_sidecar_status')){
-                        Write-Host "SETTING $($S.key)=$($S.value)"
-                    }
-                }
-            }
-        }
+    if(-not(Test-Path -LiteralPath $S.Source -PathType Container)){
+        Write-Host "SOURCE missing=$($S.Source)"
+        continue
     }
+    Write-Host "SOURCE path=$($S.Source)"
+    $Head=(& git -C $S.Source rev-parse HEAD).Trim()
+    if($LASTEXITCODE -ne 0){throw "$($S.Name) source is not a git repository"}
+    $Tree=(& git -C $S.Source rev-parse 'HEAD^{tree}').Trim()
+    $Branch=(& git -C $S.Source branch --show-current).Trim()
+    $Remote=(& git -C $S.Source remote get-url origin 2>$null | Select-Object -First 1)
+    Write-Host "SOURCE head=$Head tree=$Tree branch=$Branch remote=$Remote"
+    $Status=((& git -C $S.Source status --porcelain) -join ';')
+    Write-Host "SOURCE dirty=$([bool](-not[string]::IsNullOrWhiteSpace($Status)))"
+    & git -C $S.Source log -5 --pretty='format:LOG %H %ct %s'
 }
 
-Read-SidecarState -Name wing -Root 'C:\ProgramData\CKBR\research-sidecar'
-Read-SidecarState -Name ygg  -Root 'C:\ProgramData\CKBR\research-sidecar-yggdrasil'
-
-Write-Host '=== CODEX CANDIDATES ==='
-foreach($P in @(
+Write-Host '=== CODEX ==='
+$Candidates=@(
     'C:\ProgramData\CKBR\codex\bin\codex.cmd',
     'C:\ProgramData\CKBR\codex\bin\codex.exe',
     'C:\ProgramData\CKBR\research-sidecar\codex\bin\codex.cmd',
     'C:\ProgramData\CKBR\research-sidecar\codex\bin\codex.exe',
     'C:\ProgramData\CKBR\research-sidecar-yggdrasil\codex\bin\codex.cmd',
     'C:\ProgramData\CKBR\research-sidecar-yggdrasil\codex\bin\codex.exe'
-)){
-    if(Test-Path -LiteralPath $P -PathType Leaf){Write-Host "CODEX=$P"}
-}
-
-Write-Host '=== GIT ROOT CANDIDATES ==='
-$Roots=@(
-    'C:\ProgramData\CKBR\research-sidecar',
-    'C:\ProgramData\CKBR\research-sidecar-yggdrasil',
-    'C:\ProgramData\CKBR\codex\work'
 )
-$Seen=@{}
-foreach($Root in $Roots){
-    if(-not(Test-Path -LiteralPath $Root -PathType Container)){continue}
-    foreach($GitMark in @(Get-ChildItem -LiteralPath $Root -Force -Recurse -ErrorAction SilentlyContinue | Where-Object {$_.Name -eq '.git'})){
-        $Repo=$GitMark.DirectoryName
-        if($Seen.ContainsKey($Repo)){continue}
-        $Seen[$Repo]=$true
-        try{
-            $Head=(& git -C $Repo rev-parse HEAD 2>$null).Trim()
-            if($LASTEXITCODE -ne 0){continue}
-            $Branch=(& git -C $Repo branch --show-current 2>$null).Trim()
-            $Remote=(& git -C $Repo remote get-url origin 2>$null | Select-Object -First 1)
-            Write-Host "GITROOT path=$Repo head=$Head branch=$Branch remote=$Remote"
-        }catch{}
+foreach($P in $Candidates){
+    if(Test-Path -LiteralPath $P -PathType Leaf){
+        Write-Host "CODEX path=$P"
+        try { & $P --version } catch { Write-Host "CODEX version_error=$($_.Exception.Message)" }
     }
 }
+$Home='C:\ProgramData\CKBR\codex\home'
+Write-Host "CODEX_HOME exists=$(Test-Path -LiteralPath $Home -PathType Container)"
+if(Test-Path -LiteralPath $Home -PathType Container){
+    foreach($Name in @('.codex','auth.json','config.toml')){
+        $P=Join-Path $Home $Name
+        Write-Host "CODEX_HOME_ENTRY name=$Name exists=$(Test-Path -LiteralPath $P)"
+    }
+}
+
 Write-Host 'REPO_LOCAL_CUTOVER_PROBE=PASS'
