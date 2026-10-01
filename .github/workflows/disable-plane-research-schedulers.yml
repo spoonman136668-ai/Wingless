@@ -1,0 +1,27 @@
+name: Disable plane research schedulers
+
+on:
+  push:
+    branches:
+      - cutover/repo-local-autonomy-r1
+    paths:
+      - '.github/workflows/disable-plane-research-schedulers.yml'
+      - 'scripts/Disable-PlaneResearchSchedulers.ps1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cutover:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Stop and disable only research sidecars
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          ./scripts/Disable-PlaneResearchSchedulers.ps1
