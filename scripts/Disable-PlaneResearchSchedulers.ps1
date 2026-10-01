@@ -67,3 +67,4 @@ foreach($T in $Tasks){$Args+=($T.Label+'='+$T.Db)}
 if($LASTEXITCODE-ne0){throw 'FINAL_RESULT_READ_FAILED'}
 
 Write-Host 'PLANE_RESEARCH_SCHEDULERS_DISABLED=PASS'
+# retrigger-after-stale-cutover-rollback
