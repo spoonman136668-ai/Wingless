@@ -1,0 +1,26 @@
+name: Find Wingless North Star by hash
+
+on:
+  push:
+    branches:
+      - cutover/repo-local-autonomy-r1
+    paths:
+      - 'scripts/Find-WinglessNorthStar.ps1'
+      - '.github/workflows/find-wingless-north-star.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  find:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Recover frozen North Star
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          ./scripts/Find-WinglessNorthStar.ps1
