@@ -1,0 +1,27 @@
+name: Repo-local Codex smoke
+
+on:
+  push:
+    branches:
+      - cutover/repo-local-autonomy-r1
+    paths:
+      - '.github/workflows/repo-local-codex-smoke.yml'
+      - 'scripts/Test-RepoLocalCodex.ps1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Test shared Codex runtime
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          ./scripts/Test-RepoLocalCodex.ps1
