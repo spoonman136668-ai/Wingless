@@ -110,6 +110,7 @@ for spec in SPECS:
     latest = parse_raw(rows.get("research_sidecar_results"))
     freeze = parse_raw(rows.get("research_implementation_freezes"))
     cycle = parse_raw(rows.get("research_cycles"))
+    print("NORTH_STAR name="+spec["name"]+" value="+json.dumps(latest.get("north_star",{}),sort_keys=True))
     for label, obj in (("result", latest), ("freeze", freeze), ("cycle", cycle)):
         print(
             "ROW"
@@ -154,6 +155,11 @@ for spec in SPECS:
         _, logline = run_git(latest_repo, "show", "-s", "--format=%H|%ct|%s", latest_sha)
         print(f"LATEST_SOURCE name={spec['name']} sha={latest_sha} tree={tree} repo={latest_repo}")
         print(f"LATEST_LOG name={spec['name']} value={logline}")
+        _, tree_paths = run_git(latest_repo, "ls-tree", "-r", "--name-only", latest_sha)
+        for candidate in tree_paths.splitlines():
+            low=candidate.lower()
+            if "north" in low or "charter" in low:
+                print(f"ANCHOR_PATH name={spec['name']} path={candidate}")
         for path in spec["inspect"]:
             show_file(latest_repo, latest_sha, path)
     elif latest_sha:
