@@ -53,10 +53,10 @@ foreach($Codex in $CodexBins){
       $Alt='C:\ProgramData\CKBR\research-sidecar-yggdrasil\codex\home'
       if(Test-Path -LiteralPath $Alt -PathType Container){$Home=$Alt}
     }
-    if(Test-Path -LiteralPath $Home -PathType Container){
-      $env:CODEX_HOME=$Home
-      $env:HOME=$Home
-      $env:USERPROFILE=$Home
+    if(Test-Path -LiteralPath $CodexHome -PathType Container){
+      $env:CODEX_HOME=$CodexHome
+      $env:HOME=$CodexHome
+      $env:USERPROFILE=$CodexHome
     }
     $Out=Join-Path $SmokeRoot ((Split-Path -Leaf $Dir)+'-last.txt')
     $Prompt='Read smoke.txt using your repository/file tools. Reply with exactly CODEX_HOST_SMOKE_OK and make no changes.'
