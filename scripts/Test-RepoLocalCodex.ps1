@@ -16,7 +16,7 @@ $Out=Join-Path $Root 'last.txt'
 
 Push-Location $Root
 try{
-  Get-Content -LiteralPath $Prompt -Raw | & $Codex exec -m gpt-5.6-luna --sandbox read-only --output-last-message $Out -
+  Get-Content -LiteralPath $Prompt -Raw | & $Codex exec -m gpt-5.6-luna --sandbox read-only --skip-git-repo-check --output-last-message $Out -
   if($LASTEXITCODE-ne0){throw "CODEX_SMOKE_FAILED exit=$LASTEXITCODE"}
 }finally{Pop-Location}
 
