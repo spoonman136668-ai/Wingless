@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Apply bounded Mind-Palace Oct1 chat delta
-        shell: powershell
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
         run: |
           $ErrorActionPreference = 'Stop'
 
