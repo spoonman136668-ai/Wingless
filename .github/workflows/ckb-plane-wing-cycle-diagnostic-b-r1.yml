@@ -1,0 +1,68 @@
+name: CKB Plane Wing Cycle Diagnostic B R1
+
+on:
+  push:
+    branches:
+      - diagnostic/ckb-plane-role-swap-watch-r1
+    paths:
+      - '.github/ckb-plane-wing-cycle-diagnostic-b-r1-request.json'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Inspect latest Wingless cycle state read only
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Cfg=Join-Path $Root 'config\autonomy.yaml'
+          $Python='C:\ProgramData\CKBR\research-sidecar-yggdrasil\python312\python.exe'
+          $Raw=[IO.File]::ReadAllText($Cfg)
+          $M=[regex]::Match($Raw,'(?m)^\s*sqlite_path:\s*["'']?([^\r\n"'']+)["'']?\s*$')
+          if(-not$M.Success){throw 'WING_CYCLE_DIAG_DB_PATH_INVALID'}
+          $Db=$M.Groups[1].Value.Trim()
+          if(-not[IO.Path]::IsPathRooted($Db)){$Db=Join-Path $Root ($Db -replace '/','\')}
+          $Db=[IO.Path]::GetFullPath($Db)
+          if(-not(Test-Path -LiteralPath $Python -PathType Leaf)){throw 'WING_CYCLE_DIAG_PYTHON_MISSING'}
+
+          $Py=Join-Path $env:RUNNER_TEMP 'wing-cycle-diag-r1.py'
+          @'
+          import sqlite3, sys, json
+          db_path=sys.argv[1]
+          db=sqlite3.connect("file:"+db_path.replace("\\","/")+"?mode=ro", uri=True, timeout=5)
+          try:
+              tables=[r[0] for r in db.execute("select name from sqlite_master where type='table' order by name")]
+              wanted=[
+                  "research_cycles","research_cycle_decisions","research_controller_events",
+                  "research_implementation_contexts","research_implementation_bundles",
+                  "research_implementation_freezes","research_sidecar_results",
+                  "research_sidecar_failures","research_cycle_supersessions","settings"
+              ]
+              for table in wanted:
+                  if table not in tables:
+                      continue
+                  cols=[r[1] for r in db.execute("pragma table_info("+table+")")]
+                  print("TABLE "+table+" COLS "+",".join(cols))
+                  if table=="settings":
+                      rows=db.execute("select * from settings order by key").fetchall()
+                  else:
+                      rows=db.execute("select * from "+table+" order by rowid desc limit 12").fetchall()
+                  for row in rows:
+                      obj={cols[i]:row[i] for i in range(min(len(cols),len(row)))}
+                      print("ROW "+table+" "+json.dumps(obj,sort_keys=True,default=str))
+          finally:
+              db.close()
+          '@|Set-Content -LiteralPath $Py -Encoding UTF8
+          & $Python $Py $Db
+          if($LASTEXITCODE-ne0){throw "WING_CYCLE_DIAG_SQLITE_FAILED exit=$LASTEXITCODE"}
+          Write-Host 'CKB_PLANE_WING_CYCLE_DIAGNOSTIC_B_R1=PASS'
