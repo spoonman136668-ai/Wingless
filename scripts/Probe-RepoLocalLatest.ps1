@@ -5,7 +5,7 @@ $Specs=@(
   [pscustomobject]@{
     Name='wing'
     Db='C:\ProgramData\CKBR\research-sidecar\state\research-sidecar.db'
-    Python='C:\ProgramData\CKBR\research-sidecar\python312\python.exe'
+    Python='C:\ProgramData\CKBR\research-sidecar-yggdrasil\python312\python.exe'
     Source='C:\ProgramData\CKBR\codex\work\rs\source\Wingless'
     Inspect=@('.wingless/qualification-request.json','.github/workflows/research-qualify-windows.yml','research/bootstrap/wingless-lm-north-star.txt')
   },
