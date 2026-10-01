@@ -155,6 +155,7 @@ SCIENTIFIC CONTINUATION
 7. The final implementation commit must update .wingless/qualification-request.json using schema wingless.research-qualification-request.v1. Its branch MUST be $ActiveBranch and baseline_sha MUST be $StartSha. The test_script must be a repo-relative scripts/*.ps1 path.
 8. Preserve deterministic controls, fixed resources, disjoint seeds where required, exact negative-result cardinality, and no post-result threshold/budget/capacity tuning.
 9. Make all required commits locally with concise research commit messages. Leave the worktree clean.
+10. If implementation becomes invalid after any output has been observed, do NOT repair or rerun it under the same preregistration. Restore every implementation/request change, leave exactly the preregistration commit with a clean worktree, make no scientific claim, and end your final response with a line containing exactly RESEARCH_TERMINAL=PREREG_BLOCKED followed by a concise reason.
 
 If the evidence is insufficient, provenance is incomplete, the next question would widen authority, or safe continuation is ambiguous, make no changes and exit nonzero with a clear blocker.
 
@@ -199,7 +200,7 @@ $MindContext
 
     $Commits=@(& git rev-list --reverse "$StartSha..HEAD"|Where-Object{$_ -and $_.Trim()})
     if($LASTEXITCODE-ne0){throw 'REV_LIST_FAILED'}
-    if($Commits.Count-lt2){throw "CONTINUATION_COMMIT_COUNT_TOO_SMALL count=$($Commits.Count)"}
+    if($Commits.Count-lt1){throw "CONTINUATION_COMMIT_COUNT_TOO_SMALL count=$($Commits.Count)"}
 
     $AllFiles=New-Object Collections.Generic.List[string]
     foreach($Commit in $Commits){foreach($File in (Get-CommitFiles $Commit)){$AllFiles.Add($File)}}
@@ -211,6 +212,61 @@ $MindContext
 
     $FirstFiles=@(Get-CommitFiles $Commits[0])
     if($FirstFiles.Count-ne1 -or -not$FirstFiles[0].StartsWith('docs/experiments/')){throw "PREREG_NOT_FIRST_AND_ALONE files=$($FirstFiles -join ',')"}
+
+    if($Commits.Count-eq1){
+        if(-not(Test-Path -LiteralPath $LastMessagePath -PathType Leaf)){throw 'PREREG_BLOCKED_AGENT_SUMMARY_MISSING'}
+        $AgentSummary=[IO.File]::ReadAllText($LastMessagePath)
+        if($AgentSummary -notmatch '(?m)^RESEARCH_TERMINAL=PREREG_BLOCKED\s*$'){throw 'PREREG_ONLY_WITHOUT_BLOCKED_MARKER'}
+        $PreregCommit=[string]$Commits[0]
+        $PreregPath=[string]$FirstFiles[0]
+        $Experiment=([IO.Path]::GetFileNameWithoutExtension($PreregPath)).ToUpperInvariant()
+        $EvidenceDir=Join-Path $RepoPath '.research-autonomy\evidence'
+        New-Item -ItemType Directory -Force -Path $EvidenceDir|Out-Null
+        $EvidencePath=Join-Path $EvidenceDir ("blocked-"+$env:GITHUB_RUN_ID+".json")
+        $Record=[ordered]@{
+            schema='research.preregistered-blocker.v1'
+            program='Wingless'
+            parent_sha=$StartSha
+            preregistration_commit=$PreregCommit
+            preregistration_path=$PreregPath
+            experiment=$Experiment
+            classification='preregistered-blocked'
+            scientific_claim=$false
+            agent_summary=$AgentSummary.Trim()
+            github_run_id=$env:GITHUB_RUN_ID
+            generated_at_utc=[DateTime]::UtcNow.ToString('o')
+            authority='research-only'
+            ckb_plane_role='governance-only'
+        }
+        $Record|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $EvidencePath -Encoding UTF8
+        $State=[ordered]@{
+            schema='research.repo-local-state.v1'
+            program='Wingless'
+            active_branch=$ActiveBranch
+            north_star_path=$NorthStarPath
+            north_star_sha256=$NorthStarSha256
+            parent_sha=$StartSha
+            preregistration_commit=$PreregCommit
+            experiment=$Experiment
+            classification='preregistered-blocked'
+            scientific_claim=$false
+            last_completed_utc=[DateTime]::UtcNow.ToString('o')
+            github_run_id=$env:GITHUB_RUN_ID
+            authority='research-only'
+            ckb_plane_role='governance-only'
+        }
+        $State|ConvertTo-Json -Depth 30|Set-Content -LiteralPath $StatePath -Encoding UTF8
+        Invoke-Git add '.research-autonomy'
+        Invoke-Git commit -m ("research: seal blocked preregistration "+$Experiment)
+        $EvidenceHead=(& git rev-parse HEAD).Trim()
+        Invoke-Git push origin ("HEAD:refs/heads/"+$ActiveBranch)
+        Write-CycleResult -Advanced $true -Reason 'preregistered-blocked-sealed' -Head $EvidenceHead
+        Write-Host 'REPO_LOCAL_PREREG_BLOCKED_SEALED'
+        Write-Host "experiment=$Experiment"
+        Write-Host "preregistration_commit=$PreregCommit"
+        Write-Host "evidence_head=$EvidenceHead"
+        return
+    }
 
     $RequestPath=Join-Path $RepoPath '.wingless\qualification-request.json'
     if(-not(Test-Path -LiteralPath $RequestPath -PathType Leaf)){throw 'QUALIFICATION_REQUEST_MISSING'}
