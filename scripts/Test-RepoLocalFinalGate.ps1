@@ -1,9 +1,18 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 
+function Get-CanonicalTextSha256([string]$Path) {
+  $Text=[IO.File]::ReadAllText($Path)
+  $Normalized=$Text.Replace("`r`n","`n").Replace("`r","`n")
+  $Utf8NoBom=New-Object Text.UTF8Encoding($false)
+  $Bytes=$Utf8NoBom.GetBytes($Normalized)
+  $Sha=[Security.Cryptography.SHA256]::Create()
+  try{return ([BitConverter]::ToString($Sha.ComputeHash($Bytes))).Replace('-','').ToLowerInvariant()}finally{$Sha.Dispose()}
+}
+
 $Controller=(Resolve-Path 'controller').Path
 $Research=(Resolve-Path 'research').Path
-$Expected='0bef2799dee4f78a6de2face17407f9ce2e66372'
+$Expected='584a292dc50fc7dbef24805b29e426f2d650f426'
 $ExpectedNorth='efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8'
 
 $C=Get-Content -Raw -LiteralPath (Join-Path $Controller '.research-autonomy\config.json')|ConvertFrom-Json
@@ -23,7 +32,7 @@ if($Head-cne$Expected){throw "ACTIVE_HEAD_DRIFT expected=$Expected actual=$Head"
 if(((& git -C $Research status --porcelain)-join'').Trim()){throw 'ACTIVE_WORKTREE_DIRTY'}
 
 $NorthPath=Join-Path $Research 'research\bootstrap\wingless-lm-north-star.txt'
-$North=(Get-FileHash -LiteralPath $NorthPath -Algorithm SHA256).Hash.ToLowerInvariant()
+$North=Get-CanonicalTextSha256 $NorthPath
 if($North-cne$ExpectedNorth){throw "NORTH_STAR_DRIFT expected=$ExpectedNorth actual=$North"}
 
 foreach($TaskName in @('CKBPlane Research Sidecar','CKBPlane Research Sidecar Yggdrasil')){
