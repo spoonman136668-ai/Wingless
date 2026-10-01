@@ -1,0 +1,36 @@
+name: Mind-Palace service checkout probe
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/mind-palace-service-checkout-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    steps:
+      - name: Probe service-accessible Mind-Palace roots
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $Roots = @(
+            'C:\ProgramData',
+            'C:\actions-runner-up-b\_work'
+          )
+          Write-Host "runner=$env:RUNNER_NAME"
+          $Found = @()
+          foreach ($Root in $Roots) {
+            if (Test-Path -LiteralPath $Root -PathType Container) {
+              $Found += Get-ChildItem -LiteralPath $Root -Directory -Recurse -ErrorAction SilentlyContinue |
+                Where-Object { $_.Name -eq 'Mind-Palace' } |
+                Select-Object -ExpandProperty FullName
+            }
+          }
+          $Found = @($Found | Sort-Object -Unique)
+          Write-Host "found_count=$($Found.Count)"
+          foreach ($Path in $Found) { Write-Host "found=$Path" }
