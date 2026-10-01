@@ -1,0 +1,40 @@
+name: CKB Plane Wing Codex Audit B R1
+
+on:
+  push:
+    branches:
+      - diagnostic/ckb-plane-role-swap-watch-r1
+    paths:
+      - '.github/ckb-plane-wing-codex-audit-b-r1-request.json'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: [self-hosted, windows, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Read exact Codex source audit
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $Cycle='RSL-e24f879e92e84fa04c5b6e5f6b58d87a'
+          $Audit=Join-Path 'C:\ProgramData\CKBR\codex\work\audit' ($Cycle+'.json')
+          if(-not(Test-Path -LiteralPath $Audit -PathType Leaf)){throw "WING_CODEX_AUDIT_MISSING path=$Audit"}
+          Write-Host "audit_path=$Audit"
+          Get-Content -LiteralPath $Audit -Raw
+          $Codex='C:\ProgramData\CKBR\codex\bin\codex.exe'
+          if(Test-Path -LiteralPath $Codex -PathType Leaf){
+            & $Codex --version
+            Write-Host "codex_sha256=$((Get-FileHash -LiteralPath $Codex -Algorithm SHA256).Hash.ToLowerInvariant())"
+          }
+          Write-Host "codex_process_count=$(@(Get-Process -Name codex -ErrorAction SilentlyContinue).Count)"
+          Write-Host 'sidecar_mutation=False'
+          Write-Host 'research_state_mutation=False'
+          Write-Host 'CKB_PLANE_WING_CODEX_AUDIT_B_R1=PASS'
