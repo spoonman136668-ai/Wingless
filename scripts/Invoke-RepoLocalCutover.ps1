@@ -10,7 +10,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $HandoffPushed=$false
-$TaskDisabled=$false
+$TaskChanged=$false
+$TaskWasEnabled=$false
+$TaskWasRunning=$false
 
 function Invoke-Git {
     param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Args)
@@ -33,9 +35,13 @@ if(-not(Test-Path -LiteralPath $DbPath -PathType Leaf)){throw "SIDECAR_DB_MISSIN
 
 try{
     $Task=Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
-    Write-Host "CUTOVER_TASK_INITIAL name=$TaskName state=$($Task.State)"
-    Disable-ScheduledTask -TaskName $TaskName -ErrorAction Stop|Out-Null
-    $TaskDisabled=$true
+    $TaskWasRunning=([string]$Task.State-ceq'Running')
+    $TaskWasEnabled=([string]$Task.State-cne'Disabled')
+    Write-Host "CUTOVER_TASK_INITIAL name=$TaskName state=$($Task.State) was_enabled=$TaskWasEnabled was_running=$TaskWasRunning"
+    if($TaskWasEnabled){
+        Disable-ScheduledTask -TaskName $TaskName -ErrorAction Stop|Out-Null
+        $TaskChanged=$true
+    }
     try{Stop-ScheduledTask -TaskName $TaskName -ErrorAction Stop}catch{
         $AfterDisable=Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
         if([string]$AfterDisable.State-ceq'Running'){throw}
@@ -51,12 +57,12 @@ try{
     New-Item -ItemType Directory -Force -Path $Temp|Out-Null
     $SnapshotPy=Join-Path $Temp 'snapshot.py'
     $SnapshotJson=Join-Path $Temp 'snapshot.json'
-    $RootsJson=($SearchRoots|ConvertTo-Json -Compress)
+    $RootsPacked=($SearchRoots -join ';;')
     $PyText=@'
 import ast, datetime, hashlib, json, os, sqlite3, subprocess, sys
 
-program, db_path, roots_json, out_path = sys.argv[1:5]
-roots=json.loads(roots_json)
+program, db_path, roots_packed, out_path = sys.argv[1:5]
+roots=[x for x in roots_packed.split(';;') if x]
 
 def decode(v):
     if isinstance(v,(bytes,bytearray)):
@@ -163,7 +169,7 @@ with open(out_path,"w",encoding="utf-8") as f:
 print(json.dumps({"source_head":snapshot["source_head"],"source_repo":source_repo,"experiment_id":snapshot["experiment_id"],"result_class":snapshot["result_class"],"scientific_result_available":snapshot["scientific_result_available"]},sort_keys=True))
 '@
     [IO.File]::WriteAllText($SnapshotPy,$PyText,(New-Object Text.UTF8Encoding($false)))
-    $SnapshotLine=& $Py $SnapshotPy $Program $DbPath $RootsJson $SnapshotJson
+    $SnapshotLine=& $Py $SnapshotPy $Program $DbPath $RootsPacked $SnapshotJson
     if($LASTEXITCODE-ne0){throw "SIDECAR_SNAPSHOT_FAILED exit=$LASTEXITCODE"}
     $SnapshotInfo=$SnapshotLine|ConvertFrom-Json
     $SourceHead=[string]$SnapshotInfo.source_head
@@ -217,11 +223,15 @@ print(json.dumps({"source_head":snapshot["source_head"],"source_repo":source_rep
     }
 }
 catch{
-    if($TaskDisabled -and -not$HandoffPushed){
-        Write-Host "CUTOVER_ROLLBACK_REENABLE task=$TaskName reason=$($_.Exception.Message)"
+    if(-not$HandoffPushed){
+        Write-Host "CUTOVER_ROLLBACK_RESTORE task=$TaskName was_enabled=$TaskWasEnabled was_running=$TaskWasRunning reason=$($_.Exception.Message)"
         try{
-            Enable-ScheduledTask -TaskName $TaskName -ErrorAction Stop|Out-Null
-            Start-ScheduledTask -TaskName $TaskName -ErrorAction Stop
+            if($TaskWasEnabled){
+                Enable-ScheduledTask -TaskName $TaskName -ErrorAction Stop|Out-Null
+                if($TaskWasRunning){Start-ScheduledTask -TaskName $TaskName -ErrorAction Stop}
+            } elseif($TaskChanged) {
+                Disable-ScheduledTask -TaskName $TaskName -ErrorAction Stop|Out-Null
+            }
         }catch{
             Write-Host "CUTOVER_ROLLBACK_FAILED task=$TaskName error=$($_.Exception.Message)"
         }
