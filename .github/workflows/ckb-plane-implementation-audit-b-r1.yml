@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
       - name: Read implementation provider audits
-        shell: powershell
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           $R=Get-Content -LiteralPath '.\.github\ckb-plane-implementation-audit-b-r1-request.json' -Raw|ConvertFrom-Json
