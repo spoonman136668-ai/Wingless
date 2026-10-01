@@ -59,15 +59,21 @@ jobs:
           try:
               tables=[r[0] for r in db.execute("select name from sqlite_master where type='table' order by name")]
               print("tables="+",".join(tables))
-              for table in ("research_sidecar_failures","settings"):
+              wanted=(
+                  "research_cycles","research_cycle_decisions","research_controller_events",
+                  "research_implementation_contexts","research_implementation_bundles",
+                  "research_implementation_freezes","research_sidecar_results",
+                  "research_sidecar_failures","settings"
+              )
+              for table in wanted:
                   if table not in tables:
                       continue
                   cols=[r[1] for r in db.execute("pragma table_info("+table+")")]
                   print(table+"_columns="+",".join(cols))
-                  if table=="research_sidecar_failures":
-                      rows=db.execute("select * from research_sidecar_failures order by rowid desc limit 8").fetchall()
+                  if table=="settings":
+                      rows=db.execute("select * from settings order by key").fetchall()
                   else:
-                      rows=db.execute("select * from settings where key like '%planner%' or key like '%retry%' or key like '%status%' order by key").fetchall()
+                      rows=db.execute("select * from "+table+" order by rowid desc limit 8").fetchall()
                   for row in rows:
                       obj={cols[i]:row[i] for i in range(min(len(cols),len(row)))}
                       print(table+"_row="+json.dumps(obj,sort_keys=True,default=str))
