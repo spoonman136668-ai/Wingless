@@ -1,0 +1,68 @@
+name: Preserve Wingless pending preregistration
+
+on:
+  push:
+    branches:
+      - diagnostic/repo-local-cutover-r1
+    paths:
+      - '.github/workflows/preserve-wingless-pending-prereg.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  preserve:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - name: Preserve exact pending preregistration without checkout
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference='Stop'
+
+          $Repo='C:\actions-runner-up-b\_work\Wingless\Wingless\research'
+          $Remote='https://github.com/spoonman136668-ai/Wingless.git'
+          $ExpectedParent='7287347f636c7c2aa7c1dc3b804d06a96dd28778'
+          $Prefix='893b9a3c'
+          $ArchiveBranch='research/pending/wlm-si-stack-container-r1'
+
+          if(-not(Test-Path -LiteralPath $Repo -PathType Container)){throw "LOCAL_REPO_MISSING path=$Repo"}
+          & git -C $Repo cat-file -e ($Prefix+'^{commit}')
+          if($LASTEXITCODE-ne0){throw "PENDING_PREREG_OBJECT_MISSING prefix=$Prefix"}
+
+          $Commit=(& git -C $Repo rev-parse ($Prefix+'^{commit}')).Trim()
+          $Parent=(& git -C $Repo rev-parse ($Commit+'^')).Trim()
+          if($Parent-cne$ExpectedParent){throw "PENDING_PREREG_PARENT_DRIFT expected=$ExpectedParent actual=$Parent"}
+
+          $Files=@(& git -C $Repo diff-tree --no-commit-id --name-only -r $Commit)
+          if($Files.Count-ne1 -or $Files[0]-cne'docs/experiments/wlm-si-stack-container-r1.md'){
+            throw "PENDING_PREREG_SCOPE_INVALID files=$($Files -join ',')"
+          }
+
+          $Pair="x-access-token:$env:GITHUB_TOKEN"
+          $Basic=[Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($Pair))
+          $Header="AUTHORIZATION: basic $Basic"
+
+          $RemoteActive=@(& git -c "http.https://github.com/.extraheader=$Header" ls-remote --heads $Remote 'refs/heads/research/autonomy-wingless-active')
+          if($LASTEXITCODE-ne0 -or $RemoteActive.Count-ne1){throw 'ACTIVE_BRANCH_READ_FAILED'}
+          $ActiveHead=(([string]$RemoteActive[0])-split'\s+')[0]
+          if($ActiveHead-cne$ExpectedParent){throw "ACTIVE_HEAD_DRIFT expected=$ExpectedParent actual=$ActiveHead"}
+
+          $Existing=@(& git -c "http.https://github.com/.extraheader=$Header" ls-remote --heads $Remote ("refs/heads/"+$ArchiveBranch))
+          if($LASTEXITCODE-ne0){throw 'ARCHIVE_BRANCH_READ_FAILED'}
+          if($Existing.Count-gt0){
+            $ExistingSha=(([string]$Existing[0])-split'\s+')[0]
+            if($ExistingSha-cne$Commit){throw "ARCHIVE_BRANCH_CONFLICT expected=$Commit actual=$ExistingSha"}
+            Write-Host 'PENDING_PREREG_ALREADY_PRESERVED=true'
+          }else{
+            & git -c "http.https://github.com/.extraheader=$Header" -C $Repo push $Remote ($Commit+":refs/heads/"+$ArchiveBranch)
+            if($LASTEXITCODE-ne0){throw 'PENDING_PREREG_PUSH_FAILED'}
+          }
+
+          Write-Host 'WINGLESS_PENDING_PREREG_PRESERVE=PASS'
+          Write-Host "commit=$Commit"
+          Write-Host "parent=$Parent"
+          Write-Host "archive_branch=$ArchiveBranch"
