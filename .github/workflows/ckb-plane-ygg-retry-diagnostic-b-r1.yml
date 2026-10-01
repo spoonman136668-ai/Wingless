@@ -1,0 +1,79 @@
+name: CKB Plane Ygg Retry Diagnostic B R1
+
+on:
+  push:
+    branches:
+      - diagnostic/ckb-plane-role-swap-watch-r1
+    paths:
+      - '.github/ckb-plane-ygg-retry-diagnostic-b-r1-request.json'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Inspect Ygg retry state and Codex topology read only
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $YggRoot='C:\ProgramData\CKBR\research-sidecar-yggdrasil'
+          $Cfg=Join-Path $YggRoot 'config\autonomy.yaml'
+          $Python=Join-Path $YggRoot 'python312\python.exe'
+          $Raw=[IO.File]::ReadAllText($Cfg)
+          $M=[regex]::Match($Raw,'(?m)^\s*sqlite_path:\s*["'']?([^\r\n"'']+)["'']?\s*$')
+          if(-not$M.Success){throw 'YGG_DIAG_DB_PATH_INVALID'}
+          $Db=$M.Groups[1].Value.Trim()
+          if(-not[IO.Path]::IsPathRooted($Db)){$Db=Join-Path $YggRoot ($Db -replace '/','\')}
+          $Db=[IO.Path]::GetFullPath($Db)
+
+          $Procs=@(Get-CimInstance Win32_Process -ErrorAction Stop)
+          $ById=@{};foreach($P in $Procs){$ById[[int]$P.ProcessId]=$P}
+          foreach($P in @($Procs|Where-Object{$_.Name-ieq'codex.exe'})){
+            $ParentName='unknown'
+            $ParentCmd=''
+            if($ById.ContainsKey([int]$P.ParentProcessId)){
+              $Parent=$ById[[int]$P.ParentProcessId]
+              $ParentName=[string]$Parent.Name
+              $ParentCmd=[string]$Parent.CommandLine
+            }
+            $Cmd=[string]$P.CommandLine
+            if($Cmd.Length-gt900){$Cmd=$Cmd.Substring(0,900)}
+            if($ParentCmd.Length-gt900){$ParentCmd=$ParentCmd.Substring(0,900)}
+            Write-Host "codex pid=$($P.ProcessId) parent=$($P.ParentProcessId) parent_name=$ParentName cmd=$Cmd"
+            Write-Host "codex_parent_cmd=$ParentCmd"
+          }
+
+          $Py=Join-Path $env:RUNNER_TEMP 'ygg-retry-diag-r1.py'
+          @'
+          import sqlite3, sys, json
+          db_path=sys.argv[1]
+          db=sqlite3.connect("file:"+db_path.replace("\\","/")+"?mode=ro", uri=True, timeout=5)
+          try:
+              tables=[r[0] for r in db.execute("select name from sqlite_master where type='table' order by name")]
+              print("tables="+",".join(tables))
+              for table in ("research_sidecar_failures","settings"):
+                  if table not in tables:
+                      continue
+                  cols=[r[1] for r in db.execute("pragma table_info("+table+")")]
+                  print(table+"_columns="+",".join(cols))
+                  if table=="research_sidecar_failures":
+                      rows=db.execute("select * from research_sidecar_failures order by rowid desc limit 8").fetchall()
+                  else:
+                      rows=db.execute("select * from settings where key like '%planner%' or key like '%retry%' or key like '%status%' order by key").fetchall()
+                  for row in rows:
+                      obj={cols[i]:row[i] for i in range(min(len(cols),len(row)))}
+                      print(table+"_row="+json.dumps(obj,sort_keys=True,default=str))
+          finally:
+              db.close()
+          '@|Set-Content -LiteralPath $Py -Encoding UTF8
+          & $Python $Py $Db
+          if($LASTEXITCODE-ne0){throw "YGG_DIAG_SQLITE_FAILED exit=$LASTEXITCODE"}
+          Write-Host 'CKB_PLANE_YGG_RETRY_DIAGNOSTIC_B_R1=PASS'
