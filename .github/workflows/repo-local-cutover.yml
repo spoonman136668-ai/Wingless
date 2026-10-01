@@ -1,0 +1,47 @@
+name: Wingless repo-local cutover
+
+on:
+  push:
+    branches:
+      - autonomy/repo-local-research-r1
+    paths:
+      - '.research-autonomy/cutover-request.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wingless-repo-local-cutover
+  cancel-in-progress: false
+
+jobs:
+  cutover:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Validate cutover request
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $R=Get-Content -Raw '.research-autonomy\cutover-request.json'|ConvertFrom-Json
+          if($R.schema -cne 'research.repo-local-cutover-request.v1'){throw 'CUTOVER_REQUEST_SCHEMA_INVALID'}
+          if($R.program -cne 'Wingless'){throw 'CUTOVER_REQUEST_PROGRAM_INVALID'}
+          if($R.active_branch -cne 'research/autonomy-wingless-active'){throw 'CUTOVER_REQUEST_BRANCH_INVALID'}
+          if(-not[bool]$R.disable_plane_sidecar){throw 'CUTOVER_REQUEST_SIDECAR_DISABLE_REQUIRED'}
+
+      - name: Freeze sidecar and materialize exact handoff
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          & '.\scripts\Invoke-RepoLocalCutover.ps1' `
+            -Program Wingless `
+            -RepoPath (Resolve-Path '.').Path `
+            -ActiveBranch 'research/autonomy-wingless-active' `
+            -TaskName 'CKBPlane Research Sidecar' `
+            -DbPath 'C:\ProgramData\CKBR\research-sidecar\state\research-sidecar.db' `
+            -SearchRoots @('C:\ProgramData\CKBR\codex\work\rs','C:\ProgramData\CKBR\research-sidecar')
