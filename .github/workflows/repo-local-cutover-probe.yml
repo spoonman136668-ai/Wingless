@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/repo-local-cutover-probe.yml'
       - 'scripts/Probe-RepoLocalCutover.ps1'
+      - 'scripts/Probe-RepoLocalLatest.ps1'
 
 permissions:
   contents: read
@@ -23,4 +24,4 @@ jobs:
       - name: Inspect sidecar handoff state
         shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
         run: |
-          ./scripts/Probe-RepoLocalCutover.ps1
+          ./scripts/Probe-RepoLocalLatest.ps1
