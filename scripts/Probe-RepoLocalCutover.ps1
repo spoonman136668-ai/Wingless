@@ -41,8 +41,10 @@ foreach($S in $Sidecars){
     $Head=(& git -C $S.Source rev-parse HEAD).Trim()
     if($LASTEXITCODE -ne 0){throw "$($S.Name) source is not a git repository"}
     $Tree=(& git -C $S.Source rev-parse 'HEAD^{tree}').Trim()
-    $Branch=(& git -C $S.Source branch --show-current).Trim()
-    $Remote=(& git -C $S.Source remote get-url origin 2>$null | Select-Object -First 1)
+    $BranchRaw=(& git -C $S.Source branch --show-current 2>$null | Select-Object -First 1)
+    $Branch=if($null -eq $BranchRaw){''}else{([string]$BranchRaw).Trim()}
+    $RemoteRaw=(& git -C $S.Source remote get-url origin 2>$null | Select-Object -First 1)
+    $Remote=if($null -eq $RemoteRaw){''}else{([string]$RemoteRaw).Trim()}
     Write-Host "SOURCE head=$Head tree=$Tree branch=$Branch remote=$Remote"
     $Status=((& git -C $S.Source status --porcelain) -join ';')
     Write-Host "SOURCE dirty=$([bool](-not[string]::IsNullOrWhiteSpace($Status)))"
