@@ -1,0 +1,60 @@
+name: CKB Plane Kill Stuck Role Swap R1
+
+on:
+  push:
+    branches:
+      - diagnostic/ckb-plane-role-swap-watch-r1
+    paths:
+      - '.github/ckb-plane-kill-stuck-role-swap-r1-request.json'
+
+permissions:
+  contents: read
+
+jobs:
+  terminate:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Terminate only the wedged recovery job
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Req=Get-Content -LiteralPath '.\.github\ckb-plane-kill-stuck-role-swap-r1-request.json' -Raw|ConvertFrom-Json
+          if([string]$Req.schema-cne'wingless.ckb-plane-kill-stuck-role-swap-r1.v1' -or -not[bool]$Req.authorize_exact_job_termination){
+            throw 'STUCK_ROLE_SWAP_TERMINATION_REQUEST_INVALID'
+          }
+          $PidTarget=[int]$Req.pid
+          $ExpectedFragment=[string]$Req.expected_command_fragment
+          $Procs=@(Get-CimInstance Win32_Process -ErrorAction Stop)
+          $ById=@{};foreach($P in $Procs){$ById[[int]$P.ProcessId]=$P}
+          if(-not$ById.ContainsKey($PidTarget)){Write-Host 'target_already_exited=True';exit 0}
+          $Root=$ById[$PidTarget]
+          $Cmd=[string]$Root.CommandLine
+          if([string]$Root.Name -ine 'powershell.exe' -or $Cmd -notlike ('*'+$ExpectedFragment+'*')){
+            throw "STUCK_ROLE_SWAP_TARGET_MISMATCH name=$($Root.Name) cmd=$Cmd"
+          }
+          $Desc=New-Object System.Collections.Generic.List[int]
+          $Queue=New-Object System.Collections.Generic.Queue[int]
+          $Queue.Enqueue($PidTarget)
+          while($Queue.Count-gt0){
+            $Parent=$Queue.Dequeue()
+            foreach($Child in @($Procs|Where-Object{[int]$_.ParentProcessId-eq$Parent})){
+              $Desc.Add([int]$Child.ProcessId)
+              $Queue.Enqueue([int]$Child.ProcessId)
+              Write-Host "descendant pid=$($Child.ProcessId) name=$($Child.Name) cmd=$($Child.CommandLine)"
+            }
+          }
+          foreach($Id in @($Desc|Sort-Object -Descending)){
+            Stop-Process -Id $Id -Force -ErrorAction SilentlyContinue
+          }
+          Stop-Process -Id $PidTarget -Force -ErrorAction Stop
+          Start-Sleep -Seconds 2
+          if(Get-Process -Id $PidTarget -ErrorAction SilentlyContinue){throw 'STUCK_ROLE_SWAP_TARGET_STILL_RUNNING'}
+          Write-Host 'stuck_recovery_terminated=True'
+          Write-Host 'research_services_touched=False'
+          Write-Host 'CKB_PLANE_KILL_STUCK_ROLE_SWAP_R1=PASS'
