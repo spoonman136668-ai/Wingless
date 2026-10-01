@@ -179,7 +179,7 @@ $MindContext
         $Succeeded=$false
         foreach($Model in $Models){
             Write-Host "RESEARCH_AGENT_ATTEMPT provider=codex model=$Model"
-            $Args=@('exec','--sandbox','workspace-write','--approve-for-me','--model',$Model,'--output-last-message',$LastMessagePath,'-')
+            $Args=@('exec','--approve-for-me','--model',$Model,'--output-last-message',$LastMessagePath,'-')
             $Proc=Start-Process -FilePath $Codex -ArgumentList $Args -WorkingDirectory $RepoPath -RedirectStandardInput $PromptPath -NoNewWindow -Wait -PassThru
             if($Proc.ExitCode-eq0){$Succeeded=$true;break}
             Write-Host "RESEARCH_AGENT_RETRY model=$Model exit=$($Proc.ExitCode)"
