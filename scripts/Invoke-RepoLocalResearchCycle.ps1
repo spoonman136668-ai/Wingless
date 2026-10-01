@@ -11,6 +11,19 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+function Get-CanonicalTextSha256([string]$Path) {
+    $Text=[IO.File]::ReadAllText($Path)
+    $Normalized=$Text.Replace("`r`n","`n").Replace("`r","`n")
+    $Utf8NoBom=New-Object Text.UTF8Encoding($false)
+    $Bytes=$Utf8NoBom.GetBytes($Normalized)
+    $Sha=[Security.Cryptography.SHA256]::Create()
+    try {
+        return ([BitConverter]::ToString($Sha.ComputeHash($Bytes))).Replace('-','').ToLowerInvariant()
+    } finally {
+        $Sha.Dispose()
+    }
+}
+
 function Invoke-Git {
     param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Args)
     & git -C $RepoPath @Args
@@ -85,7 +98,7 @@ try{
 
     $NorthStarFull=Join-Path $RepoPath $NorthStarPath
     if(-not(Test-Path -LiteralPath $NorthStarFull -PathType Leaf)){throw "NORTH_STAR_MISSING path=$NorthStarPath"}
-    $NorthStarActual=(Get-FileHash -LiteralPath $NorthStarFull -Algorithm SHA256).Hash.ToLowerInvariant()
+    $NorthStarActual=Get-CanonicalTextSha256 $NorthStarFull
     if($NorthStarActual-cne$NorthStarSha256.ToLowerInvariant()){throw "NORTH_STAR_IDENTITY_DRIFT expected=$NorthStarSha256 actual=$NorthStarActual"}
 
     $StatePath=Join-Path $RepoPath '.research-autonomy\state.json'
@@ -164,7 +177,7 @@ $MindContext
         $Succeeded=$false
         foreach($Model in $Models){
             Write-Host "RESEARCH_AGENT_ATTEMPT provider=codex model=$Model"
-            $Args=@('exec','--full-auto','--model',$Model,'--output-last-message',$LastMessagePath,'-')
+            $Args=@('exec','--sandbox','workspace-write','--approve-for-me','--model',$Model,'--output-last-message',$LastMessagePath,'-')
             $Proc=Start-Process -FilePath $Codex -ArgumentList $Args -WorkingDirectory $RepoPath -RedirectStandardInput $PromptPath -NoNewWindow -Wait -PassThru
             if($Proc.ExitCode-eq0){$Succeeded=$true;break}
             Write-Host "RESEARCH_AGENT_RETRY model=$Model exit=$($Proc.ExitCode)"
