@@ -1,6 +1,11 @@
 name: Wingless repo-local research autonomy
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.research-autonomy/config.json'
   workflow_dispatch:
     inputs:
       reason:
