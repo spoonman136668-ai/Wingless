@@ -96,6 +96,29 @@ jobs:
             if($Cmd.Length-gt700){$Cmd=$Cmd.Substring(0,700)}
             Write-Host "proc name=$Name pid=$($P.ProcessId) parent=$($P.ParentProcessId) parent_name=$ParentName cmd=$Cmd"
           }
+          $KTemp='C:\actions-runner-ktrade\_work\_temp'
+          if(Test-Path -LiteralPath $KTemp -PathType Container){
+            foreach($D in @(Get-ChildItem -LiteralPath $KTemp -Directory -Filter 'role-swap-rearm-dry-*' -ErrorAction SilentlyContinue|Sort-Object LastWriteTimeUtc -Descending|Select-Object -First 5)){
+              Write-Host "dry_dir=$($D.FullName) time=$($D.LastWriteTimeUtc.ToString('o'))"
+              foreach($F in @(Get-ChildItem -LiteralPath $D.FullName -File -ErrorAction SilentlyContinue)){
+                Write-Host "dry_file=$($F.Name) bytes=$($F.Length) time=$($F.LastWriteTimeUtc.ToString('o'))"
+              }
+            }
+            $Repair=Join-Path $KTemp 'role-swap-wingless-rearm-r1.go'
+            if(Test-Path -LiteralPath $Repair -PathType Leaf){
+              $RF=Get-Item -LiteralPath $Repair
+              Write-Host "repair_go=$($RF.FullName) bytes=$($RF.Length) time=$($RF.LastWriteTimeUtc.ToString('o'))"
+            }
+          }
+          foreach($Root in @('C:\ProgramData\CKBR\research-sidecar','C:\ProgramData\CKBR\research-sidecar-yggdrasil')){
+            $A=Get-ChildItem -LiteralPath (Join-Path $Root 'state\archive') -Directory -Filter 'role-swap-r1-*' -ErrorAction SilentlyContinue|Sort-Object LastWriteTimeUtc -Descending|Select-Object -First 1
+            if($null-ne$A){
+              Write-Host "archive_dir=$($A.FullName)"
+              foreach($F in @(Get-ChildItem -LiteralPath $A.FullName -File -ErrorAction SilentlyContinue)){
+                Write-Host "archive_file=$($F.Name) bytes=$($F.Length) time=$($F.LastWriteTimeUtc.ToString('o'))"
+              }
+            }
+          }
           foreach($TaskName in @('CKBPlane Research Sidecar','CKBPlane Research Sidecar Yggdrasil')){
             $Info=Get-ScheduledTaskInfo -TaskName $TaskName -ErrorAction SilentlyContinue
             if($null-ne$Info){Write-Host "task_info name=$TaskName last_run=$($Info.LastRunTime.ToUniversalTime().ToString('o')) last_result=$($Info.LastTaskResult)"}
