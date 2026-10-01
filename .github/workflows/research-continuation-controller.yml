@@ -1,27 +1,28 @@
-name: Wingless repo-local research continuation
+name: Wingless repo-local research autonomy
 
 on:
-  workflow_run:
-    workflows:
-      - Wingless research Windows qualification
-    types:
-      - completed
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: Continuation reason
+        required: false
+        default: manual
+        type: string
+  schedule:
+    - cron: '17 * * * *'
 
 permissions:
   contents: write
-  actions: read
+  actions: write
 
 concurrency:
-  group: wingless-repo-local-continuation-${{ github.event.workflow_run.head_branch }}
+  group: wingless-repo-local-research-autonomy
   cancel-in-progress: false
 
 jobs:
-  continue:
-    if: >
-      github.event.workflow_run.head_repository.full_name == github.repository &&
-      startsWith(github.event.workflow_run.head_branch, 'research/wingless-')
-    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
-    timeout-minutes: 60
+  cycle:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 240
 
     steps:
       - name: Checkout controller
@@ -32,35 +33,71 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Read autonomy switch
-        id: gate
+      - name: Read autonomy configuration
+        id: config
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
-          $ErrorActionPreference = 'Stop'
-          $C = Get-Content -LiteralPath 'controller\.research-autonomy\config.json' -Raw | ConvertFrom-Json
-          if ([string]$C.schema -cne 'research.autonomy.v2') { throw 'AUTONOMY_SCHEMA_INVALID' }
-          if ([string]$C.authority -cne 'repo-local-research') { throw 'AUTONOMY_AUTHORITY_INVALID' }
+          $ErrorActionPreference='Stop'
+          $C=Get-Content -LiteralPath 'controller\.research-autonomy\config.json' -Raw | ConvertFrom-Json
+          if($C.schema -cne 'research.autonomy.v2'){throw "AUTONOMY_SCHEMA_INVALID $($C.schema)"}
+          if($C.program -cne 'Wingless'){throw "AUTONOMY_PROGRAM_INVALID $($C.program)"}
+          if($C.authority -cne 'research-only'){throw "AUTONOMY_AUTHORITY_INVALID $($C.authority)"}
+          if($C.ckb_plane_role -cne 'governance-only'){throw "CKB_PLANE_ROLE_INVALID $($C.ckb_plane_role)"}
           "enabled=$([string]([bool]$C.enabled).ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          "active_branch=$($C.active_branch)" >> $env:GITHUB_OUTPUT
+          "north_star_path=$($C.north_star_path)" >> $env:GITHUB_OUTPUT
+          "north_star_sha256=$($C.north_star_sha256)" >> $env:GITHUB_OUTPUT
+          "controller_workflow=$($C.controller_workflow)" >> $env:GITHUB_OUTPUT
 
-      - name: Checkout completed research head
-        if: steps.gate.outputs.enabled == 'true'
+      - name: Checkout active research branch
+        if: steps.config.outputs.enabled == 'true'
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-          path: target
-          fetch-depth: 0
+          ref: ${{ steps.config.outputs.active_branch }}
+          path: research
           persist-credentials: true
+          fetch-depth: 0
 
-      - name: Continue Wingless research
-        if: steps.gate.outputs.enabled == 'true'
+      - name: Run one bounded research cycle
+        id: cycle
+        if: steps.config.outputs.enabled == 'true'
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          & 'controller\scripts\Invoke-RepoLocalResearchContinuation.ps1' `
-            -RepoPath (Resolve-Path 'target').Path `
+          $ErrorActionPreference='Stop'
+          $Reason=if('${{ github.event_name }}' -ceq 'schedule'){'schedule'}else{'manual'}
+          $Result=Join-Path $env:RUNNER_TEMP 'wingless-repo-local-cycle-result.json'
+          & 'controller\scripts\Invoke-RepoLocalResearchCycle.ps1' `
+            -RepoPath (Resolve-Path 'research').Path `
             -Repository '${{ github.repository }}' `
-            -RunId ${{ github.event.workflow_run.id }} `
-            -HeadBranch '${{ github.event.workflow_run.head_branch }}' `
-            -HeadSha '${{ github.event.workflow_run.head_sha }}' `
-            -Conclusion '${{ github.event.workflow_run.conclusion }}'
+            -ActiveBranch '${{ steps.config.outputs.active_branch }}' `
+            -NorthStarPath '${{ steps.config.outputs.north_star_path }}' `
+            -NorthStarSha256 '${{ steps.config.outputs.north_star_sha256 }}' `
+            -Trigger $Reason `
+            -ResultPath $Result
+          if(-not(Test-Path -LiteralPath $Result -PathType Leaf)){throw 'CYCLE_RESULT_MISSING'}
+          $R=Get-Content -Raw -LiteralPath $Result|ConvertFrom-Json
+          "advanced=$([string]([bool]$R.advanced).ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          "head_sha=$($R.head_sha)" >> $env:GITHUB_OUTPUT
+          "reason=$($R.reason)" >> $env:GITHUB_OUTPUT
+
+      - name: Dispatch next bounded cycle
+        if: steps.config.outputs.enabled == 'true' && steps.cycle.outputs.advanced == 'true'
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $Headers=@{
+            Authorization="Bearer $env:GITHUB_TOKEN"
+            Accept='application/vnd.github+json'
+            'X-GitHub-Api-Version'='2022-11-28'
+            'User-Agent'='wingless-repo-local-autonomy'
+          }
+          $Body=@{
+            ref='main'
+            inputs=@{reason='qualified-chain'}
+          }|ConvertTo-Json -Depth 5
+          Invoke-RestMethod -Method Post -Headers $Headers -ContentType 'application/json' -Body $Body -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ steps.config.outputs.controller_workflow }}/dispatches"
+          Write-Host 'REPO_LOCAL_NEXT_CYCLE_DISPATCHED'
