@@ -83,5 +83,39 @@ jobs:
             if($Cmd.Length-gt800){$Cmd=$Cmd.Substring(0,800)}
             Write-Host "wingless_runner_proc pid=$($P.ProcessId) name=$($P.Name) parent=$($P.ParentProcessId) parent_name=$ParentName created=$Created cmd=$Cmd"
           }
+          $YggRoot='C:\ProgramData\CKBR\research-sidecar-yggdrasil'
+          $YggCfg=Join-Path $YggRoot 'config\autonomy.yaml'
+          $YggPython=Join-Path $YggRoot 'python312\python.exe'
+          $CfgRaw=[IO.File]::ReadAllText($YggCfg)
+          $Match=[regex]::Match($CfgRaw,'(?m)^\s*sqlite_path:\s*["'']?([^\r\n"'']+)["'']?\s*
+          Write-Host 'CKB_PLANE_ROLE_SWAP_WATCH_B_R1=PASS'
+)
+          if($Match.Success){
+            $YggDb=$Match.Groups[1].Value.Trim()
+            if(-not[IO.Path]::IsPathRooted($YggDb)){$YggDb=Join-Path $YggRoot ($YggDb -replace '/','\')}
+            $YggDb=[IO.Path]::GetFullPath($YggDb)
+            $Py=Join-Path $env:RUNNER_TEMP 'ygg-watch-db-r1.py'
+            @'
+            import sqlite3,sys,json
+            db=sqlite3.connect("file:"+sys.argv[1].replace("\\","/")+"?mode=ro",uri=True,timeout=5)
+            try:
+                for table in ("research_cycles","research_cycle_decisions","research_controller_events","research_implementation_contexts","research_implementation_bundles","research_implementation_freezes","research_sidecar_results","research_sidecar_failures","settings"):
+                    try:
+                        cols=[r[1] for r in db.execute("pragma table_info("+table+")")]
+                        if not cols: continue
+                        if table=="settings":
+                            rows=db.execute("select * from settings order by key").fetchall()
+                        else:
+                            rows=db.execute("select * from "+table+" order by rowid desc limit 6").fetchall()
+                        print("DBCOLS "+table+" "+",".join(cols))
+                        for row in rows:
+                            print("DBROW "+table+" "+json.dumps({cols[i]:row[i] for i in range(min(len(cols),len(row)))},sort_keys=True,default=str))
+                    except Exception as e:
+                        print("DBERR "+table+" "+repr(e))
+            finally:
+                db.close()
+            '@|Set-Content -LiteralPath $Py -Encoding UTF8
+            & $YggPython $Py $YggDb
+          }
           Write-Host "codex_count=$(@(Get-Process -Name codex -ErrorAction SilentlyContinue).Count)"
           Write-Host 'CKB_PLANE_ROLE_SWAP_WATCH_B_R1=PASS'
