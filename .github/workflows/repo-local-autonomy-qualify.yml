@@ -1,0 +1,75 @@
+name: Qualify Wingless repo-local autonomy
+
+on:
+  push:
+    branches:
+      - autonomy/repo-local-research-r1
+    paths:
+      - '.research-autonomy/**'
+      - 'scripts/Invoke-RepoLocalResearchCycle.ps1'
+      - '.github/workflows/research-continuation-controller.yml'
+      - '.github/workflows/repo-local-autonomy-qualify.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Parse controller and validate contract
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Path=(Resolve-Path 'scripts\Invoke-RepoLocalResearchCycle.ps1').Path
+          $Tokens=$null
+          $Errors=$null
+          [void][System.Management.Automation.Language.Parser]::ParseFile($Path,[ref]$Tokens,[ref]$Errors)
+          if(@($Errors).Count -gt 0){
+            @($Errors)|ForEach-Object{Write-Host "PARSE_ERROR line=$($_.Extent.StartLineNumber) message=$($_.Message)"}
+            throw "CONTROLLER_PARSE_FAILED count=$(@($Errors).Count)"
+          }
+          $C=Get-Content -Raw '.research-autonomy\config.json'|ConvertFrom-Json
+          if($C.schema -cne 'research.autonomy.v2'){throw 'CONFIG_SCHEMA_FAILED'}
+          if([bool]$C.enabled){throw 'CONFIG_MUST_REMAIN_DISABLED_DURING_QUALIFICATION'}
+          if($C.mode -cne 'repo-local-self-chain'){throw 'CONFIG_MODE_FAILED'}
+          if($C.authority -cne 'research-only'){throw 'CONFIG_AUTHORITY_FAILED'}
+          if($C.ckb_plane_role -cne 'governance-only'){throw 'CONFIG_CKB_ROLE_FAILED'}
+          if($C.active_branch -cne 'research/autonomy-wingless-active'){throw 'CONFIG_ACTIVE_BRANCH_FAILED'}
+          if($C.north_star_sha256 -cne 'efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8'){throw 'CONFIG_NORTH_STAR_IDENTITY_FAILED'}
+          $Text=Get-Content -Raw $Path
+          foreach($Needle in @(
+            'CKB-plane is governance-only',
+            'PREREG_NOT_FIRST_AND_ALONE',
+            'QUALIFICATION_BASELINE_MISMATCH',
+            'qualified-scientific-result',
+            'MIND_PALACE_CONTEXT_UNAVAILABLE_FALLBACK',
+            'RESEARCH_AGENT_ATTEMPT'
+          )){
+            if(-not$Text.Contains($Needle)){throw "CONTROLLER_INVARIANT_MISSING $Needle"}
+          }
+          Write-Host 'WINGLESS_REPO_LOCAL_CONTROLLER_STATIC_PASS'
+
+      - name: Verify Codex runtime
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $P='C:\ProgramData\CKBR\codex\bin\codex.exe'
+          if(-not(Test-Path -LiteralPath $P -PathType Leaf)){throw 'CODEX_RUNTIME_MISSING'}
+          & $P --version
+          if($LASTEXITCODE-ne0){throw "CODEX_VERSION_FAILED exit=$LASTEXITCODE"}
+          Write-Host 'WINGLESS_REPO_LOCAL_CODEX_PASS'
+
+      - name: Full Wingless regression
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          go test ./...
+          if($LASTEXITCODE-ne0){throw "GO_TEST_FAILED exit=$LASTEXITCODE"}
+          Write-Host 'WINGLESS_REPO_LOCAL_FULL_REGRESSION_PASS'
