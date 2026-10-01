@@ -27,7 +27,7 @@ jobs:
           $R=Get-Content -LiteralPath '.\.github\ckb-plane-implementation-audit-b-r1-request.json' -Raw|ConvertFrom-Json
           if([string]$R.schema-cne'ckb-plane.implementation-audit-b-r1.v1' -or -not[bool]$R.read_only){throw 'IMPLEMENTATION_AUDIT_REQUEST_INVALID'}
           $Cycle=[string]$R.cycle_id
-          $Root='C:\ProgramData\CKBR\codex\work'
+          $Root='C:\ProgramData\CKBR'
           $Targets=@(
             Get-ChildItem -LiteralPath $Root -Recurse -File -ErrorAction SilentlyContinue |
               Where-Object { $_.Name -ceq ($Cycle+'.json') -or $_.Name -ceq ($Cycle+'-nemotron.json') }
