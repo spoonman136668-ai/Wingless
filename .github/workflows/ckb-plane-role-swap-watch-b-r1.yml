@@ -1,0 +1,75 @@
+name: CKB Plane Role Swap Watch B R1
+
+on:
+  push:
+    branches:
+      - diagnostic/ckb-plane-role-swap-watch-r1
+    paths:
+      - '.github/ckb-plane-role-swap-watch-b-r1-request.json'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Inspect live research autonomy state read only
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          foreach($Item in @(
+            @{Name='wing';Root='C:\ProgramData\CKBR\research-sidecar';Task='CKBPlane Research Sidecar'},
+            @{Name='ygg';Root='C:\ProgramData\CKBR\research-sidecar-yggdrasil';Task='CKBPlane Research Sidecar Yggdrasil'}
+          )){
+            $Exe=Join-Path $Item.Root 'bin\research-sidecar.exe'
+            $Cfg=Join-Path $Item.Root 'config\autonomy.yaml'
+            $Policy=Join-Path $Item.Root 'config\research-sidecar.yaml'
+            $Runtime=Join-Path $Item.Root 'config\research-runtime.yaml'
+            $Task=Get-ScheduledTask -TaskName $Item.Task -ErrorAction SilentlyContinue
+            $TaskState=if($null-eq$Task){'MISSING'}else{[string]$Task.State}
+            Write-Host "$($Item.Name)_task=$TaskState"
+            if(Test-Path -LiteralPath $Exe -PathType Leaf){
+              Write-Host "$($Item.Name)_binary=$((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant())"
+            }
+            if(Test-Path -LiteralPath $Policy -PathType Leaf){
+              foreach($Line in Get-Content -LiteralPath $Policy){
+                if($Line -match '^\s*planner_model:'){Write-Host "$($Item.Name)_$($Line.Trim())"}
+              }
+            }
+            if(Test-Path -LiteralPath $Runtime -PathType Leaf){
+              $Section=''
+              foreach($Line in Get-Content -LiteralPath $Runtime){
+                if($Line -match '^(planner|implementation):\s*$'){$Section=$Matches[1];continue}
+                if($Section -and $Line -match '^\s+model:\s*(.+?)\s*$'){
+                  Write-Host "$($Item.Name)_$($Section)_model=$($Matches[1])"
+                  $Section=''
+                }
+              }
+            }
+            if((Test-Path -LiteralPath $Exe -PathType Leaf) -and (Test-Path -LiteralPath $Cfg -PathType Leaf)){
+              try{
+                $Raw=& $Exe -mode status -config $Cfg 2>$null
+                if($LASTEXITCODE-eq0){
+                  $S=(($Raw|ForEach-Object{[string]$_})-join[Environment]::NewLine)|ConvertFrom-Json
+                  Write-Host "$($Item.Name)_status=$($S.status)"
+                  Write-Host "$($Item.Name)_cycles=$($S.cycle_count)"
+                  Write-Host "$($Item.Name)_blocked=$($S.blocked_cycle_count)"
+                  Write-Host "$($Item.Name)_last_cycle_id=$($S.last_cycle_id)"
+                  Write-Host "$($Item.Name)_last_cycle_status=$($S.last_cycle_status)"
+                }else{
+                  Write-Host "$($Item.Name)_status_exit=$LASTEXITCODE"
+                }
+              }catch{
+                Write-Host "$($Item.Name)_status_error=$($_.Exception.Message)"
+              }
+            }
+          }
+          Write-Host "codex_count=$(@(Get-Process -Name codex -ErrorAction SilentlyContinue).Count)"
+          Write-Host 'CKB_PLANE_ROLE_SWAP_WATCH_B_R1=PASS'
