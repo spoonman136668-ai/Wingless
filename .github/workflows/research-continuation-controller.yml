@@ -1,0 +1,66 @@
+name: Wingless repo-local research continuation
+
+on:
+  workflow_run:
+    workflows:
+      - Wingless research Windows qualification
+    types:
+      - completed
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: wingless-repo-local-continuation-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  continue:
+    if: >
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      startsWith(github.event.workflow_run.head_branch, 'research/wingless-')
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout controller
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: controller
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Read autonomy switch
+        id: gate
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $C = Get-Content -LiteralPath 'controller\.research-autonomy\config.json' -Raw | ConvertFrom-Json
+          if ([string]$C.schema -cne 'research.autonomy.v2') { throw 'AUTONOMY_SCHEMA_INVALID' }
+          if ([string]$C.authority -cne 'repo-local-research') { throw 'AUTONOMY_AUTHORITY_INVALID' }
+          "enabled=$([string]([bool]$C.enabled).ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+
+      - name: Checkout completed research head
+        if: steps.gate.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          path: target
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Continue Wingless research
+        if: steps.gate.outputs.enabled == 'true'
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          & 'controller\scripts\Invoke-RepoLocalResearchContinuation.ps1' `
+            -RepoPath (Resolve-Path 'target').Path `
+            -Repository '${{ github.repository }}' `
+            -RunId ${{ github.event.workflow_run.id }} `
+            -HeadBranch '${{ github.event.workflow_run.head_branch }}' `
+            -HeadSha '${{ github.event.workflow_run.head_sha }}' `
+            -Conclusion '${{ github.event.workflow_run.conclusion }}'
