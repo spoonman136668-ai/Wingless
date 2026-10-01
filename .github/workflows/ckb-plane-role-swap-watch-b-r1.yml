@@ -71,5 +71,17 @@ jobs:
               }
             }
           }
+          $Procs=@(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue)
+          $ById=@{};foreach($P in $Procs){$ById[[int]$P.ProcessId]=$P}
+          foreach($P in $Procs){
+            $Cmd=[string]$P.CommandLine
+            if($Cmd -notlike '*actions-runner-wingless*_work*_temp*'){continue}
+            $ParentName='unknown'
+            if($ById.ContainsKey([int]$P.ParentProcessId)){$ParentName=[string]$ById[[int]$P.ParentProcessId].Name}
+            $Created=''
+            try{$Created=([Management.ManagementDateTimeConverter]::ToDateTime([string]$P.CreationDate)).ToUniversalTime().ToString('o')}catch{}
+            if($Cmd.Length-gt800){$Cmd=$Cmd.Substring(0,800)}
+            Write-Host "wingless_runner_proc pid=$($P.ProcessId) name=$($P.Name) parent=$($P.ParentProcessId) parent_name=$ParentName created=$Created cmd=$Cmd"
+          }
           Write-Host "codex_count=$(@(Get-Process -Name codex -ErrorAction SilentlyContinue).Count)"
           Write-Host 'CKB_PLANE_ROLE_SWAP_WATCH_B_R1=PASS'
