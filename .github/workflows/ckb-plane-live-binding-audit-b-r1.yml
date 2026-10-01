@@ -1,0 +1,73 @@
+name: CKB Plane Live Binding Audit B R1
+
+on:
+  push:
+    branches:
+      - diagnostic/ckb-plane-role-swap-watch-r1
+    paths:
+      - '.github/ckb-plane-live-binding-audit-b-r1-request.json'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Inspect sidecar bindings and blocked-cycle preimage read only
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $R=Get-Content -LiteralPath '.\.github\ckb-plane-live-binding-audit-b-r1-request.json' -Raw|ConvertFrom-Json
+          if([string]$R.schema-cne'ckb-plane.live-binding-audit-b-r1.v1' -or -not[bool]$R.read_only){throw 'LIVE_BINDING_AUDIT_REQUEST_INVALID'}
+          foreach($Item in @(
+            @{Name='wing';Root='C:\ProgramData\CKBR\research-sidecar';Task='CKBPlane Research Sidecar'},
+            @{Name='ygg';Root='C:\ProgramData\CKBR\research-sidecar-yggdrasil';Task='CKBPlane Research Sidecar Yggdrasil'}
+          )){
+            $Exe=Join-Path $Item.Root 'bin\research-sidecar.exe'
+            $Life=Join-Path $Item.Root 'ops\Lifecycle.ps1'
+            $Cfg=Join-Path $Item.Root 'config\autonomy.yaml'
+            Write-Host "$($Item.Name)_task=$((Get-ScheduledTask -TaskName $Item.Task).State)"
+            Write-Host "$($Item.Name)_binary=$((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant())"
+            foreach($Line in Get-Content -LiteralPath $Life){
+              if($Line -match '^\s*\$Expected(Head|Binary|WinglessBinary)='){Write-Host "$($Item.Name)_life=$($Line.Trim())"}
+            }
+            $Raw=& $Exe -mode status -config $Cfg 2>$null
+            if($LASTEXITCODE-ne0){throw "$($Item.Name)_STATUS_FAILED"}
+            $S=(($Raw|ForEach-Object{[string]$_})-join[Environment]::NewLine)|ConvertFrom-Json
+            Write-Host "$($Item.Name)_status=$($S.status)"
+          }
+          $WingRoot='C:\ProgramData\CKBR\research-sidecar'
+          $Cfg=Join-Path $WingRoot 'config\autonomy.yaml'
+          $CfgRaw=[IO.File]::ReadAllText($Cfg)
+          $M=[regex]::Match($CfgRaw,'(?m)^\s*sqlite_path:\s*["'']?([^\r\n"'']+)["'']?\s*$')
+          if(-not$M.Success){throw 'LIVE_BINDING_AUDIT_DB_PATH_INVALID'}
+          $Db=$M.Groups[1].Value.Trim()
+          if(-not[IO.Path]::IsPathRooted($Db)){$Db=Join-Path $WingRoot ($Db-replace'/','\')}
+          $Py=Join-Path $env:RUNNER_TEMP 'live-binding-audit.py'
+          @'
+          import sqlite3,sys,json
+          cycle="RSL-e24f879e92e84fa04c5b6e5f6b58d87a"
+          db=sqlite3.connect("file:"+sys.argv[1].replace("\","/")+"?mode=ro",uri=True,timeout=5)
+          try:
+              row=db.execute("select raw,revision from research_cycles where id=?",(cycle,)).fetchone()
+              if not row: raise RuntimeError("cycle missing")
+              c=json.loads(row[0]);print("CYCLE "+json.dumps({"status":c.get("status"),"revision":c.get("revision"),"review":c.get("requires_human_review")},sort_keys=True))
+              for table in ("research_sidecar_failures","research_implementation_contexts","research_implementation_bundles","research_implementation_freezes","research_sidecar_results"):
+                  n=db.execute("select count(*) from "+table+" where cycle_id=?",(cycle,)).fetchone()[0]
+                  print("COUNT "+table+"="+str(n))
+              rows=db.execute("select reason,created from research_sidecar_failures where cycle_id=?",(cycle,)).fetchall()
+              for row in rows: print("FAILURE "+json.dumps({"reason":row[0],"created":row[1]},sort_keys=True))
+          finally:
+              db.close()
+          '@|Set-Content -LiteralPath $Py -Encoding UTF8
+          & 'C:\ProgramData\CKBR\research-sidecar-yggdrasil\python312\python.exe' $Py $Db
+          Write-Host 'sidecar_mutation=False'
+          Write-Host 'research_state_mutation=False'
+          Write-Host 'CKB_PLANE_LIVE_BINDING_AUDIT_B_R1=PASS'
