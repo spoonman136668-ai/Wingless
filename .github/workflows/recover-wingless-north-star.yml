@@ -1,0 +1,26 @@
+name: Recover Wingless frozen North Star
+
+on:
+  push:
+    branches:
+      - cutover/repo-local-autonomy-r1
+    paths:
+      - '.github/workflows/recover-wingless-north-star.yml'
+      - 'scripts/Recover-WinglessNorthStar.ps1'
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Recover exact frozen North Star
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          ./scripts/Recover-WinglessNorthStar.ps1
