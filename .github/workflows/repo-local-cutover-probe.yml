@@ -8,6 +8,7 @@ on:
       - '.github/workflows/repo-local-cutover-probe.yml'
       - 'scripts/Probe-RepoLocalCutover.ps1'
       - 'scripts/Probe-RepoLocalLatest.ps1'
+      - 'scripts/probe_repo_local_cutover.py'
 
 permissions:
   contents: read
@@ -24,4 +25,4 @@ jobs:
       - name: Inspect sidecar handoff state
         shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
         run: |
-          ./scripts/Probe-RepoLocalCutover.ps1
+          & 'C:\\ProgramData\\CKBR\\research-sidecar-yggdrasil\\python312\\python.exe' './scripts/probe_repo_local_cutover.py'
