@@ -258,8 +258,8 @@ jobs:
             $YggRuntime=[IO.File]::ReadAllText($Ygg.Runtime)
             foreach($Text in @($WingPolicy,$YggPolicy)){if($Text-notmatch'(?m)^planner_model:\s*gpt-5\.6-sol\s*$'){throw 'ROLE_SWAP_RECOVERY_POLICY_POST_BINDING_INVALID'}}
             foreach($Text in @($WingRuntime,$YggRuntime)){
-              if($Text-notmatch"(?ms)^planner:\s*.*?model:\s*['\"]?gpt-5\.6-sol['\"]?"){throw 'ROLE_SWAP_RECOVERY_RUNTIME_PLANNER_POST_INVALID'}
-              if($Text-notmatch"(?ms)^implementation:\s*.*?model:\s*['\"]?nvidia/nemotron-3-ultra-550b-a55b:free['\"]?"){throw 'ROLE_SWAP_RECOVERY_RUNTIME_IMPLEMENTATION_POST_INVALID'}
+              if($Text-notmatch'(?ms)^planner:\s*.*?model:\s*[''"]?gpt-5\.6-sol[''"]?'){throw 'ROLE_SWAP_RECOVERY_RUNTIME_PLANNER_POST_INVALID'}
+              if($Text-notmatch'(?ms)^implementation:\s*.*?model:\s*[''"]?nvidia/nemotron-3-ultra-550b-a55b:free[''"]?'){throw 'ROLE_SWAP_RECOVERY_RUNTIME_IMPLEMENTATION_POST_INVALID'}
             }
           }catch{
             $Failure=$_.Exception.Message
