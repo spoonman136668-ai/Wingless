@@ -84,11 +84,20 @@ jobs:
           }
 
           $Procs=@(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue)
-          foreach($Name in @('research-sidecar.exe','codex.exe','powershell.exe','go.exe')){
-            foreach($P in @($Procs|Where-Object{$_.Name-ieq$Name})){
-              $Cmd=[string]$P.CommandLine
-              if($Cmd.Length-gt400){$Cmd=$Cmd.Substring(0,400)}
-              Write-Host "proc name=$Name pid=$($P.ProcessId) parent=$($P.ParentProcessId) cmd=$Cmd"
-            }
+          $ById=@{};foreach($P in $Procs){$ById[[int]$P.ProcessId]=$P}
+          foreach($P in $Procs){
+            $Cmd=[string]$P.CommandLine
+            $Name=[string]$P.Name
+            $Interesting=($Name -in @('research-sidecar.exe','codex.exe','powershell.exe','go.exe')) -or
+              ($Cmd -match 'role-swap|rearm|go-build|actions-runner-ktrade')
+            if(-not$Interesting){continue}
+            $ParentName='unknown'
+            if($ById.ContainsKey([int]$P.ParentProcessId)){$ParentName=[string]$ById[[int]$P.ParentProcessId].Name}
+            if($Cmd.Length-gt700){$Cmd=$Cmd.Substring(0,700)}
+            Write-Host "proc name=$Name pid=$($P.ProcessId) parent=$($P.ParentProcessId) parent_name=$ParentName cmd=$Cmd"
+          }
+          foreach($TaskName in @('CKBPlane Research Sidecar','CKBPlane Research Sidecar Yggdrasil')){
+            $Info=Get-ScheduledTaskInfo -TaskName $TaskName -ErrorAction SilentlyContinue
+            if($null-ne$Info){Write-Host "task_info name=$TaskName last_run=$($Info.LastRunTime.ToUniversalTime().ToString('o')) last_result=$($Info.LastTaskResult)"}
           }
           Write-Host 'CKB_PLANE_ROLE_SWAP_WATCH_R1=PASS'
