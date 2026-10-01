@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $Expected='efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8'
-$Roots=@('C:\ProgramData\CKBR\codex\work\rs','C:\ProgramData\CKBR\research-sidecar')
+$Roots=@('C:\ProgramData\CKBR','C:\actions-runner-wingless','C:\actions-runner-up-b','C:\actions-runner-up-c')
 $Found=$null
 
 function Get-CanonicalHash([string]$Path){
