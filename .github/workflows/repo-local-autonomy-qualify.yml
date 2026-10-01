@@ -55,6 +55,9 @@ jobs:
           )){
             if(-not$Text.Contains($Needle)){throw "CONTROLLER_INVARIANT_MISSING $Needle"}
           }
+          if(-not$Text.Contains("'--approve-for-me'")){throw 'CODEX_APPROVE_FOR_ME_MISSING'}
+          if($Text.Contains("'--sandbox','workspace-write','--approve-for-me'")){throw 'CODEX_MUTUALLY_EXCLUSIVE_FLAGS_PRESENT'}
+          if($Text.Contains('--full-auto')){throw 'OBSOLETE_CODEX_FULL_AUTO_PRESENT'}
           Write-Host 'WINGLESS_REPO_LOCAL_CONTROLLER_STATIC_PASS'
 
       - name: Verify Codex runtime
