@@ -96,6 +96,24 @@ jobs:
             if($Cmd.Length-gt700){$Cmd=$Cmd.Substring(0,700)}
             Write-Host "proc name=$Name pid=$($P.ProcessId) parent=$($P.ParentProcessId) parent_name=$ParentName cmd=$Cmd"
           }
+          $CutoverShell=@($Procs|Where-Object{$_.Name-ieq'powershell.exe' -and ([string]$_.CommandLine) -like '*actions-runner-ktrade*_temp*'})
+          foreach($RootProc in $CutoverShell){
+            Write-Host "cutover_root pid=$($RootProc.ProcessId)"
+            $Queue=New-Object System.Collections.Generic.Queue[int]
+            $Queue.Enqueue([int]$RootProc.ProcessId)
+            $Seen=@{}
+            while($Queue.Count-gt0){
+              $ParentId=$Queue.Dequeue()
+              if($Seen.ContainsKey($ParentId)){continue}
+              $Seen[$ParentId]=$true
+              foreach($Child in @($Procs|Where-Object{[int]$_.ParentProcessId-eq$ParentId})){
+                $CC=[string]$Child.CommandLine
+                if($CC.Length-gt900){$CC=$CC.Substring(0,900)}
+                Write-Host "desc pid=$($Child.ProcessId) name=$($Child.Name) parent=$($Child.ParentProcessId) cmd=$CC"
+                $Queue.Enqueue([int]$Child.ProcessId)
+              }
+            }
+          }
           $KTemp='C:\actions-runner-ktrade\_work\_temp'
           if(Test-Path -LiteralPath $KTemp -PathType Container){
             foreach($D in @(Get-ChildItem -LiteralPath $KTemp -Directory -Filter 'role-swap-rearm-dry-*' -ErrorAction SilentlyContinue|Sort-Object LastWriteTimeUtc -Descending|Select-Object -First 5)){
