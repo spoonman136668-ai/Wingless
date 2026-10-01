@@ -1,0 +1,28 @@
+name: Wingless repo-local authority cutover
+
+on:
+  push:
+    branches:
+      - cutover/repo-local-wingless-r1
+    paths:
+      - 'scripts/Invoke-WinglessRepoLocalCutover.ps1'
+      - '.github/workflows/repo-local-authority-cutover.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cutover:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Cut over Wingless research authority
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./scripts/Invoke-WinglessRepoLocalCutover.ps1
