@@ -162,35 +162,35 @@ jobs:
 
           $PyScript=Join-Path $env:RUNNER_TEMP 'role-swap-rearm-r1.py'
           @'
-import sqlite3, sys
-db_path, source, cycle = sys.argv[1:4]
-db = sqlite3.connect(db_path, timeout=5.0, isolation_level=None)
-try:
-    db.execute("PRAGMA busy_timeout=5000")
-    db.execute("BEGIN IMMEDIATE")
-    successor = db.execute("SELECT successor_cycle_id FROM research_cycle_supersessions WHERE source_cycle_id=?", (source,)).fetchone()
-    if not successor or successor[0] != cycle:
-        raise RuntimeError("supersession binding drift")
-    row = db.execute("SELECT reason FROM research_sidecar_failures WHERE cycle_id=?", (cycle,)).fetchone()
-    if not row or row[0] != "RESEARCH_CODEX_BUNDLE_INVALID_ALL_TIERS":
-        raise RuntimeError("successor failure drift: "+repr(row))
-    def count(table, cid):
-        return db.execute("SELECT count(*) FROM "+table+" WHERE cycle_id=?", (cid,)).fetchone()[0]
-    if count("research_implementation_contexts", cycle) != 1: raise RuntimeError("context drift")
-    if count("research_implementation_bundles", cycle) != 0: raise RuntimeError("bundle unexpectedly sealed")
-    if count("research_implementation_freezes", cycle) != 0: raise RuntimeError("freeze unexpectedly sealed")
-    if count("research_sidecar_results", cycle) != 0: raise RuntimeError("unexpected result")
-    if count("research_sidecar_failures", source) != 1: raise RuntimeError("source historical failure missing")
-    cur = db.execute("DELETE FROM research_sidecar_failures WHERE cycle_id=?", (cycle,))
-    if cur.rowcount != 1: raise RuntimeError("failure delete count")
-    db.execute("INSERT OR REPLACE INTO settings(key,value) VALUES('research_sidecar_status',?)", (cycle+": IMPLEMENTATION_REGENERATION_REQUIRED",))
-    db.execute("COMMIT")
-    print("context_preserved=1")
-    print("successor_failure_removed=1")
-    print("source_historical_failure_preserved=1")
-finally:
-    db.close()
-'@|Set-Content -LiteralPath $PyScript -Encoding UTF8
+          import sqlite3, sys
+          db_path, source, cycle = sys.argv[1:4]
+          db = sqlite3.connect(db_path, timeout=5.0, isolation_level=None)
+          try:
+              db.execute("PRAGMA busy_timeout=5000")
+              db.execute("BEGIN IMMEDIATE")
+              successor = db.execute("SELECT successor_cycle_id FROM research_cycle_supersessions WHERE source_cycle_id=?", (source,)).fetchone()
+              if not successor or successor[0] != cycle:
+                  raise RuntimeError("supersession binding drift")
+              row = db.execute("SELECT reason FROM research_sidecar_failures WHERE cycle_id=?", (cycle,)).fetchone()
+              if not row or row[0] != "RESEARCH_CODEX_BUNDLE_INVALID_ALL_TIERS":
+                  raise RuntimeError("successor failure drift: "+repr(row))
+              def count(table, cid):
+                  return db.execute("SELECT count(*) FROM "+table+" WHERE cycle_id=?", (cid,)).fetchone()[0]
+              if count("research_implementation_contexts", cycle) != 1: raise RuntimeError("context drift")
+              if count("research_implementation_bundles", cycle) != 0: raise RuntimeError("bundle unexpectedly sealed")
+              if count("research_implementation_freezes", cycle) != 0: raise RuntimeError("freeze unexpectedly sealed")
+              if count("research_sidecar_results", cycle) != 0: raise RuntimeError("unexpected result")
+              if count("research_sidecar_failures", source) != 1: raise RuntimeError("source historical failure missing")
+              cur = db.execute("DELETE FROM research_sidecar_failures WHERE cycle_id=?", (cycle,))
+              if cur.rowcount != 1: raise RuntimeError("failure delete count")
+              db.execute("INSERT OR REPLACE INTO settings(key,value) VALUES('research_sidecar_status',?)", (cycle+": IMPLEMENTATION_REGENERATION_REQUIRED",))
+              db.execute("COMMIT")
+              print("context_preserved=1")
+              print("successor_failure_removed=1")
+              print("source_historical_failure_preserved=1")
+          finally:
+              db.close()
+          '@|Set-Content -LiteralPath $PyScript -Encoding UTF8
 
           $Dry=Join-Path $env:RUNNER_TEMP ('role-swap-python-dry-'+[Guid]::NewGuid().ToString('N'))
           New-Item -ItemType Directory -Force -Path $Dry|Out-Null
