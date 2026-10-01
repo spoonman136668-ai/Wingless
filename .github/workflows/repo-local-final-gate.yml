@@ -1,0 +1,36 @@
+name: Wingless repo-local final activation gate
+
+on:
+  push:
+    branches:
+      - cutover/repo-local-autonomy-r1
+    paths:
+      - '.github/workflows/repo-local-final-gate.yml'
+      - 'scripts/Test-RepoLocalFinalGate.ps1'
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 60
+    steps:
+      - name: Checkout controller main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: controller
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout frozen active research
+        uses: actions/checkout@v4
+        with:
+          ref: research/autonomy-wingless-active
+          path: research
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Run final integration gate
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          ./controller/scripts/Test-RepoLocalFinalGate.ps1
