@@ -1,6 +1,18 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 
+function Test-GitCommit {
+  param([string]$Repo,[string]$Spec)
+  $Old=$ErrorActionPreference
+  try{
+    $ErrorActionPreference='SilentlyContinue'
+    & git -C $Repo cat-file -e $Spec 2>$null
+    return ($LASTEXITCODE -eq 0)
+  } finally {
+    $ErrorActionPreference=$Old
+  }
+}
+
 $Specs=@(
   [pscustomobject]@{
     Name='wing'
@@ -65,8 +77,7 @@ finally:
       if($Sha-notmatch'^[0-9a-f]{40}$'){throw "LATEST_SOURCE_SHA_INVALID $($S.Name)"}
       $CommitSpec=$Sha+'^{commit}'
       $RepoForCommit=$null
-      & git -C $S.Source cat-file -e $CommitSpec 2>$null
-      if($LASTEXITCODE-eq0){
+      if(Test-GitCommit -Repo $S.Source -Spec $CommitSpec){
         $RepoForCommit=$S.Source
       } else {
         Write-Host "LATEST_SOURCE_CANONICAL_MISSING name=$($S.Name) sha=$Sha"
@@ -82,8 +93,7 @@ finally:
             $Repo=if($Mark.PSIsContainer){$Mark.Parent.FullName}else{$Mark.DirectoryName}
             if([string]::IsNullOrWhiteSpace($Repo) -or $Seen.Contains($Repo)){continue}
             [void]$Seen.Add($Repo)
-            & git -C $Repo cat-file -e $CommitSpec 2>$null
-            if($LASTEXITCODE-eq0){
+            if(Test-GitCommit -Repo $Repo -Spec $CommitSpec){
               Write-Host "LATEST_SOURCE_FOUND name=$($S.Name) sha=$Sha repo=$Repo"
               if($null-eq$RepoForCommit){$RepoForCommit=$Repo}
             }
@@ -102,8 +112,7 @@ finally:
         Write-Host 'LATEST_FILES_END'
         foreach($Path in $S.Inspect){
           $BlobSpec=$Sha+':'+$Path
-          & git -C $RepoForCommit cat-file -e $BlobSpec 2>$null
-          if($LASTEXITCODE-ne0){continue}
+          if(-not(Test-GitCommit -Repo $RepoForCommit -Spec $BlobSpec)){continue}
           Write-Host "INSPECT_BEGIN $Path"
           & git -C $RepoForCommit show $BlobSpec
           Write-Host "INSPECT_END $Path"
