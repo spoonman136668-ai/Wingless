@@ -1,5 +1,6 @@
 import json
 import os
+import hashlib
 import sqlite3
 import subprocess
 import sys
@@ -111,6 +112,11 @@ for spec in SPECS:
     freeze = parse_raw(rows.get("research_implementation_freezes"))
     cycle = parse_raw(rows.get("research_cycles"))
     print("NORTH_STAR name="+spec["name"]+" value="+json.dumps(latest.get("north_star",{}),sort_keys=True))
+    result_row=rows.get("research_sidecar_results") or {}
+    print("RESULT_META name="+spec["name"]+" result_sha256="+str(result_row.get("result_sha256",""))+" observation_sha256="+str(result_row.get("observation_sha256","")))
+    evidence_list=latest.get("evidence") or []
+    if evidence_list:
+        print("EVIDENCE_DECLARED name="+spec["name"]+" value="+json.dumps(evidence_list[0],sort_keys=True))
     for label, obj in (("result", latest), ("freeze", freeze), ("cycle", cycle)):
         print(
             "ROW"
@@ -164,6 +170,26 @@ for spec in SPECS:
             show_file(latest_repo, latest_sha, path)
     elif latest_sha:
         print(f"LATEST_SOURCE_NOT_FOUND name={spec['name']} sha={latest_sha}")
+
+    wanted=str((rows.get("research_sidecar_results") or {}).get("result_sha256","")).lower()
+    if wanted:
+        evidence_roots=[r"C:\\ProgramData\\CKBR\\codex\\work\\rs",r"C:\\ProgramData\\CKBR\\research-sidecar",r"C:\\ProgramData\\CKBR\\research-sidecar-yggdrasil"]
+        found=[]
+        for root in evidence_roots:
+            if not os.path.isdir(root):
+                continue
+            for current, dirs, files in os.walk(root):
+                if "result.json" not in files:
+                    continue
+                p=os.path.join(current,"result.json")
+                try:
+                    h=hashlib.sha256(open(p,"rb").read()).hexdigest()
+                except OSError:
+                    continue
+                if h==wanted:
+                    found.append(p)
+        for p in sorted(set(found)):
+            print(f"EVIDENCE_FOUND name={spec['name']} path={p} sha256={wanted}")
 
 for p in (
     r"C:\ProgramData\CKBR\codex\bin\codex.exe",
