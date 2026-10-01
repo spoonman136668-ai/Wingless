@@ -64,22 +64,50 @@ finally:
       $Sha=[string]$R.source_head
       if($Sha-notmatch'^[0-9a-f]{40}$'){throw "LATEST_SOURCE_SHA_INVALID $($S.Name)"}
       $CommitSpec=$Sha+'^{commit}'
-      & git -C $S.Source cat-file -e $CommitSpec
-      if($LASTEXITCODE-ne0){throw "LATEST_SOURCE_COMMIT_MISSING name=$($S.Name) sha=$Sha"}
-      $TreeSpec=$Sha+'^{tree}'
-      $Tree=(& git -C $S.Source rev-parse $TreeSpec).Trim()
-      Write-Host "LATEST_SOURCE name=$($S.Name) sha=$Sha tree=$Tree"
-      & git -C $S.Source show -s --pretty='format:LATEST_LOG %H %ct %s' $Sha
-      Write-Host 'LATEST_FILES_BEGIN'
-      & git -C $S.Source diff-tree --no-commit-id --name-only -r $Sha
-      Write-Host 'LATEST_FILES_END'
-      foreach($Path in $S.Inspect){
-        $BlobSpec=$Sha+':'+$Path
-        & git -C $S.Source cat-file -e $BlobSpec 2>$null
-        if($LASTEXITCODE-ne0){continue}
-        Write-Host "INSPECT_BEGIN $Path"
-        & git -C $S.Source show $BlobSpec
-        Write-Host "INSPECT_END $Path"
+      $RepoForCommit=$null
+      & git -C $S.Source cat-file -e $CommitSpec 2>$null
+      if($LASTEXITCODE-eq0){
+        $RepoForCommit=$S.Source
+      } else {
+        Write-Host "LATEST_SOURCE_CANONICAL_MISSING name=$($S.Name) sha=$Sha"
+        $Roots=if($S.Name -eq 'wing'){
+          @('C:\ProgramData\CKBR\codex\work','C:\ProgramData\CKBR\research-sidecar')
+        }else{
+          @('C:\ProgramData\CKBR\research-sidecar-yggdrasil')
+        }
+        $Seen=New-Object Collections.Generic.HashSet[string] ([StringComparer]::OrdinalIgnoreCase)
+        foreach($Root in $Roots){
+          if(-not(Test-Path -LiteralPath $Root -PathType Container)){continue}
+          foreach($Mark in @(Get-ChildItem -LiteralPath $Root -Force -Recurse -ErrorAction SilentlyContinue | Where-Object {$_.Name -eq '.git'})){
+            $Repo=if($Mark.PSIsContainer){$Mark.Parent.FullName}else{$Mark.DirectoryName}
+            if([string]::IsNullOrWhiteSpace($Repo) -or $Seen.Contains($Repo)){continue}
+            [void]$Seen.Add($Repo)
+            & git -C $Repo cat-file -e $CommitSpec 2>$null
+            if($LASTEXITCODE-eq0){
+              Write-Host "LATEST_SOURCE_FOUND name=$($S.Name) sha=$Sha repo=$Repo"
+              if($null-eq$RepoForCommit){$RepoForCommit=$Repo}
+            }
+          }
+        }
+      }
+      if($null-eq$RepoForCommit){
+        Write-Host "LATEST_SOURCE_COMMIT_UNLOCATED name=$($S.Name) sha=$Sha"
+      } else {
+        $TreeSpec=$Sha+'^{tree}'
+        $Tree=(& git -C $RepoForCommit rev-parse $TreeSpec).Trim()
+        Write-Host "LATEST_SOURCE name=$($S.Name) sha=$Sha tree=$Tree repo=$RepoForCommit"
+        & git -C $RepoForCommit show -s --pretty='format:LATEST_LOG %H %ct %s' $Sha
+        Write-Host 'LATEST_FILES_BEGIN'
+        & git -C $RepoForCommit diff-tree --no-commit-id --name-only -r $Sha
+        Write-Host 'LATEST_FILES_END'
+        foreach($Path in $S.Inspect){
+          $BlobSpec=$Sha+':'+$Path
+          & git -C $RepoForCommit cat-file -e $BlobSpec 2>$null
+          if($LASTEXITCODE-ne0){continue}
+          Write-Host "INSPECT_BEGIN $Path"
+          & git -C $RepoForCommit show $BlobSpec
+          Write-Host "INSPECT_END $Path"
+        }
       }
     }
     $Index++
