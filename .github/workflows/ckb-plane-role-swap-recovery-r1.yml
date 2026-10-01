@@ -1,0 +1,295 @@
+name: CKB Plane Role Swap Recovery R1
+
+on:
+  push:
+    branches:
+      - diagnostic/ckb-plane-role-swap-watch-r1
+    paths:
+      - '.github/ckb-plane-role-swap-recovery-r1-request.json'
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: [self-hosted, Windows, X64, wingless-research-safe]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Recover timed-out role swap and complete bounded cutover
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+
+          $Req=Get-Content -LiteralPath '.\.github\ckb-plane-role-swap-recovery-r1-request.json' -Raw|ConvertFrom-Json
+          if([string]$Req.schema-cne'wingless.ckb-plane-role-swap-recovery-r1.v1'){throw 'ROLE_SWAP_RECOVERY_SCHEMA_INVALID'}
+          if(-not[bool]$Req.authorize_bounded_recovery){throw 'ROLE_SWAP_RECOVERY_NOT_AUTHORIZED'}
+          if([bool]$Req.authorize_accepted_ref_mutation -or [bool]$Req.authorize_broker_access -or [bool]$Req.authorize_cross_project_scientific_execution -or [bool]$Req.ktrade_stop){throw 'ROLE_SWAP_RECOVERY_AUTHORITY_WIDENED'}
+
+          $QualifiedRun=36842567891
+          $QualifiedHead='2a8f084a5563f29c435314535bbb21770ee9b707'
+          $OldHead='338b0a7004ecf2d1fd99aceb17e4cae8b428a513'
+          $OldHash='2fbf20c78c8744ed3cf9229c160a9e32bd562850250b1a3500056b4901115a3b'
+          $NewHash='8c742c6cc16ebb4a6ddb0cc77262bcfee81b8471b9e9a8768b645f4e69332432'
+          $Candidate='C:\ProgramData\CKBR\codex\work\q\RS1CAND-35756-7b270d4a453f4ca79f748ba284b1275f'
+          $CandidateExe=Join-Path $Candidate 'bin\research-sidecar.exe'
+          $CandidateProof=Join-Path $Candidate 'research-sidecar-proof.json'
+          $SourceCycle='WINGLESS-LM-LM9C-AUTONOMY-BOOTSTRAP'
+          $Cycle='WINGLESS-LM-LM9D-CARDINALITY-R1'
+          $OldPlanner='nvidia/nemotron-3-ultra-550b-a55b:free'
+          $NewPlanner='gpt-5.6-sol'
+          $OldImplementation='unused-dedicated-codex-cli'
+          $NewImplementation='nvidia/nemotron-3-ultra-550b-a55b:free'
+          $WingRoot='C:\ProgramData\CKBR\research-sidecar'
+          $YggRoot='C:\ProgramData\CKBR\research-sidecar-yggdrasil'
+          $WingTask='CKBPlane Research Sidecar'
+          $YggTask='CKBPlane Research Sidecar Yggdrasil'
+          $Python='C:\ProgramData\CKBR\research-sidecar-yggdrasil\python312\python.exe'
+          $Utf8=New-Object Text.UTF8Encoding($false)
+
+          if([long]$Req.qualification_run_id-ne$QualifiedRun -or [string]$Req.qualified_head-cne$QualifiedHead -or [string]$Req.expected_binary_sha256-cne$NewHash){
+            throw 'ROLE_SWAP_RECOVERY_QUALIFICATION_BINDING_INVALID'
+          }
+          foreach($P in @($CandidateExe,$CandidateProof,$Python)){
+            if(-not(Test-Path -LiteralPath $P -PathType Leaf)){throw "ROLE_SWAP_RECOVERY_PREREQUISITE_MISSING path=$P"}
+          }
+          if((Get-FileHash -LiteralPath $CandidateExe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$NewHash){throw 'ROLE_SWAP_RECOVERY_CANDIDATE_HASH_INVALID'}
+
+          function Paths([string]$Root){
+            return @{
+              Exe=(Join-Path $Root 'bin\research-sidecar.exe')
+              Life=(Join-Path $Root 'ops\Lifecycle.ps1')
+              Policy=(Join-Path $Root 'config\research-sidecar.yaml')
+              Runtime=(Join-Path $Root 'config\research-runtime.yaml')
+              Autonomy=(Join-Path $Root 'config\autonomy.yaml')
+              Stage=(Join-Path $Root 'stage.json')
+            }
+          }
+          function ConfiguredDb([string]$Root,[string]$Cfg){
+            $Raw=[IO.File]::ReadAllText($Cfg)
+            $M=[regex]::Match($Raw,'(?m)^\s*sqlite_path:\s*["'']?([^\r\n"'']+)["'']?\s*$')
+            if(-not$M.Success){throw "ROLE_SWAP_RECOVERY_DB_PATH_INVALID cfg=$Cfg"}
+            $P=$M.Groups[1].Value.Trim()
+            if([IO.Path]::IsPathRooted($P)){return [IO.Path]::GetFullPath($P)}
+            return [IO.Path]::GetFullPath((Join-Path $Root ($P -replace '/','\')))
+          }
+          function Assert-OldConfig([hashtable]$P){
+            $Policy=[IO.File]::ReadAllText($P.Policy)
+            $Runtime=[IO.File]::ReadAllText($P.Runtime)
+            if(([regex]::Matches($Policy,'(?m)^planner_model:\s*'+[regex]::Escape($OldPlanner)+'\s*$')).Count-ne1){throw "ROLE_SWAP_RECOVERY_OLD_POLICY_DRIFT path=$($P.Policy)"}
+            $Planner='(?ms)(^planner:\s*\r?\n(?:^[ \t]+.*\r?\n)*?^[ \t]+model:\s*[''"]?)'+[regex]::Escape($OldPlanner)+'([''"]?\s*$)'
+            $Impl='(?ms)(^implementation:\s*\r?\n(?:^[ \t]+.*\r?\n)*?^[ \t]+model:\s*[''"]?)'+[regex]::Escape($OldImplementation)+'([''"]?\s*$)'
+            if(([regex]::Matches($Runtime,$Planner)).Count-ne1){throw "ROLE_SWAP_RECOVERY_OLD_PLANNER_DRIFT path=$($P.Runtime)"}
+            if(([regex]::Matches($Runtime,$Impl)).Count-ne1){throw "ROLE_SWAP_RECOVERY_OLD_IMPLEMENTATION_DRIFT path=$($P.Runtime)"}
+          }
+          function Patch-Config([hashtable]$P){
+            $Policy=[IO.File]::ReadAllText($P.Policy)
+            $Runtime=[IO.File]::ReadAllText($P.Runtime)
+            $PolicyPattern='(?m)^planner_model:\s*'+[regex]::Escape($OldPlanner)+'\s*$'
+            $Policy=[regex]::Replace($Policy,$PolicyPattern,'planner_model: '+$NewPlanner,1)
+            $Planner='(?ms)(^planner:\s*\r?\n(?:^[ \t]+.*\r?\n)*?^[ \t]+model:\s*[''"]?)'+[regex]::Escape($OldPlanner)+'([''"]?\s*$)'
+            $Impl='(?ms)(^implementation:\s*\r?\n(?:^[ \t]+.*\r?\n)*?^[ \t]+model:\s*[''"]?)'+[regex]::Escape($OldImplementation)+'([''"]?\s*$)'
+            $Runtime=[regex]::Replace($Runtime,$Planner,'$1'+$NewPlanner+'$2',1)
+            $Runtime=[regex]::Replace($Runtime,$Impl,'$1'+$NewImplementation+'$2',1)
+            [IO.File]::WriteAllText($P.Policy,$Policy,$Utf8)
+            [IO.File]::WriteAllText($P.Runtime,$Runtime,$Utf8)
+          }
+          function Patch-Life([string]$Path,[bool]$IsYgg){
+            $Text=[IO.File]::ReadAllText($Path)
+            $Dollar=[char]36
+            $OldHeadLine=$Dollar+"ExpectedHead='"+$OldHead+"'"
+            $OldBinLine=$Dollar+"ExpectedBinary='"+$OldHash+"'"
+            if(-not$Text.Contains($OldHeadLine) -or -not$Text.Contains($OldBinLine)){throw "ROLE_SWAP_RECOVERY_LIFECYCLE_DRIFT path=$Path"}
+            $Text=$Text.Replace($OldHeadLine,$Dollar+"ExpectedHead='"+$QualifiedHead+"'").Replace($OldBinLine,$Dollar+"ExpectedBinary='"+$NewHash+"'")
+            if($IsYgg){
+              $OldWing=$Dollar+"ExpectedWinglessBinary='"+$OldHash+"'"
+              if(-not$Text.Contains($OldWing)){throw 'ROLE_SWAP_RECOVERY_YGG_WING_BINDING_DRIFT'}
+              $Text=$Text.Replace($OldWing,$Dollar+"ExpectedWinglessBinary='"+$NewHash+"'")
+            }
+            [IO.File]::WriteAllText($Path,$Text,$Utf8)
+          }
+          function Archive-State([hashtable]$P,[string]$Db,[string]$Archive){
+            New-Item -ItemType Directory -Force -Path $Archive|Out-Null
+            foreach($Pair in @(
+              @($P.Exe,'research-sidecar.exe'),
+              @($P.Life,'Lifecycle.ps1'),
+              @($P.Policy,'research-sidecar.yaml'),
+              @($P.Runtime,'research-runtime.yaml')
+            )){Copy-Item -LiteralPath ([string]$Pair[0]) -Destination (Join-Path $Archive ([string]$Pair[1])) -Force}
+            if(Test-Path -LiteralPath $P.Stage -PathType Leaf){Copy-Item -LiteralPath $P.Stage -Destination (Join-Path $Archive 'stage.json') -Force}
+            $Dir=Split-Path $Db;$Base=Split-Path $Db -Leaf
+            foreach($F in @(Get-ChildItem -LiteralPath $Dir -Filter ($Base+'*') -File -ErrorAction SilentlyContinue)){Copy-Item -LiteralPath $F.FullName -Destination $Archive -Force}
+            if(-not(Test-Path -LiteralPath (Join-Path $Archive $Base) -PathType Leaf)){throw "ROLE_SWAP_RECOVERY_ARCHIVE_DB_MISSING db=$Db"}
+          }
+          function Restore-State([hashtable]$P,[string]$Db,[string]$Archive){
+            Copy-Item -LiteralPath (Join-Path $Archive 'research-sidecar.exe') -Destination $P.Exe -Force
+            Copy-Item -LiteralPath (Join-Path $Archive 'Lifecycle.ps1') -Destination $P.Life -Force
+            Copy-Item -LiteralPath (Join-Path $Archive 'research-sidecar.yaml') -Destination $P.Policy -Force
+            Copy-Item -LiteralPath (Join-Path $Archive 'research-runtime.yaml') -Destination $P.Runtime -Force
+            $StageBackup=Join-Path $Archive 'stage.json'
+            if(Test-Path -LiteralPath $StageBackup -PathType Leaf){Copy-Item -LiteralPath $StageBackup -Destination $P.Stage -Force}
+            $Dir=Split-Path $Db;$Base=Split-Path $Db -Leaf
+            foreach($F in @(Get-ChildItem -LiteralPath $Dir -Filter ($Base+'*') -File -ErrorAction SilentlyContinue)){Remove-Item -LiteralPath $F.FullName -Force}
+            foreach($F in @(Get-ChildItem -LiteralPath $Archive -Filter ($Base+'*') -File)){Copy-Item -LiteralPath $F.FullName -Destination $Dir -Force}
+          }
+          function Update-Stage([string]$Path){
+            if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){return}
+            $S=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json
+            if($S.PSObject.Properties.Name -contains 'qualified_head'){$S.qualified_head=$QualifiedHead}
+            if($S.PSObject.Properties.Name -contains 'binary_sha256'){$S.binary_sha256=$NewHash}
+            [IO.File]::WriteAllText($Path,($S|ConvertTo-Json -Depth 10),$Utf8)
+          }
+
+          $Wing=Paths $WingRoot
+          $Ygg=Paths $YggRoot
+          $WingDb=ConfiguredDb $WingRoot $Wing.Autonomy
+          $YggDb=ConfiguredDb $YggRoot $Ygg.Autonomy
+          foreach($P in @($Wing.Exe,$Wing.Life,$Wing.Policy,$Wing.Runtime,$Wing.Autonomy,$WingDb,$Ygg.Exe,$Ygg.Life,$Ygg.Policy,$Ygg.Runtime,$Ygg.Autonomy,$YggDb)){
+            if(-not(Test-Path -LiteralPath $P -PathType Leaf)){throw "ROLE_SWAP_RECOVERY_INSTALLED_PREREQUISITE_MISSING path=$P"}
+          }
+          if((Get-FileHash -LiteralPath $Wing.Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$OldHash -or
+             (Get-FileHash -LiteralPath $Ygg.Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$OldHash){throw 'ROLE_SWAP_RECOVERY_OLD_BINARY_DRIFT'}
+          if((Get-ScheduledTask -TaskName $WingTask).State-ne'Disabled' -or (Get-ScheduledTask -TaskName $YggTask).State-ne'Disabled'){throw 'ROLE_SWAP_RECOVERY_TASK_STATE_DRIFT'}
+          if(Get-Process -Name 'research-sidecar' -ErrorAction SilentlyContinue){throw 'ROLE_SWAP_RECOVERY_RESEARCH_PROCESS_PRESENT'}
+          Assert-OldConfig $Wing
+          Assert-OldConfig $Ygg
+
+          $PyScript=Join-Path $env:RUNNER_TEMP 'role-swap-rearm-r1.py'
+          @'
+import sqlite3, sys
+db_path, source, cycle = sys.argv[1:4]
+db = sqlite3.connect(db_path, timeout=5.0, isolation_level=None)
+try:
+    db.execute("PRAGMA busy_timeout=5000")
+    db.execute("BEGIN IMMEDIATE")
+    successor = db.execute("SELECT successor_cycle_id FROM research_cycle_supersessions WHERE source_cycle_id=?", (source,)).fetchone()
+    if not successor or successor[0] != cycle:
+        raise RuntimeError("supersession binding drift")
+    row = db.execute("SELECT reason FROM research_sidecar_failures WHERE cycle_id=?", (cycle,)).fetchone()
+    if not row or row[0] != "RESEARCH_CODEX_BUNDLE_INVALID_ALL_TIERS":
+        raise RuntimeError("successor failure drift: "+repr(row))
+    def count(table, cid):
+        return db.execute("SELECT count(*) FROM "+table+" WHERE cycle_id=?", (cid,)).fetchone()[0]
+    if count("research_implementation_contexts", cycle) != 1: raise RuntimeError("context drift")
+    if count("research_implementation_bundles", cycle) != 0: raise RuntimeError("bundle unexpectedly sealed")
+    if count("research_implementation_freezes", cycle) != 0: raise RuntimeError("freeze unexpectedly sealed")
+    if count("research_sidecar_results", cycle) != 0: raise RuntimeError("unexpected result")
+    if count("research_sidecar_failures", source) != 1: raise RuntimeError("source historical failure missing")
+    cur = db.execute("DELETE FROM research_sidecar_failures WHERE cycle_id=?", (cycle,))
+    if cur.rowcount != 1: raise RuntimeError("failure delete count")
+    db.execute("INSERT OR REPLACE INTO settings(key,value) VALUES('research_sidecar_status',?)", (cycle+": IMPLEMENTATION_REGENERATION_REQUIRED",))
+    db.execute("COMMIT")
+    print("context_preserved=1")
+    print("successor_failure_removed=1")
+    print("source_historical_failure_preserved=1")
+finally:
+    db.close()
+'@|Set-Content -LiteralPath $PyScript -Encoding UTF8
+
+          $Dry=Join-Path $env:RUNNER_TEMP ('role-swap-python-dry-'+[Guid]::NewGuid().ToString('N'))
+          New-Item -ItemType Directory -Force -Path $Dry|Out-Null
+          $WingBase=Split-Path $WingDb -Leaf
+          foreach($F in @(Get-ChildItem -LiteralPath (Split-Path $WingDb) -Filter ($WingBase+'*') -File -ErrorAction SilentlyContinue)){Copy-Item -LiteralPath $F.FullName -Destination $Dry -Force}
+          & $Python $PyScript (Join-Path $Dry $WingBase) $SourceCycle $Cycle
+          if($LASTEXITCODE-ne0){throw "ROLE_SWAP_RECOVERY_DRY_REARM_FAILED exit=$LASTEXITCODE"}
+          Write-Host 'ROLE_SWAP_RECOVERY_DRY_REARM=PASS'
+
+          $Stamp=Get-Date -Format 'yyyyMMdd_HHmmss'
+          $WingArchive=Join-Path $WingRoot ("state\archive\role-swap-recovery-r1-$Stamp")
+          $YggArchive=Join-Path $YggRoot ("state\archive\role-swap-recovery-r1-$Stamp")
+          Archive-State $Wing $WingDb $WingArchive
+          Archive-State $Ygg $YggDb $YggArchive
+
+          try{
+            Patch-Config $Wing
+            Patch-Config $Ygg
+            Patch-Life $Wing.Life $false
+            Patch-Life $Ygg.Life $true
+            Update-Stage $Wing.Stage
+            Update-Stage $Ygg.Stage
+
+            Copy-Item -LiteralPath $CandidateExe -Destination $Wing.Exe -Force
+            Copy-Item -LiteralPath $CandidateExe -Destination $Ygg.Exe -Force
+            foreach($Exe in @($Wing.Exe,$Ygg.Exe)){if((Get-FileHash -LiteralPath $Exe -Algorithm SHA256).Hash.ToLowerInvariant()-cne$NewHash){throw "ROLE_SWAP_RECOVERY_INSTALL_HASH_INVALID path=$Exe"}}
+
+            & $Python $PyScript $WingDb $SourceCycle $Cycle
+            if($LASTEXITCODE-ne0){throw "ROLE_SWAP_RECOVERY_LIVE_REARM_FAILED exit=$LASTEXITCODE"}
+            Write-Host 'ROLE_SWAP_RECOVERY_LIVE_REARM=PASS'
+
+            Enable-ScheduledTask -TaskName $WingTask -ErrorAction Stop|Out-Null
+            Start-ScheduledTask -TaskName $WingTask -ErrorAction Stop
+            $WingReady=$false;$WingStatus=$null
+            for($i=0;$i-lt120;$i++){
+              Start-Sleep -Seconds 1
+              try{
+                $Raw=& $Wing.Exe -mode status -config $Wing.Autonomy 2>$null
+                if($LASTEXITCODE-eq0){
+                  $WingStatus=(($Raw|ForEach-Object{[string]$_})-join[Environment]::NewLine)|ConvertFrom-Json
+                  if((Get-ScheduledTask -TaskName $WingTask).State-eq'Running' -and [string]$WingStatus.authority-ceq'plane' -and [string]$WingStatus.generation-ceq'1'){$WingReady=$true;break}
+                }
+              }catch{}
+            }
+            if(-not$WingReady){throw 'ROLE_SWAP_RECOVERY_WING_NOT_READY'}
+
+            Enable-ScheduledTask -TaskName $YggTask -ErrorAction Stop|Out-Null
+            Start-ScheduledTask -TaskName $YggTask -ErrorAction Stop
+            $YggReady=$false;$YggStatus=$null
+            for($i=0;$i-lt120;$i++){
+              Start-Sleep -Seconds 1
+              try{
+                $Raw=& $Ygg.Exe -mode status -config $Ygg.Autonomy 2>$null
+                if($LASTEXITCODE-eq0){
+                  $YggStatus=(($Raw|ForEach-Object{[string]$_})-join[Environment]::NewLine)|ConvertFrom-Json
+                  if((Get-ScheduledTask -TaskName $YggTask).State-eq'Running' -and [string]$YggStatus.authority-ceq'plane' -and [string]$YggStatus.generation-ceq'1' -and [int]$YggStatus.blocked_cycle_count-eq0){$YggReady=$true;break}
+                }
+              }catch{}
+            }
+            if(-not$YggReady){throw 'ROLE_SWAP_RECOVERY_YGG_NOT_READY'}
+
+            $WingPolicy=[IO.File]::ReadAllText($Wing.Policy)
+            $WingRuntime=[IO.File]::ReadAllText($Wing.Runtime)
+            $YggPolicy=[IO.File]::ReadAllText($Ygg.Policy)
+            $YggRuntime=[IO.File]::ReadAllText($Ygg.Runtime)
+            foreach($Text in @($WingPolicy,$YggPolicy)){if($Text-notmatch'(?m)^planner_model:\s*gpt-5\.6-sol\s*$'){throw 'ROLE_SWAP_RECOVERY_POLICY_POST_BINDING_INVALID'}}
+            foreach($Text in @($WingRuntime,$YggRuntime)){
+              if($Text-notmatch"(?ms)^planner:\s*.*?model:\s*['\"]?gpt-5\.6-sol['\"]?"){throw 'ROLE_SWAP_RECOVERY_RUNTIME_PLANNER_POST_INVALID'}
+              if($Text-notmatch"(?ms)^implementation:\s*.*?model:\s*['\"]?nvidia/nemotron-3-ultra-550b-a55b:free['\"]?"){throw 'ROLE_SWAP_RECOVERY_RUNTIME_IMPLEMENTATION_POST_INVALID'}
+            }
+          }catch{
+            $Failure=$_.Exception.Message
+            Stop-ScheduledTask -TaskName $YggTask -ErrorAction SilentlyContinue
+            Stop-ScheduledTask -TaskName $WingTask -ErrorAction SilentlyContinue
+            Disable-ScheduledTask -TaskName $YggTask -ErrorAction SilentlyContinue|Out-Null
+            Disable-ScheduledTask -TaskName $WingTask -ErrorAction SilentlyContinue|Out-Null
+            Restore-State $Wing $WingDb $WingArchive
+            Restore-State $Ygg $YggDb $YggArchive
+            Enable-ScheduledTask -TaskName $WingTask -ErrorAction SilentlyContinue|Out-Null
+            Start-ScheduledTask -TaskName $WingTask -ErrorAction SilentlyContinue
+            Start-Sleep -Seconds 2
+            Enable-ScheduledTask -TaskName $YggTask -ErrorAction SilentlyContinue|Out-Null
+            Start-ScheduledTask -TaskName $YggTask -ErrorAction SilentlyContinue
+            throw "ROLE_SWAP_RECOVERY_ROLLED_BACK cause=$Failure"
+          }
+
+          Write-Host "installed_binary_sha256=$NewHash"
+          Write-Host "qualified_head=$QualifiedHead"
+          Write-Host "wing_status=$($WingStatus.status)"
+          Write-Host "wing_cycles=$($WingStatus.cycle_count)"
+          Write-Host "wing_blocked=$($WingStatus.blocked_cycle_count)"
+          Write-Host "ygg_status=$($YggStatus.status)"
+          Write-Host "ygg_cycles=$($YggStatus.cycle_count)"
+          Write-Host "ygg_blocked=$($YggStatus.blocked_cycle_count)"
+          Write-Host 'planner_role=codex-sol-high'
+          Write-Host 'implementation_primary=nemotron-source-only'
+          Write-Host 'implementation_fallback=codex-source-only-luna-terra-sol'
+          Write-Host 'ktrade_stopped=False'
+          Write-Host 'accepted_ref_mutation=False'
+          Write-Host 'broker_access=False'
+          Write-Host 'cross_project_scientific_execution=False'
+          Write-Host 'CKB_PLANE_ROLE_SWAP_RECOVERY_R1=PASS'
