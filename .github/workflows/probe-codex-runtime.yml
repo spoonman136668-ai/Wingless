@@ -1,0 +1,26 @@
+name: Codex runtime compatibility probe
+
+on:
+  push:
+    branches:
+      - diagnostic/repo-local-cutover-r1
+    paths:
+      - 'scripts/Probe-CodexRuntime.ps1'
+      - '.github/workflows/probe-codex-runtime.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Inspect Codex runtime compatibility
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          ./scripts/Probe-CodexRuntime.ps1
