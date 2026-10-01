@@ -1,0 +1,93 @@
+name: CKB Plane Role Swap Dry B R1
+
+on:
+  push:
+    branches:
+      - diagnostic/ckb-plane-role-swap-watch-r1
+    paths:
+      - '.github/ckb-plane-role-swap-dry-b-r1-request.json'
+
+permissions:
+  contents: read
+
+jobs:
+  dry:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Prove bounded copied-DB rearm
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 2.0
+          $Root='C:\ProgramData\CKBR\research-sidecar'
+          $Cfg=Join-Path $Root 'config\autonomy.yaml'
+          $Python='C:\ProgramData\CKBR\research-sidecar-yggdrasil\python312\python.exe'
+          $Source='WINGLESS-LM-LM9C-AUTONOMY-BOOTSTRAP'
+          $Cycle='WINGLESS-LM-LM9D-CARDINALITY-R1'
+          foreach($P in @($Cfg,$Python)){if(-not(Test-Path -LiteralPath $P -PathType Leaf)){throw "DRY_PREREQ_MISSING path=$P"}}
+          $Raw=[IO.File]::ReadAllText($Cfg)
+          $M=[regex]::Match($Raw,'(?m)^\s*sqlite_path:\s*["'']?([^\r\n"'']+)["'']?\s*$')
+          if(-not$M.Success){throw 'DRY_DB_PATH_INVALID'}
+          $Db=$M.Groups[1].Value.Trim()
+          if(-not[IO.Path]::IsPathRooted($Db)){$Db=Join-Path $Root ($Db -replace '/','\')}
+          $Db=[IO.Path]::GetFullPath($Db)
+          if(-not(Test-Path -LiteralPath $Db -PathType Leaf)){throw "DRY_DB_MISSING path=$Db"}
+
+          $Dry=Join-Path $env:RUNNER_TEMP ('role-swap-dry-b-'+[Guid]::NewGuid().ToString('N'))
+          New-Item -ItemType Directory -Force -Path $Dry|Out-Null
+          $Base=Split-Path $Db -Leaf
+          foreach($F in @(Get-ChildItem -LiteralPath (Split-Path $Db) -Filter ($Base+'*') -File -ErrorAction SilentlyContinue)){Copy-Item -LiteralPath $F.FullName -Destination $Dry -Force}
+          $DryDb=Join-Path $Dry $Base
+
+          $Py=Join-Path $env:RUNNER_TEMP 'role-swap-dry-b-r1.py'
+          @'
+          import sqlite3, sys
+          db_path, source, cycle = sys.argv[1:4]
+          db = sqlite3.connect(db_path, timeout=5.0, isolation_level=None)
+          try:
+              db.execute("PRAGMA busy_timeout=5000")
+              db.execute("BEGIN IMMEDIATE")
+              successor = db.execute("SELECT successor_cycle_id FROM research_cycle_supersessions WHERE source_cycle_id=?", (source,)).fetchone()
+              if not successor or successor[0] != cycle:
+                  raise RuntimeError("supersession binding drift")
+              row = db.execute("SELECT reason FROM research_sidecar_failures WHERE cycle_id=?", (cycle,)).fetchone()
+              if not row or row[0] != "RESEARCH_CODEX_BUNDLE_INVALID_ALL_TIERS":
+                  raise RuntimeError("successor failure drift: "+repr(row))
+              def count(table, cid):
+                  return db.execute("SELECT count(*) FROM "+table+" WHERE cycle_id=?", (cid,)).fetchone()[0]
+              if count("research_implementation_contexts", cycle) != 1: raise RuntimeError("context drift")
+              if count("research_implementation_bundles", cycle) != 0: raise RuntimeError("bundle unexpectedly sealed")
+              if count("research_implementation_freezes", cycle) != 0: raise RuntimeError("freeze unexpectedly sealed")
+              if count("research_sidecar_results", cycle) != 0: raise RuntimeError("unexpected result")
+              if count("research_sidecar_failures", source) != 1: raise RuntimeError("source historical failure missing")
+              cur = db.execute("DELETE FROM research_sidecar_failures WHERE cycle_id=?", (cycle,))
+              if cur.rowcount != 1: raise RuntimeError("failure delete count")
+              db.execute("INSERT OR REPLACE INTO settings(key,value) VALUES('research_sidecar_status',?)", (cycle+": IMPLEMENTATION_REGENERATION_REQUIRED",))
+              db.execute("COMMIT")
+              print("dry_rearm=PASS")
+              print("source_historical_failure_preserved=1")
+              print("successor_failure_removed=1")
+              print("context_preserved=1")
+          finally:
+              db.close()
+          '@|Set-Content -LiteralPath $Py -Encoding UTF8
+
+          $Out=Join-Path $env:RUNNER_TEMP 'role-swap-dry-b-r1.out.txt'
+          $Err=Join-Path $env:RUNNER_TEMP 'role-swap-dry-b-r1.err.txt'
+          $P=Start-Process -FilePath $Python -ArgumentList @($Py,$DryDb,$Source,$Cycle) -PassThru -NoNewWindow -RedirectStandardOutput $Out -RedirectStandardError $Err
+          if(-not$P.WaitForExit(30000)){
+            Stop-Process -Id $P.Id -Force -ErrorAction SilentlyContinue
+            throw 'DRY_REARM_TIMEOUT'
+          }
+          $StdOut=if(Test-Path $Out){Get-Content -LiteralPath $Out -Raw}else{''}
+          $StdErr=if(Test-Path $Err){Get-Content -LiteralPath $Err -Raw}else{''}
+          Write-Host $StdOut
+          if($P.ExitCode-ne0){throw "DRY_REARM_FAILED exit=$($P.ExitCode) stderr=$StdErr"}
+          if($StdOut-notmatch'dry_rearm=PASS'){throw 'DRY_REARM_PASS_MISSING'}
+          Write-Host 'CKB_PLANE_ROLE_SWAP_DRY_B_R1=PASS'
