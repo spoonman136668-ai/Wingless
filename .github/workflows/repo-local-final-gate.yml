@@ -16,6 +16,13 @@ jobs:
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
     timeout-minutes: 60
     steps:
+      - name: Checkout gate harness
+        uses: actions/checkout@v4
+        with:
+          ref: cutover/repo-local-autonomy-r1
+          path: gate
+          persist-credentials: false
+          fetch-depth: 1
       - name: Checkout controller main
         uses: actions/checkout@v4
         with:
@@ -33,4 +40,4 @@ jobs:
       - name: Run final integration gate
         shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
         run: |
-          ./controller/scripts/Test-RepoLocalFinalGate.ps1
+          ./gate/scripts/Test-RepoLocalFinalGate.ps1
