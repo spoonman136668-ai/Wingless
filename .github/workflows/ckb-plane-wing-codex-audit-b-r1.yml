@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
       - name: Read exact Codex source audit
-        shell: powershell
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           $Cycle='RSL-e24f879e92e84fa04c5b6e5f6b58d87a'
