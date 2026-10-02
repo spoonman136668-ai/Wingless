@@ -58,7 +58,7 @@ jobs:
           }
           $C=Get-Content -Raw '.research-autonomy\config.json'|ConvertFrom-Json
           if($C.schema -cne 'research.autonomy.v2'){throw 'CONFIG_SCHEMA_FAILED'}
-          if([bool]$C.enabled){throw 'CONFIG_MUST_REMAIN_DISABLED_DURING_QUALIFICATION'}
+          if(-not[bool]$C.enabled){throw 'CONFIG_MUST_BE_ENABLED_POST_CUTOVER'}
           if($C.mode -cne 'repo-local-self-chain'){throw 'CONFIG_MODE_FAILED'}
           if($C.authority -cne 'research-only'){throw 'CONFIG_AUTHORITY_FAILED'}
           if($C.ckb_plane_role -cne 'governance-only'){throw 'CONFIG_CKB_ROLE_FAILED'}
