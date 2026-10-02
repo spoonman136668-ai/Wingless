@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.research-classification.v1",
+  "experiment": "WLM-LM-RULE-CONDITIONED-SEQUENCE-R2",
+  "qualified_head_sha": "217756f327ccee0f3cda63440c1a9a55a944a60f",
+  "qualification_run_id": "36992977650",
+  "qualification": "qualified-scientific-result",
+  "classification": "supported",
+  "thresholds_frozen_before_execution": true,
+  "full_regression_passed": true,
+  "normalized_harness_witness": true,
+  "metrics": {
+    "valid_seed_count": 8,
+    "completed_substrate_runs": 16,
+    "training_transition_count": 49152,
+    "heldout_one_step_evaluation_count": 1024,
+    "autoregressive_evaluation_transition_count": 16384,
+    "minimum_factorized_heldout_one_step_accuracy": 1,
+    "maximum_pooled_lookup_heldout_one_step_accuracy": 0.1875,
+    "minimum_factorized_autoregressive_accuracy": 1,
+    "substrate_prediction_mismatch_count": 0,
+    "substrate_factorized_state_mismatch_count": 0,
+    "substrate_context_observable_mismatch_count": 0,
+    "heldout_rule_context_leak_count": 0,
+    "factorized_bit_coverage_missing_count": 0,
+    "invalid_context_rows": 0,
+    "counter_overflow_rows": 0
+  },
+  "scientific_claim": "Under the frozen multi-rule held-out matrix, Wingless's bounded 96-counter rule-conditioned factorized state generalized four learned next-token relations to held-out exact rule/context triples and sustained perfect autoregressive generation, while the 2048-counter exact rule/context lookup control remained at 0.1875 pooled held-out accuracy.",
+  "scope": "bounded synthetic Wingless rule-conditioned sequence-generalization research; not open-domain language",
+  "execution_mode": "direct-no-agent",
+  "authority": "research-only"
+}
