@@ -344,7 +344,15 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
         tool_choice=$ToolChoice
         max_tokens=if($Provider-ceq'nvidia'){16384}else{4096}
     }
-    if($Provider-ceq'nvidia'){$BodyObject.reasoning_effort='low'}
+    if($Provider-ceq'nvidia'){
+        $BodyObject.reasoning_effort='low'
+        if($Model -match '^z-ai/glm-5\.3'){
+            $BodyObject.chat_template_kwargs=[ordered]@{
+                clear_thinking=$true
+                reasoning_effort='low'
+            }
+        }
+    }
     $Body=$BodyObject|ConvertTo-Json -Depth 50 -Compress
 
     $Resp=$null
@@ -356,7 +364,7 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
             $StatusCode=$null
             try{$StatusCode=[int]$_.Exception.Response.StatusCode}catch{}
             $IsRateLimit=($StatusCode-eq429 -or $_.Exception.Message -match '(?i)429|too many requests')
-            $IsTransientNvidia=($Provider-ceq'nvidia' -and ($StatusCode-eq500 -or $StatusCode-eq502 -or $StatusCode-eq503 -or $StatusCode-eq504 -or $_.Exception.Message -match '(?i)internal server error|bad gateway|server unavailable|gateway timeout'))
+            $IsTransientNvidia=($Provider-ceq'nvidia' -and ($StatusCode-eq500 -or $StatusCode-eq502 -or $StatusCode-eq503 -or $StatusCode-eq504 -or $_.Exception.Message -match '(?i)internal server error|bad gateway|server unavailable|gateway timeout|underlying connection was closed|unexpected error occurred on a receive|connection reset|connection aborted'))
             if(($IsRateLimit -or $IsTransientNvidia) -and $Attempt-lt3){
                 $Delay=if($Attempt-eq1){5}else{15}
                 $Kind=if($IsRateLimit){'rate_limit'}else{'transient_server'}
