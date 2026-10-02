@@ -1,0 +1,139 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-LM-RAW-UTF8-INSTRUCTION-REASON-GENERATE-R1",
+  "program":"Wingless raw-input to representation to reasoning to generation chain",
+  "question":"Can Wingless consume variable-length raw UTF-8 instruction sentences, learn bounded instruction representations from bytes, generalize those representations to unseen sentence templates and held-out operation/operand combinations, reason over the learned representations, and generate the exact answer as raw text without a tokenizer or external model?",
+  "hypothesis":"A frozen Wingless raw-byte recurrent encoder with learned fixed-size linear heads for operation, left operand, and right operand will reach at least 0.95 held-out representation accuracy on two unseen instruction templates. A factorized reasoning learner trained only from predicted training representations and observed training answers will reach at least 0.90 result accuracy on 128 held-out template/context examples. A learned result-conditioned raw-byte generator will produce the exact canonical UTF-8 answer string on at least 0.90 of held-out examples, while exact whole-instruction lookup will remain at or below 0.25 exact-output accuracy.",
+  "exact_parent_sha":"3c94591fe4d526ba13d7ccfe19608e1c226fb0cf",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch":"research/wingless-up-manual-chain-r1",
+  "portfolio_context":{"allocation":"75% chain / 25% substrate falsification","slot":"chain"},
+  "prior_evidence":[
+    {
+      "experiment":"WLM-LM-CONTEXT-SIMILARITY-ALIAS-INDUCTION-R1",
+      "github_run_id":"37070055816",
+      "observation":"Bounded raw-context similarity recovered 9/9 alias pairs and 1.0 cross-family reasoning accuracy under frozen frequency jitter."
+    },
+    {
+      "experiment":"WLM-LM-REAL-UTF8-BYTE-PILOT-R2",
+      "github_run_id":"37000936408",
+      "observation":"Real UTF-8 raw-byte motifs improved held-out covered-position prediction by at least 0.518 and reduced effective events by at least 0.146 without tokenization."
+    },
+    {
+      "experiment":"WLM-LM-RULE-CONDITIONED-SEQUENCE-R2",
+      "observation":"A bounded factorized learner generalized rule-conditioned reasoning to held-out exact contexts and sustained autoregressive rollout."
+    }
+  ],
+  "scope_statement":"This is a supervised bounded instruction-following mechanism gate, not an open-domain language-understanding claim. Training labels identify operation, operand, and answer classes for the frozen instruction corpus; inference receives only raw instruction bytes and learned state.",
+  "authority":"research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "instruction_corpus":{
+    "encoding":"exact UTF-8 bytes of generated English instruction lines; no tokenization, Unicode normalization, vocabulary, subword mapping, or inserted token IDs",
+    "operation_count":4,
+    "operations":["xor","xnor","and","or"],
+    "value_count":8,
+    "values":["zero","one","two","three","four","five","six","seven"],
+    "target_rules":{
+      "xor":"three-bit XOR",
+      "xnor":"three-bit XNOR",
+      "and":"three-bit AND",
+      "or":"three-bit OR"
+    },
+    "training_templates":[
+      "compute {op} of {left} and {right}.",
+      "please apply {op} to {left} with {right}.",
+      "using {left} and {right}, perform {op}.",
+      "{op} on {left} plus {right}; give the answer."
+    ],
+    "heldout_templates":[
+      "what is {left} when you {op} it with {right}?",
+      "return the result of {op} for {left} and {right}."
+    ],
+    "train_context_rule":"(operation_id + left_id + right_id) mod 4 != 1",
+    "heldout_context_rule":"(operation_id + left_id + right_id) mod 4 == 1",
+    "training_context_count":192,
+    "heldout_context_count":64,
+    "training_example_count":768,
+    "heldout_example_count":128,
+    "canonical_output":"answer: {result_word}.\n"
+  },
+  "raw_representation":{
+    "encoder":"existing Wingless 64-state raw-byte recurrence used by the native language line; fixed byte embedding and recurrence, no token boundaries",
+    "pooled_state":"concatenate final 64-state vector with mean recurrent state in four equal byte-position quartiles, totaling 320 bounded real-valued features",
+    "learned_heads":"three deterministic softmax linear heads over the same 320 raw-byte features: 4-way operation, 8-way left value, 8-way right value",
+    "training":"40 epochs deterministic lexical example order, cross-entropy SGD, learning rate 0.05",
+    "capacity":"exactly 3*320 weight rows by class: 4x320 + 8x320 + 8x320 plus 20 biases; no encoder-state growth"
+  },
+  "reasoning_learner":{
+    "state":"for each predicted operation class and each of three bit positions, a 2x2x2 uint32 tensor over predicted left bit, predicted right bit, observed result bit; 96 counters",
+    "training_input":"predicted operation/left/right classes from the learned raw-byte heads on training instructions plus observed answer class",
+    "prediction":"independent argmax of each learned result bit from predicted held-out representations; ties choose zero",
+    "target_rule_visibility":"target operation implementations are corpus-generation/scoring only and are never called by prediction"
+  },
+  "raw_text_generator":{
+    "training":"canonical answer UTF-8 bytes from training examples grouped by observed result class",
+    "state":"per result class, counts of next raw byte conditioned on the previous two generated byte states; two internal start states are outside the byte alphabet",
+    "generation":"start from the two internal start states, repeatedly emit argmax next byte with lowest-byte tie break, feed each emitted byte back into the two-byte context, and stop after newline or 32 emitted bytes",
+    "target_bytes_at_inference":false
+  },
+  "controls":{
+    "whole_instruction_lookup":"exact raw instruction byte string -> canonical answer learned from training; unseen keys fall back to the globally most frequent training answer with lexicographic tie break",
+    "purpose":"tests whether held-out success can be explained by memorizing complete instruction strings"
+  },
+  "metrics_and_thresholds":[
+    ["training_example_count","==",768],
+    ["heldout_example_count","==",128],
+    ["training_context_count","==",192],
+    ["heldout_context_count","==",64],
+    ["heldout_exact_instruction_leak_count","==",0],
+    ["raw_feature_dimension","==",320],
+    ["operation_head_class_count","==",4],
+    ["value_head_class_count","==",8],
+    ["minimum_training_operation_accuracy",">=",0.98],
+    ["minimum_training_left_accuracy",">=",0.98],
+    ["minimum_training_right_accuracy",">=",0.98],
+    ["minimum_heldout_operation_accuracy",">=",0.95],
+    ["minimum_heldout_left_accuracy",">=",0.95],
+    ["minimum_heldout_right_accuracy",">=",0.95],
+    ["minimum_heldout_full_representation_accuracy",">=",0.90],
+    ["reasoning_counter_count","==",96],
+    ["minimum_heldout_reasoning_result_accuracy",">=",0.90],
+    ["minimum_output_generator_class_coverage","==",8],
+    ["maximum_output_generator_state_count","<=",160],
+    ["minimum_heldout_exact_raw_output_accuracy",">=",0.90],
+    ["maximum_whole_instruction_lookup_exact_output_accuracy","<=",0.25],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "validity_criteria":[
+    "Exact parent and North Star identities match.",
+    "All instruction and answer data are consumed as raw UTF-8 bytes with no tokenizer, vocabulary, normalization, or evaluator-provided byte segmentation.",
+    "The two heldout instruction templates never occur in representation-head training.",
+    "No heldout exact operation/operand context satisfying the frozen heldout rule occurs in reasoning training.",
+    "Representation-head labels are training supervision only; heldout inference receives raw instruction bytes only.",
+    "Reasoning training uses predicted training representations rather than evaluator operation/operand identities.",
+    "Reasoning prediction never calls target-rule implementations.",
+    "The output generator is trained only from training answer bytes and generates teacher-free from its own previous two emitted bytes.",
+    "Whole-instruction lookup receives the same training examples and no heldout strings.",
+    "Full Go regression passes before the probe and all metrics are finite.",
+    "No tokenizer, external model, network call, capacity growth, threshold adaptation, or post-result tuning occurs."
+  ],
+  "classification_rules":{
+    "supported":"All validity criteria and all frozen thresholds pass.",
+    "mixed":"Validity passes and the end-to-end chain materially beats exact whole-instruction lookup, but at least one representation, reasoning, or 0.90 raw-output threshold fails.",
+    "negative":"Validity passes but held-out end-to-end raw output does not materially outperform exact whole-instruction lookup or learned representations fail to support reasoning.",
+    "incomplete":"Compute interruption prevents the frozen train/evaluation matrix.",
+    "invalid":"Any split leakage, target-rule inference use, target-byte generation leak, raw-byte identity, capacity, deterministic-state, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule":"Do not alter templates, split rule, values, operations, encoder, pooling, feature dimension, epochs, learning rate, reasoning factorization, output generator, controls, metrics, thresholds, or interpretation after any primary output.",
+  "changed_paths":[
+    "docs/experiments/wlm-lm-raw-utf8-instruction-reason-generate-r1.json",
+    "unitary/wlm_lm_raw_utf8_instruction_reason_generate_r1.go",
+    "cmd/wlm-lm-raw-utf8-instruction-reason-generate-r1/main.go",
+    "scripts/run-wlm-lm-raw-utf8-instruction-reason-generate-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
