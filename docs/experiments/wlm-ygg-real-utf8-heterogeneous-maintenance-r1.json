@@ -1,0 +1,259 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-HETEROGENEOUS-MAINTENANCE-R1",
+  "program": "Wingless-Yggdrasil real-workload maintenance bridge",
+  "question": "Does the calibrated excess-error monitor and unchanged wrong-first/revert/correct-retain policy generalize without retuning across fresh immutable real-byte files and four heterogeneous level-1 motif-state degradation classes?",
+  "hypothesis": "Across two fresh immutable held-out blobs and four preregistered motif-state degradation classes per file, the unchanged calibrated excess-error monitor will identify the damaged motif in all 8 sequential cycles, every wrong same-budget repair will be rejected/reverted, every exact canonical repair will exceed the unchanged 0.20 selected-key validation-gain threshold and be retained, and independent audit will restore exact canonical predictions, probabilities, and 256-motif structure after every cycle.",
+  "exact_parent_sha": "1001b7576cb660b587458a065469815b7cffd008",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-YGG-REAL-UTF8-CALIBRATED-MAINTENANCE-R1",
+    "classification_commit_sha": "1001b7576cb660b587458a065469815b7cffd008",
+    "qualification_run_id": "37009066334",
+    "classification": "supported"
+  },
+  "authority": "research-only immutable real-byte maintenance generalization; no deployment, external-model inference, scheduler, queue, broker, accepted-ref, runtime, or capacity authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-ygg-real-utf8-heterogeneous-maintenance-r1.json",
+    "unitary/wlm_ygg_real_utf8_heterogeneous_maintenance_r1.go",
+    "cmd/wlm-ygg-real-utf8-heterogeneous-maintenance-r1/main.go",
+    "scripts/run-wlm-ygg-real-utf8-heterogeneous-maintenance-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "canonical_training": {
+    "construction": "exact WLM-LM-REAL-UTF8-BYTE-PILOT-R2 four training Git blobs and byte-identical TrainModel path",
+    "selected_motif_capacity": 256,
+    "tokenizer": false,
+    "retraining_between_cycles": false
+  },
+  "fresh_evaluation_blobs": [
+    {
+      "path": "docs/experiments/qwen-1.5b-linux-stage3.json",
+      "sha": "7765773c8271aa46e4414bd41b8708f1afb1af2f",
+      "size_bytes": 44558,
+      "selection_basis": "largest currently available docs/experiments file not used by the supported real-byte pilot"
+    },
+    {
+      "path": "unitary/full_latent.go",
+      "sha": "5d9400dcc08c5d10cc34303876d88ab1fb785cc8",
+      "size_bytes": 30831,
+      "selection_basis": "largest currently available unitary Go source not used by the supported real-byte pilot"
+    }
+  ],
+  "evaluation_segmentation": "Each fresh blob is divided by raw byte index into four contiguous non-overlapping quarters: pre-degradation calibration, diagnostic monitor, candidate validation, final audit. Context resets at quarter boundaries.",
+  "calibrated_monitor": {
+    "algorithm": "byte-identical to WLM-YGG-REAL-UTF8-CALIBRATED-MAINTENANCE-R1",
+    "background": "For each canonical selected motif, calibration-quarter occurrence/error counts under canonical model.",
+    "diagnostic": "For each canonical retained key, diagnostic-quarter occurrence/error counts under current active model.",
+    "score": "diagnostic_errors - calibration_errors * diagnostic_occurrences / calibration_occurrences",
+    "eligibility_for_ranking": "calibration occurrence >=3 and diagnostic occurrence >=1",
+    "selection": "highest excess-error score; lexicographic raw-key tie break",
+    "retuning": false
+  },
+  "target_schedule": {
+    "class_order": [
+      "record_missing",
+      "successor_distribution_rotated",
+      "canonical_best_bucket_erased",
+      "nonzero_counts_flattened"
+    ],
+    "distinct_target_per_class": true,
+    "eligibility": [
+      "key is one of the frozen 256 canonical selected motifs",
+      "calibration occurrence >=6",
+      "diagnostic occurrence >=3",
+      "validation occurrence >=3",
+      "audit occurrence >=3",
+      "canonical motif top-1 accuracy minus baseline top-1 accuracy on calibration occurrences >=0.20",
+      "applying that class on calibration occurrences lowers selected-key top-1 accuracy by >=0.20"
+    ],
+    "ordering": "For each class in frozen class order, among eligible not-yet-used keys choose highest calibration occurrence, then highest canonical-over-baseline calibration gain, then lexicographic raw four-byte key.",
+    "hidden_from_policy": "class identity, scheduled target key, schedule rank, calibration gains, and evaluator class-sensitivity checks"
+  },
+  "degradation_classes": {
+    "record_missing": "delete the selected motif record from active map",
+    "successor_distribution_rotated": "preserve selected key and total count but rotate the canonical 256 successor-count buckets by +1 byte; recompute best/bestCount/consistency",
+    "canonical_best_bucket_erased": "preserve selected key; set only the canonical best-successor count to zero; recompute total/best/bestCount/consistency",
+    "nonzero_counts_flattened": "preserve selected key; replace every positive canonical successor count with 1 and every zero count with 0; recompute total/best/bestCount/consistency"
+  },
+  "sequential_state": "Every cycle starts from the retained repaired state of the previous cycle. After successful audit, active state must equal canonical exactly before the next heterogeneous degradation is applied.",
+  "candidates": {
+    "retained_catalog": "bounded canonical copy of the 256 selected motif records",
+    "wrong_first": "lexicographically next retained key whose canonical best successor differs; install its full 256-count distribution under monitor-selected raw key",
+    "correct_second": "install monitor-selected key's own retained canonical record",
+    "candidate_read_bytes": 1028,
+    "repair_operations": 1,
+    "parity": true
+  },
+  "validation_policy": {
+    "selected_key_metric": "top-1 accuracy on validation-quarter occurrences of monitor-selected raw key",
+    "global_metric": "Jeffreys-smoothed overall bits-per-byte using the supported real-byte probability rule",
+    "retain_rule": "retain iff selected-key accuracy gain versus degraded pre-candidate state >=0.20 AND global bits-per-byte change <=0.005; otherwise exact revert",
+    "candidate_order": "wrong first; exact revert if rejected; correct second"
+  },
+  "final_audit": [
+    "active key set exactly equals canonical 256-key set",
+    "every active motif successor-count array, total, best, bestCount, and consistency exactly equal canonical",
+    "adaptive top-1 prediction at every audit next-byte position equals canonical model",
+    "adaptive smoothed probability for every observed audit target equals canonical model",
+    "capacity remains exactly 256"
+  ],
+  "metrics_and_thresholds": [
+    [
+      "valid_evaluation_file_count",
+      "==",
+      2
+    ],
+    [
+      "completed_cycle_count",
+      "==",
+      8
+    ],
+    [
+      "minimum_target_eligibility_count_per_file",
+      ">=",
+      4
+    ],
+    [
+      "minimum_monitor_target_selection_accuracy",
+      "==",
+      1
+    ],
+    [
+      "minimum_selected_calibrated_excess_score",
+      ">=",
+      1
+    ],
+    [
+      "minimum_selected_minus_runner_up_excess_score",
+      ">=",
+      1
+    ],
+    [
+      "maximum_wrong_candidate_selected_key_accuracy_gain",
+      "<",
+      0.2
+    ],
+    [
+      "wrong_candidate_retain_count",
+      "==",
+      0
+    ],
+    [
+      "wrong_candidate_revert_count",
+      "==",
+      8
+    ],
+    [
+      "minimum_correct_candidate_selected_key_accuracy_gain",
+      ">=",
+      0.2
+    ],
+    [
+      "correct_candidate_retain_count",
+      "==",
+      8
+    ],
+    [
+      "correct_candidate_revert_count",
+      "==",
+      0
+    ],
+    [
+      "minimum_per_class_completed_cycle_count",
+      "==",
+      2
+    ],
+    [
+      "maximum_post_repair_audit_prediction_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "maximum_post_repair_audit_probability_abs_delta",
+      "==",
+      0
+    ],
+    [
+      "minimum_structure_jaccard_after_each_cycle",
+      "==",
+      1
+    ],
+    [
+      "maximum_candidate_read_bytes",
+      "<=",
+      1028
+    ],
+    [
+      "maximum_candidate_repair_operations",
+      "<=",
+      1
+    ],
+    [
+      "maximum_final_selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "minimum_final_selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "lesion_label_access_count",
+      "==",
+      0
+    ],
+    [
+      "class_label_access_in_policy_count",
+      "==",
+      0
+    ],
+    [
+      "canonical_diagnostic_shadow_access_count",
+      "==",
+      0
+    ],
+    [
+      "evaluator_schedule_access_in_policy_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_cycle_rows",
+      "==",
+      0
+    ]
+  ],
+  "validity_criteria": [
+    "Exact parent, North Star, supported calibrated-maintenance evidence identity, training blob identities, and fresh evaluation blob identities match.",
+    "Fresh evaluation blobs are absent from all supported-pilot training/evaluation sets.",
+    "Exactly four distinct scheduled targets per file are selected before diagnostic execution by the frozen class-specific evaluator eligibility/order.",
+    "Calibration, diagnostic, validation, and audit quarters are byte-disjoint and context resets at each boundary.",
+    "The deployed monitor algorithm and score are byte-identical to supported calibrated maintenance and receive no class label or target identity.",
+    "Each degradation modifies only the selected motif record according to the frozen class rule; all other model state is unchanged.",
+    "Wrong/correct candidate budget and ordering are unchanged from supported calibrated maintenance.",
+    "Every rejected wrong candidate restores exact pre-candidate degraded state; every retained correct state becomes the next cycle start.",
+    "No tokenizer, evaluator schedule, class/lesion label, canonical diagnostic shadow, external model, capacity growth, retraining, or post-result threshold change is used.",
+    "Full Go regression passes before probe execution and normalized result carries exact experiment identity."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all frozen thresholds pass across all 8 cycles and all four degradation classes.",
+    "mixed": "Validity passes and correct repairs recover exact audit state, but at least one monitor-separation, wrong-candidate, per-class, validation, or budget threshold fails.",
+    "negative": "Validity passes but calibrated monitoring, wrong-candidate rejection, correct retention, or exact audit restoration fails for one or more degradation classes.",
+    "incomplete": "Fresh blob support or compute interruption prevents the complete 8-cycle matrix.",
+    "invalid": "Blob identity, train/eval isolation, target/class schedule isolation, quarter isolation, degradation construction, candidate parity, revert semantics, deterministic construction, capacity, or qualification criteria fail."
+  },
+  "no_post_result_tuning_rule": "Do not alter fresh blobs, quarter split, class set/order, class-specific eligibility, calibrated monitor, candidate construction/order, validation rule, budgets, metrics, thresholds, aggregation, or classification after any experiment output is observed."
+}
