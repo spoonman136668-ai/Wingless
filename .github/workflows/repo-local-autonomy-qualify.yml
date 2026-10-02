@@ -63,7 +63,7 @@ jobs:
           if($C.authority -cne 'research-only'){throw 'CONFIG_AUTHORITY_FAILED'}
           if($C.ckb_plane_role -cne 'governance-only'){throw 'CONFIG_CKB_ROLE_FAILED'}
           if($C.active_branch -cne 'research/autonomy-wingless-active'){throw 'CONFIG_ACTIVE_BRANCH_FAILED'}
-          if($C.north_star_sha256 -cne 'efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8'){throw 'CONFIG_NORTH_STAR_IDENTITY_FAILED'}
+          if($C.north_star_sha256 -cne 'e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465'){throw 'CONFIG_NORTH_STAR_IDENTITY_FAILED'}
           $Text=Get-Content -Raw $Path
           foreach($Needle in @(
             'CKB-plane is governance-only',
