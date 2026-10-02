@@ -1,0 +1,33 @@
+name: Resume repo-local research R1
+
+on:
+  push:
+    branches:
+      - ops/research-resume-r1
+    paths:
+      - '.github/workflows/resume-research-r1.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Dispatch main research controller
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GH_REPO/actions/workflows/research-continuation-controller.yml/dispatches" \
+            -d '{"ref":"main","inputs":{"reason":"post-glm-long-session-promotion-resume"}}'
+          echo "RESEARCH_RESUME_DISPATCHED"
