@@ -1,0 +1,89 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R4",
+  "question":"Can a completely unseen third raw surface family acquire only a context-derived representation and then use transition knowledge learned from two other surface families without any task-transition examples of its own?",
+  "hypothesis":"With the unchanged zero-shot scientific design, a raw bridge learner over three surface families will recover twenty-seven recurrent surface motifs and induce exactly nine three-member contextual alias classes. A class-transition learner trained only on task records from families 0 and 1 will achieve at least 0.95 semantic accuracy on all eighty family-2 single-step tasks, while exact-surface has all eighty family-2 transition keys missing and at most 0.25 accuracy, and the frozen shuffled-family2 bridge remains at or below 0.25.",
+  "exact_parent_sha":"e45020de748eb0c3a1fc6ef7611219a80cad7dcf",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "supersedes_invalid_before_execution":[
+    {
+      "experiment":"WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R1",
+      "qualification_run_id":"37067141013",
+      "reason":"direct qualification rejected a four-commit baseline-to-head delta before science",
+      "scientific_output_observed":false
+    },
+    {
+      "experiment":"WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R2",
+      "reason":"its actual preregistration parent differed from its declared exact_parent_sha during scheduler shutdown",
+      "scientific_output_observed":false
+    },
+    {
+      "experiment":"WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R3",
+      "reason":"pre-execution validity text contained a stale R2 identifier; no scientific output was produced",
+      "scientific_output_observed":false
+    }
+  ],
+  "scientific_reuse":{
+    "function":"RunWlmLmRawRepZeroshotAliasFamilyR1",
+    "scientific_change":false,
+    "allowed_difference":"R4 result identifier and qualification wrapper only",
+    "forbidden":"changes to families, bridge, task corpus, family-2 isolation, controls, metrics, thresholds, clustering, or prediction"
+  },
+  "portfolio_context":{"allocation":"75% chain / 25% substrate falsification","slot":"chain"},
+  "prior_qualified_evidence":{
+    "experiment":"WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-INDUCTION-R2",
+    "github_run_id":"37066504364",
+    "observation":"Two-family contextual alias induction recovered nine correct classes and reached 1.0 cross-family accuracy while exact-surface scored 0.03125 and shuffled-context 0.15."
+  },
+  "authority":"research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "frozen_design_reference":"docs/experiments/wlm-lm-raw-rep-zeroshot-alias-family-r1.json",
+  "metrics_and_thresholds":[
+    ["bridge_record_count","==",864],
+    ["selected_surface_representation_count","==",27],
+    ["selected_true_surface_motif_match_count","==",27],
+    ["bridge_decode_failure_count","==",0],
+    ["induced_alias_class_count","==",9],
+    ["induced_three_member_class_count","==",9],
+    ["correct_evaluator_alias_triplet_count","==",9],
+    ["task_training_record_count","==",3200],
+    ["family2_task_training_record_count","==",0],
+    ["task_training_decode_failure_count","==",0],
+    ["class_transition_key_count","==",80],
+    ["unseen_family_evaluation_count","==",80],
+    ["unseen_family_accuracy",">=",0.95],
+    ["exact_surface_unseen_family_accuracy","<=",0.25],
+    ["exact_surface_unseen_missing_transition_count","==",80],
+    ["shuffled_family2_alias_class_count","==",9],
+    ["shuffled_family2_unseen_accuracy","<=",0.25],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "validity_criteria":[
+    "Exact parent and North Star identities match.",
+    "R4 delegates to the unchanged R1 scientific function and changes only result identity/qualification wrapper.",
+    "Family 2 has zero task-transition training records and appears only in the raw bridge before evaluation.",
+    "Clustering receives no family label, semantic label, alias mapping, or evaluator dictionary.",
+    "Exact-surface and shuffled-family controls are unchanged from R1.",
+    "Full Go regression passes before probe execution and all metrics are finite.",
+    "No tokenizer, external model, network call, capacity growth, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules":{
+    "supported":"All validity criteria and all frozen thresholds pass.",
+    "mixed":"Validity passes and unseen-family accuracy materially exceeds both controls, but at least one representation recovery or 0.95 threshold fails.",
+    "negative":"Validity passes but unseen-family transfer does not materially outperform the exact-surface control.",
+    "incomplete":"Compute interruption prevents complete frozen evaluation.",
+    "invalid":"Any provenance, scientific-function drift, family-2 task leakage, bridge leakage, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule":"No scientific input, learner, control, metric, threshold, or interpretation may change after primary output.",
+  "changed_paths":[
+    "docs/experiments/wlm-lm-raw-rep-zeroshot-alias-family-r4.json",
+    "unitary/wlm_lm_raw_rep_zeroshot_alias_family_r4.go",
+    "cmd/wlm-lm-raw-rep-zeroshot-alias-family-r4/main.go",
+    "scripts/run-wlm-lm-raw-rep-zeroshot-alias-family-r4.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
