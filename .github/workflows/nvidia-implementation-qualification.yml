@@ -1,12 +1,10 @@
 name: NVIDIA Wingless implementation qualification
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - research/nvidia-provider-qualification-r2
     paths:
-      - 'cmd/nvidiaqual/fixture.go'
-      - 'scripts/Invoke-NemotronRepoAgent.ps1'
       - '.github/workflows/nvidia-implementation-qualification.yml'
   workflow_dispatch:
 
