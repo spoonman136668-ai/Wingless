@@ -169,18 +169,32 @@ $MindContext
     $NemotronAgent=Join-Path $PSScriptRoot 'Invoke-NemotronRepoAgent.ps1'
     if(Test-Path -LiteralPath $NemotronAgent -PathType Leaf){
         try{
-            Write-Host "RESEARCH_AGENT_ATTEMPT provider=openrouter model=nvidia/nemotron-3-ultra-550b-a55b:free"
-            & $NemotronAgent -RepoPath $RepoPath -Program 'Wingless' -ActiveBranch $ActiveBranch -StartSha $StartSha -PromptPath $PromptPath -LastMessagePath $LastMessagePath
+            Write-Host "RESEARCH_AGENT_ATTEMPT provider=nvidia model=z-ai/glm-5.3"
+            & $NemotronAgent -RepoPath $RepoPath -Program 'Wingless' -ActiveBranch $ActiveBranch -StartSha $StartSha -PromptPath $PromptPath -LastMessagePath $LastMessagePath -Provider nvidia -Model 'z-ai/glm-5.3'
             $Succeeded=$true
-            Write-Host 'RESEARCH_AGENT_PRIMARY_PASS provider=openrouter'
+            Write-Host 'RESEARCH_AGENT_PRIMARY_PASS provider=nvidia model=z-ai/glm-5.3'
         }catch{
             $PrimaryError=$_.Exception.Message
             if($PrimaryError -match '(?i)status=429|429|too many requests'){
                 $PrimaryRateLimited=$true
             }
-            Write-Host "RESEARCH_AGENT_PRIMARY_FAILED provider=openrouter error=$PrimaryError"
+            Write-Host "RESEARCH_AGENT_PRIMARY_FAILED provider=nvidia model=z-ai/glm-5.3 error=$PrimaryError"
             & git reset --hard $StartSha|Out-Null
             & git clean -fd|Out-Null
+        }
+
+        if(-not$Succeeded){
+            try{
+                Write-Host "RESEARCH_AGENT_ATTEMPT provider=openrouter model=nvidia/nemotron-3-ultra-550b-a55b:free"
+                & $NemotronAgent -RepoPath $RepoPath -Program 'Wingless' -ActiveBranch $ActiveBranch -StartSha $StartSha -PromptPath $PromptPath -LastMessagePath $LastMessagePath -Provider openrouter -Model 'nvidia/nemotron-3-ultra-550b-a55b:free'
+                $Succeeded=$true
+                Write-Host 'RESEARCH_AGENT_SECONDARY_PASS provider=openrouter model=nvidia/nemotron-3-ultra-550b-a55b:free'
+            }catch{
+                $SecondaryError=$_.Exception.Message
+                Write-Host "RESEARCH_AGENT_SECONDARY_FAILED provider=openrouter model=nvidia/nemotron-3-ultra-550b-a55b:free error=$SecondaryError"
+                & git reset --hard $StartSha|Out-Null
+                & git clean -fd|Out-Null
+            }
         }
     }else{
         Write-Host "RESEARCH_AGENT_PRIMARY_UNAVAILABLE path=$NemotronAgent"
@@ -205,7 +219,7 @@ $MindContext
                 $Args=@('exec','--approve-for-me','--model',$Model,'--output-last-message',$LastMessagePath,'-')
                 $Proc=Start-Process -FilePath $Codex -ArgumentList $Args -WorkingDirectory $RepoPath -RedirectStandardInput $PromptPath -NoNewWindow -Wait -PassThru
                 if($Proc.ExitCode-eq0){$Succeeded=$true;break}
-                Write-Host "RESEARCH_AGENT_RETRY model=$Model exit=$($Proc.ExitCode)"
+                Write-Host "RESEARCH_AGENT_RETRY provider=codex model=$Model exit=$($Proc.ExitCode)"
                 & git reset --hard $StartSha|Out-Null
                 & git clean -fd|Out-Null
             }
