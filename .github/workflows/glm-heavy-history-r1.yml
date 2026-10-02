@@ -1,0 +1,84 @@
+name: GLM heavy-history qualification R1
+
+on:
+  push:
+    branches:
+      - repair/glm-history-compaction-r1
+    paths:
+      - '.github/workflows/glm-heavy-history-r1.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: glm-heavy-history-r1
+  cancel-in-progress: false
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 45
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@v4
+        with:
+          ref: repair/glm-history-compaction-r1
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Heavy-history GLM tool loop
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          if([string]::IsNullOrWhiteSpace($env:NVIDIA_API_KEY)){throw 'NVIDIA_API_KEY_SECRET_MISSING'}
+          $Head=(git rev-parse HEAD).Trim()
+          $Branch=(git branch --show-current).Trim()
+          $Prompt=Join-Path $env:RUNNER_TEMP ('glm-heavy-'+$env:GITHUB_RUN_ID+'.txt')
+          $Last=Join-Path $env:RUNNER_TEMP ('glm-heavy-last-'+$env:GITHUB_RUN_ID+'.txt')
+          @(
+            'This is a frozen heavy-history provider qualification. Do not modify any file.'
+            'Use exactly one tool call in each assistant response.'
+            'Perform these eight checkpoints in order, waiting for each result before continuing:'
+            '1 read_file .ice/manifest.json start_line 1 end_line 160'
+            '2 read_file .ice/manifest.json start_line 161 end_line 320'
+            '3 read_file .ice/manifest.json start_line 321 end_line 480'
+            '4 read_file .ice/manifest.json start_line 481 end_line 640'
+            '5 read_file .ice/manifest.json start_line 641 end_line 800'
+            '6 read_file .ice/manifest.json start_line 801 end_line 960'
+            '7 read_file .ice/manifest.json start_line 961 end_line 1120'
+            '8 read_file .ice/manifest.json start_line 1121 end_line 1280'
+            'After checkpoint 8 returns, call finish exactly once with status complete and summary exactly GLM_HEAVY_HISTORY_PASS.'
+            'Do not call any other tool and do not send a normal final answer.'
+          ) | Set-Content -LiteralPath $Prompt -Encoding UTF8
+
+          $Output=@(& '.\scripts\Invoke-NemotronRepoAgent.ps1' `
+            -RepoPath (Resolve-Path '.').Path `
+            -Program 'Wingless' `
+            -ActiveBranch $Branch `
+            -StartSha $Head `
+            -PromptPath $Prompt `
+            -LastMessagePath $Last `
+            -Provider nvidia `
+            -Model 'z-ai/glm-5.3' `
+            -MaxRounds 12 *>&1)
+          $Output | ForEach-Object { Write-Host ([string]$_) }
+
+          if(-not(Test-Path -LiteralPath $Last -PathType Leaf)){throw 'GLM_HEAVY_RESULT_MISSING'}
+          $Summary=[IO.File]::ReadAllText($Last).Trim()
+          if($Summary -cne 'GLM_HEAVY_HISTORY_PASS'){throw "GLM_HEAVY_RESULT_INVALID summary=$Summary"}
+          $Trace=(@($Output)|ForEach-Object{[string]$_}) -join [Environment]::NewLine
+          foreach($Round in 1..8){
+            if($Trace -notmatch ("NEMOTRON_TOOL round="+$Round+" name=read_file")){throw "GLM_HEAVY_READ_ROUND_MISSING round=$Round"}
+          }
+          $Sizes=@([regex]::Matches($Trace,'NEMOTRON_REQUEST_SIZE[^\r\n]*body_bytes=(\d+)')|ForEach-Object{[int64]$_.Groups[1].Value})
+          if($Sizes.Count-lt9){throw "GLM_HEAVY_SIZE_TELEMETRY_TOO_SMALL count=$($Sizes.Count)"}
+          $Max=($Sizes|Measure-Object -Maximum).Maximum
+          $LastSize=$Sizes[$Sizes.Count-1]
+          Write-Host "GLM_HEAVY_REQUEST_SIZES=$($Sizes -join ',')"
+          Write-Host "GLM_HEAVY_MAX_BODY_BYTES=$Max"
+          Write-Host "GLM_HEAVY_LAST_BODY_BYTES=$LastSize"
+          if($Max-gt300000){throw "GLM_HEAVY_BODY_TOO_LARGE max=$Max"}
+          if((git status --porcelain)-join''){throw 'GLM_HEAVY_MUTATED_WORKTREE'}
+          Write-Host 'GLM_HEAVY_HISTORY_QUALIFIED=PASS'
