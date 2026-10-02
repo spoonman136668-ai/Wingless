@@ -1,0 +1,113 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-PAIRED-DELTA-MONITOR-R1",
+  "program": "Wingless-Yggdrasil real-workload maintenance bridge",
+  "question": "Does subtracting each key's canonical diagnostic score from its degraded diagnostic score remove the frozen invariant noise floor and identify all eight heterogeneous degradation targets, while the unchanged legacy score reproduces its exact single miss?",
+  "hypothesis": "Across the exact eight independent score-decomposition rows, the legacy calibrated excess-error score will reproduce exactly one nonzero_counts_flattened miss, while the paired degraded-minus-canonical score will rank the true target uniquely first in all eight rows because every eligible off-target delta is exactly zero and every target delta is positive.",
+  "exact_parent_sha": "84f0af4195d8643c90649805d07fff20257f49bb",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "source_experiment": "WLM-YGG-REAL-UTF8-HETEROGENEOUS-MONITOR-SCORE-DECOMPOSITION-R1",
+    "source_qualified_head_sha": "6630f26b08009db411a3a15497951b2613a6e830",
+    "source_qualification_run_id": "37027511676",
+    "source_classification": "qualified-scientific-result",
+    "frozen_observations": {
+      "completed_paired_row_count": 8,
+      "degraded_monitor_misrank_count": 1,
+      "nonzero_counts_flattened_misrank_count": 1,
+      "other_class_misrank_count": 0,
+      "maximum_off_target_score_abs_delta": 0,
+      "off_target_score_change_count": 0,
+      "missed_target_score_delta_relation": ">0",
+      "missed_selected_canonical_minus_target_degraded_score_relation": ">0"
+    }
+  },
+  "authority": "diagnostic research-only; no deployed monitor, threshold, corpus, schedule, degradation, repair, validation, capacity, runtime, external-model inference, scheduler, queue, broker, accepted-ref, production, or authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-ygg-real-utf8-paired-delta-monitor-r1.json",
+    "unitary/wlm_ygg_real_utf8_paired_delta_monitor_r1.go",
+    "cmd/wlm-ygg-real-utf8-paired-delta-monitor-r1/main.go",
+    "scripts/run-wlm-ygg-real-utf8-paired-delta-monitor-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "arms_and_inputs": {
+    "design": "two deterministic readouts over each of the exact eight independent R1/R2 rows; unchanged legacy calibrated score control and paired degraded-minus-canonical score diagnostic",
+    "training": "exact WLM-LM-REAL-UTF8-BYTE-PILOT-R2 four training Git blobs and byte-identical TrainModel path",
+    "evaluation_blobs": [
+      {"path": "docs/experiments/qwen-1.5b-linux-stage3.json", "git_blob_sha": "7765773c8271aa46e4414bd41b8708f1afb1af2f", "size_bytes": 44558},
+      {"path": "unitary/full_latent.go", "git_blob_sha": "5d9400dcc08c5d10cc34303876d88ab1fb785cc8", "size_bytes": 30831}
+    ],
+    "segmentation": "Each blob is split by raw byte index into the unchanged four contiguous quarters; only calibration and diagnostic quarters are read.",
+    "degradation_class_order": ["record_missing", "successor_distribution_rotated", "canonical_best_bucket_erased", "nonzero_counts_flattened"],
+    "target_schedule": "byte-identical WLM-YGG-REAL-UTF8-HETEROGENEOUS-MAINTENANCE-R1 eligibility and ordering, yielding four distinct targets per file",
+    "legacy_readout": "Rank the unchanged degraded-state calibrated excess-error scores with the frozen raw-key tie break.",
+    "paired_delta_readout": "For every identically eligible key, subtract its canonical-state calibrated excess-error score from its degraded-state calibrated excess-error score, then rank descending with the same raw-key tie break. Target and class identities remain evaluator-only."
+  },
+  "seeds": {"pseudorandom_seed_count": 0, "randomness": "none", "determinism": "Git blobs, raw-byte quarter boundaries, class order, occurrence/gain schedule, arithmetic, and lexicographic raw-key tie breaks determine every input and output"},
+  "budgets": {
+    "evaluation_file_count": 2,
+    "degradation_class_count_per_file": 4,
+    "total_rows": 8,
+    "readouts_per_row": 2,
+    "selected_motif_capacity": 256,
+    "diagnostic_state_constructions_per_row": 2,
+    "repair_operations": 0,
+    "retraining_between_rows": false,
+    "tokenizer": false,
+    "external_model_calls": 0,
+    "gomaxprocs": 1
+  },
+  "metrics_and_thresholds": [
+    ["valid_evaluation_file_count", "==", 2],
+    ["completed_row_count", "==", 8],
+    ["minimum_target_eligibility_count_per_file", ">=", 4],
+    ["legacy_misrank_count", "==", 1],
+    ["legacy_nonzero_counts_flattened_misrank_count", "==", 1],
+    ["legacy_other_class_misrank_count", "==", 0],
+    ["paired_delta_top1_target_count", "==", 8],
+    ["paired_delta_nonpositive_target_count", "==", 0],
+    ["paired_delta_positive_off_target_count", "==", 0],
+    ["minimum_paired_delta_target_margin", ">", 0],
+    ["invalid_row_count", "==", 0],
+    ["training_file_identity_mismatch_count", "==", 0],
+    ["evaluation_file_identity_mismatch_count", "==", 0],
+    ["fresh_eval_blob_overlap_count", "==", 0],
+    ["tokenizer_use_count", "==", 0],
+    ["capacity_growth_event_count", "==", 0]
+  ],
+  "controls": [
+    "Reuse the exact prior training/evaluation blobs, segmentation, target schedule, class order, degradation constructors, calibrated background, diagnostic-state construction, score arithmetic, eligibility rule, tie break, and canonical 256-motif model.",
+    "Freeze and reproduce the prior negative-result cardinality in the legacy arm: exactly one of eight misses, in nonzero_counts_flattened, and zero misses in all other classes.",
+    "Construct canonical and degraded diagnostic states independently for every row; compare identical eligible key sets and invalidate any missing or extra key.",
+    "The paired readout changes exactly one dimension: per-key canonical score subtraction. It does not change eligibility, thresholds, repair, data, target schedule, or capacity.",
+    "Use exact float64 subtraction from paired deterministic arithmetic; do not introduce a tolerance.",
+    "Use no repair, tokenizer, randomness, adaptive selection, retraining, capacity growth, external model, or live interface."
+  ],
+  "validity_criteria": [
+    "Exact parent SHA, North Star path/hash, qualified decomposition evidence identity, and frozen observations match.",
+    "Training and evaluation Git blob identities match and evaluation blobs do not overlap the supported pilot train/eval sets.",
+    "Exactly four distinct scheduled targets per file are selected before readout execution.",
+    "Every row starts from independent canonical state; only the scheduled target is degraded by the frozen constructor.",
+    "Both arms use identical eligible keys, calibrated score arithmetic, and raw-key tie break; the paired arm only subtracts canonical from degraded score for the same key.",
+    "Target and class identities are evaluator-only and never affect either ranking.",
+    "No repair, tokenizer, randomness, external model, retraining, capacity growth, threshold change, or authority widening occurs.",
+    "Full Go regression passes before probe execution and the normalized result carries the exact experiment identity."
+  ],
+  "classification_rules": {
+    "supported": "All validity thresholds pass, the legacy arm reproduces exactly one frozen miss, and paired_delta_top1_target_count is 8 with positive target margin in every row.",
+    "mixed": "All validity and legacy-cardinality thresholds pass and paired_delta_top1_target_count is greater than 7 but less than 8, or a target ranks first without a positive margin.",
+    "null": "All validity and legacy-cardinality thresholds pass and paired_delta_top1_target_count equals 7, providing no improvement over the legacy arm.",
+    "negative": "All validity and legacy-cardinality thresholds pass and paired_delta_top1_target_count is less than 7.",
+    "cardinality_mismatch": "The unchanged legacy arm does not reproduce exactly one nonzero_counts_flattened miss and zero other-class misses.",
+    "incomplete": "Compute interruption prevents the complete frozen eight-row matrix without violating a validity criterion.",
+    "invalid": "Any identity, provenance, schedule, segmentation, degradation, score, pairing, deterministic construction, capacity, or qualification criterion drifts."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific execution if any parent, North Star, evidence, blob, overlap, schedule, build/regression, or frozen-observation identity check fails.",
+    "After output begins, execute the full eight-row two-readout matrix unless interrupted or a validity criterion fails.",
+    "If implementation is discovered invalid after any output is observed, do not repair or rerun under this preregistration; restore implementation/request changes and retain only this preregistration commit.",
+    "Do not run additional blobs, classes, scores, tolerances, thresholds, budgets, capacities, or readout variants under this preregistration."
+  ],
+  "no_post_result_tuning_rule": "No question, hypothesis, input, identity, schedule, degradation, seed, budget, metric, threshold, control, validity criterion, classification rule, stop condition, code path, tolerance, or interpretation may change after any paired-delta output is observed."
+}
