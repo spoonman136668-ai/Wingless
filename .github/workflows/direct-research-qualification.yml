@@ -55,7 +55,7 @@ jobs:
           $Prereg=Get-Content -Raw -LiteralPath $PreregPath|ConvertFrom-Json
           if([string]$Prereg.experiment-cne[string]$Q.experiment){throw 'PREREG_EXPERIMENT_MISMATCH'}
           if([string]$Prereg.exact_parent_sha-cne$Baseline){throw 'PREREG_PARENT_MISMATCH'}
-          if([string]$Prereg.north_star_sha256-cne'efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8'){throw 'PREREG_NORTH_STAR_IDENTITY_MISMATCH'}
+          if([string]$Prereg.north_star_sha256-cne'e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465'){throw 'PREREG_NORTH_STAR_IDENTITY_MISMATCH'}
           $Allowed=@($Prereg.changed_paths|ForEach-Object{[string]$_})
           if($Allowed-notcontains$PreregPath){throw 'PREREG_CHANGED_PATHS_SELF_MISSING'}
           if($Allowed-notcontains$QPath){throw 'PREREG_CHANGED_PATHS_REQUEST_MISSING'}
@@ -116,7 +116,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path $Bundle|Out-Null
           $Out='${{ steps.science.outputs.output_dir }}'
           foreach($Name in @('summary.json','probe.json','transcript.txt')){$Src=Join-Path $Out $Name;if(Test-Path -LiteralPath $Src -PathType Leaf){Copy-Item -LiteralPath $Src -Destination (Join-Path $Bundle $Name) -Force}}
-          $State=[ordered]@{schema='research.repo-local-state.v1';program='Wingless';active_branch=$Branch;north_star_path='research/bootstrap/wingless-lm-north-star.txt';north_star_sha256='efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8';parent_sha='${{ steps.frozen.outputs.baseline }}';qualified_head_sha=$Head;experiment=$Experiment;classification='qualified-scientific-result';last_completed_utc=[DateTime]::UtcNow.ToString('o');github_run_id=$env:GITHUB_RUN_ID;execution_mode='direct-no-agent';authority='research-only';ckb_plane_role='governance-only'}
+          $State=[ordered]@{schema='research.repo-local-state.v1';program='Wingless';active_branch=$Branch;north_star_path='research/bootstrap/wingless-lm-north-star.txt';north_star_sha256='e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465';parent_sha='${{ steps.frozen.outputs.baseline }}';qualified_head_sha=$Head;experiment=$Experiment;classification='qualified-scientific-result';last_completed_utc=[DateTime]::UtcNow.ToString('o');github_run_id=$env:GITHUB_RUN_ID;execution_mode='direct-no-agent';authority='research-only';ckb_plane_role='governance-only'}
           $State|ConvertTo-Json -Depth 20|Set-Content -LiteralPath '.research-autonomy\state.json' -Encoding UTF8
           git config user.name 'direct-research-qualification'
           git config user.email 'direct-research-qualification@users.noreply.github.com'
