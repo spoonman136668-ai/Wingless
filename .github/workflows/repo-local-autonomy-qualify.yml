@@ -7,6 +7,7 @@ on:
     paths:
       - '.research-autonomy/**'
       - 'scripts/Invoke-RepoLocalResearchCycle.ps1'
+      - 'scripts/Invoke-NemotronRepoAgent.ps1'
       - 'scripts/Invoke-RepoLocalCutover.ps1'
       - '.github/workflows/research-continuation-controller.yml'
       - '.github/workflows/repo-local-autonomy-qualify.yml'
@@ -36,6 +37,14 @@ jobs:
             @($Errors)|ForEach-Object{Write-Host "PARSE_ERROR line=$($_.Extent.StartLineNumber) message=$($_.Message)"}
             throw "CONTROLLER_PARSE_FAILED count=$(@($Errors).Count)"
           }
+          $AgentPath=(Resolve-Path 'scripts\Invoke-NemotronRepoAgent.ps1').Path
+          $AgentTokens=$null
+          $AgentErrors=$null
+          [void][System.Management.Automation.Language.Parser]::ParseFile($AgentPath,[ref]$AgentTokens,[ref]$AgentErrors)
+          if(@($AgentErrors).Count -gt 0){
+            @($AgentErrors)|ForEach-Object{Write-Host "AGENT_PARSE_ERROR line=$($_.Extent.StartLineNumber) message=$($_.Message)"}
+            throw "NEMOTRON_AGENT_PARSE_FAILED count=$(@($AgentErrors).Count)"
+          }
           $C=Get-Content -Raw '.research-autonomy\config.json'|ConvertFrom-Json
           if($C.schema -cne 'research.autonomy.v2'){throw 'CONFIG_SCHEMA_FAILED'}
           if([bool]$C.enabled){throw 'CONFIG_MUST_REMAIN_DISABLED_DURING_QUALIFICATION'}
@@ -58,6 +67,22 @@ jobs:
           if(-not$Text.Contains("'--approve-for-me'")){throw 'CODEX_APPROVE_FOR_ME_MISSING'}
           if($Text.Contains("'--sandbox','workspace-write','--approve-for-me'")){throw 'CODEX_MUTUALLY_EXCLUSIVE_FLAGS_PRESENT'}
           if($Text.Contains('--full-auto')){throw 'OBSOLETE_CODEX_FULL_AUTO_PRESENT'}
+          $AgentText=Get-Content -Raw $AgentPath
+          foreach($Needle in @(
+            'nvidia/nemotron-3-ultra-550b-a55b:free',
+            'openrouter.ai/api/v1/chat/completions',
+            'openrouter.dpapi',
+            'NEMOTRON_PATH_ESCAPE',
+            'Test-WritablePath',
+            'git_commit',
+            'run_repo_process'
+          )){
+            if(-not$AgentText.Contains($Needle)){throw "NEMOTRON_AGENT_INVARIANT_MISSING $Needle"}
+          }
+          if($AgentText.Contains('Invoke-Expression')){throw 'NEMOTRON_AGENT_INVOKE_EXPRESSION_FORBIDDEN'}
+          $OpenRouterIndex=$Text.IndexOf('provider=openrouter')
+          $CodexIndex=$Text.IndexOf('provider=codex')
+          if($OpenRouterIndex-lt0 -or $CodexIndex-lt0 -or $OpenRouterIndex-ge$CodexIndex){throw 'AGENT_PROVIDER_ORDER_INVALID'}
           Write-Host 'WINGLESS_REPO_LOCAL_CONTROLLER_STATIC_PASS'
 
       - name: Verify Codex runtime
