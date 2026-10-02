@@ -1,0 +1,148 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-REAL-UTF8-BYTE-PILOT-R2",
+  "question": "Can the existing Wingless raw-byte substrate learn useful predictive structure from real UTF-8 prose/code bytes with a fixed bounded learned state and no tokenizer, improving held-out next-byte prediction where learned motifs apply while reducing effective event count?",
+  "hypothesis": "On an immutable repo-owned train/eval split, a fixed 256-entry four-byte motif layer over a fixed 256x256 one-byte-context baseline will cover at least 5% of held-out evaluation positions, improve top-1 next-byte accuracy by at least 0.10 on motif-covered positions, reduce held-out event count by at least 0.03, and not worsen overall held-out bits-per-byte by more than 0.02 versus the baseline.",
+  "exact_parent_sha": "35f7223ec9497201b96470bf75a8c8d31cf6f0ff",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-MULTISCALE-NATIVE-LANGUAGE-PRECURSOR-R2",
+    "classification": "supported",
+    "qualification_run_id": "36999394724"
+  },
+  "authority": "research-only real-byte pilot; no deployment or external-model inference authority",
+  "corpus": {
+    "encoding": "raw file bytes exactly as stored; UTF-8 text/code; no tokenization, normalization, decoding, remapping, or inserted boundary tokens",
+    "file_boundary_policy": "reset byte context/window state at each file boundary; file identity is evaluator/training orchestration only and is not supplied as a model feature",
+    "train": [
+      {
+        "path": "README.md",
+        "blob_sha": "50f1ab5ae468551ee48dd1143e534a0ebe01d6a8"
+      },
+      {
+        "path": "docs/architecture.md",
+        "blob_sha": "dec5b6284ec69c1c94a4cf5b005022981df0e900"
+      },
+      {
+        "path": "unitary/wlm_lm_byte_motif_discovery_r3_balanced.go",
+        "blob_sha": "f9ce41417b5000e3c2419b1b5bf0ce2fc4c41899"
+      },
+      {
+        "path": "unitary/wlm_lm_cross_domain_granularity_transfer_r1.go",
+        "blob_sha": "07b3a6fe2dec98b09c91f770f8d5648defc49ae7"
+      }
+    ],
+    "eval": [
+      {
+        "path": "docs/experiments/wlm-lm-adaptive-granularity-proposal-r1.json",
+        "blob_sha": "32c1a462863a105ac3a42e7229f2efcb15050f30"
+      },
+      {
+        "path": "unitary/wlm_lm_multiscale_native_language_precursor_r2.go",
+        "blob_sha": "ae9543d3fcd61602c14eae4cb22148610a701e0a"
+      }
+    ],
+    "contamination_rule": "No evaluation file bytes may be added to training and no corpus file may be modified under this experiment identifier."
+  },
+  "learner": {
+    "baseline": "fixed 256x256 uint32 counts indexed by previous raw byte and candidate next byte; prediction argmax with lowest-byte tie break",
+    "motif_candidates": "all observed four-byte windows with following byte in training files",
+    "motif_filter": "occurrence count >=4",
+    "motif_score": "best-successor count descending, then best-successor fraction descending, then lexicographic four-byte key",
+    "motif_capacity": 256,
+    "motif_state": "selected four-byte key plus 256 successor counts per selected motif; no capacity growth",
+    "adaptive_prediction": "if the last four raw bytes exactly match a selected motif, use that motif successor distribution/prediction; otherwise use one-byte-context baseline",
+    "probability": "Jeffreys-smoothed categorical probability (count+0.5)/(context_total+128) for bits-per-byte; adaptive uses selected motif distribution when matched, otherwise baseline"
+  },
+  "evaluation": {
+    "metrics_scope": "all next-byte positions after at least one prior byte; motif-covered metrics require four prior bytes and selected exact motif match",
+    "baseline_bpb": "mean -log2 baseline probability on heldout bytes",
+    "adaptive_bpb": "mean -log2 adaptive probability on heldout bytes",
+    "motif_covered_accuracy_gain": "adaptive top-1 accuracy minus baseline top-1 accuracy restricted to motif-covered positions",
+    "event_reduction": "greedy scan per evaluation file; selected four-byte motif span counts as one event instead of four raw byte events"
+  },
+  "metrics_and_thresholds": [
+    [
+      "training_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "evaluation_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "minimum_eval_motif_coverage_fraction",
+      ">=",
+      0.05
+    ],
+    [
+      "minimum_motif_covered_accuracy_gain",
+      ">=",
+      0.1
+    ],
+    [
+      "minimum_effective_event_reduction_fraction",
+      ">=",
+      0.03
+    ],
+    [
+      "maximum_adaptive_minus_baseline_bits_per_byte",
+      "<=",
+      0.02
+    ],
+    [
+      "maximum_learned_motif_capacity",
+      "==",
+      256
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_byte_rows",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_rows",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "All frozen thresholds and validity criteria pass.",
+    "mixed": "Real-byte motif learning improves covered-position prediction or event efficiency but at least one coverage/BPB threshold fails.",
+    "negative": "Validity passes but motif layer yields no predictive or event-reduction advantage over the raw-byte baseline.",
+    "incomplete": "Corpus or compute interruption prevents complete frozen evaluation.",
+    "invalid": "Corpus identity, train/eval isolation, raw-byte identity, capacity, deterministic construction, or qualification isolation fails."
+  },
+  "no_post_result_tuning_rule": "Do not change corpus files/blobs, motif capacity/filter/score, smoothing, metrics, thresholds, split, or classification after observing output.",
+  "supersedes_invalid_attempt": {
+    "experiment": "WLM-LM-REAL-UTF8-BYTE-PILOT-R1",
+    "disposition": "invalid-provenance-before-execution",
+    "scientific_claim": false,
+    "primary_probe_executed": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-real-utf8-byte-pilot-r2.json",
+    "unitary/wlm_lm_real_utf8_byte_pilot_r2.go",
+    "cmd/wlm-lm-real-utf8-byte-pilot-r2/main.go",
+    "scripts/run-wlm-lm-real-utf8-byte-pilot-r2.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
