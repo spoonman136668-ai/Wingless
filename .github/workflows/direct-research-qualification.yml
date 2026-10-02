@@ -3,7 +3,7 @@ name: Direct Wingless research qualification
 on:
   push:
     branches:
-      - research/autonomy-wingless-active
+      - research/direct-wingless-sparse-vector-r1c
     paths:
       - 'unitary/**'
       - 'cmd/**'
@@ -25,7 +25,7 @@ jobs:
       - name: Checkout exact active branch
         uses: actions/checkout@v4
         with:
-          ref: research/autonomy-wingless-active
+          ref: research/direct-wingless-sparse-vector-r1c
           fetch-depth: 0
           persist-credentials: true
           clean: true
@@ -35,7 +35,7 @@ jobs:
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          $Branch='research/autonomy-wingless-active'
+          $Branch='research/direct-wingless-sparse-vector-r1c'
           $QPath='.wingless/qualification-request.json'
           if(-not(Test-Path -LiteralPath $QPath -PathType Leaf)){throw 'QUALIFICATION_REQUEST_MISSING'}
           $Q=Get-Content -Raw -LiteralPath $QPath|ConvertFrom-Json
@@ -104,7 +104,7 @@ jobs:
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          $Branch='research/autonomy-wingless-active'
+          $Branch='research/direct-wingless-sparse-vector-r1c'
           $Head='${{ steps.frozen.outputs.head }}'
           git fetch origin $Branch
           if($LASTEXITCODE-ne0){throw 'REMOTE_REFRESH_FAILED'}
