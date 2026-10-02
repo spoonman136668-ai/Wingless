@@ -19,7 +19,8 @@ function Resolve-RepoPath([string]$Relative,[bool]$MustExist=$false){
     if([IO.Path]::IsPathRooted($Relative)){throw "NEMOTRON_PATH_ROOTED path=$Relative"}
     $Root=[IO.Path]::GetFullPath($RepoPath).TrimEnd('\')
     $Full=[IO.Path]::GetFullPath((Join-Path $Root ($Relative -replace '/','\')))
-    if(-not($Full.StartsWith($Root+'\',[StringComparison]::OrdinalIgnoreCase))){throw "NEMOTRON_PATH_ESCAPE path=$Relative"}
+    $InsideRoot=$Full.Equals($Root,[StringComparison]::OrdinalIgnoreCase) -or $Full.StartsWith($Root+'\',[StringComparison]::OrdinalIgnoreCase)
+    if(-not$InsideRoot){throw "NEMOTRON_PATH_ESCAPE path=$Relative"}
     if($MustExist -and -not(Test-Path -LiteralPath $Full)){throw "NEMOTRON_PATH_MISSING path=$Relative"}
     return $Full
 }
