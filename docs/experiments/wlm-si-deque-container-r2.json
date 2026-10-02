@@ -1,0 +1,160 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-SI-DEQUE-CONTAINER-R2",
+  "question": "Does the exact bounded FIFO deque state-transition law remain substrate-invariant between an independent slice-backed deque and fixed-capacity ring deque under mixed front/back admission and removal schedules?",
+  "hypothesis": "Across the frozen 512 paired cases, both independently implemented deque substrates will emit identical front-to-back state and removal observables at every step, with zero conservation, residual, capacity, schedule, cardinality, row-count, or paired-observable violations.",
+  "exact_parent_sha": "616a867a3e606593e656c8fdcfb4b0671b716cc1",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
+  "prior_evidence": {
+    "experiment": "WLM-SI-STACK-CONTAINER-R1",
+    "classification": "qualified-scientific-result"
+  },
+  "supersedes_invalid_attempt": {
+    "experiment": "WLM-SI-DEQUE-CONTAINER-R1",
+    "disposition": "invalid-infrastructure",
+    "scientific_claim": false
+  },
+  "authority": "research-only; no production, broker, live, accepted-ref, credential, runner-configuration, or cross-lane authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-si-deque-container-r2.json",
+    "unitary/wlm_si_deque_container_r2.go",
+    "cmd/wlm-si-deque-container-r2/main.go",
+    "scripts/run-wlm-si-deque-container-r2.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "substrates": [
+    "slice-backed-deque: independent contiguous slice implementation",
+    "fixed-capacity-ring-deque: independent 16-slot circular-buffer implementation"
+  ],
+  "seeds": [
+    10009,
+    10037,
+    10061,
+    10091,
+    10111,
+    10141,
+    10169,
+    10193
+  ],
+  "seed_policy": "All eight seeds were checked against the Wingless repository before preregistration and had no matches. No seed replacement, exclusion, or extension is permitted.",
+  "schedules": {
+    "alternating-ends": "requested=1+seed%8 each step; admission end alternates by (step+seed)%2; removal uses the opposite end",
+    "paired-bursts": "p=(step+seed)%4; requested=16 when p<2 else 0; admission uses front when p<2 else back; removal end is front iff (step+seed)%2==0",
+    "front-pulse": "requested=16 iff (step+seed)%8==2 else 0; admission always front; removal front iff (step+seed)%3!=0",
+    "lcg32": "advance uint32 LCG x=1664525*x+1013904223 three times per step; first draw gives requested=x%17, second draw chooses admission end by parity, third draw chooses removal end by parity"
+  },
+  "initial_occupancies": [
+    0,
+    5,
+    10,
+    15
+  ],
+  "removal_budgets": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "steps_per_case": 64,
+  "capacity": 16,
+  "token_rule": "Initial tokens are -initial through -1 in front-to-back order. Newly admitted token IDs are step*16+ordinal. Each requested token is admitted up to remaining capacity in ordinal order at the selected end. Removal pops up to the frozen budget from the selected end and records tokens in removal order.",
+  "observables": [
+    "requested pushes",
+    "admitted count",
+    "rejected count",
+    "removed count",
+    "deque occupancy before and after",
+    "residual occupancy",
+    "cumulative admitted/rejected/removed counts",
+    "front-to-back deque token IDs",
+    "removed token IDs"
+  ],
+  "budgets": {
+    "paired_case_count": 512,
+    "completed_substrate_case_runs": 1024,
+    "total_emitted_rows": 65536,
+    "capacity": 16,
+    "steps_per_case": 64,
+    "goroutine_policy": "single-process deterministic execution; GOMAXPROCS=1 in qualification",
+    "capacity_growth": false
+  },
+  "metrics_and_thresholds": [
+    {
+      "name": "paired_case_count",
+      "comparator": "==",
+      "threshold": 512
+    },
+    {
+      "name": "completed_substrate_case_runs",
+      "comparator": "==",
+      "threshold": 1024
+    },
+    {
+      "name": "total_emitted_rows",
+      "comparator": "==",
+      "threshold": 65536
+    },
+    {
+      "name": "paired_observable_mismatch_cases",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "row_count_mismatch_cases",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "state_cardinality_mismatch_cases",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "invalid_operation_schedules",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "budget_overrun_rows",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "law_violation_cases",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "max_conservation_error",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "max_residual_law_error",
+      "comparator": "==",
+      "threshold": 0
+    }
+  ],
+  "validity_criteria": [
+    "Exact parent SHA and North Star SHA-256 match this preregistration.",
+    "All 512 paired cases, 1024 substrate case-runs, and 65536 rows complete.",
+    "Both substrates are independent implementations sharing only the frozen operation schedule and comparison helpers.",
+    "All requested counts stay within 0..16 and every row remains within capacity 0..16.",
+    "Conservation after=before+admitted-removed and residual=max(0,before+admitted-budget) hold exactly.",
+    "The normalized result carries schema wingless.research-scientific-result.v1 and exact experiment identifier.",
+    "Full Go regression passes before probe execution."
+  ],
+  "classification_rules": {
+    "supported": "All eleven frozen metric thresholds and all validity criteria pass.",
+    "negative": "Validity and completeness pass but any invariant metric threshold fails; preserve the exact mismatch counts and rows.",
+    "incomplete": "Environmental or compute interruption prevents full cardinality; preserve diagnostics and make no scientific claim.",
+    "invalid": "Provenance, frozen-package identity, schedule validity, implementation isolation, or deterministic qualification fails; invalid is not a scientific outcome."
+  },
+  "stop_conditions": [
+    "Stop before execution on identity, provenance, authority, or package-scope drift.",
+    "Stop as invalid on malformed schedules or construction errors; do not repair after observing probe output under this experiment identifier.",
+    "Do not stop early for mismatches or apparent support; complete the full frozen matrix unless infrastructure prevents it."
+  ],
+  "no_post_result_tuning_rule": "After any probe or primary output is observed, do not alter seeds, schedules, initial occupancies, budgets, capacity, operation semantics, observables, metrics, thresholds, classification, or stop conditions under this experiment identifier."
+}
