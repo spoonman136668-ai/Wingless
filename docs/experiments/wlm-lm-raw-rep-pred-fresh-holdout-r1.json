@@ -1,0 +1,111 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RAW-REP-PRED-FRESH-HOLDOUT-R1",
+  "program": "Wingless raw-input to representation to prediction chain",
+  "question": "Does a fixed-capacity native four-byte representation learned directly from raw repo bytes improve next-byte prediction on four fresh immutable real-code holdouts relative to the unchanged previous-byte baseline, without tokenization or external model inference?",
+  "hypothesis": "A 512-motif representation learned only from the frozen ten-file training corpus will cover at least 4% of eligible positions on every fresh holdout, improve covered-position top-1 prediction accuracy by at least 0.05 on every holdout, reduce effective event count by at least 8% on every holdout, and avoid worsening bits-per-byte on every holdout. Passing this gate licenses a later preregistered representation-to-reasoning experiment; failing it keeps work at the representation/prediction stage.",
+  "exact_parent_sha": "67cce423f2ff5dd3e2b0b9778ae3621993d13c52",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "next_completed_experiment_target": 8,
+    "chain_experiments_target": 6,
+    "substrate_falsification_target": 2,
+    "allocation": "75% raw-input -> representation -> prediction -> reasoning chain; 25% substrate falsification",
+    "rule": "The allocation is prospective planning context only. Every experiment remains independently preregistered and frozen before scientific output."
+  },
+  "prior_evidence": {
+    "representation_precursor": "WLM-LM-REAL-UTF8-BYTE-PILOT-R2",
+    "representation_precursor_observation": "A 256-motif raw-byte representation previously achieved positive held-out covered-position prediction gain and lower bits-per-byte on its frozen evaluation set.",
+    "hierarchy_probe": "WLM-LM-REAL-UTF8-HIERARCHICAL-PATCH-R3",
+    "hierarchy_probe_observation": "A second hierarchy level did not satisfy its frozen thresholds, so this experiment returns to the established level-1 representation and tests generalization on fresh code blobs before adding further hierarchy."
+  },
+  "authority": "research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "corpus": {
+    "encoding": "exact Git blob bytes; no UTF decoding, normalization, tokenizer, vocabulary, separator token, boundary label, or remapping",
+    "file_boundary_policy": "reset previous-byte and motif context at every file boundary",
+    "train": [
+      ["README.md", "50f1ab5ae468551ee48dd1143e534a0ebe01d6a8"],
+      ["docs/architecture.md", "dec5b6284ec69c1c94a4cf5b005022981df0e900"],
+      ["docs/internal-stage-2.md", "d71357155dc1b141369dfd61d971b0eb1d00c9c9"],
+      ["docs/inference-backends.md", "4e5b3c2c268e1ded129020fd22e8fbe07725ec30"],
+      ["unitary/wlm_lm_byte_motif_discovery_r3_balanced.go", "f9ce41417b5000e3c2419b1b5bf0ce2fc4c41899"],
+      ["unitary/wlm_lm_cross_domain_granularity_transfer_r1.go", "07b3a6fe2dec98b09c91f770f8d5648defc49ae7"],
+      ["unitary/adaptive_continuous_fusion.go", "60ae9ce88419cf2541205ad41d81b8c0d3cbe114"],
+      ["unitary/anonymous_gram.go", "8a85e5e09a0ffa4a0e8e849df1a63e78ecfd2a1e"],
+      ["unitary/memory.go", "24b132e0bf81e373d7b82b70719b9ee9419d0054"],
+      ["unitary/training.go", "f39dcd4cda2f2b78b97df77fc7098199afa55acb"]
+    ],
+    "eval": [
+      ["unitary/full_latent.go", "5d9400dcc08c5d10cc34303876d88ab1fb785cc8", 30831],
+      ["unitary/real_orthogonal_equivalence.go", "46e946ace9d91347f86db6ad63233df14a5c7c1e", 27322],
+      ["unitary/learned_anchor.go", "4a47552fea9927a01ca895674bfbbb89bc9b03cd", 27201],
+      ["unitary/discovery_breadth.go", "fd97feba07d4007bab43aeb6663232c42edb6cf1", 26934]
+    ],
+    "freshness_check": "The four evaluation blob identities are absent from the existing Wingless code-search references checked before preregistration and are disjoint from the frozen training identities."
+  },
+  "learner": {
+    "baseline": "fixed 256x256 previous-byte -> next-byte uint32 counts with lowest-byte argmax tie break and Jeffreys categorical smoothing",
+    "representation": "all raw four-byte training windows with following-byte counts; require occurrence count >=4; select exactly the best 512 by best-successor count descending, then best-successor fraction descending, then lexicographic raw key",
+    "prediction": "if the previous four raw bytes match a selected motif, use that motif's learned successor distribution; otherwise use the previous-byte baseline",
+    "capacity": 512,
+    "capacity_growth": false
+  },
+  "controls": [
+    "The baseline and representation are trained on identical frozen training bytes.",
+    "Evaluation bytes never participate in candidate selection, successor counts, thresholds, or capacity selection.",
+    "Baseline and representation reset at every file boundary.",
+    "No tokenizer, external model, network access, adaptive thresholding, per-file fitting, or capacity growth is permitted.",
+    "The same deterministic tie breaks and Jeffreys smoothing are used for every file.",
+    "Full Go regression runs before the scientific probe."
+  ],
+  "metrics_and_thresholds": [
+    ["training_file_identity_mismatch_count", "==", 0],
+    ["evaluation_file_identity_mismatch_count", "==", 0],
+    ["train_eval_blob_overlap_count", "==", 0],
+    ["valid_evaluation_file_count", "==", 4],
+    ["selected_motif_count", "==", 512],
+    ["minimum_eval_representation_coverage_fraction", ">=", 0.04],
+    ["minimum_covered_top1_accuracy_gain", ">=", 0.05],
+    ["minimum_effective_event_reduction_fraction", ">=", 0.08],
+    ["maximum_representation_minus_baseline_bits_per_byte", "<=", 0.0],
+    ["files_with_positive_covered_top1_gain", "==", 4],
+    ["files_with_nonworse_bits_per_byte", "==", 4],
+    ["capacity_growth_event_count", "==", 0],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["invalid_byte_rows", "==", 0],
+    ["counter_overflow_rows", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact parent and North Star identity match.",
+    "All training and evaluation Git blob identities and evaluation sizes match.",
+    "Training and evaluation blob sets are disjoint.",
+    "The learner receives only exact raw bytes and resets context at file boundaries.",
+    "Exactly 512 motifs are selected by the frozen ranking rule.",
+    "No evaluation byte affects learned state, threshold, ranking, capacity, or selection.",
+    "No tokenizer, external model, network call, capacity growth, randomness, or per-file adaptation occurs.",
+    "Full Go regression passes before probe execution and the normalized result carries the exact experiment identifier."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all frozen scientific thresholds pass. The raw-input -> representation -> prediction bridge is accepted for a subsequent separately preregistered reasoning-stage experiment.",
+    "mixed": "Validity passes and all four files have positive covered-position prediction gain, but at least one coverage, gain magnitude, event-reduction, or bits-per-byte threshold fails.",
+    "negative": "Validity passes but any evaluation file has non-positive covered-position prediction gain or the representation worsens bits-per-byte on more than one file.",
+    "incomplete": "Compute interruption prevents complete regression or all four holdout evaluations.",
+    "invalid": "Any identity, isolation, raw-byte, deterministic-selection, capacity, or qualification criterion fails."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific evaluation on any parent, North Star, blob identity, size, train/eval overlap, build, or regression failure.",
+    "After scientific output begins, evaluate all four frozen holdouts unless interrupted or a validity criterion fails.",
+    "Do not add files, alter capacity, lower thresholds, change smoothing, or modify classification after observing output.",
+    "If implementation is invalid after output is observed, retain the preregistration and do not rerun under this experiment identifier."
+  ],
+  "no_post_result_tuning_rule": "No corpus identity, capacity, selection rule, smoothing, metric, threshold, control, validity criterion, classification rule, or interpretation may change after any primary output is observed.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-raw-rep-pred-fresh-holdout-r1.json",
+    "unitary/wlm_lm_raw_rep_pred_fresh_holdout_r1.go",
+    "cmd/wlm-lm-raw-rep-pred-fresh-holdout-r1/main.go",
+    "scripts/run-wlm-lm-raw-rep-pred-fresh-holdout-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
