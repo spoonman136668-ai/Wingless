@@ -1,0 +1,28 @@
+{
+  "schema": "wingless.research-classification.v1",
+  "experiment": "WLM-LM-REAL-UTF8-BYTE-PILOT-R2",
+  "qualified_head_sha": "b6a50199831bc6e4e243f8c2c72ef5b4cc02d75c",
+  "qualification_run_id": "37000936408",
+  "qualification": "qualified-scientific-result",
+  "classification": "supported",
+  "thresholds_frozen_before_execution": true,
+  "full_regression_passed": true,
+  "metrics": {
+    "capacity_growth_event_count": 0,
+    "counter_overflow_rows": 0,
+    "evaluation_file_identity_mismatch_count": 0,
+    "invalid_byte_rows": 0,
+    "maximum_adaptive_minus_baseline_bits_per_byte": -0.05349253593646086,
+    "maximum_learned_motif_capacity": 256,
+    "minimum_effective_event_reduction_fraction": 0.14642904641574672,
+    "minimum_eval_motif_coverage_fraction": 0.10326014637391882,
+    "minimum_motif_covered_accuracy_gain": 0.5180897250361794,
+    "selected_motif_count": 256,
+    "tokenizer_use_count": 0,
+    "training_file_identity_mismatch_count": 0
+  },
+  "scientific_claim": "On an immutable repo-owned real UTF-8 prose/code split, the existing Wingless raw-byte substrate learned a fixed 256-entry four-byte motif layer without tokenization. On held-out files it covered at least 10.33% of evaluable positions, improved motif-covered next-byte accuracy by at least 0.518, reduced effective event count by at least 14.64%, and improved overall bits-per-byte by at least 0.0535 relative to the one-byte-context baseline, with exact train/eval blob identity and no capacity growth.",
+  "next_question": "Can the real-byte motif layer support a second learned hierarchy level and preserve its predictive/efficiency gains across a larger immutable prose/code corpus and stronger cross-file distribution shift?",
+  "scope": "small immutable real UTF-8 repository corpus; not open-domain language competence",
+  "authority": "research-only"
+}
