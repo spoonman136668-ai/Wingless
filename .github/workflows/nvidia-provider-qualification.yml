@@ -1,0 +1,91 @@
+name: NVIDIA research model protocol qualification
+
+on:
+  push:
+    branches:
+      - research/nvidia-provider-qualification-r1
+    paths:
+      - 'scripts/Invoke-NemotronRepoAgent.ps1'
+      - '.github/workflows/nvidia-provider-qualification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-nvidia-provider-qualification
+  cancel-in-progress: false
+
+jobs:
+  protocol:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 90
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+        with:
+          ref: research/nvidia-provider-qualification-r1
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Verify NVIDIA credential presence
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          if([string]::IsNullOrWhiteSpace($env:NVIDIA_API_KEY)){
+            throw 'NVIDIA_API_KEY_SECRET_MISSING'
+          }
+          Write-Host 'NVIDIA_API_KEY=SET'
+
+      - name: Qualify OpenAI-compatible tool protocol
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Repo=(Resolve-Path '.').Path
+          $Branch=(git branch --show-current).Trim()
+          $Head=(git rev-parse HEAD).Trim()
+          if($Branch -cne 'research/nvidia-provider-qualification-r1'){throw "QUAL_BRANCH_MISMATCH actual=$Branch"}
+          if($Head -notmatch '^[0-9a-f]{40}$'){throw 'QUAL_HEAD_INVALID'}
+
+          $Prompt=Join-Path $env:RUNNER_TEMP 'wingless-nvidia-protocol-prompt.txt'
+          @'
+This is a frozen provider-protocol qualification only.
+Do not modify any repository file.
+Call git_status exactly once.
+Then call finish exactly once with status complete and summary exactly:
+NVIDIA_PROTOCOL_PASS
+'@ | Set-Content -LiteralPath $Prompt -Encoding UTF8
+
+          $Models=@(
+            'moonshotai/kimi-k3',
+            'z-ai/glm-5.3',
+            'nvidia/nemotron-3-ultra-550b-a55b',
+            'nvidia/nemotron-3.5-lightning-30b-a3b',
+            'poolside/laguna-xs-2.1'
+          )
+
+          foreach($Model in $Models){
+            $Last=Join-Path $env:RUNNER_TEMP (('wingless-nvidia-'+($Model-replace'[^A-Za-z0-9._-]','_')+'.txt'))
+            Remove-Item -LiteralPath $Last -Force -ErrorAction SilentlyContinue
+            & '.\scripts\Invoke-NemotronRepoAgent.ps1' `
+              -RepoPath $Repo `
+              -Program 'Wingless' `
+              -ActiveBranch $Branch `
+              -StartSha $Head `
+              -PromptPath $Prompt `
+              -LastMessagePath $Last `
+              -Provider nvidia `
+              -Model $Model `
+              -MaxRounds 6 `
+              -ProtocolProbe
+            if(-not(Test-Path -LiteralPath $Last -PathType Leaf)){throw "NVIDIA_PROTOCOL_RESULT_MISSING model=$Model"}
+            $Summary=[IO.File]::ReadAllText($Last).Trim()
+            if($Summary -cne 'NVIDIA_PROTOCOL_PASS'){throw "NVIDIA_PROTOCOL_RESULT_INVALID model=$Model summary=$Summary"}
+            if((git status --porcelain)-join''){throw "NVIDIA_PROTOCOL_MUTATED_WORKTREE model=$Model"}
+            Write-Host "NVIDIA_PROTOCOL_QUALIFIED model=$Model"
+          }
+
+          Write-Host 'NVIDIA_PROVIDER_PROTOCOL_QUALIFICATION=PASS'
