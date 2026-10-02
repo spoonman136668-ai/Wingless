@@ -59,8 +59,18 @@ function Assert-Writable([string]$Relative){
 }
 
 function Invoke-GitRaw([string[]]$GitArgs){
-    $Out=@(& git -C $RepoPath @GitArgs 2>&1 | ForEach-Object {[string]$_})
-    $Code=$LASTEXITCODE
+    $PriorErrorAction=$ErrorActionPreference
+    try{
+        # Native git may emit non-fatal warnings on stderr (for example line-ending
+        # normalization) while still returning exit code 0. Capture those bytes as
+        # tool output and judge success strictly by the process exit code.
+        $ErrorActionPreference='Continue'
+        $Out=@(& git -C $RepoPath @GitArgs 2>&1 | ForEach-Object {[string]$_})
+        $Code=$LASTEXITCODE
+    }
+    finally{
+        $ErrorActionPreference=$PriorErrorAction
+    }
     return [ordered]@{exit_code=$Code;output=($Out -join [Environment]::NewLine)}
 }
 
