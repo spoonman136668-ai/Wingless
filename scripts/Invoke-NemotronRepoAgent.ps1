@@ -5,7 +5,8 @@ param(
     [Parameter(Mandatory=$true)][string]$StartSha,
     [Parameter(Mandatory=$true)][string]$PromptPath,
     [Parameter(Mandatory=$true)][string]$LastMessagePath,
-    [string]$Model='nvidia/nemotron-3-ultra-550b-a55b:free',
+    [ValidateSet('openrouter','nvidia')][string]$Provider='openrouter',
+    [string]$Model='',
     [int]$MaxRounds=48,
     [switch]$ProtocolProbe,
     [switch]$SelfTest
@@ -13,6 +14,10 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
+
+if([string]::IsNullOrWhiteSpace($Model)){
+    $Model=if($Provider-ceq'nvidia'){'z-ai/glm-5.3'}else{'nvidia/nemotron-3-ultra-550b-a55b:free'}
+}
 
 function Resolve-RepoPath([string]$Relative,[bool]$MustExist=$false){
     if([string]::IsNullOrWhiteSpace($Relative)){throw 'NEMOTRON_PATH_EMPTY'}
@@ -54,8 +59,18 @@ function Assert-Writable([string]$Relative){
 }
 
 function Invoke-GitRaw([string[]]$GitArgs){
-    $Out=@(& git -C $RepoPath @GitArgs 2>&1 | ForEach-Object {[string]$_})
-    $Code=$LASTEXITCODE
+    $PriorErrorAction=$ErrorActionPreference
+    try{
+        # Native git may emit non-fatal warnings on stderr (for example line-ending
+        # normalization) while still returning exit code 0. Capture those bytes as
+        # tool output and judge success strictly by the process exit code.
+        $ErrorActionPreference='Continue'
+        $Out=@(& git -C $RepoPath @GitArgs 2>&1 | ForEach-Object {[string]$_})
+        $Code=$LASTEXITCODE
+    }
+    finally{
+        $ErrorActionPreference=$PriorErrorAction
+    }
     return [ordered]@{exit_code=$Code;output=($Out -join [Environment]::NewLine)}
 }
 
@@ -258,16 +273,24 @@ if($SelfTest){
     return
 }
 
-$SecretCandidates=@(
-    'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
-    'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
-)
-$Secret=$SecretCandidates|Where-Object{Test-Path -LiteralPath $_ -PathType Leaf}|Select-Object -First 1
-if([string]::IsNullOrWhiteSpace($Secret)){throw 'NEMOTRON_OPENROUTER_SECRET_MISSING'}
-$Secure=(Get-Content -LiteralPath $Secret -Raw).Trim()|ConvertTo-SecureString
-$Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
-try{$Token=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
-if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_OPENROUTER_SECRET_EMPTY'}
+$Endpoint=$null
+if($Provider-ceq'nvidia'){
+    $Token=[string]$env:NVIDIA_API_KEY
+    if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_NVIDIA_SECRET_MISSING'}
+    $Endpoint='https://integrate.api.nvidia.com/v1/chat/completions'
+}else{
+    $SecretCandidates=@(
+        'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
+        'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
+    )
+    $Secret=$SecretCandidates|Where-Object{Test-Path -LiteralPath $_ -PathType Leaf}|Select-Object -First 1
+    if([string]::IsNullOrWhiteSpace($Secret)){throw 'NEMOTRON_OPENROUTER_SECRET_MISSING'}
+    $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim()|ConvertTo-SecureString
+    $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+    try{$Token=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+    if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_OPENROUTER_SECRET_EMPTY'}
+    $Endpoint='https://openrouter.ai/api/v1/chat/completions'
+}
 
 $Prompt=[IO.File]::ReadAllText($PromptPath)
 $System=@"
@@ -303,8 +326,8 @@ $Messages.Add([ordered]@{role='user';content=$Prompt})
 $Headers=@{
     Authorization='Bearer '+$Token
     'Content-Type'='application/json'
-    'X-OpenRouter-Metadata'='enabled'
 }
+if($Provider-ceq'openrouter'){$Headers['X-OpenRouter-Metadata']='enabled'}
 
 for($Round=1;$Round-le$MaxRounds;$Round++){
     if($Round-eq([Math]::Max(2,$MaxRounds-2))){
@@ -313,34 +336,38 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
     $ToolChoice=if($Round-eq$MaxRounds){
         [ordered]@{type='function';function=[ordered]@{name='finish'}}
     }else{'auto'}
-    $Body=[ordered]@{
+    $BodyObject=[ordered]@{
         model=$Model
-        temperature=0
+        temperature=if($Provider-ceq'nvidia'){1}else{0}
         messages=$Messages.ToArray()
         tools=$Tools
         tool_choice=$ToolChoice
-        max_tokens=4096
-    }|ConvertTo-Json -Depth 50 -Compress
+        max_tokens=if($Provider-ceq'nvidia'){16384}else{4096}
+    }
+    if($Provider-ceq'nvidia'){$BodyObject.reasoning_effort='low'}
+    $Body=$BodyObject|ConvertTo-Json -Depth 50 -Compress
 
     $Resp=$null
     for($Attempt=1;$Attempt-le3;$Attempt++){
         try{
-            $Resp=Invoke-RestMethod -Method Post -Uri 'https://openrouter.ai/api/v1/chat/completions' -Headers $Headers -Body $Body -TimeoutSec 180
+            $Resp=Invoke-RestMethod -Method Post -Uri $Endpoint -Headers $Headers -Body $Body -TimeoutSec 180
             break
         }catch{
             $StatusCode=$null
             try{$StatusCode=[int]$_.Exception.Response.StatusCode}catch{}
             $IsRateLimit=($StatusCode-eq429 -or $_.Exception.Message -match '(?i)429|too many requests')
-            if($IsRateLimit -and $Attempt-lt3){
+            $IsTransientNvidia=($Provider-ceq'nvidia' -and ($StatusCode-eq500 -or $StatusCode-eq502 -or $StatusCode-eq503 -or $StatusCode-eq504 -or $_.Exception.Message -match '(?i)internal server error|bad gateway|server unavailable|gateway timeout'))
+            if(($IsRateLimit -or $IsTransientNvidia) -and $Attempt-lt3){
                 $Delay=if($Attempt-eq1){5}else{15}
-                Write-Host "NEMOTRON_OPENROUTER_RATE_LIMIT round=$Round attempt=$Attempt retry_seconds=$Delay"
+                $Kind=if($IsRateLimit){'rate_limit'}else{'transient_server'}
+                Write-Host "NEMOTRON_PROVIDER_RETRY provider=$Provider kind=$Kind status=$StatusCode round=$Round attempt=$Attempt retry_seconds=$Delay"
                 Start-Sleep -Seconds $Delay
                 continue
             }
-            throw "NEMOTRON_OPENROUTER_REQUEST_FAILED round=$Round attempt=$Attempt status=$StatusCode error=$($_.Exception.Message)"
+            throw "NEMOTRON_PROVIDER_REQUEST_FAILED provider=$Provider round=$Round attempt=$Attempt status=$StatusCode error=$($_.Exception.Message)"
         }
     }
-    if($null-eq$Resp){throw "NEMOTRON_OPENROUTER_RESPONSE_MISSING round=$Round"}
+    if($null-eq$Resp){throw "NEMOTRON_PROVIDER_RESPONSE_MISSING provider=$Provider round=$Round"}
     if($null-eq$Resp.choices -or @($Resp.choices).Count-lt1){throw "NEMOTRON_RESPONSE_CHOICES_MISSING round=$Round"}
     $Msg=$Resp.choices[0].message
     $ToolCallsProperty=$Msg.PSObject.Properties['tool_calls']
@@ -349,7 +376,11 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
         $Calls=@($ToolCallsProperty.Value)
     }
     $ContentProperty=$Msg.PSObject.Properties['content']
+    $ReasoningProperty=$Msg.PSObject.Properties['reasoning_content']
     $Assistant=[ordered]@{role='assistant';content=if($null-eq$ContentProperty -or $null-eq$ContentProperty.Value){''}else{[string]$ContentProperty.Value}}
+    if($null-ne$ReasoningProperty -and $null-ne$ReasoningProperty.Value){
+        $Assistant.reasoning_content=[string]$ReasoningProperty.Value
+    }
     if($Calls.Count-gt0){
         $ToolCallRows=New-Object Collections.Generic.List[object]
         foreach($Call in $Calls){
@@ -368,9 +399,17 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
 
     if($Calls.Count-eq0){
         $Final=[string]$Assistant.content
-        if([string]::IsNullOrWhiteSpace($Final)){throw "NEMOTRON_EMPTY_FINAL round=$Round"}
+        $Reasoning=if($Assistant.Contains('reasoning_content')){[string]$Assistant.reasoning_content}else{''}
+        if([string]::IsNullOrWhiteSpace($Final)){
+            if($Provider-ceq'nvidia' -and -not[string]::IsNullOrWhiteSpace($Reasoning) -and $Round-lt$MaxRounds){
+                $Messages.Add([ordered]@{role='user';content='Continue from your preserved reasoning. You must now call one of the supplied tools; call finish when complete.'})
+                continue
+            }
+            throw "NEMOTRON_EMPTY_FINAL round=$Round"
+        }
+        if($ProtocolProbe){throw "NEMOTRON_PROTOCOL_TOOL_CALL_REQUIRED round=$Round"}
         [IO.File]::WriteAllText($LastMessagePath,$Final,(New-Object Text.UTF8Encoding($false)))
-        Write-Host "NEMOTRON_AGENT_PASS rounds=$Round model=$Model"
+        Write-Host "NEMOTRON_AGENT_PASS provider=$Provider rounds=$Round model=$Model"
         return
     }
 
@@ -382,7 +421,7 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
             $Summary=[string]$FinishArgs.summary
             if([string]::IsNullOrWhiteSpace($Summary)){throw 'NEMOTRON_FINISH_SUMMARY_EMPTY'}
             [IO.File]::WriteAllText($LastMessagePath,$Summary,(New-Object Text.UTF8Encoding($false)))
-            Write-Host "NEMOTRON_AGENT_PASS rounds=$Round model=$Model status=$([string]$FinishArgs.status)"
+            Write-Host "NEMOTRON_AGENT_PASS provider=$Provider rounds=$Round model=$Model status=$([string]$FinishArgs.status)"
             return
         }
         try{
