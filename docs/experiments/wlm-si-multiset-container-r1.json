@@ -1,0 +1,81 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "status": "frozen-prereg-only",
+  "experiment": "WLM-SI-MULTISET-CONTAINER-R1",
+  "question": "Under a fixed 32-key universe and total multiplicity cap, do a dense per-key count table and a sorted run-length multiset preserve add/remove/count observables, total multiplicity, and conservation laws?",
+  "hypothesis": "All preregistered per-key counts, accepted/rejected updates, removals, total multiplicity, and conservation observables remain exactly invariant.",
+  "exact_parent_sha": "caaeca20548eec9836bdb90be9f95aa4cb883f90",
+  "north_star_sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
+  "prior_evidence": [
+    {
+      "experiment": "WLM-SI-MEMBERSHIP-CONTAINER-R1",
+      "run_id": 36982338668
+    },
+    {
+      "experiment": "WLM-SI-OBJECT-POOL-R1",
+      "run_id": 36982736772
+    },
+    {
+      "experiment": "WLM-SI-ACCUMULATOR-R1",
+      "run_id": 36983116846
+    }
+  ],
+  "changed_dimension": "multiset substrate only: dense count table versus sorted run-length representation",
+  "fixed_matrix": {
+    "key_universe": 32,
+    "total_multiplicity_cap": 64,
+    "seeds": [
+      1901,
+      1931,
+      1951,
+      1973,
+      1999,
+      2017,
+      2039,
+      2063
+    ],
+    "schedule_families": [
+      "sequential",
+      "repeat-hot",
+      "remove-wave",
+      "lcg32"
+    ],
+    "initial_total_multiplicities": [
+      0,
+      16,
+      32,
+      48
+    ],
+    "operation_budgets": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "steps": 64
+  },
+  "thresholds": {
+    "paired_case_count": 512,
+    "completed_substrate_case_runs": 1024,
+    "total_emitted_rows": 65536,
+    "paired_observable_mismatch_cases": 0,
+    "row_count_mismatch_cases": 0,
+    "state_cardinality_mismatch_cases": 0,
+    "invalid_operation_schedules": 0,
+    "budget_overrun_rows": 0,
+    "law_violation_cases": 0,
+    "max_conservation_error": 0,
+    "max_residual_law_error": 0
+  },
+  "authority": "research-only",
+  "no_post_result_tuning": true,
+  "changed_paths": [
+    "docs/experiments/wlm-si-multiset-container-r1.json",
+    "unitary/wlm_si_multiset_container_r1.go",
+    "cmd/wlm-si-multiset-container-r1/main.go",
+    "scripts/run-wlm-si-multiset-container-r1.ps1",
+    ".wingless/qualification-request.json",
+    ".github/workflows/direct-research-qualification.yml"
+  ],
+  "supersedes_unexecuted_prereg_branch": "research/direct-wingless-multiset-r1"
+}
