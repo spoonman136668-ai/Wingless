@@ -1,0 +1,75 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RAW-REP-PRED-FRESH-HOLDOUT-R2",
+  "program": "Wingless raw-input to representation to prediction chain",
+  "question": "Does an exact byte-identical replication of R1 reproduce the raw-input -> representation -> prediction result when emitted through the established Wingless scientific-diagnosis harness contract?",
+  "hypothesis": "With the identical R1 corpus, learner, 512-motif capacity, smoothing, controls, metrics, and thresholds, the replication will reproduce the same deterministic metrics and satisfy the same frozen scientific thresholds. No scientific parameter is changed; R2 exists only because R1's runner used an unrecognized harness marker after producing complete output.",
+  "exact_parent_sha": "4559dc78c32e64cc536f64b4b82f3be017d3b556",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-RAW-REP-PRED-FRESH-HOLDOUT-R1",
+    "github_run_id": "37062863690",
+    "disposition": "scientific output complete; qualification evidence not sealed because runner marker was '=== SCIENTIFIC GATE' instead of required '=== SCIENTIFIC DIAGNOSIS'",
+    "observed_metrics": {
+      "minimum_eval_representation_coverage_fraction": 0.36012885277106671,
+      "minimum_covered_top1_accuracy_gain": 0.38054777185211969,
+      "minimum_effective_event_reduction_fraction": 0.37991362272161633,
+      "maximum_representation_minus_baseline_bits_per_byte": -0.38933721355583994,
+      "files_with_positive_covered_top1_gain": 4,
+      "files_with_nonworse_bits_per_byte": 4
+    },
+    "scientific_claim_status": "not yet sealed; R2 is an exact replication, not a tuned rerun"
+  },
+  "replication_invariant": {
+    "scientific_code": "delegate to the exact R1 scientific function without changing its corpus, representation, prediction, evaluation, or metric computation",
+    "allowed_difference": "result experiment identifier and runner's final harness marker only",
+    "forbidden": "corpus changes, threshold changes, capacity changes, smoothing changes, selection changes, new evaluation files, new controls, metric changes, post-result tuning"
+  },
+  "authority": "research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "metrics_and_thresholds": [
+    ["training_file_identity_mismatch_count", "==", 0],
+    ["evaluation_file_identity_mismatch_count", "==", 0],
+    ["train_eval_blob_overlap_count", "==", 0],
+    ["valid_evaluation_file_count", "==", 4],
+    ["selected_motif_count", "==", 512],
+    ["minimum_eval_representation_coverage_fraction", ">=", 0.04],
+    ["minimum_covered_top1_accuracy_gain", ">=", 0.05],
+    ["minimum_effective_event_reduction_fraction", ">=", 0.08],
+    ["maximum_representation_minus_baseline_bits_per_byte", "<=", 0.0],
+    ["files_with_positive_covered_top1_gain", "==", 4],
+    ["files_with_nonworse_bits_per_byte", "==", 4],
+    ["capacity_growth_event_count", "==", 0],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["invalid_byte_rows", "==", 0],
+    ["counter_overflow_rows", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact parent and North Star identity match.",
+    "R2 scientific metrics are computed by the exact R1 scientific function with no changed scientific inputs or parameters.",
+    "R2 metrics are byte-for-byte numerically equal to the complete R1 metrics recorded in run 37062863690.",
+    "The only intended behavioral repair is emission of the established '=== SCIENTIFIC DIAGNOSIS' harness marker.",
+    "Full Go regression passes before the replication probe.",
+    "No tokenizer, external model, network call, capacity growth, randomness, or adaptive tuning occurs."
+  ],
+  "classification_rules": {
+    "supported": "Validity passes, R2 exactly reproduces R1 metrics, and all unchanged frozen R1 thresholds pass.",
+    "negative": "Validity passes but the exact replication fails an unchanged frozen R1 scientific threshold.",
+    "invalid": "Any R1 metric changes, any scientific parameter changes, or any identity/harness/qualification criterion fails.",
+    "incomplete": "Compute interruption prevents complete deterministic replication."
+  },
+  "stop_conditions": [
+    "Stop invalid on parent, North Star, regression, metric-reproduction, or scientific-path drift.",
+    "Do not change any scientific parameter after observing R1 or R2 output.",
+    "Do not create another recovery variant by weakening thresholds if this replication fails."
+  ],
+  "no_post_result_tuning_rule": "R1 output has already been observed. Therefore every scientific input, capacity, selection rule, smoothing rule, metric, and threshold is frozen byte-for-byte for R2; only the experiment label and harness marker contract may differ.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-raw-rep-pred-fresh-holdout-r2.json",
+    "unitary/wlm_lm_raw_rep_pred_fresh_holdout_r2.go",
+    "cmd/wlm-lm-raw-rep-pred-fresh-holdout-r2/main.go",
+    "scripts/run-wlm-lm-raw-rep-pred-fresh-holdout-r2.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
