@@ -1,0 +1,23 @@
+name: Research process liveness probe
+on:
+  push:
+    branches:
+      - diagnostic/repo-local-cutover-r1
+    paths:
+      - 'scripts/Probe-ResearchProcessLiveness.ps1'
+      - '.github/workflows/probe-research-process-liveness.yml'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Inspect active research processes
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          ./scripts/Probe-ResearchProcessLiveness.ps1
