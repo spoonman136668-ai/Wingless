@@ -1,0 +1,200 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RAW-BYTE-ACQUISITION-R1",
+  "proposal_parent": "WLM-LM-ADAPTIVE-GRANULARITY-PROPOSAL-R1",
+  "proposal_stage": "WBG-1",
+  "question": "Can the existing Wingless substrate learn and autoregressively generate a deterministic relation directly over the full 0..255 raw-byte alphabet without tokenization, while generalizing to exact two-byte contexts omitted from training?",
+  "hypothesis": "A fixed 64-counter bit-factorized byte learner trained on 75% of exact two-byte contexts will achieve at least 0.95 held-out one-step accuracy and at least 0.95 autoregressive accuracy across the frozen held-out contexts, while an exact-byte-context memorization control trained on the same observations will achieve at most 0.01 held-out one-step accuracy. Slice-backed and ring-backed context substrates will remain exactly equivalent.",
+  "exact_parent_sha": "979bbb3aca0cf66eb18ada4c6bd4091455cffb59",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-RULE-CONDITIONED-SEQUENCE-R2",
+    "classification": "supported",
+    "scientific_claim": "Bounded factorized learned state generalized multiple learned next-token rules to held-out exact contexts with perfect autoregressive generation."
+  },
+  "authority": "research-only; no production, broker, live, accepted-ref, credential, runner-configuration, scheduler, queue-consumer, external-model inference, or cross-lane authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-raw-byte-acquisition-r1.json",
+    "unitary/wlm_lm_raw_byte_acquisition_r1.go",
+    "cmd/wlm-lm-raw-byte-acquisition-r1/main.go",
+    "scripts/run-wlm-lm-raw-byte-acquisition-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "raw_input": {
+    "alphabet": "all 256 uint8 values 0..255",
+    "encoding": "identity byte values; no tokenizer, vocabulary remapping, chunker, subword model, UTF decoding, external embedding, or learned boundary mechanism",
+    "context_width_bytes": 2,
+    "target_law": "next_byte = older_byte XOR newer_byte",
+    "target_visibility": "used only for deterministic corpus generation/scoring; learner sees only observed byte triples"
+  },
+  "factorized_learner": {
+    "learned_state": "for each of 8 bit positions, a 2x2x2 uint32 count tensor over (older_bit,newer_bit,target_bit), totaling 64 counters",
+    "update": "increment one target-bit count per bit position for each training byte triple",
+    "prediction": "per bit choose target bit with larger learned count; ties choose zero; reassemble eight bits",
+    "logical_state_bytes": 256,
+    "capacity_growth": false
+  },
+  "memorization_control": {
+    "learned_state": "one exact-context predicted-byte slot plus seen flag for each of 65536 possible two-byte contexts",
+    "update": "store the deterministic observed next byte for a trained exact context; conflicting observations are invalid",
+    "prediction": "return stored byte when seen, otherwise zero",
+    "purpose": "tests whether held-out performance can be explained by exact-context memorization rather than learned byte composition"
+  },
+  "train_holdout_split": {
+    "training_context_rule": "(older_byte + newer_byte) mod 4 != 1",
+    "heldout_context_rule": "(older_byte + newer_byte) mod 4 == 1",
+    "training_context_count": 49152,
+    "heldout_context_count": 16384,
+    "factor_coverage_requirement": "for every bit position all four older/newer bit combinations occur in training",
+    "leakage_policy": "no held-out exact two-byte context may appear in training"
+  },
+  "seeds": [
+    11701,
+    11719,
+    11743,
+    11777
+  ],
+  "seed_policy": "All four seeds were checked against the Wingless repository before preregistration and had no matches. Seeds affect only deterministic ordering; no replacement, exclusion, or extension is permitted.",
+  "training": {
+    "observations": "each of the 49152 training contexts exactly once per seed and substrate",
+    "deterministic_order": "seeded permutation of the frozen training context set",
+    "updates_per_seed_per_substrate": 49152
+  },
+  "evaluation": {
+    "one_step": "score factorized and memorization-control predictions on all 16384 held-out exact contexts without updates",
+    "autoregressive": "from a deterministic 1024-context subset of held-out starts per seed, run 16 steps; each factorized prediction becomes the next context byte while the XOR law independently supplies the scored target",
+    "autoregressive_transitions_per_seed_per_substrate": 16384,
+    "updates_during_evaluation": false
+  },
+  "substrates": [
+    "slice-backed two-byte context deque",
+    "fixed-capacity ring two-byte context deque"
+  ],
+  "controls": [
+    "Both substrates receive byte-for-byte identical ordered training observations and held-out starts.",
+    "No tokenizer, segmentation, learned chunk boundary, external embedding, or external model is used.",
+    "The exact-context memorization control receives exactly the same training observations.",
+    "Training mutates only fixed-size learned state; evaluation is read-only.",
+    "Autoregressive evaluation feeds model predictions, not targets, back into context.",
+    "No capacity growth, oracle corrections, gradient optimizer, post-result threshold changes, or seed replacement."
+  ],
+  "budgets": {
+    "seed_count": 4,
+    "substrate_count": 2,
+    "training_transition_count_total": 393216,
+    "heldout_one_step_evaluation_count_total": 131072,
+    "autoregressive_evaluation_transition_count_total": 131072,
+    "factorized_counter_count": 64,
+    "factorized_logical_state_bytes": 256,
+    "memorization_context_slot_count": 65536,
+    "context_capacity_bytes": 2,
+    "goroutine_policy": "single-process deterministic execution; GOMAXPROCS=1 in qualification"
+  },
+  "metrics_and_thresholds": [
+    {
+      "name": "valid_seed_count",
+      "comparator": "==",
+      "threshold": 4
+    },
+    {
+      "name": "completed_substrate_runs",
+      "comparator": "==",
+      "threshold": 8
+    },
+    {
+      "name": "training_transition_count",
+      "comparator": "==",
+      "threshold": 393216
+    },
+    {
+      "name": "heldout_one_step_evaluation_count",
+      "comparator": "==",
+      "threshold": 131072
+    },
+    {
+      "name": "autoregressive_evaluation_transition_count",
+      "comparator": "==",
+      "threshold": 131072
+    },
+    {
+      "name": "minimum_factorized_heldout_one_step_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "maximum_memorization_heldout_one_step_accuracy",
+      "comparator": "<=",
+      "threshold": 0.01
+    },
+    {
+      "name": "minimum_factorized_autoregressive_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "substrate_prediction_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_factorized_state_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_context_observable_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "heldout_context_leak_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "factorized_bit_coverage_missing_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "memorization_conflict_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "invalid_context_rows",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "counter_overflow_rows",
+      "comparator": "==",
+      "threshold": 0
+    }
+  ],
+  "validity_criteria": [
+    "Exact parent SHA and North Star SHA-256 match this preregistration.",
+    "All four seeds and both context substrates complete frozen training/evaluation cardinalities.",
+    "The external input alphabet is the complete uint8 range and is presented without tokenization or remapping.",
+    "No held-out exact two-byte context appears during training.",
+    "Every two-bit input combination occurs in training for every one of eight factor positions.",
+    "The factorized learner remains exactly 64 uint32 counters; no capacity growth occurs.",
+    "Autoregressive evaluation feeds factorized predictions back into raw-byte context.",
+    "The normalized result carries schema wingless.research-scientific-result.v1 and the exact experiment identifier.",
+    "Full Go regression passes before probe execution."
+  ],
+  "classification_rules": {
+    "supported": "All sixteen frozen metric thresholds and all validity criteria pass.",
+    "mixed": "Validity/completeness pass and factorized held-out performance materially exceeds memorization control, but at least one factorized accuracy or exact cross-substrate threshold fails.",
+    "negative": "Validity passes but raw-byte factorization does not materially outperform exact-context memorization or fails autoregressive generation.",
+    "incomplete": "Environmental or compute interruption prevents frozen cardinality; preserve diagnostics and make no scientific claim.",
+    "invalid": "Provenance, raw-byte identity, split isolation, bounded-state, determinism, construction, or qualification isolation fails; invalid is not a scientific outcome."
+  },
+  "stop_conditions": [
+    "Stop before execution on provenance, authority, North Star, package-scope, or split-isolation drift.",
+    "Stop as invalid on held-out leakage, missing bit coverage, byte remapping/tokenization, learned-state cardinality drift, memorization conflict, or non-deterministic qualification.",
+    "Do not stop early for apparent support, mixed, or negative observations; complete the frozen matrix unless infrastructure prevents it."
+  ],
+  "no_post_result_tuning_rule": "After any probe or primary output is observed, do not alter seeds, raw-byte alphabet, split rule, target law, factorization, memorization control, context width, corpus size, autoregressive subset, metrics, thresholds, aggregation, classification, or stop conditions under this experiment identifier."
+}
