@@ -1,0 +1,52 @@
+name: Preserve Wingless stack result audit
+on:
+  push:
+    branches:
+      - diagnostic/repo-local-cutover-r1
+    paths:
+      - '.github/workflows/preserve-wingless-stack-audit.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - name: Inspect exact completed Wingless checkout without checkout/reset
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Repo='C:\actions-runner-up-b\_work\Wingless\Wingless\research'
+          if(-not(Test-Path -LiteralPath $Repo -PathType Container)){throw 'WINGLESS_RESEARCH_CHECKOUT_MISSING'}
+          $Head=(& git -C $Repo rev-parse HEAD).Trim()
+          $Tree=(& git -C $Repo rev-parse 'HEAD^{tree}').Trim()
+          Write-Host "HEAD=$Head"
+          Write-Host "TREE=$Tree"
+          Write-Host 'LOG_BEGIN'
+          & git -C $Repo log -5 --pretty='format:%H|%P|%s'
+          Write-Host 'LOG_END'
+          Write-Host 'STATUS_BEGIN'
+          & git -C $Repo status --short
+          Write-Host 'STATUS_END'
+          foreach($Sha in @(
+            '28d6f44cf127200465e2786b6a139f1389715225',
+            'fca6962e'
+          )){
+            & git -C $Repo cat-file -e ($Sha+'^{commit}') 2>$null
+            Write-Host "COMMIT_PRESENT sha=$Sha present=$($LASTEXITCODE -eq 0)"
+          }
+          $TempRoot='C:\actions-runner-up-b\_work\_temp\wingless-repo-local-36940852550-7'
+          if(Test-Path -LiteralPath $TempRoot -PathType Container){
+            Write-Host "TEMP_ROOT_PRESENT=$TempRoot"
+            Get-ChildItem -LiteralPath $TempRoot -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
+              Write-Host ("ARTIFACT path={0} bytes={1}" -f $_.FullName,$_.Length)
+              if($_.Length -le 262144 -and $_.Name -match '(?i)summary|transcript|result|last-message'){
+                Write-Host ("CONTENT_BEGIN "+$_.FullName)
+                Get-Content -LiteralPath $_.FullName -Raw
+                Write-Host ("CONTENT_END "+$_.FullName)
+              }
+            }
+          }else{
+            Write-Host 'TEMP_ROOT_PRESENT=false'
+          }
+          Write-Host 'WINGLESS_STACK_RESULT_AUDIT=PASS'
