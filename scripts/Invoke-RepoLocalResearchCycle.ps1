@@ -164,35 +164,53 @@ $MindContext
 "@
     [IO.File]::WriteAllText($PromptPath,$Prompt,(New-Object Text.UTF8Encoding($false)))
 
-    $Codex=Resolve-Codex
-    $OldCodeHome=$env:CODEX_HOME
-    $OldHome=$env:HOME
-    $OldProfile=$env:USERPROFILE
-    try{
-        $CodexHome='C:\ProgramData\CKBR\codex\home'
-        if(Test-Path -LiteralPath $CodexHome -PathType Container){
-            $env:CODEX_HOME=$CodexHome
-            $env:HOME=$CodexHome
-            $env:USERPROFILE=$CodexHome
-        }
-
-        $Models=@('gpt-5.6-sol','gpt-5.6-luna')
-        $Succeeded=$false
-        foreach($Model in $Models){
-            Write-Host "RESEARCH_AGENT_ATTEMPT provider=codex model=$Model"
-            $Args=@('exec','--approve-for-me','--model',$Model,'--output-last-message',$LastMessagePath,'-')
-            $Proc=Start-Process -FilePath $Codex -ArgumentList $Args -WorkingDirectory $RepoPath -RedirectStandardInput $PromptPath -NoNewWindow -Wait -PassThru
-            if($Proc.ExitCode-eq0){$Succeeded=$true;break}
-            Write-Host "RESEARCH_AGENT_RETRY model=$Model exit=$($Proc.ExitCode)"
+    $Succeeded=$false
+    $NemotronAgent=Join-Path $PSScriptRoot 'Invoke-NemotronRepoAgent.ps1'
+    if(Test-Path -LiteralPath $NemotronAgent -PathType Leaf){
+        try{
+            Write-Host "RESEARCH_AGENT_ATTEMPT provider=openrouter model=nvidia/nemotron-3-ultra-550b-a55b:free"
+            & $NemotronAgent -RepoPath $RepoPath -Program 'Wingless' -ActiveBranch $ActiveBranch -StartSha $StartSha -PromptPath $PromptPath -LastMessagePath $LastMessagePath
+            $Succeeded=$true
+            Write-Host 'RESEARCH_AGENT_PRIMARY_PASS provider=openrouter'
+        }catch{
+            Write-Host "RESEARCH_AGENT_PRIMARY_FAILED provider=openrouter error=$($_.Exception.Message)"
             & git reset --hard $StartSha|Out-Null
             & git clean -fd|Out-Null
         }
-        if(-not$Succeeded){throw 'RESEARCH_AGENT_FAILED_ALL_MODELS'}
-    }finally{
-        $env:CODEX_HOME=$OldCodeHome
-        $env:HOME=$OldHome
-        $env:USERPROFILE=$OldProfile
+    }else{
+        Write-Host "RESEARCH_AGENT_PRIMARY_UNAVAILABLE path=$NemotronAgent"
     }
+
+    if(-not$Succeeded){
+        $Codex=Resolve-Codex
+        $OldCodeHome=$env:CODEX_HOME
+        $OldHome=$env:HOME
+        $OldProfile=$env:USERPROFILE
+        try{
+            $CodexHome='C:\ProgramData\CKBR\codex\home'
+            if(Test-Path -LiteralPath $CodexHome -PathType Container){
+                $env:CODEX_HOME=$CodexHome
+                $env:HOME=$CodexHome
+                $env:USERPROFILE=$CodexHome
+            }
+
+            $Models=@('gpt-5.6-sol','gpt-5.6-luna')
+            foreach($Model in $Models){
+                Write-Host "RESEARCH_AGENT_ATTEMPT provider=codex model=$Model"
+                $Args=@('exec','--approve-for-me','--model',$Model,'--output-last-message',$LastMessagePath,'-')
+                $Proc=Start-Process -FilePath $Codex -ArgumentList $Args -WorkingDirectory $RepoPath -RedirectStandardInput $PromptPath -NoNewWindow -Wait -PassThru
+                if($Proc.ExitCode-eq0){$Succeeded=$true;break}
+                Write-Host "RESEARCH_AGENT_RETRY model=$Model exit=$($Proc.ExitCode)"
+                & git reset --hard $StartSha|Out-Null
+                & git clean -fd|Out-Null
+            }
+        }finally{
+            $env:CODEX_HOME=$OldCodeHome
+            $env:HOME=$OldHome
+            $env:USERPROFILE=$OldProfile
+        }
+    }
+    if(-not$Succeeded){throw 'RESEARCH_AGENT_FAILED_ALL_PROVIDERS'}
 
     if(((& git status --porcelain)-join'').Trim()){throw 'AGENT_LEFT_UNCOMMITTED_CHANGES'}
     $BranchAfter=((& git branch --show-current 2>$null|Select-Object -First 1)|Out-String).Trim()
