@@ -1,0 +1,72 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "status": "frozen-prereg-only",
+  "experiment": "WLM-SI-ADJACENCY-CONTAINER-R1",
+  "question": "Under a fixed 32-node undirected graph and edge cap, do an adjacency matrix and sorted adjacency lists preserve edge updates, membership queries, node degrees, edge cardinality, and conservation laws?",
+  "hypothesis": "All preregistered edge presence, degree vectors, accepted/rejected edge updates, edge counts, and conservation observables remain exactly invariant.",
+  "exact_parent_sha": "caaeca20548eec9836bdb90be9f95aa4cb883f90",
+  "north_star_sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
+  "prior_evidence": [
+    {
+      "experiment": "WLM-SI-MEMBERSHIP-CONTAINER-R1",
+      "run_id": 36982338668
+    },
+    {
+      "experiment": "WLM-SI-OBJECT-POOL-R1",
+      "run_id": 36982736772
+    },
+    {
+      "experiment": "WLM-SI-ACCUMULATOR-R1",
+      "run_id": 36983116846
+    }
+  ],
+  "changed_dimension": "graph adjacency substrate only: dense matrix versus sorted adjacency lists",
+  "fixed_matrix": {
+    "nodes": 32,
+    "edge_cap": 96,
+    "seeds": [
+      2081,
+      2111,
+      2137,
+      2161,
+      2203,
+      2237,
+      2267,
+      2293
+    ],
+    "schedule_families": [
+      "chain",
+      "star-wave",
+      "rewire",
+      "lcg32"
+    ],
+    "initial_edge_counts": [
+      0,
+      24,
+      48,
+      72
+    ],
+    "operation_budgets": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "steps": 64
+  },
+  "thresholds": {
+    "paired_case_count": 512,
+    "completed_substrate_case_runs": 1024,
+    "total_emitted_rows": 65536,
+    "paired_observable_mismatch_cases": 0,
+    "row_count_mismatch_cases": 0,
+    "state_cardinality_mismatch_cases": 0,
+    "invalid_operation_schedules": 0,
+    "budget_overrun_rows": 0,
+    "law_violation_cases": 0,
+    "max_conservation_error": 0,
+    "max_residual_law_error": 0
+  },
+  "authority": "research-only",
+  "no_post_result_tuning": true
+}
