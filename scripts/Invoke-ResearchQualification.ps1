@@ -152,7 +152,23 @@ $UnexpectedDirty = @(
     }
 )
 
-$HarnessMarker = $Transcript -match 'WINGLESS_UP\d+_HARNESS_PASS'
+$LegacyHarnessMarker = $Transcript -match 'WINGLESS_UP\d+_HARNESS_PASS'
+$NormalizedHarnessMarker = $false
+if ($null -ne $Probe) {
+    $NormalizedHarnessMarker =
+        ([string]$Probe.schema -ceq 'wingless.research-scientific-result.v1') -and
+        ([string]$Probe.experiment -ceq [string]$Request.experiment)
+}
+$HarnessMarker = $LegacyHarnessMarker -or $NormalizedHarnessMarker
+$HarnessMarkerKind = if ($LegacyHarnessMarker) {
+    'legacy-up-marker'
+}
+elseif ($NormalizedHarnessMarker) {
+    'normalized-scientific-result'
+}
+else {
+    'none'
+}
 $ScientificDiagnosis = if ($null -ne $Probe -and $null -ne $Probe.diagnosis) {
     $Probe.diagnosis
 }
@@ -191,6 +207,9 @@ $Summary = [ordered]@{
     github_run_attempt = $env:GITHUB_RUN_ATTEMPT
     test_exit_code = $TestExit
     harness_marker = [bool]$HarnessMarker
+    harness_marker_kind = $HarnessMarkerKind
+    legacy_harness_marker = [bool]$LegacyHarnessMarker
+    normalized_harness_marker = [bool]$NormalizedHarnessMarker
     probe_parsed = [bool]($null -ne $Probe)
     probe_parse_error = $ProbeParseError
     classification = $Classification
