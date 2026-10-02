@@ -1,0 +1,72 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "status": "frozen-prereg-only",
+  "experiment": "WLM-SI-PAGED-SEQUENCE-R1",
+  "question": "Under fixed total storage and identical edit schedules, do a contiguous bounded sequence and a fixed-page sequence preserve the same bounded state observables and resource-response laws?",
+  "hypothesis": "Append, replace, remove, residual length, token order, cumulative counts, and conservation observables remain exactly invariant.",
+  "exact_parent_sha": "caaeca20548eec9836bdb90be9f95aa4cb883f90",
+  "north_star_sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
+  "prior_evidence": {
+    "experiment": "WLM-SI-DEQUE-CONTAINER-R2",
+    "classification": "supported",
+    "qualified_head_sha": "0769b49c02600c2bd8822247b86fb11a9f29c1bb"
+  },
+  "changed_dimension": "sequence substrate only",
+  "fixed_matrix": {
+    "capacity": 32,
+    "page_size": 8,
+    "seeds": [
+      1117,
+      1151,
+      1181,
+      1213,
+      1249,
+      1283,
+      1307,
+      1361
+    ],
+    "schedule_families": [
+      "append-tail",
+      "replace-wave",
+      "remove-stride",
+      "lcg32"
+    ],
+    "initial_cardinalities": [
+      0,
+      8,
+      16,
+      24
+    ],
+    "operation_budgets": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "steps": 64
+  },
+  "thresholds": {
+    "paired_case_count": 512,
+    "completed_substrate_case_runs": 1024,
+    "total_emitted_rows": 65536,
+    "paired_observable_mismatch_cases": 0,
+    "row_count_mismatch_cases": 0,
+    "state_cardinality_mismatch_cases": 0,
+    "invalid_operation_schedules": 0,
+    "budget_overrun_rows": 0,
+    "law_violation_cases": 0,
+    "max_conservation_error": 0,
+    "max_residual_law_error": 0
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-si-paged-sequence-r1.json",
+    "unitary/wlm_si_paged_sequence_r1.go",
+    "cmd/wlm-si-paged-sequence-r1/main.go",
+    "scripts/run-wlm-si-paged-sequence-r1.ps1",
+    ".wingless/qualification-request.json",
+    ".github/workflows/direct-research-qualification.yml"
+  ],
+  "supersedes_unexecuted_prereg_branch": "research/direct-wingless-paged-r1",
+  "authority": "research-only",
+  "no_post_result_tuning": true
+}
