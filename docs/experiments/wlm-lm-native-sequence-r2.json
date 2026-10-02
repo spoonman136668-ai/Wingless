@@ -1,0 +1,109 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-NATIVE-SEQUENCE-R2",
+  "question": "Can the existing Wingless bounded-state substrate learn a next-token transition law directly from independent token-context observations and then generate accurate multi-step sequences with identical learned behavior across the independently qualified slice-backed and fixed-capacity ring context containers?",
+  "hypothesis": "Across the frozen deterministic corpus, both substrate implementations will learn the same two-token next-token map from independent one-step observations, reach at least 0.95 multi-step next-token accuracy, exceed the untrained deterministic baseline by at least 0.70, and disagree on zero learned predictions, learned counts, or context-state observables.",
+  "exact_parent_sha": "a6c5161570d22c896c7fa4e1120e4566e2b777ef",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-SI-DEQUE-CONTAINER-R2",
+    "classification": "supported",
+    "scientific_claim": "Slice-backed and fixed-capacity ring deques were exactly invariant on the frozen bounded state-transition observables."
+  },
+  "supersedes_invalid_attempt": {
+    "experiment": "WLM-LM-NATIVE-SEQUENCE-R1",
+    "disposition": "invalid-protocol-before-execution",
+    "scientific_claim": false
+  },
+  "authority": "research-only; no production, broker, live, accepted-ref, credential, runner-configuration, scheduler, queue-consumer, or cross-lane authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-native-sequence-r2.json",
+    "unitary/wlm_lm_native_sequence_r2.go",
+    "cmd/wlm-lm-native-sequence-r2/main.go",
+    "scripts/run-wlm-lm-native-sequence-r2.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "native_learning_rule": {
+    "alphabet_size": 8,
+    "context_width": 2,
+    "target_law": "next=(3*previous_two_back + 5*previous_one_back + 1) mod 8",
+    "learned_state": "integer transition-count tensor indexed by two-token context and candidate next token; no target-law parameters are exposed to the learner",
+    "prediction": "argmax learned transition count for the current two-token context; ties resolve to the lowest token id",
+    "update": "increment exactly one observed context->next count per training observation"
+  },
+  "training_corpus": {
+    "observations": "all 64 ordered two-token contexts repeated exactly 32 times as independent one-step context->next observations",
+    "training_transition_count_per_seed": 2048,
+    "order": "deterministic seed-derived permutation of the 2048 independent observations",
+    "sequence_rollouts_in_training": false,
+    "seeds": [11003, 11027, 11047, 11071, 11083, 11113, 11131, 11149]
+  },
+  "evaluation_corpus": {
+    "starts": "all 64 ordered two-token contexts exactly once",
+    "steps_per_start": 16,
+    "evaluation_transition_count_per_seed": 1024,
+    "generation_mode": "autoregressive rollout: each model prediction becomes the next context token while the frozen target recurrence independently supplies the scored target token",
+    "held_out_property": "multi-step autoregressive trajectories are absent from training, which contains only shuffled independent one-step observations; finite two-token support is intentionally covered during training. This experiment tests native acquisition plus generation consistency, not unseen-context generalization."
+  },
+  "substrates": [
+    "slice-backed context deque",
+    "fixed-capacity ring context deque"
+  ],
+  "controls": [
+    "Both substrates receive byte-for-byte identical ordered training observations and evaluation starts for each seed.",
+    "The target recurrence is used only to generate training targets and independent evaluation targets; the learner receives only observed context->next triples.",
+    "The untrained baseline uses the same argmax rule over an all-zero learned tensor and therefore deterministically predicts token 0.",
+    "Training mutates only the bounded transition-count tensor; evaluation does not update learned state.",
+    "During evaluation the model prediction, not the target token, is fed back into the model context for the next step.",
+    "No external model calls, language labels, oracle corrections, gradient optimizer, capacity growth, or post-result changes are permitted."
+  ],
+  "budgets": {
+    "seed_count": 8,
+    "substrate_count": 2,
+    "training_transitions_per_seed_per_substrate": 2048,
+    "evaluation_transitions_per_seed_per_substrate": 1024,
+    "learned_counter_count": 512,
+    "context_capacity": 2,
+    "goroutine_policy": "single-process deterministic execution; GOMAXPROCS=1 in qualification",
+    "capacity_growth": false
+  },
+  "metrics_and_thresholds": [
+    {"name": "valid_seed_count", "comparator": "==", "threshold": 8},
+    {"name": "completed_substrate_runs", "comparator": "==", "threshold": 16},
+    {"name": "training_transition_count", "comparator": "==", "threshold": 32768},
+    {"name": "evaluation_transition_count", "comparator": "==", "threshold": 16384},
+    {"name": "minimum_trained_next_token_accuracy", "comparator": ">=", "threshold": 0.95},
+    {"name": "maximum_untrained_baseline_accuracy", "comparator": "<=", "threshold": 0.20},
+    {"name": "minimum_accuracy_improvement_over_untrained", "comparator": ">=", "threshold": 0.70},
+    {"name": "substrate_prediction_mismatch_count", "comparator": "==", "threshold": 0},
+    {"name": "substrate_learned_state_mismatch_count", "comparator": "==", "threshold": 0},
+    {"name": "substrate_context_observable_mismatch_count", "comparator": "==", "threshold": 0},
+    {"name": "invalid_context_rows", "comparator": "==", "threshold": 0},
+    {"name": "counter_overflow_rows", "comparator": "==", "threshold": 0}
+  ],
+  "validity_criteria": [
+    "Exact parent SHA and updated North Star SHA-256 match this preregistration.",
+    "All eight seeds and both substrates complete the frozen training and evaluation cardinalities.",
+    "Training observations and evaluation targets are generated deterministically from the frozen recurrence and seed schedule.",
+    "The learner has no access to the recurrence coefficients except through observed context->next training observations.",
+    "Training includes no multi-step rollouts; evaluation is autoregressive and uses predicted tokens in subsequent model context.",
+    "Both substrate implementations share only frozen corpus observations and comparison helpers; context push/pop mechanics remain independently implemented.",
+    "Learned tensor size stays exactly 512 counters and context capacity exactly two tokens.",
+    "The normalized result carries schema wingless.research-scientific-result.v1 and exact experiment identifier.",
+    "Full Go regression passes before probe execution."
+  ],
+  "classification_rules": {
+    "supported": "All twelve frozen metric thresholds and all validity criteria pass.",
+    "mixed": "Validity and deterministic completion pass, both substrates learn above baseline, but at least one accuracy or exact cross-substrate equivalence threshold fails.",
+    "negative": "Validity passes but native learned prediction fails to exceed the frozen baseline threshold or exhibits material substrate-dependent behavior.",
+    "incomplete": "Environmental or compute interruption prevents full frozen cardinality; preserve diagnostics and make no scientific claim.",
+    "invalid": "Provenance, frozen-package identity, construction, determinism, bounded-state, or qualification isolation fails; invalid is not a scientific outcome."
+  },
+  "stop_conditions": [
+    "Stop before execution on identity, provenance, authority, or package-scope drift.",
+    "Stop as invalid on malformed corpus construction, context capacity violation, learned-state cardinality drift, or non-deterministic qualification.",
+    "Do not stop early for apparent support, mixed, or negative observations; complete the full frozen matrix unless infrastructure prevents it."
+  ],
+  "no_post_result_tuning_rule": "After any probe or primary output is observed, do not alter seeds, corpus construction, recurrence, context width, alphabet, learning rule, prediction rule, capacities, metrics, thresholds, aggregation, classification, or stop conditions under this experiment identifier."
+}
