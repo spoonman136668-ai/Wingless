@@ -18,6 +18,7 @@ jobs:
     name: implementation (${{ matrix.slug }})
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         include:
           - model: moonshotai/kimi-k3
