@@ -6,7 +6,9 @@ param(
     [Parameter(Mandatory=$true)][string]$PromptPath,
     [Parameter(Mandatory=$true)][string]$LastMessagePath,
     [string]$Model='nvidia/nemotron-3-ultra-550b-a55b:free',
-    [int]$MaxRounds=80
+    [int]$MaxRounds=48,
+    [switch]$ProtocolProbe,
+    [switch]$SelfTest
 )
 
 Set-StrictMode -Version Latest
@@ -17,7 +19,8 @@ function Resolve-RepoPath([string]$Relative,[bool]$MustExist=$false){
     if([IO.Path]::IsPathRooted($Relative)){throw "NEMOTRON_PATH_ROOTED path=$Relative"}
     $Root=[IO.Path]::GetFullPath($RepoPath).TrimEnd('\')
     $Full=[IO.Path]::GetFullPath((Join-Path $Root ($Relative -replace '/','\')))
-    if(-not($Full.StartsWith($Root+'\',[StringComparison]::OrdinalIgnoreCase))){throw "NEMOTRON_PATH_ESCAPE path=$Relative"}
+    $InsideRoot=$Full.Equals($Root,[StringComparison]::OrdinalIgnoreCase) -or $Full.StartsWith($Root+'\',[StringComparison]::OrdinalIgnoreCase)
+    if(-not$InsideRoot){throw "NEMOTRON_PATH_ESCAPE path=$Relative"}
     if($MustExist -and -not(Test-Path -LiteralPath $Full)){throw "NEMOTRON_PATH_MISSING path=$Relative"}
     return $Full
 }
@@ -50,8 +53,8 @@ function Assert-Writable([string]$Relative){
     [void](Resolve-RepoPath $Relative $false)
 }
 
-function Invoke-GitRaw([string[]]$Args){
-    $Out=@(& git -C $RepoPath @Args 2>&1 | ForEach-Object {[string]$_})
+function Invoke-GitRaw([string[]]$GitArgs){
+    $Out=@(& git -C $RepoPath @GitArgs 2>&1 | ForEach-Object {[string]$_})
     $Code=$LASTEXITCODE
     return [ordered]@{exit_code=$Code;output=($Out -join [Environment]::NewLine)}
 }
@@ -121,10 +124,10 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
         'git_diff' {
             $Ref=if($A.PSObject.Properties.Name -contains 'ref'){[string]$A.ref}else{''}
             if($Ref -and $Ref -notmatch '^[0-9A-Za-z._/^~-]+$'){throw "NEMOTRON_GIT_REF_INVALID ref=$Ref"}
-            $Args=New-Object Collections.Generic.List[string]
-            $Args.Add('diff')
-            if($Ref){$Args.Add($Ref)}
-            $R=Invoke-GitRaw @($Args)
+            $GitDiffArgs=New-Object Collections.Generic.List[string]
+            $GitDiffArgs.Add('diff')
+            if($Ref){$GitDiffArgs.Add($Ref)}
+            $R=Invoke-GitRaw @($GitDiffArgs.ToArray())
             if($R.output.Length-gt65536){$R.output=$R.output.Substring(0,65536)}
             return Convert-ToolResult $R
         }
@@ -177,37 +180,37 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
         }
         'run_repo_process' {
             $Kind=[string]$A.kind
-            $Args=@($A.args|ForEach-Object{[string]$_})
+            [string[]]$ProcessArgs=@($A.args|ForEach-Object{[string]$_})
             $Timeout=if($A.PSObject.Properties.Name -contains 'timeout_seconds'){[Math]::Min([Math]::Max([int]$A.timeout_seconds,1),600)}else{180}
             $Exe='';$FinalArgs=@()
             switch($Kind){
                 'go_test' {
                     $Exe=(Get-Command go -ErrorAction Stop).Source
-                    $FinalArgs=@('test')+$Args
-                    foreach($X in $Args){if($X -match '^-?(exec|toolexec|overlay|vettool)(=|$)'){throw "NEMOTRON_GO_FLAG_FORBIDDEN arg=$X"}}
+                    $FinalArgs=@('test')+$ProcessArgs
+                    foreach($X in $ProcessArgs){if($X -match '^-?(exec|toolexec|overlay|vettool)(=|$)'){throw "NEMOTRON_GO_FLAG_FORBIDDEN arg=$X"}}
                 }
                 'go_run' {
                     $Exe=(Get-Command go -ErrorAction Stop).Source
-                    if($Args.Count-eq0 -or $Args[0] -notmatch '^(\./)?cmd/'){throw 'NEMOTRON_GO_RUN_PATH_INVALID'}
-                    $FinalArgs=@('run')+$Args
+                    if($ProcessArgs.Count-eq0 -or $ProcessArgs[0] -notmatch '^(\./)?cmd/'){throw 'NEMOTRON_GO_RUN_PATH_INVALID'}
+                    $FinalArgs=@('run')+$ProcessArgs
                 }
                 'powershell_file' {
-                    if($Args.Count-eq0){throw 'NEMOTRON_POWERSHELL_FILE_REQUIRED'}
-                    $ScriptRel=$Args[0]
+                    if($ProcessArgs.Count-eq0){throw 'NEMOTRON_POWERSHELL_FILE_REQUIRED'}
+                    $ScriptRel=$ProcessArgs[0]
                     if($ScriptRel -notmatch '^scripts/[A-Za-z0-9._/-]+\.ps1$'){throw "NEMOTRON_POWERSHELL_PATH_INVALID path=$ScriptRel"}
                     $ScriptFull=Resolve-RepoPath $ScriptRel $true
                     $Exe='powershell.exe'
-                    $Tail=if($Args.Count-gt1){@($Args[1..($Args.Count-1)])}else{@()}
+                    $Tail=if($ProcessArgs.Count-gt1){@($ProcessArgs[1..($ProcessArgs.Count-1)])}else{@()}
                     $FinalArgs=@('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',$ScriptFull)+$Tail
                 }
                 'python_file' {
                     if($Program-cne'Yggdrasil'){throw 'NEMOTRON_PYTHON_NOT_ALLOWED_FOR_PROGRAM'}
-                    if($Args.Count-eq0){throw 'NEMOTRON_PYTHON_FILE_REQUIRED'}
-                    $ScriptRel=$Args[0]
+                    if($ProcessArgs.Count-eq0){throw 'NEMOTRON_PYTHON_FILE_REQUIRED'}
+                    $ScriptRel=$ProcessArgs[0]
                     if($ScriptRel -notmatch '^research/applications/plane/[A-Za-z0-9._/-]+\.py$'){throw "NEMOTRON_PYTHON_PATH_INVALID path=$ScriptRel"}
                     $Exe='C:\ProgramData\CKBR\research-sidecar-yggdrasil\python312\python.exe'
                     if(-not(Test-Path -LiteralPath $Exe -PathType Leaf)){$Exe=(Get-Command python -ErrorAction Stop).Source}
-                    $Tail=if($Args.Count-gt1){@($Args[1..($Args.Count-1)])}else{@()}
+                    $Tail=if($ProcessArgs.Count-gt1){@($ProcessArgs[1..($ProcessArgs.Count-1)])}else{@()}
                     $FinalArgs=@((Resolve-RepoPath $ScriptRel $true))+$Tail
                 }
                 'git_diff_check' {
@@ -244,6 +247,17 @@ if(([string]$CurrentBranch).Trim()-cne$ActiveBranch){throw "NEMOTRON_BRANCH_MISM
 $CurrentHead=(& git -C $RepoPath rev-parse HEAD).Trim()
 if($CurrentHead-cne$StartSha){throw "NEMOTRON_START_SHA_MISMATCH expected=$StartSha actual=$CurrentHead"}
 
+if($SelfTest){
+    $Status=(Invoke-Tool 'git_status' '{}')|ConvertFrom-Json
+    if([int]$Status.exit_code-ne0){throw "NEMOTRON_SELFTEST_GIT_STATUS_FAILED output=$($Status.output)"}
+    $Log=(Invoke-Tool 'git_log' '{"max_count":2}')|ConvertFrom-Json
+    if([int]$Log.exit_code-ne0){throw "NEMOTRON_SELFTEST_GIT_LOG_FAILED output=$($Log.output)"}
+    $Listing=Invoke-Tool 'list_files' '{"path":".","max_depth":1}'
+    if([string]::IsNullOrWhiteSpace([string]$Listing)){throw 'NEMOTRON_SELFTEST_LIST_EMPTY'}
+    Write-Host 'NEMOTRON_AGENT_SELFTEST=PASS'
+    return
+}
+
 $SecretCandidates=@(
     'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
     'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
@@ -258,9 +272,10 @@ if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_OPENROUTER_SECRET_EMPTY
 $Prompt=[IO.File]::ReadAllText($PromptPath)
 $System=@"
 You are the repo-local autonomous research worker. You have a constrained tool interface to inspect and modify exactly one research repository.
-Use tools rather than inventing repository contents. Never attempt to access paths outside the repository or authority outside the prompt.
+Use the minimum tools necessary and never inspect unrelated files just to gather more context. Never attempt to access paths outside the repository or authority outside the prompt.
 Follow the scientific preregistration/freeze/no-post-result-tuning rules exactly.
-Make local Git commits using git_commit. Never push. Finish only when the repository is clean and the prompt's required commit structure is satisfied, or when you must report a legitimate blocked terminal state.
+Make local Git commits using git_commit. Never push.
+You MUST terminate by calling the finish tool exactly once when the task is complete or legitimately blocked. Do not keep exploring after the prompt's requirements are satisfied. Do not send a normal final answer instead of finish.
 "@
 
 $Tools=@(
@@ -274,8 +289,12 @@ $Tools=@(
  @{type='function';function=@{name='delete_file';description='Delete a file only within allowed research paths.';parameters=@{type='object';properties=@{path=@{type='string'}};required=@('path');additionalProperties=$false}}},
  @{type='function';function=@{name='git_restore';description='Restore allowed research paths from HEAD.';parameters=@{type='object';properties=@{paths=@{type='array';items=@{type='string'};minItems=1}};required=@('paths');additionalProperties=$false}}},
  @{type='function';function=@{name='git_commit';description='Stage exactly the supplied allowed research paths and commit them locally.';parameters=@{type='object';properties=@{message=@{type='string'};paths=@{type='array';items=@{type='string'};minItems=1}};required=@('message','paths');additionalProperties=$false}}},
- @{type='function';function=@{name='run_repo_process';description='Run a bounded project-local verification process. kind is one of go_test, go_run, powershell_file, python_file, git_diff_check.';parameters=@{type='object';properties=@{kind=@{type='string';enum=@('go_test','go_run','powershell_file','python_file','git_diff_check')};args=@{type='array';items=@{type='string'}};timeout_seconds=@{type='integer';minimum=1;maximum=600}};required=@('kind','args');additionalProperties=$false}}}
+ @{type='function';function=@{name='run_repo_process';description='Run a bounded project-local verification process. kind is one of go_test, go_run, powershell_file, python_file, git_diff_check.';parameters=@{type='object';properties=@{kind=@{type='string';enum=@('go_test','go_run','powershell_file','python_file','git_diff_check')};args=@{type='array';items=@{type='string'}};timeout_seconds=@{type='integer';minimum=1;maximum=600}};required=@('kind','args');additionalProperties=$false}}},
+ @{type='function';function=@{name='finish';description='Finish the bounded research task. Call exactly once when complete or legitimately blocked. summary must include any required terminal marker from the prompt.';parameters=@{type='object';properties=@{summary=@{type='string';minLength=1};status=@{type='string';enum=@('complete','blocked')}};required=@('summary','status');additionalProperties=$false}}}
 )
+if($ProtocolProbe){
+    $Tools=@($Tools|Where-Object{[string]$_.function.name -in @('git_status','finish')})
+}
 
 $Messages=New-Object Collections.Generic.List[object]
 $Messages.Add([ordered]@{role='system';content=$System})
@@ -288,25 +307,49 @@ $Headers=@{
 }
 
 for($Round=1;$Round-le$MaxRounds;$Round++){
+    if($Round-eq([Math]::Max(2,$MaxRounds-2))){
+        $Messages.Add([ordered]@{role='user';content='The tool budget is nearly exhausted. Stop broad exploration. Complete only the essential remaining work, then call finish. If the task cannot be completed under the frozen rules, call finish with status blocked and explain why.'})
+    }
+    $ToolChoice=if($Round-eq$MaxRounds){
+        [ordered]@{type='function';function=[ordered]@{name='finish'}}
+    }else{'auto'}
     $Body=[ordered]@{
         model=$Model
         temperature=0
-        messages=@($Messages)
+        messages=$Messages.ToArray()
         tools=$Tools
-        tool_choice='auto'
+        tool_choice=$ToolChoice
         max_tokens=4096
     }|ConvertTo-Json -Depth 50 -Compress
 
-    try{
-        $Resp=Invoke-RestMethod -Method Post -Uri 'https://openrouter.ai/api/v1/chat/completions' -Headers $Headers -Body $Body -TimeoutSec 180
-    }catch{
-        throw "NEMOTRON_OPENROUTER_REQUEST_FAILED round=$Round error=$($_.Exception.Message)"
+    $Resp=$null
+    for($Attempt=1;$Attempt-le3;$Attempt++){
+        try{
+            $Resp=Invoke-RestMethod -Method Post -Uri 'https://openrouter.ai/api/v1/chat/completions' -Headers $Headers -Body $Body -TimeoutSec 180
+            break
+        }catch{
+            $StatusCode=$null
+            try{$StatusCode=[int]$_.Exception.Response.StatusCode}catch{}
+            $IsRateLimit=($StatusCode-eq429 -or $_.Exception.Message -match '(?i)429|too many requests')
+            if($IsRateLimit -and $Attempt-lt3){
+                $Delay=if($Attempt-eq1){5}else{15}
+                Write-Host "NEMOTRON_OPENROUTER_RATE_LIMIT round=$Round attempt=$Attempt retry_seconds=$Delay"
+                Start-Sleep -Seconds $Delay
+                continue
+            }
+            throw "NEMOTRON_OPENROUTER_REQUEST_FAILED round=$Round attempt=$Attempt status=$StatusCode error=$($_.Exception.Message)"
+        }
     }
+    if($null-eq$Resp){throw "NEMOTRON_OPENROUTER_RESPONSE_MISSING round=$Round"}
     if($null-eq$Resp.choices -or @($Resp.choices).Count-lt1){throw "NEMOTRON_RESPONSE_CHOICES_MISSING round=$Round"}
     $Msg=$Resp.choices[0].message
-    $Calls=@($Msg.tool_calls)
-
-    $Assistant=[ordered]@{role='assistant';content=if($null-eq$Msg.content){''}else{[string]$Msg.content}}
+    $ToolCallsProperty=$Msg.PSObject.Properties['tool_calls']
+    [object[]]$Calls=@()
+    if($null-ne$ToolCallsProperty -and $null-ne$ToolCallsProperty.Value){
+        $Calls=@($ToolCallsProperty.Value)
+    }
+    $ContentProperty=$Msg.PSObject.Properties['content']
+    $Assistant=[ordered]@{role='assistant';content=if($null-eq$ContentProperty -or $null-eq$ContentProperty.Value){''}else{[string]$ContentProperty.Value}}
     if($Calls.Count-gt0){
         $ToolCallRows=New-Object Collections.Generic.List[object]
         foreach($Call in $Calls){
@@ -319,7 +362,7 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
                 }
             })
         }
-        $Assistant.tool_calls=@($ToolCallRows)
+        $Assistant.tool_calls=$ToolCallRows.ToArray()
     }
     $Messages.Add($Assistant)
 
@@ -334,6 +377,14 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
     foreach($Call in $Calls){
         $Name=[string]$Call.function.name
         Write-Host "NEMOTRON_TOOL round=$Round name=$Name"
+        if($Name-ceq'finish'){
+            $FinishArgs=([string]$Call.function.arguments)|ConvertFrom-Json
+            $Summary=[string]$FinishArgs.summary
+            if([string]::IsNullOrWhiteSpace($Summary)){throw 'NEMOTRON_FINISH_SUMMARY_EMPTY'}
+            [IO.File]::WriteAllText($LastMessagePath,$Summary,(New-Object Text.UTF8Encoding($false)))
+            Write-Host "NEMOTRON_AGENT_PASS rounds=$Round model=$Model status=$([string]$FinishArgs.status)"
+            return
+        }
         try{
             $Result=Invoke-Tool $Name ([string]$Call.function.arguments)
             $ToolContent=[string]$Result
