@@ -1,0 +1,251 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-LEVEL1-MAINTENANCE-R2",
+  "program": "Wingless-Yggdrasil real-workload maintenance bridge",
+  "question": "Can the already-supported real UTF-8 level-1 raw-byte motif substrate detect and repair an unknown useful motif deletion from naturally distributed held-out prediction errors, reject a wrong same-budget repair, retain the correct repair on an independent validation slice, and return to byte-exact canonical function without tokenizer or lesion labels?",
+  "hypothesis": "Across the two immutable held-out UTF-8 files, two preregistered useful motif deletions per file (four sequential cycles total) will be identified from diagnostic prediction-error counts with 100% target-selection accuracy and >=1.5x selected-to-runner-up error separation. A wrong same-budget motif-state repair will never satisfy the frozen retain rule, the correct repair will improve selected-key validation accuracy by >=0.20 and be retained in every cycle, and the independent audit slice will exactly match canonical predictions/probabilities and learned structure after each repair.",
+  "exact_parent_sha": "d1042d910243d47d1692872e89770cccd0851355",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "wingless_prior_evidence": {
+    "experiment": "WLM-LM-REAL-UTF8-BYTE-PILOT-R2",
+    "classification_commit_sha": "f57261177665552e15acdab8995aee0ae2b5b738",
+    "qualification_run_id": "37000936408",
+    "scientific_claim": "Fixed 256-entry four-byte motif layer improved held-out real UTF-8 prediction and event efficiency without tokenization."
+  },
+  "yggdrasil_policy_provenance": {
+    "experiment": "EXP-BRIDGE-HETEROGENEOUS-DEGRADATION-SHIFT-001",
+    "classification_commit_sha": "7cb56dc08db62e77512c4b3b2deb8ab75d94c67d",
+    "frozen_semantics_reused": [
+      "error-only key-bucket monitor",
+      "deterministic lexicographic tie break",
+      "wrong candidate before correct candidate",
+      "byte-exact revert after failed candidate",
+      "independent validation before retain",
+      "sequential retained state across cycles"
+    ]
+  },
+  "authority": "research-only immutable real-byte maintenance test; no deployment, external-model inference, scheduler, queue, broker, accepted-ref, or runtime authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-ygg-real-utf8-level1-maintenance-r2.json",
+    "unitary/wlm_ygg_real_utf8_level1_maintenance_r2.go",
+    "cmd/wlm-ygg-real-utf8-level1-maintenance-r2/main.go",
+    "scripts/run-wlm-ygg-real-utf8-level1-maintenance-r2.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "corpus": {
+    "training": "exact WLM-LM-REAL-UTF8-BYTE-PILOT-R2 four training Git blobs and identities",
+    "evaluation": "exact WLM-LM-REAL-UTF8-BYTE-PILOT-R2 two evaluation Git blobs and identities",
+    "encoding": "exact raw Git blob bytes; no decoding, normalization, tokenizer, vocabulary, inserted boundaries, or remapping",
+    "evaluation_segmentation": "Each evaluation file is split by raw byte index into four contiguous non-overlapping quarters: target-selection calibration, diagnostic monitor, candidate validation, final audit. Raw context resets at each quarter boundary.",
+    "contamination_rule": "No evaluation bytes participate in model training or motif selection."
+  },
+  "canonical_model": {
+    "construction": "byte-identical call path to WLM-LM-REAL-UTF8-BYTE-PILOT-R2 TrainModel",
+    "baseline": "same fixed 256x256 previous-byte counts",
+    "selected_motifs": "same fixed 256 selected four-byte motif records",
+    "motif_record_logical_bytes": 1028,
+    "motif_record_definition": "4 key bytes + 256 uint32 successor counts; best successor and totals are recomputed from the stored counts",
+    "capacity_growth": false
+  },
+  "target_schedule": {
+    "cycles_per_eval_file": 2,
+    "total_cycles": 4,
+    "eligibility": [
+      "key is one of the frozen 256 canonical selected motifs",
+      "calibration-quarter occurrence count >= 6",
+      "diagnostic-quarter occurrence count >= 3",
+      "validation-quarter occurrence count >= 3",
+      "audit-quarter occurrence count >= 3",
+      "canonical motif top-1 accuracy minus baseline top-1 accuracy on calibration occurrences >= 0.20"
+    ],
+    "ordering": "Use the mechanically selected attribution Tier 1 only: eligible keys sorted by calibration occurrence descending, then calibration accuracy gain descending, then lexicographic raw four-byte key; choose first two per evaluation file.",
+    "hidden_from_policy": "scheduled target key, target rank, file quarter identities, and canonical-vs-baseline calibration gain are evaluator-only"
+  },
+  "degradation": {
+    "class": "motif_record_missing",
+    "operation": "delete the scheduled four-byte motif record from the active selected-motif map; baseline and every other motif remain unchanged",
+    "sequential_state": "every next cycle begins from the retained repaired state of the prior cycle; no model retraining or canonical reset"
+  },
+  "monitor": {
+    "input": "diagnostic-quarter raw bytes, active model prediction, subsequently observed target byte, and membership of current four-byte context in the bounded canonical retained catalog",
+    "rule": "for every misprediction whose four-byte context is in the retained catalog, increment that raw key's error bucket; select highest error count, lexicographic tie",
+    "forbidden": "scheduled target identity, lesion signal, target rank, calibration gain, validation or audit outcomes"
+  },
+  "candidates": {
+    "retained_catalog": "bounded canonical copy of the 256 selected motif records; research-only repair memory",
+    "wrong_first": "Choose the lexicographically next retained key after the monitor-selected key whose canonical best successor differs; install that record's 256-count distribution under the selected raw key while keeping the selected raw key itself.",
+    "correct_second": "Install the monitor-selected key's own retained canonical 256-count distribution.",
+    "bytes_read_per_candidate": 1028,
+    "repair_operations_per_candidate": 1,
+    "wrong_correct_budget_parity": true
+  },
+  "validation_policy": {
+    "segment": "independent validation quarter from the same immutable held-out file",
+    "selected_key_metric": "top-1 accuracy restricted to raw occurrences of the monitor-selected four-byte key",
+    "global_metric": "Jeffreys-smoothed overall bits-per-byte using the same baseline/motif probability rule as WLM-LM-REAL-UTF8-BYTE-PILOT-R2",
+    "retain_rule": "retain iff selected-key accuracy gain versus the pre-candidate degraded state >= 0.20 AND global bits-per-byte change versus the pre-candidate degraded state <= 0.005; otherwise byte-exact revert",
+    "candidate_order": "wrong first, exact revert if rejected, correct second"
+  },
+  "final_audit": {
+    "segment": "independent fourth quarter",
+    "requirements": [
+      "active selected-motif key set exactly equals canonical key set",
+      "all active motif successor-count arrays exactly equal canonical arrays",
+      "adaptive top-1 prediction at every audit next-byte position exactly matches canonical model",
+      "adaptive smoothed probability for every observed audit target exactly matches canonical model",
+      "capacity remains exactly 256 selected motifs"
+    ]
+  },
+  "metrics_and_thresholds": [
+    [
+      "valid_evaluation_file_count",
+      "==",
+      2
+    ],
+    [
+      "completed_cycle_count",
+      "==",
+      4
+    ],
+    [
+      "minimum_target_eligibility_count_per_file",
+      ">=",
+      2
+    ],
+    [
+      "minimum_monitor_target_selection_accuracy",
+      "==",
+      1
+    ],
+    [
+      "minimum_selected_error_count_ratio_vs_runner_up",
+      ">=",
+      1.5
+    ],
+    [
+      "maximum_wrong_candidate_selected_key_accuracy_gain",
+      "<",
+      0.2
+    ],
+    [
+      "wrong_candidate_retain_count",
+      "==",
+      0
+    ],
+    [
+      "wrong_candidate_revert_count",
+      "==",
+      4
+    ],
+    [
+      "minimum_correct_candidate_selected_key_accuracy_gain",
+      ">=",
+      0.2
+    ],
+    [
+      "correct_candidate_retain_count",
+      "==",
+      4
+    ],
+    [
+      "correct_candidate_revert_count",
+      "==",
+      0
+    ],
+    [
+      "maximum_post_repair_audit_prediction_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "maximum_post_repair_audit_probability_abs_delta",
+      "==",
+      0
+    ],
+    [
+      "minimum_structure_jaccard_after_each_cycle",
+      "==",
+      1
+    ],
+    [
+      "maximum_candidate_read_bytes",
+      "<=",
+      1028
+    ],
+    [
+      "maximum_candidate_repair_operations",
+      "<=",
+      1
+    ],
+    [
+      "maximum_final_selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "minimum_final_selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "lesion_label_access_count",
+      "==",
+      0
+    ],
+    [
+      "evaluator_schedule_access_in_policy_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_cycle_rows",
+      "==",
+      0
+    ]
+  ],
+  "validity_criteria": [
+    "Exact parent, North Star, supported real UTF-8 pilot identity, and frozen policy provenance match.",
+    "All training/evaluation Git blob identities match the supported pilot and train/eval sets remain disjoint.",
+    "Canonical model construction is byte-identical to the supported pilot learner.",
+    "Exactly two eligible targets per evaluation file are chosen by the attribution-mandated Tier 1 rule before degradation; target identities are unavailable to policy.",
+    "Diagnostic, validation, and audit quarters are byte-disjoint and context resets at quarter boundaries.",
+    "Monitor uses only raw current context, prediction error, observed target byte, and bounded retained-catalog membership.",
+    "Wrong and correct candidates use exactly one 1028-byte logical motif record and one repair operation.",
+    "Every rejected candidate restores byte-exact pre-candidate active state.",
+    "Every retained correct state becomes the start state of the next cycle.",
+    "No tokenizer, lesion label, evaluator schedule, external model, capacity growth, post-result threshold change, or retraining is used.",
+    "Full Go regression passes before probe execution and normalized result carries the exact experiment identity."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all frozen thresholds pass across all four sequential real-byte degradation cycles.",
+    "mixed": "Monitor identifies all targets and correct repairs restore canonical audit behavior, but at least one separation, wrong-candidate, validation-gain, or budget threshold fails.",
+    "negative": "Validity passes but target monitoring, wrong-candidate rejection, correct retention, or canonical audit restoration fails in one or more cycles.",
+    "incomplete": "Corpus or compute interruption prevents the complete four-cycle matrix.",
+    "invalid": "Blob identity, train/eval isolation, target-schedule isolation, quarter isolation, candidate-budget parity, revert semantics, deterministic construction, capacity, or qualification criteria fail."
+  },
+  "no_post_result_tuning_rule": "Tier 1 was selected mechanically by the sealed support-attribution experiment. Do not alter corpus blobs, quarter split, Tier 1 eligibility/order, monitor, candidate construction/order, retained-record format, validation rule, thresholds, metrics, aggregation, or classification after any R2 output is observed.",
+  "supersedes_invalid_attempt": {
+    "experiment": "WLM-YGG-REAL-UTF8-LEVEL1-MAINTENANCE-R1",
+    "disposition": "invalid-target-schedule-construction",
+    "qualification_run_id": "37007119117",
+    "scientific_claim": false
+  },
+  "support_attribution": {
+    "experiment": "WLM-YGG-REAL-UTF8-MAINTENANCE-SUPPORT-ATTRIBUTION-R1",
+    "classification_commit_sha": "d1042d910243d47d1692872e89770cccd0851355",
+    "qualification_run_id": "37007510416",
+    "strictest_feasible_tier_index": 1,
+    "minimum_selected_tier_eligible_count_per_file": 3
+  }
+}
