@@ -1,0 +1,207 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RULE-CONDITIONED-SEQUENCE-R2",
+  "question": "Can the existing Wingless bounded-state substrate learn multiple next-token rules selected by a rule token, generalize each rule to exact token contexts omitted during training, and sustain autoregressive generation while preserving exact cross-substrate equivalence?",
+  "hypothesis": "A fixed 96-counter rule-conditioned factorized learner trained on 75% of exact rule/context triples will achieve at least 0.95 pooled one-step accuracy and at least 0.95 pooled autoregressive accuracy on the frozen held-out triples, while a 2048-counter exact rule/context lookup control will achieve at most 0.25 pooled held-out one-step accuracy. Slice-backed and ring-backed context substrates will have zero learned-state, prediction, or context-observable mismatches.",
+  "exact_parent_sha": "88b6dab5e6fc44467d208593210c097d2759215c",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-COMPOSITIONAL-SEQUENCE-R1",
+    "classification": "supported",
+    "scientific_claim": "A 24-counter factorized learned state generalized XOR next-token behavior to all 16 exact contexts omitted from training and sustained perfect autoregressive generation while an exact-context lookup control scored zero held-out accuracy."
+  },
+  "authority": "research-only; no production, broker, live, accepted-ref, credential, runner-configuration, scheduler, queue-consumer, or cross-lane authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-rule-conditioned-sequence-r2.json",
+    "unitary/wlm_lm_rule_conditioned_sequence_r2.go",
+    "cmd/wlm-lm-rule-conditioned-sequence-r2/main.go",
+    "scripts/run-wlm-lm-rule-conditioned-sequence-r2.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "token_and_rule_definition": {
+    "alphabet_size": 8,
+    "token_representation": "fixed three-bit unsigned token identity",
+    "context_width": 2,
+    "rule_ids": {
+      "0": "bitwise XOR",
+      "1": "three-bit XNOR",
+      "2": "bitwise AND",
+      "3": "bitwise OR"
+    },
+    "rule_token_visibility": "the rule id is supplied as an ordinary bounded conditioning input; rule semantics are not exposed to prediction code except through training observations"
+  },
+  "factorized_learner": {
+    "learned_state": "for each of 4 rule ids and 3 bit positions, a 2x2x2 integer count tensor over (older_bit,newer_bit,target_bit), totaling 96 counters",
+    "update": "increment exactly one target-bit count per rule, bit position, and training observation",
+    "prediction": "for each bit independently choose the target bit with the larger learned count for the observed rule-specific input-bit pair; ties choose zero; reassemble three bits into one token",
+    "capacity_growth": false
+  },
+  "lookup_control": {
+    "learned_state": "4x8x8x8 whole rule/context next-token count tensor, totaling 2048 counters",
+    "prediction": "argmax over candidate next-token counts for the exact rule plus two-token context; ties choose token zero",
+    "purpose": "tests whether held-out performance can be explained by exact rule/context memorization"
+  },
+  "train_holdout_split": {
+    "training_rule_context_rule": "(older+newer+rule_id) mod 4 != 1",
+    "heldout_rule_context_rule": "(older+newer+rule_id) mod 4 == 1",
+    "training_rule_context_count": 192,
+    "heldout_rule_context_count": 64,
+    "factor_coverage_requirement": "for every rule and every bit position, all four (older_bit,newer_bit) input combinations must occur in training",
+    "heldout_lookup_zero_target_fraction_expected": 0.1875
+  },
+  "training_corpus": {
+    "observations": "each of the 192 training rule/context triples repeated exactly 16 times as independent one-step observations",
+    "training_transition_count_per_seed_per_substrate": 3072,
+    "order": "deterministic seed-derived permutation",
+    "seeds": [
+      11503,
+      11527,
+      11549,
+      11579,
+      11617,
+      11633,
+      11657,
+      11681
+    ],
+    "seed_policy": "All eight seeds were checked against the Wingless repository before preregistration and had no matches; no replacement, exclusion, or extension is permitted."
+  },
+  "evaluation": {
+    "one_step": "score both factorized and lookup learners once on each of the 64 held-out rule/context triples without updates",
+    "autoregressive": "from each held-out triple, hold the rule id fixed for 16 steps; the factorized model prediction becomes the next context token while the frozen rule independently supplies the scored target for the generated current context",
+    "autoregressive_transition_count_per_seed_per_substrate": 1024,
+    "evaluation_updates": false
+  },
+  "substrates": [
+    "slice-backed two-token context deque",
+    "fixed-capacity ring two-token context deque"
+  ],
+  "controls": [
+    "Both substrates receive byte-for-byte identical training observations and held-out evaluation starts for each seed.",
+    "No held-out exact rule/context triple appears during training.",
+    "Every rule-specific per-bit input combination required by the factorized learner is represented in training.",
+    "The lookup control receives exactly the same training observations.",
+    "Training mutates only fixed-size learned counters; evaluation is read-only.",
+    "Autoregressive evaluation feeds model predictions, not target tokens, into subsequent context state.",
+    "No external model calls, oracle corrections, gradient optimizer, capacity growth, rule implementations inside prediction code, or post-result changes are permitted."
+  ],
+  "budgets": {
+    "seed_count": 8,
+    "substrate_count": 2,
+    "training_transition_count_total": 49152,
+    "heldout_one_step_evaluation_count_total": 1024,
+    "autoregressive_evaluation_transition_count_total": 16384,
+    "factorized_counter_count": 96,
+    "lookup_control_counter_count": 2048,
+    "context_capacity": 2,
+    "goroutine_policy": "single-process deterministic execution; GOMAXPROCS=1 in qualification",
+    "capacity_growth": false
+  },
+  "metrics_and_thresholds": [
+    {
+      "name": "valid_seed_count",
+      "comparator": "==",
+      "threshold": 8
+    },
+    {
+      "name": "completed_substrate_runs",
+      "comparator": "==",
+      "threshold": 16
+    },
+    {
+      "name": "training_transition_count",
+      "comparator": "==",
+      "threshold": 49152
+    },
+    {
+      "name": "heldout_one_step_evaluation_count",
+      "comparator": "==",
+      "threshold": 1024
+    },
+    {
+      "name": "autoregressive_evaluation_transition_count",
+      "comparator": "==",
+      "threshold": 16384
+    },
+    {
+      "name": "minimum_factorized_heldout_one_step_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "maximum_pooled_lookup_heldout_one_step_accuracy",
+      "comparator": "<=",
+      "threshold": 0.25
+    },
+    {
+      "name": "minimum_factorized_autoregressive_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "substrate_prediction_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_factorized_state_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_context_observable_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "heldout_rule_context_leak_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "factorized_bit_coverage_missing_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "invalid_context_rows",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "counter_overflow_rows",
+      "comparator": "==",
+      "threshold": 0
+    }
+  ],
+  "validity_criteria": [
+    "Exact parent SHA and updated North Star SHA-256 match this preregistration.",
+    "All eight seeds, both substrates, 192 training rule/context triples, and 64 held-out triples complete at frozen cardinality.",
+    "No held-out exact rule/context triple appears in training.",
+    "Every two-bit input combination occurs in training for every bit position under every rule.",
+    "The factorized learner has exactly 96 counters and the lookup control exactly 2048 counters.",
+    "Rule implementations are used only for deterministic corpus generation and scoring; prediction derives solely from learned counts plus the supplied rule id.",
+    "Autoregressive evaluation holds rule id fixed and feeds model predictions, not targets, back into context.",
+    "The normalized result carries schema wingless.research-scientific-result.v1 and exact experiment identifier.",
+    "Full Go regression passes before probe execution."
+  ],
+  "classification_rules": {
+    "supported": "All fifteen frozen metric thresholds and all validity criteria pass.",
+    "mixed": "Validity and completeness pass and the factorized learner materially outperforms the lookup control, but at least one factorized accuracy or exact cross-substrate equivalence threshold fails.",
+    "negative": "Validity passes but rule-conditioned factorization does not materially outperform the exact rule/context lookup control or fails under autoregressive rollout.",
+    "incomplete": "Environmental or compute interruption prevents full frozen cardinality; preserve diagnostics and make no scientific claim.",
+    "invalid": "Provenance, split isolation, frozen-package identity, construction, determinism, bounded-state, or qualification isolation fails; invalid is not a scientific outcome."
+  },
+  "stop_conditions": [
+    "Stop before execution on identity, provenance, authority, package-scope, or split-isolation drift.",
+    "Stop as invalid on held-out leakage, missing rule-specific factor coverage, malformed rule/context construction, learned-state cardinality drift, or non-deterministic qualification.",
+    "Do not stop early for apparent support, mixed, or negative observations; complete the full frozen matrix unless infrastructure prevents it."
+  ],
+  "no_post_result_tuning_rule": "After any probe or primary output is observed, do not alter seeds, split rule, token representation, rule family, factorization, lookup control, corpus construction, context width, capacities, metrics, thresholds, aggregation, classification, or stop conditions under this experiment identifier.",
+  "supersedes_invalid_attempt": {
+    "experiment": "WLM-LM-RULE-CONDITIONED-SEQUENCE-R1",
+    "disposition": "invalid-provenance-before-execution",
+    "scientific_claim": false,
+    "primary_probe_executed": false
+  }
+}
