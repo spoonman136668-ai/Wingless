@@ -133,7 +133,23 @@ $Match = [regex]::Match(
 if (-not $Match.Success) {
     $Match = [regex]::Match(
         $Transcript,
-        '(?m)^(\{"schema":"wingless\.research-scientific-result\.v1".*\})\s*
+        '(?m)^(?:\d{4}-\d{2}-\d{2}T\S+Z\s+)?(\{"schema":"wingless\.research-scientific-result\.v1".*\})\s*$'
+    )
+}
+
+if ($Match.Success) {
+    try {
+        $Probe = $Match.Groups[1].Value | ConvertFrom-Json
+        $Probe | ConvertTo-Json -Depth 100 | Set-Content -Encoding UTF8 -Path $ProbePath
+    }
+    catch {
+        $ProbeParseError = $_.Exception.Message
+    }
+}
+else {
+    $ProbeParseError = 'No supported Wingless scientific-result JSON block was found in the transcript.'
+}
+
 $StatusLines = @(
     git -C $Repo status --short
 )
