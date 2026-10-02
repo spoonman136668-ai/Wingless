@@ -1,4 +1,4 @@
-name: Wingless ICE rebuild R1
+name: Wingless GLM promotion ICE rebuild R1
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
       - name: Checkout repair target
         uses: actions/checkout@v4
         with:
-          ref: repair/wingless-ice-rebuild-r1
+          ref: research/glm-clear-thinking-promotion-r1
           fetch-depth: 0
           persist-credentials: true
 
@@ -35,9 +35,9 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
-          $ExpectedBase='d4c52a24ee00a25bcbf41c2d100b8bad53caa512'
+          $ExpectedBase='0813a96d94e470343312eb16c51289cdc7eac275'
           $Before=(git rev-parse HEAD).Trim()
-          if($Before -cne $ExpectedBase){throw "ICE_REPAIR_BASE_DRIFT expected=$ExpectedBase actual=$Before"}
+          if($Before -cne $ExpectedBase){throw "GLM_ICE_BASE_DRIFT expected=$ExpectedBase actual=$Before"}
 
           go run -buildvcs=false ./cmd/ice build
           if($LASTEXITCODE-ne0){throw 'ICE_BUILD_FAILED'}
@@ -60,7 +60,7 @@ jobs:
           git add -- .ice
           git commit -m 'ice: rebuild derived index from current source'
           if($LASTEXITCODE-ne0){throw 'ICE_COMMIT_FAILED'}
-          git push origin HEAD:repair/wingless-ice-rebuild-r1
+          git push origin HEAD:research/glm-clear-thinking-promotion-r1
           if($LASTEXITCODE-ne0){throw 'ICE_PUSH_FAILED'}
 
           $Head=(git rev-parse HEAD).Trim()
