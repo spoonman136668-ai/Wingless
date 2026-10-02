@@ -258,9 +258,10 @@ if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_OPENROUTER_SECRET_EMPTY
 $Prompt=[IO.File]::ReadAllText($PromptPath)
 $System=@"
 You are the repo-local autonomous research worker. You have a constrained tool interface to inspect and modify exactly one research repository.
-Use tools rather than inventing repository contents. Never attempt to access paths outside the repository or authority outside the prompt.
+Use the minimum tools necessary and never inspect unrelated files just to gather more context. Never attempt to access paths outside the repository or authority outside the prompt.
 Follow the scientific preregistration/freeze/no-post-result-tuning rules exactly.
-Make local Git commits using git_commit. Never push. Finish only when the repository is clean and the prompt's required commit structure is satisfied, or when you must report a legitimate blocked terminal state.
+Make local Git commits using git_commit. Never push.
+You MUST terminate by calling the finish tool exactly once when the task is complete or legitimately blocked. Do not keep exploring after the prompt's requirements are satisfied. Do not send a normal final answer instead of finish.
 "@
 
 $Tools=@(
@@ -274,7 +275,8 @@ $Tools=@(
  @{type='function';function=@{name='delete_file';description='Delete a file only within allowed research paths.';parameters=@{type='object';properties=@{path=@{type='string'}};required=@('path');additionalProperties=$false}}},
  @{type='function';function=@{name='git_restore';description='Restore allowed research paths from HEAD.';parameters=@{type='object';properties=@{paths=@{type='array';items=@{type='string'};minItems=1}};required=@('paths');additionalProperties=$false}}},
  @{type='function';function=@{name='git_commit';description='Stage exactly the supplied allowed research paths and commit them locally.';parameters=@{type='object';properties=@{message=@{type='string'};paths=@{type='array';items=@{type='string'};minItems=1}};required=@('message','paths');additionalProperties=$false}}},
- @{type='function';function=@{name='run_repo_process';description='Run a bounded project-local verification process. kind is one of go_test, go_run, powershell_file, python_file, git_diff_check.';parameters=@{type='object';properties=@{kind=@{type='string';enum=@('go_test','go_run','powershell_file','python_file','git_diff_check')};args=@{type='array';items=@{type='string'}};timeout_seconds=@{type='integer';minimum=1;maximum=600}};required=@('kind','args');additionalProperties=$false}}}
+ @{type='function';function=@{name='run_repo_process';description='Run a bounded project-local verification process. kind is one of go_test, go_run, powershell_file, python_file, git_diff_check.';parameters=@{type='object';properties=@{kind=@{type='string';enum=@('go_test','go_run','powershell_file','python_file','git_diff_check')};args=@{type='array';items=@{type='string'}};timeout_seconds=@{type='integer';minimum=1;maximum=600}};required=@('kind','args');additionalProperties=$false}}},
+ @{type='function';function=@{name='finish';description='Finish the bounded research task. Call exactly once when complete or legitimately blocked. summary must include any required terminal marker from the prompt.';parameters=@{type='object';properties=@{summary=@{type='string';minLength=1};status=@{type='string';enum=@('complete','blocked')}};required=@('summary','status');additionalProperties=$false}}}
 )
 
 $Messages=New-Object Collections.Generic.List[object]
@@ -338,6 +340,14 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
     foreach($Call in $Calls){
         $Name=[string]$Call.function.name
         Write-Host "NEMOTRON_TOOL round=$Round name=$Name"
+        if($Name-ceq'finish'){
+            $FinishArgs=([string]$Call.function.arguments)|ConvertFrom-Json
+            $Summary=[string]$FinishArgs.summary
+            if([string]::IsNullOrWhiteSpace($Summary)){throw 'NEMOTRON_FINISH_SUMMARY_EMPTY'}
+            [IO.File]::WriteAllText($LastMessagePath,$Summary,(New-Object Text.UTF8Encoding($false)))
+            Write-Host "NEMOTRON_AGENT_PASS rounds=$Round model=$Model status=$([string]$FinishArgs.status)"
+            return
+        }
         try{
             $Result=Invoke-Tool $Name ([string]$Call.function.arguments)
             $ToolContent=[string]$Result
