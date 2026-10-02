@@ -61,7 +61,7 @@ jobs:
           )
           $ImplFiles=@(& git diff-tree --no-commit-id --name-only -r $Scientific | Where-Object {$_} | Sort-Object)
           $ExpectedImplSorted=@($ExpectedImpl|Sort-Object)
-          if((Compare-Object $ExpectedImplSorted $ImplFiles).Count-ne0){
+          if(@(Compare-Object $ExpectedImplSorted $ImplFiles).Count-ne0){
             throw "IMPLEMENTATION_FILESET_INVALID files=$($ImplFiles -join ',')"
           }
 
