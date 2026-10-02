@@ -1,0 +1,129 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RAW-REP-ROLE-COMPOSITION-R1",
+  "program": "Wingless raw-input to representation to multi-step relational reasoning chain",
+  "question": "Can Wingless discover value and operation representations from raw byte records, learn only single-step relational transitions, and then compose those learned transitions to solve unseen multi-step role programs without memorizing whole programs?",
+  "hypothesis": "A nine-motif raw-byte representation learner will recover four value motifs and five operation motifs from single-step training records. A learned primitive transition model will then achieve at least 0.95 exact final-state accuracy on unseen three-, five-, and seven-step programs, including the untrained right-role transformation produced by swap-role conjugation, while an exact whole-program lookup trained on the same single-step records will achieve at most 0.25 held-out accuracy.",
+  "exact_parent_sha": "64bb37ba4b6a0d2ac319c13d83f821a2f1fa0223",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "allocation": "75% chain / 25% substrate falsification over the current prospective block",
+    "slot": "chain",
+    "next_slot_after_this": "substrate falsification"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-RAW-REP-COMPOSITIONAL-REASONING-R1",
+    "classification": "qualified-scientific-result; frozen thresholds supported",
+    "github_run_id": "37064194956",
+    "observation": "The learned raw representation recovered all eight value motifs and achieved 1.0 held-out compositional accuracy with 1.0 exact raw output accuracy while exact-pair lookup scored 0.0."
+  },
+  "scope_statement": "This is a bounded multi-step relational composition gate. Passing establishes composition of learned raw representations and learned primitive transitions under frozen synthetic controls; it does not establish open-domain reasoning.",
+  "authority": "research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "raw_benchmark": {
+    "value_count": 4,
+    "operation_count": 5,
+    "value_motif_width_bytes": 4,
+    "operation_motif_width_bytes": 4,
+    "operations": [
+      "left_swap_start_0",
+      "left_swap_start_1",
+      "left_swap_start_2",
+      "left_swap_start_3",
+      "swap_roles"
+    ],
+    "single_step_training": "every one of the five operations on all sixteen ordered left/right value states, repeated forty times",
+    "training_record_count": 3200,
+    "record_encoding": "raw deterministic noise, left value motif, noise, right value motif, noise, one operation motif, noise, observed output-left value motif, noise, observed output-right value motif",
+    "noise": "deterministic LCG upper-bit bytes in range 192..255; no value, operation, or target information is encoded in noise",
+    "representation_labels": "none supplied to motif selection; ordered record positions are used only after unsupervised motif discovery to identify observed input, operation, and output roles"
+  },
+  "representation_learner": {
+    "input": "raw training record bytes only",
+    "candidate": "every contiguous four-byte window within each training record",
+    "selection": "top nine by occurrence count descending, then lexicographic raw key",
+    "capacity": 9,
+    "expected_recurrent_motifs": "four value motifs plus five operation motifs",
+    "tokenizer": false
+  },
+  "transition_learner": {
+    "state": "for each learned operation representation and ordered learned value pair, a sixteen-way count distribution over observed output value pairs",
+    "training": "single-step decoded records only",
+    "prediction": "argmax learned output pair for the current operation and current pair; ties choose lowest pair index",
+    "program_execution": "feed each predicted pair into the next learned primitive transition until the unseen program ends",
+    "semantic_operation_code_visibility": "none; prediction never calls the evaluator's logical operation implementation",
+    "capacity_growth": false
+  },
+  "whole_program_lookup_control": {
+    "state": "exact decoded operation-sequence plus input-pair -> output-pair counts",
+    "training": "the same single-step decoded records only",
+    "heldout_behavior": "multi-step program keys are unseen; ties choose lowest pair index",
+    "purpose": "tests whether held-out performance can be explained by memorizing exact whole programs"
+  },
+  "heldout_programs": {
+    "conjugated_right": "for every ordered input pair and each start in 0..3, evaluate swap_roles -> left_swap_start_k -> swap_roles; no right-role primitive exists in training",
+    "long_program_lengths": [5,7],
+    "long_program_generation": "for every ordered input pair, four deterministic seeds per length generate frozen mixtures of swap_roles and left_swap operations",
+    "evaluation_updates": false
+  },
+  "controls": [
+    "All learner training is single-step; no multi-step program appears in training.",
+    "The representation learner receives raw bytes only and is not seeded with the nine evaluator motif identities.",
+    "The transition learner receives decoded observed training transitions only and never calls operation semantics during prediction.",
+    "The whole-program lookup receives the same decoded training records.",
+    "Heldout evaluation is read-only and every heldout program length is at least three.",
+    "No tokenizer, external model, network access, gradient optimizer, capacity growth, oracle correction, or post-result tuning is permitted."
+  ],
+  "metrics_and_thresholds": [
+    ["training_record_count", "==", 3200],
+    ["selected_representation_count", "==", 9],
+    ["selected_true_motif_match_count", "==", 9],
+    ["value_representation_count", "==", 4],
+    ["operation_representation_count", "==", 5],
+    ["training_decode_failure_count", "==", 0],
+    ["primitive_transition_missing_count", "==", 0],
+    ["heldout_program_count", "==", 192],
+    ["heldout_decode_failure_count", "==", 0],
+    ["conjugated_right_accuracy", ">=", 0.95],
+    ["long_program_accuracy", ">=", 0.95],
+    ["overall_multistep_accuracy", ">=", 0.95],
+    ["whole_program_lookup_accuracy", "<=", 0.25],
+    ["raw_output_pair_exact_accuracy", ">=", 0.95],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["capacity_growth_event_count", "==", 0],
+    ["invalid_row_count", "==", 0],
+    ["counter_overflow_count", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact parent and North Star identities match.",
+    "Exactly 3200 single-step raw records are generated from five operations x sixteen states x forty repeats.",
+    "The raw representation learner selects exactly nine motifs without evaluator motif seeding.",
+    "Decoded training records expose exactly four value representations and five operation representations.",
+    "Every learned operation/input-pair primitive transition has at least one training observation.",
+    "No heldout program sequence appears in training and all heldout programs contain at least three operations.",
+    "Prediction uses learned transition counts only; evaluator operation semantics are used for corpus generation and scoring only.",
+    "All metrics are finite and full Go regression passes before the probe.",
+    "No tokenizer, external model, network call, capacity growth, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all nineteen frozen thresholds pass.",
+    "mixed": "Validity passes and learned-transition composition materially exceeds whole-program lookup, but at least one 0.95 multi-step or raw-output threshold fails.",
+    "negative": "Validity passes but learned-transition composition does not materially outperform the whole-program lookup control or fails on the conjugated-right family.",
+    "incomplete": "Compute interruption prevents the full frozen training/evaluation matrix.",
+    "invalid": "Any representation, primitive coverage, semantic-isolation, program-isolation, deterministic-state, capacity, or qualification criterion fails."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific execution on parent, North Star, build, frozen-package, or representation-construction drift.",
+    "After output begins, complete all 192 heldout programs unless infrastructure prevents it.",
+    "Do not alter motifs, operations, repetitions, heldout programs, transition state, controls, metrics, thresholds, or classification after observing output."
+  ],
+  "no_post_result_tuning_rule": "No benchmark, representation, transition learner, heldout program, control, metric, threshold, or interpretation may change after any primary output is observed under this experiment identifier.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-raw-rep-role-composition-r1.json",
+    "unitary/wlm_lm_raw_rep_role_composition_r1.go",
+    "cmd/wlm-lm-raw-rep-role-composition-r1/main.go",
+    "scripts/run-wlm-lm-raw-rep-role-composition-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
