@@ -102,10 +102,10 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             if(-not(Test-Path -LiteralPath $Full -PathType Leaf)){throw "NEMOTRON_READ_NOT_FILE path=$Rel"}
             $Lines=@(Get-Content -LiteralPath $Full)
             $Start=if($A.PSObject.Properties.Name -contains 'start_line'){[Math]::Max([int]$A.start_line,1)}else{1}
-            $End=if($A.PSObject.Properties.Name -contains 'end_line'){[Math]::Min([int]$A.end_line,$Lines.Count)}else{[Math]::Min($Start+399,$Lines.Count)}
+            $End=if($A.PSObject.Properties.Name -contains 'end_line'){[Math]::Min([int]$A.end_line,$Lines.Count)}else{[Math]::Min($Start+159,$Lines.Count)}
             if($Start-gt$Lines.Count){return ''}
             $Text=($Lines[($Start-1)..($End-1)] -join [Environment]::NewLine)
-            if($Text.Length-gt65536){$Text=$Text.Substring(0,65536)}
+            if($Text.Length-gt24000){$Text=$Text.Substring(0,24000)}
             return $Text
         }
         'search_text' {
@@ -113,7 +113,7 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             if([string]::IsNullOrWhiteSpace($Query)){throw 'NEMOTRON_SEARCH_QUERY_EMPTY'}
             $Rel=if($A.PSObject.Properties.Name -contains 'path'){[string]$A.path}else{'.'}
             $Base=Resolve-RepoPath $Rel $true
-            $Max=if($A.PSObject.Properties.Name -contains 'max_results'){[Math]::Min([Math]::Max([int]$A.max_results,1),100)}else{50}
+            $Max=if($A.PSObject.Properties.Name -contains 'max_results'){[Math]::Min([Math]::Max([int]$A.max_results,1),40)}else{20}
             $Files=if(Test-Path -LiteralPath $Base -PathType Leaf){@((Get-Item -LiteralPath $Base))}else{
                 @(Get-ChildItem -LiteralPath $Base -File -Recurse -ErrorAction SilentlyContinue | Where-Object{$_.Length-le2097152})
             }
@@ -143,7 +143,7 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             $GitDiffArgs.Add('diff')
             if($Ref){$GitDiffArgs.Add($Ref)}
             $R=Invoke-GitRaw @($GitDiffArgs.ToArray())
-            if($R.output.Length-gt65536){$R.output=$R.output.Substring(0,65536)}
+            if($R.output.Length-gt24000){$R.output=$R.output.Substring(0,24000)}
             return Convert-ToolResult $R
         }
         'write_file' {
@@ -244,8 +244,8 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
                 }
                 $Stdout=if(Test-Path -LiteralPath $OutFile){[IO.File]::ReadAllText($OutFile)}else{''}
                 $Stderr=if(Test-Path -LiteralPath $ErrFile){[IO.File]::ReadAllText($ErrFile)}else{''}
-                if($Stdout.Length-gt50000){$Stdout=$Stdout.Substring(0,50000)}
-                if($Stderr.Length-gt20000){$Stderr=$Stderr.Substring(0,20000)}
+                if($Stdout.Length-gt24000){$Stdout=$Stdout.Substring(0,24000)}
+                if($Stderr.Length-gt12000){$Stderr=$Stderr.Substring(0,12000)}
                 return Convert-ToolResult ([ordered]@{exit_code=$P.ExitCode;stdout=$Stdout;stderr=$Stderr})
             }finally{
                 Remove-Item -LiteralPath $OutFile,$ErrFile -Force -ErrorAction SilentlyContinue
@@ -323,6 +323,25 @@ $Messages=New-Object Collections.Generic.List[object]
 $Messages.Add([ordered]@{role='system';content=$System})
 $Messages.Add([ordered]@{role='user';content=$Prompt})
 
+function Compact-GlmHistory($MessageList){
+    $ToolIndexes=New-Object Collections.Generic.List[int]
+    for($I=0;$I-lt$MessageList.Count;$I++){
+        $M=$MessageList[$I]
+        if($M -is [Collections.IDictionary] -and $M.Contains('role') -and [string]$M['role'] -ceq 'tool'){
+            $ToolIndexes.Add($I)
+        }
+    }
+    $CompactCount=[Math]::Max(0,$ToolIndexes.Count-4)
+    for($J=0;$J-lt$CompactCount;$J++){
+        $Index=$ToolIndexes[$J]
+        $M=$MessageList[$Index]
+        $Content=[string]$M['content']
+        if($Content.Length-gt2000){
+            $Original=$Content.Length
+            $M['content']=$Content.Substring(0,2000)+[Environment]::NewLine+"[OLDER_TOOL_RESULT_COMPACTED original_chars=$Original; rerun tool if more detail is required]"
+        }
+    }
+}
 $Headers=@{
     Authorization='Bearer '+$Token
     'Content-Type'='application/json'
@@ -336,13 +355,16 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
     $ToolChoice=if($Round-eq$MaxRounds){
         [ordered]@{type='function';function=[ordered]@{name='finish'}}
     }else{'auto'}
+    if($Provider-ceq'nvidia' -and $Model -match '^z-ai/glm-5\.3'){
+        Compact-GlmHistory $Messages
+    }
     $BodyObject=[ordered]@{
         model=$Model
         temperature=if($Provider-ceq'nvidia'){1}else{0}
         messages=$Messages.ToArray()
         tools=$Tools
         tool_choice=$ToolChoice
-        max_tokens=if($Provider-ceq'nvidia'){16384}else{4096}
+        max_tokens=if($Provider-ceq'nvidia'){8192}else{4096}
     }
     if($Provider-ceq'nvidia'){
         $BodyObject.reasoning_effort='low'
@@ -354,6 +376,9 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
         }
     }
     $Body=$BodyObject|ConvertTo-Json -Depth 50 -Compress
+    $BodyBytes=[Text.Encoding]::UTF8.GetByteCount($Body)
+    $ToolMessageCount=@($Messages|Where-Object{$_ -is [Collections.IDictionary] -and $_.Contains('role') -and [string]$_['role'] -ceq 'tool'}).Count
+    Write-Host "NEMOTRON_REQUEST_SIZE provider=$Provider model=$Model round=$Round body_bytes=$BodyBytes messages=$($Messages.Count) tool_messages=$ToolMessageCount"
 
     $Resp=$null
     for($Attempt=1;$Attempt-le3;$Attempt++){
@@ -386,7 +411,7 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
     $ContentProperty=$Msg.PSObject.Properties['content']
     $ReasoningProperty=$Msg.PSObject.Properties['reasoning_content']
     $Assistant=[ordered]@{role='assistant';content=if($null-eq$ContentProperty -or $null-eq$ContentProperty.Value){''}else{[string]$ContentProperty.Value}}
-    if($null-ne$ReasoningProperty -and $null-ne$ReasoningProperty.Value){
+    if($null-ne$ReasoningProperty -and $null-ne$ReasoningProperty.Value -and -not($Provider-ceq'nvidia' -and $Model -match '^z-ai/glm-5\.3')){
         $Assistant.reasoning_content=[string]$ReasoningProperty.Value
     }
     if($Calls.Count-gt0){
@@ -438,7 +463,7 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
         }catch{
             $ToolContent="TOOL_ERROR: $($_.Exception.Message)"
         }
-        if($ToolContent.Length-gt70000){$ToolContent=$ToolContent.Substring(0,70000)}
+        if($ToolContent.Length-gt24000){$ToolContent=$ToolContent.Substring(0,24000)}
         $Messages.Add([ordered]@{role='tool';tool_call_id=[string]$Call.id;content=$ToolContent})
     }
 }
