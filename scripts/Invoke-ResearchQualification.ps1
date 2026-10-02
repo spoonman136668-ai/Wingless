@@ -130,10 +130,43 @@ $Match = [regex]::Match(
     $Transcript,
     '(?s)(\{\s*"schema".*?\r?\n\})\s*\r?\n\s*=== SCIENTIFIC DIAGNOSIS'
 )
-if (-not $Match.Success) {
-    $Match = [regex]::Match(
-        $Transcript,
-        '(?m)^(?:\d{4}-\d{2}-\d{2}T\S+Z\s+)?(\{"schema":"wingless\.research-scientific-result\.v1".*\})\s*
+if ($Match.Success) {
+    try {
+        $Probe = $Match.Groups[1].Value | ConvertFrom-Json
+    }
+    catch {
+        $ProbeParseError = $_.Exception.Message
+    }
+}
+else {
+    $Candidate = @(
+        $Transcript -split "\r?\n" |
+            ForEach-Object {
+                $Index = $_.IndexOf('{"schema":"wingless.research-scientific-result.v1"')
+                if ($Index -ge 0) {
+                    $_.Substring($Index)
+                }
+            } |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+            Select-Object -First 1
+    )
+    if ($Candidate.Count -eq 1) {
+        try {
+            $Probe = $Candidate[0] | ConvertFrom-Json
+        }
+        catch {
+            $ProbeParseError = $_.Exception.Message
+        }
+    }
+    else {
+        $ProbeParseError = 'No supported Wingless scientific-result JSON block was found in the transcript.'
+    }
+}
+
+if ($null -ne $Probe) {
+    $Probe | ConvertTo-Json -Depth 100 | Set-Content -Encoding UTF8 -Path $ProbePath
+}
+
 $StatusLines = @(
     git -C $Repo status --short
 )
