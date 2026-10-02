@@ -1,0 +1,137 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R1",
+  "program": "Wingless raw-input to invariant representation to zero-shot reasoning chain",
+  "question": "Can a completely unseen third raw surface family acquire only a context-derived representation and then use transition knowledge learned from two other surface families without any task-transition examples of its own?",
+  "hypothesis": "A raw bridge learner over three surface families will recover twenty-seven recurrent surface motifs and induce exactly nine three-member contextual alias classes. A class-transition learner trained only on task records from families 0 and 1 will then achieve at least 0.95 semantic accuracy on all eighty family-2 single-step tasks, while an exact-surface learner will have all eighty family-2 transition keys missing and at most 0.25 semantic accuracy. A frozen family-2 shuffled-context control using value rotation +3 mod 4 and operation rotation +1 mod 5 will remain at or below 0.25.",
+  "exact_parent_sha": "37181df083a7ea655b552e7ad40cd61511d795b0",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "allocation": "75% chain / 25% substrate falsification over the current prospective block",
+    "slot": "chain",
+    "reason": "test whether learned abstraction transfers task competence to a new surface family without task-specific retraining"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-INDUCTION-R2",
+    "classification": "supported by frozen rules",
+    "github_run_id": "37066504364",
+    "observation": "Context signatures induced nine correct two-member alias classes and restored cross-family accuracy to 1.0; exact-surface control scored 0.03125 with all 160 keys missing and shuffled-context control scored 0.15."
+  },
+  "scope_statement": "This is a bounded zero-shot surface-transfer test. Passing would show task competence can transfer through a learned raw contextual representation to a new alias family; it would not establish open-domain language transfer.",
+  "authority": "research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "surface_families": {
+    "family0": "four value motifs and five operation motifs from the prior alias lineage",
+    "family1": "four independent value motifs and five independent operation motifs from the prior alias lineage",
+    "family2": {
+      "task_training_examples": 0,
+      "value_motifs": [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15]],
+      "operation_motifs": [[44,45,46,47],[48,49,50,51],[52,53,54,55],[84,85,86,87],[88,89,90,91]]
+    },
+    "motif_width_bytes": 4
+  },
+  "representation_bridge": {
+    "family_count": 3,
+    "entity_count": 9,
+    "contexts_per_entity": 4,
+    "repetitions_per_context": 8,
+    "bridge_record_count": 864,
+    "surface_representation_capacity": 27,
+    "selection": "top twenty-seven raw four-byte windows by occurrence count descending, then lexicographic raw key",
+    "context_key": "two raw bytes immediately before plus two immediately after the selected surface motif",
+    "signature": "complete sorted context-key occurrence map",
+    "induction": "surface motifs with byte-identical signatures share one class; classes ordered by signature bytes only",
+    "family_labels_visible_to_learner": false,
+    "semantic_labels_visible_to_learner": false
+  },
+  "task_training": {
+    "families": [0,1],
+    "records_per_family": 1600,
+    "total_task_training_records": 3200,
+    "coverage": "all five operations x all sixteen ordered value pairs x twenty repeats independently within each trained family",
+    "family2_task_training_records": 0
+  },
+  "class_transition_learner": {
+    "state": "induced operation class plus ordered induced value-class pair -> observed induced output-class pair counts",
+    "training": "families 0 and 1 task records only",
+    "prediction": "argmax learned output-class pair for the class transition key; ties choose lexicographically lowest pair",
+    "family2_task_updates": false,
+    "semantic_dictionary": false,
+    "capacity_growth": false
+  },
+  "controls": {
+    "exact_surface": "surface operation motif plus ordered surface value-motif pair -> surface output-pair counts trained on families 0 and 1 only",
+    "shuffled_family2_bridge": {
+      "family0_context_assignment": "identity",
+      "family1_context_assignment": "identity",
+      "family2_value_context_assignment": "(semantic_value + 3) mod 4",
+      "family2_operation_context_assignment": "(semantic_operation + 1) mod 5",
+      "task_training": "unchanged families 0 and 1 only",
+      "purpose": "test whether zero-shot transfer depends on correct contextual class assignment"
+    }
+  },
+  "evaluation": {
+    "family": 2,
+    "records": "all five operations x all sixteen ordered value pairs",
+    "evaluation_count": 80,
+    "updates": false,
+    "semantic_scoring": "evaluator-only after prediction; class learner is scored against the induced class of the correct family-2 output aliases and exact-surface control outputs are mapped to semantic values only after prediction"
+  },
+  "metrics_and_thresholds": [
+    ["bridge_record_count", "==", 864],
+    ["selected_surface_representation_count", "==", 27],
+    ["selected_true_surface_motif_match_count", "==", 27],
+    ["bridge_decode_failure_count", "==", 0],
+    ["induced_alias_class_count", "==", 9],
+    ["induced_three_member_class_count", "==", 9],
+    ["correct_evaluator_alias_triplet_count", "==", 9],
+    ["task_training_record_count", "==", 3200],
+    ["family2_task_training_record_count", "==", 0],
+    ["task_training_decode_failure_count", "==", 0],
+    ["class_transition_key_count", "==", 80],
+    ["unseen_family_evaluation_count", "==", 80],
+    ["unseen_family_accuracy", ">=", 0.95],
+    ["exact_surface_unseen_family_accuracy", "<=", 0.25],
+    ["exact_surface_unseen_missing_transition_count", "==", 80],
+    ["shuffled_family2_alias_class_count", "==", 9],
+    ["shuffled_family2_unseen_accuracy", "<=", 0.25],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["capacity_growth_event_count", "==", 0],
+    ["invalid_row_count", "==", 0],
+    ["counter_overflow_count", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact parent, North Star, and prior qualified contextual-alias evidence identities match.",
+    "Family 2 has no task-transition training record and appears only in the raw representation bridge before evaluation.",
+    "Exactly twenty-seven raw surface motifs are selected from bridge bytes without evaluator motif seeding.",
+    "Context clustering receives no family label, semantic label, alias triplet, or task target.",
+    "Normal induced classes arise only from equality of complete raw context-count signatures.",
+    "Class-transition training receives only families 0 and 1 and never uses family-2 evaluation records.",
+    "Exact-surface control receives no bridge-induced alias mapping.",
+    "Shuffled control changes only family-2 context assignment by exactly value +3 mod 4 and operation +1 mod 5.",
+    "Semantic mappings are evaluator-only after prediction.",
+    "All metrics are finite and full Go regression passes before the probe.",
+    "No tokenizer, external model, network call, capacity growth, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all twenty-two frozen thresholds pass; a context-only unseen surface family inherits the trained transition capability while exact-surface and shuffled-context controls fail.",
+    "mixed": "Validity passes and unseen-family accuracy materially exceeds both controls, but at least one representation recovery or 0.95 transfer threshold fails.",
+    "negative": "Validity passes but the unseen family does not materially outperform the exact-surface control.",
+    "incomplete": "Compute interruption prevents the frozen bridge, training, or eighty-case evaluation.",
+    "invalid": "Any family-2 task leakage, bridge leakage, evaluator-boundary violation, deterministic-state, capacity, or qualification criterion fails."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific execution on parent, North Star, build, frozen-package, or family-2 isolation drift.",
+    "After output begins, complete all eighty family-2 evaluations and both controls unless infrastructure prevents it.",
+    "Do not add family-2 task examples, alias dictionaries, alter bridge contexts, increase capacity, change metrics, or weaken thresholds after observing output."
+  ],
+  "no_post_result_tuning_rule": "No surface family, bridge context, representation rule, clustering, transition learner, control, metric, threshold, or interpretation may change after any primary output is observed under this experiment identifier.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-raw-rep-zeroshot-alias-family-r1.json",
+    "unitary/wlm_lm_raw_rep_zeroshot_alias_family_r1.go",
+    "cmd/wlm-lm-raw-rep-zeroshot-alias-family-r1/main.go",
+    "scripts/run-wlm-lm-raw-rep-zeroshot-alias-family-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
