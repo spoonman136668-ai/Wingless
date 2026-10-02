@@ -1,0 +1,77 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "status": "frozen-prereg-only",
+  "experiment": "WLM-SI-LRU-CACHE-R1",
+  "question": "Under fixed cache capacity and identical request streams, do timestamp-scan LRU and an independent linked-recency LRU preserve exactly the same hits, misses, evictions, values, recency order, and conservation laws?",
+  "hypothesis": "All preregistered hit/miss, eviction identity, resident key/value state, least-to-most recency order, cumulative counts, and capacity observables remain exactly invariant.",
+  "exact_parent_sha": "caaeca20548eec9836bdb90be9f95aa4cb883f90",
+  "north_star_sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
+  "prior_evidence": [
+    {
+      "experiment": "WLM-SI-INDEX-CONTAINER-R1",
+      "run_id": 36979656775
+    },
+    {
+      "experiment": "WLM-SI-MEMBERSHIP-CONTAINER-R1",
+      "run_id": 36982338668
+    }
+  ],
+  "changed_dimension": "LRU representation only: timestamp scan versus linked recency order",
+  "fixed_matrix": {
+    "cache_capacity": 16,
+    "key_universe": 32,
+    "seeds": [
+      2731,
+      2753,
+      2777,
+      2801,
+      2833,
+      2851,
+      2879,
+      2903
+    ],
+    "schedule_families": [
+      "working-set",
+      "thrash",
+      "hot-cold",
+      "lcg32"
+    ],
+    "initial_cardinalities": [
+      0,
+      4,
+      8,
+      12
+    ],
+    "request_budgets": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "steps": 64
+  },
+  "thresholds": {
+    "paired_case_count": 512,
+    "completed_substrate_case_runs": 1024,
+    "total_emitted_rows": 65536,
+    "paired_observable_mismatch_cases": 0,
+    "row_count_mismatch_cases": 0,
+    "state_cardinality_mismatch_cases": 0,
+    "invalid_operation_schedules": 0,
+    "budget_overrun_rows": 0,
+    "law_violation_cases": 0,
+    "max_conservation_error": 0,
+    "max_residual_law_error": 0
+  },
+  "authority": "research-only",
+  "no_post_result_tuning": true,
+  "changed_paths": [
+    "docs/experiments/wlm-si-lru-cache-r1.json",
+    "unitary/wlm_si_lru_cache_r1.go",
+    "cmd/wlm-si-lru-cache-r1/main.go",
+    "scripts/run-wlm-si-lru-cache-r1.ps1",
+    ".wingless/qualification-request.json",
+    ".github/workflows/direct-research-qualification.yml"
+  ],
+  "supersedes_unexecuted_prereg_branch": "research/direct-wingless-lru-r1"
+}
