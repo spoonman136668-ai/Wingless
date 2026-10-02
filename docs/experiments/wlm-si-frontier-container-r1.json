@@ -1,0 +1,77 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "status": "frozen-prereg-only",
+  "experiment": "WLM-SI-FRONTIER-CONTAINER-R1",
+  "question": "Under a fixed 64-node frontier and identical activate/deactivate/extract-min schedules, do a sorted unique frontier and a packed bitset frontier preserve exact next-item, membership, cardinality, and conservation observables?",
+  "hypothesis": "All preregistered activation, rejection, deactivation, minimum extraction, residual frontier, cumulative-count, and conservation observables remain exactly invariant.",
+  "exact_parent_sha": "caaeca20548eec9836bdb90be9f95aa4cb883f90",
+  "north_star_sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
+  "prior_evidence": [
+    {
+      "experiment": "WLM-SI-PRIORITY-CONTAINER-R1",
+      "run_id": 36978369775
+    },
+    {
+      "experiment": "WLM-SI-MEMBERSHIP-CONTAINER-R1",
+      "run_id": 36982338668
+    }
+  ],
+  "changed_dimension": "unique frontier substrate only: sorted frontier versus packed bitset",
+  "fixed_matrix": {
+    "node_universe": 64,
+    "frontier_capacity": 64,
+    "seeds": [
+      2927,
+      2953,
+      2971,
+      2999,
+      3011,
+      3041,
+      3067,
+      3089
+    ],
+    "schedule_families": [
+      "wave",
+      "sparse",
+      "churn",
+      "lcg32"
+    ],
+    "initial_cardinalities": [
+      0,
+      16,
+      32,
+      48
+    ],
+    "operation_budgets": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "steps": 64
+  },
+  "thresholds": {
+    "paired_case_count": 512,
+    "completed_substrate_case_runs": 1024,
+    "total_emitted_rows": 65536,
+    "paired_observable_mismatch_cases": 0,
+    "row_count_mismatch_cases": 0,
+    "state_cardinality_mismatch_cases": 0,
+    "invalid_operation_schedules": 0,
+    "budget_overrun_rows": 0,
+    "law_violation_cases": 0,
+    "max_conservation_error": 0,
+    "max_residual_law_error": 0
+  },
+  "authority": "research-only",
+  "no_post_result_tuning": true,
+  "changed_paths": [
+    "docs/experiments/wlm-si-frontier-container-r1.json",
+    "unitary/wlm_si_frontier_container_r1.go",
+    "cmd/wlm-si-frontier-container-r1/main.go",
+    "scripts/run-wlm-si-frontier-container-r1.ps1",
+    ".wingless/qualification-request.json",
+    ".github/workflows/direct-research-qualification.yml"
+  ],
+  "supersedes_unexecuted_prereg_branch": "research/direct-wingless-frontier-r1"
+}
