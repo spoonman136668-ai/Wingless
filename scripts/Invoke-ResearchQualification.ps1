@@ -207,8 +207,14 @@ $UnexpectedDirty = @(
 
 $HarnessMarker = ($Transcript -match 'WINGLESS_UP\d+_HARNESS_PASS') -or
     ($Transcript -match 'Controller-owned normalized result harness; interpretation follows frozen gates\.')
-$ScientificDiagnosis = if ($null -ne $Probe -and $null -ne $Probe.diagnosis) {
-    $Probe.diagnosis
+$DiagnosisProperty = if ($null -ne $Probe) {
+    $Probe.PSObject.Properties['diagnosis']
+}
+else {
+    $null
+}
+$ScientificDiagnosis = if ($null -ne $DiagnosisProperty) {
+    $DiagnosisProperty.Value
 }
 else {
     $null
