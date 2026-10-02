@@ -133,23 +133,7 @@ $Match = [regex]::Match(
 if (-not $Match.Success) {
     $Match = [regex]::Match(
         $Transcript,
-        '(?m)^(?:\d{4}-\d{2}-\d{2}T\S+Z\s+)?(\{"schema":"wingless\.research-scientific-result\.v1".*\})\s*$'
-    )
-}
-
-if ($Match.Success) {
-    try {
-        $Probe = $Match.Groups[1].Value | ConvertFrom-Json
-        $Probe | ConvertTo-Json -Depth 100 | Set-Content -Encoding UTF8 -Path $ProbePath
-    }
-    catch {
-        $ProbeParseError = $_.Exception.Message
-    }
-}
-else {
-    $ProbeParseError = 'No supported Wingless scientific-result JSON block was found in the transcript.'
-}
-
+        '(?m)^(?:\d{4}-\d{2}-\d{2}T\S+Z\s+)?(\{"schema":"wingless\.research-scientific-result\.v1".*\})\s*
 $StatusLines = @(
     git -C $Repo status --short
 )
@@ -207,6 +191,15 @@ else {
     'qualified-scientific-result'
 }
 
+$TranscriptSourceValue = 'executed-test-script'
+if ($RecoveryMode) {
+    $TranscriptSourceValue = $ExistingTranscriptSource
+}
+$ObservedScientificHeadValue = $Head
+if (-not [string]::IsNullOrWhiteSpace($ObservedScientificHeadSha)) {
+    $ObservedScientificHeadValue = $ObservedScientificHeadSha
+}
+
 $Summary = [ordered]@{
     schema = 'wingless.research-qualification-summary.v1'
     experiment = [string]$Request.experiment
@@ -222,8 +215,8 @@ $Summary = [ordered]@{
     github_run_attempt = $env:GITHUB_RUN_ATTEMPT
     test_exit_code = $TestExit
     recovery_mode = [bool]$RecoveryMode
-    transcript_source = if ($RecoveryMode) { $ExistingTranscriptSource } else { 'executed-test-script' }
-    observed_scientific_head_sha = if ([string]::IsNullOrWhiteSpace($ObservedScientificHeadSha)) { $Head } else { $ObservedScientificHeadSha }
+    transcript_source = $TranscriptSourceValue
+    observed_scientific_head_sha = $ObservedScientificHeadValue
     harness_marker = [bool]$HarnessMarker
     probe_parsed = [bool]($null -ne $Probe)
     probe_parse_error = $ProbeParseError
