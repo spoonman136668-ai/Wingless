@@ -1,0 +1,17 @@
+{
+  "schema": "wingless.research-invalid-attempt.v1",
+  "experiment": "WLM-LM-BYTE-MOTIF-DISCOVERY-R1",
+  "qualification_run_id": "36994518216",
+  "disposition": "invalid-evidence-harness",
+  "scientific_claim": false,
+  "full_scientific_result_sealed": false,
+  "observed_diagnostic": {
+    "metric": "minimum_selected_true_motif_recall",
+    "value": 0.25,
+    "frozen_threshold": 0.875,
+    "interpretation": "A frozen scientific gate was reached, but the test script threw before emitting the normalized result, so the complete preregistered classification cannot be sealed from R1."
+  },
+  "reason": "The deterministic scientific probe ran after a full regression, but the wrapper treated the first failed scientific threshold as process failure and exited before the normalized result was emitted. The direct qualifier therefore classified the run as harness-or-artifact-failure and sealed no scientific evidence.",
+  "preservation": "Reissue the identical scientific package under R2 with no changes to seeds, corpus, hidden motifs, successor/filler rules, candidate filter, selection score, motif budget, controls, event accounting, metrics, thresholds, or classification. Change only evidence behavior so finite normalized results are emitted regardless of supported/mixed/negative threshold outcomes.",
+  "authority": "research-only"
+}
