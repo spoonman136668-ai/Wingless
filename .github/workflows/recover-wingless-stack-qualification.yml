@@ -1,0 +1,237 @@
+name: Recover Wingless stack qualification
+
+on:
+  push:
+    branches:
+      - recovery/wingless-stack-qualification-r1
+    paths:
+      - '.github/workflows/recover-wingless-stack-qualification.yml'
+      - 'scripts/Invoke-ResearchQualification.ps1'
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  recover:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: recovery/wingless-stack-qualification-r1
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Qualify immutable observed result without rerun
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference='Stop'
+
+          $Repo=(Resolve-Path '.').Path
+          $Parent='7287347f636c7c2aa7c1dc3b804d06a96dd28778'
+          $Prereg='28d6f44cf127200465e2786b6a139f1389715225'
+          $Scientific='fca6962e124b829505a896232b6c3c134d2fdb9e'
+          $Experiment='WLM-SI-STACK-CONTAINER-R1'
+          $SourceRun='36940852550'
+          $SourceAttempt='7'
+          $SourceJob='110656327110'
+
+          $RecoveryHead=(& git rev-parse HEAD).Trim()
+          & git merge-base --is-ancestor $Scientific $RecoveryHead
+          if($LASTEXITCODE-ne0){throw 'SCIENTIFIC_HEAD_NOT_ANCESTOR'}
+          if((& git rev-parse ($Prereg+'^')).Trim()-cne$Parent){throw 'PREREG_PARENT_DRIFT'}
+          if((& git rev-parse ($Scientific+'^')).Trim()-cne$Prereg){throw 'IMPLEMENTATION_PARENT_DRIFT'}
+
+          $InfraDelta=@(& git diff --name-only ($Scientific+'..'+$RecoveryHead))
+          $AllowedInfra=@(
+            'scripts/Invoke-ResearchQualification.ps1',
+            '.github/workflows/recover-wingless-stack-qualification.yml'
+          )
+          foreach($Path in $InfraDelta){
+            if($AllowedInfra -notcontains [string]$Path){throw "RECOVERY_SCOPE_WIDENED path=$Path"}
+          }
+
+          $Tokens=$null;$Errors=$null
+          [void][System.Management.Automation.Language.Parser]::ParseFile(
+            (Join-Path $Repo 'scripts\Invoke-ResearchQualification.ps1'),
+            [ref]$Tokens,[ref]$Errors
+          )
+          if(@($Errors).Count-gt0){
+            @($Errors)|ForEach-Object{Write-Host "PARSE_ERROR line=$($_.Extent.StartLineNumber) message=$($_.Message)"}
+            throw "RECOVERY_QUALIFIER_PARSE_FAILED count=$(@($Errors).Count)"
+          }
+
+          $Headers=@{
+            Authorization='Bearer '+$env:GITHUB_TOKEN
+            Accept='application/vnd.github+json'
+            'X-GitHub-Api-Version'='2022-11-28'
+          }
+          $Download=Join-Path $env:RUNNER_TEMP 'wingless-stack-original-job-log.bin'
+          $Transcript=Join-Path $env:RUNNER_TEMP 'wingless-stack-original-job.log'
+          Invoke-WebRequest -UseBasicParsing -Uri ('https://api.github.com/repos/spoonman136668-ai/Wingless/actions/jobs/'+$SourceJob+'/logs') -Headers $Headers -OutFile $Download -MaximumRedirection 8
+
+          $Bytes=[IO.File]::ReadAllBytes($Download)
+          if($Bytes.Length-ge2 -and $Bytes[0]-eq0x50 -and $Bytes[1]-eq0x4b){
+            $ZipDir=Join-Path $env:RUNNER_TEMP 'wingless-stack-job-log'
+            if(Test-Path -LiteralPath $ZipDir){Remove-Item -LiteralPath $ZipDir -Recurse -Force}
+            Expand-Archive -LiteralPath $Download -DestinationPath $ZipDir -Force
+            $Parts=@(Get-ChildItem -LiteralPath $ZipDir -File -Recurse | Sort-Object FullName)
+            if($Parts.Count-eq0){throw 'SOURCE_JOB_LOG_ZIP_EMPTY'}
+            $Text=($Parts|ForEach-Object{Get-Content -LiteralPath $_.FullName -Raw}) -join [Environment]::NewLine
+            [IO.File]::WriteAllText($Transcript,$Text,(New-Object Text.UTF8Encoding($false)))
+          }else{
+            Copy-Item -LiteralPath $Download -Destination $Transcript -Force
+          }
+
+          $TranscriptHash=(Get-FileHash -LiteralPath $Transcript -Algorithm SHA256).Hash.ToLowerInvariant()
+          $TranscriptText=Get-Content -LiteralPath $Transcript -Raw
+          foreach($Needle in @(
+            '"schema":"wingless.research-scientific-result.v1","experiment":"WLM-SI-STACK-CONTAINER-R1"',
+            'Controller-owned normalized result harness; interpretation follows frozen gates.',
+            'WINGLESS_AUTOMATED_QUALIFICATION_HARNESS_MARKER_MISSING',
+            'research: preregister stack container invariance',
+            'research: run stack container invariance'
+          )){
+            if(-not$TranscriptText.Contains($Needle)){throw "SOURCE_TRANSCRIPT_INVARIANT_MISSING needle=$Needle"}
+          }
+
+          & git checkout --detach $RecoveryHead
+          if($LASTEXITCODE-ne0){throw 'RECOVERY_DETACH_FAILED'}
+          $SavedSha=$env:GITHUB_SHA
+          $SavedRef=$env:GITHUB_REF_NAME
+          try{
+            $env:GITHUB_SHA=$RecoveryHead
+            $env:GITHUB_REF_NAME=''
+            $QualDir=Join-Path $env:RUNNER_TEMP 'wingless-stack-recovered-qualification'
+            if(Test-Path -LiteralPath $QualDir){Remove-Item -LiteralPath $QualDir -Recurse -Force}
+            & (Join-Path $Repo 'scripts\Invoke-ResearchQualification.ps1') `
+              -RequestPath '.wingless/qualification-request.json' `
+              -OutputDirectory $QualDir `
+              -ExistingTranscriptPath $Transcript `
+              -ExistingTranscriptSource ('github-actions-run='+$SourceRun+';attempt='+$SourceAttempt+';job='+$SourceJob+';sha256='+$TranscriptHash) `
+              -ObservedScientificHeadSha $Scientific
+            if($LASTEXITCODE-ne0){throw "RECOVERY_QUALIFIER_FAILED exit=$LASTEXITCODE"}
+          }finally{
+            $env:GITHUB_SHA=$SavedSha
+            $env:GITHUB_REF_NAME=$SavedRef
+          }
+
+          $SummaryPath=Join-Path $QualDir 'summary.json'
+          $ProbePath=Join-Path $QualDir 'probe.json'
+          foreach($P in @($SummaryPath,$ProbePath)){if(-not(Test-Path -LiteralPath $P -PathType Leaf)){throw "RECOVERY_OUTPUT_MISSING path=$P"}}
+          $Summary=Get-Content -LiteralPath $SummaryPath -Raw|ConvertFrom-Json
+          $Probe=Get-Content -LiteralPath $ProbePath -Raw|ConvertFrom-Json
+
+          if([string]$Summary.classification-cne'qualified-scientific-result'){throw "RECOVERY_CLASSIFICATION_INVALID actual=$($Summary.classification)"}
+          if(-not[bool]$Summary.recovery_mode){throw 'RECOVERY_MODE_NOT_RECORDED'}
+          if([string]$Summary.observed_scientific_head_sha-cne$Scientific){throw 'RECOVERY_SCIENTIFIC_HEAD_MISMATCH'}
+          if([string]$Probe.schema-cne'wingless.research-scientific-result.v1'){throw 'RECOVERY_PROBE_SCHEMA_MISMATCH'}
+          if([string]$Probe.experiment-cne$Experiment){throw 'RECOVERY_EXPERIMENT_MISMATCH'}
+
+          $ExpectedMetrics=[ordered]@{
+            paired_case_count=512
+            completed_substrate_case_runs=1024
+            total_emitted_rows=65536
+            paired_observable_mismatch_cases=0
+            row_count_mismatch_cases=0
+            state_cardinality_mismatch_cases=0
+            invalid_state_schedules=0
+            budget_overrun_rows=0
+            law_violation_cases=0
+            max_conservation_error=0
+            max_residual_law_error=0
+          }
+          foreach($Key in $ExpectedMetrics.Keys){
+            $Actual=$Probe.metrics.PSObject.Properties[$Key].Value
+            if([double]$Actual-ne[double]$ExpectedMetrics[$Key]){throw "RECOVERY_METRIC_MISMATCH metric=$Key expected=$($ExpectedMetrics[$Key]) actual=$Actual"}
+          }
+
+          & git checkout -B recovery/wingless-stack-qualification-r1 $RecoveryHead
+          if($LASTEXITCODE-ne0){throw 'RECOVERY_BRANCH_RESTORE_FAILED'}
+
+          $EvidenceDir=Join-Path $Repo '.research-autonomy\evidence\WLM-SI-STACK-CONTAINER-R1-recovered-36940852550'
+          New-Item -ItemType Directory -Force -Path $EvidenceDir|Out-Null
+          Copy-Item -LiteralPath $SummaryPath -Destination (Join-Path $EvidenceDir 'summary.json') -Force
+          Copy-Item -LiteralPath $ProbePath -Destination (Join-Path $EvidenceDir 'probe.json') -Force
+          $ProbeHash=(Get-FileHash -LiteralPath $ProbePath -Algorithm SHA256).Hash.ToLowerInvariant()
+
+          $Provenance=[ordered]@{
+            schema='wingless.recovered-qualification-provenance.v1'
+            experiment=$Experiment
+            parent_sha=$Parent
+            preregistration_sha=$Prereg
+            observed_scientific_head_sha=$Scientific
+            recovery_qualifier_head_sha=$RecoveryHead
+            source_github_run_id=$SourceRun
+            source_github_run_attempt=$SourceAttempt
+            source_github_job_id=$SourceJob
+            source_job_log_sha256=$TranscriptHash
+            recovered_probe_sha256=$ProbeHash
+            scientific_rerun=$false
+            recovery_scope='qualification-infrastructure-only'
+            generated_at_utc=[DateTime]::UtcNow.ToString('o')
+          }
+          $Provenance|ConvertTo-Json -Depth 20|Set-Content -LiteralPath (Join-Path $EvidenceDir 'provenance.json') -Encoding UTF8
+
+          $State=[ordered]@{
+            schema='research.repo-local-state.v1'
+            program='Wingless'
+            active_branch='research/autonomy-wingless-active'
+            north_star_path='research/bootstrap/wingless-lm-north-star.txt'
+            north_star_sha256='efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8'
+            parent_sha=$Parent
+            qualified_head_sha=$Scientific
+            qualification_recovery_head_sha=$RecoveryHead
+            experiment=$Experiment
+            classification='qualified-scientific-result'
+            scientific_rerun=$false
+            source_github_run_id=$SourceRun
+            source_github_job_id=$SourceJob
+            last_completed_utc=[DateTime]::UtcNow.ToString('o')
+            authority='research-only'
+            ckb_plane_role='governance-only'
+          }
+          $State|ConvertTo-Json -Depth 30|Set-Content -LiteralPath (Join-Path $Repo '.research-autonomy\state.json') -Encoding UTF8
+
+          if(Test-Path -LiteralPath (Join-Path $Repo '.github\workflows\recover-wingless-stack-qualification.yml')){
+            & git rm -- '.github/workflows/recover-wingless-stack-qualification.yml'
+            if($LASTEXITCODE-ne0){throw 'RECOVERY_WORKFLOW_REMOVE_FAILED'}
+          }
+          & git add -- '.research-autonomy' 'scripts/Invoke-ResearchQualification.ps1'
+          if($LASTEXITCODE-ne0){throw 'RECOVERY_EVIDENCE_STAGE_FAILED'}
+          & git diff --cached --check
+          if($LASTEXITCODE-ne0){throw 'RECOVERY_DIFF_CHECK_FAILED'}
+          $Staged=@(& git diff --cached --name-only)
+          $AllowedFinal=@(
+            '.research-autonomy/state.json',
+            '.research-autonomy/evidence/WLM-SI-STACK-CONTAINER-R1-recovered-36940852550/summary.json',
+            '.research-autonomy/evidence/WLM-SI-STACK-CONTAINER-R1-recovered-36940852550/probe.json',
+            '.research-autonomy/evidence/WLM-SI-STACK-CONTAINER-R1-recovered-36940852550/provenance.json',
+            '.github/workflows/recover-wingless-stack-qualification.yml'
+          )
+          foreach($Path in $Staged){
+            if($AllowedFinal -notcontains [string]$Path){throw "RECOVERY_FINAL_SCOPE_WIDENED path=$Path"}
+          }
+
+          & git config user.name 'ckb-research-recovery'
+          & git config user.email 'research-recovery@localhost'
+          & git commit -m 'research: recover qualified evidence for WLM-SI-STACK-CONTAINER-R1'
+          if($LASTEXITCODE-ne0){throw 'RECOVERY_EVIDENCE_COMMIT_FAILED'}
+          $EvidenceHead=(& git rev-parse HEAD).Trim()
+
+          $Remote='https://github.com/spoonman136668-ai/Wingless.git'
+          $Pair="x-access-token:$env:GITHUB_TOKEN"
+          $Basic=[Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($Pair))
+          $Header="AUTHORIZATION: basic $Basic"
+          & git -c "http.https://github.com/.extraheader=$Header" push $Remote ($EvidenceHead+':refs/heads/recovery/wingless-stack-qualification-r1')
+          if($LASTEXITCODE-ne0){throw 'RECOVERY_EVIDENCE_PUSH_FAILED'}
+
+          Write-Host 'WINGLESS_STACK_RECOVERY_QUALIFICATION=PASS'
+          Write-Host "observed_scientific_head=$Scientific"
+          Write-Host "recovery_qualifier_head=$RecoveryHead"
+          Write-Host "evidence_head=$EvidenceHead"
+          Write-Host "source_job_log_sha256=$TranscriptHash"
