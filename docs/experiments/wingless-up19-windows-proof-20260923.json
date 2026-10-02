@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.unitary-anonymous-gram-windows-proof.v1",
+  "experiment": "UP-19-direct-anonymous-gram-readout",
+  "status": "qualified-scientific-negative",
+  "observed_at": "2026-09-23T10:55:48Z",
+  "source_head": "7eb608cf291adb2dcb7718582d93fe148b0fbd56",
+  "parent_up18_seal": "070b759e6284830726e758e1b2ab9aae245ea5a5",
+  "workflow_run_id": 35851476994,
+  "workflow_artifact_id": 10745243694,
+  "workflow_artifact_sha256": "200afbdb27f249b62a9b07ac36cacd2c360685cd6704eb0b4fb86ba519680507",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "representation": {
+    "runtime_state_objects": 1,
+    "anonymous_channels": 6,
+    "semantic_channel_locations_known": false,
+    "known_mixer_exposed_to_learner": false,
+    "runtime_mixer_inverse_applied": false,
+    "learned_demixer_used": false,
+    "linear_feature_dimension": 36,
+    "quadratic_feature_dimension": 702,
+    "canonical_training_only": true
+  },
+  "linear_unitary": {
+    "train_accuracy": 0.283203125,
+    "held_out_accuracy": 0.26220703125
+  },
+  "quadratic_unitary": {
+    "train_accuracy": 0.2529296875,
+    "held_out_accuracy": 0.25146484375,
+    "max_norm_drift": 3.3306690738754696e-14
+  },
+  "matched_control": {
+    "held_out_accuracy": 0.256591796875,
+    "max_norm_drift": 2211700831922.4893
+  },
+  "feature_drift": {
+    "unitary_depth_1024": 1.389999226830696e-13,
+    "nonunitary_depth_1024": 1.077751562699128e25
+  },
+  "mutable_integration": {
+    "commit_decode_accuracy": 0.0013020833333333333,
+    "exact_final_table_accuracy": 0.0,
+    "relational_query_accuracy": 0.25,
+    "max_norm_drift": 2.886579864025407e-14
+  },
+  "diagnosis": {
+    "feature_invariance_pass": true,
+    "direct_quadratic_readout_pass": false,
+    "unseen_depth_pass": false,
+    "mutable_integration_pass": false
+  },
+  "interpretation": "The anonymous pairwise Gram representation remains numerically invariant under deep unitary transport, but the gradient-trained linear and complete degree-2 softmax readouts remain near chance even on the training set. This is a readout learning/optimization negative, not evidence of transport instability. Because the historical frame decision function is algebraically representable as a quadratic function of the anonymous Gram entries after fixed invertible channel mixing, the next experiment should isolate optimizer failure using a deterministic closed-form quadratic readout rather than increasing feature degree or returning to semantic demixing.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

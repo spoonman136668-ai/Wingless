@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.unitary-orthogonal-demixer-windows-proof.v1",
+  "experiment": "UP-18-orthogonal-anonymous-channel-demixer",
+  "status": "qualified-scientific-negative",
+  "observed_at": "2026-09-23T10:17:11Z",
+  "source_head": "b6d831bdf1e864d12c79c1bfb7e16c2671efaaa5",
+  "parent_up17_seal": "652cefb5ce4b629a048f10c9ed82c622695c35b1",
+  "workflow_run_id": 35847657929,
+  "workflow_artifact_id": 10743864680,
+  "workflow_artifact_sha256": "001cf9aa4219c750efb100d36d736a548f92f4be431587d5f5096a48946480db",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "oracle_recoverability": {
+    "pass": true,
+    "held_out_accuracy": 1.0,
+    "feature_error": 8.881784197001252e-16,
+    "max_norm_drift": 3.219646771412954e-14
+  },
+  "structured_orthogonal_learning": {
+    "pass": false,
+    "initial_capacity_accuracy": 0.375,
+    "initial_loss": 1.3007693192539334,
+    "final_loss": 1.1894680255014871,
+    "angle_l2_shift": 0.7483513080484312,
+    "mean_role_alignment": 0.13934972461308595,
+    "minimum_role_alignment": 0.001685505003744147,
+    "learned_vs_oracle_matrix_l2": 3.209766057019835,
+    "train_accuracy": 0.37516276041666663,
+    "held_out_accuracy": 0.34423828125
+  },
+  "matched_control": {
+    "held_out_accuracy": 0.309326171875,
+    "max_norm_drift": 2211700831922.4907
+  },
+  "mutable_integration": {
+    "pass": false,
+    "commit_decode_accuracy": 0.010416666666666666,
+    "exact_final_table_accuracy": 0.0,
+    "relational_query_accuracy": 0.08333333333333333,
+    "max_norm_drift": 3.241851231905457e-14
+  },
+  "interpretation": "The dense anonymous channel mixer preserves the complete task-relevant representation: exact oracle recovery restores perfect held-out decoding to numerical precision. However, a 15-parameter orthogonal demixer trained only by downstream classification loss fails to discover the semantic roles. The current bottleneck is therefore blind role discovery/observer architecture rather than information preservation or unitary transport.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

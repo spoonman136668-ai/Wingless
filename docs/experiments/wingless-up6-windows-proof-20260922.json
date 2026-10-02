@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.unitary-learned-readout-windows-proof.v1",
+  "experiment": "UP-6-learned-readout-query",
+  "status": "qualified",
+  "observed_at": "2026-09-22T20:39:26-04:00",
+  "source_head": "a9d617a0fc7f10987544382fedbcaa0903ad087a",
+  "baseline_head": "1c61d679b4928e6e4f92fa63236a7872bcce4a15",
+  "platform": "windows",
+  "focused_pass": true,
+  "full_regression_pass": true,
+  "runtime_prototype_lookup": false,
+  "value_decoder": {
+    "train_accuracy": 1.0,
+    "train_loss": 0.015513629452800173
+  },
+  "relation_head": {
+    "train_accuracy": 1.0,
+    "train_loss": 0.033537355148506295
+  },
+  "unitary": {
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "max_round_trip_error": 9.186076156046701e-14,
+    "max_forward_norm_drift": 6.683542608243442e-14,
+    "min_value_margin": 0.893706970114021,
+    "min_relation_margin": 0.9197317821275425
+  },
+  "non_unitary_matched": {
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "max_round_trip_error": 5.97826796336944e-14,
+    "max_forward_norm_drift": 3970852389496.2446,
+    "min_value_margin": 0.8937069701140207,
+    "min_relation_margin": 0.9197317821275428
+  },
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "Learned value and relation heads replaced UP-5 runtime prototype lookup and hard-coded relation arithmetic. Both paths remained perfect because each transport was explicitly inverted into the canonical observation frame. UP-6 therefore validates learned observation/query heads but does not establish direct observation of transported latent state."
+}

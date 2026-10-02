@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.unitary-discovered-commutant-windows-proof.v1",
+  "experiment": "UP-25-dynamics-discovered-commuting-observables",
+  "status": "qualified-partial-positive-gate-negative",
+  "observed_at": "2026-09-23T13:47:53Z",
+  "source_head": "69e57caa13e91353e9a02540525a9e4cd08c9e93",
+  "parent_up24_seal": "08acd3e00736069e3682813c4a905691697ed505",
+  "workflow_run_id": 35869512824,
+  "workflow_artifact_id": 10754421980,
+  "workflow_artifact_sha256": "4b866e00f43cbe643095da98381f5ac7a6d0138c3c29054786b3df2e060df214",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "discovery": {
+    "from_transport": true,
+    "uses_hidden_multiplicity": false,
+    "uses_hidden_mixer": false,
+    "seed_count": 32,
+    "projection_rounds": 20,
+    "effective_orbit_size": 1048576,
+    "min_pre_normalization_frobenius": 0.24098440765259346,
+    "commutator_pass": true,
+    "max_commutator_entry_error": 2.678430105985744e-7,
+    "feature_invariance_pass": true,
+    "max_feature_drift": 0.000022921056928353924
+  },
+  "unitary": {
+    "train_accuracy": 0.994140625,
+    "held_out_accuracy": 0.9248046875,
+    "per_entity_held_out_accuracy": [
+      0.9091796875,
+      0.974609375,
+      0.953125,
+      0.8623046875
+    ],
+    "mean_phase_cosine": 0.9185854820727649,
+    "max_norm_drift": 1.3704593015972932e-12
+  },
+  "matched_control": {
+    "held_out_accuracy": 0.56201171875,
+    "max_norm_drift": 2201078893387.29
+  },
+  "mutable_integration": {
+    "commit_decode_accuracy": 0.5989583333333334,
+    "exact_final_table_accuracy": 0.625,
+    "relational_query_accuracy": 0.8958333333333334,
+    "min_value_margin": 0.0029753876164782533,
+    "min_relation_margin": 0.09429844891798533,
+    "max_norm_drift": 1.2503331703328513e-12
+  },
+  "interpretation": "Transport-only discovery successfully produces approximately commuting, depth-stable observables and almost perfectly fits the training task, but a 32-observable generic discovered bank does not capture enough task-relevant commutant orientation for the preregistered unseen-depth and mutable gates. The next experiment changes only discovered-bank breadth, comparing the frozen 32-observable construction with 64 observables under the same discovery rounds, learner, data, regularization, and thresholds.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

@@ -1,0 +1,39 @@
+{
+  "schema": "wingless.unitary-sequential-windows-proof.v1",
+  "experiment": "UP-4-sequential-composition",
+  "status": "qualified",
+  "observed_at": "2026-09-22T20:23:40-04:00",
+  "source_head": "7def6815b665710649234fa8d30345cd31cee52a",
+  "baseline_head": "d5f63c863af4cf85a813bc3d45cb8bccd6b89e2b",
+  "platform": "windows",
+  "focused_pass": true,
+  "full_regression_pass": true,
+  "dimension": 4,
+  "event_types": 3,
+  "train_samples": 12,
+  "held_out_samples": 96,
+  "held_out_lengths": [4,8,16,32,64,128],
+  "unitary": {
+    "initial_train_accuracy": 0.5,
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 1.0,
+    "final_loss": 0.000012851168659739225,
+    "parameters": [1.5657265903913178,1.5657265903902045,1.5657265903876434],
+    "max_norm_drift": 1.6209256159527285e-14,
+    "max_round_trip_error": 1.6215291016099233e-14
+  },
+  "non_unitary_matched": {
+    "initial_train_accuracy": 0.5,
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 0.4270833333333333,
+    "final_loss": 0.12026422403622287,
+    "parameters": [1.9176905679258975,1.9176905679227754,1.9176905679258978],
+    "max_norm_drift": 1.496812711127465e64
+  },
+  "order_sensitive_ab_target": 2,
+  "order_sensitive_ba_target": 1,
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "The unitary path learned one-step local operations and composed them correctly across unseen order-sensitive sequences up to length 128. The matched non-unitary path learned the one-step task but failed long-horizon composition and exhibited extreme norm growth. This is evidence for a bounded sequential composition primitive, not language reasoning."
+}

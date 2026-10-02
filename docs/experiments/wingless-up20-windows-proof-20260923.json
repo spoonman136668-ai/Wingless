@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.unitary-ridge-anonymous-windows-proof.v1",
+  "experiment": "UP-20-closed-form-anonymous-quadratic-readout",
+  "status": "qualified-partial-positive",
+  "observed_at": "2026-09-23T11:02:42Z",
+  "source_head": "69da5e36dff0f85ea5006def5a4f660e87891d9b",
+  "parent_up19_seal": "c511ff937a02692c5d5bec0d1d397d1a3f3df22b",
+  "workflow_run_id": 35852144146,
+  "workflow_artifact_id": 10745539177,
+  "workflow_artifact_sha256": "d17944d721a1239d275212b637afec8e864683a13a7e02cfb3e020093b643407",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "oracle_witness": {
+    "pass": true,
+    "max_error": 7.3504189744306e-18,
+    "train_accuracy": 0.9970703125,
+    "held_out_accuracy": 0.996826171875
+  },
+  "closed_form_ridge": {
+    "pass": true,
+    "lambda": 1e-6,
+    "train_accuracy": 0.99169921875,
+    "held_out_accuracy": 0.97216796875,
+    "per_entity_held_out_accuracy": [
+      0.9814453125,
+      0.9091796875,
+      0.9990234375,
+      0.9990234375
+    ],
+    "max_norm_drift": 3.3306690738754696e-14
+  },
+  "matched_control": {
+    "held_out_accuracy": 0.513916015625,
+    "max_norm_drift": 2211700831922.4893
+  },
+  "mutable_integration": {
+    "commit_decode_accuracy": 0.7018229166666666,
+    "exact_final_table_accuracy": 0.6666666666666666,
+    "relational_query_accuracy": 0.75,
+    "max_norm_drift": 3.1308289294429414e-14
+  },
+  "diagnosis": {
+    "oracle_witness_pass": true,
+    "closed_form_learning_pass": true,
+    "unseen_depth_pass": false,
+    "mutable_integration_pass": false
+  },
+  "interpretation": "UP-20 proves that the anonymous 702-feature quadratic representation contains the task signal and that generic closed-form task learning can recover most of it without semantic demixing: train accuracy rises to 99.17% and unseen-depth held-out accuracy to 97.22%. The remaining failure is concentrated in generalization/calibration, especially entity 1, and compounds during mutable writes. The next experiment should exploit the already learned circular value-phase code as a low-rank supervised target rather than add generic feature capacity or return to hidden-channel recovery.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

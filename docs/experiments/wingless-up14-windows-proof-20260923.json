@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.unitary-learned-support-frame-windows-proof.v1",
+  "experiment": "UP-14-task-learned-pilot-support",
+  "status": "qualified",
+  "observed_at": "2026-09-23T04:50:32-04:00",
+  "source_head": "9c326f3497db8aa67553aaebe616c1b80a4fd296",
+  "baseline_head": "ea19f64307567fcab2853055fcabd6d18f1f5093",
+  "platform": "windows",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "code_rank": 4,
+  "pilot_states": 5,
+  "pilot_complex_scalars": 80,
+  "features_per_entity": 2,
+  "runtime_prototype_lookup": false,
+  "explicit_inverse_readout": false,
+  "explicit_depth_provided": false,
+  "global_phase_nuisance": true,
+  "phase_alphabet_learned": false,
+  "entity_support_learned": true,
+  "anchor_learned": false,
+  "memory_noise_amplitude": 0.05,
+  "initial_capacity_accuracy": 0.453125,
+  "initial_mean_target_purity": 0.2649941199529597,
+  "learned_mean_target_purity": 0.9996657702546374,
+  "minimum_learned_target_purity": 0.9995317710567762,
+  "initial_loss": 1.210122312263619,
+  "final_loss": 0.00731077627204388,
+  "unitary": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 1.0
+  },
+  "matched_control": {
+    "train_accuracy": 0.8833821614583334,
+    "held_out_accuracy": 0.779296875
+  },
+  "unitary_mutable_integration": {
+    "scenarios": 48,
+    "writes_per_scenario": 16,
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "min_value_margin": 0.9041895757606637,
+    "min_relation_margin": 0.9593017699189835,
+    "max_norm_drift": 6.616929226765933e-14
+  },
+  "diagnosis": {
+    "support_learning_pass": true,
+    "unseen_depth_pass": true,
+    "mutable_integration_pass": true
+  },
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "Task loss learned the pilot support matrix from an almost-uniform dense initialization to a nearly entity-selective basis without target support coefficients. With the UP-13 learned phase alphabet and fixed anchor, the learned unitary support frame generalized perfectly to unseen depths and mutable integration. This removes manual pilot-support selection; the fixed global anchor and explicit five-state side-frame topology remain the next research boundary."
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "wingless.unitary-full-latent-mix-windows-proof.v1",
+  "experiment": "UP-22-full-96d-latent-mixing",
+  "status": "qualified-scientific-negative",
+  "observed_at": "2026-09-23T11:18:36Z",
+  "source_head": "2d4b1cadf9d00451a76f855654eb41b92ac12f71",
+  "parent_up21_seal": "3c2181a95f7834b43ec58e5bf63abcb899d711b0",
+  "workflow_run_id": 35853721728,
+  "workflow_artifact_id": 10746466864,
+  "workflow_artifact_sha256": "1259b2fe68990dc15c952bde82109e4b6fbd60e715d52a8bb938645b61a0472a",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "representation": {
+    "latent_dimension": 96,
+    "runtime_state_objects": 1,
+    "visible_channel_blocks": false,
+    "full_coordinate_mixing": true,
+    "conjugated_transport": true,
+    "known_full_mixer_exposed_to_learner": false,
+    "runtime_unmix_applied": false,
+    "learned_demixer_used": false,
+    "phase_alphabet_supervision": true,
+    "full_hermitian_feature_dimension": 9216
+  },
+  "diagnostics": {
+    "conjugation_equivalence_pass": true,
+    "max_oracle_recovery_error": 5.627308017761762e-12,
+    "minimum_mixer_participation_ratio": 95.99999999999991
+  },
+  "unitary": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 0.267333984375,
+    "per_entity_held_out_accuracy": [
+      0.2802734375,
+      0.2919921875,
+      0.19921875,
+      0.2978515625
+    ],
+    "mean_held_phase_cosine": 0.020758496278884302,
+    "max_norm_drift": 1.5265566588595902e-12
+  },
+  "matched_control": {
+    "held_out_accuracy": 0.271484375,
+    "max_norm_drift": 2201078893382.24
+  },
+  "mutable_integration": {
+    "commit_decode_accuracy": 0.00390625,
+    "exact_final_table_accuracy": 0.0,
+    "relational_query_accuracy": 0.125,
+    "min_value_margin": 0.002559743243762125,
+    "min_relation_margin": 0.2078259801227999,
+    "max_norm_drift": 1.410871419693649e-12
+  },
+  "interpretation": "UP-22 proves the six-by-sixteen runtime block layout can be removed without breaking the conjugated transport itself, but a generic full-state Hermitian ridge observer does not generalize across unseen depths. The failure is not information destruction: oracle unmixing recovers the historical evolved state to numerical tolerance. The next experiment should derive basis-independent observables from the transport dynamics themselves rather than fit coordinate-basis features across depths.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

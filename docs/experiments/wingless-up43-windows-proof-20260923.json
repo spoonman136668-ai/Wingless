@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.rolling-task-bridge-windows-proof.v1",
+  "experiment": "UP-43-rolling-gradient-free-running-task-bridge",
+  "status": "qualified-scientific-negative",
+  "observed_at": "2026-09-24T00:01:35Z",
+  "source_head": "47fac701b3e73e19fa8826a959776ce65e8c01ea",
+  "parent_up42_seal": "a76463ccff664fdb392ead5d024fb1cb8e7778e6",
+  "workflow_run_id": 35935011865,
+  "workflow_artifact_id": 10783122736,
+  "workflow_artifact_sha256": "dbd863ded10cfcf43f8362248aad1584c3cf82122fd32962ca8a4563e726b68e",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "optimizer": {
+    "name": "rolling-full-rank-directional-memory",
+    "maximum_steps": 48,
+    "rolling_buffer_size": 7,
+    "full_rank_reconstruction_steps": 44,
+    "sticky_projection_used": false
+  },
+  "geometry": {
+    "first_provisional_fusion_step": 10,
+    "maximum_provisional_capacity": 8,
+    "task_gradient_entered_fusion_basin": true,
+    "selected_provisional_capacity": 6,
+    "selected_nearest_offset_gap": 0.029277002188455997
+  },
+  "checkpoint_objectives": {
+    "initial": 0.6498734172582427,
+    "step_12": 0.6257176169903816,
+    "step_24": 0.6164862228413023,
+    "step_48": 0.6222920471220585,
+    "selected_step": 0,
+    "selected_objective": 0.6498734172582427,
+    "selected_objective_gain": 0
+  },
+  "true_heldout": {
+    "held_out_accuracy": 0.90185546875,
+    "commit_decode_accuracy": 0.34375,
+    "exact_final_table_accuracy": 0.375,
+    "relational_query_accuracy": 0.5625,
+    "heldout_retention_delta": 0.09814453125,
+    "commit_retention_delta": 0.65625,
+    "capability_gates_without_exact_fusion": false
+  },
+  "diagnosis": {
+    "optimizer_reachability_demonstrated": true,
+    "objective_prefers_initial_geometry": true,
+    "next_controlled_variable": "sqrt-probability-soft-memory-representation"
+  },
+  "interpretation": "The repaired optimizer can move the task trajectory into reversible symmetry neighborhoods, but the current free-running soft-state objective assigns lower score to every preregistered checkpoint and selects step zero. The next experiment changes only the probability-to-amplitude representation to sqrt(p), preserving optimizer, horizon, gates, objective weights, and held-out discipline.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.unitary-commuting-weyl-windows-proof.v1",
+  "experiment": "UP-24-full-latent-commuting-weyl-algebra",
+  "status": "qualified-scientific-pass",
+  "observed_at": "2026-09-23T13:41:36Z",
+  "source_head": "98e173b3c785526f40f7d5a94f1c92ecdc865719",
+  "parent_up23_seal": "8e54fba4e58e632c37d580e2d9cf4b58e92ba4f7",
+  "workflow_run_id": 35868771822,
+  "workflow_artifact_id": 10753931155,
+  "workflow_artifact_sha256": "e75ef9b9269f0362148aed13188c086b6d175fc6f761b0bc119c28569b828e82",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "representation": {
+    "latent_dimension": 96,
+    "runtime_state_objects": 1,
+    "visible_channel_blocks": false,
+    "full_coordinate_mixing": true,
+    "transport_multiplicity_dimension": 6,
+    "commuting_observable_algebra": true,
+    "observable_algebra_hand_constructed": true,
+    "weyl_observable_count": 36,
+    "raw_feature_dimension": 72,
+    "quadratic_feature_dimension": 2700,
+    "runtime_unmix_applied": false,
+    "learned_demixer_used": false
+  },
+  "invariance": {
+    "commutator_pass": true,
+    "feature_invariance_pass": true,
+    "max_commutator_entry_error": 1.622242763424964e-14,
+    "max_feature_drift": 1.7917889394425401e-12
+  },
+  "unitary": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 1.0,
+    "mean_phase_cosine": 0.9851637813485223,
+    "max_norm_drift": 1.5483170301422433e-12
+  },
+  "matched_control": {
+    "held_out_accuracy": 0.58154296875,
+    "max_norm_drift": 2201078893384.372
+  },
+  "mutable_integration": {
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "min_value_margin": 0.6370882275394993,
+    "min_relation_margin": 0.8878539656227666,
+    "max_norm_drift": 1.2707612739859542e-12
+  },
+  "interpretation": "UP-24 confirms the UP-23 degeneracy diagnosis. A complete transport-commuting multiplicity-space observable algebra restores perfect unseen-depth and mutable decoding while the recurrent state remains one fully mixed 96-dimensional object and no runtime unmix is applied. The remaining structural assumption is that the observer algebra was hand-constructed from the known six-fold transport multiplicity. The next experiment must discover commuting observables directly from the transport dynamics without using the hidden six-channel factorization.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

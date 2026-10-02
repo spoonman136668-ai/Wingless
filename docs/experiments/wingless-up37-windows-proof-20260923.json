@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.adaptive-continuous-fusion-windows-proof.v1",
+  "experiment": "UP-37-adaptive-task-weighted-continuous-symmetry-fusion",
+  "status": "qualified-near-positive-gate-negative",
+  "observed_at": "2026-09-23T21:16:59Z",
+  "source_head": "9f442cf5e1acf9627a35e32fb2ddaf34b5a9609e",
+  "parent_up36_seal": "fde6ad40fdd9548e24374c16a2459d42f9c076d3",
+  "workflow_run_id": 35919151769,
+  "workflow_artifact_id": 10776484631,
+  "workflow_artifact_sha256": "d0fa333872bbbb33cffaa4d867919f89573ca0c9f5ee159f7deba54a155edfab",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "adaptive_process": {
+    "affinity_reestimation_count": 10,
+    "total_positive_affinity_count": 53,
+    "selected_step": 5,
+    "start_capacity": 6,
+    "selected_capacity": 12,
+    "additional_fusion_beyond_up36": true,
+    "selected_groups": [[0],[1,2,3],[4],[5]]
+  },
+  "true_heldout": {
+    "held_out_accuracy": 0.994873046875,
+    "commit_decode_accuracy": 0.9739583333333334,
+    "exact_final_table_accuracy": 0.9166666666666666,
+    "relational_query_accuracy": 0.9375,
+    "mean_phase_cosine": 0.9762029632268434,
+    "heldout_retention_delta": 0.005126953125,
+    "commit_retention_delta": 0.02604166666666663
+  },
+  "frozen_gates": {
+    "held_out_accuracy_min": 0.985,
+    "commit_decode_accuracy_min": 0.95,
+    "exact_final_table_accuracy_min": 0.90,
+    "relational_query_accuracy_min": 0.95,
+    "heldout_retention_delta_max": 0.02,
+    "commit_retention_delta_max": 0.05
+  },
+  "diagnosis": {
+    "inner_split_balanced_pass": true,
+    "adaptive_fusion_pass": false,
+    "sole_final_metric_gate_miss": "relational_query_accuracy",
+    "relational_query_shortfall": 0.0125
+  },
+  "interpretation": "Adaptive recomputation materially repairs UP-36's stale-guidance failure. The continuous process created additional symmetry to capacity 12 and satisfied the static, mutable-commit, exact-final, and retention gates. It missed only the frozen relational-query threshold, scoring 0.9375 against 0.95. This is strong evidence that adaptive self-evaluation is useful, but the hand-designed attraction-flow rule still leaves residual task structure unresolved. The next experiment should optimize continuous spectral parameters directly under a smooth task/resource objective rather than further tuning the attraction flow.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}
