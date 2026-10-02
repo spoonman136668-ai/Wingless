@@ -1,0 +1,11 @@
+{
+  "schema": "wingless.research-invalid-attempt.v1",
+  "experiment": "WLM-LM-REAL-UTF8-HIERARCHICAL-PATCH-R1",
+  "qualification_run_id": "37001851634",
+  "disposition": "invalid-infrastructure",
+  "scientific_claim": false,
+  "primary_probe_executed": false,
+  "reason": "Full regression failed at compile time before the probe. unitary/wlm_lm_real_utf8_hierarchical_patch_r1.go declared both the frozen eval-file slice and an evaluation function with the same Go identifier wlmLmRealUTF8HierarchicalPatchR1Eval, causing a redeclaration error and cascading unused/call errors.",
+  "preservation": "Reissue the identical frozen scientific design under R2. Change only implementation identifiers required to compile; do not alter corpus blob identities, train/eval split, capacities, minimum counts, scoring, smoothing, prediction precedence, controls, metrics, thresholds, or classification.",
+  "authority": "research-only"
+}
