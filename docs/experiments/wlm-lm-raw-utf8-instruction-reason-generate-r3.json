@@ -1,0 +1,111 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-LM-RAW-UTF8-INSTRUCTION-REASON-GENERATE-R3",
+  "program":"Wingless raw-input to representation to reasoning to generation chain",
+  "question":"Can a compact learned raw-byte anchor lexicon remove sentence-template dependence by discovering invariant local operation/value spans and composing them by byte order before the unchanged reasoning and text-generation stages?",
+  "hypothesis":"On the byte-identical R1/R2 corpus and split, supervised raw substring discovery will select exactly four operation anchors and eight value anchors, decode both operands in byte order with at least 0.98 training and 0.95 held-out accuracy, classify operation from learned anchor-count distributions with at least 0.95 held-out accuracy, and restore at least 0.90 held-out reasoning and exact raw-output accuracy while exact whole-instruction lookup remains at or below 0.25.",
+  "exact_parent_sha":"7f26fe3865aa6b908aeaa548c3d1a26dabc50308",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch":"research/wingless-up-manual-chain-r1",
+  "portfolio_context":{"allocation":"75% chain / 25% substrate falsification","slot":"chain","next_slot":"substrate falsification"},
+  "prior_evidence":{
+    "experiment":"WLM-LM-RAW-UTF8-INSTRUCTION-REASON-GENERATE-R2",
+    "github_run_id":"37071975528",
+    "classification":"mixed",
+    "observation":{
+      "training_operation_accuracy":0.984375,
+      "training_left_accuracy":1.0,
+      "training_right_accuracy":1.0,
+      "heldout_operation_accuracy":0.4921875,
+      "heldout_left_accuracy":0.5859375,
+      "heldout_right_accuracy":1.0,
+      "heldout_full_representation_accuracy":0.296875,
+      "heldout_reasoning_result_accuracy":0.40625,
+      "heldout_exact_raw_output_accuracy":0.3203125
+    },
+    "diagnosis":"hashed motif evidence solved fitting but retained strong template/role dependence on unseen sentence forms"
+  },
+  "repair_boundary":{
+    "changed":"instruction representation only",
+    "unchanged":"R1 corpus/templates/split, target rules, R1 96-counter factorized reasoning, reasoning training from predicted representations, canonical output bytes, R1 raw generator, R1 exact-instruction lookup control, scientific chain thresholds"
+  },
+  "anchor_induction":{
+    "input":"raw training instruction bytes plus training supervision labels only",
+    "candidate_windows":"every distinct contiguous raw byte substring width 2 through 7 occurring in at least one training instruction",
+    "operation_positive_set":"training examples whose supervised operation label equals the candidate operation class",
+    "value_positive_set":"training examples whose supervised left or right value label equals the candidate value class",
+    "candidate_statistics":"positive-example coverage, negative-example coverage, total positive occurrence count, total negative occurrence count",
+    "selection_order":"highest positive coverage; then largest positive-minus-negative mean occurrence margin; then highest positive precision; then widest byte span; then lexicographically smallest raw bytes",
+    "capacity":"one anchor for each of four operation classes and one anchor for each of eight value classes; exactly twelve anchors; maximum width seven bytes",
+    "semantic_span_or_word_boundary_input":false
+  },
+  "representation_inference":{
+    "operation":"for each learned operation anchor count raw occurrences in the instruction, cap each count at 8, then score each candidate operation from a learned 4x4x9 Laplace-smoothed count histogram; sum log probabilities across the four anchors; ties choose lowest operation id",
+    "operands":"scan the raw instruction for all occurrences of the eight learned value anchors; sort non-overlapping matches by byte offset then by wider anchor then lower value id; the first two distinct occurrence positions are the predicted left and right values respectively",
+    "operand_fallback":"if fewer than two value-anchor occurrence positions are found, fill missing roles with value id zero and record a decode failure",
+    "tokenizer":false,
+    "capacity_growth":false
+  },
+  "reasoning_learner":"byte-for-byte same R1 96-counter factorized learner, trained only from R3 predicted training operation/left/right representations plus observed answer class",
+  "raw_text_generator":"byte-for-byte same R1 result-conditioned two-generated-byte context model",
+  "controls":{"whole_instruction_lookup":"byte-for-byte same R1 exact raw instruction lookup control"},
+  "metrics_and_thresholds":[
+    ["training_example_count","==",768],
+    ["heldout_example_count","==",128],
+    ["training_context_count","==",192],
+    ["heldout_context_count","==",64],
+    ["heldout_exact_instruction_leak_count","==",0],
+    ["selected_operation_anchor_count","==",4],
+    ["selected_value_anchor_count","==",8],
+    ["maximum_anchor_width_bytes","<=",7],
+    ["maximum_total_anchor_bytes","<=",84],
+    ["minimum_training_operation_accuracy",">=",0.98],
+    ["minimum_training_left_accuracy",">=",0.98],
+    ["minimum_training_right_accuracy",">=",0.98],
+    ["maximum_training_operand_decode_failure_count","==",0],
+    ["minimum_heldout_operation_accuracy",">=",0.95],
+    ["minimum_heldout_left_accuracy",">=",0.95],
+    ["minimum_heldout_right_accuracy",">=",0.95],
+    ["maximum_heldout_operand_decode_failure_count","==",0],
+    ["minimum_heldout_full_representation_accuracy",">=",0.90],
+    ["reasoning_counter_count","==",96],
+    ["minimum_heldout_reasoning_result_accuracy",">=",0.90],
+    ["minimum_output_generator_class_coverage","==",8],
+    ["maximum_output_generator_state_count","<=",160],
+    ["minimum_heldout_exact_raw_output_accuracy",">=",0.90],
+    ["maximum_whole_instruction_lookup_exact_output_accuracy","<=",0.25],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "validity_criteria":[
+    "Exact parent and North Star identities match.",
+    "R3 calls the byte-identical R1 corpus constructor and keeps every R1 instruction/answer byte and split unchanged.",
+    "Candidate anchors are selected from raw substrings only; evaluator word boundaries, token spans, and heldout bytes are unavailable to induction.",
+    "Training labels may identify positive examples for supervised anchor selection but may not identify a byte span within an instruction.",
+    "Operand roles are assigned only from learned anchor occurrence order in raw bytes; no parser, word splitter, delimiter grammar, or evaluator operand offset is supplied.",
+    "Operation classification uses only learned raw anchor occurrence counts and frozen training histograms.",
+    "Reasoning consumes predicted R3 representations and never calls target-rule implementations.",
+    "Generation remains unchanged and teacher-free.",
+    "Full Go regression passes before the probe and all metrics are finite.",
+    "No tokenizer, external model, network call, capacity growth, threshold adaptation, or post-result tuning occurs."
+  ],
+  "classification_rules":{
+    "supported":"All validity criteria and all frozen thresholds pass.",
+    "mixed":"Validity passes and anchor induction materially improves unseen-template end-to-end performance over R2 but at least one frozen threshold fails.",
+    "negative":"Validity passes but local learned anchors do not materially improve the chain over R2.",
+    "incomplete":"Compute interruption prevents the frozen matrix.",
+    "invalid":"Any corpus/split drift, heldout participation in anchor selection, semantic span leakage, parser/tokenizer use, downstream mechanism drift, capacity, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule":"No corpus, candidate width, anchor-selection order, count histogram, operand-order rule, fallback, downstream learner, generator, control, metric, threshold, or interpretation may change after primary output.",
+  "changed_paths":[
+    "docs/experiments/wlm-lm-raw-utf8-instruction-reason-generate-r3.json",
+    "unitary/wlm_lm_raw_utf8_instruction_reason_generate_r3.go",
+    "cmd/wlm-lm-raw-utf8-instruction-reason-generate-r3/main.go",
+    "scripts/run-wlm-lm-raw-utf8-instruction-reason-generate-r3.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
