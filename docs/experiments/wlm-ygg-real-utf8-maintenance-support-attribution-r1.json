@@ -1,0 +1,145 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-MAINTENANCE-SUPPORT-ATTRIBUTION-R1",
+  "program": "Wingless-Yggdrasil real-workload maintenance bridge",
+  "question": "Which predeclared raw-byte support tier is the strictest one that yields at least two useful maintainable level-1 motifs in each immutable held-out UTF-8 file under the same four-quarter isolation used by the invalid maintenance R1?",
+  "hypothesis": "At least one of five frozen descending-support tiers will provide >=2 eligible motifs in both held-out files while preserving positive calibration advantage over the baseline. The strictest feasible tier is selected mechanically as the lowest tier index meeting that cross-file cardinality rule.",
+  "exact_parent_sha": "045f2e168555d651a04c72a383bb08e043b83105",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_invalid_attempt": {
+    "experiment": "WLM-YGG-REAL-UTF8-LEVEL1-MAINTENANCE-R1",
+    "disposition": "invalid-target-schedule-construction",
+    "qualification_run_id": "37007119117",
+    "scientific_claim": false
+  },
+  "authority": "research-only schedule attribution; no model repair, deployment, external-model inference, scheduler, queue, or runtime authority",
+  "changed_paths": [
+    "docs/experiments/wlm-ygg-real-utf8-maintenance-support-attribution-r1.json",
+    "unitary/wlm_ygg_real_utf8_maintenance_support_attribution_r1.go",
+    "cmd/wlm-ygg-real-utf8-maintenance-support-attribution-r1/main.go",
+    "scripts/run-wlm-ygg-real-utf8-maintenance-support-attribution-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "fixed_inputs": {
+    "training_and_model": "exact canonical WLM-LM-REAL-UTF8-BYTE-PILOT-R2 model construction and four training blobs",
+    "evaluation": "exact two WLM-LM-REAL-UTF8-BYTE-PILOT-R2 held-out blobs",
+    "segmentation": "same four contiguous raw-byte quarters per file as invalid maintenance R1; context resets at each quarter boundary",
+    "motif_universe": "same fixed 256 selected canonical four-byte motifs"
+  },
+  "tiers": [
+    {
+      "index": 0,
+      "calibration_occurrence_min": 8,
+      "diagnostic_occurrence_min": 4,
+      "validation_occurrence_min": 4,
+      "audit_occurrence_min": 4,
+      "calibration_accuracy_gain_min": 0.25
+    },
+    {
+      "index": 1,
+      "calibration_occurrence_min": 6,
+      "diagnostic_occurrence_min": 3,
+      "validation_occurrence_min": 3,
+      "audit_occurrence_min": 3,
+      "calibration_accuracy_gain_min": 0.2
+    },
+    {
+      "index": 2,
+      "calibration_occurrence_min": 4,
+      "diagnostic_occurrence_min": 2,
+      "validation_occurrence_min": 2,
+      "audit_occurrence_min": 2,
+      "calibration_accuracy_gain_min": 0.15
+    },
+    {
+      "index": 3,
+      "calibration_occurrence_min": 3,
+      "diagnostic_occurrence_min": 2,
+      "validation_occurrence_min": 2,
+      "audit_occurrence_min": 2,
+      "calibration_accuracy_gain_min": 0.1
+    },
+    {
+      "index": 4,
+      "calibration_occurrence_min": 2,
+      "diagnostic_occurrence_min": 1,
+      "validation_occurrence_min": 1,
+      "audit_occurrence_min": 1,
+      "calibration_accuracy_gain_min": 0.1
+    }
+  ],
+  "selection_rule": "For each tier compute eligible motif count independently in each file. The strictest feasible tier is the lowest numeric tier index whose minimum eligible count across both files is >=2. If no tier is feasible, selected_tier_index=-1. No other tie break or post-result schedule choice is permitted.",
+  "metrics_and_thresholds": [
+    [
+      "valid_evaluation_file_count",
+      "==",
+      2
+    ],
+    [
+      "canonical_selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "strictest_feasible_tier_index",
+      ">=",
+      0
+    ],
+    [
+      "strictest_feasible_tier_index",
+      "<=",
+      4
+    ],
+    [
+      "minimum_selected_tier_eligible_count_per_file",
+      ">=",
+      2
+    ],
+    [
+      "training_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "evaluation_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_attribution_rows",
+      "==",
+      0
+    ]
+  ],
+  "diagnostic_metrics": [
+    "file0_tier0_eligible_count through file0_tier4_eligible_count",
+    "file1_tier0_eligible_count through file1_tier4_eligible_count",
+    "minimum_tier0_eligible_count_per_file through minimum_tier4_eligible_count_per_file"
+  ],
+  "validity_criteria": [
+    "Exact parent, North Star, prior invalid-attempt identity, corpus blob identities, canonical learner, and four-quarter split match.",
+    "No model degradation, repair, candidate intervention, or outcome interpretation is performed.",
+    "Eligibility uses only frozen raw support counts and canonical-vs-baseline calibration top-1 gain.",
+    "All five tiers and the strictest-feasible selection rule are fixed before output.",
+    "No evaluation bytes enter training or motif selection.",
+    "Full Go regression passes and normalized result carries exact experiment identity."
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and a frozen tier 0..4 yields at least two eligible motifs in both files.",
+    "negative": "Validity passes but no frozen tier yields at least two eligible motifs in both files.",
+    "incomplete": "Corpus or compute interruption prevents complete attribution.",
+    "invalid": "Identity, split, tier construction, deterministic selection, capacity, or qualification criteria fail."
+  },
+  "no_post_result_tuning_rule": "Do not alter the five tiers, four-quarter split, canonical learner, corpus, metric definitions, or strictest-feasible decision rule after observing output."
+}
