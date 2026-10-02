@@ -291,7 +291,7 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
     $Body=[ordered]@{
         model=$Model
         temperature=0
-        messages=@($Messages)
+        messages=$Messages.ToArray()
         tools=$Tools
         tool_choice='auto'
         max_tokens=4096
@@ -319,7 +319,7 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
                 }
             })
         }
-        $Assistant.tool_calls=@($ToolCallRows)
+        $Assistant.tool_calls=$ToolCallRows.ToArray()
     }
     $Messages.Add($Assistant)
 
