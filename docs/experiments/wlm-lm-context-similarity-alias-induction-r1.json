@@ -1,0 +1,89 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-LM-CONTEXT-SIMILARITY-ALIAS-INDUCTION-R1",
+  "program":"Wingless raw-input to robust invariant representation to reasoning chain",
+  "question":"Can a bounded similarity rule recover correct alias classes and cross-family reasoning when aliases share identical raw context support but have small context-frequency drift?",
+  "hypothesis":"Using the frozen jitter bridge from WLM-SI-CONTEXT-COUNT-JITTER-FALSIFICATION-R1, a context-similarity inducer requiring support Jaccard exactly 1.0 and total-variation distance at most 0.05 will recover exactly nine two-member alias classes, restore at least 0.95 same-family and cross-family reasoning accuracy, while exact-surface remains at or below 0.25 and a frozen +2 shuffled-context control remains at or below 0.25.",
+  "exact_parent_sha":"6c31188b9fa3b9d0030f07e62765573c3d6bb385",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch":"research/wingless-up-manual-chain-r1",
+  "portfolio_context":{"allocation":"75% chain / 25% substrate falsification","slot":"chain"},
+  "prior_evidence":{
+    "experiment":"WLM-SI-CONTEXT-COUNT-JITTER-FALSIFICATION-R1",
+    "github_run_id":"37069664096",
+    "observation":"Exact-signature induction split all nine alias pairs under 8/8/8/8 versus 9/7/8/8 count drift despite support Jaccard 1.0 and total variation 0.03125."
+  },
+  "scope_statement":"This is a bounded robustness repair for context-count drift. Passing does not establish natural-language synonymy; it establishes that raw-context alias induction can tolerate the preregistered frequency drift without semantic labels.",
+  "authority":"research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "task_corpus":"byte-identical two-family contextual-alias R2 task corpus",
+  "surface_representation":{"capacity":18,"selection":"top eighteen raw four-byte task windows by occurrence count descending then lexicographic key"},
+  "normal_bridge":{"family0_counts":[8,8,8,8],"family1_counts":[9,7,8,8],"record_count":576},
+  "similarity_induction":{
+    "context_support_jaccard_min":1.0,
+    "total_variation_max":0.05,
+    "graph_rule":"connect two selected surface motifs iff observed context-support Jaccard is at least 1.0 and observed normalized count total-variation distance is at most 0.05",
+    "class_rule":"connected components of the undirected similarity graph; class order by lowest surface representation id",
+    "semantic_labels_visible":false,
+    "family_labels_visible":false
+  },
+  "controls":{
+    "exact_surface":"unchanged exact surface-operation plus exact surface-value pair transition learner",
+    "shuffled_bridge":"family0 context identity; family1 value context assignment +2 mod 4 and operation context assignment +2 mod 5, with the same 8/8/8/8 versus 9/7/8/8 frequency drift",
+    "purpose":"show that successful transfer depends on correct raw-context similarity rather than transition capacity or evaluator scoring"
+  },
+  "metrics_and_thresholds":[
+    ["task_training_record_count","==",3200],
+    ["selected_surface_representation_count","==",18],
+    ["selected_true_surface_motif_match_count","==",18],
+    ["jitter_bridge_record_count","==",576],
+    ["bridge_decode_failure_count","==",0],
+    ["similarity_tv_threshold","==",0.05],
+    ["induced_alias_class_count","==",9],
+    ["induced_two_member_class_count","==",9],
+    ["correct_evaluator_alias_pair_count","==",9],
+    ["task_training_decode_failure_count","==",0],
+    ["class_transition_missing_count","==",0],
+    ["same_family_evaluation_count","==",160],
+    ["induced_same_family_accuracy",">=",0.95],
+    ["cross_family_evaluation_count","==",160],
+    ["induced_cross_family_accuracy",">=",0.95],
+    ["exact_surface_cross_family_accuracy","<=",0.25],
+    ["exact_surface_cross_family_missing_transition_count",">",0],
+    ["shuffled_alias_class_count","==",9],
+    ["shuffled_correct_evaluator_alias_pair_count","==",0],
+    ["shuffled_cross_family_accuracy","<=",0.25],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "validity_criteria":[
+    "Exact parent and North Star identities match.",
+    "Surface representations are selected before bridge induction and receive no evaluator alias mapping.",
+    "Similarity uses only observed immediate raw-context support and normalized counts.",
+    "No pair is merged unless support Jaccard is 1.0 and total variation is at most 0.05.",
+    "The class-transition learner receives induced class ids only and no semantic mapping.",
+    "The exact-surface control receives no bridge information.",
+    "The shuffled bridge changes only family1 context assignment by the frozen +2 rotations.",
+    "Semantic mappings are evaluator-only after prediction.",
+    "Full Go regression passes before the probe and all metrics are finite.",
+    "No tokenizer, external model, network call, capacity growth, threshold adaptation, or post-result tuning occurs."
+  ],
+  "classification_rules":{
+    "supported":"All validity criteria and all frozen thresholds pass.",
+    "mixed":"Validity passes and similarity induction materially outperforms both controls, but at least one alias recovery or 0.95 accuracy threshold fails.",
+    "negative":"Validity passes but similarity induction does not materially improve cross-family reasoning over exact-surface.",
+    "incomplete":"Compute interruption prevents the frozen matrix.",
+    "invalid":"Any similarity-rule drift, evaluator leakage, representation, deterministic-state, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule":"The 1.0 Jaccard and 0.05 total-variation thresholds, bridges, controls, metrics, and interpretations are frozen before primary output.",
+  "changed_paths":[
+    "docs/experiments/wlm-lm-context-similarity-alias-induction-r1.json",
+    "unitary/wlm_lm_context_similarity_alias_induction_r1.go",
+    "cmd/wlm-lm-context-similarity-alias-induction-r1/main.go",
+    "scripts/run-wlm-lm-context-similarity-alias-induction-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
