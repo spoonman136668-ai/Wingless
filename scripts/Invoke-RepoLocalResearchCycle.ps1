@@ -51,6 +51,11 @@ function Write-CycleResult([bool]$Advanced,[string]$Reason,[string]$Head){
     $Obj|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $ResultPath -Encoding UTF8
 }
 
+function Test-ProviderAvailabilityFailure([string]$Message){
+    if([string]::IsNullOrWhiteSpace($Message)){return $false}
+    return [bool]($Message -match '(?i)(status=(?:408|429|500|502|503|504)\b|\b(?:408|429|500|502|503|504)\b|too many requests|rate.?limit|timed?\s*out|timeout|underlying connection was closed|unexpected error occurred on a receive|connection (?:reset|aborted)|internal server error|bad gateway|server unavailable|service unavailable|gateway timeout)')
+}
+
 function Resolve-Codex {
     foreach($P in @(
         'C:\ProgramData\CKBR\codex\bin\codex.exe',
@@ -165,7 +170,8 @@ $MindContext
     [IO.File]::WriteAllText($PromptPath,$Prompt,(New-Object Text.UTF8Encoding($false)))
 
     $Succeeded=$false
-    $PrimaryRateLimited=$false
+    $PrimaryAvailabilityFailure=$false
+    $SecondaryAvailabilityFailure=$false
     $NemotronAgent=Join-Path $PSScriptRoot 'Invoke-NemotronRepoAgent.ps1'
     if(Test-Path -LiteralPath $NemotronAgent -PathType Leaf){
         try{
@@ -175,9 +181,8 @@ $MindContext
             Write-Host 'RESEARCH_AGENT_PRIMARY_PASS provider=nvidia model=z-ai/glm-5.3'
         }catch{
             $PrimaryError=$_.Exception.Message
-            if($PrimaryError -match '(?i)status=429|429|too many requests'){
-                $PrimaryRateLimited=$true
-            }
+            $PrimaryAvailabilityFailure=Test-ProviderAvailabilityFailure $PrimaryError
+            Write-Host "RESEARCH_AGENT_PRIMARY_FAILURE_CLASS availability=$([string]$PrimaryAvailabilityFailure.ToString().ToLowerInvariant())"
             Write-Host "RESEARCH_AGENT_PRIMARY_FAILED provider=nvidia model=z-ai/glm-5.3 error=$PrimaryError"
             & git reset --hard $StartSha|Out-Null
             & git clean -fd|Out-Null
@@ -191,6 +196,8 @@ $MindContext
                 Write-Host 'RESEARCH_AGENT_SECONDARY_PASS provider=openrouter model=nvidia/nemotron-3-ultra-550b-a55b:free'
             }catch{
                 $SecondaryError=$_.Exception.Message
+                $SecondaryAvailabilityFailure=Test-ProviderAvailabilityFailure $SecondaryError
+                Write-Host "RESEARCH_AGENT_SECONDARY_FAILURE_CLASS availability=$([string]$SecondaryAvailabilityFailure.ToString().ToLowerInvariant())"
                 Write-Host "RESEARCH_AGENT_SECONDARY_FAILED provider=openrouter model=nvidia/nemotron-3-ultra-550b-a55b:free error=$SecondaryError"
                 & git reset --hard $StartSha|Out-Null
                 & git clean -fd|Out-Null
@@ -198,6 +205,18 @@ $MindContext
         }
     }else{
         Write-Host "RESEARCH_AGENT_PRIMARY_UNAVAILABLE path=$NemotronAgent"
+    }
+
+    if(-not$Succeeded -and $PrimaryAvailabilityFailure -and $SecondaryAvailabilityFailure){
+        & git reset --hard $StartSha|Out-Null
+        & git clean -fd|Out-Null
+        $DeferredHead=(& git rev-parse HEAD).Trim()
+        if($DeferredHead-cne$StartSha){throw "PROVIDER_DEFER_HEAD_DRIFT expected=$StartSha actual=$DeferredHead"}
+        if(((& git status --porcelain)-join'').Trim()){throw 'PROVIDER_DEFER_DIRTY_WORKTREE'}
+        Write-CycleResult -Advanced $false -Reason 'provider-deferred' -Head $DeferredHead
+        Write-Host 'REPO_LOCAL_PROVIDER_DEFERRED free_providers_unavailable=true codex_invoked=false'
+        Write-Host "head_sha=$DeferredHead"
+        return
     }
 
     if(-not$Succeeded){
@@ -230,17 +249,6 @@ $MindContext
         }
     }
     if(-not$Succeeded){
-        if($PrimaryRateLimited){
-            & git reset --hard $StartSha|Out-Null
-            & git clean -fd|Out-Null
-            $WaitHead=(& git rev-parse HEAD).Trim()
-            if($WaitHead-cne$StartSha){throw "PROVIDER_WAIT_HEAD_DRIFT expected=$StartSha actual=$WaitHead"}
-            if(((& git status --porcelain)-join'').Trim()){throw 'PROVIDER_WAIT_DIRTY_WORKTREE'}
-            Write-CycleResult -Advanced $false -Reason 'provider-wait' -Head $WaitHead
-            Write-Host 'REPO_LOCAL_PROVIDER_WAIT'
-            Write-Host "head_sha=$WaitHead"
-            return
-        }
         throw 'RESEARCH_AGENT_FAILED_ALL_PROVIDERS'
     }
 
