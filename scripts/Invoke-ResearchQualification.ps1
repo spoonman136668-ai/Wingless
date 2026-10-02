@@ -181,11 +181,12 @@ elseif ($NormalizedHarnessMarker) {
 else {
     'none'
 }
-$ScientificDiagnosis = if ($null -ne $Probe -and $null -ne $Probe.diagnosis) {
-    $Probe.diagnosis
-}
-else {
-    $null
+$ScientificDiagnosis = $null
+if ($null -ne $Probe) {
+    $DiagnosisProperty = $Probe.PSObject.Properties['diagnosis']
+    if ($null -ne $DiagnosisProperty) {
+        $ScientificDiagnosis = $DiagnosisProperty.Value
+    }
 }
 
 $Classification = if ($TestExit -ne 0) {
