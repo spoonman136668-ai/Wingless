@@ -114,39 +114,7 @@ jobs:
           if([string]::IsNullOrWhiteSpace($env:NVIDIA_API_KEY)){throw 'NVIDIA_API_KEY_SECRET_MISSING'}
           $Root=(Resolve-Path '.').Path
           $Head=(git rev-parse HEAD).Trim()
-          if($Head -notmatch '^[0-9a-f]{40}
-        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
-        run: |
-          $ErrorActionPreference='Stop'
-          $P='C:\ProgramData\CKBR\codex\bin\codex.exe'
-          if(-not(Test-Path -LiteralPath $P -PathType Leaf)){throw 'CODEX_RUNTIME_MISSING'}
-          & $P --version
-          if($LASTEXITCODE-ne0){throw "CODEX_VERSION_FAILED exit=$LASTEXITCODE"}
-          $Help=(& $P exec --help 2>&1)-join "`n"
-          if($LASTEXITCODE-ne0){throw 'CODEX_EXEC_HELP_FAILED'}
-          foreach($Needle in @('--sandbox','workspace-write','--approve-for-me','--output-last-message')){if(-not$Help.Contains($Needle)){throw "CODEX_EXEC_INTERFACE_MISSING $Needle"}}
-          $Controller=Get-Content -Raw 'scripts\Invoke-RepoLocalResearchCycle.ps1'
-          if($Controller.Contains('--full-auto')){throw 'OBSOLETE_CODEX_FULL_AUTO_PRESENT'}
-          Write-Host 'WINGLESS_REPO_LOCAL_CODEX_PASS'
-
-      - name: Verify Codex exec CLI contract
-        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
-        run: |
-          $ErrorActionPreference='Stop'
-          $P='C:\ProgramData\CKBR\codex\bin\codex.exe'
-          $Help=((& $P exec --approve-for-me --help 2>&1)|ForEach-Object{[string]$_}) -join [Environment]::NewLine
-          if($LASTEXITCODE-ne0){throw "CODEX_EXEC_HELP_FAILED exit=$LASTEXITCODE"}
-          Write-Host $Help
-          Write-Host 'WINGLESS_REPO_LOCAL_CODEX_EXEC_HELP_PASS'
-
-      - name: Full Wingless regression
-        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
-        run: |
-          $ErrorActionPreference='Stop'
-          go test ./...
-          if($LASTEXITCODE-ne0){throw "GO_TEST_FAILED exit=$LASTEXITCODE"}
-          Write-Host 'WINGLESS_REPO_LOCAL_FULL_REGRESSION_PASS'
-){throw 'PROVIDER_PROBE_HEAD_INVALID'}
+          if($Head -notmatch '^[0-9a-f]{40}$'){throw 'PROVIDER_PROBE_HEAD_INVALID'}
           $Worktree=Join-Path $env:RUNNER_TEMP ('glm-provider-probe-'+$env:GITHUB_RUN_ID+'-'+$env:GITHUB_RUN_ATTEMPT)
           $ProbeBranch='qual/glm-provider-probe-'+$env:GITHUB_RUN_ID+'-'+$env:GITHUB_RUN_ATTEMPT
           $Prompt=Join-Path $env:RUNNER_TEMP ('glm-provider-prompt-'+$env:GITHUB_RUN_ID+'.txt')
