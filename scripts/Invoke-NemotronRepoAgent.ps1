@@ -328,7 +328,7 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
         if([string]::IsNullOrWhiteSpace($Final)){throw "NEMOTRON_EMPTY_FINAL round=$Round"}
         [IO.File]::WriteAllText($LastMessagePath,$Final,(New-Object Text.UTF8Encoding($false)))
         Write-Host "NEMOTRON_AGENT_PASS rounds=$Round model=$Model"
-        exit 0
+        return
     }
 
     foreach($Call in $Calls){
