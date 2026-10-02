@@ -1,0 +1,201 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-CALIBRATED-MAINTENANCE-R1",
+  "program": "Wingless-Yggdrasil real-workload maintenance bridge",
+  "question": "Can a deployable pre-degradation background-calibrated excess-error monitor fix the monitor-only failure on immutable real UTF-8 bytes while leaving the previously frozen wrong-first/revert/correct-retain policy and 0.20 validation threshold unchanged?",
+  "hypothesis": "Across the same four attribution-selected Tier 1 deletion cycles, calibration-estimated excess-error ranking will select the true damaged motif in all four cycles with positive score margin over the runner-up. The unchanged wrong candidate will be reverted in all four cycles, the unchanged correct candidate will exceed the same 0.20 selected-key validation-gain threshold and be retained in all four cycles, and final audit predictions/probabilities/structure will exactly match canonical state after every cycle.",
+  "exact_parent_sha": "4f4033eb63821ded0ecb81d111660744bd3f56de",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_attribution": {
+    "experiment": "WLM-YGG-REAL-UTF8-MAINTENANCE-FAILURE-ATTRIBUTION-R1",
+    "classification_commit_sha": "4f4033eb63821ded0ecb81d111660744bd3f56de",
+    "qualification_run_id": "37008563597",
+    "classification": "monitor_only",
+    "evidence": {
+      "raw_monitor_top1_target_count": 1,
+      "excess_error_monitor_top1_target_count": 4,
+      "minimum_correct_restoration_selected_key_accuracy_gain": 0.7153284671532847,
+      "correct_restoration_gain_ge_0_20_count": 4
+    }
+  },
+  "authority": "research-only immutable real-byte maintenance test; no deployment, external-model inference, scheduler, queue, broker, accepted-ref, or runtime authority",
+  "changed_paths": [
+    "docs/experiments/wlm-ygg-real-utf8-calibrated-maintenance-r1.json",
+    "unitary/wlm_ygg_real_utf8_calibrated_maintenance_r1.go",
+    "cmd/wlm-ygg-real-utf8-calibrated-maintenance-r1/main.go",
+    "scripts/run-wlm-ygg-real-utf8-calibrated-maintenance-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "frozen_reuse": {
+    "corpus": "exact immutable real UTF-8 train/eval blobs from WLM-LM-REAL-UTF8-BYTE-PILOT-R2",
+    "canonical_model": "exact fixed 256-entry level-1 motif model",
+    "target_schedule": "exact Tier 1 first-two eligible targets per file from maintenance R3",
+    "degradation": "delete scheduled motif record",
+    "candidate_order": "wrong same-budget candidate first; byte-exact revert if rejected; correct retained-catalog candidate second",
+    "candidate_budget": "1028 logical bytes and one repair operation per candidate",
+    "validation": "same independent third-quarter selected-key top-1 gain plus global BPB rule",
+    "retain_threshold": "selected-key accuracy gain >=0.20 AND global BPB change <=0.005",
+    "audit": "same independent fourth-quarter canonical prediction/probability/state equality"
+  },
+  "calibrated_monitor": {
+    "calibration_segment": "first raw-byte quarter of each held-out file, before any degradation",
+    "stored_state": "for each of the 256 retained-catalog four-byte keys store canonical occurrence_count and canonical prediction_error_count as two uint32 counters; fixed 2048 logical bytes total",
+    "eligibility_for_ranking": "calibration occurrence_count >=3 and diagnostic occurrence_count >=1",
+    "diagnostic_observation": "second raw-byte quarter after deletion; count occurrence_count and prediction_error_count for retained-catalog keys",
+    "score": "observed diagnostic error_count - (calibration_error_count/calibration_occurrence_count)*diagnostic_occurrence_count",
+    "selection": "highest score; exact float tie resolved lexicographically by raw four-byte key",
+    "required_signal": "selected score >0 and selected-minus-runner-up score >0",
+    "forbidden": "canonical diagnostic shadow predictions, evaluator target identity/rank, lesion label, validation/audit outcomes"
+  },
+  "metrics_and_thresholds": [
+    [
+      "valid_evaluation_file_count",
+      "==",
+      2
+    ],
+    [
+      "completed_cycle_count",
+      "==",
+      4
+    ],
+    [
+      "minimum_target_eligibility_count_per_file",
+      ">=",
+      3
+    ],
+    [
+      "minimum_monitor_target_selection_accuracy",
+      "==",
+      1
+    ],
+    [
+      "minimum_selected_calibrated_excess_score",
+      ">",
+      0
+    ],
+    [
+      "minimum_selected_minus_runner_up_excess_score",
+      ">",
+      0
+    ],
+    [
+      "maximum_wrong_candidate_selected_key_accuracy_gain",
+      "<",
+      0.2
+    ],
+    [
+      "wrong_candidate_retain_count",
+      "==",
+      0
+    ],
+    [
+      "wrong_candidate_revert_count",
+      "==",
+      4
+    ],
+    [
+      "minimum_correct_candidate_selected_key_accuracy_gain",
+      ">=",
+      0.2
+    ],
+    [
+      "correct_candidate_retain_count",
+      "==",
+      4
+    ],
+    [
+      "correct_candidate_revert_count",
+      "==",
+      0
+    ],
+    [
+      "maximum_post_repair_audit_prediction_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "maximum_post_repair_audit_probability_abs_delta",
+      "==",
+      0
+    ],
+    [
+      "minimum_structure_jaccard_after_each_cycle",
+      "==",
+      1
+    ],
+    [
+      "maximum_background_monitor_state_bytes",
+      "<=",
+      2048
+    ],
+    [
+      "maximum_candidate_read_bytes",
+      "<=",
+      1028
+    ],
+    [
+      "maximum_candidate_repair_operations",
+      "<=",
+      1
+    ],
+    [
+      "maximum_final_selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "minimum_final_selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "lesion_label_access_count",
+      "==",
+      0
+    ],
+    [
+      "canonical_diagnostic_shadow_access_count",
+      "==",
+      0
+    ],
+    [
+      "evaluator_schedule_access_in_policy_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_cycle_rows",
+      "==",
+      0
+    ]
+  ],
+  "validity_criteria": [
+    "Exact parent, monitor-only attribution evidence, canonical model, Tier 1 targets, corpus identities, and quarter split match.",
+    "Background state is learned only from intact calibration-quarter predictions and observed bytes before degradation.",
+    "Diagnostic selection uses only stored calibration occurrence/error counts plus current diagnostic occurrence/error counts; no canonical diagnostic shadow is available to policy.",
+    "Target schedule remains evaluator-only and unchanged from Tier 1.",
+    "Candidate order, candidate contents/budgets, revert semantics, validation segment, 0.20 retain threshold, BPB constraint, and audit are unchanged from R3.",
+    "Every rejected candidate restores byte-exact pre-candidate state; every retained result becomes the next-cycle state.",
+    "No tokenizer, lesion label, external model, capacity growth, or post-result threshold change occurs.",
+    "Full Go regression passes and normalized result carries exact experiment identity."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all frozen thresholds pass across all four real-byte cycles.",
+    "mixed": "Monitor selects all four targets and repairs restore canonical audit state, but at least one margin, wrong-candidate, validation, or budget threshold fails.",
+    "negative": "Validity passes but calibrated monitoring fails target selection or the unchanged repair/retain loop still fails one or more cycles.",
+    "incomplete": "Corpus or compute interruption prevents full matrix.",
+    "invalid": "Identity, calibration isolation, forbidden shadow access, target-schedule isolation, candidate-budget parity, revert semantics, deterministic construction, capacity, or qualification criteria fail."
+  },
+  "no_post_result_tuning_rule": "Do not alter calibration state, minimum calibration support, excess-score formula, target schedule, candidate policy, validation threshold, BPB constraint, audit, metrics, thresholds, aggregation, or classification after any output."
+}
