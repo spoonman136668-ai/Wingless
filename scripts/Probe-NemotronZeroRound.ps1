@@ -18,3 +18,5 @@ try{
   Write-Host "POSITION=$($_.InvocationInfo.PositionMessage)"
   throw
 }
+
+# adapter-root-guard-selftest
