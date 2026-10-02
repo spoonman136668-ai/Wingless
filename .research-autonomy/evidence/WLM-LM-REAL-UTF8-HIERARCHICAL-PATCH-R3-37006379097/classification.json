@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.research-classification.v1",
+  "experiment": "WLM-LM-REAL-UTF8-HIERARCHICAL-PATCH-R3",
+  "qualified_head_sha": "86a57d22e2ce5d3c4d0a122906a7cfdc8e70c88e",
+  "qualification_run_id": "37006379097",
+  "qualification": "qualified-scientific-result",
+  "classification": "negative",
+  "thresholds_frozen_before_execution": true,
+  "full_regression_passed": true,
+  "metrics": {
+    "training_file_identity_mismatch_count": 0,
+    "evaluation_file_identity_mismatch_count": 0,
+    "train_eval_blob_overlap_count": 0,
+    "selected_level1_count": 512,
+    "selected_level2_count": 128,
+    "minimum_eval_level1_coverage_fraction": 0.056856187290969896,
+    "minimum_eval_level2_coverage_fraction": 0.0007605719501064801,
+    "minimum_level2_covered_accuracy_gain": 0,
+    "minimum_effective_event_reduction_fraction": 0.1137742269566504,
+    "maximum_hierarchical_minus_level1_bits_per_byte": 0.027406012775581967,
+    "maximum_hierarchical_minus_baseline_bits_per_byte": -0.018287330453136796,
+    "maximum_total_learned_structure_count": 640,
+    "capacity_growth_event_count": 0,
+    "tokenizer_use_count": 0,
+    "invalid_byte_rows": 0,
+    "counter_overflow_rows": 0
+  },
+  "failed_frozen_gates": [
+    "minimum_eval_level1_coverage_fraction >= 0.08",
+    "minimum_eval_level2_coverage_fraction >= 0.005",
+    "minimum_level2_covered_accuracy_gain >= 0.05",
+    "minimum_effective_event_reduction_fraction >= 0.12",
+    "maximum_hierarchical_minus_level1_bits_per_byte <= 0",
+    "maximum_hierarchical_minus_baseline_bits_per_byte <= -0.02"
+  ],
+  "scientific_claim": "On the frozen immutable real UTF-8 prose/code split, Wingless formed the full fixed 512-entry level-1 and 128-entry level-2 hierarchy without tokenization or capacity growth, but the second level did not generalize sufficiently to fresh files: minimum level-2 coverage was 0.0007606, level-2-covered accuracy gain was zero, and hierarchical bits-per-byte was 0.0274 worse than level-1-only on the worst held-out file. This is a valid negative for the tested adjacent-two-selected-motif hierarchy, not a negative against the already-supported real-byte level-1 motif layer.",
+  "preservation": "WLM-LM-REAL-UTF8-BYTE-PILOT-R2 remains supported. Do not retune R3 capacities, occurrence thresholds, scoring, smoothing, or corpus post hoc.",
+  "next_question": "Use the supported real UTF-8 level-1 motif substrate as the target of a frozen real-workload degradation/monitor/retain-revert maintenance test; separately attribute why second-level real-byte compounds fail cross-file support before proposing a new hierarchy.",
+  "scope": "immutable repo-owned real UTF-8 prose/code corpus; not open-domain language competence",
+  "authority": "research-only"
+}
