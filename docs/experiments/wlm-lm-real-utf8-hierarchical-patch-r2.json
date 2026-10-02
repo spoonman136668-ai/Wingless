@@ -1,0 +1,233 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-REAL-UTF8-HIERARCHICAL-PATCH-R2",
+  "question": "Can the existing Wingless raw-byte substrate build a second learned granularity level on real UTF-8 prose/code bytes and preserve predictive/efficiency gains on a fresh immutable cross-file holdout without tokenization?",
+  "hypothesis": "On the frozen larger real-byte corpus, a fixed hierarchy of 512 four-byte motifs plus 128 eight-byte compounds formed only from adjacent selected motifs will cover at least 8% of held-out positions at level 1 and at least 0.5% at level 2, improve next-byte accuracy by at least 0.05 over the level-1 predictor on level-2-covered positions, reduce effective held-out events by at least 0.12, and not worsen bits-per-byte relative to the level-1 model.",
+  "exact_parent_sha": "7e38ae6aa5b201700d7066114f829465a82b6583",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-REAL-UTF8-BYTE-PILOT-R2",
+    "classification": "supported",
+    "qualification_run_id": "37000936408",
+    "metrics": {
+      "minimum_eval_motif_coverage_fraction": 0.10326014637391882,
+      "minimum_motif_covered_accuracy_gain": 0.5180897250361794,
+      "minimum_effective_event_reduction_fraction": 0.14642904641574672,
+      "maximum_adaptive_minus_baseline_bits_per_byte": -0.05349253593646086
+    }
+  },
+  "authority": "research-only real-byte hierarchy pilot; no deployment or external-model inference authority",
+  "corpus": {
+    "encoding": "exact Git blob bytes; no UTF decoding, normalization, tokenizer, subword vocabulary, boundary tokens, or remapping",
+    "file_boundary_policy": "reset byte context/hierarchy scan at every file boundary",
+    "train": [
+      [
+        "README.md",
+        "50f1ab5ae468551ee48dd1143e534a0ebe01d6a8"
+      ],
+      [
+        "docs/architecture.md",
+        "dec5b6284ec69c1c94a4cf5b005022981df0e900"
+      ],
+      [
+        "docs/internal-stage-2.md",
+        "d71357155dc1b141369dfd61d971b0eb1d00c9c9"
+      ],
+      [
+        "docs/inference-backends.md",
+        "4e5b3c2c268e1ded129020fd22e8fbe07725ec30"
+      ],
+      [
+        "unitary/wlm_lm_byte_motif_discovery_r3_balanced.go",
+        "f9ce41417b5000e3c2419b1b5bf0ce2fc4c41899"
+      ],
+      [
+        "unitary/wlm_lm_cross_domain_granularity_transfer_r1.go",
+        "07b3a6fe2dec98b09c91f770f8d5648defc49ae7"
+      ],
+      [
+        "unitary/adaptive_continuous_fusion.go",
+        "60ae9ce88419cf2541205ad41d81b8c0d3cbe114"
+      ],
+      [
+        "unitary/anonymous_gram.go",
+        "8a85e5e09a0ffa4a0e8e849df1a63e78ecfd2a1e"
+      ],
+      [
+        "unitary/memory.go",
+        "24b132e0bf81e373d7b82b70719b9ee9419d0054"
+      ],
+      [
+        "unitary/training.go",
+        "f39dcd4cda2f2b78b97df77fc7098199afa55acb"
+      ]
+    ],
+    "eval": [
+      [
+        "docs/internal-stage-3.md",
+        "08dc1153ed401c23194dd5bdd6bb06ff5881c3ab"
+      ],
+      [
+        "docs/integration-seams.md",
+        "3b368fdb1c97dc5a24e41d437718c82f1c4b6ebc"
+      ],
+      [
+        "unitary/blind_channel.go",
+        "7323002862869b8073189b944fc645e4956a8f1b"
+      ],
+      [
+        "unitary/composite_state.go",
+        "29653a18fdf9eae88e95f10dd969835e3307b743"
+      ]
+    ],
+    "contamination_rule": "No eval blob may appear in training. Every blob identity must match before model construction."
+  },
+  "learner": {
+    "baseline": "fixed 256x256 previous-byte -> next-byte uint32 counts; lowest-byte argmax tie break; Jeffreys categorical smoothing",
+    "level1": {
+      "width_bytes": 4,
+      "minimum_occurrences": 4,
+      "capacity": 512,
+      "candidate": "every raw four-byte training window with following byte",
+      "score": "best-successor count descending, then best-successor fraction descending, then lexicographic raw key",
+      "state": "four-byte key plus 256 successor uint32 counts"
+    },
+    "level2": {
+      "width_bytes": 8,
+      "minimum_occurrences": 2,
+      "capacity": 128,
+      "candidate": "an eight-byte training span whose first four bytes and second four bytes are both exact selected level-1 motif keys; candidate has following raw byte",
+      "score": "best-successor count descending, then best-successor fraction descending, then lexicographic eight-byte key",
+      "state": "eight-byte key plus 256 successor uint32 counts",
+      "forbidden": "no level2 candidate may form unless both component halves were independently selected at level1"
+    },
+    "prediction": "longest learned context wins: level2 eight-byte distribution, else level1 four-byte distribution, else baseline one-byte distribution",
+    "probability": "Jeffreys-smoothed categorical probability (count+0.5)/(context_total+128) at the selected hierarchy level",
+    "capacity_growth": false
+  },
+  "controls": {
+    "level1_only": "same baseline and selected 512 level1 motifs with level2 disabled",
+    "baseline_only": "same previous-byte baseline with both motif levels disabled"
+  },
+  "evaluation": {
+    "level1_coverage": "fraction of positions with at least four prior bytes whose last four bytes match a selected level1 motif",
+    "level2_coverage": "fraction of positions with at least eight prior bytes whose last eight bytes match a selected level2 compound",
+    "level2_accuracy_gain": "hierarchical top-1 accuracy minus level1-only top-1 accuracy restricted to level2-covered positions",
+    "event_reduction": "greedy raw scan: selected level2 span consumes 8 bytes as one event; else selected level1 span consumes 4 bytes as one event; else one raw byte event",
+    "bpb": "mean negative log2 smoothed probability per next byte; report hierarchical minus level1 and hierarchical minus baseline per eval file"
+  },
+  "metrics_and_thresholds": [
+    [
+      "training_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "evaluation_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "train_eval_blob_overlap_count",
+      "==",
+      0
+    ],
+    [
+      "selected_level1_count",
+      "==",
+      512
+    ],
+    [
+      "selected_level2_count",
+      "==",
+      128
+    ],
+    [
+      "minimum_eval_level1_coverage_fraction",
+      ">=",
+      0.08
+    ],
+    [
+      "minimum_eval_level2_coverage_fraction",
+      ">=",
+      0.005
+    ],
+    [
+      "minimum_level2_covered_accuracy_gain",
+      ">=",
+      0.05
+    ],
+    [
+      "minimum_effective_event_reduction_fraction",
+      ">=",
+      0.12
+    ],
+    [
+      "maximum_hierarchical_minus_level1_bits_per_byte",
+      "<=",
+      0
+    ],
+    [
+      "maximum_hierarchical_minus_baseline_bits_per_byte",
+      "<=",
+      -0.02
+    ],
+    [
+      "maximum_total_learned_structure_count",
+      "==",
+      640
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_byte_rows",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_rows",
+      "==",
+      0
+    ]
+  ],
+  "validity_criteria": [
+    "Exact parent and North Star identity match.",
+    "All Git blob identities match and train/eval blob sets are disjoint.",
+    "The learner receives exact raw bytes only and resets state at file boundaries.",
+    "Every level2 key is exactly eight raw bytes composed of two selected adjacent level1 keys.",
+    "No eval bytes participate in candidate selection or learned counts.",
+    "Fixed capacities are 512 level1 plus 128 level2; no capacity growth.",
+    "Full Go regression passes before probe execution.",
+    "Normalized result carries the exact experiment identifier."
+  ],
+  "classification_rules": {
+    "supported": "All frozen thresholds and validity criteria pass.",
+    "mixed": "Level2 forms and improves either prediction or event efficiency but at least one coverage/BPB threshold fails.",
+    "negative": "Validity passes but level2 provides no held-out predictive/efficiency advantage over the level1-only control.",
+    "incomplete": "Corpus or compute interruption prevents complete evaluation.",
+    "invalid": "Blob identity, train/eval isolation, raw-byte identity, hierarchy construction, capacity, determinism, or qualification criteria fail."
+  },
+  "no_post_result_tuning_rule": "Do not change corpus blobs, capacities, minimum counts, scoring, smoothing, prediction precedence, metrics, thresholds, or classification after observing output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-real-utf8-hierarchical-patch-r2.json",
+    "unitary/wlm_lm_real_utf8_hierarchical_patch_r2.go",
+    "cmd/wlm-lm-real-utf8-hierarchical-patch-r2/main.go",
+    "scripts/run-wlm-lm-real-utf8-hierarchical-patch-r2.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "supersedes_invalid_attempt": {
+    "experiment": "WLM-LM-REAL-UTF8-HIERARCHICAL-PATCH-R1",
+    "disposition": "invalid-infrastructure",
+    "scientific_claim": false,
+    "primary_probe_executed": false
+  }
+}
