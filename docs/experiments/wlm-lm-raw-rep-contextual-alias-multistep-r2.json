@@ -1,0 +1,201 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-MULTISTEP-R2",
+  "program": "Wingless raw-input to invariant representation to multi-step reasoning chain",
+  "question": "Do the context-induced alias classes remain useful when unseen multi-step role programs switch raw surface families across operations, rather than only in one-step cross-family transitions?",
+  "hypothesis": "Using the exact R2 surface representation, contextual bridge, induced classes, and single-step transition training, the induced-class learner will achieve at least 0.95 accuracy on all frozen three-, five-, and seven-step programs whose operation aliases alternate across families. The exact-surface learner and shuffled-bridge learner will each remain at or below 0.25 overall accuracy.",
+  "exact_parent_sha": "bb8f3c4d6082072a9303e2b6831e51fc3b7078fd",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "allocation": "75% chain / 25% substrate falsification",
+    "slot": "chain",
+    "reason": "stress the newly supported context-induced surface invariance under multi-step composition"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-INDUCTION-R2",
+    "classification": "supported by frozen rules",
+    "github_run_id": "37066504364",
+    "observation": "Nine two-member alias classes were recovered correctly; induced same-family and cross-family accuracy were both 1.0, exact-surface cross-family accuracy was 0.03125 with 160 missing transitions, and shuffled-context control accuracy was 0.15."
+  },
+  "scope_statement": "This is a bounded compositional stress test. Passing establishes that context-induced alias abstraction survives multi-step learned-transition composition on the frozen synthetic role workload; it does not establish open-domain language reasoning.",
+  "authority": "research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "training_and_representation": {
+    "task_training": "byte-identical R2 task corpus: two complete surface families, all five operations on all sixteen value pairs, twenty repeats per family",
+    "bridge": "byte-identical R2 normal bridge and byte-identical R2 shuffled +2 controls",
+    "surface_representation": "byte-identical R2 top-eighteen raw four-byte motif selection",
+    "transition_training": "single-step only; no multi-step program is used for training"
+  },
+  "heldout_programs": {
+    "conjugated_right": "for every ordered semantic value pair and each left-swap start 0..3, evaluate swap_roles -> left_swap_start_k -> swap_roles",
+    "conjugated_right_program_count": 64,
+    "long_program_lengths": [
+      5,
+      7
+    ],
+    "long_program_generation": "for every ordered semantic value pair and four frozen seeds per length, use the established deterministic role-program generator",
+    "long_program_count": 128,
+    "total_program_count": 192,
+    "input_value_alias_family": "(left + right + program_tag) mod 2",
+    "operation_alias_family": "step_index mod 2, so every heldout program contains both operation surface families",
+    "evaluation_updates": false
+  },
+  "learners": {
+    "induced": "R2 context-induced alias classes plus R2 class transition learner; predictions are fed forward through every heldout program step",
+    "exact_surface_control": "R2 exact-surface transition learner; predicted surface value IDs are fed forward through every step",
+    "shuffled_bridge_control": "R2 frozen +2 shuffled context classes plus identical class transition learner"
+  },
+  "controls": [
+    "All three learners receive identical single-step task training observations.",
+    "No multi-step program appears in training.",
+    "Every heldout program contains both operation alias families.",
+    "Normal and shuffled alias classes are induced before heldout execution and remain frozen.",
+    "Evaluator operation semantics generate and score targets only; no prediction path calls evaluator operation code.",
+    "No tokenizer, external model, network access, capacity growth, oracle correction, or post-result tuning is permitted."
+  ],
+  "metrics_and_thresholds": [
+    [
+      "training_record_count",
+      "==",
+      3200
+    ],
+    [
+      "bridge_record_count",
+      "==",
+      576
+    ],
+    [
+      "selected_surface_representation_count",
+      "==",
+      18
+    ],
+    [
+      "induced_alias_class_count",
+      "==",
+      9
+    ],
+    [
+      "correct_evaluator_alias_pair_count",
+      "==",
+      9
+    ],
+    [
+      "heldout_program_count",
+      "==",
+      192
+    ],
+    [
+      "mixed_alias_program_count",
+      "==",
+      192
+    ],
+    [
+      "program_decode_failure_count",
+      "==",
+      0
+    ],
+    [
+      "conjugated_right_program_count",
+      "==",
+      64
+    ],
+    [
+      "induced_conjugated_right_accuracy",
+      ">=",
+      0.95
+    ],
+    [
+      "long_program_count",
+      "==",
+      128
+    ],
+    [
+      "induced_long_program_accuracy",
+      ">=",
+      0.95
+    ],
+    [
+      "induced_overall_multistep_accuracy",
+      ">=",
+      0.95
+    ],
+    [
+      "exact_surface_overall_multistep_accuracy",
+      "<=",
+      0.25
+    ],
+    [
+      "exact_surface_programs_with_missing_transition",
+      ">",
+      0
+    ],
+    [
+      "shuffled_bridge_overall_multistep_accuracy",
+      "<=",
+      0.25
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ]
+  ],
+  "validity_criteria": [
+    "Exact parent, North Star, and sealed R2 evidence identity match.",
+    "Task corpus, surface representation, normal bridge, shuffled bridge, induced classes, and single-step transition semantics are byte-identical to R2.",
+    "Exactly 192 heldout programs execute: 64 conjugated-right and 128 long programs.",
+    "No heldout program has fewer than three operations and no multi-step program enters training.",
+    "Every heldout program uses both operation surface families.",
+    "Predictions, not evaluator targets, are fed into the next step for all learners.",
+    "Semantic mapping is evaluator-only and occurs after final prediction for scoring.",
+    "All metrics are finite and full Go regression passes before the probe.",
+    "No tokenizer, external model, network call, capacity growth, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all twenty-one frozen thresholds pass.",
+    "mixed": "Validity passes and induced classes materially outperform both controls, but at least one 0.95 multi-step threshold fails.",
+    "negative": "Validity passes but induced multi-step execution does not materially outperform the exact-surface or shuffled-bridge controls.",
+    "incomplete": "Compute interruption prevents the full frozen matrix.",
+    "invalid": "Any representation, bridge, training-isolation, feed-forward, evaluator-boundary, deterministic-state, or qualification criterion fails."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific execution on parent, North Star, build, frozen-package, or R2-reuse drift.",
+    "After output begins, complete all 192 heldout programs across all three learners unless infrastructure prevents it.",
+    "Do not alter alias schedules, program lengths, bridge contexts, transition state, controls, metrics, thresholds, or classification after observing output."
+  ],
+  "no_post_result_tuning_rule": "No training corpus, representation, bridge, alias schedule, heldout program, learner, control, metric, threshold, or interpretation may change after any primary output is observed under this experiment identifier.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-raw-rep-contextual-alias-multistep-r2.json",
+    "unitary/wlm_lm_raw_rep_contextual_alias_multistep_r2.go",
+    "cmd/wlm-lm-raw-rep-contextual-alias-multistep-r2/main.go",
+    "scripts/run-wlm-lm-raw-rep-contextual-alias-multistep-r2.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "supersedes_unexecuted_prereg": {
+    "experiment": "WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-MULTISTEP-R1",
+    "disposition": "superseded-before-execution",
+    "reason": "repo-local scheduler inserted another preregistration between R1 preregistration and implementation, violating the direct two-commit qualification boundary",
+    "scientific_output_observed": false,
+    "scientific_claim": false
+  }
+}
