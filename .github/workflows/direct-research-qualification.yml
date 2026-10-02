@@ -120,7 +120,8 @@ jobs:
           $State|ConvertTo-Json -Depth 20|Set-Content -LiteralPath '.research-autonomy\state.json' -Encoding UTF8
           git config user.name 'direct-research-qualification'
           git config user.email 'direct-research-qualification@users.noreply.github.com'
-          git add -- '.research-autonomy'
+          git add -- '.research-autonomy\state.json'
+          git add -f -- $Bundle
           git commit -m ("research: record direct qualified evidence for "+$Experiment)
           if($LASTEXITCODE-ne0){throw 'EVIDENCE_COMMIT_FAILED'}
           git push origin ("HEAD:refs/heads/"+$Branch)
