@@ -1,0 +1,23 @@
+name: Nemotron tool calling probe
+on:
+  push:
+    branches:
+      - diagnostic/repo-local-cutover-r1
+    paths:
+      - 'scripts/Probe-NemotronToolCalling.ps1'
+      - '.github/workflows/probe-nemotron-tool-calling.yml'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Probe Nemotron function calling
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          ./scripts/Probe-NemotronToolCalling.ps1
