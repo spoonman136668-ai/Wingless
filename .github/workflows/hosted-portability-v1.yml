@@ -37,7 +37,7 @@ jobs:
           test -n "$sealed"
           python3 - "$sealed" /tmp/hosted-probe.json <<'PY'
           import json,sys
-          with open(sys.argv[1],encoding='utf-8') as f:
+          with open(sys.argv[1],encoding='utf-8-sig') as f:
               a=json.load(f)
           with open(sys.argv[2],encoding='utf-8') as f:
               b=json.load(f)
