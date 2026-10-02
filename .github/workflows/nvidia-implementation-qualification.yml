@@ -1,0 +1,177 @@
+name: NVIDIA Wingless implementation qualification
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'cmd/nvidiaqual/fixture.go'
+      - 'scripts/Invoke-NemotronRepoAgent.ps1'
+      - '.github/workflows/nvidia-implementation-qualification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-nvidia-implementation-qualification
+  cancel-in-progress: false
+
+jobs:
+  implementation:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 120
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+
+    steps:
+      - name: Checkout frozen qualification candidate
+        uses: actions/checkout@v4
+        with:
+          ref: research/nvidia-provider-qualification-r1
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify credential and frozen fixture
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          if([string]::IsNullOrWhiteSpace($env:NVIDIA_API_KEY)){throw 'NVIDIA_API_KEY_SECRET_MISSING'}
+          if(-not(Test-Path -LiteralPath 'cmd/nvidiaqual/fixture.go' -PathType Leaf)){throw 'WINGLESS_NVIDIA_FIXTURE_MISSING'}
+          Write-Host 'WINGLESS_NVIDIA_IMPL_PRECHECK=PASS'
+
+      - name: Run blind first-attempt implementation gate
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Root=(Resolve-Path '.').Path
+          $Base=(git rev-parse HEAD).Trim()
+          if($Base -notmatch '^[0-9a-f]{40}$'){throw 'BASE_SHA_INVALID'}
+
+          $Models=@(
+            'moonshotai/kimi-k3',
+            'z-ai/glm-5.3',
+            'poolside/laguna-xs-2.1'
+          )
+
+          foreach($Model in $Models){
+            $Safe=$Model-replace'[^A-Za-z0-9._-]','_'
+            $Worktree=Join-Path $env:RUNNER_TEMP ("wingless-nvidia-impl-"+$Safe)
+            $LocalBranch="qual/nvidia-wingless-$env:GITHUB_RUN_ID-$Safe"
+            $Prompt=Join-Path $env:RUNNER_TEMP ("wingless-nvidia-impl-prompt-"+$Safe+".txt")
+            $Last=Join-Path $env:RUNNER_TEMP ("wingless-nvidia-impl-last-"+$Safe+".txt")
+            $Started=[DateTime]::UtcNow
+
+            if(Test-Path -LiteralPath $Worktree){Remove-Item -LiteralPath $Worktree -Recurse -Force}
+            git branch -D $LocalBranch 2>$null | Out-Null
+            git worktree add -b $LocalBranch $Worktree $Base
+            if($LASTEXITCODE-ne0){throw "WORKTREE_CREATE_FAILED model=$Model"}
+
+            try{
+              @(
+                'This is a frozen blind implementation qualification.'
+                'Modify exactly one file: cmd/nvidiaqual/fixture.go.'
+                'Implement ReadyTaskOrder according to all requirements below.'
+                'Do not add or modify tests, workflows, documentation, or any other file.'
+                'Requirements:'
+                '- Reject an empty task ID with an error.'
+                '- Reject duplicate task IDs with an error.'
+                '- A dependency is valid only if its ID is another candidate task or is present as a key in completed; otherwise return an error.'
+                '- Do not return tasks whose own ID is completed=true.'
+                '- A task is ready only when every dependency has completed=true.'
+                '- Return ready IDs ordered by priority descending, then ID ascending.'
+                '- Return a fresh result and do not mutate items, dependency slices, or completed.'
+                '- An empty input returns an empty non-nil slice and nil error.'
+                'Use repository tools as needed. Commit exactly the implementation file.'
+                'When complete, call finish with status complete and summary exactly IMPLEMENTATION_QUAL_PASS.'
+              ) | Set-Content -LiteralPath $Prompt -Encoding UTF8
+
+              & "$Root\scripts\Invoke-NemotronRepoAgent.ps1" `
+                -RepoPath $Worktree `
+                -Program 'Wingless' `
+                -ActiveBranch $LocalBranch `
+                -StartSha $Base `
+                -PromptPath $Prompt `
+                -LastMessagePath $Last `
+                -Provider nvidia `
+                -Model $Model `
+                -MaxRounds 24
+
+              if(-not(Test-Path -LiteralPath $Last -PathType Leaf)){throw "IMPLEMENTATION_SUMMARY_MISSING model=$Model"}
+              $Summary=[IO.File]::ReadAllText($Last).Trim()
+              if($Summary -cne 'IMPLEMENTATION_QUAL_PASS'){throw "IMPLEMENTATION_SUMMARY_INVALID model=$Model summary=$Summary"}
+
+              $Head=(git -C $Worktree rev-parse HEAD).Trim()
+              $Count=[int](git -C $Worktree rev-list --count "$Base..$Head")
+              if($Count-ne1){throw "IMPLEMENTATION_COMMIT_COUNT_INVALID model=$Model count=$Count"}
+              $Changed=@(git -C $Worktree diff --name-only "$Base..$Head" | Where-Object{$_ -and $_.Trim()})
+              if($Changed.Count-ne1 -or [string]$Changed[0]-cne'cmd/nvidiaqual/fixture.go'){
+                throw "IMPLEMENTATION_SCOPE_INVALID model=$Model files=$($Changed -join ',')"
+              }
+
+              $Hidden=Join-Path $Worktree 'cmd\nvidiaqual\fixture_hidden_test.go'
+              @'
+package nvidiaqual
+
+import (
+	"reflect"
+	"testing"
+)
+
+func TestReadyTaskOrderHidden(t *testing.T) {
+	items := []CandidateTask{
+		{ID: "a", Priority: 1},
+		{ID: "b", Priority: 3, DependsOn: []string{"a"}},
+		{ID: "c", Priority: 3},
+		{ID: "d", Priority: 2, DependsOn: []string{"c"}},
+	}
+	before := append([]CandidateTask(nil), items...)
+	before[1].DependsOn = append([]string(nil), items[1].DependsOn...)
+	before[3].DependsOn = append([]string(nil), items[3].DependsOn...)
+	completed := map[string]bool{"a": true, "c": false}
+	got, err := ReadyTaskOrder(items, completed)
+	if err != nil { t.Fatalf("unexpected error: %v", err) }
+	want := []string{"b", "c"}
+	if !reflect.DeepEqual(got, want) { t.Fatalf("got %v want %v", got, want) }
+	if !reflect.DeepEqual(items, before) { t.Fatalf("items mutated: %#v", items) }
+	if !completed["a"] || completed["c"] { t.Fatalf("completed mutated: %#v", completed) }
+
+	completed2 := map[string]bool{"a": true, "c": true}
+	got, err = ReadyTaskOrder(items, completed2)
+	if err != nil { t.Fatalf("unexpected error 2: %v", err) }
+	want = []string{"b", "d"}
+	if !reflect.DeepEqual(got, want) { t.Fatalf("got %v want %v", got, want) }
+
+	empty, err := ReadyTaskOrder(nil, nil)
+	if err != nil || empty == nil || len(empty) != 0 { t.Fatalf("empty contract got=%v err=%v", empty, err) }
+
+	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"", Priority:1}}, nil); err == nil { t.Fatal("expected empty-id error") }
+	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"x"}, {ID:"x"}}, nil); err == nil { t.Fatal("expected duplicate-id error") }
+	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"x", DependsOn:[]string{"missing"}}}, nil); err == nil { t.Fatal("expected unknown-dependency error") }
+	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"x", DependsOn:[]string{"external"}}}, map[string]bool{"external":false}); err != nil {
+		t.Fatalf("known incomplete external dependency should not error: %v", err)
+	}
+}
+'@ | Set-Content -LiteralPath $Hidden -Encoding UTF8
+
+              Push-Location $Worktree
+              try{
+                go test ./cmd/nvidiaqual
+                if($LASTEXITCODE-ne0){throw "IMPLEMENTATION_HIDDEN_TEST_FAILED model=$Model"}
+              }finally{Pop-Location}
+
+              Remove-Item -LiteralPath $Hidden -Force
+              if((git -C $Worktree status --porcelain)-join''){throw "IMPLEMENTATION_WORKTREE_DIRTY model=$Model"}
+
+              $Seconds=[Math]::Round(([DateTime]::UtcNow-$Started).TotalSeconds,1)
+              Write-Host "NVIDIA_IMPLEMENTATION_QUALIFIED program=Wingless model=$Model seconds=$Seconds head=$Head"
+            }
+            finally{
+              if(Test-Path -LiteralPath $Worktree){
+                git worktree remove --force $Worktree 2>$null | Out-Null
+              }
+              git branch -D $LocalBranch 2>$null | Out-Null
+            }
+          }
+
+          Write-Host 'NVIDIA_WINGLESS_IMPLEMENTATION_QUALIFICATION=PASS'
