@@ -1,0 +1,114 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-MAINTENANCE-FAILURE-ATTRIBUTION-R1",
+  "program": "Wingless-Yggdrasil real-workload maintenance bridge",
+  "question": "Why did the frozen real UTF-8 maintenance policy fail: because raw error-bucket monitoring confuses deletion-induced errors with pre-existing natural prediction errors, because correct-repair validation gain is unstable across held-out quarters, or both?",
+  "exact_parent_sha": "4a5c0402068f26f0bdd7c721a5faa4ac4a7b484e",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_negative": {
+    "experiment": "WLM-YGG-REAL-UTF8-LEVEL1-MAINTENANCE-R3",
+    "classification_commit_sha": "4a5c0402068f26f0bdd7c721a5faa4ac4a7b484e",
+    "qualification_run_id": "37008099569",
+    "classification": "negative"
+  },
+  "authority": "research-only diagnostic attribution; no intervention, repair, threshold update, deployment, or runtime authority",
+  "changed_paths": [
+    "docs/experiments/wlm-ygg-real-utf8-maintenance-failure-attribution-r1.json",
+    "unitary/wlm_ygg_real_utf8_maintenance_failure_attribution_r1.go",
+    "cmd/wlm-ygg-real-utf8-maintenance-failure-attribution-r1/main.go",
+    "scripts/run-wlm-ygg-real-utf8-maintenance-failure-attribution-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "frozen_reuse": {
+    "corpus": "exact real UTF-8 pilot train/eval Git blobs",
+    "canonical_model": "exact supported 256-motif WLM-LM-REAL-UTF8-BYTE-PILOT-R2 model",
+    "target_schedule": "exact attribution-selected Tier 1 rule from WLM-YGG-REAL-UTF8-MAINTENANCE-SUPPORT-ATTRIBUTION-R1; first two eligible targets in each file",
+    "quarter_split": "exact calibration/diagnostic/validation/audit quarters from R3",
+    "degradation": "delete the scheduled motif record only"
+  },
+  "attribution": {
+    "raw_monitor": "On the diagnostic quarter, count all prediction errors by retained-catalog four-byte key under the degraded model exactly as R3 did; record target rank and target/runner-up ratio.",
+    "canonical_background": "Run the intact canonical model on the same diagnostic quarter and count its naturally occurring errors by the same key.",
+    "excess_error_monitor": "For every catalog key compute max(0,degraded_error_count-canonical_error_count); rank by excess count with lexicographic tie. This is evaluator-only diagnostic attribution and is not an authorized replacement policy.",
+    "validation_stability": "On the independent validation quarter, compare selected-target top-1 accuracy and global BPB between deleted state and exact canonical restoration. No retain decision is made.",
+    "no_intervention": "Each attribution cycle starts from canonical state, applies one deletion, measures, and discards state. There is no candidate installation, retain/revert, or sequential carryover."
+  },
+  "metrics_and_thresholds": [
+    [
+      "valid_evaluation_file_count",
+      "==",
+      2
+    ],
+    [
+      "completed_target_count",
+      "==",
+      4
+    ],
+    [
+      "minimum_target_eligibility_count_per_file",
+      ">=",
+      3
+    ],
+    [
+      "minimum_validation_target_occurrence_count",
+      ">=",
+      3
+    ],
+    [
+      "training_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "evaluation_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_attribution_rows",
+      "==",
+      0
+    ]
+  ],
+  "diagnostic_metrics": [
+    "raw_monitor_top1_target_count",
+    "excess_error_monitor_top1_target_count",
+    "maximum_raw_target_rank",
+    "minimum_raw_target_to_runner_up_ratio",
+    "maximum_excess_target_rank",
+    "minimum_excess_target_to_runner_up_ratio",
+    "minimum_correct_restoration_selected_key_accuracy_gain",
+    "maximum_correct_restoration_selected_key_accuracy_gain",
+    "correct_restoration_gain_ge_0_20_count",
+    "maximum_correct_restoration_global_bpb_change"
+  ],
+  "attribution_classification_rules": {
+    "background_error_confusion": "raw_monitor_top1_target_count < 4 AND excess_error_monitor_top1_target_count == 4",
+    "validation_instability": "correct_restoration_gain_ge_0_20_count < 4",
+    "dual_bottleneck": "both background_error_confusion and validation_instability are true",
+    "monitor_only": "background_error_confusion true and validation_instability false",
+    "validation_only": "background_error_confusion false and validation_instability true",
+    "unresolved": "neither attribution condition explains the R3 failures",
+    "invalid": "identity, target reconstruction, quarter isolation, completion, or deterministic attribution fails"
+  },
+  "validity_criteria": [
+    "Exact parent, prior negative evidence, canonical model, Tier 1 targets, corpus identities, and quarter boundaries match R3.",
+    "Every deletion is analyzed independently from canonical state; no sequential carryover.",
+    "Canonical background errors are evaluator-only diagnostics and are never used to repair or retain anything.",
+    "Validation compares exact deleted versus exact canonical-restored state only; no candidate policy executes.",
+    "No tokenizer, capacity growth, lesion label access by a policy, intervention, or post-result threshold change occurs.",
+    "Full Go regression passes and normalized result carries exact experiment identity."
+  ],
+  "no_post_result_tuning_rule": "Do not change targets, corpus, quarter split, raw-error definition, background subtraction, ranking, validation comparison, metrics, or attribution classification after observing output."
+}
