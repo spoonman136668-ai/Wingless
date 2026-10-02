@@ -1,0 +1,101 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R5",
+  "question":"Can a completely unseen third raw surface family acquire only a context-derived representation and then use transition knowledge learned from two other surface families without any task-transition examples of its own, after removing a benchmark construction alias between true motifs and fixed boundary windows?",
+  "hypothesis":"With 32 distinct family-independent raw context keys per latent entity, each of the twenty-seven true surface motifs will occur exactly 32 times while every non-true four-byte bridge window occurs at most 4 times. The top-27 raw selector will therefore recover all twenty-seven motifs, context signatures will induce exactly nine correct three-member alias classes, and a class-transition learner trained only on families 0 and 1 will achieve at least 0.95 accuracy on all eighty family-2 tasks. Exact-surface will have all eighty keys missing and at most 0.25 accuracy; the frozen shuffled-family2 bridge will remain at or below 0.25.",
+  "exact_parent_sha":"6827cc878f65753773c88a8c33eed7c85e5efa57",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "supersedes_invalid_before_execution_or_claim":[
+    {
+      "experiment":"WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R4",
+      "qualification_run_id":"37067708593",
+      "disposition":"invalid-benchmark-construction",
+      "reason":"fixed post-motif context caused motif-suffix overlapping four-byte windows to tie true motifs at 32 occurrences, so the frozen top-27 selector admitted boundary artifacts and decode validity failed before a scientific claim",
+      "scientific_claim":false
+    }
+  ],
+  "repair_boundary":{
+    "changed":"bridge immediate-context construction only",
+    "unchanged":"surface families, family-2 zero-task-training rule, representation width, top-27 selector, context-signature equality induction, task corpus, class transition learner, exact-surface control, shuffled semantic rotation, evaluation set, scientific accuracy thresholds",
+    "reason":"remove a deterministic benchmark encoding collision rather than increase capacity, alter selection, or weaken thresholds"
+  },
+  "portfolio_context":{"allocation":"75% chain / 25% substrate falsification","slot":"chain"},
+  "authority":"research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "bridge":{
+    "family_count":3,
+    "entity_count":9,
+    "contexts_per_entity":32,
+    "record_count":864,
+    "motif_occurrences_per_surface":32,
+    "context_indices":"context_index 0..3 and repeat 0..7",
+    "normal_assigned_entity":"semantic entity for all three families",
+    "prefix_byte_0":"192 + ((assigned_entity*7 + context_index*3 + repeat) mod 16)",
+    "prefix_byte_1":"208 + ((assigned_entity*5 + context_index + 2*repeat) mod 16)",
+    "suffix_byte_0":"224 + ((assigned_entity*11 + 2*context_index + repeat) mod 16)",
+    "suffix_byte_1":"240 + ((assigned_entity*13 + context_index + 3*repeat) mod 16)",
+    "family_visibility_to_clustering":false,
+    "semantic_visibility_to_clustering":false,
+    "signature":"complete sorted map of exact four-byte immediate context key -> occurrence count",
+    "shuffled_family2_assignment":"value semantic +3 mod 4; operation semantic +1 mod 5"
+  },
+  "scientific_core":{
+    "surface_representation_capacity":27,
+    "surface_selection":"top twenty-seven four-byte windows by occurrence count descending, then lexicographic raw key",
+    "task_training":"families 0 and 1 only; all five operations x sixteen value pairs x twenty repeats per family",
+    "family2_task_training_records":0,
+    "class_transition":"induced operation class plus ordered induced value-class pair -> observed induced output-class pair counts",
+    "evaluation":"all eighty family-2 single-step tasks, read-only"
+  },
+  "metrics_and_thresholds":[
+    ["bridge_record_count","==",864],
+    ["minimum_true_surface_motif_occurrence_count","==",32],
+    ["maximum_nontrue_bridge_window_occurrence_count","<=",4],
+    ["selected_surface_representation_count","==",27],
+    ["selected_true_surface_motif_match_count","==",27],
+    ["bridge_decode_failure_count","==",0],
+    ["induced_alias_class_count","==",9],
+    ["induced_three_member_class_count","==",9],
+    ["correct_evaluator_alias_triplet_count","==",9],
+    ["task_training_record_count","==",3200],
+    ["family2_task_training_record_count","==",0],
+    ["task_training_decode_failure_count","==",0],
+    ["class_transition_key_count","==",80],
+    ["unseen_family_evaluation_count","==",80],
+    ["unseen_family_accuracy",">=",0.95],
+    ["exact_surface_unseen_family_accuracy","<=",0.25],
+    ["exact_surface_unseen_missing_transition_count","==",80],
+    ["shuffled_family2_alias_class_count","==",9],
+    ["shuffled_family2_unseen_accuracy","<=",0.25],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "validity_criteria":[
+    "Exact parent and North Star identities match.",
+    "The twenty-seven evaluator-defined true motif identities are used only for construction diagnostics and post-selection scoring, never to seed or filter the selector.",
+    "All thirty-two immediate context keys per assigned entity are distinct and are family-independent.",
+    "Normal clustering receives only observed raw context signatures and no family, semantic, or alias mapping.",
+    "Family 2 has zero task-transition training records.",
+    "Exact-surface and shuffled controls remain unchanged except that shuffled family2 uses the repaired context-key generator with the same frozen semantic rotations.",
+    "Full Go regression passes before probe execution and all metrics are finite.",
+    "No tokenizer, external model, network call, capacity growth, selector-capacity increase, threshold weakening, or adaptive evaluation occurs."
+  ],
+  "classification_rules":{
+    "supported":"All validity criteria and all frozen thresholds pass.",
+    "mixed":"Validity passes and unseen-family accuracy materially exceeds both controls, but at least one 0.95 transfer or representation-recovery threshold fails.",
+    "negative":"Validity passes but unseen-family transfer does not materially outperform exact-surface.",
+    "incomplete":"Compute interruption prevents the frozen matrix.",
+    "invalid":"Any construction separation, bridge decoding, family-2 isolation, evaluator-boundary, deterministic-state, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule":"No bridge formula, surface family, selector, capacity, learner, control, metric, threshold, or interpretation may change after primary output.",
+  "changed_paths":[
+    "docs/experiments/wlm-lm-raw-rep-zeroshot-alias-family-r5.json",
+    "unitary/wlm_lm_raw_rep_zeroshot_alias_family_r5.go",
+    "cmd/wlm-lm-raw-rep-zeroshot-alias-family-r5/main.go",
+    "scripts/run-wlm-lm-raw-rep-zeroshot-alias-family-r5.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
