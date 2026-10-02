@@ -1,0 +1,125 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-HETEROGENEOUS-FAILURE-ATTRIBUTION-R1",
+  "question": "Is the heterogeneous real-byte maintenance R1 negative caused by calibrated-monitor target-ranking confusion rather than by inadequate canonical repair or validation semantics?",
+  "hypothesis": "Across the exact frozen two fresh blobs, four degradation classes, target schedule, and eight cycles from heterogeneous maintenance R1, every true target's exact canonical restoration will improve validation selected-key accuracy by at least 0.20 and restore exact canonical audit behavior, while one or more cycles will rank a non-target key above the true damaged key under the unchanged calibrated excess-error score. If so, classify the R1 failure as monitor-only; otherwise identify repair/validation or interaction failure.",
+  "exact_parent_sha": "7dd4e0e29806e7f3c7ba0de250754dc0e3e9326a",
+  "prior_evidence": {
+    "experiment": "WLM-YGG-REAL-UTF8-HETEROGENEOUS-MAINTENANCE-R1",
+    "qualification_run_id": "37010222809",
+    "classification": "negative"
+  },
+  "authority": "diagnostic research-only; no monitor, threshold, target schedule, corpus, degradation, repair, validation, or capacity changes",
+  "changed_paths": [
+    "docs/experiments/wlm-ygg-real-utf8-heterogeneous-failure-attribution-r1.json",
+    "unitary/wlm_ygg_real_utf8_heterogeneous_failure_attribution_r1.go",
+    "cmd/wlm-ygg-real-utf8-heterogeneous-failure-attribution-r1/main.go",
+    "scripts/run-wlm-ygg-real-utf8-heterogeneous-failure-attribution-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "frozen_reuse": [
+    "exact R1 training blobs",
+    "exact R1 fresh evaluation blobs",
+    "exact quarter segmentation",
+    "exact class order and target schedule",
+    "exact four degradation constructors",
+    "exact calibrated background and diagnostic score",
+    "exact 0.20 selected-key gain and 0.005 BPB retain thresholds",
+    "exact canonical 256-motif model"
+  ],
+  "diagnostic_outputs": [
+    "true-target calibrated score and rank for every cycle",
+    "policy-selected key and whether it equals true target",
+    "selected-minus-target score margin when misselected",
+    "exact true-target canonical repair selected-key validation gain",
+    "exact true-target canonical repair global BPB delta",
+    "counterfactual exact-target audit prediction/probability mismatch",
+    "per-class top1 target count and maximum target rank",
+    "per-class exact-target repair-pass count"
+  ],
+  "metrics_and_thresholds": [
+    [
+      "valid_evaluation_file_count",
+      "==",
+      2
+    ],
+    [
+      "completed_target_count",
+      "==",
+      8
+    ],
+    [
+      "minimum_target_eligibility_count_per_file",
+      ">=",
+      4
+    ],
+    [
+      "minimum_exact_target_repair_accuracy_gain",
+      ">=",
+      0.2
+    ],
+    [
+      "maximum_exact_target_repair_global_bpb_change",
+      "<=",
+      0.005
+    ],
+    [
+      "exact_target_repair_retain_count",
+      "==",
+      8
+    ],
+    [
+      "maximum_counterfactual_audit_prediction_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "maximum_counterfactual_audit_probability_abs_delta",
+      "==",
+      0
+    ],
+    [
+      "minimum_per_class_target_count",
+      "==",
+      2
+    ],
+    [
+      "invalid_attribution_rows",
+      "==",
+      0
+    ],
+    [
+      "training_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "evaluation_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "fresh_eval_blob_overlap_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ]
+  ],
+  "attribution_classification": {
+    "monitor_only": "All exact-target repair/audit thresholds pass and calibrated monitor top1 target count is <8.",
+    "repair_or_validation": "At least one exact-target repair fails the unchanged retain rule or exact audit restoration.",
+    "mixed": "Both monitor misranking and exact-target repair/validation failure occur.",
+    "no_failure_reproduced": "All eight true targets rank top1 and all exact repairs pass, contradicting R1 failure.",
+    "invalid": "Any frozen identity, schedule, degradation, score, or diagnostic construction drifts."
+  },
+  "no_post_result_tuning_rule": "No scientific or diagnostic design field may change after any attribution output is observed."
+}
