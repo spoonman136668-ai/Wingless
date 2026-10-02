@@ -1,0 +1,91 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-SI-CONTEXT-COUNT-JITTER-FALSIFICATION-R1",
+  "program":"Wingless substrate falsification",
+  "question":"Does the current context-signature alias substrate preserve abstraction when alias pairs have identical raw context support but slightly different context frequencies?",
+  "hypothesis":"The existing exact-equality context-signature inducer will pass the unchanged exact-context positive control, but a bounded 9/7/8/8 versus 8/8/8/8 frequency jitter across the same four context keys will split all nine semantic alias pairs into eighteen singleton classes. If so, count-jitter robustness is falsified even though every true alias pair retains context-support Jaccard 1.0 and total-variation distance only 0.03125.",
+  "exact_parent_sha":"b1dc138cc2ef366653d268e0139805cd6ab09ee5",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch":"research/wingless-up-manual-chain-r1",
+  "portfolio_context":{"allocation":"75% chain / 25% substrate falsification","slot":"substrate falsification"},
+  "prior_evidence":{
+    "experiment":"WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-MULTISTEP-R5",
+    "github_run_id":"37069178573",
+    "observation":"Context-induced aliases achieved 1.0 accuracy across all 192 unseen mixed-alias multi-step programs; exact-surface scored 0.026041666666666668 and shuffled-context 0.14583333333333334."
+  },
+  "scope_statement":"This falsifies only robustness of exact context-count signature equality to small frequency drift. It does not invalidate the prior exact-context abstraction or reasoning results.",
+  "authority":"research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "surface_representation":{
+    "task_records":"byte-identical two-family R2 task corpus",
+    "selection":"top eighteen raw four-byte windows by occurrence count descending then lexicographic key",
+    "capacity":18
+  },
+  "positive_control":{
+    "bridge":"byte-identical R2 normal bridge",
+    "per_alias_context_counts":[8,8,8,8],
+    "expected_record_count":576
+  },
+  "jitter_bridge":{
+    "family0_context_counts":[8,8,8,8],
+    "family1_context_counts":[9,7,8,8],
+    "context_keys":"identical four raw immediate-context keys to the positive control for each semantic entity",
+    "total_observations_per_alias":32,
+    "expected_record_count":576,
+    "expected_support_jaccard":1.0,
+    "expected_total_variation_distance":0.03125
+  },
+  "induction":{
+    "signature":"complete sorted exact context-key -> count map",
+    "merge_rule":"byte-identical signature only",
+    "family_labels_visible":false,
+    "semantic_labels_visible":false,
+    "capacity_growth":false
+  },
+  "metrics_and_thresholds":[
+    ["task_training_record_count","==",3200],
+    ["selected_surface_representation_count","==",18],
+    ["selected_true_surface_motif_match_count","==",18],
+    ["normal_bridge_record_count","==",576],
+    ["normal_bridge_decode_failure_count","==",0],
+    ["normal_induced_alias_class_count","==",9],
+    ["normal_two_member_class_count","==",9],
+    ["normal_correct_evaluator_alias_pair_count","==",9],
+    ["jitter_bridge_record_count","==",576],
+    ["jitter_bridge_decode_failure_count","==",0],
+    ["minimum_alias_pair_context_support_jaccard","==",1.0],
+    ["maximum_alias_pair_total_variation_distance","==",0.03125],
+    ["jitter_induced_alias_class_count","==",18],
+    ["jitter_two_member_class_count","==",0],
+    ["jitter_correct_evaluator_alias_pair_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["invalid_row_count","==",0]
+  ],
+  "validity_criteria":[
+    "Exact parent and North Star identities match.",
+    "Surface representations are selected from the unchanged task corpus before either bridge is evaluated.",
+    "Positive-control and jitter bridges use identical context-key identities for each semantic entity; only family-1 frequencies differ.",
+    "Every jitter alias still has exactly 32 bridge observations.",
+    "Support Jaccard and total-variation metrics are computed from observed raw bridge context counts, not construction labels.",
+    "Semantic/family mappings are evaluator-only after induction for pair diagnostics.",
+    "Full Go regression passes before the probe and all metrics are finite.",
+    "No tokenizer, external model, network call, alias dictionary, capacity growth, adaptive clustering, or post-result tuning occurs."
+  ],
+  "classification_rules":{
+    "survives_falsification":"Validity passes, normal control passes, and jitter_correct_evaluator_alias_pair_count remains 9 with nine two-member classes.",
+    "count_jitter_robustness_falsified":"Validity passes, normal control passes, support Jaccard is 1.0, total variation is 0.03125, and jitter_correct_evaluator_alias_pair_count is 0 with eighteen classes.",
+    "mixed":"Validity passes but jitter behavior falls between those criteria.",
+    "incomplete":"Compute interruption prevents both frozen bridge evaluations.",
+    "invalid":"Any context-support identity, observation cardinality, evaluator boundary, representation, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule":"No bridge frequency, context key, representation rule, signature rule, metric, threshold, or interpretation may change after primary output.",
+  "changed_paths":[
+    "docs/experiments/wlm-si-context-count-jitter-falsification-r1.json",
+    "unitary/wlm_si_context_count_jitter_falsification_r1.go",
+    "cmd/wlm-si-context-count-jitter-falsification-r1/main.go",
+    "scripts/run-wlm-si-context-count-jitter-falsification-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
