@@ -1,0 +1,77 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "status": "frozen-prereg-only",
+  "experiment": "WLM-SI-WINDOW-COUNTER-R1",
+  "question": "For integer-tick event streams and a fixed 16-tick exact window, do an explicit event deque and a 16-bucket circular counter preserve exact window totals, expirations, admissions, and conservation laws?",
+  "hypothesis": "At every frozen step the two substrates emit exactly identical window totals, expired counts, accepted counts, residual state, and cumulative conservation observables.",
+  "exact_parent_sha": "caaeca20548eec9836bdb90be9f95aa4cb883f90",
+  "north_star_sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
+  "prior_evidence": [
+    {
+      "experiment": "WLM-SI-ACCUMULATOR-R1",
+      "run_id": 36983116846
+    },
+    {
+      "experiment": "WLM-SI-DEQUE-CONTAINER-R2",
+      "run_id": 36956441599
+    }
+  ],
+  "changed_dimension": "exact sliding-window substrate only: explicit event deque versus unit-tick circular buckets",
+  "fixed_matrix": {
+    "window_ticks": 16,
+    "max_events_per_tick": 8,
+    "seeds": [
+      2311,
+      2339,
+      2371,
+      2393,
+      2411,
+      2441,
+      2473,
+      2503
+    ],
+    "schedule_families": [
+      "steady",
+      "burst",
+      "alternating",
+      "lcg32"
+    ],
+    "initial_window_totals": [
+      0,
+      16,
+      32,
+      48
+    ],
+    "admission_budgets": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "steps": 64
+  },
+  "thresholds": {
+    "paired_case_count": 512,
+    "completed_substrate_case_runs": 1024,
+    "total_emitted_rows": 65536,
+    "paired_observable_mismatch_cases": 0,
+    "row_count_mismatch_cases": 0,
+    "state_cardinality_mismatch_cases": 0,
+    "invalid_operation_schedules": 0,
+    "budget_overrun_rows": 0,
+    "law_violation_cases": 0,
+    "max_conservation_error": 0,
+    "max_residual_law_error": 0
+  },
+  "authority": "research-only",
+  "no_post_result_tuning": true,
+  "changed_paths": [
+    "docs/experiments/wlm-si-window-counter-r1.json",
+    "unitary/wlm_si_window_counter_r1.go",
+    "cmd/wlm-si-window-counter-r1/main.go",
+    "scripts/run-wlm-si-window-counter-r1.ps1",
+    ".wingless/qualification-request.json",
+    ".github/workflows/direct-research-qualification.yml"
+  ],
+  "supersedes_unexecuted_prereg_branch": "research/direct-wingless-window-r1"
+}
