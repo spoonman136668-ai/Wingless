@@ -1,0 +1,85 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-MULTISTEP-R4",
+  "question":"Do context-induced alias classes remain useful when unseen multi-step role programs switch raw surface families across operations, rather than only in one-step cross-family transitions?",
+  "hypothesis":"Using the unchanged previously frozen multistep scientific function with single-step transition training only, the induced-class learner will achieve at least 0.95 accuracy on all 192 frozen three-, five-, and seven-step mixed-alias programs. Exact-surface and shuffled-bridge controls will each remain at or below 0.25 overall accuracy.",
+  "exact_parent_sha":"9522b9e70df0852d42d05478c96843c4e72b5b0d",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "supersedes_invalid_before_execution":[
+    {
+      "experiment":"WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-MULTISTEP-R2",
+      "qualification_run_id":"37067304661",
+      "reason":"frozen-package validation failed before science",
+      "scientific_output_observed":false
+    },
+    {
+      "experiment":"WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-MULTISTEP-R3",
+      "qualification_run_id":"37068567497",
+      "reason":"an unrelated preregistration landed between the frozen parent and R3 preregistration, making the baseline-to-head delta three commits; deterministic science was skipped",
+      "scientific_output_observed":false
+    }
+  ],
+  "scientific_reuse":{
+    "function":"RunWlmLmRawRepContextualAliasMultistepR2",
+    "scientific_change":false,
+    "allowed_difference":"R4 result identifier and qualification wrapper only",
+    "forbidden":"changes to task corpus, representation, bridge, program schedule, transition learner, controls, metrics, thresholds, or prediction"
+  },
+  "portfolio_context":{"allocation":"75% chain / 25% substrate falsification","slot":"chain"},
+  "prior_qualified_evidence":{
+    "experiment":"WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R5",
+    "github_run_id":"37068206954",
+    "observation":"An unseen third surface family with zero task-transition examples achieved 1.0 task accuracy; exact-surface scored 0.0625 and shuffled-context scored 0.05."
+  },
+  "authority":"research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "frozen_design_reference":"docs/experiments/wlm-lm-raw-rep-contextual-alias-multistep-r2.json",
+  "metrics_and_thresholds":[
+    ["training_record_count","==",3200],
+    ["bridge_record_count","==",576],
+    ["selected_surface_representation_count","==",18],
+    ["induced_alias_class_count","==",9],
+    ["correct_evaluator_alias_pair_count","==",9],
+    ["heldout_program_count","==",192],
+    ["mixed_alias_program_count","==",192],
+    ["program_decode_failure_count","==",0],
+    ["conjugated_right_program_count","==",64],
+    ["induced_conjugated_right_accuracy",">=",0.95],
+    ["long_program_count","==",128],
+    ["induced_long_program_accuracy",">=",0.95],
+    ["induced_overall_multistep_accuracy",">=",0.95],
+    ["exact_surface_overall_multistep_accuracy","<=",0.25],
+    ["exact_surface_programs_with_missing_transition",">",0],
+    ["shuffled_bridge_overall_multistep_accuracy","<=",0.25],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "validity_criteria":[
+    "Exact parent and North Star identities match.",
+    "R4 delegates to the unchanged R2 scientific function and changes only result identity/qualification wrapper.",
+    "No multi-step program appears in training.",
+    "All 192 heldout programs contain both operation surface families and predictions are fed forward through every step.",
+    "Normal and shuffled alias classes are frozen before heldout execution.",
+    "Evaluator operation semantics generate and score targets only; prediction never calls evaluator semantics.",
+    "Full Go regression passes before probe execution and all metrics are finite.",
+    "No tokenizer, external model, network call, capacity growth, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules":{
+    "supported":"All validity criteria and all frozen thresholds pass.",
+    "mixed":"Validity passes and induced classes materially outperform both controls, but at least one 0.95 multi-step threshold fails.",
+    "negative":"Validity passes but induced multi-step execution does not materially outperform the exact-surface or shuffled-bridge controls.",
+    "incomplete":"Compute interruption prevents the full matrix.",
+    "invalid":"Any scientific-function drift, training-isolation, feed-forward, evaluator-boundary, deterministic-state, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule":"No training corpus, representation, bridge, alias schedule, heldout program, learner, control, metric, threshold, or interpretation may change after primary output.",
+  "changed_paths":[
+    "docs/experiments/wlm-lm-raw-rep-contextual-alias-multistep-r4.json",
+    "unitary/wlm_lm_raw_rep_contextual_alias_multistep_r4.go",
+    "cmd/wlm-lm-raw-rep-contextual-alias-multistep-r4/main.go",
+    "scripts/run-wlm-lm-raw-rep-contextual-alias-multistep-r4.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
