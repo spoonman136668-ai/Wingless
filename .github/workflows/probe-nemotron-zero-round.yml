@@ -1,0 +1,24 @@
+name: Nemotron zero round init probe
+on:
+  push:
+    branches:
+      - autonomy/repo-local-research-r1
+    paths:
+      - 'scripts/Probe-NemotronZeroRound.ps1'
+      - '.github/workflows/probe-nemotron-zero-round.yml'
+      - 'scripts/Invoke-NemotronRepoAgent.ps1'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Run zero-round initialization probe
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          ./scripts/Probe-NemotronZeroRound.ps1
