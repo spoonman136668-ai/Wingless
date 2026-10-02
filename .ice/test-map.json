@@ -491,6 +491,563 @@
     ]
   },
   {
+    "name": "TestTranslateValidPlaneBinding",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 45,
+    "end": 60,
+    "calls": [
+      "Translate",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateTrustedRoutingAndResources",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 62,
+    "end": 82,
+    "calls": [
+      "Translate",
+      "len",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsStaleWorkspaceRevision",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 84,
+    "end": 90,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "strings.Repeat",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsWorkspaceIdentityMismatch",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 92,
+    "end": 98,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsMissingPlaneProtectionGate",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 100,
+    "end": 106,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsUntrustedBackendPolicy",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 108,
+    "end": 114,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestDecodeReplayEnvelopeRejectsUnknownField",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 116,
+    "end": 126,
+    "calls": [
+      "DecodeReplayEnvelope",
+      "json.Marshal",
+      "string",
+      "strings.TrimSuffix",
+      "t.Fatal",
+      "t.Fatal",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestCancelMapsPlaneAttemptToWinglessRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 138,
+    "end": 146,
+    "calls": [
+      "Cancel",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCandidateNeverClaimsPlaneAcceptance",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 148,
+    "end": 166,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCandidatePreservesBlockedBackendOutcomeWithoutAcceptance",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 168,
+    "end": 177,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCandidateRejectsAcceptanceClaim",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 179,
+    "end": 184,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestCandidateRejectsUnknownTerminalState",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 186,
+    "end": 191,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerAcceptsExactPlaneRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 102,
+    "end": 126,
+    "calls": [
+      "NewListener",
+      "atomic.AddInt32",
+      "atomic.LoadInt32",
+      "json.Unmarshal",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "requestRecorder",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "w.Header",
+      "w.Header"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerRejectsSessionMethodPathAndContentType",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 128,
+    "end": 151,
+    "calls": [
+      "NewListener",
+      "bytes.NewReader",
+      "httptest.NewRecorder",
+      "httptest.NewRequest",
+      "json.Marshal",
+      "listener.ServeHTTP",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "strings.Repeat",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerRejectsUnknownDuplicateAndTrailingJSON",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 153,
+    "end": 172,
+    "calls": [
+      "NewListener",
+      "append",
+      "append",
+      "bytes.NewReader",
+      "httptest.NewRecorder",
+      "httptest.NewRequest",
+      "json.Marshal",
+      "listener.ServeHTTP",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "string",
+      "string",
+      "strings.Replace",
+      "strings.Replace",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerConsumesAndClosesBodyBeforeInference",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 190,
+    "end": 210,
+    "calls": [
+      "NewListener",
+      "httptest.NewRecorder",
+      "httptest.NewRequest",
+      "int64",
+      "json.Marshal",
+      "len",
+      "listener.ServeHTTP",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "newTrackingBody",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerCancellationParentsInferenceToRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 212,
+    "end": 249,
+    "calls": [
+      "NewListener",
+      "bytes.NewReader",
+      "cancel",
+      "close",
+      "close",
+      "context.Background",
+      "context.WithCancel",
+      "ctx.Done",
+      "ctx.Err",
+      "http.NewRequestWithContext",
+      "httptest.NewServer",
+      "json.Marshal",
+      "listener.Handler",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "make",
+      "make",
+      "make",
+      "server.Close",
+      "t.Fatal",
+      "t.Fatal",
+      "time.After",
+      "time.After"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerRejectsAcceptanceClaimAndIdentityChange",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 251,
+    "end": 268,
+    "calls": [
+      "NewListener",
+      "bad.EditsCopy",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "mutate",
+      "requestRecorder",
+      "strings.Repeat",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerCallsIntelligenceExactlyOnce",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 280,
+    "end": 292,
+    "calls": [
+      "NewListener",
+      "atomic.AddInt32",
+      "atomic.LoadInt32",
+      "errors.New",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "requestRecorder",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerNoProcessListenQueueOrAcceptanceSurface",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 294,
+    "end": 315,
+    "calls": [
+      "filepath.Dir",
+      "filepath.Join",
+      "os.ReadFile",
+      "reflect.TypeOf",
+      "runtime.Caller",
+      "string",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "typ.MethodByName"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerFullRequestResponseReplayThroughBroker",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 377,
+    "end": 414,
+    "calls": [
+      "NewListener",
+      "bytes.NewReader",
+      "http.NewRequest",
+      "httptest.NewServer",
+      "io.ReadAll",
+      "json.Marshal",
+      "json.Unmarshal",
+      "len",
+      "listener.Handler",
+      "listenerFixture",
+      "reg.Register",
+      "server.Close",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerIsolatedProof",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 416,
+    "end": 424,
+    "calls": [
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofCandidateFlow",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 96,
+    "end": 124,
+    "calls": [
+      "CandidateFromOutcome",
+      "Translate",
+      "context.Background",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "runner.Run",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofAuthorizedDeepFallback",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 126,
+    "end": 155,
+    "calls": [
+      "Translate",
+      "context.Background",
+      "len",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "runner.Run",
+      "strings.Contains",
+      "strings.Join",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofBackendFailureNoDuplicateRetry",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 157,
+    "end": 184,
+    "calls": [
+      "CandidateFromOutcome",
+      "Translate",
+      "context.Background",
+      "errors.New",
+      "len",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "runner.Run",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofCancellationPropagation",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 186,
+    "end": 234,
+    "calls": [
+      "Cancel",
+      "Translate",
+      "context.Background",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "svc.Result",
+      "svc.Status",
+      "svc.SubmitWork",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "time.Now",
+      "time.Now",
+      "time.Sleep",
+      "worker.New"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceReadyContract",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 78,
+    "end": 99,
+    "calls": [
+      "bytes.NewReader",
+      "http.NewRequest",
+      "json.Marshal",
+      "startServiceFixture",
+      "stopServiceFixture",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceNumericIPv4Only",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 101,
+    "end": 113,
+    "calls": [
+      "ip.IsLoopback",
+      "ip.To4",
+      "net.ParseIP",
+      "startServiceFixture",
+      "stopServiceFixture",
+      "t.Fatal",
+      "t.Fatalf",
+      "u.Hostname",
+      "u.Port",
+      "url.Parse"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceCancellationStopsListener",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 115,
+    "end": 127,
+    "calls": [
+      "conn.Close",
+      "net.DialTimeout",
+      "startServiceFixture",
+      "stopServiceFixture",
+      "t.Fatal",
+      "t.Fatal",
+      "url.Parse"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceNoDefaultActivationSurface",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 129,
+    "end": 146,
+    "calls": [
+      "filepath.Clean",
+      "filepath.Dir",
+      "filepath.Join",
+      "filepath.Join",
+      "os.ReadFile",
+      "runtime.Caller",
+      "string",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
     "name": "TestMain",
     "kind": "function",
     "file": "modelhost/process_test.go",
