@@ -1,0 +1,13 @@
+{
+  "schema": "wingless.research-invalid-attempt.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-LEVEL1-MAINTENANCE-R2",
+  "qualification_run_id": "37007806811",
+  "qualified_head_sha": "ba9aebc861c2bb143ccdddc05bbbaa5c9ad11109",
+  "disposition": "invalid-implementation-contract-mismatch",
+  "scientific_claim": false,
+  "primary_probe_executed": true,
+  "scientific_result_interpreted": false,
+  "reason": "R2 correctly changed target eligibility to attribution-selected Tier 1 (validation occurrence minimum 3), but the copied implementation retained an R1 internal guard that increments invalid_cycle_rows whenever selected-key validation occurrences are <4. Three completed cycles therefore violated the R2 implementation contract even though a count of 3 is explicitly valid under the frozen Tier 1 schedule.",
+  "preservation": "Do not interpret R2 policy metrics. Reissue the identical Tier 1 corpus, targets, monitor, candidates, validation retain rule, audit, budgets, metrics, and thresholds under R3, changing only the stale internal support guard from validation_count<4 to validation_count<3.",
+  "authority": "research-only"
+}
