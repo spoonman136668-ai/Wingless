@@ -1,0 +1,43 @@
+{
+  "schema": "wingless.research-classification.v1",
+  "experiment": "WLM-LM-BYTE-MOTIF-DISCOVERY-R2",
+  "proposal_parent": "WLM-LM-ADAPTIVE-GRANULARITY-PROPOSAL-R1",
+  "proposal_stage": "WBG-2",
+  "qualified_head_sha": "671943aff88ad558514665c3e372d9d03082373c",
+  "qualification_run_id": "36994857916",
+  "qualification": "qualified-scientific-result",
+  "classification": "negative",
+  "thresholds_frozen_before_execution": true,
+  "full_regression_passed": true,
+  "normalized_harness_witness": true,
+  "metrics": {
+    "valid_seed_count": 4,
+    "completed_substrate_runs": 8,
+    "selected_motif_count": 8,
+    "minimum_selected_true_motif_recall": 0.25,
+    "maximum_false_selected_motif_count": 6,
+    "minimum_motif_enabled_successor_accuracy": 0,
+    "maximum_byte_only_ablation_successor_accuracy": 0,
+    "maximum_shuffled_motif_successor_accuracy": 0,
+    "minimum_causal_accuracy_gain_over_ablation": 0,
+    "minimum_effective_event_reduction_fraction": 0,
+    "substrate_selected_motif_mismatch_count": 0,
+    "substrate_prediction_mismatch_count": 0,
+    "substrate_event_accounting_mismatch_count": 0,
+    "duplicate_shuffled_control_key_count": 0,
+    "invalid_candidate_rows": 0,
+    "counter_overflow_rows": 0
+  },
+  "failed_frozen_gates": [
+    "minimum_selected_true_motif_recall >= 0.875",
+    "maximum_false_selected_motif_count <= 1",
+    "minimum_motif_enabled_successor_accuracy >= 0.95",
+    "minimum_causal_accuracy_gain_over_ablation >= 0.70",
+    "minimum_effective_event_reduction_fraction >= 0.30"
+  ],
+  "scientific_claim": "Under the frozen WBG-2 raw-byte stream and recurrence/consistency selector, bounded four-byte motif discovery failed to recover the hidden predictive motif set and produced no causal held-out prediction or event-reduction benefit. The result is a valid negative against this specific selector/design, not against adaptive granularity in general.",
+  "next_question": "Which recurrent non-target four-byte windows outranked the hidden predictive motifs under the frozen occurrence-times-consistency score, and is the failure attributable to score confounding, stream construction, or insufficient motif-identifiability evidence?",
+  "scope": "bounded synthetic raw-byte motif discovery; no open-domain language claim",
+  "execution_mode": "direct-no-agent",
+  "authority": "research-only"
+}
