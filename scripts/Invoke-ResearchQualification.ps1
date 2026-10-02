@@ -104,7 +104,7 @@ $Probe = $null
 $ProbeParseError = $null
 $Match = [regex]::Match(
     $Transcript,
-    '(?s)(\{\s*"schema".*?\r?\n\})\s*\r?\n\s*=== SCIENTIFIC DIAGNOSIS'
+    '(?s)(\{\s*"schema".*?\})\s*\r?\n\s*=== SCIENTIFIC DIAGNOSIS'
 )
 
 if ($Match.Success) {
