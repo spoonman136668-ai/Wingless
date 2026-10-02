@@ -1,0 +1,114 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RAW-REP-COMPOSITIONAL-REASONING-R1",
+  "program": "Wingless raw-input to representation to prediction to reasoning chain",
+  "question": "Can Wingless learn a compact representation directly from raw byte records and use that learned representation to infer a compositional relation on exact operand pairs never observed during training, while exact raw-pair memorization fails?",
+  "hypothesis": "From a frozen raw-byte corpus containing eight recurrent four-byte value motifs embedded in nonsemantic high-byte noise, an unsupervised top-frequency four-byte representation learner will recover all eight recurrent motifs. A factorized learner trained only on represented training observations will achieve at least 0.95 accuracy on sixteen held-out operand pairs and reconstruct the correct raw output motif at least 0.95 of the time, while an exact represented-pair lookup control will achieve at most 0.25 held-out accuracy.",
+  "exact_parent_sha": "5b7b7c4f5a27dd0cd118fdcf951a2ae63351479a",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-RAW-REP-PRED-FRESH-HOLDOUT-R2",
+    "classification": "qualified-scientific-result; frozen thresholds supported",
+    "github_run_id": "37063503522",
+    "qualified_head_sha": "c55a65cb6d791f6b8873b8cdf6e73aa92c12ddda",
+    "observation": "On four fresh real-code holdouts, the 512-motif raw-byte representation had minimum coverage 0.36012885277106671, minimum covered top-1 gain 0.38054777185211969, minimum event reduction 0.37991362272161633, and maximum representation-minus-baseline bits-per-byte -0.38933721355583994."
+  },
+  "scope_statement": "This is a bounded mechanism-level reasoning integration gate. Passing does not establish open-domain reasoning or LLM-class competence; it establishes that the raw representation stage can feed a learned compositional inference stage without tokenization or external-model inference.",
+  "authority": "research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "raw_benchmark": {
+    "value_count": 8,
+    "value_motif_width_bytes": 4,
+    "record_encoding": "two raw four-byte operand motifs and one raw four-byte target motif embedded in deterministic nonsemantic bytes from range 192..255; benchmark record boundaries are supplied as sample boundaries only",
+    "motif_construction": "eight distinct fixed raw motifs whose lexicographic order defines representation IDs 0..7; motif bytes are below 192 and noise bytes are 192..255",
+    "noise": "deterministic LCG-derived bytes; no target information is encoded in noise",
+    "target_law": "target_id = operand_a_id XOR operand_b_id; this law generates/scorers the benchmark only and is not called by prediction code",
+    "training_pair_rule": "(a+b) mod 4 != 1",
+    "heldout_pair_rule": "(a+b) mod 4 == 1",
+    "training_pair_count": 48,
+    "heldout_pair_count": 16,
+    "training_repetitions_per_pair": 32
+  },
+  "representation_learner": {
+    "input": "raw training record bytes only",
+    "candidate": "every contiguous four-byte window within each training record",
+    "selection": "top eight by occurrence count descending, then lexicographic raw-byte key",
+    "semantic_labels": "none",
+    "representation_id": "lexicographic rank of each selected four-byte key",
+    "capacity": 8,
+    "tokenizer": false
+  },
+  "reasoning_learner": {
+    "factorized_state": "for each of three representation-ID bit positions, a 2x2x2 integer count tensor over (operand_a_bit, operand_b_bit, target_bit), totaling 24 counters",
+    "update": "increment target-bit counts using only decoded training representations and observed target representations",
+    "prediction": "independently argmax each target bit from learned counts and reassemble one representation ID",
+    "target_law_visibility": "prediction has no access to XOR or evaluator target code",
+    "capacity_growth": false
+  },
+  "lookup_control": {
+    "state": "8x8x8 exact represented-pair target counts",
+    "prediction": "argmax target ID for the exact pair with lowest-ID tie break",
+    "purpose": "tests whether held-out success can be explained by memorizing exact represented operand pairs"
+  },
+  "raw_output": {
+    "generation": "map the predicted representation ID back to its learned selected four-byte motif",
+    "metric": "exact four-byte equality to the evaluator's target raw motif on held-out pairs"
+  },
+  "controls": [
+    "The representation learner sees raw training bytes only and receives no motif labels, operand IDs, target law, or held-out bytes.",
+    "The factorized learner and exact-pair lookup receive the same represented training observations.",
+    "All sixteen exact held-out operand pairs are absent from training.",
+    "Every per-bit input combination required by the factorized learner occurs in represented training data for every bit position.",
+    "Evaluation is read-only; no held-out byte enters representation selection or reasoning updates.",
+    "No tokenizer, external model, network access, gradient optimizer, target-law call in prediction, capacity growth, or post-result tuning is permitted."
+  ],
+  "metrics_and_thresholds": [
+    ["training_record_count", "==", 1536],
+    ["heldout_pair_count", "==", 16],
+    ["selected_representation_count", "==", 8],
+    ["selected_true_motif_match_count", "==", 8],
+    ["training_representation_decode_failure_count", "==", 0],
+    ["heldout_representation_decode_failure_count", "==", 0],
+    ["heldout_context_leak_count", "==", 0],
+    ["factorized_bit_coverage_missing_count", "==", 0],
+    ["factorized_heldout_accuracy", ">=", 0.95],
+    ["lookup_heldout_accuracy", "<=", 0.25],
+    ["raw_output_exact_accuracy", ">=", 0.95],
+    ["factorized_counter_count", "==", 24],
+    ["lookup_counter_count", "==", 512],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["capacity_growth_event_count", "==", 0],
+    ["invalid_row_count", "==", 0],
+    ["counter_overflow_count", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact parent and North Star identities match.",
+    "Raw benchmark construction, train/holdout rule, repetitions, noise generator, representation capacity, and tie breaks match this preregistration.",
+    "The representation learner scans raw bytes and is not seeded with the evaluator's eight motif identities.",
+    "The factorized learner sees only learned representation IDs plus observed training target IDs; prediction does not call the target law.",
+    "The exact-pair lookup receives the same represented training examples.",
+    "All metrics are finite and full Go regression passes before the probe.",
+    "No external model, tokenizer, network call, capacity growth, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all eighteen frozen metric thresholds pass.",
+    "mixed": "Validity passes and factorized held-out accuracy exceeds lookup accuracy, but at least one representation recovery, 0.95 reasoning, or raw-output threshold fails.",
+    "negative": "Validity passes but factorized held-out accuracy does not exceed lookup accuracy, or representation discovery fails to support compositional generalization.",
+    "incomplete": "Compute interruption prevents complete frozen training/evaluation.",
+    "invalid": "Any provenance, construction, leakage, target-law isolation, deterministic-state, capacity, or qualification criterion fails."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific execution on parent, North Star, build, or frozen-package drift.",
+    "After output begins, complete the full frozen train/heldout matrix unless infrastructure prevents it.",
+    "Do not change motif construction, noise, split, capacity, factorization, lookup control, thresholds, or classification after observing output."
+  ],
+  "no_post_result_tuning_rule": "No benchmark, representation, reasoning, control, metric, threshold, or interpretation may change after any primary output is observed under this experiment identifier.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-raw-rep-compositional-reasoning-r1.json",
+    "unitary/wlm_lm_raw_rep_compositional_reasoning_r1.go",
+    "cmd/wlm-lm-raw-rep-compositional-reasoning-r1/main.go",
+    "scripts/run-wlm-lm-raw-rep-compositional-reasoning-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
