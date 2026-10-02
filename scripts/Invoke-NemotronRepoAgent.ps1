@@ -356,9 +356,11 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
             $StatusCode=$null
             try{$StatusCode=[int]$_.Exception.Response.StatusCode}catch{}
             $IsRateLimit=($StatusCode-eq429 -or $_.Exception.Message -match '(?i)429|too many requests')
-            if($IsRateLimit -and $Attempt-lt3){
+            $IsTransientNvidia=($Provider-ceq'nvidia' -and ($StatusCode-eq500 -or $StatusCode-eq502 -or $StatusCode-eq503 -or $StatusCode-eq504 -or $_.Exception.Message -match '(?i)internal server error|bad gateway|server unavailable|gateway timeout'))
+            if(($IsRateLimit -or $IsTransientNvidia) -and $Attempt-lt3){
                 $Delay=if($Attempt-eq1){5}else{15}
-                Write-Host "NEMOTRON_PROVIDER_RATE_LIMIT provider=$Provider round=$Round attempt=$Attempt retry_seconds=$Delay"
+                $Kind=if($IsRateLimit){'rate_limit'}else{'transient_server'}
+                Write-Host "NEMOTRON_PROVIDER_RETRY provider=$Provider kind=$Kind status=$StatusCode round=$Round attempt=$Attempt retry_seconds=$Delay"
                 Start-Sleep -Seconds $Delay
                 continue
             }
