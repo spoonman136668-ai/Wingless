@@ -1,0 +1,121 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RAW-REP-DISTRIBUTIONAL-ALIAS-BRIDGE-R1",
+  "program": "Wingless raw-input to invariant representation to reasoning chain",
+  "question": "Can the current exact raw motifs be converted into surface-invariant canonical representations using only data-derived distributional signatures, restoring cross-family reasoning without an evaluator alias dictionary?",
+  "hypothesis": "If each recurrent surface motif is assigned a raw occurrence-count signature from a frozen calibration corpus, the two aliases of each of four values and five operations will form nine unique equal-signature pairs. Canonicalizing each pair before transition learning will restore at least 0.95 cross-family semantic accuracy while an otherwise identical unbridged surface learner remains at or below 0.25.",
+  "exact_parent_sha": "5ccd0f081de185eb41573f892d8b47b234e9984b",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "allocation": "75% chain / 25% substrate falsification",
+    "slot": "chain",
+    "reason": "directly repair the alias-invariance failure exposed by the preceding substrate falsification"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-SI-RAW-REP-ALIAS-INVARIANCE-FALSIFICATION-R1",
+    "classification": "surface_invariance_falsified by frozen rules",
+    "github_run_id": "37065587817",
+    "observation": "Same-family semantic accuracy was 1.0, cross-family accuracy was 0.0625, and all 160 cross-family transition keys were absent."
+  },
+  "scope_statement": "This is a bounded distributional canonicalization mechanism. Passing shows that surface aliases can be merged from frozen occurrence statistics; it does not establish general semantic equivalence learning.",
+  "authority": "research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "benchmark": {
+    "semantic_value_count": 4,
+    "semantic_operation_count": 5,
+    "alias_family_count": 2,
+    "surface_value_motif_count": 8,
+    "surface_operation_motif_count": 10,
+    "motif_width_bytes": 4,
+    "transition_training": "the same two independently complete alias families used by the falsification: all five operations on all sixteen value pairs, twenty repeats per family",
+    "transition_training_record_count": 3200,
+    "calibration": {
+      "construction": "separate raw calibration records containing only one selected motif surrounded by deterministic high-byte noise; aliases of the same semantic item occur the same frozen number of times, and different semantic items use different counts",
+      "value_signature_counts": [17,23,31,41],
+      "operation_signature_counts": [53,67,83,101,127],
+      "family_symmetry": "both surface aliases of one semantic item receive the same signature count",
+      "semantic_labels_exposed_to_learner": false
+    },
+    "same_family_evaluation_count": 160,
+    "cross_family_evaluation_count": 160
+  },
+  "representation_learner": {
+    "input": "raw transition-training plus raw calibration bytes",
+    "candidate": "every contiguous four-byte window within record boundaries",
+    "selection": "top eighteen transition-corpus recurrent motifs by occurrence count descending, then lexicographic raw key; calibration records are excluded from selection and used only after selection for signature measurement",
+    "capacity": 18,
+    "tokenizer": false
+  },
+  "alias_bridge": {
+    "signature": "exact count of each selected motif in the frozen calibration corpus",
+    "pairing": "within surface-value representations and within surface-operation representations, pair exactly two motifs only when their nonzero calibration signature is equal and unique to that pair",
+    "canonical_id": "sort alias pairs by signature count ascending and assign one canonical ID per pair",
+    "forbidden": "no evaluator semantic ID, family ID, motif-content lookup, operation semantics, or hand-written alias map may participate in pairing"
+  },
+  "learners": {
+    "bridged": "canonical operation ID plus canonical ordered value pair -> canonical output-pair counts",
+    "unbridged_control": "exact surface operation ID plus exact surface ordered value pair -> surface output-pair counts, identical to the falsified substrate",
+    "prediction": "argmax learned count distribution; evaluator semantics are used only after prediction for scoring"
+  },
+  "controls": [
+    "Representation selection uses transition-training bytes only; calibration does not affect which motifs are selected.",
+    "Calibration pairing uses count equality only and cannot inspect evaluator semantic or family labels.",
+    "Both bridged and unbridged learners receive byte-for-byte identical decoded transition observations.",
+    "Same-family evaluation must remain strong for both learners.",
+    "Cross-family evaluation is identical to the preceding falsification.",
+    "No tokenizer, external model, network access, gradient optimizer, capacity growth, evaluator alias dictionary, oracle correction, or post-result tuning is permitted."
+  ],
+  "metrics_and_thresholds": [
+    ["transition_training_record_count", "==", 3200],
+    ["selected_representation_count", "==", 18],
+    ["selected_true_motif_match_count", "==", 18],
+    ["value_alias_pair_count", "==", 4],
+    ["operation_alias_pair_count", "==", 5],
+    ["ambiguous_signature_group_count", "==", 0],
+    ["unpaired_selected_motif_count", "==", 0],
+    ["training_decode_failure_count", "==", 0],
+    ["same_family_evaluation_count", "==", 160],
+    ["bridged_same_family_accuracy", ">=", 0.95],
+    ["unbridged_same_family_accuracy", ">=", 0.95],
+    ["cross_family_evaluation_count", "==", 160],
+    ["bridged_cross_family_accuracy", ">=", 0.95],
+    ["unbridged_cross_family_accuracy", "<=", 0.25],
+    ["bridged_minus_unbridged_cross_family_accuracy", ">=", 0.70],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["capacity_growth_event_count", "==", 0],
+    ["invalid_row_count", "==", 0],
+    ["counter_overflow_count", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact parent and North Star identities match.",
+    "Transition training is byte-for-byte the frozen two-family design from the preceding falsification except for experiment identity.",
+    "Representation selection excludes calibration records.",
+    "Calibration counts match the frozen value and operation signature lists exactly in both families.",
+    "Alias pairing uses only selected-representation type and equal nonzero calibration signature.",
+    "Each selected motif belongs to exactly one two-member signature group and no signature is shared by more than one semantic pair.",
+    "Both bridged and unbridged learners receive identical transition observations after their respective surface/canonical encoding.",
+    "All metrics are finite and full Go regression passes before the probe.",
+    "No evaluator semantic/family label influences alias pairing or prediction."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all twenty frozen thresholds pass.",
+    "mixed": "Validity passes and bridged cross-family accuracy materially exceeds the unbridged control, but at least one pairing or 0.95 accuracy threshold fails.",
+    "negative": "Validity passes but distributional canonicalization does not materially improve cross-family accuracy.",
+    "incomplete": "Compute interruption prevents the full frozen matrix.",
+    "invalid": "Any selection/calibration leakage, evaluator-label access, ambiguous pairing, deterministic-state, capacity, or qualification criterion fails."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific execution on parent, North Star, build, frozen-package, or calibration-construction drift.",
+    "After output begins, complete all pairing, same-family, and cross-family evaluations unless infrastructure prevents it.",
+    "Do not alter signature counts, add semantic cues, inspect evaluator labels during pairing, increase capacity, or weaken thresholds after observing output."
+  ],
+  "no_post_result_tuning_rule": "No calibration signature, pairing rule, canonicalization, learner, evaluation, metric, threshold, or interpretation may change after any primary output is observed under this experiment identifier.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-raw-rep-distributional-alias-bridge-r1.json",
+    "unitary/wlm_lm_raw_rep_distributional_alias_bridge_r1.go",
+    "cmd/wlm-lm-raw-rep-distributional-alias-bridge-r1/main.go",
+    "scripts/run-wlm-lm-raw-rep-distributional-alias-bridge-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
