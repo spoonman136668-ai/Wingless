@@ -6,7 +6,7 @@ param(
     [Parameter(Mandatory=$true)][string]$PromptPath,
     [Parameter(Mandatory=$true)][string]$LastMessagePath,
     [string]$Model='nvidia/nemotron-3-ultra-550b-a55b:free',
-    [int]$MaxRounds=80
+    [int]$MaxRounds=48
 )
 
 Set-StrictMode -Version Latest
@@ -290,12 +290,18 @@ $Headers=@{
 }
 
 for($Round=1;$Round-le$MaxRounds;$Round++){
+    if($Round-eq([Math]::Max(2,$MaxRounds-2))){
+        $Messages.Add([ordered]@{role='user';content='The tool budget is nearly exhausted. Stop broad exploration. Complete only the essential remaining work, then call finish. If the task cannot be completed under the frozen rules, call finish with status blocked and explain why.'})
+    }
+    $ToolChoice=if($Round-eq$MaxRounds){
+        [ordered]@{type='function';function=[ordered]@{name='finish'}}
+    }else{'auto'}
     $Body=[ordered]@{
         model=$Model
         temperature=0
         messages=$Messages.ToArray()
         tools=$Tools
-        tool_choice='auto'
+        tool_choice=$ToolChoice
         max_tokens=4096
     }|ConvertTo-Json -Depth 50 -Compress
 
