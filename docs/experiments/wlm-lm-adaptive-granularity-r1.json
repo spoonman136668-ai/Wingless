@@ -1,0 +1,176 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-ADAPTIVE-GRANULARITY-R1",
+  "proposal_parent": "WLM-LM-ADAPTIVE-GRANULARITY-PROPOSAL-R1",
+  "proposal_stage": "WBG-3",
+  "question": "Can Wingless use learned raw-byte motifs as an uncertainty-gated coarse representation only in predictable regions, while retaining byte-level processing in high-entropy regions, reducing effective compute at matched predictive quality?",
+  "hypothesis": "Across four new disjoint seeds, adaptive granularity will match the full-byte motif-aware policy within 0.01 target accuracy, achieve at least 0.95 target accuracy, reduce total internal events by at least 0.18, reduce predictable-region events by at least 0.35, keep high-entropy false coarse activation below 0.01, and outperform a blind fixed-4-byte chunk policy by at least 0.20 target accuracy.",
+  "exact_parent_sha": "48d0ccd0401db5baaafb9410a701ef0caa3b4db6",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-BYTE-MOTIF-DISCOVERY-R3-BALANCED",
+    "classification": "supported",
+    "qualification_run_id": "36996924997",
+    "scientific_claim": "Balanced raw-byte exposure produced 8/8 motif recovery, perfect motif successor accuracy, 0.875 causal gain, and 0.375 effective event reduction."
+  },
+  "authority": "research-only; no production, live, accepted-ref, scheduler, queue-consumer, external-model inference, or cross-lane authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-adaptive-granularity-r1.json",
+    "unitary/wlm_lm_adaptive_granularity_r1.go",
+    "cmd/wlm-lm-adaptive-granularity-r1/main.go",
+    "scripts/run-wlm-lm-adaptive-granularity-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "training": {
+    "seeds": [
+      11903,
+      11923,
+      11933,
+      11939
+    ],
+    "seed_policy": "All four seeds were checked against the Wingless repository before preregistration and had no matches.",
+    "corpus": "balanced WBG-2 R3 training construction, 4096 motif records per seed",
+    "selector": "byte-identical WBG-2 R3 four-byte motif selector, filter, score, and budget"
+  },
+  "mixed_evaluation_stream": {
+    "record_count_per_seed": 4096,
+    "predictable_record_count": 2048,
+    "high_entropy_record_count": 2048,
+    "predictable_record": "four-byte learned motif + canonical successor + three filler bytes",
+    "high_entropy_record": "seven deterministic pseudorandom raw bytes",
+    "record_type_schedule": "alternating by (record+seed) mod 2; no boundary markers are exposed to execution policy",
+    "predictable_motif_schedule": "balanced across all eight motifs",
+    "target_positions": "canonical successor positions of predictable records only",
+    "high_entropy_bytes": "full uint8 pseudorandom bytes from an evaluation-only LCG state"
+  },
+  "execution_policies": {
+    "full_byte_motif_aware": "process every raw byte as one internal event; target prediction may use the learned motif table on the preceding four-byte window",
+    "adaptive": "scan the raw stream; collapse exactly four bytes into one internal event only when the current four-byte window matches a selected learned motif; otherwise process one byte event. Prediction remains the learned motif predictor at target positions.",
+    "static_fixed4": "blindly partition the entire raw stream into nonoverlapping four-byte chunks from global offset zero. At a target position the motif predictor may be used only if the preceding true motif span exactly coincides with one static chunk; otherwise fall back to the trained two-byte byte-level baseline."
+  },
+  "evaluation_metrics": {
+    "overall_event_reduction": "1 - adaptive_event_count/full_byte_event_count",
+    "predictable_region_event_reduction": "saved events attributable to evaluator-known true motif spans divided by predictable-region raw bytes",
+    "high_entropy_false_coarse_activation_rate": "adaptive coarse activations wholly inside high-entropy records divided by high-entropy record count",
+    "predictable_coarse_activation_recall": "true predictable motif starts receiving adaptive coarse activation divided by predictable record count"
+  },
+  "budgets": {
+    "seed_count": 4,
+    "substrate_count": 2,
+    "selected_motif_budget": 8,
+    "mixed_evaluation_records_total": 16384,
+    "mixed_evaluation_raw_bytes_per_seed": 30720,
+    "target_evaluations_per_seed": 2048,
+    "context_width_bytes": 4,
+    "capacity_growth": false,
+    "goroutine_policy": "single-process deterministic execution; GOMAXPROCS=1 in qualification"
+  },
+  "metrics_and_thresholds": [
+    {
+      "name": "valid_seed_count",
+      "comparator": "==",
+      "threshold": 4
+    },
+    {
+      "name": "completed_substrate_runs",
+      "comparator": "==",
+      "threshold": 8
+    },
+    {
+      "name": "minimum_adaptive_target_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "minimum_full_byte_target_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "maximum_adaptive_accuracy_gap_vs_full_byte",
+      "comparator": "<=",
+      "threshold": 0.01
+    },
+    {
+      "name": "maximum_static_fixed4_target_accuracy",
+      "comparator": "<=",
+      "threshold": 0.75
+    },
+    {
+      "name": "minimum_adaptive_accuracy_gain_vs_static_fixed4",
+      "comparator": ">=",
+      "threshold": 0.2
+    },
+    {
+      "name": "minimum_overall_event_reduction_fraction",
+      "comparator": ">=",
+      "threshold": 0.18
+    },
+    {
+      "name": "minimum_predictable_region_event_reduction_fraction",
+      "comparator": ">=",
+      "threshold": 0.35
+    },
+    {
+      "name": "maximum_high_entropy_false_coarse_activation_rate",
+      "comparator": "<=",
+      "threshold": 0.01
+    },
+    {
+      "name": "minimum_predictable_coarse_activation_recall",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "maximum_adaptive_events_per_raw_byte",
+      "comparator": "<=",
+      "threshold": 0.82
+    },
+    {
+      "name": "substrate_selected_motif_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_prediction_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_event_accounting_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "invalid_stream_rows",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "counter_overflow_rows",
+      "comparator": "==",
+      "threshold": 0
+    }
+  ],
+  "validity_criteria": [
+    "Exact parent SHA, North Star identity, and supported WBG-2 R3 evidence match.",
+    "All four seeds and both independent context substrates complete frozen training and mixed evaluation cardinalities.",
+    "Training selector and learned motif budget are unchanged from supported WBG-2 R3.",
+    "No evaluator record-type, boundary, entropy-stratum, motif-ID, or target-position label is visible to the adaptive policy.",
+    "Adaptive coarse activation depends only on exact membership in the learned selected-motif table.",
+    "Full-byte and adaptive policies use the same learned predictor; only event accounting/granularity differs.",
+    "Static fixed-4 boundaries are global and cannot shift to match targets.",
+    "No capacity growth or external model call occurs.",
+    "The normalized result carries schema wingless.research-scientific-result.v1 and exact experiment identifier.",
+    "Full Go regression passes before probe execution."
+  ],
+  "classification_rules": {
+    "supported": "All seventeen frozen thresholds and all validity criteria pass.",
+    "mixed": "Adaptive policy preserves quality and reduces compute, but at least one entropy-selectivity, static-control, or exact-equivalence threshold fails.",
+    "negative": "Validity passes but adaptive granularity does not reduce compute at matched quality or coarsens high-entropy regions materially.",
+    "incomplete": "Environmental or compute interruption prevents frozen cardinality.",
+    "invalid": "Provenance, label isolation, policy identity, deterministic stream construction, bounded capacity, or qualification isolation fails."
+  },
+  "no_post_result_tuning_rule": "After any output is observed, do not alter seeds, corpus, mixed-stream composition, policy definitions, learned selector, motif budget, event accounting, metrics, thresholds, aggregation, or classification."
+}
