@@ -1,0 +1,18 @@
+{
+  "schema": "wingless.research-invalid-attempt.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-LEVEL1-MAINTENANCE-R1",
+  "qualification_run_id": "37007119117",
+  "qualified_head_sha": "3a795bf170309814f9e0dd9c3dd26e3fe7058087",
+  "disposition": "invalid-target-schedule-construction",
+  "scientific_claim": false,
+  "full_matrix_completed": false,
+  "observed_diagnostics": {
+    "valid_evaluation_file_count": 1,
+    "completed_cycle_count": 2,
+    "minimum_target_eligibility_count_per_file": 0,
+    "invalid_cycle_rows": 2
+  },
+  "reason": "The frozen target-eligibility rule required at least two motifs per evaluation file with calibration occurrence >=8, each later-quarter occurrence >=4, and calibration motif-over-baseline accuracy gain >=0.25. One immutable held-out file had zero motifs meeting that full rule, so the four-cycle cross-file matrix could not be constructed. The partial two-cycle outcomes are not interpreted as scientific evidence.",
+  "preservation": "Do not lower R1 thresholds or reinterpret the two completed cycles. Run a separate preregistered support-attribution experiment on the same immutable files, then reissue maintenance under a new identifier using a schedule selected by a predeclared strictest-feasible rule.",
+  "authority": "research-only"
+}
