@@ -1,0 +1,66 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "status": "frozen-prereg-only",
+  "experiment": "WLM-SI-SET-CONTAINER-R1",
+  "question": "Under a fixed 64-key universe and fixed storage budget, do a sorted fixed-array set and a 64-bit bitset preserve the same membership, cardinality, admission/removal, and conservation observables?",
+  "hypothesis": "All preregistered observables remain exactly invariant across both substrates.",
+  "exact_parent_sha": "caaeca20548eec9836bdb90be9f95aa4cb883f90",
+  "north_star_sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
+  "prior_evidence": {
+    "experiments": [
+      "WLM-SI-PRIORITY-CONTAINER-R1",
+      "WLM-SI-INDEX-CONTAINER-R1",
+      "WLM-SI-PAGED-SEQUENCE-R1"
+    ],
+    "classification": "supported"
+  },
+  "changed_dimension": "set substrate only",
+  "seeds": [
+    1423,
+    1451,
+    1481,
+    1511,
+    1543,
+    1571,
+    1601,
+    1627
+  ],
+  "fixed_matrix": {
+    "key_universe": 64,
+    "capacity": 64,
+    "schedule_families": [
+      "sequential",
+      "toggle-wave",
+      "hotset",
+      "lcg32"
+    ],
+    "initial_cardinalities": [
+      0,
+      16,
+      32,
+      48
+    ],
+    "operation_budgets": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "steps": 64
+  },
+  "thresholds": {
+    "paired_case_count": 512,
+    "completed_substrate_case_runs": 1024,
+    "total_emitted_rows": 65536,
+    "paired_observable_mismatch_cases": 0,
+    "row_count_mismatch_cases": 0,
+    "state_cardinality_mismatch_cases": 0,
+    "invalid_operation_schedules": 0,
+    "budget_overrun_rows": 0,
+    "law_violation_cases": 0,
+    "max_conservation_error": 0,
+    "max_residual_law_error": 0
+  },
+  "authority": "research-only",
+  "no_post_result_tuning": true
+}
