@@ -1,0 +1,99 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-LM-RAW-UTF8-INSTRUCTION-REASON-GENERATE-R4",
+  "program":"Wingless raw-input to representation to reasoning to generation chain",
+  "question":"Does changing only value-anchor selection from occurrence-margin-first to precision-first eliminate the R3 cross-class anchor collision and restore operand/template invariance while leaving operation inference, reasoning, and generation unchanged?",
+  "hypothesis":"On the byte-identical R3 corpus and split, the unchanged R3 operation anchors/model plus precision-first value-anchor selection will choose eight distinct value anchors with zero equality to any operation anchor, reach at least 0.98 training and 0.95 held-out left/right accuracy with zero decode failures, preserve at least 0.95 held-out operation accuracy, and restore at least 0.90 held-out reasoning and exact raw-output accuracy.",
+  "exact_parent_sha":"d557c8e50456a2d35679cb64935d794f41e22836",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch":"research/wingless-up-manual-chain-r1",
+  "portfolio_context":{"allocation":"75% chain / 25% substrate falsification","slot":"chain","note":"R3 itself produced a direct falsification of occurrence-margin-first anchor selection via a sealed cross-class anchor collision"},
+  "prior_evidence":{
+    "experiment":"WLM-LM-RAW-UTF8-INSTRUCTION-REASON-GENERATE-R3",
+    "github_run_id":"37072558023",
+    "classification":"negative",
+    "observation":{
+      "heldout_operation_accuracy":0.9609375,
+      "heldout_left_accuracy":0.5625,
+      "heldout_right_accuracy":0.4375,
+      "heldout_full_representation_accuracy":0.359375,
+      "heldout_reasoning_result_accuracy":0.3203125,
+      "heldout_exact_raw_output_accuracy":0.2109375,
+      "operation_anchors":["xor","xnor","and"," o"],
+      "value_anchors":[" zero"," o"," two"," three"," four"," five"," six"," seven"]
+    },
+    "diagnosis":"value class one selected the same ambiguous raw anchor as operation or because occurrence margin outranked class precision after equal positive coverage"
+  },
+  "repair_boundary":{
+    "changed":"value-anchor candidate tie ordering only",
+    "unchanged":"R3 raw candidate windows, example-level supervision, operation-anchor selection, operation histogram inference, byte-order operand role assignment, corpus, split, target rules, reasoning learner, generator, lookup control, scientific chain thresholds"
+  },
+  "value_anchor_selection":{
+    "candidate_windows":"unchanged raw width 2..7 candidates from training instructions",
+    "selection_order":"highest positive-example coverage; then highest positive precision; then largest positive-minus-negative mean occurrence margin; then widest byte span; then lexicographically smallest raw bytes",
+    "operation_selection":"unchanged R3 order: coverage, occurrence margin, precision, width, lexicographic",
+    "semantic_span_or_word_boundary_input":false,
+    "post_selection_constraints":"none; cross-class anchor equality is measured, not prohibited by the selector"
+  },
+  "metrics_and_thresholds":[
+    ["training_example_count","==",768],
+    ["heldout_example_count","==",128],
+    ["training_context_count","==",192],
+    ["heldout_context_count","==",64],
+    ["heldout_exact_instruction_leak_count","==",0],
+    ["selected_operation_anchor_count","==",4],
+    ["selected_value_anchor_count","==",8],
+    ["maximum_anchor_width_bytes","<=",7],
+    ["maximum_total_anchor_bytes","<=",84],
+    ["value_anchor_duplicate_count","==",0],
+    ["value_operation_anchor_collision_count","==",0],
+    ["minimum_training_operation_accuracy",">=",0.98],
+    ["minimum_training_left_accuracy",">=",0.98],
+    ["minimum_training_right_accuracy",">=",0.98],
+    ["maximum_training_operand_decode_failure_count","==",0],
+    ["minimum_heldout_operation_accuracy",">=",0.95],
+    ["minimum_heldout_left_accuracy",">=",0.95],
+    ["minimum_heldout_right_accuracy",">=",0.95],
+    ["maximum_heldout_operand_decode_failure_count","==",0],
+    ["minimum_heldout_full_representation_accuracy",">=",0.90],
+    ["reasoning_counter_count","==",96],
+    ["minimum_heldout_reasoning_result_accuracy",">=",0.90],
+    ["minimum_output_generator_class_coverage","==",8],
+    ["maximum_output_generator_state_count","<=",160],
+    ["minimum_heldout_exact_raw_output_accuracy",">=",0.90],
+    ["maximum_whole_instruction_lookup_exact_output_accuracy","<=",0.25],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "validity_criteria":[
+    "Exact parent and North Star identities match.",
+    "R4 calls the byte-identical R1 corpus constructor and retains all R3 downstream mechanisms.",
+    "Operation anchors and operation-count inference use the unchanged R3 selector/model.",
+    "Only the value-anchor candidate comparison order changes, exactly as preregistered.",
+    "Candidate induction receives training labels only at example level and no evaluator byte spans, word boundaries, parser, or tokenizer.",
+    "Value anchor duplicate/collision metrics are post-selection diagnostics and do not alter selection.",
+    "Operand roles remain assigned only from raw anchor occurrence byte order.",
+    "Reasoning consumes predicted R4 representations and generation remains teacher-free.",
+    "Full Go regression passes before the probe and all metrics are finite.",
+    "No external model, network call, capacity growth, threshold adaptation, or post-result tuning occurs."
+  ],
+  "classification_rules":{
+    "supported":"All validity criteria and all frozen thresholds pass.",
+    "mixed":"Validity passes and R4 materially improves operands/end-to-end output over R3 but at least one frozen threshold fails.",
+    "negative":"Validity passes but precision-first value anchors do not materially improve the chain over R3.",
+    "incomplete":"Compute interruption prevents the frozen matrix.",
+    "invalid":"Any corpus/split drift, operation-model drift, semantic-span leakage, parser/tokenizer use, downstream mechanism drift, capacity, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule":"No corpus, candidate set, operation selector, value selector order, operand rule, downstream learner, generator, control, metric, threshold, or interpretation may change after primary output.",
+  "changed_paths":[
+    "docs/experiments/wlm-lm-raw-utf8-instruction-reason-generate-r4.json",
+    "unitary/wlm_lm_raw_utf8_instruction_reason_generate_r4.go",
+    "cmd/wlm-lm-raw-utf8-instruction-reason-generate-r4/main.go",
+    "scripts/run-wlm-lm-raw-utf8-instruction-reason-generate-r4.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
