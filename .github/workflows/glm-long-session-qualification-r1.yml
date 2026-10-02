@@ -71,7 +71,7 @@ jobs:
               'Do not send a normal final answer.'
             ) | Set-Content -LiteralPath $Prompt -Encoding UTF8
 
-            $Output=@(& '.\scripts\Invoke-NemotronRepoAgent.ps1' `
+            & '.\scripts\Invoke-NemotronRepoAgent.ps1' `
               -RepoPath $Worktree `
               -Program 'Wingless' `
               -ActiveBranch $ProbeBranch `
@@ -81,8 +81,9 @@ jobs:
               -Provider nvidia `
               -Model 'z-ai/glm-5.3' `
               -MaxRounds 12 `
-              -ProtocolProbe 2>&1)
-            $Output | Tee-Object -FilePath $Trace | ForEach-Object { Write-Host ([string]$_) }
+              -ProtocolProbe *>&1 |
+              Tee-Object -FilePath $Trace |
+              ForEach-Object { Write-Host ([string]$_) }
 
             if(-not(Test-Path -LiteralPath $Last -PathType Leaf)){throw 'GLM_LONG_RESULT_MISSING'}
             $Summary=[IO.File]::ReadAllText($Last).Trim()
