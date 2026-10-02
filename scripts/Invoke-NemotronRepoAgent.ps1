@@ -7,7 +7,8 @@ param(
     [Parameter(Mandatory=$true)][string]$LastMessagePath,
     [string]$Model='nvidia/nemotron-3-ultra-550b-a55b:free',
     [int]$MaxRounds=48,
-    [switch]$ProtocolProbe
+    [switch]$ProtocolProbe,
+    [switch]$SelfTest
 )
 
 Set-StrictMode -Version Latest
@@ -245,6 +246,17 @@ if(([string]$CurrentBranch).Trim()-cne$ActiveBranch){throw "NEMOTRON_BRANCH_MISM
 $CurrentHead=(& git -C $RepoPath rev-parse HEAD).Trim()
 if($CurrentHead-cne$StartSha){throw "NEMOTRON_START_SHA_MISMATCH expected=$StartSha actual=$CurrentHead"}
 
+if($SelfTest){
+    $Status=(Invoke-Tool 'git_status' '{}')|ConvertFrom-Json
+    if([int]$Status.exit_code-ne0){throw "NEMOTRON_SELFTEST_GIT_STATUS_FAILED output=$($Status.output)"}
+    $Log=(Invoke-Tool 'git_log' '{"max_count":2}')|ConvertFrom-Json
+    if([int]$Log.exit_code-ne0){throw "NEMOTRON_SELFTEST_GIT_LOG_FAILED output=$($Log.output)"}
+    $Listing=Invoke-Tool 'list_files' '{"path":".","max_depth":0}'
+    if([string]::IsNullOrWhiteSpace([string]$Listing)){throw 'NEMOTRON_SELFTEST_LIST_EMPTY'}
+    Write-Host 'NEMOTRON_AGENT_SELFTEST=PASS'
+    return
+}
+
 $SecretCandidates=@(
     'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
     'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
@@ -309,11 +321,25 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
         max_tokens=4096
     }|ConvertTo-Json -Depth 50 -Compress
 
-    try{
-        $Resp=Invoke-RestMethod -Method Post -Uri 'https://openrouter.ai/api/v1/chat/completions' -Headers $Headers -Body $Body -TimeoutSec 180
-    }catch{
-        throw "NEMOTRON_OPENROUTER_REQUEST_FAILED round=$Round error=$($_.Exception.Message)"
+    $Resp=$null
+    for($Attempt=1;$Attempt-le3;$Attempt++){
+        try{
+            $Resp=Invoke-RestMethod -Method Post -Uri 'https://openrouter.ai/api/v1/chat/completions' -Headers $Headers -Body $Body -TimeoutSec 180
+            break
+        }catch{
+            $StatusCode=$null
+            try{$StatusCode=[int]$_.Exception.Response.StatusCode}catch{}
+            $IsRateLimit=($StatusCode-eq429 -or $_.Exception.Message -match '(?i)429|too many requests')
+            if($IsRateLimit -and $Attempt-lt3){
+                $Delay=if($Attempt-eq1){5}else{15}
+                Write-Host "NEMOTRON_OPENROUTER_RATE_LIMIT round=$Round attempt=$Attempt retry_seconds=$Delay"
+                Start-Sleep -Seconds $Delay
+                continue
+            }
+            throw "NEMOTRON_OPENROUTER_REQUEST_FAILED round=$Round attempt=$Attempt status=$StatusCode error=$($_.Exception.Message)"
+        }
     }
+    if($null-eq$Resp){throw "NEMOTRON_OPENROUTER_RESPONSE_MISSING round=$Round"}
     if($null-eq$Resp.choices -or @($Resp.choices).Count-lt1){throw "NEMOTRON_RESPONSE_CHOICES_MISSING round=$Round"}
     $Msg=$Resp.choices[0].message
     $ToolCallsProperty=$Msg.PSObject.Properties['tool_calls']
