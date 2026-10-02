@@ -4,7 +4,13 @@ param(
 
     [string]$OutputDirectory = 'evidence/research-qualification',
 
-    [int]$GuardWaitMinutes = 120
+    [int]$GuardWaitMinutes = 120,
+
+    [string]$ExistingTranscriptPath = '',
+
+    [string]$ExistingTranscriptSource = '',
+
+    [string]$ObservedScientificHeadSha = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -70,10 +76,13 @@ $ProbePath = Join-Path $OutputFull 'probe.json'
 $SummaryPath = Join-Path $OutputFull 'summary.json'
 $StatusPath = Join-Path $OutputFull 'git-status.txt'
 
-# This executes in the current PowerShell process. Its BelowNormal process
-# priority and GOMAXPROCS settings therefore apply to the qualification and its
-# child Go processes.
-& (Join-Path $Repo 'scripts\Test-WinglessHostGuard.ps1') -WaitMinutes $GuardWaitMinutes
+$RecoveryMode = -not [string]::IsNullOrWhiteSpace($ExistingTranscriptPath)
+if (-not $RecoveryMode) {
+    # This executes in the current PowerShell process. Its BelowNormal process
+    # priority and GOMAXPROCS settings therefore apply to the qualification and its
+    # child Go processes.
+    & (Join-Path $Repo 'scripts\Test-WinglessHostGuard.ps1') -WaitMinutes $GuardWaitMinutes
+}
 
 Write-Host "=== AUTOMATED WINGLESS RESEARCH QUALIFICATION ==="
 Write-Host "Experiment: $($Request.experiment)"
@@ -83,19 +92,34 @@ Write-Host "HEAD:       $Head"
 Write-Host "Test:       $($Request.test_script)"
 
 $TestExit = 0
-$PriorErrorActionPreference = $ErrorActionPreference
-try {
-    # Windows PowerShell wraps redirected native stderr as ErrorRecord objects.
-    # Keep the parent pipeline non-terminating while the child qualification
-    # runs so compiler/test diagnostics are captured in full. The child exit
-    # code remains authoritative for pass/fail classification below.
-    $ErrorActionPreference = 'Continue'
-    & powershell -ExecutionPolicy Bypass -File $TestScript 2>&1 |
-        Tee-Object -FilePath $TranscriptPath
-    $TestExit = $LASTEXITCODE
+if ($RecoveryMode) {
+    $ExistingFull = if ([IO.Path]::IsPathRooted($ExistingTranscriptPath)) {
+        $ExistingTranscriptPath
+    }
+    else {
+        Join-Path $Repo $ExistingTranscriptPath
+    }
+    if (-not (Test-Path -LiteralPath $ExistingFull -PathType Leaf)) {
+        throw "WINGLESS_QUAL_EXISTING_TRANSCRIPT_MISSING: $ExistingFull"
+    }
+    Copy-Item -LiteralPath $ExistingFull -Destination $TranscriptPath -Force
+    Write-Host "Recovery transcript: $ExistingTranscriptSource"
 }
-finally {
-    $ErrorActionPreference = $PriorErrorActionPreference
+else {
+    $PriorErrorActionPreference = $ErrorActionPreference
+    try {
+        # Windows PowerShell wraps redirected native stderr as ErrorRecord objects.
+        # Keep the parent pipeline non-terminating while the child qualification
+        # runs so compiler/test diagnostics are captured in full. The child exit
+        # code remains authoritative for pass/fail classification below.
+        $ErrorActionPreference = 'Continue'
+        & powershell -ExecutionPolicy Bypass -File $TestScript 2>&1 |
+            Tee-Object -FilePath $TranscriptPath
+        $TestExit = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $PriorErrorActionPreference
+    }
 }
 
 $Transcript = Get-Content -Raw -Path $TranscriptPath
@@ -106,6 +130,121 @@ $Match = [regex]::Match(
     $Transcript,
     '(?s)(\{\s*"schema".*?\r?\n\})\s*\r?\n\s*=== SCIENTIFIC DIAGNOSIS'
 )
+if (-not $Match.Success) {
+    $Match = [regex]::Match(
+        $Transcript,
+        '(?m)^(\{"schema":"wingless\.research-scientific-result\.v1".*\})\s*
+$StatusLines = @(
+    git -C $Repo status --short
+)
+$StatusLines | Set-Content -Encoding UTF8 -Path $StatusPath
+
+$AllowedDirty = @(
+    if ($null -ne $Request.allowed_dirty_paths) {
+        foreach ($path in $Request.allowed_dirty_paths) {
+            [string]$path
+        }
+    }
+)
+
+$UnexpectedDirty = @(
+    foreach ($line in $StatusLines) {
+        if ([string]::IsNullOrWhiteSpace($line)) {
+            continue
+        }
+
+        $path = if ($line.Length -gt 3) {
+            $line.Substring(3).Trim()
+        }
+        else {
+            $line.Trim()
+        }
+
+        if ($AllowedDirty -notcontains $path) {
+            $line
+        }
+    }
+)
+
+$HarnessMarker = ($Transcript -match 'WINGLESS_UP\d+_HARNESS_PASS') -or
+    ($Transcript -match 'Controller-owned normalized result harness; interpretation follows frozen gates\.')
+$ScientificDiagnosis = if ($null -ne $Probe -and $null -ne $Probe.diagnosis) {
+    $Probe.diagnosis
+}
+else {
+    $null
+}
+
+$Classification = if ($TestExit -ne 0) {
+    'harness-or-artifact-failure'
+}
+elseif ($UnexpectedDirty.Count -gt 0) {
+    'unexpected-worktree-mutation'
+}
+elseif (-not $HarnessMarker) {
+    'missing-harness-marker'
+}
+elseif ($null -eq $Probe) {
+    'probe-parse-failure'
+}
+else {
+    'qualified-scientific-result'
+}
+
+$Summary = [ordered]@{
+    schema = 'wingless.research-qualification-summary.v1'
+    experiment = [string]$Request.experiment
+    branch = [string]$Request.branch
+    baseline_sha = [string]$Request.baseline_sha
+    head_sha = $Head
+    test_script = [string]$Request.test_script
+    platform = 'windows-self-hosted'
+    runner_name = $env:RUNNER_NAME
+    runner_os = $env:RUNNER_OS
+    runner_arch = $env:RUNNER_ARCH
+    github_run_id = $env:GITHUB_RUN_ID
+    github_run_attempt = $env:GITHUB_RUN_ATTEMPT
+    test_exit_code = $TestExit
+    recovery_mode = [bool]$RecoveryMode
+    transcript_source = if ($RecoveryMode) { $ExistingTranscriptSource } else { 'executed-test-script' }
+    observed_scientific_head_sha = if ([string]::IsNullOrWhiteSpace($ObservedScientificHeadSha)) { $Head } else { $ObservedScientificHeadSha }
+    harness_marker = [bool]$HarnessMarker
+    probe_parsed = [bool]($null -ne $Probe)
+    probe_parse_error = $ProbeParseError
+    classification = $Classification
+    scientific_diagnosis = $ScientificDiagnosis
+    allowed_dirty_paths = $AllowedDirty
+    unexpected_dirty = $UnexpectedDirty
+    production_priority_guard = 'passed'
+    process_priority = [string][System.Diagnostics.Process]::GetCurrentProcess().PriorityClass
+    gomaxprocs = $env:GOMAXPROCS
+    generated_at_utc = [DateTime]::UtcNow.ToString('o')
+}
+
+$Summary | ConvertTo-Json -Depth 100 |
+    Set-Content -Encoding UTF8 -Path $SummaryPath
+
+Write-Host ""
+Write-Host "WINGLESS_AUTOMATED_QUALIFICATION_CLASSIFICATION: $Classification"
+Write-Host "WINGLESS_AUTOMATED_QUALIFICATION_SUMMARY: $SummaryPath"
+
+if ($TestExit -ne 0) {
+    throw "WINGLESS_AUTOMATED_QUALIFICATION_TEST_FAILED exit=$TestExit"
+}
+if ($UnexpectedDirty.Count -gt 0) {
+    throw "WINGLESS_AUTOMATED_QUALIFICATION_UNEXPECTED_DIRT: $($UnexpectedDirty -join '; ')"
+}
+if (-not $HarnessMarker) {
+    throw 'WINGLESS_AUTOMATED_QUALIFICATION_HARNESS_MARKER_MISSING'
+}
+if ($null -eq $Probe) {
+    throw "WINGLESS_AUTOMATED_QUALIFICATION_PROBE_PARSE_FAILED: $ProbeParseError"
+}
+
+Write-Host 'WINGLESS_AUTOMATED_QUALIFICATION_PASS'
+
+    )
+}
 
 if ($Match.Success) {
     try {
@@ -117,7 +256,7 @@ if ($Match.Success) {
     }
 }
 else {
-    $ProbeParseError = 'No probe JSON block was found before the scientific-diagnosis marker.'
+    $ProbeParseError = 'No supported Wingless scientific-result JSON block was found in the transcript.'
 }
 
 $StatusLines = @(
