@@ -252,7 +252,7 @@ if($SelfTest){
     if([int]$Status.exit_code-ne0){throw "NEMOTRON_SELFTEST_GIT_STATUS_FAILED output=$($Status.output)"}
     $Log=(Invoke-Tool 'git_log' '{"max_count":2}')|ConvertFrom-Json
     if([int]$Log.exit_code-ne0){throw "NEMOTRON_SELFTEST_GIT_LOG_FAILED output=$($Log.output)"}
-    $Listing=Invoke-Tool 'list_files' '{"path":".","max_depth":0}'
+    $Listing=Invoke-Tool 'list_files' '{"path":".","max_depth":1}'
     if([string]::IsNullOrWhiteSpace([string]$Listing)){throw 'NEMOTRON_SELFTEST_LIST_EMPTY'}
     Write-Host 'NEMOTRON_AGENT_SELFTEST=PASS'
     return
