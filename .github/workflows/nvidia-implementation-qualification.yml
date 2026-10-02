@@ -110,57 +110,57 @@ jobs:
               }
 
               $Hidden=Join-Path $Worktree 'cmd\nvidiaqual\fixture_hidden_test.go'
-              @'
-package nvidiaqual
-
-import (
-	"reflect"
-	"testing"
-)
-
-func TestReadyTaskOrderHidden(t *testing.T) {
-	items := []CandidateTask{
-		{ID: "a", Priority: 1},
-		{ID: "b", Priority: 3, DependsOn: []string{"a"}},
-		{ID: "c", Priority: 3},
-		{ID: "d", Priority: 2, DependsOn: []string{"c"}},
-	}
-	before := append([]CandidateTask(nil), items...)
-	before[1].DependsOn = append([]string(nil), items[1].DependsOn...)
-	before[3].DependsOn = append([]string(nil), items[3].DependsOn...)
-	completed := map[string]bool{"a": true, "c": false}
-	got, err := ReadyTaskOrder(items, completed)
-	if err != nil { t.Fatalf("unexpected error: %v", err) }
-	want := []string{"b", "c"}
-	if !reflect.DeepEqual(got, want) { t.Fatalf("got %v want %v", got, want) }
-	if !reflect.DeepEqual(items, before) { t.Fatalf("items mutated: %#v", items) }
-	if !completed["a"] || completed["c"] { t.Fatalf("completed mutated: %#v", completed) }
-
-	completed2 := map[string]bool{"a": true, "c": true}
-	got, err = ReadyTaskOrder(items, completed2)
-	if err != nil { t.Fatalf("unexpected error 2: %v", err) }
-	want = []string{"b", "d"}
-	if !reflect.DeepEqual(got, want) { t.Fatalf("got %v want %v", got, want) }
-
-	empty, err := ReadyTaskOrder(nil, nil)
-	if err != nil || empty == nil || len(empty) != 0 { t.Fatalf("empty contract got=%v err=%v", empty, err) }
-
-	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"", Priority:1}}, nil); err == nil { t.Fatal("expected empty-id error") }
-	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"x"}, {ID:"x"}}, nil); err == nil { t.Fatal("expected duplicate-id error") }
-	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"x", DependsOn:[]string{"missing"}}}, nil); err == nil { t.Fatal("expected unknown-dependency error") }
-	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"x", DependsOn:[]string{"external"}}}, map[string]bool{"external":false}); err != nil {
-		t.Fatalf("known incomplete external dependency should not error: %v", err)
-	}
-}
-'@ | Set-Content -LiteralPath $Hidden -Encoding UTF8
-
+              @(
+                'package nvidiaqual'
+                ''
+                'import ('
+                '	"reflect"'
+                '	"testing"'
+                ')'
+                ''
+                'func TestReadyTaskOrderHidden(t *testing.T) {'
+                '	items := []CandidateTask{'
+                '		{ID: "a", Priority: 1},'
+                '		{ID: "b", Priority: 3, DependsOn: []string{"a"}},'
+                '		{ID: "c", Priority: 3},'
+                '		{ID: "d", Priority: 2, DependsOn: []string{"c"}},'
+                '	}'
+                '	before := append([]CandidateTask(nil), items...)'
+                '	before[1].DependsOn = append([]string(nil), items[1].DependsOn...)'
+                '	before[3].DependsOn = append([]string(nil), items[3].DependsOn...)'
+                '	completed := map[string]bool{"a": true, "c": false}'
+                '	got, err := ReadyTaskOrder(items, completed)'
+                '	if err != nil { t.Fatalf("unexpected error: %v", err) }'
+                '	want := []string{"b", "c"}'
+                '	if !reflect.DeepEqual(got, want) { t.Fatalf("got %v want %v", got, want) }'
+                '	if !reflect.DeepEqual(items, before) { t.Fatalf("items mutated: %#v", items) }'
+                '	if !completed["a"] || completed["c"] { t.Fatalf("completed mutated: %#v", completed) }'
+                ''
+                '	completed2 := map[string]bool{"a": true, "c": true}'
+                '	got, err = ReadyTaskOrder(items, completed2)'
+                '	if err != nil { t.Fatalf("unexpected error 2: %v", err) }'
+                '	want = []string{"b", "d"}'
+                '	if !reflect.DeepEqual(got, want) { t.Fatalf("got %v want %v", got, want) }'
+                ''
+                '	empty, err := ReadyTaskOrder(nil, nil)'
+                '	if err != nil || empty == nil || len(empty) != 0 { t.Fatalf("empty contract got=%v err=%v", empty, err) }'
+                ''
+                '	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"", Priority:1}}, nil); err == nil { t.Fatal("expected empty-id error") }'
+                '	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"x"}, {ID:"x"}}, nil); err == nil { t.Fatal("expected duplicate-id error") }'
+                '	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"x", DependsOn:[]string{"missing"}}}, nil); err == nil { t.Fatal("expected unknown-dependency error") }'
+                '	if _, err := ReadyTaskOrder([]CandidateTask{{ID:"x", DependsOn:[]string{"external"}}}, map[string]bool{"external":false}); err != nil {'
+                '		t.Fatalf("known incomplete external dependency should not error: %v", err)'
+                '	}'
+                '}'
+                ''
+              ) | Set-Content -LiteralPath $Hidden -Encoding UTF8
               Push-Location $Worktree
               try{
                 go test ./cmd/nvidiaqual
                 if($LASTEXITCODE-ne0){throw "IMPLEMENTATION_HIDDEN_TEST_FAILED model=$Model"}
               }finally{Pop-Location}
-
               Remove-Item -LiteralPath $Hidden -Force
+
               if((git -C $Worktree status --porcelain)-join''){throw "IMPLEMENTATION_WORKTREE_DIRTY model=$Model"}
 
               $Seconds=[Math]::Round(([DateTime]::UtcNow-$Started).TotalSeconds,1)
