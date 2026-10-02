@@ -1,0 +1,155 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-FRESH-PAIR-FAILURE-ATTRIBUTION-R1",
+  "program": "Wingless-Yggdrasil real-workload maintenance bridge",
+  "question": "Is the R4 fresh-pair maintenance negative attributable to paired-delta target-ranking failure, insufficient unchanged validation sensitivity for exact-target repair, or both?",
+  "hypothesis": "Across eight independently reconstructed rows on the exact R4 fresh pair, at least one true damaged target will not rank first under the frozen paired-delta monitor and at least one exact-target canonical restoration will fail the unchanged 0.20 selected-key validation-gain and 0.005 BPB retain rule, classifying the fresh-pair boundary as mixed monitor-and-validation failure rather than sequential carryover alone.",
+  "exact_parent_sha": "653b26d9e20fdb8954df431414bef99788470284",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-YGG-REAL-UTF8-HETEROGENEOUS-MAINTENANCE-R4-FRESH-PAIR",
+    "classification": "negative",
+    "qualification_run_id": "37038739889",
+    "qualified_head_sha": "55d50293c5f84f9512ab469dd202899e14eb8bb8",
+    "classification_commit_sha": "653b26d9e20fdb8954df431414bef99788470284",
+    "frozen_observations": {
+      "valid_evaluation_file_count": 2,
+      "completed_cycle_count": 8,
+      "minimum_monitor_target_selection_accuracy": 0,
+      "wrong_candidate_retain_count": 0,
+      "wrong_candidate_revert_count": 8,
+      "correct_candidate_retain_count": 4,
+      "correct_candidate_revert_count": 4,
+      "maximum_post_repair_audit_prediction_mismatch_count": 113,
+      "maximum_post_repair_audit_probability_abs_delta": 0.40425531914893614,
+      "minimum_structure_jaccard_after_each_cycle": 1,
+      "canonical_selected_motif_count": 256
+    }
+  },
+  "authority": "diagnostic research-only; no learner, corpus, monitor, threshold, target schedule, degradation, repair, validation, capacity, deployment, external-model inference, scheduler, queue, broker, accepted-ref, runtime, or authority changes",
+  "arms_and_inputs": {
+    "design": "one diagnostic matrix of eight independent rows plus a byte-identical replay of the prior sequential R4 aggregate as a provenance/cardinality control",
+    "training": "exact WLM-LM-REAL-UTF8-BYTE-PILOT-R2 four training Git blobs and byte-identical TrainModel path",
+    "evaluation_blobs": [
+      {
+        "path": "unitary/discovered_commutant.go",
+        "git_blob_sha": "a6973d8e888c4df8ac1ce0ee50d74477188d7c23",
+        "size_bytes": 30625
+      },
+      {
+        "path": "unitary/blind_channel.go",
+        "git_blob_sha": "7323002862869b8073189b944fc645e4956a8f1b",
+        "size_bytes": 28383
+      }
+    ],
+    "segmentation": "Each evaluation blob is split by raw byte index into the unchanged four contiguous quarters with context reset at boundaries.",
+    "degradation_class_order": [
+      "record_missing",
+      "successor_distribution_rotated",
+      "canonical_best_bucket_erased",
+      "nonzero_counts_flattened"
+    ],
+    "target_schedule": "byte-identical R4 eligibility, distinct-target rule, ordering, and four scheduled targets per file",
+    "monitor_diagnostic": "For each row independently degraded from canonical state, rank the frozen stored-healthy paired degraded-minus-healthy scores without target or class access and record true-target rank, top1 identity, score, and margin.",
+    "repair_diagnostic": "On a separate clone of the same independently degraded row, restore the evaluator-known true target's exact canonical record, apply the unchanged validation retain rule, and measure audit restoration. Target identity is evaluator-only and never enters monitor ranking.",
+    "sequential_control": "Invoke the byte-identical frozen R4 implementation and require its complete normalized aggregate to reproduce the prior negative's exact cardinalities and scalar metrics."
+  },
+  "seeds": {
+    "pseudorandom_seed_count": 0,
+    "randomness": "none",
+    "determinism": "Git blob identities, raw-byte quarter boundaries, frozen class order, occurrence/gain ordering, and lexicographic raw-key tie breaks determine every row"
+  },
+  "budgets": {
+    "evaluation_file_count": 2,
+    "degradation_class_count_per_file": 4,
+    "total_independent_diagnostic_rows": 8,
+    "sequential_control_runs": 1,
+    "selected_motif_capacity": 256,
+    "candidate_read_bytes_per_row": 1028,
+    "repair_operations_per_row": 1,
+    "retraining_between_rows": false,
+    "tokenizer": false,
+    "external_model_calls": 0,
+    "gomaxprocs": 1
+  },
+  "controls": [
+    "Reuse the exact R4 training blobs, evaluation blobs, blob hashes, quarter segmentation, class order, target schedule, degradation constructors, canonical model, stored healthy profile, paired-delta score, eligibility, and raw-key tie break.",
+    "Reuse the exact R4 0.20 selected-key validation-gain and 0.005 global-BPB retain thresholds without alteration.",
+    "Reconstruct every diagnostic row from canonical state so earlier failed or retained repairs cannot contaminate later attribution rows.",
+    "Compute monitor attribution and exact-target repair attribution on separate clones of the same independently degraded row.",
+    "Keep target and class identity unavailable to monitor ranking; evaluator-only target access is limited to rank measurement and the preregistered exact-target counterfactual.",
+    "Run the prior sequential implementation only as an unchanged replay control; its output cannot select or modify diagnostic behavior.",
+    "Use no tokenizer, randomness, external model, retraining, capacity growth, class-dependent policy, live canonical shadow, or live interface."
+  ],
+  "metrics_and_thresholds": [
+    ["valid_evaluation_file_count", "==", 2],
+    ["completed_independent_row_count", "==", 8],
+    ["minimum_target_eligibility_count_per_file", ">=", 4],
+    ["minimum_per_class_completed_row_count", "==", 2],
+    ["monitor_top1_target_count", ">=", 0],
+    ["monitor_top1_target_count", "<=", 8],
+    ["minimum_true_target_rank", ">=", 1],
+    ["maximum_true_target_rank", "<=", 256],
+    ["exact_target_repair_retain_count", ">=", 0],
+    ["exact_target_repair_retain_count", "<=", 8],
+    ["exact_target_repair_revert_count", ">=", 0],
+    ["exact_target_repair_revert_count", "<=", 8],
+    ["exact_target_repair_retain_count_plus_revert_count", "==", 8],
+    ["maximum_exact_target_post_repair_audit_prediction_mismatch_count", ">=", 0],
+    ["maximum_exact_target_post_repair_audit_probability_abs_delta", ">=", 0],
+    ["sequential_control_valid_evaluation_file_count", "==", 2],
+    ["sequential_control_completed_cycle_count", "==", 8],
+    ["sequential_control_minimum_monitor_target_selection_accuracy", "==", 0],
+    ["sequential_control_wrong_candidate_retain_count", "==", 0],
+    ["sequential_control_wrong_candidate_revert_count", "==", 8],
+    ["sequential_control_correct_candidate_retain_count", "==", 4],
+    ["sequential_control_correct_candidate_revert_count", "==", 4],
+    ["sequential_control_maximum_post_repair_audit_prediction_mismatch_count", "==", 113],
+    ["sequential_control_maximum_post_repair_audit_probability_abs_delta", "==", 0.40425531914893614],
+    ["sequential_control_minimum_structure_jaccard_after_each_cycle", "==", 1],
+    ["maximum_candidate_read_bytes", "<=", 1028],
+    ["maximum_candidate_repair_operations", "<=", 1],
+    ["canonical_selected_motif_count", "==", 256],
+    ["training_file_identity_mismatch_count", "==", 0],
+    ["evaluation_file_identity_mismatch_count", "==", 0],
+    ["fresh_eval_blob_overlap_count", "==", 0],
+    ["invalid_attribution_rows", "==", 0],
+    ["lesion_label_access_in_monitor_count", "==", 0],
+    ["class_label_access_in_monitor_count", "==", 0],
+    ["tokenizer_use_count", "==", 0],
+    ["capacity_growth_event_count", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact parent SHA, North Star path/hash, prior negative identity, qualification identity, and classification identity match.",
+    "Training and evaluation Git blob identities match; the two evaluation blobs remain disjoint from the pilot and R1/R2 evaluation sets.",
+    "The frozen R4 schedule yields exactly four distinct targets per file and all eight independent rows complete in the frozen class order.",
+    "Quarter boundaries, degradation constructors, canonical model, healthy profile, monitor pairing, eligibility, score, tie break, repair, validation, and audit semantics are byte-identical to R4.",
+    "The unchanged sequential replay reproduces every preregistered R4 control scalar exactly, including the four-retain/four-revert cardinality and audit maxima.",
+    "Every independent row starts from canonical state and the monitor and exact-target counterfactual operate on separate clones.",
+    "No target or class label enters monitor ranking; no tokenizer, randomness, external model, retraining, capacity growth, threshold change, or authority widening occurs.",
+    "Full Go regression passes before probe execution and the normalized result carries the exact experiment identity."
+  ],
+  "classification_rules": {
+    "monitor_only": "Validity passes, monitor_top1_target_count is less than 8, and exact_target_repair_retain_count is 8 with exact audit restoration in all rows.",
+    "validation_only": "Validity passes, monitor_top1_target_count is 8, and exact_target_repair_retain_count is less than 8 or exact audit restoration fails in at least one row.",
+    "mixed": "Validity passes, monitor_top1_target_count is less than 8, and exact_target_repair_retain_count is less than 8 or exact audit restoration fails in at least one row.",
+    "no_independent_failure": "Validity passes, monitor_top1_target_count and exact_target_repair_retain_count are both 8 with exact audit restoration in all rows; the prior negative is then attributable to sequential interaction not reproduced by either isolated component.",
+    "incomplete": "Compute interruption prevents the complete frozen eight-row matrix or single sequential replay without violating a validity criterion.",
+    "invalid": "Any identity, provenance, schedule, segmentation, degradation, monitor, repair, validation, replay cardinality, deterministic construction, capacity, or qualification criterion drifts."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific execution if any parent, North Star, evidence, blob, overlap, schedule, build/regression, or frozen-control identity check fails.",
+    "After output begins, execute the full eight-row matrix and one sequential control unless interrupted or a validity criterion fails.",
+    "If implementation is discovered invalid after any output is observed, do not repair or rerun under this preregistration; restore implementation/request changes and retain only this preregistration commit.",
+    "Do not run additional blobs, classes, thresholds, budgets, capacities, seeds, repair variants, monitor variants, or diagnostic arms under this preregistration."
+  ],
+  "no_post_result_tuning_rule": "No question, hypothesis, input, identity, schedule, degradation, seed, budget, metric, threshold, control, validity criterion, classification rule, stop condition, code path, or interpretation may change after any attribution output is observed.",
+  "changed_paths": [
+    "docs/experiments/wlm-ygg-real-utf8-fresh-pair-failure-attribution-r1.json",
+    "unitary/wlm_ygg_real_utf8_fresh_pair_failure_attribution_r1.go",
+    "cmd/wlm-ygg-real-utf8-fresh-pair-failure-attribution-r1/main.go",
+    "scripts/run-wlm-ygg-real-utf8-fresh-pair-failure-attribution-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
