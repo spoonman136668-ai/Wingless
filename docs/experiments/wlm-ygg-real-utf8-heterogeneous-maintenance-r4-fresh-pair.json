@@ -1,0 +1,236 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-HETEROGENEOUS-MAINTENANCE-R4-FRESH-PAIR",
+  "program": "Wingless-Yggdrasil real-workload maintenance bridge",
+  "question": "Does the supported paired-delta heterogeneous maintenance policy generalize without retuning to a new deterministic pair of immutable real-byte source files not used by the pilot or R1/R2 maintenance evaluations?",
+  "hypothesis": "Across two new immutable raw-byte Go files and the same four degradation classes per file, the frozen paired-delta monitor will identify all eight damaged motifs with positive margin; every wrong same-budget repair will be rejected/reverted; every exact canonical repair will meet the unchanged 0.20 selected-key validation-gain and 0.005 BPB guard and be retained; final audit will restore exact canonical predictions, probabilities, and 256-motif structure after every cycle.",
+  "exact_parent_sha": "efac2b356a2e4779962e22e7b7c58534c41cadc1",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-YGG-REAL-UTF8-HETEROGENEOUS-MAINTENANCE-R2",
+    "classification": "supported",
+    "qualification_run_id": "37037849295",
+    "qualified_head_sha": "f35cf64c6ba8d5e5f3fb0582b47fa84096012676"
+  },
+  "authority": "research-only; no deployment, external-model inference, scheduler, queue, broker, accepted-ref, runtime, or capacity authority changes",
+  "fresh_evaluation_blobs": [
+    {
+      "path": "unitary/discovered_commutant.go",
+      "git_blob_sha": "a6973d8e888c4df8ac1ce0ee50d74477188d7c23",
+      "size_bytes": 30625
+    },
+    {
+      "path": "unitary/blind_channel.go",
+      "git_blob_sha": "7323002862869b8073189b944fc645e4956a8f1b",
+      "size_bytes": 28383
+    }
+  ],
+  "selection_rule": "At the exact parent, choose the two largest unitary/*.go blobs by Git blob size after excluding every file used by the supported real-byte pilot train/eval sets, R1/R2 maintenance evaluation blobs, generated maintenance/diagnostic implementations, and files whose bytes contributed to learner construction. Ties break lexicographically by path. Selection is frozen before execution.",
+  "frozen_reuse": {
+    "learner": "byte-identical WLM-LM-REAL-UTF8-BYTE-PILOT-R2 training blobs, TrainModel path, 256-motif capacity, and probability rule",
+    "segmentation": "four contiguous raw-byte quarters with context reset at boundaries",
+    "target_schedule": "byte-identical heterogeneous class order, eligibility, distinct-target rule, and deterministic ordering from R2",
+    "monitor": "byte-identical R2 stored-healthy paired degraded-minus-healthy score, eligibility, and raw-key tie break",
+    "candidates": "byte-identical wrong-first/revert/correct-second construction and 1028-byte/one-operation budget",
+    "validation": "unchanged retain iff selected-key accuracy gain >=0.20 and global BPB change <=0.005",
+    "audit": "exact canonical key set, record state, predictions, probabilities, and capacity"
+  },
+  "budgets": {
+    "evaluation_file_count": 2,
+    "degradation_classes_per_file": 4,
+    "total_cycles": 8,
+    "selected_motif_capacity": 256,
+    "repair_operations_per_candidate": 1,
+    "candidate_read_bytes": 1028,
+    "external_model_calls": 0,
+    "tokenizer": false,
+    "retraining": false
+  },
+  "metrics_and_thresholds": [
+    [
+      "valid_evaluation_file_count",
+      "==",
+      2
+    ],
+    [
+      "completed_cycle_count",
+      "==",
+      8
+    ],
+    [
+      "minimum_target_eligibility_count_per_file",
+      ">=",
+      4
+    ],
+    [
+      "minimum_monitor_target_selection_accuracy",
+      "==",
+      1
+    ],
+    [
+      "minimum_selected_paired_delta_score",
+      ">",
+      0
+    ],
+    [
+      "minimum_selected_minus_runner_up_paired_delta",
+      ">",
+      0
+    ],
+    [
+      "maximum_wrong_candidate_selected_key_accuracy_gain",
+      "<",
+      0.2
+    ],
+    [
+      "wrong_candidate_retain_count",
+      "==",
+      0
+    ],
+    [
+      "wrong_candidate_revert_count",
+      "==",
+      8
+    ],
+    [
+      "minimum_correct_candidate_selected_key_accuracy_gain",
+      ">=",
+      0.2
+    ],
+    [
+      "correct_candidate_retain_count",
+      "==",
+      8
+    ],
+    [
+      "correct_candidate_revert_count",
+      "==",
+      0
+    ],
+    [
+      "minimum_per_class_completed_cycle_count",
+      "==",
+      2
+    ],
+    [
+      "maximum_post_repair_audit_prediction_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "maximum_post_repair_audit_probability_abs_delta",
+      "==",
+      0
+    ],
+    [
+      "minimum_structure_jaccard_after_each_cycle",
+      "==",
+      1
+    ],
+    [
+      "maximum_candidate_read_bytes",
+      "<=",
+      1028
+    ],
+    [
+      "maximum_candidate_repair_operations",
+      "<=",
+      1
+    ],
+    [
+      "maximum_final_selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "minimum_final_selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "lesion_label_access_count",
+      "==",
+      0
+    ],
+    [
+      "class_label_access_in_policy_count",
+      "==",
+      0
+    ],
+    [
+      "healthy_profile_recompute_count",
+      "==",
+      0
+    ],
+    [
+      "live_canonical_shadow_access_count",
+      "==",
+      0
+    ],
+    [
+      "evaluator_schedule_access_in_policy_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_cycle_rows",
+      "==",
+      0
+    ],
+    [
+      "training_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "evaluation_file_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "fresh_eval_blob_overlap_count",
+      "==",
+      0
+    ],
+    [
+      "canonical_selected_motif_count",
+      "==",
+      256
+    ]
+  ],
+  "classification_rules": {
+    "supported": "All validity and frozen thresholds pass across all eight cycles.",
+    "mixed": "Validity passes and exact repair/audit restoration succeeds, but at least one monitor-separation, wrong-candidate, validation, per-class, or budget threshold fails.",
+    "negative": "Validity passes but monitoring, wrong-candidate rejection, correct retention, or exact audit restoration fails on one or more cycles.",
+    "incomplete": "Corpus or compute interruption prevents the complete eight-cycle matrix.",
+    "invalid": "Any identity, corpus-isolation, schedule, quarter-isolation, degradation, candidate-parity, revert, deterministic-construction, capacity, or qualification criterion fails."
+  },
+  "stop_conditions": [
+    "Stop invalid before science on any parent/North-Star/blob/provenance/overlap mismatch.",
+    "After output begins, execute all eight cycles unless interrupted or validity fails.",
+    "Do not repair or rerun under this identifier after observing output."
+  ],
+  "no_post_result_tuning_rule": "Do not alter corpus, selection rule, quarter split, degradation classes/order, target schedule, healthy profile, paired-delta monitor, candidates, validation, budgets, metrics, thresholds, classification, or stop conditions after any output is observed.",
+  "changed_paths": [
+    "docs/experiments/wlm-ygg-real-utf8-heterogeneous-maintenance-r4-fresh-pair.json",
+    "unitary/wlm_ygg_real_utf8_heterogeneous_maintenance_r4_fresh_pair.go",
+    "cmd/wlm-ygg-real-utf8-heterogeneous-maintenance-r4-fresh-pair/main.go",
+    "scripts/run-wlm-ygg-real-utf8-heterogeneous-maintenance-r4-fresh-pair.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "supersedes_unexecuted_preregistrations": [
+    "WLM-YGG-REAL-UTF8-HETEROGENEOUS-MAINTENANCE-R3",
+    "WLM-YGG-REAL-UTF8-HETEROGENEOUS-MAINTENANCE-R3-FRESH-PAIR"
+  ]
+}
