@@ -21,11 +21,9 @@ jobs:
       max-parallel: 1
       matrix:
         include:
-          - model: z-ai/glm-5.3
-            slug: glm-5-3
           - model: poolside/laguna-xs-2.1
             slug: laguna-xs-2-1
-    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
     timeout-minutes: 60
     env:
       NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
