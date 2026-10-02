@@ -1,0 +1,31 @@
+{
+  "schema": "wingless.research-classification.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-PAIRED-DELTA-MONITOR-R1",
+  "qualified_head_sha": "e72b815fb27d1844003f7bedbb5a4a558c7d57eb",
+  "qualification_run_id": "37030707842",
+  "classification": "supported",
+  "thresholds_frozen_before_execution": true,
+  "full_regression_passed": true,
+  "metrics": {
+    "valid_evaluation_file_count": 2,
+    "completed_row_count": 8,
+    "minimum_target_eligibility_count_per_file": 6,
+    "legacy_misrank_count": 1,
+    "legacy_nonzero_counts_flattened_misrank_count": 1,
+    "legacy_other_class_misrank_count": 0,
+    "paired_delta_top1_target_count": 8,
+    "paired_delta_nonpositive_target_count": 0,
+    "paired_delta_positive_off_target_count": 0,
+    "minimum_paired_delta_target_margin": 5,
+    "invalid_row_count": 0,
+    "training_file_identity_mismatch_count": 0,
+    "evaluation_file_identity_mismatch_count": 0,
+    "fresh_eval_blob_overlap_count": 0,
+    "tokenizer_use_count": 0,
+    "capacity_growth_event_count": 0
+  },
+  "scientific_claim": "On the exact eight heterogeneous real-byte degradation rows, the legacy calibrated monitor reproduced its single frozen nonzero_counts_flattened miss, while the paired degraded-minus-canonical score uniquely ranked the true target first in all 8/8 rows with zero nonpositive target deltas, zero positive off-target deltas, and minimum target margin 5.",
+  "next_question": "Replace only the legacy monitor readout in the full heterogeneous maintenance loop with the qualified paired-delta monitor and rerun wrong-first/revert/correct-retain across the same eight cycles.",
+  "scope": "real-byte heterogeneous damage monitoring; diagnostic readout only",
+  "authority": "research-only"
+}
