@@ -1,0 +1,47 @@
+name: Preserve Wingless stack commits
+on:
+  push:
+    branches:
+      - diagnostic/repo-local-cutover-r1
+    paths:
+      - '.github/workflows/preserve-wingless-stack-commits.yml'
+permissions:
+  contents: write
+jobs:
+  preserve:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - name: Push exact observed Wingless commits to recovery ref
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $Repo='C:\actions-runner-up-b\_work\Wingless\Wingless\research'
+          $Expected='fca6962e124b829505a896232b6c3c134d2fdb9e'
+          $Parent='7287347f636c7c2aa7c1dc3b804d06a96dd28778'
+          $Ref='refs/heads/recovery/wingless-stack-container-r1'
+          if(-not(Test-Path -LiteralPath $Repo -PathType Container)){throw 'CHECKOUT_MISSING'}
+          $Head=(& git -C $Repo rev-parse HEAD).Trim()
+          if($Head-cne$Expected){throw "HEAD_DRIFT expected=$Expected actual=$Head"}
+          $Base=(& git -C $Repo rev-parse ($Expected+'~2')).Trim()
+          if($Base-cne$Parent){throw "LINEAGE_DRIFT expected_parent=$Parent actual=$Base"}
+          if(((& git -C $Repo status --porcelain)-join'').Trim()){throw 'WORKTREE_DIRTY'}
+          $Remote='https://github.com/spoonman136668-ai/Wingless.git'
+          $Pair="x-access-token:$env:GITHUB_TOKEN"
+          $Basic=[Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($Pair))
+          $Header="AUTHORIZATION: basic $Basic"
+          $Existing=@(& git -c "http.https://github.com/.extraheader=$Header" ls-remote --heads $Remote $Ref)
+          if($Existing.Count-gt0){
+            $Sha=(([string]$Existing[0]) -split '\s+')[0]
+            if($Sha-cne$Expected){throw "RECOVERY_REF_CONFLICT expected=$Expected actual=$Sha"}
+            Write-Host "RECOVERY_REF_ALREADY_CORRECT=$Sha"
+          }else{
+            & git -c "http.https://github.com/.extraheader=$Header" -C $Repo push $Remote ($Expected+':'+$Ref)
+            if($LASTEXITCODE-ne0){throw 'RECOVERY_PUSH_FAILED'}
+          }
+          $Verify=@(& git -c "http.https://github.com/.extraheader=$Header" ls-remote --heads $Remote $Ref)
+          $Actual=(([string]$Verify[0]) -split '\s+')[0]
+          if($Actual-cne$Expected){throw "RECOVERY_VERIFY_FAILED expected=$Expected actual=$Actual"}
+          Write-Host "WINGLESS_STACK_RECOVERY_REF=PASS sha=$Actual"
