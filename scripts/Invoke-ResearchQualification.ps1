@@ -153,13 +153,25 @@ $UnexpectedDirty = @(
 )
 
 $LegacyHarnessMarker = $Transcript -match 'WINGLESS_UP\d+_HARNESS_PASS'
+$ProbeSchema = ''
+$ProbeExperiment = ''
+$RequestExperiment = [string]$Request.experiment
 $NormalizedHarnessMarker = $false
 if ($null -ne $Probe) {
+    $SchemaProperty = $Probe.PSObject.Properties['schema']
+    $ExperimentProperty = $Probe.PSObject.Properties['experiment']
+    if ($null -ne $SchemaProperty) {
+        $ProbeSchema = [string]$SchemaProperty.Value
+    }
+    if ($null -ne $ExperimentProperty) {
+        $ProbeExperiment = [string]$ExperimentProperty.Value
+    }
     $NormalizedHarnessMarker =
-        ([string]$Probe.schema -ceq 'wingless.research-scientific-result.v1') -and
-        ([string]$Probe.experiment -ceq [string]$Request.experiment)
+        $ProbeSchema.Equals('wingless.research-scientific-result.v1', [StringComparison]::Ordinal) -and
+        $ProbeExperiment.Equals($RequestExperiment, [StringComparison]::Ordinal)
 }
 $HarnessMarker = $LegacyHarnessMarker -or $NormalizedHarnessMarker
+Write-Host "WINGLESS_QUAL_HARNESS_WITNESS legacy=$LegacyHarnessMarker normalized=$NormalizedHarnessMarker probe_schema=$ProbeSchema probe_experiment=$ProbeExperiment request_experiment=$RequestExperiment"
 $HarnessMarkerKind = if ($LegacyHarnessMarker) {
     'legacy-up-marker'
 }
