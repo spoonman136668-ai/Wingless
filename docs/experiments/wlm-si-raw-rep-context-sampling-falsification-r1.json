@@ -1,0 +1,126 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-SI-RAW-REP-CONTEXT-SAMPLING-FALSIFICATION-R1",
+  "program":"Wingless substrate falsification",
+  "question":"Does the current exact context-signature representation preserve alias abstraction when equivalent raw surface families receive independent finite samples from the same underlying context distribution rather than byte-identical context-count histograms?",
+  "hypothesis":"If the current contextual representation is robust to ordinary sampling variation, three equivalent surface aliases independently sampled sixty-four times from the same uniform sixteen-context distribution will still induce exactly nine three-member classes and transfer at least 0.90 accuracy to task-untrained family 2. A matched-sample positive control must retain nine correct classes and at least 0.95 transfer accuracy.",
+  "exact_parent_sha":"20c6e0f5acb04056f2ec1b39a3928581891132ac",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context":{
+    "allocation":"75% chain / 25% substrate falsification",
+    "slot":"substrate falsification",
+    "block_position":8,
+    "block_result_if_completed":"6 chain / 2 falsification"
+  },
+  "prior_evidence":{
+    "experiment":"WLM-LM-RAW-REP-ZEROSHOT-MULTISTEP-R2",
+    "github_run_id":"37068942080",
+    "observation":"A task-untrained third surface family achieved 1.0 accuracy on all 192 multi-step programs through exact context-signature alias classes."
+  },
+  "scope_statement":"This experiment attacks sampling robustness of the representation layer only. It does not reinterpret the prior exact-signature results; it asks whether the abstraction survives independent finite observations drawn from the same latent context distribution.",
+  "authority":"research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "surface_families":{
+    "family_count":3,
+    "entity_count":9,
+    "surface_motif_count":27,
+    "motif_width_bytes":4,
+    "motifs":"byte-identical to the qualified R5 three-family lineage"
+  },
+  "context_distribution":{
+    "latent_context_count_per_entity":16,
+    "underlying_distribution":"uniform over context_index 0..15 for every family and entity",
+    "samples_per_surface":64,
+    "bridge_record_count_per_arm":1728,
+    "context_bytes":[
+      "prefix0 = 192 + ((entity*7 + context_index*3) mod 16)",
+      "prefix1 = 208 + ((entity*5 + context_index*5) mod 16)",
+      "suffix0 = 224 + ((entity*11 + context_index*7) mod 16)",
+      "suffix1 = 240 + ((entity*13 + context_index*11) mod 16)"
+    ],
+    "sampler_step":"state = state*1664525 + 1013904223; context_index = (state >> 16) mod 16",
+    "matched_control_seed":"0x243f6a88 XOR ((entity+1)*1009); identical sample sequence for all three families of an entity",
+    "independent_arm_seed":"0x243f6a88 XOR ((entity+1)*1009) XOR ((family+1)*0x9e3779b9); distinct deterministic sequence per family",
+    "family_labels_visible_to_clustering":false,
+    "semantic_labels_visible_to_clustering":false
+  },
+  "representation":{
+    "surface_selection":"top twenty-seven raw four-byte bridge windows by occurrence count descending, then lexicographic raw key",
+    "capacity":27,
+    "signature":"complete sorted exact immediate-context-key occurrence map",
+    "clustering":"surfaces share a class only if complete count signatures are byte-identical",
+    "approximate_matching":false
+  },
+  "task_transfer":{
+    "training":"families 0 and 1 only; same 3200 single-step task records as R5",
+    "family2_task_training_records":0,
+    "evaluation":"all eighty family-2 single-step tasks, read-only",
+    "transition_model":"dynamic exact induced-class transition counts so class fragmentation is a scientific outcome rather than an invalid construction",
+    "missing_transition_behavior":"predict lexicographically lowest observed output-class pair",
+    "semantic_scoring":"evaluator-only after prediction"
+  },
+  "controls":[
+    "Matched-sample arm uses identical finite context samples across aliases and must reproduce the established alias abstraction.",
+    "Independent-sample arm differs only in family-specific sampler seed; underlying context distribution, sample count, motifs, learner, task data, and evaluator are unchanged.",
+    "Exact-surface task control remains trained on families 0 and 1 only.",
+    "No alias dictionary, family label, semantic label, tokenizer, external model, network access, capacity growth, or oracle correction enters learning."
+  ],
+  "metrics_and_thresholds":[
+    ["matched_bridge_record_count","==",1728],
+    ["independent_bridge_record_count","==",1728],
+    ["selected_surface_representation_count","==",27],
+    ["selected_true_surface_motif_match_count","==",27],
+    ["matched_max_context_count_l1_distance","==",0],
+    ["independent_max_context_count_l1_distance",">",0],
+    ["matched_alias_class_count","==",9],
+    ["matched_three_member_class_count","==",9],
+    ["matched_correct_alias_triplet_count","==",9],
+    ["matched_unseen_family_accuracy",">=",0.95],
+    ["independent_alias_class_count","==",9],
+    ["independent_three_member_class_count","==",9],
+    ["independent_correct_alias_triplet_count","==",9],
+    ["independent_missing_transition_count","==",0],
+    ["independent_unseen_family_accuracy",">=",0.90],
+    ["exact_surface_unseen_family_accuracy","<=",0.25],
+    ["task_training_record_count","==",3200],
+    ["family2_task_training_record_count","==",0],
+    ["unseen_family_evaluation_count","==",80],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "validity_criteria":[
+    "Exact parent, North Star, and sealed zero-shot multi-step evidence identity match.",
+    "Both arms use the same twenty-seven motifs, sixteen latent context keys per entity, uniform underlying distribution, sixty-four samples per surface, task records, transition learner, and evaluator.",
+    "Matched and independent arms differ only in whether aliases share the sampler seed.",
+    "Independent empirical context histograms must differ for at least one alias pair, proven by positive maximum L1 count distance.",
+    "Class fragmentation is allowed and must not increment invalid_row_count.",
+    "Family 2 contributes zero task-transition training records.",
+    "Semantic identity is evaluator-only after prediction.",
+    "All metrics are finite and full Go regression passes before the probe.",
+    "No tokenizer, external model, network call, capacity growth, approximate-clustering repair, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules":{
+    "survives_falsification":"Validity passes, matched control passes, and all independent-arm class/transfer thresholds pass.",
+    "sampling_invariance_falsified":"Validity passes, matched control has nine correct triplet classes and at least 0.95 transfer accuracy, independent empirical histograms differ, and independent alias classes fragment or independent transfer accuracy is at most 0.25 with missing transition keys.",
+    "mixed":"Validity passes and matched control succeeds, but independent behavior lies between survival and falsification criteria.",
+    "negative_control_failure":"Matched control fails its class or transfer threshold, preventing sampling-invariance interpretation.",
+    "incomplete":"Compute interruption prevents the frozen matrix.",
+    "invalid":"Any distribution mismatch, family2 task leakage, evaluator-boundary, deterministic-state, or qualification criterion fails."
+  },
+  "stop_conditions":[
+    "Stop invalid before science on parent, North Star, construction, build, or frozen-package drift.",
+    "After output begins, complete both bridge arms and all eighty family2 evaluations unless infrastructure prevents it.",
+    "Do not introduce approximate clustering, alter sample size, change seeds, add family2 task data, increase capacity, or weaken thresholds after observing output."
+  ],
+  "no_post_result_tuning_rule":"No context distribution, sample count, seed, representation rule, transition model, control, metric, threshold, or interpretation may change after primary output.",
+  "changed_paths":[
+    "docs/experiments/wlm-si-raw-rep-context-sampling-falsification-r1.json",
+    "unitary/wlm_si_raw_rep_context_sampling_falsification_r1.go",
+    "cmd/wlm-si-raw-rep-context-sampling-falsification-r1/main.go",
+    "scripts/run-wlm-si-raw-rep-context-sampling-falsification-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
