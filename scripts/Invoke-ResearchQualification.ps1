@@ -52,7 +52,13 @@ $Branch = if (-not [string]::IsNullOrWhiteSpace($env:GITHUB_REF_NAME)) {
     $env:GITHUB_REF_NAME
 }
 else {
-    (git -C $Repo branch --show-current).Trim()
+    $BranchRaw = git -C $Repo branch --show-current
+    if ($null -eq $BranchRaw) {
+        ''
+    }
+    else {
+        ([string]$BranchRaw).Trim()
+    }
 }
 
 if (-not [string]::IsNullOrWhiteSpace($Branch) -and $Branch -cne [string]$Request.branch) {
