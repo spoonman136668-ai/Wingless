@@ -56,7 +56,6 @@ jobs:
           $ProbeBranch='qual/glm-long-'+$env:GITHUB_RUN_ID
           $Prompt=Join-Path $env:RUNNER_TEMP ('glm-long-prompt-'+$env:GITHUB_RUN_ID+'.txt')
           $Last=Join-Path $env:RUNNER_TEMP ('glm-long-last-'+$env:GITHUB_RUN_ID+'.txt')
-          $Trace=Join-Path $env:RUNNER_TEMP ('glm-long-trace-'+$env:GITHUB_RUN_ID+'.txt')
           if(Test-Path -LiteralPath $Worktree){Remove-Item -LiteralPath $Worktree -Recurse -Force}
           git worktree add -b $ProbeBranch $Worktree $Head
           if($LASTEXITCODE-ne0){throw 'GLM_LONG_WORKTREE_CREATE_FAILED'}
@@ -71,7 +70,7 @@ jobs:
               'Do not send a normal final answer.'
             ) | Set-Content -LiteralPath $Prompt -Encoding UTF8
 
-            & '.\scripts\Invoke-NemotronRepoAgent.ps1' `
+            $Output=@(& '.\scripts\Invoke-NemotronRepoAgent.ps1' `
               -RepoPath $Worktree `
               -Program 'Wingless' `
               -ActiveBranch $ProbeBranch `
@@ -81,14 +80,13 @@ jobs:
               -Provider nvidia `
               -Model 'z-ai/glm-5.3' `
               -MaxRounds 12 `
-              -ProtocolProbe *>&1 |
-              Tee-Object -FilePath $Trace |
-              ForEach-Object { Write-Host ([string]$_) }
+              -ProtocolProbe *>&1)
+            $Output | ForEach-Object { Write-Host ([string]$_) }
 
             if(-not(Test-Path -LiteralPath $Last -PathType Leaf)){throw 'GLM_LONG_RESULT_MISSING'}
             $Summary=[IO.File]::ReadAllText($Last).Trim()
             if($Summary -cne 'GLM_LONG_SESSION_PASS'){throw "GLM_LONG_RESULT_INVALID summary=$Summary"}
-            $TraceText=[IO.File]::ReadAllText($Trace)
+            $TraceText=(@($Output) | ForEach-Object { [string]$_ }) -join [Environment]::NewLine
             foreach($Round in 1..8){
               if($TraceText -notmatch ("NEMOTRON_TOOL round="+$Round+" name=git_status")){throw "GLM_LONG_ROUND_MISSING round=$Round"}
             }
