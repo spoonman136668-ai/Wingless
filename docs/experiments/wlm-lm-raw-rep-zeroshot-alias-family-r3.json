@@ -1,0 +1,174 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R3",
+  "program": "Wingless raw-input to invariant representation to zero-shot reasoning chain",
+  "question": "Can the exact R1 zero-shot alias-family experiment execute from a clean two-commit qualification boundary after the concurrent autonomous preregistration invalidated R1 before science?",
+  "hypothesis": "With byte-identical R1 scientific code, corpus, representation bridge, family isolation, controls, metrics, and thresholds, a third surface family with zero task-transition examples will reach at least 0.95 task accuracy through context-induced classes, while the exact-surface and frozen shuffled-family controls remain at or below 0.25.",
+  "exact_parent_sha": "3644ad9fd04a54c765f98cdea02a6ae2268d0dd3",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "supersedes_invalid_before_execution": {
+    "experiment": "WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R2",
+    "disposition": "invalid-preregistration-before-execution",
+    "reason": "the contextual-alias multistep implementation landed between the R2 preregistration's recorded parent and its actual commit parent during scheduler shutdown",
+    "scientific_step_ran": false,
+    "scientific_output_observed": false,
+    "scientific_claim": false
+  },
+  "replication_invariant": {
+    "scientific_function": "RunWlmLmRawRepZeroshotAliasFamilyR1",
+    "scientific_change": false,
+    "family2_task_training_examples": 0,
+    "bridge_record_count": 864,
+    "surface_representation_capacity": 27,
+    "normal_alias_classes": "nine three-member context-signature classes",
+    "shuffled_family2_control": "value context rotation +3 mod 4; operation context rotation +1 mod 5",
+    "forbidden": "corpus changes, family-2 task examples, representation changes, bridge changes, threshold changes, control changes, semantic dictionary, post-result tuning"
+  },
+  "prior_qualified_evidence": {
+    "experiment": "WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-INDUCTION-R2",
+    "github_run_id": "37066504364",
+    "observation": "Two-family contextual induction achieved 1.0 cross-family accuracy; exact-surface scored 0.03125 and shuffled-context scored 0.15."
+  },
+  "metrics_and_thresholds": [
+    [
+      "bridge_record_count",
+      "==",
+      864
+    ],
+    [
+      "selected_surface_representation_count",
+      "==",
+      27
+    ],
+    [
+      "selected_true_surface_motif_match_count",
+      "==",
+      27
+    ],
+    [
+      "bridge_decode_failure_count",
+      "==",
+      0
+    ],
+    [
+      "induced_alias_class_count",
+      "==",
+      9
+    ],
+    [
+      "induced_three_member_class_count",
+      "==",
+      9
+    ],
+    [
+      "correct_evaluator_alias_triplet_count",
+      "==",
+      9
+    ],
+    [
+      "task_training_record_count",
+      "==",
+      3200
+    ],
+    [
+      "family2_task_training_record_count",
+      "==",
+      0
+    ],
+    [
+      "task_training_decode_failure_count",
+      "==",
+      0
+    ],
+    [
+      "class_transition_key_count",
+      "==",
+      80
+    ],
+    [
+      "unseen_family_evaluation_count",
+      "==",
+      80
+    ],
+    [
+      "unseen_family_accuracy",
+      ">=",
+      0.95
+    ],
+    [
+      "exact_surface_unseen_family_accuracy",
+      "<=",
+      0.25
+    ],
+    [
+      "exact_surface_unseen_missing_transition_count",
+      "==",
+      80
+    ],
+    [
+      "shuffled_family2_alias_class_count",
+      "==",
+      9
+    ],
+    [
+      "shuffled_family2_unseen_accuracy",
+      "<=",
+      0.25
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ]
+  ],
+  "validity_criteria": [
+    "Exact parent and North Star identities match.",
+    "R2 delegates to the exact R1 scientific function without changing any scientific input or parameter.",
+    "Family 2 remains absent from all task-transition training and appears only in the raw bridge before evaluation.",
+    "Normal clustering receives no family or semantic labels; semantic mapping remains evaluator-only after prediction.",
+    "Exact-surface and shuffled-family controls are byte-identical to R1.",
+    "Full Go regression passes before the probe and all metrics are finite.",
+    "No tokenizer, external model, network call, capacity growth, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all twenty-two frozen thresholds pass.",
+    "mixed": "Validity passes and unseen-family accuracy materially exceeds both controls, but at least one representation recovery or 0.95 transfer threshold fails.",
+    "negative": "Validity passes but the unseen family does not materially outperform the exact-surface control.",
+    "incomplete": "Compute interruption prevents the frozen bridge, training, or eighty-case evaluation.",
+    "invalid": "Any R1 scientific drift, family-2 task leakage, bridge leakage, evaluator-boundary violation, capacity, determinism, or qualification criterion fails."
+  },
+  "stop_conditions": [
+    "Stop invalid before science on parent, North Star, package, build, or R1 scientific-code drift.",
+    "After output begins, complete the full frozen R1 matrix unless infrastructure prevents it.",
+    "Do not alter any scientific parameter or threshold after output."
+  ],
+  "no_post_result_tuning_rule": "R1 scientific inputs and thresholds are frozen byte-for-byte for R2. R2 exists only to restore a valid qualification boundary after R1 was blocked before scientific execution.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-raw-rep-zeroshot-alias-family-r3.json",
+    "unitary/wlm_lm_raw_rep_zeroshot_alias_family_r3.go",
+    "cmd/wlm-lm-raw-rep-zeroshot-alias-family-r3/main.go",
+    "scripts/run-wlm-lm-raw-rep-zeroshot-alias-family-r3.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
