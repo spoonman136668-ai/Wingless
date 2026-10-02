@@ -1,0 +1,197 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-CROSS-DOMAIN-GRANULARITY-TRANSFER-R1",
+  "proposal_parent": "WLM-LM-ADAPTIVE-GRANULARITY-PROPOSAL-R1",
+  "proposal_stage": "WBG-4",
+  "question": "Do learned raw-byte motifs and adaptive granularity transfer into a sealed fourth synthetic domain by reusing shared low-level structures, requiring only bounded domain-specific state growth and preserving prior-domain capability?",
+  "hypothesis": "After training one bounded motif store on three disjoint synthetic domains, the held-out fourth domain will achieve at least 0.65 zero-shot target accuracy from four shared motifs, reach at least 0.95 after adapting only two new domain-specific motifs, require at most two added motif entries versus at least six for a fresh target-domain learner, preserve source-domain accuracy within 0.01, and retain at least 0.18 adaptive event reduction on the held-out domain.",
+  "exact_parent_sha": "9be707030362ab2dfbfb5b9ac12d378e2261fb11",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-ADAPTIVE-GRANULARITY-R1",
+    "classification": "supported",
+    "qualification_run_id": "36997554755",
+    "scientific_claim": "Learned motifs enabled uncertainty-selective granularity with perfect target accuracy, 20% total event reduction, and zero false coarse activation in high-entropy regions."
+  },
+  "authority": "research-only; no production, live, accepted-ref, scheduler, queue-consumer, external-model inference, or cross-lane authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-cross-domain-granularity-transfer-r1.json",
+    "unitary/wlm_lm_cross_domain_granularity_transfer_r1.go",
+    "cmd/wlm-lm-cross-domain-granularity-transfer-r1/main.go",
+    "scripts/run-wlm-lm-cross-domain-granularity-transfer-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "domains": {
+    "names": [
+      "prose-like",
+      "code-like",
+      "structured-data-like",
+      "binary-like"
+    ],
+    "train_domain_ids": [
+      0,
+      1,
+      2
+    ],
+    "heldout_domain_id": 3,
+    "shared_motif_count": 4,
+    "domain_specific_motif_count_per_domain": 2,
+    "shared_motifs": "WBG-2 motifs 0..3 with unchanged successor mapping",
+    "domain_specific_motif_rule": "domain d, local j in {0,1}: [32+16*d+j, 96+5*d+3*j, 204, 51]",
+    "domain_specific_successor_rule": "128 + 8*d + 3*j",
+    "corpus_record": "four-byte motif + successor + three domain-specific filler bytes",
+    "domain_filler_ranges": {
+      "0": "160..175",
+      "1": "176..191",
+      "2": "208..223",
+      "3": "224..239"
+    },
+    "boundary_visibility": "domain ID and record boundaries are available to corpus construction/evaluation only; motif learner sees concatenated raw bytes"
+  },
+  "learner": {
+    "motif_width_bytes": 4,
+    "global_store_capacity": 12,
+    "candidate_occurrence_threshold": 64,
+    "successor_consistency_threshold": 0.9,
+    "selection": "same recurrence/consistency rule as WBG-2, but entries are admitted into one persistent global motif store until capacity 12",
+    "prediction": "exact learned motif match -> learned successor; otherwise byte-level fallback zero",
+    "adaptation": "target-domain adaptation may add new entries but may not rewrite or evict existing entries",
+    "capacity_growth": false
+  },
+  "corpora": {
+    "source_training_records_per_domain_per_seed": 3072,
+    "source_evaluation_records_per_domain_per_seed": 768,
+    "heldout_evaluation_records_per_seed": 1536,
+    "heldout_adaptation_records_per_seed": 768,
+    "seeds": [
+      12007,
+      12011,
+      12037,
+      12041
+    ],
+    "seed_policy": "All four seeds were checked against the Wingless repository before preregistration and had no matches.",
+    "schedule": "balanced motif schedule within each domain; every six-record block contains all four shared and both domain-specific motifs exactly once",
+    "train_eval_separation": "disjoint deterministic filler counter ranges"
+  },
+  "evaluation": {
+    "zero_shot": "Evaluate held-out domain before any target adaptation.",
+    "adapted": "Adapt persistent learner on held-out adaptation stream, then evaluate held-out domain again.",
+    "fresh_control": "Train an empty bounded store on the same held-out adaptation stream and evaluate the same target set.",
+    "source_retention": "Re-evaluate all three source domains after held-out adaptation.",
+    "event_reduction": "On held-out evaluation, exact learned motif spans count as one event instead of four; all other bytes count individually."
+  },
+  "metrics_and_thresholds": [
+    {
+      "name": "valid_seed_count",
+      "comparator": "==",
+      "threshold": 4
+    },
+    {
+      "name": "minimum_zero_shot_shared_transfer_accuracy",
+      "comparator": ">=",
+      "threshold": 0.65
+    },
+    {
+      "name": "minimum_adapted_target_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "minimum_fresh_target_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "maximum_transfer_added_motif_count",
+      "comparator": "<=",
+      "threshold": 2
+    },
+    {
+      "name": "minimum_fresh_added_motif_count",
+      "comparator": ">=",
+      "threshold": 6
+    },
+    {
+      "name": "maximum_transfer_to_fresh_added_motif_ratio",
+      "comparator": "<=",
+      "threshold": 0.34
+    },
+    {
+      "name": "maximum_source_accuracy_loss_after_target_adaptation",
+      "comparator": "<=",
+      "threshold": 0.01
+    },
+    {
+      "name": "minimum_post_adaptation_source_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "minimum_heldout_event_reduction_fraction",
+      "comparator": ">=",
+      "threshold": 0.18
+    },
+    {
+      "name": "minimum_shared_motif_reuse_count",
+      "comparator": ">=",
+      "threshold": 4
+    },
+    {
+      "name": "maximum_global_store_size",
+      "comparator": "<=",
+      "threshold": 12
+    },
+    {
+      "name": "minimum_global_store_size_after_source_training",
+      "comparator": "==",
+      "threshold": 10
+    },
+    {
+      "name": "maximum_global_store_size_after_source_training",
+      "comparator": "==",
+      "threshold": 10
+    },
+    {
+      "name": "motif_eviction_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "motif_rewrite_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "invalid_stream_rows",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "counter_overflow_rows",
+      "comparator": "==",
+      "threshold": 0
+    }
+  ],
+  "validity_criteria": [
+    "Exact parent SHA, North Star identity, and supported WBG-3 evidence match.",
+    "All four seeds and all four domains complete frozen corpus cardinalities.",
+    "Held-out domain ID, motif identities, and boundary labels are unavailable to the learner.",
+    "The four shared motifs are byte-identical and successor-identical across all domains.",
+    "Each domain has exactly two unique motifs unavailable in the other three domains.",
+    "Persistent target adaptation may only add entries into the preallocated 12-slot store; no eviction, rewrite, capacity growth, or source retraining occurs.",
+    "Fresh control receives exactly the same held-out adaptation bytes as transfer learner.",
+    "Source retention is measured after target adaptation without source rehearsal.",
+    "Event reduction is computed only from exact learned motif spans.",
+    "The normalized result carries schema wingless.research-scientific-result.v1 and exact experiment identifier.",
+    "Full Go regression passes before probe execution."
+  ],
+  "classification_rules": {
+    "supported": "All eighteen frozen thresholds and all validity criteria pass.",
+    "mixed": "Shared transfer and bounded target adaptation are demonstrated, but at least one state-growth, retention, or event-reduction threshold fails.",
+    "negative": "Validity passes but shared motifs do not transfer materially, target adaptation requires near-fresh state growth, or source capability degrades.",
+    "incomplete": "Environmental or compute interruption prevents frozen cardinality.",
+    "invalid": "Provenance, domain isolation, store-capacity, no-rewrite/no-eviction, deterministic construction, or qualification isolation fails."
+  },
+  "no_post_result_tuning_rule": "After any output is observed, do not alter seeds, domains, motif definitions, successor rules, corpus sizes, store capacity, admission thresholds, adaptation policy, controls, metrics, thresholds, aggregation, or classification."
+}
