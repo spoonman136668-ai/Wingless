@@ -165,6 +165,7 @@ $MindContext
     [IO.File]::WriteAllText($PromptPath,$Prompt,(New-Object Text.UTF8Encoding($false)))
 
     $Succeeded=$false
+    $PrimaryRateLimited=$false
     $NemotronAgent=Join-Path $PSScriptRoot 'Invoke-NemotronRepoAgent.ps1'
     if(Test-Path -LiteralPath $NemotronAgent -PathType Leaf){
         try{
@@ -173,7 +174,11 @@ $MindContext
             $Succeeded=$true
             Write-Host 'RESEARCH_AGENT_PRIMARY_PASS provider=openrouter'
         }catch{
-            Write-Host "RESEARCH_AGENT_PRIMARY_FAILED provider=openrouter error=$($_.Exception.Message)"
+            $PrimaryError=$_.Exception.Message
+            if($PrimaryError -match '(?i)status=429|429|too many requests'){
+                $PrimaryRateLimited=$true
+            }
+            Write-Host "RESEARCH_AGENT_PRIMARY_FAILED provider=openrouter error=$PrimaryError"
             & git reset --hard $StartSha|Out-Null
             & git clean -fd|Out-Null
         }
@@ -210,7 +215,20 @@ $MindContext
             $env:USERPROFILE=$OldProfile
         }
     }
-    if(-not$Succeeded){throw 'RESEARCH_AGENT_FAILED_ALL_PROVIDERS'}
+    if(-not$Succeeded){
+        if($PrimaryRateLimited){
+            & git reset --hard $StartSha|Out-Null
+            & git clean -fd|Out-Null
+            $WaitHead=(& git rev-parse HEAD).Trim()
+            if($WaitHead-cne$StartSha){throw "PROVIDER_WAIT_HEAD_DRIFT expected=$StartSha actual=$WaitHead"}
+            if(((& git status --porcelain)-join'').Trim()){throw 'PROVIDER_WAIT_DIRTY_WORKTREE'}
+            Write-CycleResult -Advanced $false -Reason 'provider-wait' -Head $WaitHead
+            Write-Host 'REPO_LOCAL_PROVIDER_WAIT'
+            Write-Host "head_sha=$WaitHead"
+            return
+        }
+        throw 'RESEARCH_AGENT_FAILED_ALL_PROVIDERS'
+    }
 
     if(((& git status --porcelain)-join'').Trim()){throw 'AGENT_LEFT_UNCOMMITTED_CHANGES'}
     $BranchAfter=((& git branch --show-current 2>$null|Select-Object -First 1)|Out-String).Trim()
