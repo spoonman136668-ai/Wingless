@@ -1,0 +1,128 @@
+name: Direct Wingless research qualification
+
+on:
+  push:
+    branches:
+      - research/autonomy-wingless-active
+    paths:
+      - 'unitary/**'
+      - 'cmd/**'
+      - 'scripts/run-wlm-**'
+      - '.wingless/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wingless-direct-research-qualification
+  cancel-in-progress: false
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 120
+    steps:
+      - name: Checkout exact active branch
+        uses: actions/checkout@v4
+        with:
+          ref: research/autonomy-wingless-active
+          fetch-depth: 0
+          persist-credentials: true
+          clean: true
+
+      - name: Validate frozen package
+        id: frozen
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Branch='research/autonomy-wingless-active'
+          $QPath='.wingless/qualification-request.json'
+          if(-not(Test-Path -LiteralPath $QPath -PathType Leaf)){throw 'QUALIFICATION_REQUEST_MISSING'}
+          $Q=Get-Content -Raw -LiteralPath $QPath|ConvertFrom-Json
+          if([string]$Q.schema-cne'wingless.research-qualification-request.v1'){throw 'QUALIFICATION_SCHEMA_INVALID'}
+          if([string]$Q.branch-cne$Branch){throw 'QUALIFICATION_BRANCH_MISMATCH'}
+          if([string]$Q.baseline_sha-notmatch'^[0-9a-f]{40}$'){throw 'QUALIFICATION_BASELINE_INVALID'}
+          if([string]$Q.test_script-notmatch'^scripts/run-wlm-[A-Za-z0-9._-]+\.ps1$'){throw 'QUALIFICATION_TEST_SCRIPT_INVALID'}
+          $Head=(git rev-parse HEAD).Trim()
+          $Baseline=[string]$Q.baseline_sha
+          git merge-base --is-ancestor $Baseline $Head
+          if($LASTEXITCODE-ne0){throw "BASELINE_ANCESTRY_FAILED baseline=$Baseline head=$Head"}
+          $Commits=@(git rev-list --reverse "$Baseline..$Head"|Where-Object{$_ -and $_.Trim()})
+          if($Commits.Count-ne2){throw "DIRECT_COMMIT_COUNT_INVALID count=$($Commits.Count)"}
+          $FirstFiles=@(git diff-tree --no-commit-id --name-only -r $Commits[0]|Where-Object{$_ -and $_.Trim()})
+          if($FirstFiles.Count-ne1 -or -not$FirstFiles[0].StartsWith('docs/experiments/')){throw "PREREG_NOT_FIRST_AND_ALONE files=$($FirstFiles -join ',')"}
+          $PreregPath=[string]$FirstFiles[0]
+          $Prereg=Get-Content -Raw -LiteralPath $PreregPath|ConvertFrom-Json
+          if([string]$Prereg.experiment-cne[string]$Q.experiment){throw 'PREREG_EXPERIMENT_MISMATCH'}
+          if([string]$Prereg.exact_parent_sha-cne$Baseline){throw 'PREREG_PARENT_MISMATCH'}
+          if([string]$Prereg.north_star_sha256-cne'efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8'){throw 'PREREG_NORTH_STAR_IDENTITY_MISMATCH'}
+          $Allowed=@($Prereg.changed_paths|ForEach-Object{[string]$_})
+          if($Allowed-notcontains$PreregPath){throw 'PREREG_CHANGED_PATHS_SELF_MISSING'}
+          if($Allowed-notcontains$QPath){throw 'PREREG_CHANGED_PATHS_REQUEST_MISSING'}
+          if($Allowed-notcontains[string]$Q.test_script){throw 'PREREG_CHANGED_PATHS_TEST_MISSING'}
+          $AllFiles=@()
+          foreach($C in $Commits){$AllFiles+=@(git diff-tree --no-commit-id --name-only -r $C|Where-Object{$_ -and $_.Trim()})}
+          foreach($F in $AllFiles){if($Allowed-notcontains[string]$F){throw "CHANGE_OUTSIDE_FROZEN_PACKAGE path=$F"}}
+          $LastFiles=@(git diff-tree --no-commit-id --name-only -r $Commits[-1]|Where-Object{$_ -and $_.Trim()})
+          foreach($Need in @($QPath,[string]$Q.test_script)){if($LastFiles-notcontains$Need){throw "FINAL_COMMIT_MISSING path=$Need"}}
+          $North='research/bootstrap/wingless-lm-north-star.txt'
+          $Text=[IO.File]::ReadAllText((Resolve-Path $North))
+          $Normalized=$Text.Replace("`r`n","`n").Replace("`r","`n")
+          $Bytes=(New-Object Text.UTF8Encoding($false)).GetBytes($Normalized)
+          $Sha=[Security.Cryptography.SHA256]::Create()
+          try{$NorthHash=([BitConverter]::ToString($Sha.ComputeHash($Bytes))).Replace('-','').ToLowerInvariant()}finally{$Sha.Dispose()}
+          if($NorthHash-cne[string]$Prereg.north_star_sha256){throw "NORTH_STAR_HASH_MISMATCH actual=$NorthHash"}
+          if((git status --porcelain)-join''){throw 'START_WORKTREE_DIRTY'}
+          "experiment=$($Q.experiment)" >> $env:GITHUB_OUTPUT
+          "baseline=$Baseline" >> $env:GITHUB_OUTPUT
+          "head=$Head" >> $env:GITHUB_OUTPUT
+          "prereg=$PreregPath" >> $env:GITHUB_OUTPUT
+          Write-Host 'WINGLESS_DIRECT_FROZEN_PACKAGE=PASS'
+
+      - name: Run deterministic qualification
+        id: science
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Out=Join-Path $env:RUNNER_TEMP ("wingless-direct-"+$env:GITHUB_RUN_ID)
+          & ./scripts/Invoke-ResearchQualification.ps1 -RequestPath '.wingless/qualification-request.json' -OutputDirectory $Out -GuardWaitMinutes 0
+          if($LASTEXITCODE-ne0){throw "WINGLESS_DIRECT_QUALIFICATION_FAILED exit=$LASTEXITCODE"}
+          $SummaryPath=Join-Path $Out 'summary.json'
+          $ProbePath=Join-Path $Out 'probe.json'
+          if(-not(Test-Path -LiteralPath $SummaryPath -PathType Leaf)){throw 'QUALIFICATION_SUMMARY_MISSING'}
+          if(-not(Test-Path -LiteralPath $ProbePath -PathType Leaf)){throw 'QUALIFICATION_PROBE_MISSING'}
+          $Summary=Get-Content -Raw -LiteralPath $SummaryPath|ConvertFrom-Json
+          $Probe=Get-Content -Raw -LiteralPath $ProbePath|ConvertFrom-Json
+          if([string]$Summary.classification-cne'qualified-scientific-result'){throw "QUALIFICATION_CLASSIFICATION_INVALID actual=$($Summary.classification)"}
+          if([string]$Probe.schema-cne'wingless.research-scientific-result.v1'){throw 'PROBE_SCHEMA_INVALID'}
+          if([string]$Probe.experiment-cne'${{ steps.frozen.outputs.experiment }}'){throw 'PROBE_EXPERIMENT_MISMATCH'}
+          if((git status --porcelain)-join''){throw "QUALIFICATION_MUTATED_WORKTREE status=$((git status --porcelain)-join';')"}
+          "output_dir=$Out" >> $env:GITHUB_OUTPUT
+          Write-Host 'WINGLESS_DIRECT_QUALIFICATION=PASS'
+
+      - name: Seal evidence on active branch
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Branch='research/autonomy-wingless-active'
+          $Head='${{ steps.frozen.outputs.head }}'
+          git fetch origin $Branch
+          if($LASTEXITCODE-ne0){throw 'REMOTE_REFRESH_FAILED'}
+          $Remote=(git rev-parse FETCH_HEAD).Trim()
+          if($Remote-cne$Head){throw "REMOTE_HEAD_DRIFT expected=$Head actual=$Remote"}
+          $Experiment='${{ steps.frozen.outputs.experiment }}'
+          $Safe=$Experiment-replace'[^A-Za-z0-9._-]','_'
+          $Bundle=Join-Path '.research-autonomy\evidence' ("$Safe-"+$env:GITHUB_RUN_ID)
+          New-Item -ItemType Directory -Force -Path $Bundle|Out-Null
+          $Out='${{ steps.science.outputs.output_dir }}'
+          foreach($Name in @('summary.json','probe.json','transcript.txt')){$Src=Join-Path $Out $Name;if(Test-Path -LiteralPath $Src -PathType Leaf){Copy-Item -LiteralPath $Src -Destination (Join-Path $Bundle $Name) -Force}}
+          $State=[ordered]@{schema='research.repo-local-state.v1';program='Wingless';active_branch=$Branch;north_star_path='research/bootstrap/wingless-lm-north-star.txt';north_star_sha256='efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8';parent_sha='${{ steps.frozen.outputs.baseline }}';qualified_head_sha=$Head;experiment=$Experiment;classification='qualified-scientific-result';last_completed_utc=[DateTime]::UtcNow.ToString('o');github_run_id=$env:GITHUB_RUN_ID;execution_mode='direct-no-agent';authority='research-only';ckb_plane_role='governance-only'}
+          $State|ConvertTo-Json -Depth 20|Set-Content -LiteralPath '.research-autonomy\state.json' -Encoding UTF8
+          git config user.name 'direct-research-qualification'
+          git config user.email 'direct-research-qualification@users.noreply.github.com'
+          git add -- '.research-autonomy'
+          git commit -m ("research: record direct qualified evidence for "+$Experiment)
+          if($LASTEXITCODE-ne0){throw 'EVIDENCE_COMMIT_FAILED'}
+          git push origin ("HEAD:refs/heads/"+$Branch)
+          if($LASTEXITCODE-ne0){throw 'EVIDENCE_PUSH_FAILED'}
+          Write-Host 'WINGLESS_DIRECT_EVIDENCE_SEALED=PASS'
