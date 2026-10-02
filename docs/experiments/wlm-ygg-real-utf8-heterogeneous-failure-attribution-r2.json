@@ -1,0 +1,129 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-YGG-REAL-UTF8-HETEROGENEOUS-FAILURE-ATTRIBUTION-R2",
+  "program": "Wingless-Yggdrasil real-workload maintenance bridge",
+  "question": "Is the heterogeneous real-byte maintenance R1 negative caused by calibrated-monitor target-ranking confusion rather than by inadequate canonical repair or validation semantics?",
+  "hypothesis": "Across the exact frozen two fresh blobs, four degradation classes, target schedule, and eight independent attribution rows from heterogeneous maintenance R1, every true target's exact canonical restoration will improve validation selected-key accuracy by at least 0.20 and restore exact canonical audit behavior, while one or more rows will rank a non-target key above the true damaged key under the unchanged calibrated excess-error score. If so, classify the R1 failure as monitor-only; otherwise identify repair/validation or interaction failure.",
+  "exact_parent_sha": "9560d8848821f0eeed03c08f92e8d0bfdb620f2a",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "scientific_source_experiment": "WLM-YGG-REAL-UTF8-HETEROGENEOUS-MAINTENANCE-R1",
+    "scientific_source_qualification_run_id": "37010222809",
+    "scientific_source_classification": "negative",
+    "invalid_predecessor_experiment": "WLM-YGG-REAL-UTF8-HETEROGENEOUS-FAILURE-ATTRIBUTION-R1",
+    "invalid_predecessor_qualification_run_id": "37012085974",
+    "invalid_predecessor_classification": "invalid-before-science",
+    "invalid_predecessor_reason": "qualification identity field missing from frozen preregistration; qualification failed before science"
+  },
+  "authority": "diagnostic research-only; no monitor, threshold, target schedule, corpus, degradation, repair, validation, capacity, deployment, external-model inference, scheduler, queue, broker, accepted-ref, runtime, or authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-ygg-real-utf8-heterogeneous-failure-attribution-r2.json",
+    "unitary/wlm_ygg_real_utf8_heterogeneous_failure_attribution_r2.go",
+    "cmd/wlm-ygg-real-utf8-heterogeneous-failure-attribution-r2/main.go",
+    "scripts/run-wlm-ygg-real-utf8-heterogeneous-failure-attribution-r2.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "arms_and_inputs": {
+    "design": "single diagnostic arm with eight independent counterfactual rows; no adaptive arm selection",
+    "training": "exact WLM-LM-REAL-UTF8-BYTE-PILOT-R2 four training Git blobs and byte-identical TrainModel path",
+    "evaluation_blobs": [
+      {
+        "path": "docs/experiments/qwen-1.5b-linux-stage3.json",
+        "git_blob_sha": "7765773c8271aa46e4414bd41b8708f1afb1af2f",
+        "size_bytes": 44558
+      },
+      {
+        "path": "unitary/full_latent.go",
+        "git_blob_sha": "5d9400dcc08c5d10cc34303876d88ab1fb785cc8",
+        "size_bytes": 30831
+      }
+    ],
+    "segmentation": "Each evaluation blob is split by raw byte index into four contiguous non-overlapping quarters: calibration, diagnostic, validation, and audit; context resets at boundaries.",
+    "degradation_class_order": [
+      "record_missing",
+      "successor_distribution_rotated",
+      "canonical_best_bucket_erased",
+      "nonzero_counts_flattened"
+    ],
+    "target_schedule": "byte-identical WLM-YGG-REAL-UTF8-HETEROGENEOUS-MAINTENANCE-R1 eligibility and deterministic ordering, yielding four distinct targets per file",
+    "counterfactual": "For each independently reconstructed degraded canonical state, rank the frozen monitor and install the true target's exact canonical record before unchanged validation and audit. Rows do not carry repaired state forward."
+  },
+  "seeds": {
+    "pseudorandom_seed_count": 0,
+    "randomness": "none",
+    "determinism": "Git blob identities, raw-byte quarter boundaries, frozen class order, occurrence/gain ordering, and lexicographic raw-key tie breaks determine every input and target"
+  },
+  "budgets": {
+    "evaluation_file_count": 2,
+    "degradation_class_count_per_file": 4,
+    "total_attribution_rows": 8,
+    "selected_motif_capacity": 256,
+    "exact_target_candidate_read_bytes_per_row": 1028,
+    "exact_target_repair_operations_per_row": 1,
+    "retraining_between_rows": false,
+    "tokenizer": false,
+    "external_model_calls": 0,
+    "gomaxprocs": 1
+  },
+  "controls": [
+    "Reuse the exact R1 training blobs, evaluation blobs, quarter segmentation, class order, target schedule, four degradation constructors, calibrated background, diagnostic score, and canonical 256-motif model.",
+    "Use the exact R1 0.20 selected-key gain and 0.005 global BPB retain thresholds.",
+    "Rank only keys with calibration occurrence >=3 and diagnostic occurrence >=1 by diagnostic_errors - calibration_errors * diagnostic_occurrences / calibration_occurrences, with lexicographic raw-key tie break.",
+    "Reconstruct every row from canonical state so a prior row cannot contaminate a later counterfactual.",
+    "Keep target identity hidden from monitor ranking; use it only for evaluator attribution and the preregistered counterfactual repair.",
+    "Use no tokenizer, random seed, capacity growth, retraining, class-dependent monitor, external model, or live interface."
+  ],
+  "diagnostic_outputs": [
+    "true-target calibrated score and rank for every row",
+    "policy-selected key and whether it equals true target",
+    "selected-minus-target score margin when misselected",
+    "exact true-target canonical repair selected-key validation gain",
+    "exact true-target canonical repair global BPB delta",
+    "counterfactual exact-target audit prediction/probability mismatch",
+    "per-class top1 target count and maximum target rank",
+    "per-class exact-target repair-pass count"
+  ],
+  "metrics_and_thresholds": [
+    ["valid_evaluation_file_count", "==", 2],
+    ["completed_target_count", "==", 8],
+    ["minimum_target_eligibility_count_per_file", ">=", 4],
+    ["minimum_exact_target_repair_accuracy_gain", ">=", 0.2],
+    ["maximum_exact_target_repair_global_bpb_change", "<=", 0.005],
+    ["exact_target_repair_retain_count", "==", 8],
+    ["maximum_counterfactual_audit_prediction_mismatch_count", "==", 0],
+    ["maximum_counterfactual_audit_probability_abs_delta", "==", 0],
+    ["minimum_per_class_target_count", "==", 2],
+    ["invalid_attribution_rows", "==", 0],
+    ["training_file_identity_mismatch_count", "==", 0],
+    ["evaluation_file_identity_mismatch_count", "==", 0],
+    ["fresh_eval_blob_overlap_count", "==", 0],
+    ["tokenizer_use_count", "==", 0],
+    ["capacity_growth_event_count", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact parent SHA, North Star path/hash, prior negative evidence identity, and invalid-before-science predecessor identity match.",
+    "Training and evaluation Git blob identities match and evaluation blobs do not overlap the supported pilot train/eval sets.",
+    "Exactly four distinct scheduled targets per file are selected before diagnostic execution by the frozen R1 evaluator eligibility/order.",
+    "Quarter boundaries, monitor eligibility/score/tie-break, degradation constructors, canonical model, and counterfactual repair semantics are byte-identical to R1.",
+    "Every row begins from an independent canonical clone and only its true target record is degraded and then exactly restored.",
+    "The monitor receives no target or class identity; evaluator-only target access is limited to attribution and exact-target counterfactual repair.",
+    "No tokenizer, randomness, external model, retraining, capacity growth, threshold change, or authority widening occurs.",
+    "Full Go regression passes before probe execution and the normalized result carries the exact R2 experiment identity."
+  ],
+  "classification_rules": {
+    "monitor_only": "All exact-target repair, retain, and audit thresholds pass and calibrated_monitor_top1_target_count is <8.",
+    "repair_or_validation": "All eight true targets rank top1 but at least one exact-target repair fails the unchanged retain rule or exact audit restoration.",
+    "mixed": "Calibrated_monitor_top1_target_count is <8 and at least one exact-target repair fails the unchanged retain rule or exact audit restoration.",
+    "no_failure_reproduced": "All eight true targets rank top1 and all eight exact-target repairs pass, contradicting the R1 failure attribution premise.",
+    "incomplete": "Compute interruption prevents the complete frozen eight-row matrix without violating a validity criterion.",
+    "invalid": "Any identity, provenance, schedule, segmentation, degradation, score, repair, deterministic construction, capacity, or qualification criterion drifts."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific execution if any parent, North Star, evidence, blob, overlap, schedule, or build/regression identity check fails.",
+    "After output begins, execute the full eight-row matrix unless the process is interrupted or a validity criterion fails.",
+    "If implementation is discovered invalid after any output is observed, do not repair or rerun under this preregistration; restore implementation/request changes and retain only this preregistration commit.",
+    "Do not run additional seeds, blobs, classes, thresholds, budgets, capacities, or diagnostic variants under this preregistration."
+  ],
+  "no_post_result_tuning_rule": "No question, hypothesis, input, identity, schedule, degradation, seed, budget, metric, threshold, control, validity criterion, classification rule, stop condition, code path, or interpretation may change after any attribution output is observed."
+}
