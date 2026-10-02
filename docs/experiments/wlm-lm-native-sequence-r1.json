@@ -32,7 +32,16 @@
     "steps_per_start": 32,
     "training_transition_count": 2048,
     "order": "deterministic seed-derived permutation of the 64 starts followed by deterministic recurrence rollout",
-    "seeds": [11003, 11027, 11047, 11071, 11083, 11113, 11131, 11149]
+    "seeds": [
+      11003,
+      11027,
+      11047,
+      11071,
+      11083,
+      11113,
+      11131,
+      11149
+    ]
   },
   "evaluation_corpus": {
     "starts": "same 64 context support, independently permuted and rolled forward after training; evaluation does not update learned state",
@@ -62,18 +71,66 @@
     "capacity_growth": false
   },
   "metrics_and_thresholds": [
-    {"name": "valid_seed_count", "comparator": "==", "threshold": 8},
-    {"name": "completed_substrate_runs", "comparator": "==", "threshold": 16},
-    {"name": "training_transition_count", "comparator": "==", "threshold": 32768},
-    {"name": "evaluation_transition_count", "comparator": "==", "threshold": 16384},
-    {"name": "minimum_trained_next_token_accuracy", "comparator": ">=", "threshold": 0.95},
-    {"name": "maximum_untrained_baseline_accuracy", "comparator": "<=", "threshold": 0.20},
-    {"name": "minimum_accuracy_improvement_over_untrained", "comparator": ">=", "threshold": 0.70},
-    {"name": "substrate_prediction_mismatch_count", "comparator": "==", "threshold": 0},
-    {"name": "substrate_learned_state_mismatch_count", "comparator": "==", "threshold": 0},
-    {"name": "substrate_context_observable_mismatch_count", "comparator": "==", "threshold": 0},
-    {"name": "invalid_context_rows", "comparator": "==", "threshold": 0},
-    {"name": "counter_overflow_rows", "comparator": "==", "threshold": 0}
+    {
+      "name": "valid_seed_count",
+      "comparator": "==",
+      "threshold": 8
+    },
+    {
+      "name": "completed_substrate_runs",
+      "comparator": "==",
+      "threshold": 16
+    },
+    {
+      "name": "training_transition_count",
+      "comparator": "==",
+      "threshold": 32768
+    },
+    {
+      "name": "evaluation_transition_count",
+      "comparator": "==",
+      "threshold": 16384
+    },
+    {
+      "name": "minimum_trained_next_token_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "maximum_untrained_baseline_accuracy",
+      "comparator": "<=",
+      "threshold": 0.2
+    },
+    {
+      "name": "minimum_accuracy_improvement_over_untrained",
+      "comparator": ">=",
+      "threshold": 0.7
+    },
+    {
+      "name": "substrate_prediction_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_learned_state_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_context_observable_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "invalid_context_rows",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "counter_overflow_rows",
+      "comparator": "==",
+      "threshold": 0
+    }
   ],
   "validity_criteria": [
     "Exact parent SHA and updated North Star SHA-256 match this preregistration.",
@@ -97,5 +154,8 @@
     "Stop as invalid on malformed corpus construction, context capacity violation, learned-state cardinality drift, or non-deterministic qualification.",
     "Do not stop early for apparent support, mixed, or negative observations; complete the full frozen matrix unless infrastructure prevents it."
   ],
-  "no_post_result_tuning_rule": "After any probe or primary output is observed, do not alter seeds, corpus construction, recurrence, context width, alphabet, learning rule, prediction rule, capacities, metrics, thresholds, aggregation, classification, or stop conditions under this experiment identifier."
+  "no_post_result_tuning_rule": "After any probe or primary output is observed, do not alter seeds, corpus construction, recurrence, context width, alphabet, learning rule, prediction rule, capacities, metrics, thresholds, aggregation, classification, or stop conditions under this experiment identifier.",
+  "disposition": "invalid-protocol-before-execution",
+  "scientific_claim": false,
+  "invalid_reason": "The preregistration claimed held-out evaluation trajectories while specifying the same deterministic recurrence rollouts from the same 64 starts for training and evaluation. No primary or diagnostic probe was executed."
 }
