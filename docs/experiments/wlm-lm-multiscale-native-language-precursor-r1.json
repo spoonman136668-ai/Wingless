@@ -1,0 +1,114 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-MULTISCALE-NATIVE-LANGUAGE-PRECURSOR-R1",
+  "proposal_parent": "WLM-LM-ADAPTIVE-GRANULARITY-PROPOSAL-R1",
+  "proposal_stage": "WBG-5",
+  "question": "Can the qualified raw-byte motif and adaptive-granularity stack learn a second hierarchy level that captures morphology-like compounds and a sealed long-range reference relation, improving compositional held-out prediction while preserving bounded state and event reduction without an external tokenizer?",
+  "hypothesis": "Across four new seeds, a fixed-capacity hierarchy learned only from raw bytes will recover all eight qualified four-byte motifs plus four recurring two-motif compounds, achieve at least 0.95 held-out local successor accuracy and 0.90 long-range reference accuracy on unseen compound/reference combinations, reduce effective events by at least 0.30, outperform a motif-only ablation on long-range references by at least 0.50, and keep total learned structures at or below 16.",
+  "exact_parent_sha": "b8364542128d24df065ff40c75fb890ed5427fb1",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-CROSS-DOMAIN-GRANULARITY-TRANSFER-R1",
+    "classification": "supported",
+    "qualification_run_id": "36998212129"
+  },
+  "authority": "research-only controlled synthetic language precursor",
+  "corpora": {
+    "seeds": [
+      12101,
+      12109,
+      12113,
+      12119
+    ],
+    "training_records_per_seed": 4096,
+    "evaluation_records_per_seed": 1024
+  },
+  "frozen_design": {
+    "base_motif_count": 8,
+    "compound_count": 4,
+    "level1_capacity": 8,
+    "level2_capacity": 4,
+    "reference_capacity": 4,
+    "total_structure_capacity": 16,
+    "candidate_occurrence_threshold": 64,
+    "consistency_threshold": 0.9,
+    "heldout_rule": "one deterministic compound-A/compound-B/reference-parity family per seed is excluded from training and used for evaluation",
+    "learner_input": "concatenated raw bytes only; no record, motif, compound, or semantic boundary labels"
+  },
+  "metrics_and_thresholds": [
+    [
+      "valid_seed_count",
+      "==",
+      4
+    ],
+    [
+      "minimum_level1_motif_recall",
+      "==",
+      1
+    ],
+    [
+      "minimum_level2_compound_recall",
+      ">=",
+      1
+    ],
+    [
+      "minimum_local_successor_accuracy",
+      ">=",
+      0.95
+    ],
+    [
+      "minimum_long_range_reference_accuracy",
+      ">=",
+      0.9
+    ],
+    [
+      "maximum_motif_only_long_range_reference_accuracy",
+      "<=",
+      0.4
+    ],
+    [
+      "minimum_hierarchical_long_range_gain",
+      ">=",
+      0.5
+    ],
+    [
+      "minimum_effective_event_reduction_fraction",
+      ">=",
+      0.3
+    ],
+    [
+      "maximum_total_learned_structure_count",
+      "<=",
+      16
+    ],
+    [
+      "oracle_boundary_use_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_stream_rows",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_rows",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "All frozen thresholds and validity criteria pass.",
+    "mixed": "Hierarchy is causal and improves held-out reference prediction but at least one accuracy, event-reduction, or capacity threshold fails.",
+    "negative": "Validity passes but hierarchy provides less than 0.10 long-range gain or fails sealed-combination generalization.",
+    "incomplete": "Environmental or compute interruption prevents frozen cardinality.",
+    "invalid": "Provenance, hidden-boundary isolation, capacity, deterministic construction, or qualification isolation fails."
+  },
+  "no_post_result_tuning_rule": "Do not alter frozen inputs, capacities, metrics, thresholds, aggregation, or classification after observing output."
+}
