@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "status": "frozen-prereg-only",
+  "experiment": "WLM-SI-PRIORITY-CONTAINER-R1",
+  "question": "Under fixed capacity and identical schedules, do a sorted-slice priority container and an independent binary heap preserve the same bounded state observables and resource-response laws?",
+  "hypothesis": "Admission, rejection, extraction order, cardinality, cumulative counts, and conservation observables remain exactly invariant.",
+  "exact_parent_sha": "caaeca20548eec9836bdb90be9f95aa4cb883f90",
+  "north_star_sha256": "efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8",
+  "prior_evidence": {
+    "experiment": "WLM-SI-DEQUE-CONTAINER-R2",
+    "classification": "supported",
+    "qualified_head_sha": "0769b49c02600c2bd8822247b86fb11a9f29c1bb"
+  },
+  "changed_dimension": "container substrate only",
+  "fixed_matrix": {
+    "capacity": 16,
+    "seeds": [
+      701,
+      719,
+      733,
+      751,
+      773,
+      797,
+      821,
+      853
+    ],
+    "schedule_families": [
+      "monotone",
+      "burst",
+      "alternating",
+      "lcg32"
+    ],
+    "initial_cardinalities": [
+      0,
+      5,
+      10,
+      15
+    ],
+    "budgets": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "steps": 64
+  },
+  "thresholds": {
+    "paired_case_count": 512,
+    "completed_substrate_case_runs": 1024,
+    "total_emitted_rows": 65536,
+    "paired_observable_mismatch_cases": 0,
+    "row_count_mismatch_cases": 0,
+    "state_cardinality_mismatch_cases": 0,
+    "invalid_operation_schedules": 0,
+    "budget_overrun_rows": 0,
+    "law_violation_cases": 0,
+    "max_conservation_error": 0,
+    "max_residual_law_error": 0
+  },
+  "authority": "research-only",
+  "no_post_result_tuning": true
+}
