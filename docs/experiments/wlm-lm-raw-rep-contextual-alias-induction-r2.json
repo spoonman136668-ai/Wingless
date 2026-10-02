@@ -1,0 +1,145 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-INDUCTION-R2",
+  "program": "Wingless raw-input to invariant representation to reasoning chain",
+  "question": "Can Wingless induce shared latent representations for independently recurring raw-byte aliases from matching distributional context alone, then recover cross-family reasoning that the exact-surface representation failed?",
+  "hypothesis": "Using the same two complete raw alias families that falsified exact-surface invariance, a learner that receives no alias dictionary but clusters selected surface motifs by their frozen immediate raw-context count signatures will recover exactly nine two-member alias classes. Transition learning over those induced classes will achieve at least 0.95 same-family and cross-family semantic accuracy, while the unchanged exact-surface control remains at or below 0.25 cross-family accuracy with missing transition keys, and a frozen shuffled-context control using value rotation +2 mod 4 and operation rotation +2 mod 5 remains at or below 0.25 cross-family accuracy.",
+  "exact_parent_sha": "5134ed98df1b909a14d8db7648c8ee5a91436538",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "supersedes_invalid_before_execution": {
+    "experiment": "WLM-LM-RAW-REP-CONTEXTUAL-ALIAS-INDUCTION-R1",
+    "disposition": "invalid-preregistration-before-execution",
+    "reason": "the shuffled bridge was described as a within-type rotation but did not freeze the exact rotation amount",
+    "scientific_output_observed": false,
+    "scientific_claim": false
+  },
+  "portfolio_context": {
+    "allocation": "75% chain / 25% substrate falsification over the current prospective block",
+    "slot": "chain",
+    "reason": "directly address the sealed alias-invariance falsification without replacing the established substrate"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-SI-RAW-REP-ALIAS-INVARIANCE-FALSIFICATION-R1",
+    "classification": "surface_invariance_falsified by frozen rules",
+    "github_run_id": "37065587817",
+    "observation": "Same-family accuracy was 1.0, cross-family accuracy was 0.0625, and all 160 cross-family exact-surface transition keys were missing despite perfect recovery of all eighteen surface motifs."
+  },
+  "scope_statement": "This is a bounded representation-abstraction mechanism test. Passing would establish context-induced alias merging on the frozen synthetic alias workload; it would not establish open-domain semantic equivalence or natural-language synonymy.",
+  "authority": "research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "task_corpus": {
+    "semantic_value_count": 4,
+    "semantic_operation_count": 5,
+    "alias_family_count": 2,
+    "surface_value_motif_count": 8,
+    "surface_operation_motif_count": 10,
+    "motif_width_bytes": 4,
+    "single_step_training": "for each surface family independently, all five semantic operations on all sixteen semantic value pairs, repeated twenty times",
+    "training_record_count": 3200,
+    "same_family_evaluation_count": 160,
+    "cross_family_evaluation_count": 160,
+    "task_noise": "deterministic LCG upper-bit bytes in range 192..255 with no semantic or alias-equivalence information"
+  },
+  "surface_representation": {
+    "input": "raw task-training record bytes only",
+    "candidate": "every contiguous four-byte task-training window",
+    "selection": "top eighteen by occurrence count descending, then lexicographic raw key",
+    "capacity": 18,
+    "expected_surface_motifs": "eight value aliases plus ten operation aliases",
+    "tokenizer": false
+  },
+  "distributional_bridge": {
+    "bridge_record_count": 576,
+    "construction": "for each of nine latent task entities and each of two surface families, expose the selected alias motif thirty-two times across four frozen immediate raw context keys repeated eight times each",
+    "context_key": "two raw bytes immediately before plus two raw bytes immediately after the selected surface motif",
+    "family_visibility": "family identity is never passed to clustering",
+    "semantic_visibility": "semantic identity is never passed to clustering",
+    "signature": "sorted map of exact four-byte context key -> occurrence count for each selected surface motif over bridge records",
+    "induction": "surface motifs with byte-identical context-count signatures are assigned to the same induced class; induced classes are ordered by signature bytes only",
+    "expected_class_count": 9,
+    "expected_members_per_class": 2
+  },
+  "class_transition_learner": {
+    "training_input": "task records decoded to induced class identities after bridge clustering",
+    "state": "exact induced operation class plus ordered induced value-class pair -> observed induced output-class pair counts",
+    "prediction": "argmax learned induced output pair; ties choose the lowest dense pair index",
+    "semantic_alias_dictionary": false,
+    "capacity_growth": false
+  },
+  "controls": {
+    "exact_surface": "the unchanged exact surface-operation plus exact surface-value-pair transition learner from the falsification experiment, trained on the same task records",
+    "shuffled_bridge": {
+      "family0_context_assignment": "identity",
+      "family1_value_context_assignment": "(semantic_value + 2) mod 4",
+      "family1_operation_context_assignment": "(semantic_operation + 2) mod 5",
+      "task_data": "unchanged",
+      "learner": "unchanged",
+      "purpose": "destroy correct alias equivalence while preserving within-type class cardinality"
+    },
+    "purpose": "show that restored cross-family behavior depends on correct distributional context equivalence rather than transition capacity or evaluator scoring"
+  },
+  "evaluation": {
+    "same_family": "both values and operation use family 0, and separately both use family 1, across all five operations and sixteen value pairs",
+    "cross_family": "values use family 0 with operation family 1, plus values family 1 with operation family 0",
+    "semantic_scoring": "after prediction only, evaluator maps predicted learned value classes or exact surface outputs to the frozen target surface alias/class for accuracy",
+    "updates": false
+  },
+  "metrics_and_thresholds": [
+    ["training_record_count", "==", 3200],
+    ["bridge_record_count", "==", 576],
+    ["selected_surface_representation_count", "==", 18],
+    ["selected_true_surface_motif_match_count", "==", 18],
+    ["bridge_decode_failure_count", "==", 0],
+    ["induced_alias_class_count", "==", 9],
+    ["induced_two_member_class_count", "==", 9],
+    ["correct_evaluator_alias_pair_count", "==", 9],
+    ["task_training_decode_failure_count", "==", 0],
+    ["class_transition_missing_count", "==", 0],
+    ["same_family_evaluation_count", "==", 160],
+    ["induced_same_family_accuracy", ">=", 0.95],
+    ["cross_family_evaluation_count", "==", 160],
+    ["induced_cross_family_accuracy", ">=", 0.95],
+    ["exact_surface_cross_family_accuracy", "<=", 0.25],
+    ["exact_surface_cross_family_missing_transition_count", ">", 0],
+    ["shuffled_bridge_alias_class_count", "==", 9],
+    ["shuffled_bridge_cross_family_accuracy", "<=", 0.25],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["capacity_growth_event_count", "==", 0],
+    ["invalid_row_count", "==", 0],
+    ["counter_overflow_count", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact parent, North Star, and sealed falsification identity match.",
+    "Task-training corpus is byte-identical in semantic coverage, aliases, repetitions, and exact-surface transition semantics to the prior falsification design.",
+    "Exactly eighteen surface motifs are selected from task bytes before bridge induction.",
+    "Bridge clustering receives only selected raw surface motif identity and immediate raw-context count signatures; no family label, semantic label, alias pairing, or evaluator dictionary enters induction.",
+    "Each normal induced class is formed solely by exact equality of complete frozen context-count signatures.",
+    "The class transition learner receives induced class identities only and no semantic mapping.",
+    "The exact-surface control receives no bridge information.",
+    "The shuffled bridge control uses exactly value +2 mod 4 and operation +2 mod 5 for family-1 context assignment, with no other change.",
+    "Semantic mappings are evaluator-only and are consulted after prediction for scoring and alias-pair diagnostics.",
+    "All metrics are finite and full Go regression passes before the probe.",
+    "No tokenizer, external model, network call, capacity growth, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all twenty-three frozen thresholds pass; context-induced alias classes restore cross-family reasoning while both exact-surface and shuffled-context controls fail.",
+    "mixed": "Validity passes and induced cross-family accuracy materially exceeds both controls, but at least one alias-class recovery or 0.95 accuracy threshold fails.",
+    "negative": "Validity passes but context-induced classes do not materially improve cross-family reasoning over the exact-surface control.",
+    "incomplete": "Compute interruption prevents the full frozen task, bridge, or evaluation matrix.",
+    "invalid": "Any bridge leakage, evaluator-boundary violation, representation, deterministic-state, capacity, or qualification criterion fails."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific execution on parent, North Star, build, frozen-package, or bridge-construction drift.",
+    "After output begins, complete the full normal, exact-surface, and shuffled-control matrices unless infrastructure prevents it.",
+    "Do not add alias dictionaries, alter bridge contexts, increase capacity, modify clustering, change metrics, or weaken thresholds after observing output."
+  ],
+  "no_post_result_tuning_rule": "No task corpus, bridge context, representation rule, signature rule, clustering, transition learner, control, metric, threshold, or interpretation may change after any primary output is observed under this experiment identifier.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-raw-rep-contextual-alias-induction-r2.json",
+    "unitary/wlm_lm_raw_rep_contextual_alias_induction_r2.go",
+    "cmd/wlm-lm-raw-rep-contextual-alias-induction-r2/main.go",
+    "scripts/run-wlm-lm-raw-rep-contextual-alias-induction-r2.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
