@@ -1,0 +1,47 @@
+name: Wingless hosted portability V1
+
+on:
+  push:
+    branches:
+      - ops/hosted-portability-v1
+    paths:
+      - '.github/workflows/hosted-portability-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Full Go regression
+        run: go test ./... -count=1
+
+      - name: Reproduce sealed surface-invariance probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/wlm-si-raw-utf8-surface-invariance-falsification-r1 > /tmp/hosted-probe.json
+          sealed="$(find .research-autonomy/evidence -type f -path '*WLM-SI-RAW-UTF8-SURFACE-INVARIANCE-FALSIFICATION-R1-*/probe.json' | sort | tail -n 1)"
+          test -n "$sealed"
+          python3 - "$sealed" /tmp/hosted-probe.json <<'PY'
+          import json,sys
+          with open(sys.argv[1],encoding='utf-8') as f:
+              a=json.load(f)
+          with open(sys.argv[2],encoding='utf-8') as f:
+              b=json.load(f)
+          if a != b:
+              raise SystemExit('HOSTED_PROBE_MISMATCH')
+          print('HOSTED_PROBE_MATCH=PASS')
+          PY
