@@ -6,7 +6,8 @@ param(
     [Parameter(Mandatory=$true)][string]$PromptPath,
     [Parameter(Mandatory=$true)][string]$LastMessagePath,
     [string]$Model='nvidia/nemotron-3-ultra-550b-a55b:free',
-    [int]$MaxRounds=48
+    [int]$MaxRounds=48,
+    [switch]$ProtocolProbe
 )
 
 Set-StrictMode -Version Latest
@@ -278,6 +279,9 @@ $Tools=@(
  @{type='function';function=@{name='run_repo_process';description='Run a bounded project-local verification process. kind is one of go_test, go_run, powershell_file, python_file, git_diff_check.';parameters=@{type='object';properties=@{kind=@{type='string';enum=@('go_test','go_run','powershell_file','python_file','git_diff_check')};args=@{type='array';items=@{type='string'}};timeout_seconds=@{type='integer';minimum=1;maximum=600}};required=@('kind','args');additionalProperties=$false}}},
  @{type='function';function=@{name='finish';description='Finish the bounded research task. Call exactly once when complete or legitimately blocked. summary must include any required terminal marker from the prompt.';parameters=@{type='object';properties=@{summary=@{type='string';minLength=1};status=@{type='string';enum=@('complete','blocked')}};required=@('summary','status');additionalProperties=$false}}}
 )
+if($ProtocolProbe){
+    $Tools=@($Tools|Where-Object{[string]$_.function.name -in @('git_status','finish')})
+}
 
 $Messages=New-Object Collections.Generic.List[object]
 $Messages.Add([ordered]@{role='system';content=$System})
