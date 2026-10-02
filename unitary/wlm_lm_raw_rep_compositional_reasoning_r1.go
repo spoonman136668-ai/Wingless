@@ -34,7 +34,7 @@ func wlmLmRawRepCompositionalReasoningR1Noise(state *uint32, n int) []uint8 {
 	out:=make([]uint8,n)
 	for i:=0;i<n;i++ {
 		*state=*state*1664525+1013904223
-		out[i]=uint8(192+(*state%64))
+		out[i]=uint8(192+((*state>>16)%64))
 	}
 	return out
 }
