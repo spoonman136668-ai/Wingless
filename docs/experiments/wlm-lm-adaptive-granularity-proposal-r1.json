@@ -1,0 +1,122 @@
+{
+  "schema": "wingless.research-proposal.v1",
+  "proposal_id": "WLM-LM-ADAPTIVE-GRANULARITY-PROPOSAL-R1",
+  "date": "2026-10-02",
+  "status": "proposed-test-candidate",
+  "priority": "high",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "objective": "Determine whether the existing Wingless substrate can learn directly from raw byte streams while developing compact reusable multiscale internal representations that reduce effective computation and preserve or improve generalization relative to fixed-granularity baselines.",
+  "substrate_preservation": "This proposal tests granularity inside the existing Wingless substrate. It does not authorize replacing the substrate with a conventional transformer, tokenizer-first model, or external frontier model.",
+  "research_claim_to_test": "Raw bytes can remain the universal input granularity while Wingless learns higher internal granularities only where they improve prediction, reuse, generalization, or compute efficiency.",
+  "candidate_input_granularities": [
+    "UTF-8/raw byte stream",
+    "bit-level raw stream as a small-scale stress-test extreme",
+    "fixed byte-only processing with no learned aggregation",
+    "fixed character or fixed subword segmentation as comparison baselines only",
+    "learned multi-byte motif/chunk aggregation",
+    "hierarchical latent patches",
+    "entropy-adaptive segmentation",
+    "predictive-state merging",
+    "event-driven local updates"
+  ],
+  "proposed_test_ladder": [
+    {
+      "stage": "WBG-1",
+      "name": "raw-byte acquisition baseline",
+      "question": "Can the native substrate learn predictive structure directly from bytes without a tokenizer?",
+      "design": "Train on a frozen synthetic byte language with deterministic train/validation/test splits. Compare byte-native Wingless against an information-matched fixed-symbol baseline under preregistered state and compute budgets.",
+      "primary_metrics": [
+        "held-out cross-entropy per byte",
+        "next-byte accuracy",
+        "autoregressive generation accuracy",
+        "active operations per input byte",
+        "resident learned-state bytes"
+      ],
+      "gate": "Byte-native learning must exceed an untrained baseline and remain deterministic/reproducible before adaptive aggregation is introduced."
+    },
+    {
+      "stage": "WBG-2",
+      "name": "emergent multi-byte motif formation",
+      "question": "Can the substrate discover reusable multi-byte units without a supplied lexicon or tokenizer?",
+      "design": "Expose repeated and compositional byte motifs while allowing only bounded internal aggregation. Compare against byte-only and static-chunk controls.",
+      "primary_metrics": [
+        "motif reuse count",
+        "held-out predictive gain attributable to learned motifs",
+        "effective internal sequence-length reduction",
+        "active-compute reduction at matched predictive quality",
+        "ablation loss for learned motifs",
+        "false motif formation on frequency-matched random controls"
+      ],
+      "gate": "A learned motif counts only if causal ablation degrades held-out prediction or efficiency and a matched random/shuffled control does not reproduce the benefit."
+    },
+    {
+      "stage": "WBG-3",
+      "name": "adaptive granularity under uncertainty",
+      "question": "Can Wingless spend byte-level compute on surprising regions while using coarser learned representations on predictable regions?",
+      "design": "Freeze mixed low-entropy/high-entropy byte streams and compare fixed byte, static chunk, and entropy-adaptive internal granularity at matched quality targets.",
+      "primary_metrics": [
+        "compute per byte by entropy stratum",
+        "quality-adjusted active operations",
+        "latency proxy",
+        "granularity-switch count",
+        "prediction degradation under compute cap"
+      ],
+      "gate": "Adaptive granularity must reduce compute at matched quality without hidden capacity growth or oracle boundary labels."
+    },
+    {
+      "stage": "WBG-4",
+      "name": "cross-domain granularity transfer",
+      "question": "Do learned byte-level structures transfer across prose-like, code-like, structured-data, and binary-like synthetic domains?",
+      "design": "Use preregistered disjoint domains with common low-level motifs and domain-specific higher structure. Measure reuse versus unnecessary specialization.",
+      "primary_metrics": [
+        "zero/few-shot motif reuse",
+        "adaptation cost",
+        "OOD prediction quality",
+        "resident-state growth",
+        "catastrophic interference",
+        "domain-specific versus shared motif utilization"
+      ],
+      "gate": "Transfer must be demonstrated on sealed held-out domains; post-result motif relabeling or boundary tuning is forbidden."
+    },
+    {
+      "stage": "WBG-5",
+      "name": "multiscale native-language precursor",
+      "question": "Can raw bytes support a hierarchy from byte motifs to larger reusable sequence structures without an external tokenizer?",
+      "design": "Scale the best qualified granularity mechanism to a controlled language-like corpus with morphology, syntax-like dependencies, and long-range references.",
+      "primary_metrics": [
+        "cross-entropy per byte",
+        "long-range dependency accuracy",
+        "effective sequence compression",
+        "active compute per generated byte",
+        "held-out compositional generalization",
+        "autoregressive stability"
+      ],
+      "gate": "This remains a controlled precursor and does not count as open-domain language competence."
+    }
+  ],
+  "required_controls": [
+    "untrained native substrate",
+    "fixed byte-only substrate",
+    "static chunking with equal or lower representational capacity",
+    "frequency-matched shuffled motifs",
+    "random-boundary aggregation",
+    "whole-context memorization control where applicable",
+    "fixed-token/subword baseline only as an external scientific comparator, never as the deployed substrate"
+  ],
+  "resource_accounting": [
+    "raw input bytes",
+    "active operations",
+    "active learned-state size",
+    "resident state bytes",
+    "communication events",
+    "aggregation/chunk creation events",
+    "average and maximum learned span",
+    "latency proxy",
+    "training updates"
+  ],
+  "success_definition": "Evidence for a substrate advantage requires matched or better held-out predictive/generalization quality with materially lower effective compute, shorter internal sequence length, stronger transfer, or lower persistent state growth than fixed-granularity controls. Interesting-looking chunks without causal/efficiency evidence are not success.",
+  "failure_definition": "The hypothesis is weakened if learned granularity adds complexity without quality/compute benefit, collapses under OOD transfer, requires hand-authored boundaries, or merely recreates a static tokenizer with no measurable substrate advantage.",
+  "sequencing_rule": "Do not interrupt or mutate a currently frozen experiment. Promote one stage at a time into a separate preregistration only after its prerequisites are satisfied. Freeze seeds, splits, budgets, controls, metrics, thresholds, and stop rules before implementation.",
+  "authority": "proposal only; no execution, scheduler, queue-consumer, accepted-ref, deployment, runtime, broker, or external-model inference authority"
+}
