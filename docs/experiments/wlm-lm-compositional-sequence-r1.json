@@ -1,0 +1,124 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-COMPOSITIONAL-SEQUENCE-R1",
+  "question": "Can a bounded factorized Wingless learned state infer next tokens for two-token contexts never presented during training, and then sustain autoregressive generation from those held-out contexts, without replacing the existing substrate or using an external model?",
+  "hypothesis": "A three-bit factorized transition learner trained on 48 of 64 two-token contexts will achieve at least 0.95 one-step accuracy on the 16 frozen unseen contexts and at least 0.95 autoregressive rollout accuracy from those contexts, while a whole-context lookup learner trained on the same observations will achieve at most 0.25 one-step held-out accuracy. Both independently qualified context-container substrates will produce identical factorized learned state and predictions.",
+  "exact_parent_sha": "8d9472c84143cf8df9c9738c7281a1c33bd84e9a",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-NATIVE-SEQUENCE-R2",
+    "classification": "supported",
+    "scientific_claim": "Wingless bounded learned state acquired an in-support two-token next-token law and generated multi-step autoregressive token sequences with exact cross-substrate agreement."
+  },
+  "authority": "research-only; no production, broker, live, accepted-ref, credential, runner-configuration, scheduler, queue-consumer, or cross-lane authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-compositional-sequence-r1.json",
+    "unitary/wlm_lm_compositional_sequence_r1.go",
+    "cmd/wlm-lm-compositional-sequence-r1/main.go",
+    "scripts/run-wlm-lm-compositional-sequence-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "token_and_target_definition": {
+    "alphabet_size": 8,
+    "token_representation": "fixed three-bit unsigned token identity; this representation is input structure, not a target label",
+    "context_width": 2,
+    "target_law": "next=previous_two_back XOR previous_one_back",
+    "target_visibility": "the learner receives target tokens only through frozen training observations; target-law semantics are not exposed to prediction code"
+  },
+  "factorized_learner": {
+    "learned_state": "for each of three bit positions, a 2x2x2 integer count tensor over (older_bit,newer_bit,target_bit), totaling 24 counters",
+    "update": "for each training observation increment one target-bit count for each of the three bit positions",
+    "prediction": "for each bit independently choose the target bit with the larger learned count for the observed input-bit pair; ties choose zero; reassemble the three predicted bits into one token",
+    "capacity_growth": false
+  },
+  "lookup_control": {
+    "learned_state": "8x8x8 whole-context next-token count tensor, totaling 512 counters",
+    "prediction": "argmax over candidate next-token counts for the exact two-token context; ties choose the lowest token id",
+    "purpose": "tests whether held-out performance can be explained by exact-context memorization"
+  },
+  "train_holdout_split": {
+    "training_context_rule": "(older+newer) mod 4 != 1",
+    "heldout_context_rule": "(older+newer) mod 4 == 1",
+    "training_context_count": 48,
+    "heldout_context_count": 16,
+    "coverage_check": "within the 48 training contexts, every (older_bit,newer_bit) combination occurs for every bit position",
+    "heldout_target_zero_count": 0
+  },
+  "training_corpus": {
+    "observations": "each of the 48 training contexts repeated exactly 32 times as independent one-step context->next observations",
+    "training_transition_count_per_seed_per_substrate": 1536,
+    "order": "deterministic seed-derived permutation",
+    "seeds": [11261,11287,11311,11329,11351,11369,11383,11411]
+  },
+  "evaluation": {
+    "one_step": "score factorized and lookup learners once on each of the 16 held-out contexts without state updates",
+    "autoregressive": "from each held-out context, run 16 steps; the factorized model prediction becomes the next context token and the frozen XOR law supplies the independently scored target for the current generated context",
+    "autoregressive_transition_count_per_seed_per_substrate": 256,
+    "evaluation_updates": false
+  },
+  "substrates": [
+    "slice-backed context deque",
+    "fixed-capacity ring context deque"
+  ],
+  "controls": [
+    "Both substrates receive byte-for-byte identical ordered training observations and held-out starts for each seed.",
+    "The 16 held-out exact contexts never appear in training observations.",
+    "Every per-bit input combination required by the factorized learner is represented in training for every bit position.",
+    "The whole-context lookup control receives exactly the same training observations as the factorized learner.",
+    "Training mutates only fixed-size learned counters; evaluation is read-only.",
+    "No external model calls, oracle corrections, gradient optimizer, capacity growth, target-law coefficients, or post-result changes are permitted."
+  ],
+  "budgets": {
+    "seed_count": 8,
+    "substrate_count": 2,
+    "training_transition_count_total": 24576,
+    "heldout_one_step_evaluation_count_total": 256,
+    "autoregressive_evaluation_transition_count_total": 4096,
+    "factorized_counter_count": 24,
+    "lookup_control_counter_count": 512,
+    "context_capacity": 2,
+    "goroutine_policy": "single-process deterministic execution; GOMAXPROCS=1 in qualification"
+  },
+  "metrics_and_thresholds": [
+    {"name":"valid_seed_count","comparator":"==","threshold":8},
+    {"name":"completed_substrate_runs","comparator":"==","threshold":16},
+    {"name":"training_transition_count","comparator":"==","threshold":24576},
+    {"name":"heldout_one_step_evaluation_count","comparator":"==","threshold":256},
+    {"name":"autoregressive_evaluation_transition_count","comparator":"==","threshold":4096},
+    {"name":"minimum_factorized_heldout_one_step_accuracy","comparator":">=","threshold":0.95},
+    {"name":"maximum_lookup_heldout_one_step_accuracy","comparator":"<=","threshold":0.25},
+    {"name":"minimum_factorized_autoregressive_accuracy","comparator":">=","threshold":0.95},
+    {"name":"substrate_prediction_mismatch_count","comparator":"==","threshold":0},
+    {"name":"substrate_factorized_state_mismatch_count","comparator":"==","threshold":0},
+    {"name":"substrate_context_observable_mismatch_count","comparator":"==","threshold":0},
+    {"name":"heldout_context_leak_count","comparator":"==","threshold":0},
+    {"name":"factorized_bit_coverage_missing_count","comparator":"==","threshold":0},
+    {"name":"invalid_context_rows","comparator":"==","threshold":0},
+    {"name":"counter_overflow_rows","comparator":"==","threshold":0}
+  ],
+  "validity_criteria": [
+    "Exact parent SHA and updated North Star SHA-256 match this preregistration.",
+    "All eight seeds, both substrates, 48 training contexts, and 16 held-out contexts complete at frozen cardinality.",
+    "No held-out exact context appears in any training observation.",
+    "Every two-bit input combination appears in training for each of the three factor positions.",
+    "The factorized learner has exactly 24 counters and the lookup control exactly 512 counters.",
+    "The target XOR law is used for deterministic corpus generation and scoring only; prediction derives solely from learned counts.",
+    "Autoregressive evaluation feeds factorized model predictions, not targets, back into the model context.",
+    "The normalized result carries schema wingless.research-scientific-result.v1 and exact experiment identifier.",
+    "Full Go regression passes before probe execution."
+  ],
+  "classification_rules": {
+    "supported": "All fifteen frozen metric thresholds and all validity criteria pass.",
+    "mixed": "Validity and completeness pass and factorized held-out one-step accuracy exceeds the lookup control, but at least one factorized accuracy or cross-substrate equivalence threshold fails.",
+    "negative": "Validity passes but factorization does not outperform the exact-context lookup control on held-out contexts or fails materially under autoregressive rollout.",
+    "incomplete": "Environmental or compute interruption prevents full frozen cardinality; preserve diagnostics and make no scientific claim.",
+    "invalid": "Provenance, split isolation, frozen-package identity, construction, determinism, bounded-state, or qualification isolation fails; invalid is not a scientific outcome."
+  },
+  "stop_conditions": [
+    "Stop before execution on identity, provenance, authority, package-scope, or split-isolation drift.",
+    "Stop as invalid on held-out leakage, missing factor-bit coverage, malformed context construction, learned-state cardinality drift, or non-deterministic qualification.",
+    "Do not stop early for apparent support, mixed, or negative observations; complete the full frozen matrix unless infrastructure prevents it."
+  ],
+  "no_post_result_tuning_rule": "After any probe or primary output is observed, do not alter seeds, split rule, token representation, target law, factorization, lookup control, corpus construction, context width, capacities, metrics, thresholds, aggregation, classification, or stop conditions under this experiment identifier."
+}
