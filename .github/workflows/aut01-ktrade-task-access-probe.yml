@@ -1,4 +1,4 @@
-name: AUT01 temporary KTRADE task access probe
+name: AUT01 targeted controller API discovery
 
 on:
   push:
@@ -6,14 +6,14 @@ on:
       - ops/aut01-ktrade-maintenance-probe-20261002
     paths:
       - .github/workflows/aut01-ktrade-task-access-probe.yml
-      - .github/aut01/AUT01-KTRADE-TASK-ACCESS-PROBE.ps1
+      - .github/aut01/AUT01-CONTROLLER-TARGETED-API-DISCOVERY.ps1
 
 permissions:
   contents: read
 
 concurrency:
-  group: aut01-ktrade-task-access-probe-wingless-up-b
-  cancel-in-progress: false
+  group: aut01-targeted-controller-api-discovery
+  cancel-in-progress: true
 
 jobs:
   probe:
@@ -24,6 +24,6 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
-      - name: Probe KTRADE task access
+      - name: Inspect targeted controller API
         shell: cmd
-        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%GITHUB_WORKSPACE%\.github\aut01\AUT01-KTRADE-TASK-ACCESS-PROBE.ps1"
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%GITHUB_WORKSPACE%\.github\aut01\AUT01-CONTROLLER-TARGETED-API-DISCOVERY.ps1"
