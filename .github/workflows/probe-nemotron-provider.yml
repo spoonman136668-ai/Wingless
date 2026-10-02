@@ -1,0 +1,23 @@
+name: Nemotron provider contract probe
+on:
+  push:
+    branches:
+      - diagnostic/repo-local-cutover-r1
+    paths:
+      - 'scripts/Probe-NemotronProvider.ps1'
+      - '.github/workflows/probe-nemotron-provider.yml'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Read existing provider contract
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          ./scripts/Probe-NemotronProvider.ps1
