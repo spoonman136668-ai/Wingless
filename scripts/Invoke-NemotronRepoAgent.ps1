@@ -326,14 +326,16 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
     $ToolChoice=if($Round-eq$MaxRounds){
         [ordered]@{type='function';function=[ordered]@{name='finish'}}
     }else{'auto'}
-    $Body=[ordered]@{
+    $BodyObject=[ordered]@{
         model=$Model
-        temperature=0
+        temperature=if($Provider-ceq'nvidia'){1}else{0}
         messages=$Messages.ToArray()
         tools=$Tools
         tool_choice=$ToolChoice
-        max_tokens=4096
-    }|ConvertTo-Json -Depth 50 -Compress
+        max_tokens=if($Provider-ceq'nvidia'){16384}else{4096}
+    }
+    if($Provider-ceq'nvidia'){$BodyObject.reasoning_effort='low'}
+    $Body=$BodyObject|ConvertTo-Json -Depth 50 -Compress
 
     $Resp=$null
     for($Attempt=1;$Attempt-le3;$Attempt++){
@@ -362,7 +364,11 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
         $Calls=@($ToolCallsProperty.Value)
     }
     $ContentProperty=$Msg.PSObject.Properties['content']
+    $ReasoningProperty=$Msg.PSObject.Properties['reasoning_content']
     $Assistant=[ordered]@{role='assistant';content=if($null-eq$ContentProperty -or $null-eq$ContentProperty.Value){''}else{[string]$ContentProperty.Value}}
+    if($null-ne$ReasoningProperty -and $null-ne$ReasoningProperty.Value){
+        $Assistant.reasoning_content=[string]$ReasoningProperty.Value
+    }
     if($Calls.Count-gt0){
         $ToolCallRows=New-Object Collections.Generic.List[object]
         foreach($Call in $Calls){
@@ -381,7 +387,15 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
 
     if($Calls.Count-eq0){
         $Final=[string]$Assistant.content
-        if([string]::IsNullOrWhiteSpace($Final)){throw "NEMOTRON_EMPTY_FINAL round=$Round"}
+        $Reasoning=if($Assistant.Contains('reasoning_content')){[string]$Assistant.reasoning_content}else{''}
+        if([string]::IsNullOrWhiteSpace($Final)){
+            if($Provider-ceq'nvidia' -and -not[string]::IsNullOrWhiteSpace($Reasoning) -and $Round-lt$MaxRounds){
+                $Messages.Add([ordered]@{role='user';content='Continue from your preserved reasoning. You must now call one of the supplied tools; call finish when complete.'})
+                continue
+            }
+            throw "NEMOTRON_EMPTY_FINAL round=$Round"
+        }
+        if($ProtocolProbe){throw "NEMOTRON_PROTOCOL_TOOL_CALL_REQUIRED round=$Round"}
         [IO.File]::WriteAllText($LastMessagePath,$Final,(New-Object Text.UTF8Encoding($false)))
         Write-Host "NEMOTRON_AGENT_PASS provider=$Provider rounds=$Round model=$Model"
         return
