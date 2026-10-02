@@ -63,7 +63,6 @@ jobs:
             $Started=[DateTime]::UtcNow
 
             if(Test-Path -LiteralPath $Worktree){Remove-Item -LiteralPath $Worktree -Recurse -Force}
-            git branch -D $LocalBranch 2>$null | Out-Null
             git worktree add -b $LocalBranch $Worktree $Base
             if($LASTEXITCODE-ne0){throw "WORKTREE_CREATE_FAILED model=$Model"}
 
@@ -170,7 +169,11 @@ jobs:
               if(Test-Path -LiteralPath $Worktree){
                 git worktree remove --force $Worktree 2>$null | Out-Null
               }
-              git branch -D $LocalBranch 2>$null | Out-Null
+              $Existing=@(git branch --list $LocalBranch | Where-Object{$_ -and $_.Trim()})
+              if($Existing.Count-gt0){
+                git branch -D $LocalBranch | Out-Null
+                if($LASTEXITCODE-ne0){throw "WORKTREE_BRANCH_CLEANUP_FAILED branch=$LocalBranch"}
+              }
             }
           }
 
