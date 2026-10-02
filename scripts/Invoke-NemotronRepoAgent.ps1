@@ -51,8 +51,8 @@ function Assert-Writable([string]$Relative){
     [void](Resolve-RepoPath $Relative $false)
 }
 
-function Invoke-GitRaw([string[]]$Args){
-    $Out=@(& git -C $RepoPath @Args 2>&1 | ForEach-Object {[string]$_})
+function Invoke-GitRaw([string[]]$GitArgs){
+    $Out=@(& git -C $RepoPath @GitArgs 2>&1 | ForEach-Object {[string]$_})
     $Code=$LASTEXITCODE
     return [ordered]@{exit_code=$Code;output=($Out -join [Environment]::NewLine)}
 }
@@ -122,10 +122,10 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
         'git_diff' {
             $Ref=if($A.PSObject.Properties.Name -contains 'ref'){[string]$A.ref}else{''}
             if($Ref -and $Ref -notmatch '^[0-9A-Za-z._/^~-]+$'){throw "NEMOTRON_GIT_REF_INVALID ref=$Ref"}
-            $Args=New-Object Collections.Generic.List[string]
-            $Args.Add('diff')
-            if($Ref){$Args.Add($Ref)}
-            $R=Invoke-GitRaw @($Args)
+            $GitDiffArgs=New-Object Collections.Generic.List[string]
+            $GitDiffArgs.Add('diff')
+            if($Ref){$GitDiffArgs.Add($Ref)}
+            $R=Invoke-GitRaw @($GitDiffArgs.ToArray())
             if($R.output.Length-gt65536){$R.output=$R.output.Substring(0,65536)}
             return Convert-ToolResult $R
         }
@@ -178,37 +178,37 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
         }
         'run_repo_process' {
             $Kind=[string]$A.kind
-            $Args=@($A.args|ForEach-Object{[string]$_})
+            [string[]]$ProcessArgs=@($A.args|ForEach-Object{[string]$_})
             $Timeout=if($A.PSObject.Properties.Name -contains 'timeout_seconds'){[Math]::Min([Math]::Max([int]$A.timeout_seconds,1),600)}else{180}
             $Exe='';$FinalArgs=@()
             switch($Kind){
                 'go_test' {
                     $Exe=(Get-Command go -ErrorAction Stop).Source
-                    $FinalArgs=@('test')+$Args
-                    foreach($X in $Args){if($X -match '^-?(exec|toolexec|overlay|vettool)(=|$)'){throw "NEMOTRON_GO_FLAG_FORBIDDEN arg=$X"}}
+                    $FinalArgs=@('test')+$ProcessArgs
+                    foreach($X in $ProcessArgs){if($X -match '^-?(exec|toolexec|overlay|vettool)(=|$)'){throw "NEMOTRON_GO_FLAG_FORBIDDEN arg=$X"}}
                 }
                 'go_run' {
                     $Exe=(Get-Command go -ErrorAction Stop).Source
-                    if($Args.Count-eq0 -or $Args[0] -notmatch '^(\./)?cmd/'){throw 'NEMOTRON_GO_RUN_PATH_INVALID'}
-                    $FinalArgs=@('run')+$Args
+                    if($ProcessArgs.Count-eq0 -or $ProcessArgs[0] -notmatch '^(\./)?cmd/'){throw 'NEMOTRON_GO_RUN_PATH_INVALID'}
+                    $FinalArgs=@('run')+$ProcessArgs
                 }
                 'powershell_file' {
-                    if($Args.Count-eq0){throw 'NEMOTRON_POWERSHELL_FILE_REQUIRED'}
-                    $ScriptRel=$Args[0]
+                    if($ProcessArgs.Count-eq0){throw 'NEMOTRON_POWERSHELL_FILE_REQUIRED'}
+                    $ScriptRel=$ProcessArgs[0]
                     if($ScriptRel -notmatch '^scripts/[A-Za-z0-9._/-]+\.ps1$'){throw "NEMOTRON_POWERSHELL_PATH_INVALID path=$ScriptRel"}
                     $ScriptFull=Resolve-RepoPath $ScriptRel $true
                     $Exe='powershell.exe'
-                    $Tail=if($Args.Count-gt1){@($Args[1..($Args.Count-1)])}else{@()}
+                    $Tail=if($ProcessArgs.Count-gt1){@($ProcessArgs[1..($ProcessArgs.Count-1)])}else{@()}
                     $FinalArgs=@('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',$ScriptFull)+$Tail
                 }
                 'python_file' {
                     if($Program-cne'Yggdrasil'){throw 'NEMOTRON_PYTHON_NOT_ALLOWED_FOR_PROGRAM'}
-                    if($Args.Count-eq0){throw 'NEMOTRON_PYTHON_FILE_REQUIRED'}
-                    $ScriptRel=$Args[0]
+                    if($ProcessArgs.Count-eq0){throw 'NEMOTRON_PYTHON_FILE_REQUIRED'}
+                    $ScriptRel=$ProcessArgs[0]
                     if($ScriptRel -notmatch '^research/applications/plane/[A-Za-z0-9._/-]+\.py$'){throw "NEMOTRON_PYTHON_PATH_INVALID path=$ScriptRel"}
                     $Exe='C:\ProgramData\CKBR\research-sidecar-yggdrasil\python312\python.exe'
                     if(-not(Test-Path -LiteralPath $Exe -PathType Leaf)){$Exe=(Get-Command python -ErrorAction Stop).Source}
-                    $Tail=if($Args.Count-gt1){@($Args[1..($Args.Count-1)])}else{@()}
+                    $Tail=if($ProcessArgs.Count-gt1){@($ProcessArgs[1..($ProcessArgs.Count-1)])}else{@()}
                     $FinalArgs=@((Resolve-RepoPath $ScriptRel $true))+$Tail
                 }
                 'git_diff_check' {
