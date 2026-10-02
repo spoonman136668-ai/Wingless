@@ -304,9 +304,10 @@ for($Round=1;$Round-le$MaxRounds;$Round++){
     }
     if($null-eq$Resp.choices -or @($Resp.choices).Count-lt1){throw "NEMOTRON_RESPONSE_CHOICES_MISSING round=$Round"}
     $Msg=$Resp.choices[0].message
-    $Calls=@($Msg.tool_calls)
-
-    $Assistant=[ordered]@{role='assistant';content=if($null-eq$Msg.content){''}else{[string]$Msg.content}}
+    $ToolCallsProperty=$Msg.PSObject.Properties['tool_calls']
+    $Calls=if($null-eq$ToolCallsProperty -or $null-eq$ToolCallsProperty.Value){@()}else{@($ToolCallsProperty.Value)}
+    $ContentProperty=$Msg.PSObject.Properties['content']
+    $Assistant=[ordered]@{role='assistant';content=if($null-eq$ContentProperty -or $null-eq$ContentProperty.Value){''}else{[string]$ContentProperty.Value}}
     if($Calls.Count-gt0){
         $ToolCallRows=New-Object Collections.Generic.List[object]
         foreach($Call in $Calls){
