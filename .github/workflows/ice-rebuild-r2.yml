@@ -1,0 +1,100 @@
+name: Wingless ICE rebuild R2
+
+on:
+  push:
+    branches:
+      - ops/wingless-ice-rebuild-r2
+    paths:
+      - '.github/workflows/ice-rebuild-r2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      candidate_sha: ${{ steps.commit.outputs.candidate_sha }}
+    steps:
+      - name: Checkout repair target
+        uses: actions/checkout@v4
+        with:
+          ref: repair/wingless-ice-rebuild-r2
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+
+      - name: Rebuild deterministic ICE
+        id: commit
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $ExpectedBase='aa19361e3c4f7f804d27d48c8ebceeee316e974f'
+          $Before=(git rev-parse HEAD).Trim()
+          if($Before -cne $ExpectedBase){throw "ICE_REPAIR_BASE_DRIFT expected=$ExpectedBase actual=$Before"}
+
+          go run -buildvcs=false ./cmd/ice build
+          if($LASTEXITCODE-ne0){throw 'ICE_BUILD_FAILED'}
+
+          $Changed=@(git status --porcelain | ForEach-Object {
+            if($_.Length -ge4){$_.Substring(3).Trim()}else{''}
+          } | Where-Object{$_})
+          if($Changed.Count-eq0){throw 'ICE_REBUILD_NO_DELTA'}
+          foreach($Path in $Changed){
+            if(-not$Path.StartsWith('.ice/')){throw "ICE_REPAIR_SCOPE_WIDENED path=$Path"}
+          }
+
+          go run -buildvcs=false ./cmd/ice validate
+          if($LASTEXITCODE-ne0){throw 'ICE_VALIDATE_AFTER_BUILD_FAILED'}
+          go test -buildvcs=false ./...
+          if($LASTEXITCODE-ne0){throw 'ICE_FOCUSED_REGRESSION_FAILED'}
+
+          git config user.name 'wingless-ice-repair'
+          git config user.email 'wingless-ice-repair@users.noreply.github.com'
+          git add -- .ice
+          git commit -m 'ice: rebuild derived index after provider policy'
+          if($LASTEXITCODE-ne0){throw 'ICE_COMMIT_FAILED'}
+          git push origin HEAD:repair/wingless-ice-rebuild-r2
+          if($LASTEXITCODE-ne0){throw 'ICE_PUSH_FAILED'}
+
+          $Head=(git rev-parse HEAD).Trim()
+          "candidate_sha=$Head" >> $env:GITHUB_OUTPUT
+          Write-Host "ICE_REBUILD_COMMITTED head=$Head"
+
+  validate:
+    needs: rebuild
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact rebuilt candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.rebuild.outputs.candidate_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+
+      - name: Native validation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          ./scripts/Test-Native.ps1
+          if($LASTEXITCODE-ne0){throw 'NATIVE_VALIDATION_FAILED'}
+          go run -buildvcs=false ./cmd/ice validate
+          if($LASTEXITCODE-ne0){throw 'ICE_FINAL_VALIDATE_FAILED'}
+          Write-Host "WINGLESS_ICE_REPAIR_R2_NATIVE_PASS os=${{ matrix.os }}"
