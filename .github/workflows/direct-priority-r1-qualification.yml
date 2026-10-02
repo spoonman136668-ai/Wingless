@@ -1,0 +1,122 @@
+name: Direct Wingless priority research qualification
+
+on:
+  push:
+    branches:
+      - research/direct-wingless-priority-r1
+    paths:
+      - 'unitary/wlm_si_priority_container_r1.go'
+      - 'cmd/wlm-si-priority-container-r1/**'
+      - 'scripts/run-wlm-si-priority-container-r1.ps1'
+      - '.wingless/qualification-request.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wingless-direct-priority-r1
+  cancel-in-progress: false
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 120
+    steps:
+      - name: Checkout frozen branch
+        uses: actions/checkout@v4
+        with:
+          ref: research/direct-wingless-priority-r1
+          fetch-depth: 0
+          persist-credentials: true
+          clean: true
+
+      - name: Validate frozen package and commit separation
+        id: frozen
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Branch='research/direct-wingless-priority-r1'
+          $Baseline='caaeca20548eec9836bdb90be9f95aa4cb883f90'
+          $PreregPath='docs/experiments/wlm-si-priority-container-r1.json'
+          $WorkflowPath='.github/workflows/direct-priority-r1-qualification.yml'
+          $QPath='.wingless/qualification-request.json'
+          $Expected=@(
+            'unitary/wlm_si_priority_container_r1.go',
+            'cmd/wlm-si-priority-container-r1/main.go',
+            'scripts/run-wlm-si-priority-container-r1.ps1',
+            $QPath
+          )
+          $Head=(git rev-parse HEAD).Trim()
+          git merge-base --is-ancestor $Baseline $Head
+          if($LASTEXITCODE-ne0){throw 'BASELINE_ANCESTRY_FAILED'}
+          $Commits=@(git rev-list --reverse "$Baseline..$Head"|Where-Object{$_ -and $_.Trim()})
+          if($Commits.Count-ne3){throw "COMMIT_COUNT_INVALID count=$($Commits.Count)"}
+          $First=@(git diff-tree --no-commit-id --name-only -r $Commits[0]|Where-Object{$_ -and $_.Trim()})
+          if($First.Count-ne1 -or [string]$First[0]-cne$PreregPath){throw "PREREG_NOT_FIRST_AND_ALONE files=$($First -join ',')"}
+          $Second=@(git diff-tree --no-commit-id --name-only -r $Commits[1]|Where-Object{$_ -and $_.Trim()})
+          if($Second.Count-ne1 -or [string]$Second[0]-cne$WorkflowPath){throw "INFRA_NOT_SEPARATE files=$($Second -join ',')"}
+          $Third=@(git diff-tree --no-commit-id --name-only -r $Commits[2]|Where-Object{$_ -and $_.Trim()})
+          if($Third.Count-ne$Expected.Count){throw "IMPLEMENTATION_PATH_COUNT_INVALID count=$($Third.Count)"}
+          foreach($Need in $Expected){if($Third-notcontains$Need){throw "IMPLEMENTATION_PATH_MISSING path=$Need"}}
+          $P=Get-Content -Raw -LiteralPath $PreregPath|ConvertFrom-Json
+          if([string]$P.experiment-cne'WLM-SI-PRIORITY-CONTAINER-R1'){throw 'PREREG_EXPERIMENT_MISMATCH'}
+          if([string]$P.exact_parent_sha-cne$Baseline){throw 'PREREG_PARENT_MISMATCH'}
+          if([string]$P.north_star_sha256-cne'efd6172772d76f03ac04bdab0af40941232311def8202d6f0f953d33b3d05dd8'){throw 'PREREG_NORTH_STAR_MISMATCH'}
+          $Q=Get-Content -Raw -LiteralPath $QPath|ConvertFrom-Json
+          if([string]$Q.experiment-cne[string]$P.experiment){throw 'REQUEST_EXPERIMENT_MISMATCH'}
+          if([string]$Q.branch-cne$Branch){throw 'REQUEST_BRANCH_MISMATCH'}
+          if([string]$Q.baseline_sha-cne$Baseline){throw 'REQUEST_BASELINE_MISMATCH'}
+          if([string]$Q.test_script-cne'scripts/run-wlm-si-priority-container-r1.ps1'){throw 'REQUEST_TEST_MISMATCH'}
+          $North='research/bootstrap/wingless-lm-north-star.txt'
+          $Text=[IO.File]::ReadAllText((Resolve-Path $North))
+          $Normalized=$Text.Replace("`r`n","`n").Replace("`r","`n")
+          $Bytes=(New-Object Text.UTF8Encoding($false)).GetBytes($Normalized)
+          $Sha=[Security.Cryptography.SHA256]::Create()
+          try{$Hash=([BitConverter]::ToString($Sha.ComputeHash($Bytes))).Replace('-','').ToLowerInvariant()}finally{$Sha.Dispose()}
+          if($Hash-cne[string]$P.north_star_sha256){throw "NORTH_STAR_HASH_MISMATCH actual=$Hash"}
+          if((git status --porcelain)-join''){throw 'START_WORKTREE_DIRTY'}
+          "head=$Head" >> $env:GITHUB_OUTPUT
+          Write-Host 'WINGLESS_PRIORITY_R1_FROZEN_PACKAGE=PASS'
+
+      - name: Run deterministic qualification
+        id: science
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Out=Join-Path $env:RUNNER_TEMP ("wingless-priority-r1-"+$env:GITHUB_RUN_ID)
+          & ./scripts/Invoke-ResearchQualification.ps1 -RequestPath '.wingless/qualification-request.json' -OutputDirectory $Out -GuardWaitMinutes 0
+          if($LASTEXITCODE-ne0){throw "QUALIFICATION_FAILED exit=$LASTEXITCODE"}
+          $Summary=Get-Content -Raw -LiteralPath (Join-Path $Out 'summary.json')|ConvertFrom-Json
+          $Probe=Get-Content -Raw -LiteralPath (Join-Path $Out 'probe.json')|ConvertFrom-Json
+          if([string]$Summary.classification-cne'qualified-scientific-result'){throw "CLASSIFICATION_INVALID actual=$($Summary.classification)"}
+          if([string]$Probe.schema-cne'wingless.research-scientific-result.v1'){throw 'PROBE_SCHEMA_INVALID'}
+          if([string]$Probe.experiment-cne'WLM-SI-PRIORITY-CONTAINER-R1'){throw 'PROBE_EXPERIMENT_MISMATCH'}
+          if((git status --porcelain)-join''){throw "QUALIFICATION_MUTATED_WORKTREE status=$((git status --porcelain)-join';')"}
+          "output_dir=$Out" >> $env:GITHUB_OUTPUT
+          Write-Host 'WINGLESS_PRIORITY_R1_QUALIFICATION=PASS'
+
+      - name: Seal evidence
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Branch='research/direct-wingless-priority-r1'
+          $Head='${{ steps.frozen.outputs.head }}'
+          git fetch origin $Branch
+          if($LASTEXITCODE-ne0){throw 'REMOTE_REFRESH_FAILED'}
+          $Remote=(git rev-parse FETCH_HEAD).Trim()
+          if($Remote-cne$Head){throw "REMOTE_HEAD_DRIFT expected=$Head actual=$Remote"}
+          $Bundle=Join-Path '.research-autonomy\evidence' ("WLM-SI-PRIORITY-CONTAINER-R1-"+$env:GITHUB_RUN_ID)
+          New-Item -ItemType Directory -Force -Path $Bundle|Out-Null
+          $Out='${{ steps.science.outputs.output_dir }}'
+          foreach($Name in @('summary.json','probe.json','transcript.txt')){
+            $Src=Join-Path $Out $Name
+            if(Test-Path -LiteralPath $Src -PathType Leaf){Copy-Item -LiteralPath $Src -Destination (Join-Path $Bundle $Name) -Force}
+          }
+          git config user.name 'direct-research-qualification'
+          git config user.email 'direct-research-qualification@users.noreply.github.com'
+          git add -f -- $Bundle
+          git commit -m 'research: seal WLM-SI-PRIORITY-CONTAINER-R1 evidence'
+          if($LASTEXITCODE-ne0){throw 'EVIDENCE_COMMIT_FAILED'}
+          git push origin ("HEAD:refs/heads/"+$Branch)
+          if($LASTEXITCODE-ne0){throw 'EVIDENCE_PUSH_FAILED'}
+          Write-Host 'WINGLESS_PRIORITY_R1_EVIDENCE_SEALED=PASS'
