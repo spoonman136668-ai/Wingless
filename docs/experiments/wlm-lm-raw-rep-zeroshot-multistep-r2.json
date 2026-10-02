@@ -1,0 +1,83 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-LM-RAW-REP-ZEROSHOT-MULTISTEP-R2",
+  "program":"Wingless raw-input to invariant representation to zero-shot multi-step reasoning chain",
+  "question":"Can a completely task-untrained third raw surface family use only context-induced representations plus transition knowledge learned from two other families to execute unseen multi-step role programs?",
+  "hypothesis":"Using the qualified R5 repaired three-family bridge, the learner will recover twenty-seven surface motifs and nine correct three-member alias classes. A class-transition model trained only on families 0 and 1 single-step task records will achieve at least 0.95 exact final-state accuracy on all 192 frozen family-2-only three-, five-, and seven-step programs, including conjugated right-role transformations, while exact-surface and shuffled-family2 controls remain at or below 0.25.",
+  "exact_parent_sha":"9522b9e70df0852d42d05478c96843c4e72b5b0d",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "supersedes_invalid_before_execution":{
+    "experiment":"WLM-LM-RAW-REP-ZEROSHOT-MULTISTEP-R1",
+    "disposition":"invalid-qualification-boundary-before-science",
+    "reason":"contextual-alias multistep R3 preregistration and implementation landed after R1 preregistration before R1 implementation could be applied",
+    "scientific_output_observed":false,
+    "scientific_claim":false
+  },
+  "scientific_reuse":{
+    "design":"byte-identical to the frozen R1 preregistration",
+    "scientific_change":false,
+    "forbidden":"changes to R5 bridge, family2 zero-task-training isolation, program matrix, controls, metrics, thresholds, feed-forward execution, or evaluator boundary"
+  },
+  "portfolio_context":{"allocation":"75% chain / 25% substrate falsification over eight completed post-shift experiments","slot":"chain","next_slot":"substrate falsification"},
+  "prior_evidence":{
+    "experiment":"WLM-LM-RAW-REP-ZEROSHOT-ALIAS-FAMILY-R5",
+    "github_run_id":"37068206954",
+    "observation":"Family 2 had zero task-training records yet achieved 1.0 one-step accuracy through contextual alias classes; exact-surface scored 0.0625 and shuffled context 0.05."
+  },
+  "authority":"research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "frozen_design_reference":"docs/experiments/wlm-lm-raw-rep-zeroshot-multistep-r1.json",
+  "metrics_and_thresholds":[
+    ["bridge_record_count","==",864],
+    ["selected_surface_representation_count","==",27],
+    ["selected_true_surface_motif_match_count","==",27],
+    ["induced_alias_class_count","==",9],
+    ["correct_evaluator_alias_triplet_count","==",9],
+    ["task_training_record_count","==",3200],
+    ["family2_task_training_record_count","==",0],
+    ["class_transition_key_count","==",80],
+    ["heldout_program_count","==",192],
+    ["family2_operation_step_count","==",960],
+    ["program_decode_failure_count","==",0],
+    ["conjugated_right_program_count","==",64],
+    ["induced_conjugated_right_accuracy",">=",0.95],
+    ["long_program_count","==",128],
+    ["induced_long_program_accuracy",">=",0.95],
+    ["induced_overall_multistep_accuracy",">=",0.95],
+    ["raw_output_pair_exact_accuracy",">=",0.95],
+    ["exact_surface_overall_multistep_accuracy","<=",0.25],
+    ["exact_surface_programs_with_missing_transition","==",192],
+    ["shuffled_bridge_overall_multistep_accuracy","<=",0.25],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "validity_criteria":[
+    "Exact parent, North Star, and sealed R5 evidence identity match.",
+    "R2 scientific code is byte-equivalent to the staged R1 scientific code except experiment identifiers.",
+    "Bridge construction, representation selection, normal classes, shuffled family2 assignment, and task-training corpus are byte-identical to R5.",
+    "Family 2 contributes zero task-transition records.",
+    "Exactly 192 heldout programs execute and every input value and operation motif is family 2.",
+    "All learners feed their own predictions into subsequent steps.",
+    "Evaluator operation semantics and semantic mappings are inaccessible to prediction.",
+    "All metrics are finite and full Go regression passes before the probe.",
+    "No tokenizer, external model, network call, capacity growth, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules":{
+    "supported":"All validity criteria and all twenty-five frozen thresholds pass.",
+    "mixed":"Validity passes and induced zero-shot multi-step accuracy materially exceeds both controls, but at least one 0.95 threshold fails.",
+    "negative":"Validity passes but induced multi-step execution does not materially outperform exact-surface or shuffled controls.",
+    "incomplete":"Compute interruption prevents the full 192-program matrix.",
+    "invalid":"Any family2 task leakage, R5 reuse drift, feed-forward violation, evaluator-boundary violation, deterministic-state, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule":"No training corpus, bridge, representation, class induction, program, learner, control, metric, threshold, or interpretation may change after primary output.",
+  "changed_paths":[
+    "docs/experiments/wlm-lm-raw-rep-zeroshot-multistep-r2.json",
+    "unitary/wlm_lm_raw_rep_zeroshot_multistep_r2.go",
+    "cmd/wlm-lm-raw-rep-zeroshot-multistep-r2/main.go",
+    "scripts/run-wlm-lm-raw-rep-zeroshot-multistep-r2.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
