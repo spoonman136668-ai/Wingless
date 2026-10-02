@@ -4,8 +4,28 @@
     "sha256": "9ab332fba1f3bba1c7e234d8d39974e1de53c3efaa612d5f9bdc2681db7f27a6"
   },
   {
+    "path": ".github/workflows/mind-palace-cross-repo-probe.yml",
+    "sha256": "fc182a8a801e75b18034c4bd4edfbb367b450382e1ddae1495887d8f4efc26f4"
+  },
+  {
+    "path": ".github/workflows/mind-palace-service-checkout-probe.yml",
+    "sha256": "106ed2ecfa948ba4d485dadd1875471231981b07c1799df8822a6c4483661e08"
+  },
+  {
     "path": ".github/workflows/native.yml",
     "sha256": "3719dbdb91e821263564348ef8432bcdcc51a8951687babdd1cd7e6a85a044e2"
+  },
+  {
+    "path": ".github/workflows/repo-local-autonomy-qualify.yml",
+    "sha256": "edcd787db55a2c0fedcdc5f8b2dcb6ceabe9ca3db28030a6262af0582cb6b665"
+  },
+  {
+    "path": ".github/workflows/research-continuation-controller.yml",
+    "sha256": "b7104ea8250b437c60ad6e0fe259eca7a237d6b271663d7a472eed242a389ee2"
+  },
+  {
+    "path": ".github/workflows/research-qualify-hosted.yml",
+    "sha256": "5fbbedec545824cc06a7fb1fb33c1b698c538fd65232be403ea861d5c8f96d77"
   },
   {
     "path": ".gitignore",
@@ -18,6 +38,26 @@
   {
     "path": "README.md",
     "sha256": "3eec3518943ac6e6c85394156af48d1776c2bbf655e5867903c76c1a7cd03df8"
+  },
+  {
+    "path": "acceptance/stage3-5-isolated-integration-20260911.json",
+    "sha256": "ea5712ca756edd228135c715a8845ef7b104ef64886fce91b6fda85e7f7a28c1"
+  },
+  {
+    "path": "acceptance/stage3-6-inactive-listener-20260912.json",
+    "sha256": "91859cac71855917710d77a9e24a1778320789ed3e4c77f704a4f9108b235b79"
+  },
+  {
+    "path": "acceptance/stage3-6-listener-validation.json",
+    "sha256": "ac9f2b9ae365cbfb3799387051225bdc1eca911ec078e65c2735e43d2544e84d"
+  },
+  {
+    "path": "acceptance/stage3-7-service-validation.json",
+    "sha256": "ab488860fc123e02a6cabcb91f6d3688619a5dbb05ca63203ea812e5cb48c68e"
+  },
+  {
+    "path": "acceptance/stage3-7-service-windows-20260912.json",
+    "sha256": "cd733ad84449cde91b62a366b8a1cf3171b643d2ed3f1cc3be546bac83b4f991"
   },
   {
     "path": "benchmark/fixtures.go",
@@ -259,11 +299,11 @@
   },
   {
     "path": "docs/integration-seams.json",
-    "sha256": "ccd70c1bb4d73535db9dbe8fa7ab3f2c08b72cce56169f6621e4d347aaad13ad"
+    "sha256": "b669cfcb87e49919f05350656f2649501c0da5d83b107307722333f7f93ddf6f"
   },
   {
     "path": "docs/integration-seams.md",
-    "sha256": "e1f56700516de41f31bbf8bba99a3210a79ca00b9301453e0ed5114dd69544f7"
+    "sha256": "0262925e178e87ef8f3df3cd175d3a56e6dfe5b45cdb10c32e4e4b4f72613712"
   },
   {
     "path": "docs/internal-stage-2.md",
@@ -274,8 +314,24 @@
     "sha256": "eb549da553e426e3f452a2186f885f28050ba54047b07b50008d23fd11105ca0"
   },
   {
+    "path": "docs/isolated-integration-proof.md",
+    "sha256": "1c1206eb9ae12e7982c99aa5b2143a5e471976047b93059259df38d98ff4bc1e"
+  },
+  {
     "path": "docs/known-gaps.md",
     "sha256": "cb061d8ed79509e1e993c6060019d5fe9a0755b6ffad2afde677522734274eba"
+  },
+  {
+    "path": "docs/plane-listener-contract-v1.json",
+    "sha256": "6f6421454f44e522bccc1b27de713c3a01ad72b525e5ec4dfc5be2078513b2f2"
+  },
+  {
+    "path": "docs/plane-reconciliation-stage.md",
+    "sha256": "5ba4a22c71dd445f11a13c69869235302bc66e1776096b26971c72f1726a83a8"
+  },
+  {
+    "path": "docs/plane-service-lifecycle-v1.json",
+    "sha256": "136099f8ff0f7d36734dfb66a5bffea63d9e3f9fd69ac044c8ee0e32df39c699"
   },
   {
     "path": "docs/resource-model.md",
@@ -283,7 +339,7 @@
   },
   {
     "path": "docs/worker-protocol.md",
-    "sha256": "2efc7086a2f77c4b936aa66a8a1cbabbb703bd13b670faef7c4a0d2f32cd47d0"
+    "sha256": "ad8e72ab9c38ec91470035b1680da8d22f934c7fe9c06da65efb550ee055f6ed"
   },
   {
     "path": "go.mod",
@@ -494,6 +550,155 @@
       "encoding/json",
       "strings",
       "testing"
+    ]
+  },
+  {
+    "path": "integration/ckbplane/adapter.go",
+    "sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+    "package": "ckbplane",
+    "imports": [
+      "bytes",
+      "encoding/json",
+      "errors",
+      "fmt",
+      "io",
+      "regexp",
+      "strings",
+      "time",
+      "github.com/spoonman136668-ai/Wingless/broker",
+      "github.com/spoonman136668-ai/Wingless/inference",
+      "github.com/spoonman136668-ai/Wingless/resources"
+    ]
+  },
+  {
+    "path": "integration/ckbplane/adapter_test.go",
+    "sha256": "1e35a3609ffa0a91a830ccf9c1be524aab1b3c52d826cdb87dfe423cec02d022",
+    "package": "ckbplane",
+    "imports": [
+      "encoding/json",
+      "strings",
+      "testing",
+      "time",
+      "github.com/spoonman136668-ai/Wingless/broker",
+      "github.com/spoonman136668-ai/Wingless/inference",
+      "github.com/spoonman136668-ai/Wingless/resources"
+    ]
+  },
+  {
+    "path": "integration/ckbplane/listener.go",
+    "sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+    "package": "ckbplane",
+    "imports": [
+      "bytes",
+      "context",
+      "crypto/subtle",
+      "encoding/json",
+      "errors",
+      "fmt",
+      "io",
+      "mime",
+      "net/http",
+      "regexp",
+      "strings",
+      "time",
+      "unicode/utf8"
+    ]
+  },
+  {
+    "path": "integration/ckbplane/listener_contract.go",
+    "sha256": "461fef533529c31dcff996239565027eb3ff62a06ca3132b3b55bd568d06415d",
+    "package": "ckbplane"
+  },
+  {
+    "path": "integration/ckbplane/listener_test.go",
+    "sha256": "f574bbf48a690f93138dc8f55c19a78c1fdeb9f4e1076b4a1b11a98ecbc85d0c",
+    "package": "ckbplane",
+    "imports": [
+      "bytes",
+      "context",
+      "encoding/json",
+      "errors",
+      "io",
+      "net/http",
+      "net/http/httptest",
+      "os",
+      "path/filepath",
+      "reflect",
+      "runtime",
+      "strings",
+      "sync/atomic",
+      "testing",
+      "time",
+      "github.com/spoonman136668-ai/Wingless/broker",
+      "github.com/spoonman136668-ai/Wingless/inference",
+      "github.com/spoonman136668-ai/Wingless/resources"
+    ]
+  },
+  {
+    "path": "integration/ckbplane/proof_test.go",
+    "sha256": "69fa12701db08f76259085e08d9d41cd1f7b94cf91d5e353f75e590bcffa66ab",
+    "package": "ckbplane",
+    "imports": [
+      "context",
+      "errors",
+      "strings",
+      "testing",
+      "time",
+      "github.com/spoonman136668-ai/Wingless/broker",
+      "github.com/spoonman136668-ai/Wingless/inference",
+      "github.com/spoonman136668-ai/Wingless/resources",
+      "github.com/spoonman136668-ai/Wingless/worker"
+    ]
+  },
+  {
+    "path": "integration/ckbplane/proofservice/main.go",
+    "sha256": "39ad209e05715dd14b2a21bafa37a42811fdeddff8b3c63b034ab8afb88f26bd",
+    "package": "main",
+    "imports": [
+      "context",
+      "fmt",
+      "os",
+      "path/filepath",
+      "strings",
+      "github.com/spoonman136668-ai/Wingless/integration/ckbplane"
+    ]
+  },
+  {
+    "path": "integration/ckbplane/service.go",
+    "sha256": "0f7fd9fa4b73e0275f4e969c51d3b5a5cee5365d56cbd91c965eca12a7052453",
+    "package": "ckbplane",
+    "imports": [
+      "context",
+      "encoding/json",
+      "errors",
+      "fmt",
+      "io",
+      "net",
+      "net/http",
+      "os",
+      "time"
+    ]
+  },
+  {
+    "path": "integration/ckbplane/service_test.go",
+    "sha256": "20ce7afb76524f5cdf26930bf9ab9bf7a5b7da3c72ccb43c15e8987afb14fa9a",
+    "package": "ckbplane",
+    "imports": [
+      "bufio",
+      "bytes",
+      "context",
+      "encoding/json",
+      "errors",
+      "io",
+      "net",
+      "net/http",
+      "net/url",
+      "os",
+      "path/filepath",
+      "runtime",
+      "strings",
+      "testing",
+      "time"
     ]
   },
   {
@@ -725,12 +930,32 @@
     ]
   },
   {
+    "path": "scripts/Invoke-NemotronRepoAgent.ps1",
+    "sha256": "fa3e31c3abacb5d8dcfe53659fd6f3975091c2665b0595b934dbc6f8cb324a2f"
+  },
+  {
+    "path": "scripts/Invoke-RepoLocalResearchContinuation.ps1",
+    "sha256": "cf6741ca6af9197d2c642ff8be7300f265a839d68bfc23902c484ac7e425e427"
+  },
+  {
+    "path": "scripts/Invoke-RepoLocalResearchCycle.ps1",
+    "sha256": "21eb2b798b2fd77cf766d6b5fad33deb318dd3d73824d396f8ac624d8fcd8e02"
+  },
+  {
     "path": "scripts/New-LocalModelConfig.ps1",
     "sha256": "6ec7d7ea626879fe20da080f24d5ebf0c3c03e9fd8acc432fa2a2aced556355b"
   },
   {
     "path": "scripts/Test-Native.ps1",
     "sha256": "ccd675ed20fcbcb7633a587b5c0c54344bba7960fb747936ef2089732bd149d9"
+  },
+  {
+    "path": "scripts/Test-Stage3-6-Listener.ps1",
+    "sha256": "e0414ada26f6308f937867760dd12c23a887f4f4f82b223fde19a6ffeb52d1a8"
+  },
+  {
+    "path": "scripts/Verify-Isolated-Plane-Integration.ps1",
+    "sha256": "579dbd275090a4eda9486648473df20d39b93db810abd268b845eb7827899f75"
   },
   {
     "path": "toolboundary/tools.go",
