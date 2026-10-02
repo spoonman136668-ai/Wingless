@@ -1,0 +1,193 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-BYTE-MOTIF-DISCOVERY-R1",
+  "proposal_parent": "WLM-LM-ADAPTIVE-GRANULARITY-PROPOSAL-R1",
+  "proposal_stage": "WBG-2",
+  "question": "Can the existing Wingless substrate discover reusable predictive four-byte motifs directly from an unsegmented raw byte stream, causally improve held-out next-byte prediction, and reduce effective internal event count without a supplied tokenizer, lexicon, or boundary labels?",
+  "hypothesis": "A bounded motif learner that selects at most eight four-byte patterns solely from training recurrence and successor consistency will recover at least seven of eight hidden predictive motifs, achieve at least 0.95 held-out successor accuracy on motif-bearing positions, exceed its byte-only ablation by at least 0.70 accuracy, reduce effective evaluation events by at least 0.30, and show no comparable gain from deterministically shuffled learned motifs. Independently implemented slice and ring byte-window substrates will agree exactly.",
+  "exact_parent_sha": "2ddd4e4cb18953de4803525bf60d40297e813252",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-RAW-BYTE-ACQUISITION-R1",
+    "classification": "supported",
+    "scientific_claim": "The existing Wingless substrate learned and autoregressively generalized over the complete raw 0..255 byte alphabet without tokenization or remapping."
+  },
+  "authority": "research-only; no production, broker, live, accepted-ref, credential, runner-configuration, scheduler, queue-consumer, external-model inference, or cross-lane authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-byte-motif-discovery-r1.json",
+    "unitary/wlm_lm_byte_motif_discovery_r1.go",
+    "cmd/wlm-lm-byte-motif-discovery-r1/main.go",
+    "scripts/run-wlm-lm-byte-motif-discovery-r1.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "raw_stream": {
+    "encoding": "identity uint8 bytes; no tokenizer, UTF decoder, boundary marker, chunk label, vocabulary remapping, or external embedding",
+    "record_construction": "Each hidden record contains four motif bytes, one motif-dependent successor byte, and three deterministic pseudo-random filler bytes. Records are concatenated with no boundary bytes or boundary labels exposed to the learner.",
+    "hidden_motif_count": 8,
+    "hidden_motif_rule": "motif i = [128+i, 64+((7*i) mod 32), 170, 85] for i in 0..7",
+    "successor_rule": "successor i = 16 + 13*i for i in 0..7",
+    "filler_rule": "three bytes per record generated from a seed-specific uint32 LCG and mapped into 192..255",
+    "learner_visibility": "The hidden motif identities, record boundaries, and construction rules are available only to deterministic corpus generation and evaluation, not motif selection."
+  },
+  "learner": {
+    "byte_only_baseline": "two-byte context -> next-byte empirical count table; argmax prediction with lowest-byte tie break",
+    "motif_candidates": "all observed four-byte windows with a following byte in the unsegmented training stream",
+    "candidate_statistics": "occurrence count plus empirical successor counts learned only from training bytes",
+    "qualification_filter": "candidate occurrence count >= 64 and best-successor fraction >= 0.90",
+    "score": "descending occurrence_count * best_successor_fraction; ties use lexicographic four-byte key",
+    "selected_motif_budget": 8,
+    "motif_prediction": "when the current four-byte window matches a selected motif, use its empirical best successor; otherwise use the byte-only two-byte baseline",
+    "capacity_growth": false
+  },
+  "controls": {
+    "ablation": "disable selected motif lookup at evaluation while retaining the trained two-byte baseline",
+    "shuffled_motif": "for each selected motif use deterministic byte order [2,0,3,1] as the control key while retaining the learned successor; duplicate shuffled keys are invalid",
+    "false_motif_test": "compare selected motif keys against the hidden motif set only after selection for evaluation; hidden identities are never used by the learner",
+    "causality": "a learned motif counts only if motif-enabled held-out accuracy exceeds ablation and shuffled controls under frozen thresholds"
+  },
+  "corpora": {
+    "training_records_per_seed": 4096,
+    "evaluation_records_per_seed": 2048,
+    "training_bytes_per_seed": 32768,
+    "evaluation_bytes_per_seed": 16384,
+    "seed_count": 4,
+    "seeds": [
+      11801,
+      11821,
+      11827,
+      11863
+    ],
+    "seed_policy": "All four seeds were checked against the Wingless repository before preregistration and had no matches. No replacement, exclusion, or extension is permitted.",
+    "train_eval_separation": "Training and evaluation use separate LCG counter ranges and independently generated record-order sequences."
+  },
+  "substrates": [
+    "slice-backed rolling four-byte raw-byte window",
+    "fixed-capacity ring rolling four-byte raw-byte window"
+  ],
+  "evaluation": {
+    "target_positions": "score next-byte predictions only at the hidden successor position immediately after each true four-byte motif; these labels are evaluator-only and never used by motif selection",
+    "recognized_motif_event_rule": "for event-count accounting, a selected motif recognized at a hidden true-motif span replaces four raw byte events with one motif event; spans are non-overlapping by construction",
+    "effective_event_reduction": "(raw_evaluation_byte_events - motif_aware_event_count) / raw_evaluation_byte_events",
+    "selected_true_motif_recall": "number of selected keys equal to hidden true motifs divided by eight",
+    "false_selected_motif_count": "selected keys not in hidden true motif set"
+  },
+  "budgets": {
+    "seed_count": 4,
+    "substrate_count": 2,
+    "selected_motif_budget": 8,
+    "motif_width_bytes": 4,
+    "two_byte_baseline_contexts": 65536,
+    "maximum_candidate_windows_per_training_stream": 32765,
+    "training_bytes_total": 262144,
+    "evaluation_bytes_total": 131072,
+    "target_successor_evaluations_total": 16384,
+    "goroutine_policy": "single-process deterministic execution; GOMAXPROCS=1 in qualification"
+  },
+  "metrics_and_thresholds": [
+    {
+      "name": "valid_seed_count",
+      "comparator": "==",
+      "threshold": 4
+    },
+    {
+      "name": "completed_substrate_runs",
+      "comparator": "==",
+      "threshold": 8
+    },
+    {
+      "name": "selected_motif_count",
+      "comparator": "==",
+      "threshold": 8
+    },
+    {
+      "name": "minimum_selected_true_motif_recall",
+      "comparator": ">=",
+      "threshold": 0.875
+    },
+    {
+      "name": "maximum_false_selected_motif_count",
+      "comparator": "<=",
+      "threshold": 1
+    },
+    {
+      "name": "minimum_motif_enabled_successor_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "maximum_byte_only_ablation_successor_accuracy",
+      "comparator": "<=",
+      "threshold": 0.2
+    },
+    {
+      "name": "maximum_shuffled_motif_successor_accuracy",
+      "comparator": "<=",
+      "threshold": 0.2
+    },
+    {
+      "name": "minimum_causal_accuracy_gain_over_ablation",
+      "comparator": ">=",
+      "threshold": 0.7
+    },
+    {
+      "name": "minimum_effective_event_reduction_fraction",
+      "comparator": ">=",
+      "threshold": 0.3
+    },
+    {
+      "name": "substrate_selected_motif_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_prediction_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_event_accounting_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "duplicate_shuffled_control_key_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "invalid_candidate_rows",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "counter_overflow_rows",
+      "comparator": "==",
+      "threshold": 0
+    }
+  ],
+  "validity_criteria": [
+    "Exact parent SHA and North Star SHA-256 match this preregistration.",
+    "All four seeds and both independent rolling-window substrates complete frozen training and evaluation cardinalities.",
+    "Training/evaluation bytes are identity raw uint8 values and contain no supplied segmentation or motif labels.",
+    "Motif selection uses only recurrence and successor statistics from unsegmented training windows.",
+    "Exactly eight motifs are selected from candidates satisfying the frozen count and successor-consistency filter; no post-result budget expansion is permitted.",
+    "Ablation and shuffled controls use the same trained byte-only baseline and no extra information.",
+    "Target-position labels and hidden motif identities are evaluator-only.",
+    "The normalized result carries schema wingless.research-scientific-result.v1 and exact experiment identifier.",
+    "Full Go regression passes before probe execution."
+  ],
+  "classification_rules": {
+    "supported": "All sixteen frozen metric thresholds and all validity criteria pass.",
+    "mixed": "Validity/completeness pass and motif-enabled prediction causally exceeds both controls, but at least one motif-recovery, event-reduction, or cross-substrate threshold fails.",
+    "negative": "Validity passes but learned motifs do not causally improve held-out prediction/efficiency or the controls reproduce the claimed gain.",
+    "incomplete": "Environmental or compute interruption prevents frozen cardinality; preserve diagnostics and make no scientific claim.",
+    "invalid": "Provenance, raw-byte identity, hidden-boundary isolation, bounded motif budget, deterministic selection, construction, or qualification isolation fails; invalid is not a scientific outcome."
+  },
+  "stop_conditions": [
+    "Stop before execution on provenance, authority, North Star, package-scope, hidden-label isolation, or corpus identity drift.",
+    "Stop as invalid on supplied boundary leakage, hidden motif leakage into selection, candidate-statistic corruption, motif-budget growth, duplicate shuffled control keys, or non-deterministic qualification.",
+    "Do not stop early for apparent support, mixed, or negative observations; complete the frozen matrix unless infrastructure prevents it."
+  ],
+  "no_post_result_tuning_rule": "After any probe or primary output is observed, do not alter seeds, hidden motifs, successor/filler rules, record counts, candidate filter, selection score, motif budget, controls, event accounting, metrics, thresholds, aggregation, classification, or stop conditions under this experiment identifier."
+}
