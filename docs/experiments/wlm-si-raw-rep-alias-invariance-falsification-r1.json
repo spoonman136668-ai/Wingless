@@ -1,0 +1,109 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-SI-RAW-REP-ALIAS-INVARIANCE-FALSIFICATION-R1",
+  "program": "Wingless substrate falsification",
+  "question": "Does the current exact raw-byte representation substrate preserve learned behavior when the same logical values and operations are expressed through independently recurring surface aliases that are never explicitly identified as equivalent?",
+  "hypothesis": "If the current substrate has learned surface-invariant abstractions rather than exact recurring byte motifs, training two complete alias families independently should permit cross-family value/operation combinations to retain at least 0.90 semantic transition accuracy. If same-family accuracy is at least 0.95 but cross-family accuracy is at most 0.25 with cross-family transition keys absent, the current representation mechanism is falsified as surface-invariant and should be treated as exact-motif dependent.",
+  "exact_parent_sha": "fc114a24f1ba17300fb47a14b9fe961b9fd84a34",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "allocation": "75% chain / 25% substrate falsification over the current prospective block",
+    "slot": "substrate falsification",
+    "reason": "challenge whether recent raw-representation successes reflect invariant learned structure or exact surface recurrence"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-RAW-REP-ROLE-COMPOSITION-R1",
+    "classification": "qualified-scientific-result; frozen thresholds supported",
+    "github_run_id": "37064979781",
+    "observation": "Nine exact recurring raw motifs were recovered and learned primitive transitions composed perfectly across 192 unseen multi-step programs."
+  },
+  "scope_statement": "This experiment attacks surface-form invariance only. It does not reinterpret prior supported results; it tests a stronger abstraction claim that those results did not establish.",
+  "authority": "research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "benchmark": {
+    "semantic_value_count": 4,
+    "semantic_operation_count": 5,
+    "alias_family_count": 2,
+    "surface_value_motif_count": 8,
+    "surface_operation_motif_count": 10,
+    "motif_width_bytes": 4,
+    "single_step_training": "for each alias family independently, all five semantic operations on all sixteen semantic value pairs, repeated twenty times",
+    "training_record_count": 3200,
+    "same_family_evaluation_count": 160,
+    "cross_family_evaluation_count": 160,
+    "cross_family_cases": "values expressed in family 0 with operation in family 1, plus values in family 1 with operation in family 0",
+    "noise": "deterministic LCG upper-bit bytes in range 192..255; no semantic identity or alias-equivalence information is encoded in noise"
+  },
+  "representation_learner": {
+    "input": "raw training record bytes only",
+    "candidate": "every contiguous four-byte window within each training record",
+    "selection": "top eighteen by occurrence count descending, then lexicographic raw key",
+    "capacity": 18,
+    "alias_equivalence_signal": "none",
+    "tokenizer": false
+  },
+  "transition_learner": {
+    "state": "exact learned surface-operation representation plus exact ordered learned surface-value pair -> observed surface-output-pair counts",
+    "semantic_alias_merging": false,
+    "prediction": "argmax learned surface-output pair for the exact surface transition key; unseen keys tie to the lowest surface-output pair",
+    "semantic_scoring": "only the evaluator maps predicted surface value motifs back to their known semantic values after prediction",
+    "capacity_growth": false
+  },
+  "controls": [
+    "Both alias families receive complete same-family training at identical cardinality.",
+    "The representation learner receives no evaluator alias pairing or semantic label.",
+    "The transition learner receives decoded surface representations only and is never given semantic alias equivalence.",
+    "Same-family evaluation verifies that each surface family was independently learned before cross-family falsification is interpreted.",
+    "Cross-family evaluation changes only the combination of already-trained surface aliases; semantic operations and value pairs remain within the trained logical support.",
+    "No tokenizer, external model, network access, gradient optimizer, capacity growth, oracle correction, alias dictionary, or post-result tuning is permitted."
+  ],
+  "metrics_and_thresholds": [
+    ["training_record_count", "==", 3200],
+    ["selected_representation_count", "==", 18],
+    ["selected_true_motif_match_count", "==", 18],
+    ["surface_value_representation_count", "==", 8],
+    ["surface_operation_representation_count", "==", 10],
+    ["training_decode_failure_count", "==", 0],
+    ["same_family_evaluation_count", "==", 160],
+    ["same_family_accuracy", ">=", 0.95],
+    ["cross_family_evaluation_count", "==", 160],
+    ["cross_family_accuracy", ">=", 0.90],
+    ["cross_family_missing_transition_count", "==", 0],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["capacity_growth_event_count", "==", 0],
+    ["invalid_row_count", "==", 0],
+    ["counter_overflow_count", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact parent and North Star identities match.",
+    "Both surface families contain four value aliases and five operation aliases, and both are fully trained independently.",
+    "Exactly 3200 raw single-step training records, 160 same-family controls, and 160 cross-family evaluations complete.",
+    "The representation learner selects raw motifs without evaluator alias-equivalence information.",
+    "The transition learner uses exact surface representation identities and receives no semantic alias mapping.",
+    "Same-family and cross-family semantic accuracy are scored only after prediction by evaluator-only mapping.",
+    "All metrics are finite and full Go regression passes before the probe.",
+    "No tokenizer, external model, network call, capacity growth, alias dictionary, threshold change, or adaptive evaluation occurs."
+  ],
+  "classification_rules": {
+    "survives_falsification": "Validity passes, same-family accuracy is at least 0.95, cross-family accuracy is at least 0.90, and no cross-family transition key is missing.",
+    "surface_invariance_falsified": "Validity passes, same-family accuracy is at least 0.95, cross-family accuracy is at most 0.25, and cross-family missing transition count is greater than zero.",
+    "mixed": "Validity passes and same-family learning succeeds, but cross-family behavior lies between the survives-falsification and surface-invariance-falsified criteria.",
+    "negative_control_failure": "Same-family accuracy is below 0.95, so alias-invariance interpretation is not valid.",
+    "incomplete": "Compute interruption prevents the full frozen matrix.",
+    "invalid": "Any representation, alias-isolation, evaluator-boundary, deterministic-state, capacity, or qualification criterion fails."
+  },
+  "stop_conditions": [
+    "Stop invalid before scientific execution on parent, North Star, build, frozen-package, or alias-construction drift.",
+    "After output begins, complete all same-family and cross-family evaluations unless infrastructure prevents it.",
+    "Do not add alias-merging logic, increase capacity, alter motifs, change scoring, or weaken thresholds after observing output."
+  ],
+  "no_post_result_tuning_rule": "No alias family, representation rule, transition state, evaluation pairing, metric, threshold, or interpretation may change after any primary output is observed under this experiment identifier.",
+  "changed_paths": [
+    "docs/experiments/wlm-si-raw-rep-alias-invariance-falsification-r1.json",
+    "unitary/wlm_si_raw_rep_alias_invariance_falsification_r1.go",
+    "cmd/wlm-si-raw-rep-alias-invariance-falsification-r1/main.go",
+    "scripts/run-wlm-si-raw-rep-alias-invariance-falsification-r1.ps1",
+    ".wingless/qualification-request.json"
+  ]
+}
