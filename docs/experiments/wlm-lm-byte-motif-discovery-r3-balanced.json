@@ -1,0 +1,164 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-BYTE-MOTIF-DISCOVERY-R3-BALANCED",
+  "proposal_parent": "WLM-LM-ADAPTIVE-GRANULARITY-PROPOSAL-R1",
+  "proposal_stage": "WBG-2",
+  "question": "When the WBG-2 corpus is corrected to expose all eight hidden motifs equally while holding seeds, filler-state trajectory, selector, motif budget, controls, metrics, and thresholds unchanged, can the existing Wingless substrate causally discover reusable four-byte motifs from an unsegmented raw-byte stream?",
+  "hypothesis": "With balanced eight-motif exposure, the unchanged WBG-2 selector will recover at least seven of eight hidden predictive motifs, achieve at least 0.95 held-out successor accuracy, exceed its byte-only ablation by at least 0.70 accuracy, reduce effective evaluation events by at least 0.30, and show no comparable gain from shuffled learned motifs. Slice and ring byte-window substrates will agree exactly.",
+  "exact_parent_sha": "27b1f61f050c40d5ce323c312dfd393fa2212c41",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "negative_experiment": "WLM-LM-BYTE-MOTIF-DISCOVERY-R2",
+    "negative_classification": "negative",
+    "attribution_experiment": "WLM-LM-BYTE-MOTIF-ATTRIBUTION-R1",
+    "attribution_classification": "supported",
+    "attribution_claim": "Each R2 seed exposed exactly two hidden motifs, and the unchanged selector recovered all presented true motifs."
+  },
+  "authority": "research-only; no production, live, accepted-ref, scheduler, queue-consumer, external-model inference, or cross-lane authority changes",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-byte-motif-discovery-r3-balanced.json",
+    "unitary/wlm_lm_byte_motif_discovery_r3_balanced.go",
+    "cmd/wlm-lm-byte-motif-discovery-r3-balanced/main.go",
+    "scripts/run-wlm-lm-byte-motif-discovery-r3-balanced.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "paired_single_variable_delta": {
+    "reused_seeds": [
+      11801,
+      11821,
+      11827,
+      11863
+    ],
+    "reason_for_seed_reuse": "Intentional paired comparison to R2; same seeds preserve the prior LCG/filler trajectory while isolating motif-support scheduling.",
+    "unchanged": [
+      "raw uint8 stream representation",
+      "eight hidden motif byte definitions",
+      "successor mapping",
+      "record width",
+      "training/evaluation record counts",
+      "LCG state initialization",
+      "four LCG advances per record",
+      "three filler-byte mappings per record",
+      "four-byte candidate width",
+      "occurrence threshold >=64",
+      "successor-consistency threshold >=0.90",
+      "selection score/order",
+      "selected motif budget=8",
+      "byte-only baseline",
+      "ablation control",
+      "shuffled-motif control",
+      "event accounting",
+      "all scientific thresholds"
+    ],
+    "only_change": "Motif id no longer uses state mod 8. After preserving the same otherwise-unused first LCG advance per record, motif id is (5*record + seed mod 8) mod 8, so every eight records expose all eight motifs exactly once."
+  },
+  "corpora": {
+    "training_records_per_seed": 4096,
+    "evaluation_records_per_seed": 2048,
+    "training_bytes_per_seed": 32768,
+    "evaluation_bytes_per_seed": 16384,
+    "balanced_training_occurrences_per_motif": 512,
+    "balanced_evaluation_occurrences_per_motif": 256,
+    "train_eval_separation": "Evaluation retains the original R2 alternate LCG initial state; balanced motif scheduling applies independently to both."
+  },
+  "metrics_and_thresholds": [
+    {
+      "name": "valid_seed_count",
+      "comparator": "==",
+      "threshold": 4
+    },
+    {
+      "name": "completed_substrate_runs",
+      "comparator": "==",
+      "threshold": 8
+    },
+    {
+      "name": "selected_motif_count",
+      "comparator": "==",
+      "threshold": 8
+    },
+    {
+      "name": "minimum_selected_true_motif_recall",
+      "comparator": ">=",
+      "threshold": 0.875
+    },
+    {
+      "name": "maximum_false_selected_motif_count",
+      "comparator": "<=",
+      "threshold": 1
+    },
+    {
+      "name": "minimum_motif_enabled_successor_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "maximum_byte_only_ablation_successor_accuracy",
+      "comparator": "<=",
+      "threshold": 0.2
+    },
+    {
+      "name": "maximum_shuffled_motif_successor_accuracy",
+      "comparator": "<=",
+      "threshold": 0.2
+    },
+    {
+      "name": "minimum_causal_accuracy_gain_over_ablation",
+      "comparator": ">=",
+      "threshold": 0.7
+    },
+    {
+      "name": "minimum_effective_event_reduction_fraction",
+      "comparator": ">=",
+      "threshold": 0.3
+    },
+    {
+      "name": "substrate_selected_motif_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_prediction_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "substrate_event_accounting_mismatch_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "duplicate_shuffled_control_key_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "invalid_candidate_rows",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "counter_overflow_rows",
+      "comparator": "==",
+      "threshold": 0
+    }
+  ],
+  "validity_criteria": [
+    "Exact parent SHA, North Star identity, R2 negative evidence, and attribution evidence match this preregistration.",
+    "The only corpus-generation semantic change from R2 is motif-ID scheduling; the LCG still advances once before motif emission and three times for filler bytes per record.",
+    "Every training seed contains each hidden motif exactly 512 times and every evaluation seed exactly 256 times.",
+    "The selector/filter/ranking/budget and all R2 controls and thresholds remain byte-equivalent in behavior.",
+    "No boundary bytes, motif IDs, or labels are exposed to selection.",
+    "The normalized result carries schema wingless.research-scientific-result.v1 and the exact experiment identifier.",
+    "Full Go regression passes before probe execution."
+  ],
+  "classification_rules": {
+    "supported": "All sixteen original WBG-2 frozen scientific thresholds and all validity criteria pass.",
+    "mixed": "Validity passes and motif-enabled prediction causally exceeds controls, but at least one motif recovery, event reduction, or exact-equivalence threshold fails.",
+    "negative": "Validity passes but balanced support does not produce causal motif discovery under the unchanged selector.",
+    "incomplete": "Environmental or compute interruption prevents frozen cardinality.",
+    "invalid": "Provenance, paired single-variable identity, balanced-support construction, raw-byte isolation, bounded selector, deterministic execution, or qualification isolation fails."
+  },
+  "no_post_result_tuning_rule": "Do not alter seeds, balanced schedule, filler trajectory, selector, candidate filter, motif budget, controls, event accounting, metrics, thresholds, or classification after any output is observed."
+}
