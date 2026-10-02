@@ -1,0 +1,219 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-MULTISCALE-NATIVE-LANGUAGE-PRECURSOR-R2",
+  "proposal_parent": "WLM-LM-ADAPTIVE-GRANULARITY-PROPOSAL-R1",
+  "proposal_stage": "WBG-5",
+  "question": "Can the qualified raw-byte motif/adaptive-granularity stack induce a second hierarchy level over recurring morpheme-like compounds and use those structures to generalize a sealed variable-distance reference relation without an external tokenizer?",
+  "hypothesis": "Across four new seeds, a fixed 16-structure hierarchy learned only from raw bytes will recover all eight level-1 motifs, all four recurring two-motif compounds, achieve >=0.95 local lexicon successor accuracy, >=0.90 long-range reference accuracy on exact compound-pair families excluded from grammar training, beat a motif-only frequency control by >=0.50 reference accuracy, reduce effective grammar-stream events by >=0.30, and use no more than 16 learned structures.",
+  "exact_parent_sha": "f7dd09aa2df0ca7b866c4f2ebcad42836b6aba4b",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-CROSS-DOMAIN-GRANULARITY-TRANSFER-R1",
+    "classification": "supported",
+    "qualification_run_id": "36998212129",
+    "scientific_claim": "Four shared raw-byte motifs transferred zero-shot into a sealed domain; two added target motifs reached perfect accuracy with no source forgetting."
+  },
+  "supersedes_invalid_attempt": {
+    "experiment": "WLM-LM-MULTISCALE-NATIVE-LANGUAGE-PRECURSOR-R1",
+    "disposition": "invalid-preregistration-before-execution",
+    "scientific_claim": false
+  },
+  "authority": "research-only controlled synthetic language precursor",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-multiscale-native-language-precursor-r2.json",
+    "unitary/wlm_lm_multiscale_native_language_precursor_r2.go",
+    "cmd/wlm-lm-multiscale-native-language-precursor-r2/main.go",
+    "scripts/run-wlm-lm-multiscale-native-language-precursor-r2.ps1",
+    ".wingless/qualification-request.json"
+  ],
+  "seeds": [
+    12203,
+    12211,
+    12227,
+    12239
+  ],
+  "seed_policy": "All four seeds were checked against the Wingless repository before preregistration and had no matches. No replacement, exclusion, or extension is permitted.",
+  "level1_lexicon": {
+    "base_motif_count": 8,
+    "motif_rule": "motif i=[128+i,64+((7*i) mod 32),170,85], i=0..7",
+    "successor_rule": "16+13*i",
+    "training_record": "four motif bytes + deterministic successor + three filler bytes",
+    "training_records_per_seed": 4096,
+    "evaluation_records_per_seed": 1024,
+    "selector": "all observed four-byte windows; occurrence>=64; best-successor fraction>=0.90; rank by best-successor count then consistency then lexicographic key; capacity 8",
+    "prediction": "exact learned motif match -> learned best successor; otherwise zero",
+    "filler": "seeded uint32 LCG mapped into 192..255",
+    "learner_visibility": "raw bytes only; record boundaries and motif IDs evaluator-only"
+  },
+  "level2_compounds": {
+    "definitions": {
+      "0": [
+        0,
+        4
+      ],
+      "1": [
+        1,
+        5
+      ],
+      "2": [
+        2,
+        6
+      ],
+      "3": [
+        3,
+        7
+      ]
+    },
+    "grammar_representation": "compound c is the eight raw bytes of its two constituent learned motifs concatenated with no boundary byte",
+    "induction": "After level-1 motifs are frozen for the seed, scan grammar bytes left-to-right and emit a motif event whenever a selected level-1 motif matches; otherwise emit one raw-byte event. A level-2 candidate is any two adjacent motif events with zero intervening raw events. Select candidates with occurrence>=64, ranked by occurrence then lexicographic pair, capacity 4.",
+    "hidden_identity": "compound IDs/definitions are evaluator-only and unavailable to candidate selection"
+  },
+  "grammar": {
+    "training_records_per_seed": 3072,
+    "evaluation_records_per_seed": 1024,
+    "record_shape": "compound A (8 bytes) + twelve filler bytes + compound B (8 bytes) + one reference byte + three filler bytes = 32 raw bytes",
+    "pair_space": "A,B each in 0..3",
+    "heldout_rule": "pair (A,B) is held out iff (A+B+(seed mod 4)) mod 4 == 1; exactly four of sixteen pairs are sealed from grammar training",
+    "training_schedule": "balanced over the twelve non-heldout pairs",
+    "evaluation_schedule": "balanced over the four heldout pairs only",
+    "filler": "grammar-specific LCG state mapped into 192..255, disjoint training/evaluation initial states",
+    "reference_rule": "reference byte = 224 + ((A mod 2)<<1) + (B mod 2)",
+    "record_boundary_visibility": "no record marker or boundary byte exists; evaluator positions are unavailable to learning"
+  },
+  "reference_hierarchy": {
+    "capacity": 4,
+    "pattern_detection": "Using recognized level-2 compound events, collect patterns where two compound events are separated by exactly twelve raw-byte events and the byte immediately after the second compound is the candidate reference target.",
+    "first_role_learning": "for each first-position compound c, learn one high contribution bit from target-class bit1 by majority count",
+    "second_role_learning": "for each second-position compound c, learn one low contribution bit from target-class bit0 by majority count",
+    "prediction": "combine learned first-role bit for compound A and second-role bit for compound B; predicted reference byte=224+(high<<1)+low",
+    "tie_rule": "ties choose zero",
+    "structure_accounting": "one reference profile structure per compound stores both role contribution counters; capacity 4",
+    "no_pair_memorization": "exact (A,B)->reference table is forbidden"
+  },
+  "controls": {
+    "motif_only": "global reference-byte frequency argmax learned from grammar training; ties choose lowest byte; no level-2 compounds or role profiles",
+    "shuffled_compound": "deterministically swap the two motif IDs inside every learned compound key for evaluation only; no retraining",
+    "oracle_boundary_use_forbidden": true,
+    "capacity_growth_forbidden": true
+  },
+  "event_accounting": {
+    "raw_event_count": "one event per raw byte",
+    "level1": "each recognized four-byte motif span replaces four raw events with one event",
+    "level2": "each recognized two-motif compound replaces its two level-1 motif events with one event",
+    "effective_reduction": "1 - hierarchical_event_count/raw_event_count on heldout grammar evaluation"
+  },
+  "budgets": {
+    "level1_capacity": 8,
+    "level2_capacity": 4,
+    "reference_profile_capacity": 4,
+    "total_structure_capacity": 16,
+    "grammar_record_bytes": 32,
+    "seeds": 4,
+    "full_regression_required": true,
+    "goroutine_policy": "single-process deterministic execution; GOMAXPROCS=1 in qualification"
+  },
+  "metrics_and_thresholds": [
+    {
+      "name": "valid_seed_count",
+      "comparator": "==",
+      "threshold": 4
+    },
+    {
+      "name": "minimum_level1_motif_recall",
+      "comparator": "==",
+      "threshold": 1
+    },
+    {
+      "name": "minimum_level2_compound_recall",
+      "comparator": "==",
+      "threshold": 1
+    },
+    {
+      "name": "minimum_local_successor_accuracy",
+      "comparator": ">=",
+      "threshold": 0.95
+    },
+    {
+      "name": "minimum_long_range_reference_accuracy",
+      "comparator": ">=",
+      "threshold": 0.9
+    },
+    {
+      "name": "maximum_motif_only_long_range_reference_accuracy",
+      "comparator": "<=",
+      "threshold": 0.4
+    },
+    {
+      "name": "maximum_shuffled_compound_long_range_accuracy",
+      "comparator": "<=",
+      "threshold": 0.4
+    },
+    {
+      "name": "minimum_hierarchical_long_range_gain",
+      "comparator": ">=",
+      "threshold": 0.5
+    },
+    {
+      "name": "minimum_effective_event_reduction_fraction",
+      "comparator": ">=",
+      "threshold": 0.3
+    },
+    {
+      "name": "maximum_total_learned_structure_count",
+      "comparator": "<=",
+      "threshold": 16
+    },
+    {
+      "name": "minimum_reference_profile_coverage",
+      "comparator": "==",
+      "threshold": 4
+    },
+    {
+      "name": "maximum_heldout_pair_leak_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "oracle_boundary_use_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "capacity_growth_event_count",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "invalid_stream_rows",
+      "comparator": "==",
+      "threshold": 0
+    },
+    {
+      "name": "counter_overflow_rows",
+      "comparator": "==",
+      "threshold": 0
+    }
+  ],
+  "validity_criteria": [
+    "Exact parent SHA, North Star identity, WBG-4 evidence identity, and invalid-R1 supersession match this preregistration.",
+    "All four seeds complete frozen lexicon and grammar cardinalities.",
+    "Level-1 selection uses only raw-byte window recurrence and successor statistics.",
+    "Level-2 selection uses only adjacency of recognized level-1 motif events; hidden compound IDs are unavailable.",
+    "Reference learning uses only the frozen twelve-raw-event separation pattern between recognized compounds; evaluator record boundaries are unavailable.",
+    "No exact compound-pair reference memorization table exists.",
+    "No heldout (A,B) pair appears in grammar training.",
+    "Motif-only and shuffled-compound controls receive no extra information or retraining.",
+    "Total learned structures never exceed 8+4+4=16.",
+    "The normalized result carries schema wingless.research-scientific-result.v1 and exact experiment identifier.",
+    "Full Go regression passes before probe execution."
+  ],
+  "classification_rules": {
+    "supported": "All sixteen frozen thresholds and all validity criteria pass.",
+    "mixed": "Hierarchy causally improves sealed long-range reference prediction but at least one recall, accuracy, event-reduction, or capacity threshold fails.",
+    "negative": "Validity passes but hierarchy provides less than 0.10 long-range gain or fails sealed-pair generalization.",
+    "incomplete": "Environmental or compute interruption prevents frozen cardinality.",
+    "invalid": "Provenance, hidden-boundary isolation, heldout leakage, capacity, deterministic construction, or qualification isolation fails."
+  },
+  "no_post_result_tuning_rule": "After any output is observed, do not alter seeds, motif definitions, compound definitions, grammar shape, heldout rule, reference rule, hierarchy-learning rules, controls, metrics, thresholds, aggregation, or classification."
+}
