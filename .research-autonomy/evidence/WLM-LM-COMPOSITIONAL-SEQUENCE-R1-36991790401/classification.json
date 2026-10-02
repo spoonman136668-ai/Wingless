@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.research-classification.v1",
+  "experiment": "WLM-LM-COMPOSITIONAL-SEQUENCE-R1",
+  "qualified_head_sha": "991ca542b20d08f9e681d2f71c569586b5d96769",
+  "qualification_run_id": "36991790401",
+  "qualification": "qualified-scientific-result",
+  "classification": "supported",
+  "thresholds_frozen_before_execution": true,
+  "full_regression_passed": true,
+  "normalized_harness_witness": true,
+  "metrics": {
+    "valid_seed_count": 8,
+    "completed_substrate_runs": 16,
+    "training_transition_count": 24576,
+    "heldout_one_step_evaluation_count": 256,
+    "autoregressive_evaluation_transition_count": 4096,
+    "minimum_factorized_heldout_one_step_accuracy": 1,
+    "maximum_lookup_heldout_one_step_accuracy": 0,
+    "minimum_factorized_autoregressive_accuracy": 1,
+    "substrate_prediction_mismatch_count": 0,
+    "substrate_factorized_state_mismatch_count": 0,
+    "substrate_context_observable_mismatch_count": 0,
+    "heldout_context_leak_count": 0,
+    "factorized_bit_coverage_missing_count": 0,
+    "invalid_context_rows": 0,
+    "counter_overflow_rows": 0
+  },
+  "scientific_claim": "Under the frozen held-out matrix, Wingless's bounded 24-counter factorized learned state generalized the three-bit XOR next-token relation to all 16 exact two-token contexts omitted from training and sustained perfect autoregressive rollouts, while the 512-counter exact-context lookup control achieved zero held-out accuracy.",
+  "scope": "bounded synthetic Wingless compositional sequence-generalization research; not open-domain language",
+  "execution_mode": "direct-no-agent",
+  "authority": "research-only"
+}
