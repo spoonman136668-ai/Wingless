@@ -51,13 +51,13 @@ jobs:
           if($Head -notmatch '^[0-9a-f]{40}$'){throw 'QUAL_HEAD_INVALID'}
 
           $Prompt=Join-Path $env:RUNNER_TEMP 'wingless-nvidia-protocol-prompt.txt'
-          @'
-This is a frozen provider-protocol qualification only.
-Do not modify any repository file.
-Call git_status exactly once.
-Then call finish exactly once with status complete and summary exactly:
-NVIDIA_PROTOCOL_PASS
-'@ | Set-Content -LiteralPath $Prompt -Encoding UTF8
+          @(
+            'This is a frozen provider-protocol qualification only.'
+            'Do not modify any repository file.'
+            'Call git_status exactly once.'
+            'Then call finish exactly once with status complete and summary exactly:'
+            'NVIDIA_PROTOCOL_PASS'
+          ) | Set-Content -LiteralPath $Prompt -Encoding UTF8
 
           $Models=@(
             'moonshotai/kimi-k3',
