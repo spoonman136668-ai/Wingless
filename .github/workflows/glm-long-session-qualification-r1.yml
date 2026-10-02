@@ -1,0 +1,101 @@
+name: GLM long-session qualification R1
+
+on:
+  push:
+    branches:
+      - qualification/glm-clear-thinking-r1
+    paths:
+      - '.github/workflows/glm-long-session-qualification-r1.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: glm-long-session-qualification-r1
+  cancel-in-progress: false
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 60
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+    steps:
+      - name: Checkout exact adapter candidate
+        uses: actions/checkout@v4
+        with:
+          ref: qualification/glm-clear-thinking-r1
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate adapter invariants
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          if([string]::IsNullOrWhiteSpace($env:NVIDIA_API_KEY)){throw 'NVIDIA_API_KEY_SECRET_MISSING'}
+          $Text=Get-Content -Raw 'scripts\Invoke-NemotronRepoAgent.ps1'
+          foreach($Needle in @(
+            "chat_template_kwargs",
+            "clear_thinking=$true",
+            "reasoning_effort='low'",
+            "underlying connection was closed",
+            "unexpected error occurred on a receive",
+            "z-ai/glm-5.3"
+          )){
+            if(-not$Text.Contains($Needle)){throw "GLM_LONG_SESSION_ADAPTER_INVARIANT_MISSING $Needle"}
+          }
+          Write-Host 'GLM_LONG_SESSION_ADAPTER_STATIC=PASS'
+
+      - name: Exercise eight sequential GLM tool turns
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Root=(Resolve-Path '.').Path
+          $Head=(git rev-parse HEAD).Trim()
+          $Worktree=Join-Path $env:RUNNER_TEMP ('glm-long-'+$env:GITHUB_RUN_ID)
+          $ProbeBranch='qual/glm-long-'+$env:GITHUB_RUN_ID
+          $Prompt=Join-Path $env:RUNNER_TEMP ('glm-long-prompt-'+$env:GITHUB_RUN_ID+'.txt')
+          $Last=Join-Path $env:RUNNER_TEMP ('glm-long-last-'+$env:GITHUB_RUN_ID+'.txt')
+          $Trace=Join-Path $env:RUNNER_TEMP ('glm-long-trace-'+$env:GITHUB_RUN_ID+'.txt')
+          if(Test-Path -LiteralPath $Worktree){Remove-Item -LiteralPath $Worktree -Recurse -Force}
+          git worktree add -b $ProbeBranch $Worktree $Head
+          if($LASTEXITCODE-ne0){throw 'GLM_LONG_WORKTREE_CREATE_FAILED'}
+          try{
+            @(
+              'This is a frozen multi-turn provider qualification. Do not modify any repository file.'
+              'You must complete exactly eight sequential checkpoints.'
+              'For checkpoint 1 through checkpoint 8: call git_status exactly once, and do not call another tool in the same assistant response.'
+              'Wait for each tool result before proceeding to the next checkpoint.'
+              'Do not call finish before checkpoint 8 has returned.'
+              'After checkpoint 8 returns, call finish exactly once with status complete and summary exactly GLM_LONG_SESSION_PASS.'
+              'Do not send a normal final answer.'
+            ) | Set-Content -LiteralPath $Prompt -Encoding UTF8
+
+            $Output=@(& '.\scripts\Invoke-NemotronRepoAgent.ps1' `
+              -RepoPath $Worktree `
+              -Program 'Wingless' `
+              -ActiveBranch $ProbeBranch `
+              -StartSha $Head `
+              -PromptPath $Prompt `
+              -LastMessagePath $Last `
+              -Provider nvidia `
+              -Model 'z-ai/glm-5.3' `
+              -MaxRounds 12 `
+              -ProtocolProbe 2>&1)
+            $Output | Tee-Object -FilePath $Trace | ForEach-Object { Write-Host ([string]$_) }
+
+            if(-not(Test-Path -LiteralPath $Last -PathType Leaf)){throw 'GLM_LONG_RESULT_MISSING'}
+            $Summary=[IO.File]::ReadAllText($Last).Trim()
+            if($Summary -cne 'GLM_LONG_SESSION_PASS'){throw "GLM_LONG_RESULT_INVALID summary=$Summary"}
+            $TraceText=[IO.File]::ReadAllText($Trace)
+            foreach($Round in 1..8){
+              if($TraceText -notmatch ("NEMOTRON_TOOL round="+$Round+" name=git_status")){throw "GLM_LONG_ROUND_MISSING round=$Round"}
+            }
+            if((git -C $Worktree status --porcelain)-join''){throw 'GLM_LONG_MUTATED_WORKTREE'}
+            Write-Host 'GLM_LONG_SESSION_8_TURN=PASS'
+          }
+          finally{
+            if(Test-Path -LiteralPath $Worktree){git worktree remove --force $Worktree | Out-Null}
+            $Existing=@(git branch --list $ProbeBranch | Where-Object{$_ -and $_.Trim()})
+            if($Existing.Count-gt0){git branch -D $ProbeBranch | Out-Null}
+          }
