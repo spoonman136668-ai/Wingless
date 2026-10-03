@@ -1,0 +1,184 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-BRIDGE-ATTRIBUTION-R1",
+  "program": "Wingless external raw-input to repaired multi-step prediction to bounded reasoning failure attribution",
+  "question": "Why did the supported low-support transition repair improve exact multi-step prediction but fail to improve the frozen three-class reasoning readout?",
+  "hypothesis": "On the exact sealed substrate and heldout queries, attribute the failed reasoning bridge using three frozen controls: exact terminal top-1 correctness for transition quality, repaired distributional class versus repaired top-1 class projection for aggregation, and the fraction of exact-motif repair gains that are invisible under the training-frozen COMMON/MID/RARE partition for readout ceiling. The dominant failure signature will be identifiable without changing learned capacity or readout assignments.",
+  "exact_parent_sha": "96de88b7da95fc9aec693fecbc74ac65dd2473c5",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-bridge-attribution-r1",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REPAIRED-RELATION-REASONING-BRIDGE-R1",
+    "github_run_id": "37119649434",
+    "classification": "negative",
+    "observation": {
+      "depth3_repaired_reasoning_minus_baseline_accuracy": -0.001071811361200492,
+      "depth3_repaired_reasoning_minus_top1_projection_accuracy": 0.009110396570203627,
+      "depth2_repaired_reasoning_minus_baseline_accuracy": -0.0021419009370816644,
+      "minimum_source_depth3_repaired_reasoning_minus_baseline_accuracy": -0.0036976170912078883
+    },
+    "diagnosis": "The repaired predictive distribution remained valid and aggregation beat top-1 projection, yet the frozen commonality task did not benefit relative to the unrepaired baseline. Attribution must distinguish transition-level, aggregation-level, and readout-level causes before any capacity change."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical sealed three-source manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "baseline_relation": "byte-identical sealed unrepaired predictor",
+    "repaired_relation": "byte-identical supported 0.5 current-row plus 0.5 overflow-row backoff for exact-pair support below 3",
+    "pair_support_threshold": 3,
+    "runtime_pair_state_cap": 2048,
+    "horizons": [
+      2,
+      3
+    ],
+    "reasoning_readout": "byte-identical training-frozen COMMON/MID/RARE rank partition from the negative bridge"
+  },
+  "attribution_protocol": {
+    "selection_data": "training prefixes only",
+    "heldout_role": "scoring and diagnostic counting only; never selection or tuning",
+    "transition_control": "compare baseline versus repaired terminal top-1 motif correctness on identical depth-2/depth-3 heldout queries",
+    "aggregation_control": "compare repaired distributional class decision versus repaired terminal top-1 class projection on identical queries",
+    "readout_ceiling_control": "among queries where repaired terminal top-1 changes an incorrect baseline motif to the correct terminal motif, count how often the baseline and repaired top-1 motifs map to the same frozen reasoning class or the baseline class answer was already correct",
+    "no_new_state": true
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      512
+    ],
+    [
+      "reasoning_class_count",
+      "==",
+      3
+    ],
+    [
+      "motif_class_assignment_count",
+      "==",
+      512
+    ],
+    [
+      "depth2_query_count",
+      ">",
+      0
+    ],
+    [
+      "depth3_query_count",
+      ">",
+      0
+    ],
+    [
+      "depth3_exact_repair_gain_query_count",
+      ">",
+      0
+    ],
+    [
+      "depth3_repaired_exact_top1_minus_baseline_exact_top1_accuracy",
+      ">",
+      0
+    ],
+    [
+      "maximum_probability_mass_error",
+      "<=",
+      1e-9
+    ],
+    [
+      "heldout_selection_use_count",
+      "==",
+      0
+    ],
+    [
+      "relation_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "readout_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ]
+  ],
+  "attribution_rules": {
+    "transition_failure": "Validity passes and repaired exact top-1 depth-3 accuracy does not exceed baseline exact top-1 depth-3 accuracy.",
+    "aggregation_failure": "Validity passes, repaired exact top-1 improves, and repaired distributional class accuracy is at least 0.005 below repaired top-1 class projection.",
+    "readout_ceiling": "Validity passes, repaired exact top-1 improves, aggregation is not failing, class-level repaired-minus-baseline accuracy is nonpositive, and at least 0.50 of exact-gain queries are hidden by the frozen readout (same-class motif correction or baseline class already correct).",
+    "distributed": "Validity passes but none of the three preregistered signatures dominates.",
+    "invalid": "Any sealed-parent, authority, source, split, representation, relation identity, readout identity, determinism, capacity, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact sealed negative parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and external manifest.",
+    "Baseline relation, repaired relation, motif representation, runtime cap, horizons, and frozen class assignments are byte-identical in semantics to the sealed bridge.",
+    "Heldout labels are used only for scoring fixed controls and diagnostic counts; they never choose thresholds, rows, classes, or successor mechanism.",
+    "Duplicate complete probes are byte-identical and probability mass remains normalized within tolerance.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, learned-capacity growth, adaptive readout growth, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, repair rule, support threshold, class assignments, runtime cap, horizons, attribution controls, 0.005 aggregation margin, 0.50 readout-ceiling fraction, metrics, classification, or authority after primary output.",
+  "successor_if_transition_failure": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-TRANSITION-ATTRIBUTION-R2",
+    "intent": "localize why exact predictive improvement from the prior repair did not reproduce under the bridge probe before changing capacity"
+  },
+  "successor_if_aggregation_failure": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-AGGREGATION-REPAIR-R1",
+    "intent": "test one bounded training-frozen probability aggregation repair without changing relation capacity"
+  },
+  "successor_if_readout_ceiling": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-READOUT-REFINEMENT-R1",
+    "intent": "test one bounded training-only refinement of the abstract readout while preserving the learned relation substrate"
+  },
+  "successor_if_distributed": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-FACTORIAL-ATTRIBUTION-R2",
+    "intent": "factor the remaining transition/aggregation/readout interactions without capacity growth"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-bridge-attribution-r1.json",
+    "unitary/wlm_lm_external_reasoning_bridge_attribution_r1.go",
+    "cmd/wlm-lm-external-reasoning-bridge-attribution-r1/main.go",
+    ".github/workflows/external-reasoning-bridge-attribution-r1.yml"
+  ]
+}
