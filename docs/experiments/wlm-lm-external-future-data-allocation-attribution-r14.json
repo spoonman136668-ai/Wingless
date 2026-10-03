@@ -1,0 +1,84 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-ALLOCATION-ATTRIBUTION-R14",
+  "program": "Wingless fixed-budget allocation failure attribution",
+  "question": "Which prediction-path mechanism explains why the R13 guided fixed-budget allocation gains 5 code hits but loses 10 technical-prose hits versus equal allocation?",
+  "hypothesis": "Replay R13 exactly: same three leave-one-domain-out arms, 15,819 non-target training bytes per arm, 256 motifs, sealed 582-byte evaluation prefixes, 872-byte adaptation reservoirs, and the exact EQUAL and GUIDED allocations. Add attribution only. For every sealed evaluation position, compare EQUAL and GUIDED predictions and assign exactly one frozen category: motif_admission_in_guided, motif_eviction_in_guided, motif_successor_refinement, baseline_byte_refinement, or prediction_unchanged. Record signed hit delta GUIDED_correct-EQUAL_correct. Category sums must reconstruct code=+5, structured=0, technical_prose=-10 and aggregate=-5 exactly. The dominant technical-prose loss mechanism is the category with the most negative prose signed delta. No allocation, budget, capacity, predictor, source, evaluator, or authority change is allowed.",
+  "exact_parent_sha": "62aef857f4dc3a15d1e4f75002fe18e6a8564379",
+  "qualification_branch": "research/external-hosted-wingless-future-data-allocation-attribution-r14",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MECHANISM-GUIDED-ALLOCATION-R13",
+    "run_id": 37158607244,
+    "classification": "negative",
+    "observation": {
+      "code_delta": 5,
+      "structured_delta": 0,
+      "technical_prose_delta": -10,
+      "aggregate_delta": -5
+    }
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "arm_count": 3,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "equal_allocation": {
+      "code": 582,
+      "structured": 581,
+      "technical_prose": 581
+    },
+    "guided_allocation": {
+      "code": 872,
+      "structured": 436,
+      "technical_prose": 436
+    }
+  },
+  "attribution": {
+    "categories": [
+      "motif_admission_in_guided",
+      "motif_eviction_in_guided",
+      "motif_successor_refinement",
+      "baseline_byte_refinement",
+      "prediction_unchanged"
+    ],
+    "accounting_targets": {
+      "code": 5,
+      "structured": 0,
+      "technical_prose": -10,
+      "aggregate": -5
+    },
+    "dominant_loss_rule": "technical-prose category with most negative signed hit delta"
+  },
+  "classification_rules": {
+    "supported": "valid with exact accounting and one category explains at least 50% of the absolute technical-prose loss",
+    "mixed": "valid with exact accounting and at least one category has negative prose contribution but none reaches 50%",
+    "negative": "valid but no frozen category explains a negative prose contribution despite replayed loss",
+    "invalid": "any identity, authority, source, budget, split, allocation, category accounting, determinism, provenance, or capacity requirement fails"
+  },
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-ALLOCATION-MARGINAL-EFFICIENCY-R15",
+    "intent": "measure preregistered per-domain marginal value curves around the fixed R13 budget without selecting a new policy from the same data"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-ALLOCATION-FACTORIAL-R15",
+    "intent": "factor interacting admission/refinement effects before any new allocation policy"
+  },
+  "no_post_result_tuning_rule": "Do not alter R13 data, allocations, budgets, predictor, categories, accounting targets, 50% criterion, classification, or authority after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-allocation-attribution-r14.json",
+    "unitary/wlm_lm_external_future_data_allocation_attribution_r14.go",
+    "cmd/wlm-lm-external-future-data-allocation-attribution-r14/main.go",
+    ".github/workflows/external-future-data-allocation-attribution-r14.yml"
+  ]
+}
