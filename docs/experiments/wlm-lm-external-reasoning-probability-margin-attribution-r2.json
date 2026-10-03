@@ -1,0 +1,123 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-PROBABILITY-MARGIN-ATTRIBUTION-R2",
+  "program": "Wingless fixed-capacity probability-margin gate failure attribution",
+  "question": "Why did the frozen training-median probability-margin gate miss all 19 same-class hidden gains while opening on most heldout queries at low exact precision?",
+  "hypothesis": "Replay the exact R1 representation, repaired relation, eight fixed classes, training-derived median threshold, and heldout depth-3 population without changing any threshold or capacity. All 19 same-class hidden gains will reproduce below the frozen threshold. If repaired exact precision among below-threshold heldout queries is at least the 0.34276267450404113 precision of the opened region, then the scalar margin is directionally miscalibrated for exposing exact repaired predictions rather than merely too conservative.",
+  "exact_parent_sha": "aea00739d40448845304f9458217e29dd66b3173",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-probability-margin-attribution-r2",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-PROBABILITY-MARGIN-READOUT-R1",
+    "github_run_id": "37131915056",
+    "classification": "negative",
+    "observation": {
+      "training_margin_sample_count": 5978,
+      "training_margin_threshold": 0.4329118785561704,
+      "depth3_query_count": 3732,
+      "gate_activation_count": 2722,
+      "gate_activation_fraction": 0.7293676312968917,
+      "gate_exact_hit_count": 933,
+      "gate_exact_precision": 0.34276267450404113,
+      "same_class_hidden_gain_count": 19,
+      "same_class_hidden_gate_activation_count": 0,
+      "same_class_hidden_gate_activation_fraction": 0.0
+    },
+    "diagnosis": "The training-median gate is not simply under-active: it opens broadly yet excludes every known same-class hidden gain and has low exact precision. The bounded next step is threshold-relative attribution only."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical R1 three-source manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "baseline_relation": "byte-identical sealed unrepaired predictor",
+    "repaired_relation": "byte-identical supported low-support repair",
+    "refined_readout": "byte-identical eight fixed 64-motif classes",
+    "training_margin_rule": "byte-identical R1 normalized within-class top1-versus-runner-up margin",
+    "training_margin_threshold_rule": "byte-identical median over valid repaired depth-3 training queries",
+    "expected_threshold": 0.4329118785561704,
+    "relation_capacity_change": false,
+    "readout_capacity_change": false,
+    "threshold_change": false
+  },
+  "attribution_protocol": {
+    "heldout_partition": "below frozen threshold versus at-or-above frozen threshold",
+    "same_class_hidden_population": "the exact 19 R1 same-class hidden repaired-gain rows",
+    "metrics": [
+      "same-class hidden margin minimum, maximum, median",
+      "same-class hidden rows below frozen threshold",
+      "below-threshold repaired exact precision",
+      "at-or-above-threshold repaired exact precision",
+      "precision difference below minus above"
+    ],
+    "selection_data": "none; post hoc heldout attribution only",
+    "adaptive_changes": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["refined_reasoning_class_count","==",8],
+    ["training_margin_sample_count","==",5978],
+    ["training_margin_threshold","==",0.4329118785561704],
+    ["depth3_query_count","==",3732],
+    ["above_threshold_query_count","==",2722],
+    ["below_threshold_query_count","==",1010],
+    ["same_class_hidden_gain_count","==",19],
+    ["same_class_hidden_below_threshold_count","==",19],
+    ["same_class_hidden_below_threshold_fraction",">=",0.95],
+    ["above_threshold_exact_precision","==",0.34276267450404113],
+    ["below_threshold_exact_precision",">=",0.0],
+    ["threshold_direction_precision_delta","finite",true],
+    ["attribution_accounting_error_count","==",0],
+    ["heldout_selection_use_count","==",0],
+    ["relation_capacity_growth_event_count","==",0],
+    ["adaptive_readout_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes; at least 0.95 of same-class hidden gains are below threshold and below-threshold repaired exact precision is at least the above-threshold exact precision, supporting directional margin miscalibration.",
+    "mixed": "Validity passes and at least 0.95 of same-class hidden gains are below threshold, but below-threshold exact precision is lower than above-threshold precision; the threshold is exclusionary for the hidden population without a globally inverted precision ordering.",
+    "negative": "Validity passes but fewer than 0.95 of the same-class hidden gains reproduce below the frozen threshold.",
+    "invalid": "Any sealed-parent, authority, source, threshold reproduction, population accounting, determinism, capacity, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact qualified negative R1 parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and external manifest.",
+    "Representation, repaired relation, eight class assignments, support threshold, runtime cap, horizons, margin formula, and median threshold rule are unchanged.",
+    "The training threshold reproduces exactly at 0.4329118785561704 and the heldout population reproduces 3732 rows with 2722 above and 1010 below threshold.",
+    "The 19 same-class hidden-gain rows reproduce exactly before attribution.",
+    "Attribution adds no learned state, threshold adjustment, class, relation state, tokenizer, parser, or adaptive update.",
+    "Heldout labels affect attribution only and never threshold selection or gate behavior.",
+    "Duplicate complete probes are byte-identical and probability mass remains normalized within tolerance.",
+    "No external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, repair rule, classes, margin formula, median threshold, heldout partition, 0.95 hidden-below floor, metrics, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-MARGIN-DIRECTION-READOUT-R2",
+    "intent": "test one training-frozen direction-aware margin predicate without adding relation or class capacity"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-MARGIN-SOURCE-ATTRIBUTION-R3",
+    "intent": "attribute hidden margins and false-positive precision by source before changing the gate"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-probability-margin-attribution-r2.json",
+    "unitary/wlm_lm_external_reasoning_probability_margin_attribution_r2.go",
+    "cmd/wlm-lm-external-reasoning-probability-margin-attribution-r2/main.go",
+    ".github/workflows/external-reasoning-probability-margin-attribution-r2.yml"
+  ]
+}
