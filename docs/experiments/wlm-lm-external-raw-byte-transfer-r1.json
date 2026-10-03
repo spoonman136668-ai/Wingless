@@ -1,0 +1,218 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-RAW-BYTE-TRANSFER-R1",
+  "program": "Wingless external raw-input to representation to prediction frontier",
+  "question": "Does Wingless's already-supported fixed 256-entry four-byte raw motif mechanism learn predictive structure from independently sourced external bytes and transfer that structure across prose, code, and structured-data domains without tokenization?",
+  "hypothesis": "Using the exact three-source external-exposure V1 manifest, the unchanged one-byte baseline plus fixed 256 four-byte motifs will show useful within-domain learning on each source and nonzero cross-domain transfer when trained on the other two sources. Supported requires at least 1% mean cross-domain motif coverage, positive mean cross-domain covered-position accuracy gain, positive gain on at least two of three held-out domains, and no more than 0.05 bits/byte mean degradation versus the one-byte baseline; within-domain half/half controls must show at least 3% motif coverage and 0.10 covered-position accuracy gain on every domain.",
+  "exact_parent_sha": "e36a552f7480421a84bfc726b565c04632b87544",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/wingless-up-manual-chain-r1",
+  "portfolio_context": {
+    "allocation": "75% chain / 25% substrate falsification",
+    "slot": "chain",
+    "frontier": "independent external raw information"
+  },
+  "prior_evidence": [
+    {
+      "experiment": "WLM-LM-REAL-UTF8-BYTE-PILOT-R2",
+      "run_id": "37000936408",
+      "observation": {
+        "selected_motif_count": 256,
+        "minimum_eval_motif_coverage_fraction": 0.10326014637391882,
+        "minimum_motif_covered_accuracy_gain": 0.5180897250361794,
+        "minimum_effective_event_reduction_fraction": 0.14642904641574672,
+        "maximum_adaptive_minus_baseline_bits_per_byte": -0.05349253593646086
+      }
+    },
+    {
+      "experiment": "WLM-LM-REAL-UTF8-HIERARCHICAL-PATCH-R3",
+      "run_id": "37006379097",
+      "observation": {
+        "selected_level1_count": 512,
+        "selected_level2_count": 128,
+        "minimum_eval_level2_coverage_fraction": 0.0007605719501064801,
+        "minimum_level2_covered_accuracy_gain": 0,
+        "maximum_hierarchical_minus_level1_bits_per_byte": 0.027406012775581967
+      },
+      "interpretation": "The deeper hierarchy did not justify additional structure on the fresh holdout; R1 therefore reuses the simpler flat four-byte mechanism."
+    }
+  ],
+  "external_authority": {
+    "ckb_plane_plan_receipt_sha256": "e1585e948b8640d50a3acd8bcea416dff764d32f7994d20aa6867e9e9e1b82aa",
+    "ckb_plane_fetch_authority_receipt_sha256": "f9b763527699f042322b6aeece814c0fe9d67a3f2e8db02e20dad1b796f54dc6",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "execution_requirement": "A separate CKB-plane READY_CONSUME receipt bound to this exact preregistration commit and experiment identifier is required before primary execution."
+  },
+  "sources": [
+    {
+      "domain": "code",
+      "uri": "https://raw.githubusercontent.com/python/cpython/ebf955df7a89ed0c7968f79faec1de49f61ed7cb/Lib/fractions.py",
+      "sha256": "7a95f1c506c9ac4b2277df5f2bdd9d61cc67b520c45021a5a961939770221ef6",
+      "bytes": 41453,
+      "license": "Python Software Foundation License Version 2"
+    },
+    {
+      "domain": "structured",
+      "uri": "https://raw.githubusercontent.com/json-schema-org/JSON-Schema-Test-Suite/5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8/tests/draft2020-12/type.json",
+      "sha256": "4c5cbe6cbcd28af73761091367b20e07d0403847e236c06c31fc27061bd81192",
+      "bytes": 14365,
+      "license": "MIT"
+    },
+    {
+      "domain": "technical-prose",
+      "uri": "https://raw.githubusercontent.com/golang/go/6f5c275ebdc454197fff5f1496521c8f81e20eef/README.md",
+      "sha256": "8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",
+      "bytes": 1454,
+      "license": "BSD-3-Clause"
+    }
+  ],
+  "raw_byte_contract": {
+    "encoding": "exact fetched bytes after SHA-256 verification; no decoding, Unicode normalization, tokenizer, vocabulary, subword mapping, line parsing, or inserted boundary tokens",
+    "file_boundary_policy": "reset baseline and motif window state at every source boundary",
+    "external_byte_budget": 57272,
+    "source_count": 3
+  },
+  "learner": {
+    "baseline": "same fixed 256x256 previous-byte -> next-byte uint32 counts used by WLM-LM-REAL-UTF8-BYTE-PILOT-R2; lowest-byte argmax tie break; Jeffreys smoothing",
+    "motifs": "same four-byte candidate construction, occurrence >=4, best-successor-count then consistency then lexicographic ranking used by R2",
+    "motif_capacity": 256,
+    "prediction": "selected exact four-byte motif successor distribution when matched, otherwise one-byte baseline",
+    "capacity_growth": false
+  },
+  "evaluation": {
+    "cross_domain": [
+      "For each target domain, train baseline and motifs on the complete other two source files only; evaluate every next-byte position in the untouched target source.",
+      "Report motif coverage, motif-covered accuracy gain over the same training-set one-byte baseline, event reduction, and adaptive-minus-baseline bits/byte.",
+      "No target byte participates in training for its leave-one-domain-out arm."
+    ],
+    "within_domain_control": [
+      "For each domain independently, split exact bytes at floor(length/2); train on first half only and evaluate second half only.",
+      "Use the identical learner, capacity, filter, smoothing, and metrics.",
+      "This control distinguishes inability to learn the domain at all from failure of cross-domain transfer."
+    ]
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "cross_domain_arm_count",
+      "==",
+      3
+    ],
+    [
+      "within_domain_control_arm_count",
+      "==",
+      3
+    ],
+    [
+      "minimum_selected_motif_count_cross_domain",
+      "==",
+      256
+    ],
+    [
+      "minimum_selected_motif_count_within_domain",
+      ">=",
+      1
+    ],
+    [
+      "mean_cross_domain_motif_coverage_fraction",
+      ">=",
+      0.01
+    ],
+    [
+      "mean_cross_domain_motif_covered_accuracy_gain",
+      ">",
+      0
+    ],
+    [
+      "positive_cross_domain_gain_arm_count",
+      ">=",
+      2
+    ],
+    [
+      "mean_cross_domain_adaptive_minus_baseline_bits_per_byte",
+      "<=",
+      0.05
+    ],
+    [
+      "minimum_within_domain_motif_coverage_fraction",
+      ">=",
+      0.03
+    ],
+    [
+      "minimum_within_domain_motif_covered_accuracy_gain",
+      ">=",
+      0.1
+    ],
+    [
+      "maximum_total_learned_motif_capacity",
+      "==",
+      256
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_byte_rows",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_rows",
+      "==",
+      0
+    ]
+  ],
+  "validity_criteria": [
+    "Exact parent and North Star identities match.",
+    "A CKB-plane READY_CONSUME receipt is bound to the exact preregistration commit, experiment identifier, manifest identity, source count, byte budget, and hosted-only execution before primary execution.",
+    "All three external source SHA-256 values and exact byte lengths match before learner construction.",
+    "Cross-domain target bytes never enter the corresponding arm's baseline counts, motif candidates, motif counts, ranking, or capacity selection.",
+    "Within-domain controls use first-half bytes only for training and second-half bytes only for evaluation.",
+    "Learner mechanics are byte-for-byte equivalent to the flat R2 one-byte baseline plus four-byte motif mechanism except for accepting verified external byte slices instead of Git blobs.",
+    "No tokenizer, parser, decoder, normalization, hierarchy, semantic labels, external model, network access inside the learner, capacity growth, or post-result tuning occurs.",
+    "Primary execution occurs only on CKB-plane-authorized hosted compute, not LINKDEADKB.",
+    "Full Go regression passes before the probe and all metrics are finite."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and frozen thresholds pass, supporting cross-domain transfer of the fixed raw-byte motif representation on independent external data.",
+    "mixed": "Validity passes and every within-domain control learns useful structure, but one or more frozen cross-domain transfer thresholds fail.",
+    "negative": "Validity passes but the fixed motif mechanism fails the within-domain controls or shows no meaningful cross-domain predictive advantage.",
+    "incomplete": "Authority, source retrieval, or compute interruption prevents the frozen six-arm matrix.",
+    "invalid": "Any authority, source identity, split isolation, raw-byte identity, learner-equivalence, capacity, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule": "Do not alter sources, hashes, byte budgets, train/eval splits, motif mechanics, capacity, occurrence filter, smoothing, metrics, thresholds, controls, authority binding, or interpretation after any primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-raw-byte-transfer-r1.json",
+    "unitary/wlm_lm_external_raw_byte_transfer_r1.go",
+    "cmd/wlm-lm-external-raw-byte-transfer-r1/main.go",
+    ".github/workflows/external-raw-byte-transfer-r1.yml",
+    ".wingless/qualification-request.json"
+  ]
+}
