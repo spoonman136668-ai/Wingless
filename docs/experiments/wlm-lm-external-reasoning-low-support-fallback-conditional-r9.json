@@ -1,0 +1,217 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-LOW-SUPPORT-FALLBACK-CONDITIONAL-R9",
+  "program": "Wingless pre-outcome conditional low-support fallback counterfactual",
+  "question": "Can a frozen native-state condition preserve the three useful low-support fallback hits while avoiding fallback on a bounded subset plausibly associated with the class-5/6 suppression signal, without using future target bytes or labels?",
+  "hypothesis": "Replay exact R8/R7 data, budgets, 256 motifs, 8x32 classes, relation tables, code target, and depth-3 cap. BASELINE remains B11 full repair. CANDIDATE uses only the already-observed current pair before rollout: if pair support<3 AND the current motif (curr) belongs to training-defined reasoning class 5 or 6, disable low-support fallback for the entire depth-3 rollout while retaining exact-context logic; otherwise use byte-identical B11. The condition cannot inspect later motifs in the query window, the truth motif, heldout labels, target outcomes, or post-result statistics. This is an originating-dataset mechanism probe only and cannot be retained from R9. Any useful candidate must later pass a disjoint future-data transfer test under identical budgets.",
+  "exact_parent_sha": "76d5e5c649baad01ff4a22c08fa5ea6b7e3da704",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-low-support-fallback-conditional-r9",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; candidate must improve task learning/transfer, not merely internal state"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-LOW-SUPPORT-FALLBACK-ATTRIBUTION-R8",
+    "github_run_id": "37150162377",
+    "classification": "supported",
+    "observation": {
+      "baseline_only_hit_count": 3,
+      "candidate_only_hit_count": 0,
+      "baseline_only_hit_pair_support_lt3_count": 3,
+      "baseline_only_hit_selected_count": 0,
+      "baseline_only_hit_nonselected_count": 3,
+      "selected_query_net_hit_delta": 0,
+      "nonselected_query_net_hit_delta": -3
+    },
+    "interpretation": "All harm from globally disabling fallback occurs on nonselected queries with initial pair support<3; future-window selected membership cannot itself be used as a legal inference-time condition."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "training_domains": [
+      "structured",
+      "technical_prose"
+    ],
+    "target_domain": "code",
+    "training_byte_budget": 15819,
+    "target_eval_byte_budget": 1454,
+    "selected_motif_capacity": 256,
+    "reasoning_class_count": 8,
+    "motifs_per_reasoning_class": 32,
+    "depth3_runtime_cap": 2048,
+    "baseline": "B11 full repaired bridge byte-identical R8",
+    "conditional_candidate": "if initial pair support<3 and class(curr) in {5,6}, use B01 for entire rollout; else B11",
+    "allowed_condition_inputs": [
+      "initial pair support",
+      "training-defined class of current observed motif"
+    ],
+    "forbidden_condition_inputs": [
+      "later target-window motifs",
+      "truth motif",
+      "heldout label",
+      "heldout outcome",
+      "post-result chosen threshold"
+    ]
+  },
+  "evaluation": {
+    "target_query_count": 63,
+    "primary_metric": "candidate_total_exact_hit_count - baseline_total_exact_hit_count",
+    "safety_metric": "candidate exact hits must not fall below baseline",
+    "selected_diagnostic_metric": "candidate selected-query exact hits - baseline selected-query exact hits",
+    "gating_count_metric": "conditional_B01_query_count",
+    "retention": false
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "reasoning_class_count",
+      "==",
+      8
+    ],
+    [
+      "target_query_count",
+      "==",
+      63
+    ],
+    [
+      "baseline_total_exact_hit_count",
+      "==",
+      11
+    ],
+    [
+      "baseline_selected_query_exact_hit_count",
+      "==",
+      2
+    ],
+    [
+      "condition_future_byte_use_count",
+      "==",
+      0
+    ],
+    [
+      "condition_target_label_use_count",
+      "==",
+      0
+    ],
+    [
+      "condition_post_result_choice_count",
+      "==",
+      0
+    ],
+    [
+      "conditional_B01_query_count",
+      ">=",
+      1
+    ],
+    [
+      "baseline_B11_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "candidate_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "candidate_total_exact_hit_delta",
+      ">=",
+      0
+    ],
+    [
+      "candidate_selected_query_exact_hit_delta",
+      ">=",
+      0
+    ],
+    [
+      "candidate_maximum_probability_mass_error",
+      "<=",
+      1e-9
+    ],
+    [
+      "candidate_minimum_repaired_retained_mass",
+      ">",
+      0
+    ],
+    [
+      "relation_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "adaptive_readout_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes; candidate improves total exact hits by at least one without reducing selected-query exact hits or violating controls.",
+    "mixed": "Validity passes; candidate preserves total and selected-query exact hits while changing at least one query's bridge mode or prediction, but does not improve total exact hits.",
+    "negative": "Validity passes but candidate reduces total or selected-query exact hits, or makes no prediction-relevant difference.",
+    "invalid": "Any parent, authority, source, budget, representation, condition identity/input boundary, bridge identity, target identity, determinism, provenance, capacity, or qualification criterion fails."
+  },
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-LOW-SUPPORT-CONDITIONAL-TRANSFER-R10",
+    "intent": "test exact frozen conditional candidate against no-change on a preregistered disjoint future dataset under identical data/compute/capacity/authority budgets; retain only on transfer"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-EFFICIENCY-SIGNAL-R10",
+    "intent": "stop optimizing this originating-dataset bridge mechanism and return to native training signals that predict future-dataset learning efficiency under fixed budgets"
+  },
+  "no_post_result_tuning_rule": "Do not alter data, budgets, 256 capacity, classes, pair-support threshold 3, current-class set {5,6}, baseline/candidate bridge variants, metrics, thresholds, classification, or authority after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-low-support-fallback-conditional-r9.json",
+    "unitary/wlm_lm_external_reasoning_low_support_fallback_conditional_r9.go",
+    "cmd/wlm-lm-external-reasoning-low-support-fallback-conditional-r9/main.go",
+    ".github/workflows/external-reasoning-low-support-fallback-conditional-r9.yml"
+  ]
+}
