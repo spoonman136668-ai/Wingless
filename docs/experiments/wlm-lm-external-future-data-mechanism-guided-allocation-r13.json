@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MECHANISM-GUIDED-ALLOCATION-R13",
+  "exact_parent_sha": "ab6277d50036c19da4d9a6f5baa82d6747bdd8e9",
+  "qualification_branch": "research/external-hosted-wingless-future-data-mechanism-guided-allocation-r13",
+  "question": "Under the same fixed total future-data budget, does an R12 mechanism-guided allocation improve aggregate sealed-evaluation accuracy versus equal allocation?",
+  "hypothesis": "Use the same three leave-one-domain-out arms, 15,819 non-target training bytes per arm, 256 motifs, and admitted external source manifest. Use target bytes 0:582 only for sealed evaluation and bytes 582:1454 as adaptation reservoirs. Compare EQUAL allocations code=582 structured=581 technical_prose=581 with GUIDED allocations code=872 structured=436 technical_prose=436. Each policy uses exactly 1,744 adaptation bytes total. The guided allocation is frozen from R12's supported baseline-byte-refinement attribution and uses no R13 evaluation labels.",
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "fixed_contract": {
+    "arm_count": 3,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "equal_allocation": {
+      "code": 582,
+      "structured": 581,
+      "technical_prose": 581
+    },
+    "guided_allocation": {
+      "code": 872,
+      "structured": 436,
+      "technical_prose": 436
+    },
+    "total_adaptation_budget_each": 1744
+  },
+  "classification_rules": {
+    "supported": "valid and guided aggregate exact hits exceed equal by at least 1 with zero guided domains below packet0 baseline",
+    "mixed": "valid and guided aggregate improves but at least one domain drops below packet0, or aggregate ties while code improves",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "any identity, authority, source, split, budget, capacity, isolation, determinism, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Freeze source identities, split, 256 capacity, allocations, evaluator, budgets, metrics, and classification before primary execution.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-mechanism-guided-allocation-r13.json",
+    "unitary/wlm_lm_external_future_data_mechanism_guided_allocation_r13.go",
+    "cmd/wlm-lm-external-future-data-mechanism-guided-allocation-r13/main.go",
+    ".github/workflows/external-future-data-mechanism-guided-allocation-r13.yml"
+  ]
+}
