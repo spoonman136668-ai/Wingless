@@ -1,0 +1,116 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-PROBABILITY-MARGIN-READOUT-R1",
+  "program": "Wingless fixed-capacity repaired prediction to confidence-gated refined reasoning readout",
+  "question": "Can one training-only fixed intra-class probability-margin gate expose the same-class predictive gains identified by R3 without adding relation state or adaptive readout capacity?",
+  "hypothesis": "Keep the sealed 512-motif representation, repaired relation, eight fixed 64-motif classes, support threshold, runtime cap, and horizons unchanged. Compute one scalar gate threshold before heldout scoring: the median normalized top1-versus-runner-up motif probability margin within the repaired top1 class over training-prefix depth-3 queries. On heldout depth-3 queries, expose the repaired exact top motif only when its normalized within-class margin meets that frozen threshold; otherwise retain the existing eight-class distributional answer. The gate will activate on at least 0.75 of the exact 19 R3 same-class hidden-gain rows, achieve at least 0.90 exact precision when open, and open on no more than 0.75 of all heldout depth-3 queries.",
+  "exact_parent_sha": "8c539826896f22dbe4fe6e4052e1bd4ac90a1efb",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-probability-margin-readout-r1",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-PROBABILITY-READOUT-ATTRIBUTION-R3",
+    "github_run_id": "37130559566",
+    "classification": "supported",
+    "observation": {
+      "hidden_gain_count": 49,
+      "same_class_hidden_gain_count": 19,
+      "cross_class_hidden_gain_count": 30,
+      "same_class_truth_motif_share_increase_count": 19,
+      "same_class_truth_motif_share_increase_fraction": 1.0,
+      "code_structured_same_class_rate_gap": 0.2927927927927928,
+      "minimum_truth_motif_share_increase": 0.12268621074261077
+    },
+    "diagnosis": "Every same-class hidden gain contains usable repaired within-class probability signal. A fixed training-derived confidence gate can now test whether that signal can be exposed selectively without adding learned capacity."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical sealed three-source manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "baseline_relation": "byte-identical sealed unrepaired predictor",
+    "repaired_relation": "byte-identical supported low-support repair",
+    "pair_support_threshold": 3,
+    "runtime_pair_state_cap": 2048,
+    "horizons": [2,3],
+    "refined_readout": "byte-identical fixed eight training-rank classes of 64 motifs each",
+    "relation_capacity_change": false,
+    "readout_class_count_change": false,
+    "adaptive_readout_learning": false
+  },
+  "margin_gate": {
+    "threshold_selection_data": "training prefixes only",
+    "threshold_population": "all valid repaired depth-3 training queries",
+    "per_query_margin": "(top repaired motif probability minus second-highest motif probability within the repaired top motif's fixed class) divided by total repaired probability mass of that class",
+    "threshold": "median per-query margin; arithmetic mean of the two middle values for even count",
+    "heldout_gate": "open iff heldout repaired per-query margin is greater than or equal to frozen training threshold",
+    "open_output": "repaired exact top motif",
+    "closed_output": "existing eight-class repaired distributional answer",
+    "new_learned_parameters": 0,
+    "new_relation_states": 0
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["refined_reasoning_class_count","==",8],
+    ["motif_class_assignment_count","==",512],
+    ["minimum_refined_class_size","==",64],
+    ["maximum_refined_class_size","==",64],
+    ["training_margin_sample_count",">",0],
+    ["depth3_query_count",">",0],
+    ["same_class_hidden_gain_count","==",19],
+    ["same_class_hidden_gate_activation_fraction",">=",0.75],
+    ["gate_exact_precision",">=",0.90],
+    ["gate_activation_fraction","<=",0.75],
+    ["maximum_probability_mass_error","<=",1e-9],
+    ["heldout_selection_use_count","==",0],
+    ["relation_capacity_growth_event_count","==",0],
+    ["adaptive_readout_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and the frozen hidden-recovery, precision, and bounded-activation thresholds all pass.",
+    "mixed": "Validity passes, the gate activates on at least one same-class hidden gain, and gate exact precision exceeds 0.50, but one or more supported thresholds fail.",
+    "negative": "Validity passes but the gate exposes no same-class hidden gain or gate exact precision is at most 0.50.",
+    "invalid": "Any sealed-parent, authority, source, split, representation, relation identity, class assignment, training-only threshold, determinism, capacity, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact qualified supported R3 parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and external manifest.",
+    "Representation, baseline relation, repaired relation, fixed eight-class assignment, support threshold, runtime cap, and horizons are unchanged.",
+    "The scalar threshold is computed only from training-prefix repaired depth-3 distributions and frozen before heldout scoring.",
+    "Heldout labels affect scoring only and never threshold selection or gate behavior.",
+    "The R3 same-class hidden-gain population reproduces exactly at 19 rows.",
+    "The gate adds no learned parameter, class, relation state, tokenizer, parser, or adaptive update.",
+    "Duplicate complete probes are byte-identical and probability mass remains normalized within tolerance.",
+    "No external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, repair rule, support threshold, class assignment, training-margin definition, median threshold rule, gate inequality, 0.75 hidden-recovery floor, 0.90 precision floor, 0.75 activation ceiling, runtime cap, horizons, metrics, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-GATED-PREDICATE-COMPOSITION-R1",
+    "intent": "compose multiple training-frozen predicates over the confidence-gated repaired predictive state without changing relation capacity"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-PROBABILITY-MARGIN-ATTRIBUTION-R2",
+    "intent": "attribute gate false positives and missed same-class gains before changing threshold form or capacity"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-probability-margin-readout-r1.json",
+    "unitary/wlm_lm_external_reasoning_probability_margin_readout_r1.go",
+    "cmd/wlm-lm-external-reasoning-probability-margin-readout-r1/main.go",
+    ".github/workflows/external-reasoning-probability-margin-readout-r1.yml"
+  ]
+}
