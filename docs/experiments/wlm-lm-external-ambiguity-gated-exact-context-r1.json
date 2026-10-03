@@ -1,0 +1,95 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-AMBIGUITY-GATED-EXACT-CONTEXT-R1",
+  "program": "Wingless external raw-input to representation to context-gated prediction",
+  "question": "Can the supported ambiguity concentration result be converted into a fixed-capacity selector that uses exact pair context only where training-side ambiguity indicates it is useful?",
+  "hypothesis": "Reconstruct the sealed current-only predictor and top-511 exact-pair predictor. For each heldout triple, use exact-pair prediction only when the pair is dedicated, its training support is at least three, the current row has at least four training transitions, and its training-side top1-minus-top2 probability margin is at or below the frozen median ambiguity cutoff. Otherwise use current-only prediction. The hybrid will improve pooled top-1 accuracy by at least 0.005 over current-only, outperform the sealed support>=3 backoff selector by at least 0.002 pooled, and degrade no source by more than 0.005 versus current-only.",
+  "exact_parent_sha": "25a13b836e6ef450a2849caa50e33b368ebde50d",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-ambiguity-gated-context-r1",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-CONTEXT-SIGNAL-ATTRIBUTION-R1",
+    "github_run_id": "37110751099",
+    "classification": "supported",
+    "observation": {
+      "ambiguity_median_margin": 0.2857142857142857,
+      "ambiguous_supported_query_count": 653,
+      "ambiguous_supported_exact_minus_current_accuracy": 0.0444104134762634,
+      "confident_supported_exact_minus_current_accuracy": -0.009604519774011222,
+      "context_signal_concentration_gap": 0.05401493325027462
+    },
+    "diagnosis": "Exact context is useful when current-state prediction is ambiguous and sufficiently supported, but slightly harmful on confident rows."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical sealed external manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "motif_stream_decode": "byte-identical non-overlapping exact-motif scanner",
+    "current_only_predictor": "byte-identical 512x512 current-motif successor counts",
+    "exact_pair_predictor": "byte-identical top-511 exact-pair contexts plus overflow",
+    "support_backoff_control": "byte-identical sealed support>=3 exact-pair selector",
+    "ambiguity_cutoff": "byte-identical training-only median-margin rule from signal attribution R1"
+  },
+  "selector": {
+    "use_exact_context": "dedicated pair AND pair support >=3 AND current-row count >=4 AND current-row training margin <= training median margin",
+    "otherwise": "current-only relation",
+    "heldout_updates": false,
+    "capacity_growth": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["ambiguity_gated_query_count",">",0],
+    ["selector_rule_violation_count","==",0],
+    ["pooled_hybrid_minus_current_accuracy",">=",0.005],
+    ["pooled_hybrid_minus_support_backoff_accuracy",">=",0.002],
+    ["minimum_source_hybrid_minus_current_accuracy",">=",-0.005],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and frozen gain/nondegradation thresholds pass.",
+    "mixed": "Validity passes and the ambiguity gate improves pooled accuracy over current-only but misses another frozen threshold.",
+    "negative": "Validity passes but ambiguity gating fails to improve pooled current-only accuracy.",
+    "invalid": "Any sealed-parent, authority, source, split, representation, predictor, ambiguity-rule, support-rule, capacity, determinism, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact sealed parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and manifest.",
+    "All predictors, support counts, and ambiguity margins are reconstructed from training prefixes only.",
+    "Selector rule is frozen before heldout scoring and never updated.",
+    "No new predictive state is added; the hybrid chooses only between existing frozen predictors.",
+    "Full Go regression passes before probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, top-511 map, pair-support threshold, ambiguity formula/cutoff, selector, controls, metrics, thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-AMBIGUITY-GATED-DISTRIBUTIONAL-COMPOSITION",
+    "intent": "carry the supported ambiguity gate into depth-two/depth-three probability-mass composition without increasing state capacity"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-SEQUENCE-CONTEXT-ATTRIBUTION",
+    "intent": "test longer sequence state if the one-step selector does not transfer cleanly"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-ambiguity-gated-exact-context-r1.json",
+    "unitary/wlm_lm_external_ambiguity_gated_exact_context_r1.go",
+    "cmd/wlm-lm-external-ambiguity-gated-exact-context-r1/main.go",
+    ".github/workflows/external-ambiguity-gated-exact-context-r1.yml"
+  ]
+}
