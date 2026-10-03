@@ -1,0 +1,102 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-RANK-CALIBRATION-R19",
+  "program": "Wingless cross-manifest replication of frozen training-only marginal-rank signal",
+  "question": "Does the R18-calibrated training-only state-change score rank productive marginal adaptation intervals on the original external manifest, without refitting weights or using evaluation labels in the signal?",
+  "hypothesis": "Freeze the score entirely from sealed R18 evidence using the preregistered bounded grid w_baseline,w_churn,w_best in {0..5}: maximize positive-vs-zero interval AUC on R18; tie-break minimum L1 weight then lexicographic weights. This yields weights (1,3,0) and calibration AUC 0.90. On the original immutable manifest only, replay the R15 budget grids, 15,819 non-target bytes, 256 motifs, 582-byte sealed evaluation, and 872-byte adaptation reservoir. For each adjacent interval compute rank_signal=(baseline_argmax_change_count + 3*(motif_entry_count+motif_exit_count))/bytes_added using training/adaptation state only. After freezing all signals, open evaluation outcomes and measure positive-vs-zero AUC plus pairwise concordance against exact-hit gain per byte. No R19 label may refit weights or alter the score.",
+  "exact_parent_sha": "80d2f568cbcff95a6193f37971fa42e8e0ed8a10",
+  "qualification_branch": "research/external-hosted-wingless-future-data-marginal-signal-rank-calibration-r19",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-TRANSFERABILITY-R18",
+    "github_run_id": 37162200716,
+    "classification": "supported",
+    "observation": {
+      "positive_gain_interval_count": 5,
+      "positive_gain_with_zero_state_delta_count": 0,
+      "zero_gain_interval_count": 7,
+      "zero_gain_with_zero_state_delta_count": 3
+    },
+    "calibration_rule": {
+      "candidate_weights": "w_baseline,w_churn,w_best each integer 0..5 except all-zero",
+      "score": "(w_baseline*baseline_argmax_change_count + w_churn*(motif_entry_count+motif_exit_count) + w_best*retained_motif_best_change_count)/bytes_added",
+      "objective": "positive-vs-zero interval AUC on sealed R18 only",
+      "tie_break": "minimum L1 weight, then lexicographic weights",
+      "selected_weights": [
+        1,
+        3,
+        0
+      ],
+      "sealed_calibration_auc": 0.9
+    }
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "06c3cb723820407bc2db1bd3ec9e46f462059e41",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "fixed_contract": {
+    "source_count": 3,
+    "total_source_bytes": 57272,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "code_budgets": [
+      0,
+      436,
+      582,
+      727,
+      872
+    ],
+    "structured_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "technical_prose_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "signal_weights": {
+      "baseline_argmax_change": 1,
+      "motif_churn": 3,
+      "retained_best_change": 0
+    },
+    "signal_normalization": "divide by interval bytes",
+    "signal_evaluation_byte_use_count": 0,
+    "signal_evaluation_label_use_count": 0,
+    "signal_post_result_choice_count": 0
+  },
+  "classification_rules": {
+    "supported": "valid and positive_vs_zero_auc >= 0.75 and marginal_efficiency_pairwise_concordance >= 0.65 and mean_positive_rank_signal > mean_zero_rank_signal",
+    "mixed": "valid and positive_vs_zero_auc >= 0.60 with mean_positive_rank_signal > mean_zero_rank_signal, but supported thresholds are not all met",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "any parent, authority, source, split, budget-grid, frozen-weight identity, signal-label isolation, capacity, deterministic replay, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter source identities, 15,819-byte non-target budget, 256 capacity, 582/872 split, budget grids, weights (1,3,0), normalization, evaluator, 0.75/0.65/0.60 thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-GUIDED-ALLOCATION-R20",
+    "intent": "freeze an allocation rule from the cross-manifest calibrated rank signal and validate it only on a newly admitted disjoint future manifest under the same total budget"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-FACTORIAL-R20",
+    "intent": "factor false-positive and rank-error intervals across the two manifests before another allocation policy"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-marginal-signal-rank-calibration-r19.json",
+    "unitary/wlm_lm_external_future_data_marginal_signal_rank_calibration_r19.go",
+    "cmd/wlm-lm-external-future-data-marginal-signal-rank-calibration-r19/main.go",
+    ".github/workflows/external-future-data-marginal-signal-rank-calibration-r19.yml"
+  ]
+}
