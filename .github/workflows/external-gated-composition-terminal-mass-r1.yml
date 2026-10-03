@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-          fetch-depth: 3
+          fetch-depth: 5
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
@@ -29,9 +29,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "5022c0395aadf2ce86fca4c4ecc29334f357a742"
-          test "$(git rev-parse HEAD^^)" = "0b332964af73eef8b74d78e0eb5e0be194e13418"
-          test "$(git rev-parse HEAD^^^)" = "75e49e3e402c66c8af21e060a4162d369f3ed1ec"
+          test "$(git rev-parse HEAD^)" = "ac25cebd811ed2acd7ff7fb76a44c4da3f64f32f"
+          test "$(git rev-parse HEAD^^)" = "5022c0395aadf2ce86fca4c4ecc29334f357a742"
+          test "$(git rev-parse HEAD^^^)" = "0b332964af73eef8b74d78e0eb5e0be194e13418"
+          test "$(git rev-parse HEAD^^^^)" = "75e49e3e402c66c8af21e060a4162d369f3ed1ec"
       - name: Verify READY_RESEARCH receipt
         shell: bash
         run: |
