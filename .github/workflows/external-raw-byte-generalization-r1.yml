@@ -1,0 +1,152 @@
+name: Wingless external raw-byte generalization R1
+
+on:
+  push:
+    branches:
+      - research/external-hosted-wingless-r1
+    paths:
+      - 'unitary/wlm_lm_external_raw_byte_generalization_r1.go'
+      - 'cmd/wlm-lm-external-raw-byte-generalization-r1/main.go'
+      - '.github/workflows/external-raw-byte-generalization-r1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Validate frozen authority and preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "7756dbedc87d3b1f5597746f035f0ee323fff496"
+          test "$(git rev-parse HEAD^:docs/experiments/wlm-lm-external-raw-byte-generalization-r1.json >/dev/null 2>&1; echo $?)" = "0"
+          echo "ckb_ready_research_run_id=37081177972"
+          echo "ckb_ready_research_receipt_sha256=a63f7e44b170d5df4f9ff078485d711877c90158f37c73c2ba5815f70c57e9dd"
+          echo "ckb_plane_main_sha=36d99a0257120ede57bb96638660d35014dd529e"
+
+      - name: Full Wingless regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./... -count=1
+
+      - name: Fetch exact external sources into ephemeral scratch
+        shell: bash
+        run: |
+          set -euo pipefail
+          export EXTERNAL_ROOT="$RUNNER_TEMP/wlm-external-r1"
+          mkdir -p "$EXTERNAL_ROOT"
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,urllib.parse,urllib.request
+          prereg=json.loads(pathlib.Path("docs/experiments/wlm-lm-external-raw-byte-generalization-r1.json").read_text(encoding="utf-8"))
+          if prereg["external_authority"]["manifest_sha256"]!="75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4":
+              raise SystemExit("MANIFEST_IDENTITY_DRIFT")
+          root=pathlib.Path(os.environ["EXTERNAL_ROOT"])
+          total=0
+          for src in prereg["sources"]:
+              u=urllib.parse.urlparse(src["uri"])
+              if u.scheme!="https" or u.hostname!="raw.githubusercontent.com":
+                  raise SystemExit("SOURCE_HOST_NOT_ALLOWED")
+              req=urllib.request.Request(src["uri"],headers={"User-Agent":"wingless-external-r1"})
+              with urllib.request.urlopen(req,timeout=30) as response:
+                  data=response.read(int(src["bytes"])+1)
+              if len(data)!=int(src["bytes"]):
+                  raise SystemExit("SOURCE_BYTE_COUNT_MISMATCH")
+              actual=hashlib.sha256(data).hexdigest()
+              if actual.lower()!=src["sha256"].lower():
+                  raise SystemExit("SOURCE_SHA256_MISMATCH")
+              (root/(src["domain"]+".bin")).write_bytes(data)
+              total+=len(data)
+          if total!=57272:
+              raise SystemExit("TOTAL_SOURCE_BYTES_MISMATCH")
+          print("EXTERNAL_SOURCE_VERIFICATION=PASS total_bytes=57272")
+          PY
+          echo "EXTERNAL_ROOT=$EXTERNAL_ROOT" >> "$GITHUB_ENV"
+
+      - name: Run frozen external experiment
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/wlm-lm-external-raw-byte-generalization-r1 --root "$EXTERNAL_ROOT" | tee /tmp/probe.json
+
+      - name: Classify only from frozen preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,pathlib
+          probe=json.loads(pathlib.Path("/tmp/probe.json").read_text(encoding="utf-8"))
+          m=probe["metrics"]
+          validity=(
+              m["source_identity_mismatch_count"]==0 and
+              m["source_count"]==3 and
+              m["total_source_bytes"]==57272 and
+              m["pooled_selected_motif_count"]==256 and
+              m["maximum_learned_motif_capacity"]==256 and
+              m["capacity_growth_event_count"]==0 and
+              m["tokenizer_use_count"]==0 and
+              m["external_model_call_count"]==0 and
+              m["invalid_byte_rows"]==0 and
+              m["counter_overflow_rows"]==0
+          )
+          pooled=(
+              m["minimum_pooled_motif_coverage_fraction"]>=0.03 and
+              m["minimum_pooled_motif_covered_accuracy_gain"]>=0.05 and
+              m["minimum_pooled_effective_event_reduction_fraction"]>=0.02 and
+              m["maximum_pooled_adaptive_minus_baseline_bits_per_byte"]<=0.05
+          )
+          cross=(
+              m["cross_domain_eval_count"]==3 and
+              m["minimum_cross_domain_motif_coverage_fraction"]>=0.005 and
+              m["mean_cross_domain_motif_covered_accuracy_gain"]>=0.0 and
+              m["maximum_cross_domain_adaptive_minus_baseline_bits_per_byte"]<=0.10
+          )
+          if not validity:
+              cls="invalid"
+          elif pooled and cross:
+              cls="supported"
+          elif pooled:
+              cls="mixed"
+          else:
+              cls="negative"
+          out={
+              "schema":"wingless.research-classification.v1",
+              "experiment":"WLM-LM-EXTERNAL-RAW-BYTE-GENERALIZATION-R1",
+              "classification":cls,
+              "validity_pass":validity,
+              "pooled_thresholds_pass":pooled,
+              "cross_domain_thresholds_pass":cross,
+              "ckb_ready_research_receipt_sha256":"a63f7e44b170d5df4f9ff078485d711877c90158f37c73c2ba5815f70c57e9dd"
+          }
+          pathlib.Path("/tmp/classification.json").write_text(json.dumps(out,separators=(",",":")),encoding="utf-8")
+          print(json.dumps(out,separators=(",",":")))
+          PY
+
+      - name: Delete external bytes
+        if: always()
+        shell: bash
+        run: |
+          rm -rf "$RUNNER_TEMP/wlm-external-r1"
+          test ! -e "$RUNNER_TEMP/wlm-external-r1"
+
+      - name: Upload scientific evidence only
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-external-raw-byte-generalization-r1
+          path: |
+            /tmp/probe.json
+            /tmp/classification.json
+          if-no-files-found: error
