@@ -1,0 +1,159 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-TRANSFER-CAPACITY-FEASIBILITY-R2",
+  "program": "Wingless fixed-budget cross-domain representation support feasibility",
+  "question": "Under the unchanged 15,819-byte non-target training budget, what preregistered motif capacity can every leave-one-domain-out arm actually support without opening target bytes?",
+  "hypothesis": "Replay the three exact leave-one-domain-out training arms from prospective R1, using the same 15,819-byte proportional non-target source budget per arm and the same occurrence>=4 motif construction/ranking. Evaluate the frozen candidate capacities 128, 256, 384, and 512 using training bytes only. For each arm and candidate capacity, report whether at least that many eligible motifs exist before truncation. The selected common capacity is the largest candidate supported by all three arms, with ties impossible by construction. No target-domain bytes, labels, repaired-relation outcomes, heldout scores, or post-result capacity choices are permitted. This experiment characterizes the data-budget/capacity frontier only; it does not change or retain any cognitive mechanism.",
+  "exact_parent_sha": "bba8dd9d15bb956dc7f9f08226d367e31386160d",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-transfer-capacity-feasibility-r2",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; objective is unseen-future-data learning efficiency under fixed budgets"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-SELF-DIAGNOSIS-PROSPECTIVE-R1",
+    "github_run_id": "37141761444",
+    "classification": "invalid",
+    "observation": {
+      "training_byte_budget_per_arm": 15819,
+      "code_target_selected_motif_count": 377,
+      "structured_target_selected_motif_count": 512,
+      "technical_prose_target_selected_motif_count": 512,
+      "valid_fixed_class_arm_count": 2,
+      "decision_freeze_count": 2,
+      "preflight_target_byte_use_count": 0,
+      "preflight_target_label_use_count": 0
+    },
+    "interpretation": "The frozen 512-motif capacity was structurally infeasible in the code-target arm under the full available non-target training budget. The successor must measure the fixed-budget capacity frontier before any further prospective diagnosis."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "fixed_budget": {
+    "arm_count": 3,
+    "training_bytes_per_arm": 15819,
+    "training_allocation_rule": "same proportional exact-prefix rule as prospective R1 across the two non-target sources",
+    "target_byte_use": 0,
+    "target_label_use": 0,
+    "candidate_motif_capacities": [
+      128,
+      256,
+      384,
+      512
+    ],
+    "motif_occurrence_floor": 4,
+    "motif_ranking": "unchanged best-successor-count then consistency then lexicographic ranking",
+    "tokenizer": false
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "arm_count",
+      "==",
+      3
+    ],
+    [
+      "training_byte_budget_per_arm",
+      "==",
+      15819
+    ],
+    [
+      "target_byte_use_count",
+      "==",
+      0
+    ],
+    [
+      "target_label_use_count",
+      "==",
+      0
+    ],
+    [
+      "candidate_capacity_count",
+      "==",
+      4
+    ],
+    [
+      "minimum_eligible_motif_count_across_arms",
+      ">=",
+      256
+    ],
+    [
+      "selected_common_capacity",
+      ">=",
+      256
+    ],
+    [
+      "selected_common_capacity",
+      "<=",
+      512
+    ],
+    [
+      "capacity_selection_post_target_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and all three training-only arms support at least the frozen 256-motif candidate; select the largest preregistered candidate supported by every arm.",
+    "negative": "Validity passes but at least one arm cannot support even 256 eligible motifs under the fixed 15,819-byte budget.",
+    "invalid": "Any parent, authority, source, budget, target-isolation, motif-construction/ranking, deterministic replay, provenance, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule": "Do not alter source identities, arm definitions, 15,819-byte budget, allocation rule, occurrence floor, candidate capacity grid, motif ranking, metrics, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-SELF-DIAGNOSIS-PROSPECTIVE-R3",
+    "intent": "use the selected common capacity from this training-only frontier in a new frozen prospective diagnostic on the still-sealed code target; capacity and class partition are preregistered before target bytes open"
+  },
+  "successor_if_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-RAW-REP-DATA-EFFICIENCY-ATTRIBUTION-R3",
+    "intent": "attribute which source-pair statistics prevent a common 256-motif representation under the fixed budget before changing capacity or data budget"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-transfer-capacity-feasibility-r2.json",
+    "unitary/wlm_lm_external_reasoning_transfer_capacity_feasibility_r2.go",
+    "cmd/wlm-lm-external-reasoning-transfer-capacity-feasibility-r2/main.go",
+    ".github/workflows/external-reasoning-transfer-capacity-feasibility-r2.yml"
+  ]
+}
