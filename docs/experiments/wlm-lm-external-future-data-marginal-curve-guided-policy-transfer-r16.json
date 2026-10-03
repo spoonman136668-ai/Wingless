@@ -1,0 +1,111 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-CURVE-GUIDED-POLICY-TRANSFER-R16",
+  "program": "Wingless disjoint-dataset transfer of a fixed marginal-curve-guided future-data allocation policy",
+  "question": "Does the allocation policy frozen from R15's marginal curves improve aggregate sealed-evaluation accuracy versus equal allocation on a genuinely disjoint external dataset under the same total data, compute, capacity, and authority budgets?",
+  "hypothesis": "Use the immutable disjoint transfer manifest below, truncate each source to the exact effective byte count, and replay the R13-R15 three leave-one-domain-out evaluation contract with 15,819 non-target training bytes per arm, 256 motifs, target bytes [0:582] sealed for evaluation, and [582:1454] as the adaptation reservoir. Compare EQUAL code=582 structured=581 technical_prose=581 against CURVE_GUIDED code=582 structured=436 technical_prose=726; both total exactly 1,744 adaptation bytes. The policy is frozen solely from R15: structured 436→581 produced 0 gain while technical-prose 581→726 produced +7 hits and code above 582 had lower marginal value. No R16 target labels, results, or post-result choices may influence the allocation.",
+  "exact_parent_sha": "0932449aad72ae7cfbb7379a79e763ffb49facf4",
+  "qualification_branch": "research/external-hosted-wingless-future-data-marginal-curve-guided-policy-transfer-r16",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-ALLOCATION-MARGINAL-EFFICIENCY-R15",
+    "github_run_id": 37159173390,
+    "classification": "supported",
+    "observation": {
+      "code_582_872_efficiency": 0.017241379310344827,
+      "structured_436_581_gain": 0,
+      "technical_prose_436_581_gain": 10,
+      "technical_prose_436_581_efficiency": 0.06896551724137931,
+      "technical_prose_581_726_gain": 7,
+      "technical_prose_581_726_efficiency": 0.04827586206896552
+    },
+    "policy_derivation": "relative to equal 582/581/581, move exactly 145 bytes from the zero-gain structured 436→581 interval to technical prose 581→726; leave code at 582"
+  },
+  "external_transfer_manifest": {
+    "schema": "wingless.external-transfer-manifest.v1",
+    "sources": [
+      {
+        "domain": "code",
+        "repository": "python/cpython",
+        "commit": "ebf955df7a89ed0c7968f79faec1de49f61ed7cb",
+        "path": "Lib/statistics.py",
+        "full_bytes": 61896,
+        "full_sha256": "3023ec949802c2e880a000775bfd1a6b70c21b5423881118141e3ec69d8e3336",
+        "effective_prefix_bytes": 41453,
+        "effective_prefix_sha256": "66bb25b24a0316b4965c64798494de93a1d7332672b15b5f430ab6a2fb4b9d45"
+      },
+      {
+        "domain": "structured",
+        "repository": "json-schema-org/JSON-Schema-Test-Suite",
+        "commit": "5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8",
+        "path": "tests/draft2020-12/uniqueItems.json",
+        "full_bytes": 14490,
+        "full_sha256": "ed84ef6ddc827659e257ba64cbe9679f06932b6320bea5c07622bf3d2cc4daa5",
+        "effective_prefix_bytes": 14365,
+        "effective_prefix_sha256": "95ddbd0eaef29aad5ecfc74f9da21b795481f58b2c59380324a445fcd4d08932"
+      },
+      {
+        "domain": "technical_prose",
+        "repository": "golang/go",
+        "commit": "6f5c275ebdc454197fff5f1496521c8f81e20eef",
+        "path": "doc/README.md",
+        "full_bytes": 3124,
+        "full_sha256": "c1bf000e7a873b3afed329c5b9f9c07f7692b1d7fb2bfca2d7600cec8b1d1407",
+        "effective_prefix_bytes": 1454,
+        "effective_prefix_sha256": "48c3d95b8b03864a4af41d892710675956cde85afd0d5d6c331594de9f17881b"
+      }
+    ],
+    "effective_total_bytes": 57272
+  },
+  "external_transfer_manifest_sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250",
+  "external_authority": {
+    "ckb_plane_main_sha": "06c3cb723820407bc2db1bd3ec9e46f462059e41",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "fixed_contract": {
+    "arm_count": 3,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "equal_allocation": {
+      "code": 582,
+      "structured": 581,
+      "technical_prose": 581
+    },
+    "curve_guided_allocation": {
+      "code": 582,
+      "structured": 436,
+      "technical_prose": 726
+    },
+    "total_adaptation_budget_each": 1744,
+    "allocation_target_label_use_count": 0,
+    "allocation_post_result_choice_count": 0
+  },
+  "classification_rules": {
+    "supported": "valid and curve-guided aggregate exact hits exceed equal by at least 1 with zero curve-guided domains below packet0 baseline",
+    "mixed": "valid and curve-guided aggregate improves but at least one domain drops below packet0, or aggregate ties while technical-prose improves versus equal",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "any parent, authority, transfer-manifest, source-prefix, split, budget, capacity, isolation, determinism, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter source files/commits/hashes/prefix lengths, 15,819-byte base budget, 256 capacity, 582/872 split, equal allocation, 582/436/726 curve-guided allocation, total 1,744-byte budget, evaluator, metrics, thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-CURVE-GUIDED-POLICY-RETAIN-REVERT-R17",
+    "intent": "record the transfer-supported allocation as a bounded research candidate and verify exact retain/revert and rollback semantics without granting autonomous data-budget growth"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-CURVE-GUIDED-POLICY-TRANSFER-ATTRIBUTION-R17",
+    "intent": "attribute the disjoint-dataset failure by domain and marginal interval before modifying the policy"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-marginal-curve-guided-policy-transfer-r16.json",
+    "unitary/wlm_lm_external_future_data_marginal_curve_guided_policy_transfer_r16.go",
+    "cmd/wlm-lm-external-future-data-marginal-curve-guided-policy-transfer-r16/main.go",
+    ".github/workflows/external-future-data-marginal-curve-guided-policy-transfer-r16.yml"
+  ]
+}
