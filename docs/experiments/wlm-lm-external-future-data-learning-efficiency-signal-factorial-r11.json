@@ -1,0 +1,203 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-EFFICIENCY-SIGNAL-FACTORIAL-R11",
+  "program": "Wingless training-only signal factorial for future-data learning efficiency",
+  "question": "Which preregistered native training signal, if any, tracks cumulative equal-budget adaptation gain when the R10 first-gain metric saturates?",
+  "hypothesis": "Replay the exact three R10 leave-one-domain-out arms, 15,819-byte non-target budgets, fixed 256-motif capacity, 1,454-byte target windows, 872-byte adaptation streams, eight 109-byte cumulative packets, and 582-byte sealed evaluation suffixes. Freeze three training-only signals before target bytes are opened: (H) representation_headroom = eligible 4-byte motifs with occurrence>=4 minus 256; (D) class_support_deficit = 1 - minimum/maximum total occurrence mass across eight fixed 32-motif frequency-ranked classes; (M) relation_margin_median = median byte-relation top1-minus-runner probability margin over training rows with total support>=4. The frozen outcome is cumulative_adaptation_gain = sum over packets 1..8 of (packet exact hits - packet0 exact hits); final_gain is recorded secondarily. Test all three signals, not a post-result-selected subset. Prespecified directions: higher H predicts higher cumulative gain; higher D predicts lower cumulative gain; higher M predicts higher cumulative gain. Pairwise ties are neutral. This is signal attribution only; it cannot allocate data, change capacity, or retain a mechanism.",
+  "exact_parent_sha": "62c189ce34df01a3cdb5599e997a5c1dcd1557db",
+  "qualification_branch": "research/external-hosted-wingless-future-data-learning-efficiency-signal-factorial-r11",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; optimize unseen-future-data learning efficiency under fixed budgets"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-EFFICIENCY-SIGNAL-R10",
+    "github_run_id": "37150894420",
+    "classification": "mixed",
+    "observation": {
+      "code_headroom": 121,
+      "structured_headroom": 495,
+      "technical_prose_headroom": 396,
+      "code_packets_to_first_gain": 1,
+      "structured_packets_to_first_gain": 1,
+      "technical_prose_packets_to_first_gain": 1,
+      "pairwise_signal_tie_count": 3
+    },
+    "interpretation": "First-gain saturates at one packet for all three domains, so it cannot discriminate learning efficiency. R11 changes the outcome metric prospectively only through its frozen successor preregistration; R10 itself is not retuned."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "arm_count": 3,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "target_window_bytes_per_arm": 1454,
+    "target_adaptation_bytes_per_arm": 872,
+    "target_evaluation_bytes_per_arm": 582,
+    "adaptation_packet_count": 8,
+    "bytes_per_packet": 109,
+    "representation_and_evaluator": "byte-identical R10"
+  },
+  "signals": {
+    "H": {
+      "name": "representation_headroom",
+      "direction": "higher predicts higher cumulative_adaptation_gain"
+    },
+    "D": {
+      "name": "class_support_deficit",
+      "definition": "1 - min(class occurrence mass)/max(class occurrence mass), eight 32-motif classes ranked by training motif occurrence",
+      "direction": "higher predicts lower cumulative_adaptation_gain"
+    },
+    "M": {
+      "name": "relation_margin_median",
+      "definition": "median (top1_count-runner_count)/row_total over training byte-relation rows with row_total>=4",
+      "direction": "higher predicts higher cumulative_adaptation_gain"
+    },
+    "target_byte_use_count": 0,
+    "target_label_use_count": 0,
+    "post_result_choice_count": 0
+  },
+  "outcome": {
+    "primary": "cumulative_adaptation_gain = sum(packet_i_exact_hits - packet0_exact_hits), i=1..8",
+    "secondary": "final_gain = packet8_exact_hits - packet0_exact_hits",
+    "pairwise_test": "for each signal separately, count concordant, reversed, and tied arm pairs under the prespecified direction"
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "arm_count",
+      "==",
+      3
+    ],
+    [
+      "non_target_training_byte_budget_per_arm",
+      "==",
+      15819
+    ],
+    [
+      "motif_capacity",
+      "==",
+      256
+    ],
+    [
+      "target_window_bytes_per_arm",
+      "==",
+      1454
+    ],
+    [
+      "target_adaptation_bytes_per_arm",
+      "==",
+      872
+    ],
+    [
+      "target_evaluation_bytes_per_arm",
+      "==",
+      582
+    ],
+    [
+      "adaptation_packet_count",
+      "==",
+      8
+    ],
+    [
+      "signal_target_byte_use_count",
+      "==",
+      0
+    ],
+    [
+      "signal_target_label_use_count",
+      "==",
+      0
+    ],
+    [
+      "signal_post_result_choice_count",
+      "==",
+      0
+    ],
+    [
+      "tested_signal_count",
+      "==",
+      3
+    ],
+    [
+      "best_signal_pairwise_agreement_count",
+      ">=",
+      2
+    ],
+    [
+      "best_signal_pairwise_reversal_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and at least one preregistered signal has at least two concordant non-tied pairwise comparisons and zero reversals against cumulative adaptation gain.",
+    "mixed": "Validity passes and at least one signal has a concordant comparison, but no signal satisfies the supported criterion because of reversals or ties.",
+    "negative": "Validity passes and no signal has a concordant non-tied comparison.",
+    "invalid": "Any parent, authority, source, budget, split, signal definition/direction, R10 replay identity, target isolation, determinism, capacity, provenance, or qualification criterion fails."
+  },
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-SIGNAL-GUIDED-ALLOCATION-R12",
+    "intent": "test a frozen fixed-total-data allocation policy driven by the supported training-only signal against equal allocation on multiple future arms; no self-modification"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-CURVE-MECHANISM-R12",
+    "intent": "stop signal selection and directly characterize why adaptation curves differ under fixed budgets before proposing an allocation policy"
+  },
+  "no_post_result_tuning_rule": "Do not alter R10 data/budgets/splits/capacity, H/D/M definitions or directions, cumulative-gain outcome, pairwise test, metrics, thresholds, classification, or authority after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-learning-efficiency-signal-factorial-r11.json",
+    "unitary/wlm_lm_external_future_data_learning_efficiency_signal_factorial_r11.go",
+    "cmd/wlm-lm-external-future-data-learning-efficiency-signal-factorial-r11/main.go",
+    ".github/workflows/external-future-data-learning-efficiency-signal-factorial-r11.yml"
+  ]
+}
