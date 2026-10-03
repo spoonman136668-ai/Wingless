@@ -1,0 +1,139 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-CONTEXT-ALIAS-GENERALIZATION-R2",
+  "program": "Wingless external raw-input to representation to context-alias prediction frontier",
+  "question": "Can training-only distributional context aliases generalize unseen exact pair surfaces while preserving the fixed 512-state context budget?",
+  "hypothesis": "Using the exact sealed 512-motif representation and 60/40 external split, induce 16 previous-role aliases from training-only outgoing transition distributions and 32 current-role aliases from training-only incoming transition distributions. Their Cartesian product forms exactly 512 context states. A 512x512 alias-state -> next-motif predictor will improve pooled heldout top-1 accuracy by at least 0.005 over the sealed current-only relation, avoid degrading any source by more than 0.01, and improve the exact-pair overflow/unseen subset by at least 0.02 over the sealed support-backoff predictor.",
+  "exact_parent_sha": "112a64fe44e5e55395bde0ede5942c6d000336b5",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-context-alias-r2",
+  "supersedes_unexecuted_prereg": {
+    "experiment": "WLM-LM-EXTERNAL-CONTEXT-ALIAS-GENERALIZATION-R1",
+    "commit_sha": "210dc7799380b192a2a812c9ae66520416773ff7",
+    "disposition": "superseded-before-execution",
+    "reason": "hourly scheduler created R1 against the scientific implementation SHA before the completed result was evidence-sealed; R2 restores the direct sealed-parent qualification boundary",
+    "scientific_output_observed": false,
+    "scientific_claim": false
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-CONTEXT-SUPPORT-BACKOFF-R1",
+    "github_run_id": "37107000828",
+    "classification": "mixed",
+    "observation": {
+      "pooled_hybrid_minus_current_accuracy": 0.0032102728731943087,
+      "pooled_hybrid_minus_ungated_context_accuracy": 0.07758159443552703,
+      "eval_code_hybrid_minus_current_accuracy": -0.004515599343185572,
+      "eval_structured_hybrid_minus_current_accuracy": 0.01815311760063143,
+      "eval_technical_prose_hybrid_minus_current_accuracy": 0.0
+    },
+    "diagnosis": "Support backoff recovers most exact-pair context damage but exact pair identity remains too brittle to clear the frozen gain threshold; generalize pair surfaces without increasing predictive-state capacity."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "same exact three-source external manifest",
+    "split": "first floor(0.60*N) bytes training-only; final 40% suffix scoring-only",
+    "representation": "byte-identical sealed 512-motif learner",
+    "motif_stream_decode": "byte-identical non-overlapping exact-motif scanner",
+    "source_boundaries": "reset history per source and never form transitions across sources",
+    "current_only_control": "byte-identical sealed current-motif relation predictor",
+    "support_backoff_control": "byte-identical sealed support>=3 exact-pair selector"
+  },
+  "alias_induction": {
+    "previous_role_feature": "for each motif ID, its 512-dimensional training-only outgoing successor count vector",
+    "current_role_feature": "for each motif ID, its 512-dimensional training-only incoming predecessor count vector",
+    "normalization": "L1 normalize nonzero vectors; all-zero vectors remain all zero",
+    "distance": "L1 distance over normalized feature vectors",
+    "previous_alias_count": 16,
+    "current_alias_count": 32,
+    "clustering": "deterministic farthest-first medoid partition independently for each role",
+    "first_medoid": "highest training role-occurrence count, tie lowest motif ID",
+    "next_medoid": "motif maximizing minimum L1 distance to existing medoids, tie higher role-occurrence count then lower motif ID",
+    "assignment": "nearest medoid by L1 distance, tie lower medoid rank",
+    "iterations_after_assignment": 0,
+    "heldout_in_alias_induction": false
+  },
+  "alias_state": {
+    "state_id": "previous_alias_id * 32 + current_alias_id",
+    "total_alias_states": 512,
+    "predictor": "512 x 512 uint32 alias-state -> next-motif counts",
+    "zero_row_fallback": "same pooled training successor unigram argmax as sealed relation experiments",
+    "predictive_counter_capacity": 262144,
+    "capacity_growth_after_freeze": false
+  },
+  "comparison_subset": {
+    "exact_pair_overflow_or_unseen": "evaluation pair not in the frozen top-511 exact-pair context dictionary from the sealed backoff parent",
+    "subset_baseline": "sealed support-backoff prediction, which uses current-only relation on these queries",
+    "evaluation_updates": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["previous_alias_count","==",16],
+    ["current_alias_count","==",32],
+    ["alias_state_count","==",512],
+    ["alias_predictive_counter_capacity","==",262144],
+    ["nonempty_previous_alias_count",">=",12],
+    ["nonempty_current_alias_count",">=",24],
+    ["overflow_unseen_query_count",">",0],
+    ["pooled_alias_minus_current_accuracy",">=",0.005],
+    ["minimum_source_alias_minus_current_accuracy",">=",-0.01],
+    ["overflow_unseen_alias_minus_exact_backoff_accuracy",">=",0.02],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "diagnostic_metrics": [
+    "previous/current alias population histograms",
+    "role zero-vector counts",
+    "per-source alias/current/support-backoff top-1 accuracy",
+    "pooled alias/current/support-backoff top-1 accuracy",
+    "overflow/unseen subset alias and exact-backoff accuracy",
+    "alias-state training occupancy and evaluation coverage"
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and frozen thresholds pass.",
+    "mixed": "Validity passes and aliasing improves either pooled accuracy or overflow/unseen accuracy materially but misses at least one frozen gain/nondegradation threshold.",
+    "negative": "Validity passes but aliasing does not materially improve either pooled or overflow/unseen accuracy over the frozen controls.",
+    "invalid": "Any sealed-parent, authority, source, split, representation, clustering, capacity, deterministic, or heldout-isolation criterion fails.",
+    "incomplete": "Authority, source retrieval, or hosted compute interruption prevents the frozen matrix."
+  },
+  "validity_criteria": [
+    "Exact sealed parent and North Star identities match.",
+    "A fresh CKB-plane READY_RESEARCH receipt is bound to this exact preregistration and external manifest.",
+    "All motif learning, decoding, source splits, controls, and source-boundary behavior are byte-identical to sealed parents.",
+    "Alias features, medoid selection, and assignment use training-prefix data only.",
+    "Previous/current alias counts remain exactly 16/32 and Cartesian alias-state count remains exactly 512.",
+    "No iterative heldout-driven clustering, dynamic alias creation, or capacity expansion occurs.",
+    "All controls and alias predictor score identical heldout suffix triples.",
+    "Full Go regression passes before probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, hashes, split, representation, role features, L1 normalization, farthest-first medoid rules, 16x32 alias budget, predictor capacity, controls, metrics, thresholds, classification, or authority requirements after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-ALIAS-DISTRIBUTIONAL-COMPOSITION",
+    "intent": "carry the supported fixed-budget alias state into depth-two/depth-three probability-mass composition"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-FACTOR-ABLATION",
+    "intent": "separate previous-role and current-role alias contributions before changing representation or capacity"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-context-alias-generalization-r2.json",
+    "unitary/wlm_lm_external_context_alias_generalization_r2.go",
+    "cmd/wlm-lm-external-context-alias-generalization-r2/main.go",
+    ".github/workflows/external-context-alias-generalization-r2.yml"
+  ]
+}
