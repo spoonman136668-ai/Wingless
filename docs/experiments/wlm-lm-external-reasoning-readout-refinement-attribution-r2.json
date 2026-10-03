@@ -1,0 +1,112 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-READOUT-REFINEMENT-ATTRIBUTION-R2",
+  "program": "Wingless external raw-input to repaired prediction to fixed refined abstract reasoning attribution",
+  "question": "Why does the fixed eight-class training-rank readout expose only part of the supported exact predictive gain at depth 3?",
+  "hypothesis": "Without changing the sealed 512-motif representation, repaired relation, eight fixed 64-motif classes, runtime cap, horizons, or any learned/readout capacity, attribute every depth-3 query where repaired exact top-1 correctness differs from baseline into frozen categories: same refined class versus cross-class transition, repaired probability mass moved toward truth class versus away, source domain, and whether distributional class aggregation agrees with repaired top-1 projection. The residual hidden-gain population will be explained primarily by class-boundary geometry rather than transition prediction or probability aggregation: at least 0.75 of hidden exact-gain queries will be same-class under the eight-class readout, repaired truth-class mass will not decrease on more than 0.25 of hidden-gain queries, and source-specific hidden fractions will remain finite and explicitly reported.",
+  "exact_parent_sha": "1fa8099ce6fce693c06369f8eae888052d10a922",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-readout-refinement-attribution-r2",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-READOUT-REFINEMENT-R1",
+    "github_run_id": "37124153727",
+    "classification": "mixed",
+    "observation": {
+      "depth3_refined_repaired_reasoning_minus_baseline_accuracy": 0.003215434083601365,
+      "depth2_refined_repaired_reasoning_minus_baseline_accuracy": 0.008835341365461824,
+      "depth3_refined_repaired_reasoning_minus_top1_projection_accuracy": 0.010718113612004365,
+      "depth3_exact_repair_gain_query_count": 61,
+      "depth3_exact_gain_hidden_by_refined_readout_count": 49,
+      "depth3_exact_gain_hidden_by_refined_readout_fraction": 0.8032786885245902
+    },
+    "diagnosis": "The fixed 8x64 readout exposes some predictive gain but leaves 80.33% of exact repair-gain queries hidden. The next bounded step is attribution only, not more readout capacity."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical sealed three-source manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "baseline_relation": "byte-identical sealed unrepaired predictor",
+    "repaired_relation": "byte-identical supported low-support repair",
+    "pair_support_threshold": 3,
+    "runtime_pair_state_cap": 2048,
+    "horizons": [2,3],
+    "refined_readout": "byte-identical fixed eight training-rank classes of 64 motifs each",
+    "relation_capacity_change": false,
+    "readout_capacity_change": false
+  },
+  "attribution_protocol": {
+    "primary_population": "all heldout depth-3 queries with repaired exact top-1 correctness different from baseline exact top-1 correctness",
+    "hidden_gain_population": "queries where repaired exact top-1 becomes correct but refined class answer does not improve",
+    "categories": [
+      "truth motif and repaired predicted motif in same refined class",
+      "truth motif and repaired predicted motif in different refined classes",
+      "repaired truth-class probability mass minus baseline truth-class probability mass",
+      "distributional refined answer agreement with repaired top-1 projection",
+      "source domain"
+    ],
+    "selection_data": "none; attribution is post hoc over frozen heldout scoring rows only",
+    "adaptive_changes": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["refined_reasoning_class_count","==",8],
+    ["motif_class_assignment_count","==",512],
+    ["minimum_refined_class_size","==",64],
+    ["maximum_refined_class_size","==",64],
+    ["depth3_query_count",">",0],
+    ["depth3_exact_repair_gain_query_count","==",61],
+    ["depth3_exact_gain_hidden_by_refined_readout_count","==",49],
+    ["hidden_gain_same_class_fraction",">=",0.75],
+    ["hidden_gain_truth_class_mass_decrease_fraction","<=",0.25],
+    ["attribution_accounting_error_count","==",0],
+    ["heldout_selection_use_count","==",0],
+    ["relation_capacity_growth_event_count","==",0],
+    ["adaptive_readout_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and both preregistered attribution thresholds pass, supporting class-boundary geometry as the primary residual bottleneck.",
+    "mixed": "Validity passes but only one attribution threshold passes or source strata disagree materially.",
+    "negative": "Validity passes but neither attribution threshold passes, rejecting class-boundary geometry as the primary residual bottleneck.",
+    "invalid": "Any sealed-parent, authority, source, frozen-readout, accounting, determinism, capacity, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact sealed mixed-result parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and external manifest.",
+    "Representation, baseline relation, repaired relation, eight class assignments, support threshold, runtime cap, and horizons are unchanged.",
+    "Attribution introduces no learned state, adaptive thresholds, labels for selection, or additional readout capacity.",
+    "Heldout data is used only to score and categorize already-frozen predictions.",
+    "Duplicate complete probes are byte-identical and all attribution rows account exactly once.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, relation repair, class boundaries, runtime cap, horizons, attribution categories, 0.75 same-class floor, 0.25 mass-decrease ceiling, metrics, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-BOUNDARY-AWARE-READOUT-R1",
+    "intent": "test one preregistered training-only boundary rule while keeping eight fixed classes and relation capacity unchanged"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-PROBABILITY-READOUT-ATTRIBUTION-R3",
+    "intent": "attribute residual failure to probability geometry/source specificity before any capacity change"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-readout-refinement-attribution-r2.json",
+    "unitary/wlm_lm_external_reasoning_readout_refinement_attribution_r2.go",
+    "cmd/wlm-lm-external-reasoning-readout-refinement-attribution-r2/main.go",
+    ".github/workflows/external-reasoning-readout-refinement-attribution-r2.yml"
+  ]
+}
