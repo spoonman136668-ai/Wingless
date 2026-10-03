@@ -1,0 +1,102 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-INTERMEDIATE-BEAM-ATTRIBUTION-R1",
+  "program": "Wingless ambiguity-gated compositional prediction beam-capacity attribution",
+  "question": "Is the persistent 71.04% intermediate retained-mass failure caused by the 512 runtime beam cap, and if so does a preregistered larger runtime beam recover both validity and depth-3 predictive benefit without changing learned capacity?",
+  "hypothesis": "Reuse the exact learned relations, ambiguity gate, sources, split, terminal unpruned aggregation, horizons, and scientific thresholds from the terminal-mass experiment. Evaluate three explicitly preregistered runtime pair-state beam caps: 512, 1024, and 2048. The 512 arm must reproduce the sealed 0.71041895336719 minimum intermediate retained mass within 1e-12. Retained mass must be monotonic with beam size, and at least one expanded arm must meet the unchanged 0.75 validity floor. If the smallest beam meeting 0.75 also achieves depth-3 pooled gated-minus-first-order accuracy >=0.002 with minimum source delta >=-0.01, beam truncation is sufficient to explain the prior invalid depth-3 result.",
+  "exact_parent_sha": "c1346cef73a849080fff93249243d98cdd240065",
+  "accepted_scientific_parent_sha": "5445a8e654fa90707aa3ca094ba3119aaae28b04",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-intermediate-beam-attribution-r1",
+  "prior_invalid_evidence": {
+    "terminal_mass_experiment": "WLM-LM-EXTERNAL-GATED-COMPOSITION-TERMINAL-MASS-R1",
+    "github_run_id": "37112907963",
+    "minimum_intermediate_beam_retained_mass": 0.71041895336719,
+    "depth3_pooled_gated_minus_first_order_accuracy": -0.0037513397642015,
+    "diagnosis": "Terminal pruning is not the cause; validity loss is localized to the intermediate 512-state beam."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical predecessor source manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "current_relation": "byte-identical predecessor current-motif successor counts",
+    "exact_pair_relation": "byte-identical predecessor top-511 exact-pair successor counts",
+    "pair_support_threshold": 3,
+    "current_row_minimum_count": 4,
+    "ambiguity_cutoff": "byte-identical training-only median margin",
+    "hybrid_transition": "byte-identical terminal-mass transition rule",
+    "terminal_aggregation": "unpruned pair-to-target motif marginalization",
+    "horizons": [2,3],
+    "first_order_distributional_control": "byte-identical predecessor control"
+  },
+  "diagnostic_arms": {
+    "beam_caps": [512,1024,2048],
+    "learned_capacity_change": false,
+    "persistent_state_change": false,
+    "smallest_valid_beam_rule": "select the smallest preregistered cap whose minimum intermediate retained mass is >=0.75; no interpolation or additional cap may be introduced after results"
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["beam512_reproduction_absolute_error","<=",1e-12],
+    ["beam_retained_mass_monotonic_violation_count","==",0],
+    ["minimum_intermediate_retained_mass_beam512","<",0.75],
+    ["maximum_expanded_beam_retained_mass",">=",0.75],
+    ["selected_smallest_valid_beam",">=",1024],
+    ["selected_smallest_valid_beam","<=",2048],
+    ["selected_beam_depth3_pooled_gated_minus_first_order_accuracy",">=",0.002],
+    ["selected_beam_depth3_minimum_source_gated_minus_first_order_accuracy",">=",-0.01],
+    ["maximum_probability_mass_error","<=",1e-9],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes, at least one expanded beam crosses the unchanged 0.75 mass floor, and the smallest valid beam passes the original depth-3 gain and source-nondegradation thresholds.",
+    "mixed": "Validity passes and an expanded beam crosses 0.75, but the smallest valid beam does not pass the original depth-3 predictive thresholds.",
+    "negative": "Validity passes but even beam 2048 fails to reach the unchanged 0.75 retained-mass floor.",
+    "invalid": "Any sealed-parent, authority, source, reproduction, monotonicity, deterministic, probability, capacity, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "The 512 arm reproduces the sealed terminal-mass retained statistic within 1e-12.",
+    "The 0.75 validity floor is unchanged and is not lowered.",
+    "Only runtime pair-state support changes across arms; learned relations, gate, representation, and persistent state are byte-identical.",
+    "All beam caps are preregistered before execution; no additional cap may be selected after observing results.",
+    "Terminal pair mass remains unpruned and is aggregated directly into motif probabilities.",
+    "Duplicate complete executions are byte-identical and all numeric outputs are finite.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter beam caps, 0.75 floor, 512 reproduction tolerance, sources, split, learned state, gate, horizons, scientific thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-AMBIGUITY-GATED-REASONING-BRIDGE",
+    "intent": "use the preregistered smallest valid runtime beam to feed multi-step predictive state into bounded controlled reasoning"
+  },
+  "successor_if_mixed": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-TRANSITION-ATTRIBUTION",
+    "intent": "beam validity is recovered but transition quality remains the depth bottleneck"
+  },
+  "successor_if_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-PAIR-MASS-REPRESENTATION-ATTRIBUTION",
+    "intent": "runtime pair support remains too diffuse even at the preregistered upper beam"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-intermediate-beam-attribution-r1.json",
+    "unitary/wlm_lm_external_intermediate_beam_attribution_r1.go",
+    "cmd/wlm-lm-external-intermediate-beam-attribution-r1/main.go",
+    ".github/workflows/external-intermediate-beam-attribution-r1.yml"
+  ]
+}
