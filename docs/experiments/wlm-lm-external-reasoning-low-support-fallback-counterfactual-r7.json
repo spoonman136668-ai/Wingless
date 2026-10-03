@@ -1,0 +1,187 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-LOW-SUPPORT-FALLBACK-COUNTERFACTUAL-R7",
+  "program": "Wingless fixed-budget low-support fallback counterfactual",
+  "question": "Does disabling only the low-support fallback mixture improve the already-opened code-target reasoning result relative to the unchanged full repaired bridge under identical data, compute, capacity, and authority budgets?",
+  "hypothesis": "Replay the exact R6 package: structured+technical-prose training domains, 15,819 training bytes, 256 motifs, 8x32 reasoning classes, exact-context tables, 1,454-byte code target, depth-3 cap, and selected-query identity. Compare two frozen bridge variants only: BASELINE=B11 full repaired bridge; CANDIDATE=B01 exact-context enabled with low-support fallback disabled. No other bridge stage, relation table, capacity, class assignment, threshold, source, runtime cap, or evaluator changes. This is a mechanism counterfactual on the originating dataset only. It cannot be retained from R7 even if better; any candidate advantage must later transfer to a preregistered disjoint future dataset under equal budgets before retention.",
+  "exact_parent_sha": "fefa1616f783a38e0efb331dccf2e629121aaae4",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-low-support-fallback-counterfactual-r7",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; optimize future-dataset learning efficiency, not self-modification"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-BRIDGE-SUPPRESSION-FACTORIAL-R6",
+    "github_run_id": "37149252747",
+    "classification": "supported",
+    "observation": {
+      "selected_query_count": 21,
+      "low_support_main_count": 16,
+      "full_no_suppression_count": 5,
+      "exact_context_main_count": 0,
+      "interaction_only_count": 0,
+      "additive_shared_count": 0,
+      "B11_repaired_top1_class5_count": 0,
+      "B11_repaired_top1_class6_count": 0
+    },
+    "interpretation": "The low-support fallback is the dominant causal factor in suppression on the frozen code-target queries."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "training_domains": [
+      "structured",
+      "technical_prose"
+    ],
+    "target_domain": "code",
+    "training_byte_budget": 15819,
+    "target_eval_byte_budget": 1454,
+    "selected_motif_capacity": 256,
+    "reasoning_class_count": 8,
+    "motifs_per_reasoning_class": 32,
+    "depth3_runtime_cap": 2048,
+    "baseline": "B11 full repaired bridge byte-identical R6",
+    "candidate": "B01 exact-context=true, low-support-fallback=false byte-identical R6 factorial variant",
+    "candidate_selection": "preregistered; no target-result choice"
+  },
+  "evaluation": {
+    "all_target_queries": 63,
+    "selected_query_count": 21,
+    "primary_metric": "candidate_total_exact_hit_count - baseline_total_exact_hit_count",
+    "secondary_metrics": [
+      "candidate_selected_query_exact_hit_count - baseline_selected_query_exact_hit_count",
+      "candidate_class5_or_6_top1_count - baseline_class5_or_6_top1_count",
+      "candidate_probability_mass_error",
+      "candidate_retained_mass_min"
+    ],
+    "retention": false
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "reasoning_class_count",
+      "==",
+      8
+    ],
+    [
+      "target_query_count",
+      "==",
+      63
+    ],
+    [
+      "selected_query_count",
+      "==",
+      21
+    ],
+    [
+      "baseline_B11_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "candidate_variant_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "candidate_total_exact_hit_delta",
+      ">=",
+      1
+    ],
+    [
+      "candidate_selected_query_exact_hit_delta",
+      ">=",
+      0
+    ],
+    [
+      "candidate_maximum_probability_mass_error",
+      "<=",
+      1e-9
+    ],
+    [
+      "candidate_minimum_repaired_retained_mass",
+      ">",
+      0
+    ],
+    [
+      "relation_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "adaptive_readout_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and the preregistered exact-context-only candidate improves total code-target exact hits by at least one without reducing selected-query exact hits or violating probability/accounting controls.",
+    "mixed": "Validity passes and the candidate changes class-5/6 competitive behavior or selected-query hits but does not improve total target exact hits by at least one.",
+    "negative": "Validity passes and the candidate yields no useful target improvement or worsens target exact hits.",
+    "invalid": "Any parent, authority, source, budget, candidate identity, bridge identity, target identity, determinism, provenance, capacity, or qualification criterion fails."
+  },
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-LOW-SUPPORT-FALLBACK-TRANSFER-R8",
+    "intent": "test the exact frozen candidate versus no-change on a preregistered disjoint future dataset under identical data/compute/capacity/authority budgets; retain only if transfer advantage is supported"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-LOW-SUPPORT-FALLBACK-ATTRIBUTION-R8",
+    "intent": "attribute why removal changes internal competition without producing transferable task gain before proposing another mechanism"
+  },
+  "no_post_result_tuning_rule": "Do not alter data, budgets, 256 capacity, classes, selected-query set, baseline/candidate bridge variants, metrics, thresholds, classification, or authority after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-low-support-fallback-counterfactual-r7.json",
+    "unitary/wlm_lm_external_reasoning_low_support_fallback_counterfactual_r7.go",
+    "cmd/wlm-lm-external-reasoning-low-support-fallback-counterfactual-r7/main.go",
+    ".github/workflows/external-reasoning-low-support-fallback-counterfactual-r7.yml"
+  ]
+}
