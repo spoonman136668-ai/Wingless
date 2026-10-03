@@ -1,0 +1,112 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-MARGIN-SOURCE-ATTRIBUTION-R3",
+  "program": "Wingless fixed-capacity probability-margin source calibration attribution",
+  "question": "Is the global training-median margin gate failing because margin scale and low-margin exact precision differ materially between source domains?",
+  "hypothesis": "Replay the exact mixed R2 representation, repaired relation, eight fixed classes, pooled training-median threshold, and heldout population without changing any gate or capacity. Compute source-specific training margin medians for attribution only, plus source-specific repaired exact precision below the unchanged global threshold. The absolute code-versus-structured training-median margin gap will be at least 0.05 and the absolute code-versus-structured below-threshold exact-precision gap will be at least 0.10. All 17 code and 2 structured same-class hidden gains will reproduce below the unchanged global threshold. This would support source calibration as a bounded next readout factor without changing relation or class capacity.",
+  "exact_parent_sha": "06a029cfba10f63351058b4a7f549d131b76bd30",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-margin-source-attribution-r3",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-PROBABILITY-MARGIN-ATTRIBUTION-R2",
+    "github_run_id": "37133677044",
+    "classification": "mixed",
+    "observation": {
+      "training_margin_threshold": 0.4329118785561704,
+      "above_threshold_exact_precision": 0.34276267450404113,
+      "below_threshold_exact_precision": 0.21386138613861386,
+      "threshold_direction_precision_delta": -0.12890128836542727,
+      "same_class_hidden_gain_count": 19,
+      "same_class_hidden_below_threshold_count": 19,
+      "same_class_source_code_count": 17,
+      "same_class_source_structured_count": 2,
+      "minimum_same_class_hidden_margin": 0.07895505602537631,
+      "median_same_class_hidden_margin": 0.20879223744430164,
+      "maximum_same_class_hidden_margin": 0.32716659926631914
+    },
+    "diagnosis": "The global threshold excludes every same-class hidden gain, but low-margin predictions are not globally more precise. The next bounded question is whether margin calibration differs by source."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical R2 three-source manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "baseline_relation": "byte-identical sealed unrepaired predictor",
+    "repaired_relation": "byte-identical supported low-support repair",
+    "refined_readout": "byte-identical eight fixed 64-motif classes",
+    "global_training_margin_threshold": 0.4329118785561704,
+    "relation_capacity_change": false,
+    "readout_capacity_change": false,
+    "threshold_change": false
+  },
+  "attribution_protocol": {
+    "source_training_margin_median": "median of the same frozen repaired depth-3 margin statistic within each source's training-prefix queries; attribution only, never used to gate heldout rows",
+    "source_below_threshold_precision": "repaired exact precision within each source's heldout rows whose margin is below the unchanged global threshold",
+    "hidden_population": "exact R2 same-class hidden gains: code 17, structured 2, technical-prose 0",
+    "adaptive_changes": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["training_margin_sample_count","==",5978],
+    ["training_margin_threshold","==",0.4329118785561704],
+    ["depth3_query_count","==",3732],
+    ["same_class_hidden_gain_count","==",19],
+    ["same_class_source_code_count","==",17],
+    ["same_class_source_structured_count","==",2],
+    ["same_class_source_technical_prose_count","==",0],
+    ["same_class_hidden_below_threshold_count","==",19],
+    ["code_structured_training_margin_median_gap",">=",0.05],
+    ["code_structured_below_threshold_precision_gap",">=",0.10],
+    ["source_attribution_accounting_error_count","==",0],
+    ["heldout_selection_use_count","==",0],
+    ["relation_capacity_growth_event_count","==",0],
+    ["adaptive_readout_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and both preregistered source-calibration gaps pass.",
+    "mixed": "Validity passes and exactly one source-calibration gap passes.",
+    "negative": "Validity passes but neither source-calibration gap passes.",
+    "invalid": "Any sealed-parent, authority, source, threshold/population reproduction, source accounting, determinism, capacity, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact qualified mixed R2 parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and manifest.",
+    "Representation, relation, class assignments, margin formula, pooled threshold, runtime cap, and horizons are unchanged.",
+    "Per-source training medians are attribution outputs only and never influence heldout gating.",
+    "The 3732 heldout rows and 19 same-class hidden gains reproduce exactly, including 17 code and 2 structured rows.",
+    "Heldout labels affect attribution only and never threshold selection or behavior.",
+    "Duplicate complete executions are byte-identical.",
+    "No new learned state, tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, relation, classes, margin formula, global threshold, source definitions, 0.05/0.10 attribution floors, metrics, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-SOURCE-CALIBRATED-MARGIN-READOUT-R1",
+    "intent": "test source-specific training-only margin thresholds while keeping relation and class capacity unchanged"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-MARGIN-CLASS-ATTRIBUTION-R4",
+    "intent": "attribute margin failure by fixed reasoning class before changing the gate"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-margin-source-attribution-r3.json",
+    "unitary/wlm_lm_external_reasoning_margin_source_attribution_r3.go",
+    "cmd/wlm-lm-external-reasoning-margin-source-attribution-r3/main.go",
+    ".github/workflows/external-reasoning-margin-source-attribution-r3.yml"
+  ]
+}
