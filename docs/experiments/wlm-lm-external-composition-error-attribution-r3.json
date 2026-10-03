@@ -1,0 +1,112 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-LM-EXTERNAL-COMPOSITION-ERROR-ATTRIBUTION-R3",
+  "program":"Wingless external raw-input to representation to multi-step composition attribution",
+  "question":"Was the invalid ambiguity-gated composition run limited primarily by runtime beam truncation or by transition quality?",
+  "hypothesis":"Recompute the frozen ambiguity-gated pair-state propagation at deterministic runtime caps 512, 1024, and 2048 using the same learned 512-motif representation, relations, support threshold, ambiguity rule, heldout queries, and horizons. If beam truncation is the dominant cause, cap 2048 will increase minimum retained probability mass by at least 0.05 versus cap 512 and improve depth-3 pooled top-1 accuracy by at least 0.005 without degrading depth-2 pooled accuracy by more than 0.005.",
+  "exact_parent_sha":"5445a8e654fa90707aa3ca094ba3119aaae28b04",
+  "qualification_branch":"research/external-hosted-wingless-composition-error-attribution-r3",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "supersedes_before_execution":[
+    {
+      "experiment":"WLM-LM-EXTERNAL-COMPOSITION-ERROR-ATTRIBUTION-R1",
+      "preregistration_sha":"f53ce73f214549afd61745dd14ee55ab599e0358",
+      "package_head_sha":"d5af4244d3be8ec8a66f8f1c5ef9871ca9d02144",
+      "disposition":"package-invalid-before-science",
+      "reason":"prereg git parent was package-close commit 1c255ca085a8ae2261ebd20c57f8ecdc9716089e rather than accepted seal 5445a8e654fa90707aa3ca094ba3119aaae28b04"
+    },
+    {
+      "experiment":"WLM-LM-EXTERNAL-COMPOSITION-ERROR-ATTRIBUTION-R2",
+      "disposition":"superseded-empty-pointer",
+      "reason":"branch pointer was created from package-invalid closure d049e35f9b87aa8b134ab02beab85e8a1de37226 and no preregistration or science was produced"
+    }
+  ],
+  "invalid_diagnostic_only":{
+    "experiment":"WLM-LM-EXTERNAL-AMBIGUITY-GATED-DISTRIBUTIONAL-COMPOSITION-R1",
+    "github_run_id":"37112074300",
+    "head_sha":"2a8908c1d3902f51ded575a363df2cc6ec63ab90",
+    "classification":"invalid",
+    "promotion":false,
+    "reason":"frozen validity required minimum_beam_retained_mass >=0.75; observed 0.7104189533671852",
+    "observed_depth2_gated_minus_first_order_accuracy":0.004283801874163329,
+    "observed_depth3_gated_minus_first_order_accuracy":-0.0037513397642015
+  },
+  "external_authority":{
+    "ckb_plane_main_sha":"36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256":"75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required":"READY_RESEARCH",
+    "execution_host_policy":"GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus":false,
+    "external_model_calls":false,
+    "production_authority":false
+  },
+  "frozen_reuse":{
+    "sources":"byte-identical sealed three-source manifest",
+    "split":"first 60% training / final 40% heldout",
+    "representation":"byte-identical sealed 512-motif learner",
+    "current_relation":"byte-identical 512x512 current-motif successor counts",
+    "exact_pair_relation":"byte-identical top-511 exact-pair successor counts plus overflow",
+    "pair_support_threshold":3,
+    "current_row_minimum_count":4,
+    "ambiguity_cutoff":"training-only median top1-minus-top2 probability margin",
+    "horizons":[2,3],
+    "beam_tie_break":"probability descending, then previous motif ID ascending, then current motif ID ascending"
+  },
+  "attribution_matrix":{
+    "runtime_pair_state_caps":[512,1024,2048],
+    "learned_capacity_growth":false,
+    "renormalize_after_pruning":true,
+    "same_queries_across_caps":true
+  },
+  "metrics_and_thresholds":[
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["depth2_query_count",">",0],
+    ["depth3_query_count",">",0],
+    ["cap512_minimum_retained_mass",">",0],
+    ["cap1024_minimum_retained_mass",">=","cap512_minimum_retained_mass"],
+    ["cap2048_minimum_retained_mass",">=","cap1024_minimum_retained_mass"],
+    ["cap2048_minus_cap512_minimum_retained_mass",">=",0.05],
+    ["depth3_cap2048_minus_cap512_accuracy",">=",0.005],
+    ["depth2_cap2048_minus_cap512_accuracy",">=",-0.005],
+    ["maximum_probability_mass_error","<=",1e-9],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules":{
+    "supported":"Validity passes, cap 2048 retains at least 0.05 more mass than cap 512, improves depth-3 pooled accuracy by at least 0.005, and does not degrade depth-2 by more than 0.005; attribute the prior failure primarily to beam truncation.",
+    "mixed":"Validity passes and larger caps improve retained mass plus at least one horizon, but the full supported attribution thresholds do not pass.",
+    "negative":"Validity passes, retained mass rises materially with larger caps, but depth-3 accuracy does not improve; attribute the remaining error primarily to transition quality rather than beam truncation.",
+    "invalid":"Any authority, source, split, representation, gate, query-identity, cap, deterministic-pruning, probability, capacity, or heldout-isolation criterion fails."
+  },
+  "validity_criteria":[
+    "Exact accepted parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact R3 preregistration and manifest.",
+    "All learned parameters and gate decisions are training-prefix only and identical across caps.",
+    "The only experimental variable is runtime pair-state cap 512/1024/2048.",
+    "Runtime beam state is ephemeral probability mass and adds no learned or persistent capacity.",
+    "Every cap scores exactly the same heldout windows and duplicate complete probes are byte-identical.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule":"Do not alter sources, split, representation, relations, support threshold, ambiguity rule, horizons, cap set, pruning/tie-break, controls, metrics, thresholds, classification, or authority after primary output.",
+  "successor_if_supported":{
+    "experiment_family":"WLM-LM-EXTERNAL-MASS-CONSERVING-GATED-COMPOSITION",
+    "intent":"replace fixed beam count with a preregistered bounded retained-mass rule before the reasoning bridge"
+  },
+  "successor_if_mixed_or_negative":{
+    "experiment_family":"WLM-LM-EXTERNAL-CONTEXT-TRANSITION-QUALITY-ATTRIBUTION",
+    "intent":"diagnose pair-transition quality at depth before adding learned state"
+  },
+  "changed_paths":[
+    "docs/experiments/wlm-lm-external-composition-error-attribution-r3.json",
+    "unitary/wlm_lm_external_composition_error_attribution_r3.go",
+    "cmd/wlm-lm-external-composition-error-attribution-r3/main.go",
+    ".github/workflows/external-composition-error-attribution-r3.yml"
+  ]
+}
