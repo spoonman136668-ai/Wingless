@@ -1,0 +1,186 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-SELF-DIAGNOSIS-PROSPECTIVE-R1",
+  "program": "Wingless cross-domain training-only support diagnosis under fixed data budget",
+  "question": "Does the supported R5 training-only support diagnostic transfer prospectively to unseen source domains: can it flag class-support risk before target-domain bytes or labels are opened, and do the unseen targets actually exercise the preregistered zero-support classes?",
+  "hypothesis": "Run three leave-one-domain-out arms over the exact external source manifest. In every arm, exclude the target domain entirely from representation/relation/class construction and training-only diagnosis. Use an identical 15,819-byte training budget derived deterministically and proportionally from the two non-target sources, preserve the exact R5 512-motif/8x64-class/repaired-relation mechanics, compute and freeze the zero-training-margin class set, then open exactly 1,454 target-domain bytes. Supported requires at least two of three arms to prospectively flag a nonempty zero-support set and then observe at least one target query whose repaired top-1 lands in that frozen unsupported set, with zero preflight target-byte/label use and no capacity or authority change. This is diagnostic transfer only; no cognitive modification is selected or retained.",
+  "exact_parent_sha": "35853e0230d57061c0b2f36da3b1afd572f47cf5",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-self-diagnosis-prospective-r1",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; objective is future-dataset learning efficiency, not self-modification"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-CLASS-SUPPORT-PREFLIGHT-R5",
+    "github_run_id": "37140138629",
+    "classification": "supported",
+    "observation": {
+      "zero_training_margin_class_count": 1,
+      "preflight_unevaluable_flag": 1,
+      "preflight_decision_frozen_flag": 1,
+      "preflight_heldout_label_use_count": 0,
+      "parent_r4_invalid_reproduced_flag": 1
+    },
+    "limitation": "R5 was retrospective on the originating external dataset and does not establish transfer to unseen future data."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_sources": [
+    {
+      "domain": "code",
+      "sha256": "7a95f1c506c9ac4b2277df5f2bdd9d61cc67b520c45021a5a961939770221ef6",
+      "bytes": 41453
+    },
+    {
+      "domain": "structured",
+      "sha256": "4c5cbe6cbcd28af73761091367b20e07d0403847e236c06c31fc27061bd81192",
+      "bytes": 14365
+    },
+    {
+      "domain": "technical_prose",
+      "sha256": "8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",
+      "bytes": 1454
+    }
+  ],
+  "fixed_budget": {
+    "arm_count": 3,
+    "training_bytes_per_arm": 15819,
+    "target_evaluation_bytes_per_arm": 1454,
+    "training_allocation_rule": "For the two non-target sources, allocate the 15,819-byte budget proportionally to their exact source lengths using floor for the first canonical source and the remainder for the second; take exact source prefixes only.",
+    "target_rule": "Open no target bytes before preflight freeze; afterward evaluate exactly the first 1,454 bytes of the target source.",
+    "capacity": "exact R5 fixed 512 motifs and eight fixed 64-motif classes; no growth",
+    "compute": "same repaired-relation bridge and depth-3 runtime cap as R5"
+  },
+  "prospective_protocol": {
+    "preflight_inputs": "non-target training bytes only",
+    "preflight_signal": "per-class count of training depth-3 repaired-margin samples",
+    "risk_rule": "flag arm iff at least one fixed class has zero training-margin samples",
+    "decision_freeze": "serialize target domain, training identities/budgets, zero-support class set and risk flag before target bytes are opened",
+    "validation": "after freeze, count target depth-3 queries whose repaired top-1 belongs to a frozen zero-support class; target truth bytes may be scored only after the decision is frozen",
+    "modification": "none",
+    "label": "self-improvement precursor / transfer diagnostic only"
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "arm_count",
+      "==",
+      3
+    ],
+    [
+      "training_byte_budget_per_arm",
+      "==",
+      15819
+    ],
+    [
+      "target_eval_byte_budget_per_arm",
+      "==",
+      1454
+    ],
+    [
+      "preflight_target_byte_use_count",
+      "==",
+      0
+    ],
+    [
+      "preflight_target_label_use_count",
+      "==",
+      0
+    ],
+    [
+      "decision_freeze_count",
+      "==",
+      3
+    ],
+    [
+      "valid_fixed_class_arm_count",
+      "==",
+      3
+    ],
+    [
+      "prospective_risk_arm_count",
+      ">=",
+      2
+    ],
+    [
+      "prospective_confirmed_arm_count",
+      ">=",
+      2
+    ],
+    [
+      "relation_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "adaptive_readout_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes; at least two of three leave-one-domain-out arms freeze a training-only support-risk diagnosis and the unseen target later exercises at least one of those frozen unsupported classes.",
+    "mixed": "Validity passes and at least one arm transfers prospectively, but fewer than two arms confirm.",
+    "negative": "Validity passes but no arm's training-only support-risk diagnosis is confirmed on its unseen target.",
+    "invalid": "Any parent, authority, source, fixed-budget, target-isolation, class identity, decision-ordering, determinism, capacity, provenance, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule": "Do not alter source identities, 15,819-byte training budget, 1,454-byte target budget, proportional allocation rule, target arms, representation/relation/class mechanics, risk rule, metrics, thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-EFFICIENCY-R1",
+    "intent": "compare no-change versus a frozen bounded candidate mechanism on a preregistered disjoint future dataset under identical data/compute/capacity budgets; retain nothing without transfer advantage"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-TRANSFER-DIAGNOSTIC-ATTRIBUTION-R2",
+    "intent": "attribute why the training-only diagnostic transfers to some unseen domains but not others before any modification-selection experiment"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-self-diagnosis-prospective-r1.json",
+    "unitary/wlm_lm_external_reasoning_self_diagnosis_prospective_r1.go",
+    "cmd/wlm-lm-external-reasoning-self-diagnosis-prospective-r1/main.go",
+    ".github/workflows/external-reasoning-self-diagnosis-prospective-r1.yml"
+  ]
+}
