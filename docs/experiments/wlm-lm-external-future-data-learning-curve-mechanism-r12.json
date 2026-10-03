@@ -1,0 +1,202 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-CURVE-MECHANISM-R12",
+  "program": "Wingless fixed-budget future-data learning-curve mechanism attribution",
+  "question": "Which concrete prediction-path mechanism explains the large cross-domain difference in cumulative adaptation gain observed in R11 under identical fixed budgets?",
+  "hypothesis": "Replay the exact R11 three leave-one-domain-out arms, 15,819-byte non-target training budget, 256-motif capacity, 1,454-byte target window, 872-byte adaptation stream, eight 109-byte cumulative packets, 582-byte sealed evaluation suffix, and deterministic R10/R11 predictor. Add attribution only. For every evaluation prediction at every packet, compare packet0 and adapted predictions and assign exactly one frozen category: motif_admission (target 4-byte motif absent from packet0 selected set and present after adaptation), motif_eviction (present at packet0 and absent after adaptation), motif_successor_refinement (present in both but selected motif best successor changes), baseline_byte_refinement (motif absent in both and byte-baseline prediction changes), or prediction_unchanged. Record signed hit delta (-1/0/+1) per category. Category net gains must exactly reconstruct each arm's R11 cumulative adaptation gain: code=210, structured=98, technical_prose=103. Define code_excess_gain = code gain - mean(other two)=109.5. The dominant mechanism is the non-unchanged category with largest code category net gain minus mean(other-domain category net gain). This is retrospective mechanism attribution only; it cannot allocate data, change the predictor, or retain any mechanism.",
+  "exact_parent_sha": "db0f731dc3c6419058c6fa67dfab2a890a277192",
+  "qualification_branch": "research/external-hosted-wingless-future-data-learning-curve-mechanism-r12",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; characterize fixed-budget future-data learning before proposing policy"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-EFFICIENCY-SIGNAL-FACTORIAL-R11",
+    "github_run_id": "37151415289",
+    "classification": "mixed",
+    "observation": {
+      "code_cumulative_adaptation_gain": 210,
+      "structured_cumulative_adaptation_gain": 98,
+      "technical_prose_cumulative_adaptation_gain": 103,
+      "H_agree": 0,
+      "H_reverse": 3,
+      "D_agree": 0,
+      "D_reverse": 3,
+      "M_agree": 2,
+      "M_reverse": 1,
+      "best_signal": "relation_margin_median"
+    },
+    "interpretation": "No preregistered training-only signal reliably orders learning efficiency; directly attribute the adaptation-gain mechanism before proposing allocation."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "arm_count": 3,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "target_window_bytes_per_arm": 1454,
+    "target_adaptation_bytes_per_arm": 872,
+    "target_evaluation_bytes_per_arm": 582,
+    "adaptation_packet_count": 8,
+    "bytes_per_packet": 109,
+    "representation_and_evaluator": "byte-identical R11"
+  },
+  "attribution": {
+    "categories": [
+      "motif_admission",
+      "motif_eviction",
+      "motif_successor_refinement",
+      "baseline_byte_refinement",
+      "prediction_unchanged"
+    ],
+    "observation_count": "3 arms * 8 packets * 581 evaluation predictions = 13,944",
+    "signed_delta": "adapted_correct - packet0_correct for the same evaluation position",
+    "accounting_rule": "sum category signed deltas per arm must equal that arm's R11 cumulative_adaptation_gain",
+    "code_excess_gain": 109.5,
+    "dominant_rule": "among first four categories, maximize code_category_net_gain - mean(structured_category_net_gain, technical_prose_category_net_gain)",
+    "dominant_fraction": "dominant_category_excess_gain / 109.5"
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "arm_count",
+      "==",
+      3
+    ],
+    [
+      "non_target_training_byte_budget_per_arm",
+      "==",
+      15819
+    ],
+    [
+      "motif_capacity",
+      "==",
+      256
+    ],
+    [
+      "target_window_bytes_per_arm",
+      "==",
+      1454
+    ],
+    [
+      "target_adaptation_bytes_per_arm",
+      "==",
+      872
+    ],
+    [
+      "target_evaluation_bytes_per_arm",
+      "==",
+      582
+    ],
+    [
+      "adaptation_packet_count",
+      "==",
+      8
+    ],
+    [
+      "transition_observation_count",
+      "==",
+      13944
+    ],
+    [
+      "transition_accounting_error_count",
+      "==",
+      0
+    ],
+    [
+      "arm_code_reconstructed_cumulative_gain",
+      "==",
+      210
+    ],
+    [
+      "arm_structured_reconstructed_cumulative_gain",
+      "==",
+      98
+    ],
+    [
+      "arm_technical_prose_reconstructed_cumulative_gain",
+      "==",
+      103
+    ],
+    [
+      "code_excess_gain",
+      "==",
+      109.5
+    ],
+    [
+      "dominant_category_excess_gain",
+      ">",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and one frozen prediction-path category explains at least 50% of the code-vs-other cumulative-gain excess, with exact transition accounting.",
+    "mixed": "Validity passes and at least one category has positive code excess but no category reaches 50%.",
+    "negative": "Validity passes but no category has positive code excess despite the replayed R11 gain difference.",
+    "invalid": "Any parent, authority, source, budget, split, R11 replay identity, transition categorization/accounting, determinism, capacity, provenance, or qualification criterion fails."
+  },
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MECHANISM-GUIDED-ALLOCATION-R13",
+    "intent": "test a bounded no-self-modification data-allocation policy targeted to the attributed mechanism on a new preregistered split; compare against equal allocation under the same fixed total data budget"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-CURVE-FACTORIAL-R13",
+    "intent": "factor interacting admission/refinement pathways before proposing any data-allocation policy"
+  },
+  "no_post_result_tuning_rule": "Do not alter R11 data/budgets/splits/capacity, predictor, transition categories, R11 replay totals, code-excess definition, dominant rule, 50% criterion, metrics, classification, or authority after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-learning-curve-mechanism-r12.json",
+    "unitary/wlm_lm_external_future_data_learning_curve_mechanism_r12.go",
+    "cmd/wlm-lm-external-future-data-learning-curve-mechanism-r12/main.go",
+    ".github/workflows/external-future-data-learning-curve-mechanism-r12.yml"
+  ]
+}
