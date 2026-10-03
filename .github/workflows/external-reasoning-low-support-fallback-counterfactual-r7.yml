@@ -104,7 +104,7 @@ jobs:
           )
           total=m["candidate_total_exact_hit_delta"]
           selected=m["candidate_selected_query_exact_hit_delta"]
-          class_delta=m["candidate_class5_or6_top1_delta"]
+          class_delta=m["candidate_class5_or_6_top1_delta"]
           if not valid: cls="invalid"
           elif total>=1 and selected>=0: cls="supported"
           elif total==0 and (selected!=0 or class_delta!=0): cls="mixed"
