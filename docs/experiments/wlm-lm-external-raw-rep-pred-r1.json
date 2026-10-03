@@ -1,0 +1,133 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-RAW-REP-PRED-R1",
+  "program": "Wingless external raw-input to representation to prediction chain",
+  "question": "Can the already-qualified 512-motif raw-byte representation learner train directly on independently sourced external bytes and improve next-byte prediction on untouched external holdouts across code, structured data, and technical prose without tokenization or model calls?",
+  "hypothesis": "Using the frozen three-source external manifest, train the exact WLM-LM-RAW-REP-PRED-FRESH-HOLDOUT-R2 512-motif learner on the first floor(0.60*N) bytes of each source pooled together and evaluate the untouched final 40% of each source separately. Supported requires every external holdout to meet the same qualified internal prediction thresholds: at least 0.04 representation coverage, at least 0.05 covered-position top-1 accuracy gain, at least 0.08 effective event reduction, and nonworse bits/byte relative to the same pooled previous-byte baseline.",
+  "exact_parent_sha": "c01f3ce2ebb8a859adb4ca1e9a197e894174ea3b",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-raw-rep-pred-r1",
+  "portfolio_context": {
+    "allocation": "majority chain / minority substrate falsification",
+    "slot": "chain",
+    "frontier": "external raw-input -> representation -> prediction"
+  },
+  "prior_evidence": [
+    {
+      "experiment": "WLM-LM-EXTERNAL-RAW-BYTE-TRANSFER-R1",
+      "github_run_id": "37081813922",
+      "classification": "supported",
+      "observation": {
+        "mean_cross_domain_motif_coverage_fraction": 0.2386,
+        "mean_cross_domain_motif_covered_accuracy_gain_points": 12.34,
+        "positive_cross_domain_gain_arm_count": 3,
+        "mean_cross_domain_bits_per_byte_improvement": 0.0263
+      }
+    },
+    {
+      "experiment": "WLM-LM-RAW-REP-PRED-FRESH-HOLDOUT-R2",
+      "github_run_id": "37063503522",
+      "classification": "supported",
+      "observation": {
+        "minimum_eval_representation_coverage_fraction": 0.36012885277106671,
+        "minimum_covered_top1_accuracy_gain": 0.38054777185211969,
+        "minimum_effective_event_reduction_fraction": 0.37991362272161633,
+        "maximum_representation_minus_baseline_bits_per_byte": -0.38933721355583994
+      }
+    }
+  ],
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "sources": [
+    {
+      "domain": "code",
+      "uri": "https://raw.githubusercontent.com/python/cpython/ebf955df7a89ed0c7968f79faec1de49f61ed7cb/Lib/fractions.py",
+      "sha256": "7a95f1c506c9ac4b2277df5f2bdd9d61cc67b520c45021a5a961939770221ef6",
+      "bytes": 41453
+    },
+    {
+      "domain": "structured",
+      "uri": "https://raw.githubusercontent.com/json-schema-org/JSON-Schema-Test-Suite/5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8/tests/draft2020-12/type.json",
+      "sha256": "4c5cbe6cbcd28af73761091367b20e07d0403847e236c06c31fc27061bd81192",
+      "bytes": 14365
+    },
+    {
+      "domain": "technical-prose",
+      "uri": "https://raw.githubusercontent.com/golang/go/6f5c275ebdc454197fff5f1496521c8f81e20eef/README.md",
+      "sha256": "8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",
+      "bytes": 1454
+    }
+  ],
+  "frozen_input_protocol": {
+    "raw_bytes": "exact SHA-256-verified fetched bytes; no decoding, parsing, normalization, tokenizer, vocabulary, or boundary tokens",
+    "train_split": "first floor(0.60*N) bytes of each source",
+    "evaluation_split": "remaining bytes of each source",
+    "training_pool": "concatenate logically as three independent files for learner counting; reset motif and previous-byte windows at source boundaries",
+    "evaluation": "evaluate each source holdout separately; no heldout byte enters baseline counts, motif counts, ranking, capacity selection, smoothing, or threshold choice"
+  },
+  "learner": {
+    "identity": "byte-for-byte scientific mechanics of WLM-LM-RAW-REP-PRED-FRESH-HOLDOUT-R2",
+    "baseline": "256x256 previous-byte -> next-byte uint32 counts, lowest-byte argmax tie break, Jeffreys smoothing",
+    "representation": "four-byte candidate windows with occurrence >=4, ranked by best-successor count, consistency, then lexicographic raw-byte key",
+    "representation_capacity": 512,
+    "prediction": "selected motif successor distribution when matched, otherwise pooled previous-byte baseline",
+    "capacity_growth": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count", "==", 0],
+    ["source_count", "==", 3],
+    ["total_source_bytes", "==", 57272],
+    ["valid_evaluation_source_count", "==", 3],
+    ["selected_motif_count", "==", 512],
+    ["minimum_eval_representation_coverage_fraction", ">=", 0.04],
+    ["minimum_covered_top1_accuracy_gain", ">=", 0.05],
+    ["minimum_effective_event_reduction_fraction", ">=", 0.08],
+    ["maximum_representation_minus_baseline_bits_per_byte", "<=", 0.0],
+    ["sources_with_positive_covered_top1_gain", "==", 3],
+    ["sources_with_nonworse_bits_per_byte", "==", 3],
+    ["capacity_growth_event_count", "==", 0],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["invalid_byte_rows", "==", 0],
+    ["counter_overflow_rows", "==", 0]
+  ],
+  "diagnostic_metrics": [
+    "per-source representation coverage",
+    "per-source covered top-1 accuracy gain",
+    "per-source effective event reduction",
+    "per-source representation-minus-baseline bits/byte"
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and every frozen external prediction threshold pass.",
+    "mixed": "Validity passes and at least two of three external holdouts show positive covered-position gain with nonworse aggregate predictive coding, but one or more per-source frozen thresholds fail.",
+    "negative": "Validity passes but fewer than two external holdouts show positive covered-position gain, or aggregate representation coding is worse than the baseline.",
+    "invalid": "Any authority, source identity, train/holdout contamination, mechanism-equivalence, capacity, determinism, or host-isolation criterion fails.",
+    "incomplete": "Authority, source retrieval, or hosted compute interruption prevents the frozen matrix."
+  },
+  "validity_criteria": [
+    "The exact sealed Wingless state head is the parent and North Star identity matches.",
+    "A fresh CKB-plane READY_RESEARCH receipt is bound to this exact preregistration commit and frozen external manifest.",
+    "All three source SHA-256 values and exact byte lengths match before learner construction.",
+    "The scientific learner reuses the exact internal R2 baseline, candidate construction, occurrence filter, ranking, smoothing, prediction, and 512-entry capacity.",
+    "Training and evaluation windows reset at every source boundary.",
+    "No heldout byte participates in training, representation selection, capacity selection, thresholds, or stopping.",
+    "Primary execution occurs only on GitHub-hosted compute and external bytes are deleted before completion.",
+    "Full Go regression passes before the probe; duplicate complete probes are byte-identical; all metrics are finite.",
+    "No tokenizer, parser, external model, network access inside the learner, persistent corpus, capacity growth, production authority, LINKDEADKB execution, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, hashes, byte budgets, 60/40 split, learner mechanics, 512 capacity, smoothing, metrics, thresholds, controls, authority binding, or interpretation after any primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-raw-rep-pred-r1.json",
+    "unitary/wlm_lm_external_raw_rep_pred_r1.go",
+    "cmd/wlm-lm-external-raw-rep-pred-r1/main.go",
+    ".github/workflows/external-raw-rep-pred-r1.yml"
+  ]
+}
