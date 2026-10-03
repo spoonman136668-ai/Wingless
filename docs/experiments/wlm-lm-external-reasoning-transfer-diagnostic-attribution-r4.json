@@ -1,0 +1,184 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-TRANSFER-DIAGNOSTIC-ATTRIBUTION-R4",
+  "program": "Wingless fixed-budget prospective diagnostic failure attribution",
+  "question": "Why did R3 flag zero-support classes 5, 6, and 7 while the code target exercised none of them: were those classes absent from the target representation, or present but suppressed by the repaired reasoning bridge?",
+  "hypothesis": "Replay the exact R3 training sources, 15,819-byte training budget, 256-motif capacity, 8x32 class partition, repaired relation, and 1,454-byte code target. Freeze the R3 zero-support class set {5,6,7}. Add only attribution metrics on the already-opened target: per class, count raw decoded target motif occurrences, repaired depth-3 top-1 occurrences, and cumulative repaired probability mass. Each zero-support class receives exactly one frozen attribution: target_representation_absence if raw decoded target motif count is zero; bridge_suppression if raw decoded target motif count is positive but repaired top-1 count is zero; diagnostic_active if repaired top-1 count is positive. No representation, relation, class assignment, capacity, threshold, data split, or diagnostic rule changes.",
+  "exact_parent_sha": "05242db7ccf4c9e6073319d0769f3e36a63770e8",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-transfer-diagnostic-attribution-r4",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; optimize future-data learning efficiency, not self-modification"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-SELF-DIAGNOSIS-PROSPECTIVE-R3",
+    "github_run_id": "37143167463",
+    "classification": "negative",
+    "observation": {
+      "selected_motif_count": 256,
+      "reasoning_class_count": 8,
+      "zero_training_margin_class_count": 3,
+      "zero_support_classes": [
+        5,
+        6,
+        7
+      ],
+      "target_query_count": 63,
+      "unsupported_target_query_count": 0,
+      "preflight_target_byte_use_count": 0,
+      "preflight_target_label_use_count": 0
+    },
+    "diagnosis": "The support diagnostic produced a prospective false positive: it flagged three training-empty classes, but the code target never used them as repaired top-1."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "training_domains": [
+      "structured",
+      "technical_prose"
+    ],
+    "target_domain": "code",
+    "training_byte_budget": 15819,
+    "target_eval_byte_budget": 1454,
+    "selected_motif_capacity": 256,
+    "reasoning_class_count": 8,
+    "motifs_per_reasoning_class": 32,
+    "zero_support_classes": [
+      5,
+      6,
+      7
+    ],
+    "motif_selection": "byte-identical R3",
+    "class_assignment": "byte-identical R3",
+    "repaired_relation": "byte-identical R3",
+    "depth3_runtime_cap": 2048
+  },
+  "attribution_rules": {
+    "target_representation_absence": "raw decoded target motif count for the zero-support class == 0",
+    "bridge_suppression": "raw decoded target motif count > 0 AND repaired top-1 count == 0",
+    "diagnostic_active": "repaired top-1 count > 0",
+    "exactly_one_category_per_zero_support_class": true
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "reasoning_class_count",
+      "==",
+      8
+    ],
+    [
+      "minimum_reasoning_class_size",
+      "==",
+      32
+    ],
+    [
+      "maximum_reasoning_class_size",
+      "==",
+      32
+    ],
+    [
+      "zero_support_class_count",
+      "==",
+      3
+    ],
+    [
+      "target_query_count",
+      "==",
+      63
+    ],
+    [
+      "zero_support_target_top1_count",
+      "==",
+      0
+    ],
+    [
+      "zero_support_attribution_record_count",
+      "==",
+      3
+    ],
+    [
+      "attribution_accounting_error_count",
+      "==",
+      0
+    ],
+    [
+      "relation_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "adaptive_readout_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes; all three zero-support classes receive exactly one frozen attribution and the R3 target-top1 absence reproduces with complete accounting.",
+    "negative": "Validity passes but the frozen attribution rules cannot account for one or more zero-support classes.",
+    "invalid": "Any parent, authority, source, budget, representation, class, relation, target-query identity, determinism, provenance, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule": "Do not alter R3 source identities, budgets, 256 capacity, 8x32 class partition, zero-support class set, target bytes, repaired relation, attribution rules, metrics, thresholds, classification, or authority after primary output.",
+  "successor_if_representation_absence_dominates": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-EFFICIENCY-SIGNAL-R1",
+    "intent": "replace zero-support-class diagnosis with a preregistered target-agnostic learning-efficiency signal based on training coverage/prediction statistics, then test it on a new future dataset under fixed budgets"
+  },
+  "successor_if_bridge_suppression_dominates": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-BRIDGE-SUPPRESSION-ATTRIBUTION-R5",
+    "intent": "attribute which repaired-bridge transition suppresses target-represented unsupported classes before proposing any bounded mechanism change"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-transfer-diagnostic-attribution-r4.json",
+    "unitary/wlm_lm_external_reasoning_transfer_diagnostic_attribution_r4.go",
+    "cmd/wlm-lm-external-reasoning-transfer-diagnostic-attribution-r4/main.go",
+    ".github/workflows/external-reasoning-transfer-diagnostic-attribution-r4.yml"
+  ]
+}
