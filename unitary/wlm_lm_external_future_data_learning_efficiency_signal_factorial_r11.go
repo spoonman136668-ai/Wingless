@@ -11,7 +11,7 @@ type wlmLmFutureDataSignalFactorialR11Result struct {
   Metrics map[string]float64 `json:"metrics"`
 }
 
-func wlmLmR10Eligible(files [][]byte) int {
+func wlmLmR11Eligible(files [][]byte) int {
   c:=map[[4]uint8]uint32{}
   for _,d:=range files {
     for i:=4;i<len(d);i++ {
@@ -24,7 +24,7 @@ func wlmLmR10Eligible(files [][]byte) int {
   return n
 }
 
-func wlmLmR10Train256(files [][]byte, m map[string]float64) ([256][256]uint32,map[[4]uint8]wlmLmRawRepPredFreshHoldoutR1Motif) {
+func wlmLmR11Train256(files [][]byte, m map[string]float64) ([256][256]uint32,map[[4]uint8]wlmLmRawRepPredFreshHoldoutR1Motif) {
   local:=map[string]float64{"counter_overflow_rows":0}
   baseline,raw:=wlmLmRawRepPredFreshHoldoutR1TrainModel(files,local)
   m["counter_overflow_count"]+=local["counter_overflow_rows"]
@@ -41,7 +41,7 @@ func wlmLmR10Train256(files [][]byte, m map[string]float64) ([256][256]uint32,ma
   return baseline,out
 }
 
-func wlmLmR10Hits(d []byte,b *[256][256]uint32,s map[[4]uint8]wlmLmRawRepPredFreshHoldoutR1Motif) int {
+func wlmLmR11Hits(d []byte,b *[256][256]uint32,s map[[4]uint8]wlmLmRawRepPredFreshHoldoutR1Motif) int {
   hits:=0
   for i:=1;i<len(d);i++ {
     p:=wlmLmRawRepPredFreshHoldoutR1BaselinePrediction(b,d[i-1])
@@ -89,7 +89,7 @@ func RunWlmLmExternalFutureDataLearningEfficiencySignalFactorialR11(code,structu
     for i:=range ss { if i!=ti { idx=append(idx,i) } }
     a,b:=wlmLmTransferCapacityBudgetR2(ss[idx[0]].data,ss[idx[1]].data)
     if len(a)+len(b)!=15819 { m["invalid_row_count"]++; continue }
-    eligible:=wlmLmR10Eligible([][]byte{a,b})
+    eligible:=wlmLmR11Eligible([][]byte{a,b})
     head[ti]=float64(eligible-256)
     pfx:="arm_"+t.domain+"_"
     m[pfx+"eligible_motif_count"]=float64(eligible)
@@ -133,16 +133,16 @@ func RunWlmLmExternalFutureDataLearningEfficiencySignalFactorialR11(code,structu
     m[pfx+"relation_margin_median"]=marginMedian[ti]
     if len(t.data)<1454 { m["invalid_row_count"]++; continue }
     adapt:=t.data[:872]; eval:=t.data[872:1454]
-    base,sel:=wlmLmR10Train256([][]byte{a,b},m)
+    base,sel:=wlmLmR11Train256([][]byte{a,b},m)
     if len(sel)!=256 { m["invalid_row_count"]++ }
-    h0:=wlmLmR10Hits(eval,&base,sel)
+    h0:=wlmLmR11Hits(eval,&base,sel)
     m[pfx+"packet0_exact_hit_count"]=float64(h0)
     sumGain:=0.0
     h8:=h0
     for p:=1;p<=8;p++ {
-      bb,ss2:=wlmLmR10Train256([][]byte{a,b,adapt[:p*109]},m)
+      bb,ss2:=wlmLmR11Train256([][]byte{a,b,adapt[:p*109]},m)
       if len(ss2)!=256 { m["invalid_row_count"]++ }
-      h:=wlmLmR10Hits(eval,&bb,ss2)
+      h:=wlmLmR11Hits(eval,&bb,ss2)
       m[pfx+"packet_"+string(rune('0'+p))+"_exact_hit_count"]=float64(h)
       gain:=float64(h-h0)
       sumGain+=gain
