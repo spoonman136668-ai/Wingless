@@ -61,14 +61,20 @@ func wlmLmExternalGatedCompositionTerminalMassR1Predict(
 			}
 		}
 
+		entries:=make([]wlmLmExternalGatedCompositionTerminalMassR1PairMass,0,len(next))
+		for p,m:=range next { entries=append(entries,wlmLmExternalGatedCompositionTerminalMassR1PairMass{prev:p[0],curr:p[1],mass:m}) }
+		sort.Slice(entries,func(i,j int)bool{
+			if entries[i].prev!=entries[j].prev { return entries[i].prev<entries[j].prev }
+			return entries[i].curr<entries[j].curr
+		})
 		total:=0.0
-		for _,m:=range next { total+=m }
+		for _,e:=range entries { total+=e.mass }
 		if err:=math.Abs(1.0-total);err>maxMassError { maxMassError=err }
 		if total==0 { return 0,maxMassError,0 }
 
 		if step==depth-1 {
 			var final [512]float64
-			for p,m:=range next { final[p[1]]+=m }
+			for _,e:=range entries { final[e.curr]+=e.mass }
 			best:=0
 			finalTotal:=0.0
 			for i,m:=range final {
@@ -79,8 +85,6 @@ func wlmLmExternalGatedCompositionTerminalMassR1Predict(
 			return best,maxMassError,minRetained
 		}
 
-		entries:=make([]wlmLmExternalGatedCompositionTerminalMassR1PairMass,0,len(next))
-		for p,m:=range next { entries=append(entries,wlmLmExternalGatedCompositionTerminalMassR1PairMass{prev:p[0],curr:p[1],mass:m}) }
 		sort.Slice(entries,func(i,j int)bool{
 			if entries[i].mass!=entries[j].mass { return entries[i].mass>entries[j].mass }
 			if entries[i].prev!=entries[j].prev { return entries[i].prev<entries[j].prev }
