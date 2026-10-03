@@ -11,7 +11,7 @@ type wlmLmExternalReasoningReadoutRefinementAttributionR2Result struct{
 func RunWlmLmExternalReasoningReadoutRefinementAttributionR2(code,structured,prose []byte)interface{}{
  sources:=[]wlmLmExternalMotifRelationDistributionalR1Source{
   {domain:"code",data:code,sha256:"7a95f1c506c9ac4b2277df5f2bdd9d61cc67b520c45021a5a961939770221ef6",bytes:41453},
-  {domain:"structured",data:structured,sha256:"4c5cbe6cbcd28af73761091367b20e07c19cd49b00d8a8",bytes:14365},
+  {domain:"structured",data:structured,sha256:"4c5cbe6cbcd28af73761091367b20e07d0403847e236c06c31fc27061bd81192",bytes:14365},
   {domain:"technical_prose",data:prose,sha256:"8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",bytes:1454},
  }
  m:=map[string]float64{
