@@ -1,4 +1,4 @@
-# Wingless RSI / Safety Research Portfolio — Next Tranche v1
+# Wingless Learning-Efficiency / Safety Research Portfolio — Next Tranche v1
 
 **Status:** ACTIVE ADVISORY PORTFOLIO  
 **Effective boundary:** applies only to successors after closure of WLM-LM-EXTERNAL-REASONING-MARGIN-CLASS-ATTRIBUTION-R4.  
@@ -6,13 +6,13 @@
 
 ## Governing objective
 
-Capability improvement under invariant external control, with deterministic evidence, complete causal traceability, bounded reversible modification, and reproducible qualification.
+Increasingly efficient learning of unseen future datasets under fixed data, compute, capacity, and authority budgets, with invariant external control, deterministic evidence, complete causal traceability, bounded reversible modification, and reproducible qualification.
 
 Shared North Star:
 
 raw input -> representation -> prediction -> reasoning/generation -> persistent accumulated cognition -> trainable general language/reasoning system.
 
-RSI is an explicit scientific objective, not an assumed capability.
+Self-modification and RSI are not optimization targets. They remain bounded scientific hypotheses/mechanisms that may be tested only when they plausibly improve transfer-efficient learning under the unchanged external envelope.
 
 ## Current closure evidence
 
@@ -23,27 +23,48 @@ R4 executed without infrastructure failure through duplicate scientific executio
 Use a rolling 20-successor planning window. Existing frozen successor commitments always take precedence.
 
 - 45% / 9 of 20 — raw-input, representation, prediction, reasoning/generation progression.
-- 30% / 6 of 20 — RSI-enabling closed-loop research.
+- 30% / 6 of 20 — transfer-efficient learning / meta-learning research under fixed budgets; bounded self-modification is only one candidate mechanism.
 - 15% / 3 of 20 — OOD/generalization.
 - 10% / 2 of 20 — substrate falsification.
 
-When RSI/self-improvement experiments are active, reserve approximately 5–10% of total effort for explicit alignment/control-falsification. Rebalance the other streams if necessary; never remove substrate/scientific falsification.
+When bounded self-modification, self-maintenance, or meta-learning experiments are active, reserve approximately 5–10% of total effort for explicit alignment/control-falsification. Rebalance the other streams if necessary; never remove substrate/scientific falsification.
 
-## RSI evidence ladder
+## Transfer-efficient learning objective
 
-Use **self-improvement precursor** until individual pieces are supported.
+The primary optimization target is **increasingly efficient learning of unseen future datasets under fixed data, compute, capacity, and authority budgets**.
 
-Do not use **autonomous self-improvement** until Wingless independently demonstrates, across multiple unseen cases:
+Do not directly optimize for self-modification. Bounded self-modification may be tested only as one possible mechanism for improving future learning efficiency.
 
-detect -> diagnose -> select an allowed bounded modification -> instantiate candidate -> external held-out validation -> retain/revert.
+A modification may not be retained merely because it improves the dataset, task family, diagnostic subset, or failure class that produced it. Retention requires a preregistered transfer advantage on one or more disjoint future datasets that were unavailable during diagnosis/selection.
 
-Do not use **recursive self-improvement** until an accepted improvement measurably improves later diagnosis, modification selection, validation efficiency, or improvement success under the same external control envelope.
+Required comparison discipline:
+- exact predecessor/no-modification baseline under the same data budget;
+- same adaptation compute/runtime budget;
+- same model/substrate capacity;
+- same tool and authority envelope;
+- same evaluation protocol and frozen acceptance thresholds;
+- disjoint future dataset(s) for transfer validation;
+- no post-result choice of transfer dataset.
+
+Preferred transfer metrics include data-to-threshold, fixed-budget held-out performance, adaptation compute-to-threshold, error reduction per training byte/example, retention of prior capability, OOD transfer, and performance on later unseen datasets after equal-budget adaptation.
+
+If a candidate helps the originating dataset but fails to transfer, revert it. Record the result as mechanism-specific evidence rather than self-improvement.
+
+## Learning-efficiency and self-modification evidence ladder
+
+Use **self-improvement precursor** only for bounded mechanisms that have been demonstrated but have not yet shown transferable advantage on later unseen datasets.
+
+Do not use **autonomous self-improvement** unless a bounded closed-loop process is demonstrated across multiple unseen cases **and** retained modifications improve learning on preregistered disjoint future datasets under the same budgets.
+
+Do not use **recursive self-improvement** unless an accepted transferable improvement measurably improves later learning/adaptation or later improvement cycles under the same unchanged external envelope.
 
 Near-term progression should favor:
 
-defect-class discrimination -> self-diagnosis on sealed failures -> frozen candidate-modification selection -> held-out retain/revert -> second unseen failure class -> repeated closed-loop improvement -> eventual meta-improvement.
+unseen-dataset baseline -> native learning-efficiency diagnosis -> bounded mechanism selection (which may include no modification) -> equal-budget candidate training/adaptation -> sealed transfer evaluation on a different preregistered dataset -> retain/revert -> second unseen dataset -> repeated transfer-efficient learning -> eventual meta-learning test.
 
-Keep OOD pressure active. Improvement confined to the exact diagnostic domain is insufficient evidence.
+Self-diagnosis and causal attribution remain useful research components, but they are instruments for improving future learning efficiency rather than goals in themselves.
+
+Keep OOD pressure active. Improvement confined to the exact diagnostic domain or originating dataset is insufficient evidence.
 
 ## Candidate-only self-improvement boundary
 
@@ -107,7 +128,7 @@ Retries are bounded to the failing idempotent operation with explicit retryable/
 
 ## Reversibility
 
-Every self-improvement experiment preserves exact predecessor identity, candidate identity, bounded delta, selection provenance, external validation evidence, deterministic rollback where applicable, and explicit retain/revert outcome.
+Every experiment that proposes a cognitive/state modification preserves exact predecessor identity, candidate identity, bounded delta, selection provenance, originating-dataset evidence, disjoint future-transfer evidence, deterministic rollback where applicable, and explicit retain/revert outcome.
 
 Rejected candidates must leave no unauthorized residual state. Rollback qualification verifies expected source/cognitive state, external control integrity, no orphan workers, no hidden persistent state, no unauthorized resource use, and no evaluator change.
 
@@ -131,4 +152,4 @@ If a run unexpectedly attempts evaluator manipulation, extra permissions/resourc
 
 Every experiment closes with experiment identity, scientific classification, infrastructure classification if applicable, technical/raw evidence, plain-speak interpretation, deterministic/probabilistic qualification status, causal trace, hypothesis strengthened/eliminated, exact predecessor/resulting-state identity, exact successor question, and preregistered successor where scientifically safe and obvious.
 
-Automatic continuation is allowed only when the successor follows from frozen evidence, no safety tripwire fired, no architectural premise changed, provenance is complete, qualification is valid, and authority/resource envelope is unchanged.
+Automatic continuation is allowed only when the successor follows from frozen evidence, no safety tripwire fired, no architectural premise changed, provenance is complete, qualification is valid, fixed data/compute/capacity/authority budgets remain explicit, and the authority/resource envelope is unchanged.
