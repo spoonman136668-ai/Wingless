@@ -1,0 +1,183 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-BRIDGE-SUPPRESSION-ATTRIBUTION-R5",
+  "program": "Wingless repaired-bridge suppression attribution under fixed future-data budget",
+  "question": "For code-target motifs in zero-training-support classes 5 and 6 that are present in the target representation but never become repaired top-1, at what frozen bridge stage does their competitive rank disappear?",
+  "hypothesis": "Replay the exact R4/R3 training sources, 15,819-byte budget, 256 selected motifs, 8x32 class partition, repaired relation, and 1,454-byte code target. Restrict attribution to target depth-3 query windows containing at least one raw decoded motif in classes 5 or 6. For every such query, record four byte-identical-stage diagnostics without changing prediction: (B) unrepaired base relation terminal distribution; (E) exact-pair context terminal distribution before repair selection where available; (R) final repaired terminal distribution; and (T) final repaired top-1. For classes 5/6, measure per-stage probability mass, top-1 counts, and rank of the highest-probability class member. Attribute suppression to base_relation_absence if class mass is zero at B; exact_context_suppression if positive at B but zero/noncompetitive after E; repair_selection_suppression if competitive before repair but loses rank/mass at R; or final_competition if class mass remains positive at R but no class member reaches T. No bridge, capacity, threshold, data, class, or selection rule changes.",
+  "exact_parent_sha": "a798d1d978f4a133f18a19ac90618eaf808248c7",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-bridge-suppression-attribution-r5",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; diagnostic attribution only; optimize future-data learning efficiency"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-TRANSFER-DIAGNOSTIC-ATTRIBUTION-R4",
+    "github_run_id": "37143501653",
+    "classification": "supported",
+    "observation": {
+      "bridge_suppression_count": 2,
+      "target_representation_absence_count": 1,
+      "diagnostic_active_count": 0,
+      "class5_raw_target_count": 4,
+      "class5_repaired_top1_count": 0,
+      "class6_raw_target_count": 2,
+      "class6_repaired_top1_count": 0
+    },
+    "diagnosis": "Classes 5 and 6 exist in the code target representation but are suppressed before repaired top-1; class 7 is absent and is not the focus of R5."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "training_domains": [
+      "structured",
+      "technical_prose"
+    ],
+    "target_domain": "code",
+    "training_byte_budget": 15819,
+    "target_eval_byte_budget": 1454,
+    "selected_motif_capacity": 256,
+    "reasoning_class_count": 8,
+    "motifs_per_reasoning_class": 32,
+    "suppressed_classes": [
+      5,
+      6
+    ],
+    "motif_selection": "byte-identical R4",
+    "class_assignment": "byte-identical R4",
+    "repaired_relation": "byte-identical R4",
+    "depth3_runtime_cap": 2048
+  },
+  "attribution_categories": [
+    "base_relation_absence",
+    "exact_context_suppression",
+    "repair_selection_suppression",
+    "final_competition"
+  ],
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "reasoning_class_count",
+      "==",
+      8
+    ],
+    [
+      "minimum_reasoning_class_size",
+      "==",
+      32
+    ],
+    [
+      "maximum_reasoning_class_size",
+      "==",
+      32
+    ],
+    [
+      "suppressed_class_count",
+      "==",
+      2
+    ],
+    [
+      "target_query_count",
+      "==",
+      63
+    ],
+    [
+      "suppression_attribution_record_count",
+      ">=",
+      1
+    ],
+    [
+      "suppression_attribution_accounting_error_count",
+      "==",
+      0
+    ],
+    [
+      "class5_repaired_top1_count",
+      "==",
+      0
+    ],
+    [
+      "class6_repaired_top1_count",
+      "==",
+      0
+    ],
+    [
+      "relation_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "adaptive_readout_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes; every target query selected by the frozen class-5/6 raw-presence criterion receives exactly one suppression attribution and R4's zero repaired-top1 result for classes 5 and 6 reproduces.",
+    "negative": "Validity passes but one or more selected queries cannot be attributed by the frozen stage categories.",
+    "invalid": "Any parent, authority, source, budget, representation, class, bridge-stage identity, target-query identity, determinism, provenance, or accounting criterion fails."
+  },
+  "no_post_result_tuning_rule": "Do not alter R4 source identities, budgets, 256 capacity, 8x32 class partition, suppressed classes, target bytes, bridge stages, attribution rules, metrics, thresholds, classification, or authority after primary output.",
+  "successor_if_final_competition_dominates": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-EFFICIENCY-SIGNAL-R1",
+    "intent": "replace zero-support preflight with a target-agnostic training signal tied to competitive probability mass and test on new future data under fixed budgets"
+  },
+  "successor_otherwise": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-BRIDGE-SUPPRESSION-FACTORIAL-R6",
+    "intent": "factor the attributed bridge stage under fixed data/capacity before proposing any bounded mechanism"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-bridge-suppression-attribution-r5.json",
+    "unitary/wlm_lm_external_reasoning_bridge_suppression_attribution_r5.go",
+    "cmd/wlm-lm-external-reasoning-bridge-suppression-attribution-r5/main.go",
+    ".github/workflows/external-reasoning-bridge-suppression-attribution-r5.yml"
+  ]
+}
