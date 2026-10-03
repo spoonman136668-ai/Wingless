@@ -1,0 +1,90 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-TRANSFERABILITY-R18",
+  "program": "Wingless training-only marginal-state signal on disjoint future data",
+  "question": "Can a target-label-free change in the learned predictor state identify which fixed adaptation intervals are capable of producing positive sealed-evaluation gain on the disjoint dataset where the R15 marginal curve failed to transfer?",
+  "hypothesis": "Replay the exact R17 disjoint manifest, leave-one-domain-out 15,819-byte non-target budget, 256-motif capacity, 582-byte sealed evaluation and frozen R17 budget grids. Before reading sealed-evaluation outcomes for an interval, compute STATE_DELTA between its lower- and upper-budget training models: baseline_argmax_change_count + motif_entry_count + motif_exit_count + retained_motif_best_change_count. The signal uses training/adaptation bytes only and no evaluation labels. Supported requires every interval with positive sealed-evaluation gain to have STATE_DELTA>0 (zero false negatives) and at least one zero-gain interval to have STATE_DELTA=0, demonstrating nontrivial selectivity. Mixed requires zero false negatives but no zero-gain interval with STATE_DELTA=0. Negative if any positive-gain interval has STATE_DELTA=0. This experiment does not select or retain an allocation policy.",
+  "exact_parent_sha": "8c600faa11459f94cfeb908bda38860aa203b08a",
+  "qualification_branch": "research/external-hosted-wingless-future-data-marginal-signal-transferability-r18",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-CURVE-GUIDED-POLICY-TRANSFER-ATTRIBUTION-R17",
+    "github_run_id": 37161558530,
+    "classification": "supported",
+    "observation": {
+      "predicted_curve_net_delta": 0,
+      "code_positive_intervals": 2,
+      "structured_positive_intervals": 2,
+      "technical_prose_positive_intervals": 1,
+      "transfer_policy_delta": 0
+    },
+    "interpretation": "The originating allocation curve was not portable; the next question is whether a training-only model-state signal can detect marginal opportunity without sealed labels."
+  },
+  "external_transfer_manifest_sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250",
+  "external_authority": {
+    "ckb_plane_main_sha": "06c3cb723820407bc2db1bd3ec9e46f462059e41",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "source_count": 3,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "code_budgets": [
+      0,
+      436,
+      582,
+      727,
+      872
+    ],
+    "structured_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "technical_prose_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "evaluator": "byte-identical R17"
+  },
+  "signal": {
+    "name": "training_state_delta",
+    "formula": "baseline_argmax_change_count + motif_entry_count + motif_exit_count + retained_motif_best_change_count",
+    "evaluation_byte_use_count": 0,
+    "evaluation_label_use_count": 0,
+    "post_result_choice_count": 0
+  },
+  "classification_rules": {
+    "supported": "valid; positive_gain_with_zero_state_delta_count==0; zero_gain_with_zero_state_delta_count>=1",
+    "mixed": "valid; positive_gain_with_zero_state_delta_count==0; zero_gain_with_zero_state_delta_count==0",
+    "negative": "valid; positive_gain_with_zero_state_delta_count>0",
+    "invalid": "any parent, authority, source, split, budget-grid, state-delta formula, capacity, deterministic replay, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter transfer sources, 15,819-byte non-target budget, 256 capacity, 582/872 split, R17 budget grids, STATE_DELTA formula, evaluator, thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-RANK-CALIBRATION-R19",
+    "intent": "test whether normalized training-state delta ranks marginal value strongly enough for a frozen budget allocator without using sealed labels"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-FACTORIAL-R19",
+    "intent": "factor baseline-transition, motif-entry/exit, and best-successor-change components before another policy experiment"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-marginal-signal-transferability-r18.json",
+    "unitary/wlm_lm_external_future_data_marginal_signal_transferability_r18.go",
+    "cmd/wlm-lm-external-future-data-marginal-signal-transferability-r18/main.go",
+    ".github/workflows/external-future-data-marginal-signal-transferability-r18.yml"
+  ]
+}
