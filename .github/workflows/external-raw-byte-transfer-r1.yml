@@ -1,0 +1,201 @@
+name: Wingless external raw-byte transfer R1
+
+on:
+  push:
+    branches:
+      - staging/external-raw-byte-transfer-r1
+    paths:
+      - 'docs/experiments/wlm-lm-external-raw-byte-transfer-r1.json'
+      - 'unitary/wlm_lm_external_raw_byte_transfer_r1.go'
+      - 'cmd/wlm-lm-external-raw-byte-transfer-r1/main.go'
+      - '.github/workflows/external-raw-byte-transfer-r1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Validate frozen two-commit package
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline='e36a552f7480421a84bfc726b565c04632b87544'
+          prereg='af94165f66941d36ca374cb0ab0868e0f6d6d893'
+          test "$(git rev-parse HEAD^)" = "$prereg"
+          mapfile -t commits < <(git rev-list --reverse "$baseline..HEAD")
+          test "${#commits[@]}" -eq 2
+          test "${commits[0]}" = "$prereg"
+          first="$(git diff-tree --no-commit-id --name-only -r "${commits[0]}")"
+          test "$first" = 'docs/experiments/wlm-lm-external-raw-byte-transfer-r1.json'
+          python3 - <<'PY'
+          import json
+          p=json.load(open('docs/experiments/wlm-lm-external-raw-byte-transfer-r1.json',encoding='utf-8'))
+          assert p['schema']=='wingless.direct-preregistration.v1'
+          assert p['experiment']=='WLM-LM-EXTERNAL-RAW-BYTE-TRANSFER-R1'
+          assert p['exact_parent_sha']=='e36a552f7480421a84bfc726b565c04632b87544'
+          assert p['north_star_sha256']=='e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465'
+          allowed=set(p['changed_paths'])
+          import subprocess
+          changed=subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r','HEAD'],text=True).splitlines()
+          bad=[x for x in changed if x not in allowed]
+          assert not bad,bad
+          PY
+          echo 'WINGLESS_EXTERNAL_FROZEN_PACKAGE=PASS'
+
+      - name: Verify CKB-plane research authority receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          raw=r'''{"schema":"ckb-plane.external-exposure-research-receipt.v1","authority_source_sha":"36d99a0257120ede57bb96638660d35014dd529e","qualified_gate_run_id":"37080606806","research":{"owner_id":"research-hosted-external-v1","host_id":"runnervm8df0l","runner_id":"GitHub Actions 1000001344","worktree_id":"/home/runner/work/ckb-plane/ckb-plane","cache_id":"/opt/hostedtoolcache","scratch_id":"/home/runner/work/_temp"},"ktrade":{"owner_id":"ktrade","host_id":"LINKDEADKB","runner_id":"LINKDEADKB","worktree_id":"C:\\Users\\camar\\GolandProjects\\ckb-plane|%LOCALAPPDATA%\\CKBPlaneQualification\\KTRADE_AUT01_PERSISTENT\\repo","cache_id":"%LOCALAPPDATA%\\CKBPlaneQualification\\KTRADE_AUT01_PERSISTENT\\cache","scratch_id":"C:\\Users\\camar\\AppData\\Local\\Temp"},"plan_decision":{"schema":"ckb-plane.external-exposure.v1","disposition":"READY_PLAN","scope":"plan-only","reasons":null},"fetch_decision":{"schema":"ckb-plane.external-exposure-fetch.v1","disposition":"READY_FETCH","scope":"fetch-verify-only","reasons":null},"research_decision":{"schema":"ckb-plane.external-exposure-research.v1","disposition":"READY_RESEARCH","scope":"research-consume-once","reasons":null},"manifest_sha256":"75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4","project":"Wingless","experiment_id":"WLM-LM-EXTERNAL-RAW-BYTE-TRANSFER-R1","preregistration_sha":"af94165f66941d36ca374cb0ab0868e0f6d6d893"}'''
+          b=raw.encode()
+          assert hashlib.sha256(b).hexdigest()=='ddd860cbf0d63c2909302f3795c0cb2f593d04f4a8a5b6436e3adcac3d23d972'
+          r=json.loads(raw)
+          assert r['research_decision']['disposition']=='READY_RESEARCH'
+          assert r['research_decision']['scope']=='research-consume-once'
+          assert r['project']=='Wingless'
+          assert r['experiment_id']=='WLM-LM-EXTERNAL-RAW-BYTE-TRANSFER-R1'
+          assert r['preregistration_sha']=='af94165f66941d36ca374cb0ab0868e0f6d6d893'
+          assert r['manifest_sha256']=='75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4'
+          pathlib.Path('/tmp/wingless-external-r1-authority.json').write_bytes(b)
+          print('CKB_READY_RESEARCH=PASS')
+          PY
+
+      - name: Fetch exact external sources into ephemeral scratch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,urllib.parse,urllib.request
+          sources=[
+            ('code','https://raw.githubusercontent.com/python/cpython/ebf955df7a89ed0c7968f79faec1de49f61ed7cb/Lib/fractions.py','7a95f1c506c9ac4b2277df5f2bdd9d61cc67b520c45021a5a961939770221ef6',41453),
+            ('structured','https://raw.githubusercontent.com/json-schema-org/JSON-Schema-Test-Suite/5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8/tests/draft2020-12/type.json','4c5cbe6cbcd28af73761091367b20e07d0403847e236c06c31fc27061bd81192',14365),
+            ('technical-prose','https://raw.githubusercontent.com/golang/go/6f5c275ebdc454197fff5f1496521c8f81e20eef/README.md','8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3',1454),
+          ]
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'wingless-external-r1'
+          root.mkdir(parents=True,exist_ok=False)
+          rows=[]
+          for domain,url,want_sha,want_bytes in sources:
+              u=urllib.parse.urlparse(url)
+              assert u.scheme=='https' and u.hostname=='raw.githubusercontent.com'
+              req=urllib.request.Request(url,headers={'User-Agent':'wingless-external-r1'})
+              with urllib.request.urlopen(req,timeout=30) as resp:
+                  data=resp.read(want_bytes+1)
+              assert len(data)==want_bytes,(domain,len(data),want_bytes)
+              got=hashlib.sha256(data).hexdigest()
+              assert got==want_sha,(domain,got,want_sha)
+              p=root/(domain+'.bin')
+              p.write_bytes(data)
+              rows.append({'domain':domain,'bytes':len(data),'sha256':got})
+          assert sum(x['bytes'] for x in rows)==57272
+          pathlib.Path('/tmp/wingless-external-r1-sources.json').write_text(json.dumps(rows,separators=(',',':')),encoding='utf-8')
+          print(json.dumps(rows,separators=(',',':')))
+          PY
+
+      - name: Full Go regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./... -count=1
+
+      - name: Run frozen external transfer matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/wingless-external-r1"
+          go run ./cmd/wlm-lm-external-raw-byte-transfer-r1             --code "$root/code.bin"             --structured "$root/structured.bin"             --technical-prose "$root/technical-prose.bin"             | tee /tmp/wingless-external-r1-probe.json
+          python3 - <<'PY'
+          import json,math,pathlib
+          p=json.load(open('/tmp/wingless-external-r1-probe.json',encoding='utf-8'))
+          assert p['schema']=='wingless.research-scientific-result.v1'
+          assert p['experiment']=='WLM-LM-EXTERNAL-RAW-BYTE-TRANSFER-R1'
+          m=p['metrics']
+          required=[
+            'source_identity_mismatch_count','source_count','total_source_bytes',
+            'cross_domain_arm_count','within_domain_control_arm_count',
+            'minimum_selected_motif_count_cross_domain','minimum_selected_motif_count_within_domain',
+            'mean_cross_domain_motif_coverage_fraction','mean_cross_domain_motif_covered_accuracy_gain',
+            'positive_cross_domain_gain_arm_count','mean_cross_domain_adaptive_minus_baseline_bits_per_byte',
+            'minimum_within_domain_motif_coverage_fraction','minimum_within_domain_motif_covered_accuracy_gain',
+            'maximum_total_learned_motif_capacity','capacity_growth_event_count','tokenizer_use_count',
+            'external_model_call_count','invalid_byte_rows','counter_overflow_rows'
+          ]
+          for k in required:
+              assert k in m,k
+              assert math.isfinite(float(m[k])),k
+          assert m['source_identity_mismatch_count']==0
+          assert m['source_count']==3
+          assert m['total_source_bytes']==57272
+          assert m['cross_domain_arm_count']==3
+          assert m['within_domain_control_arm_count']==3
+          assert m['maximum_total_learned_motif_capacity']<=256
+          assert m['capacity_growth_event_count']==0
+          assert m['tokenizer_use_count']==0
+          assert m['external_model_call_count']==0
+          assert m['invalid_byte_rows']==0
+          assert m['counter_overflow_rows']==0
+
+          within=(
+            m['minimum_selected_motif_count_within_domain']>=1 and
+            m['minimum_within_domain_motif_coverage_fraction']>=0.03 and
+            m['minimum_within_domain_motif_covered_accuracy_gain']>=0.10
+          )
+          cross=(
+            m['minimum_selected_motif_count_cross_domain']==256 and
+            m['mean_cross_domain_motif_coverage_fraction']>=0.01 and
+            m['mean_cross_domain_motif_covered_accuracy_gain']>0 and
+            m['positive_cross_domain_gain_arm_count']>=2 and
+            m['mean_cross_domain_adaptive_minus_baseline_bits_per_byte']<=0.05
+          )
+          if within and cross:
+              cls='supported'
+          elif within:
+              cls='mixed'
+          else:
+              cls='negative'
+          summary={
+            'schema':'wingless.research-hosted-summary.v1',
+            'experiment':'WLM-LM-EXTERNAL-RAW-BYTE-TRANSFER-R1',
+            'classification':cls,
+            'authority_receipt_sha256':'ddd860cbf0d63c2909302f3795c0cb2f593d04f4a8a5b6436e3adcac3d23d972',
+            'manifest_sha256':'75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4',
+            'hosted_compute':True,
+            'metrics':m,
+          }
+          pathlib.Path('/tmp/wingless-external-r1-summary.json').write_text(json.dumps(summary,separators=(',',':')),encoding='utf-8')
+          print('FROZEN_CLASSIFICATION='+cls)
+          print(json.dumps(summary,separators=(',',':')))
+          PY
+
+      - name: Remove external source bytes
+        if: always()
+        shell: bash
+        run: |
+          rm -rf "$RUNNER_TEMP/wingless-external-r1"
+          test ! -e "$RUNNER_TEMP/wingless-external-r1"
+
+      - name: Upload evidence only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-external-raw-byte-transfer-r1-evidence
+          path: |
+            /tmp/wingless-external-r1-authority.json
+            /tmp/wingless-external-r1-sources.json
+            /tmp/wingless-external-r1-probe.json
+            /tmp/wingless-external-r1-summary.json
+          if-no-files-found: error
