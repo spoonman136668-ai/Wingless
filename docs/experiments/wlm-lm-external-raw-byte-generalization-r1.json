@@ -1,0 +1,182 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-RAW-BYTE-GENERALIZATION-R1",
+  "program": "Wingless external raw-input to representation to prediction",
+  "question": "Does Wingless's existing bounded raw-byte motif mechanism learn predictive structure from genuinely external UTF-8/code/JSON bytes and transfer any of that structure across domains without tokenization or external models?",
+  "hypothesis": "Using only the first 60% of each pinned external source for pooled training, the unchanged 256-entry four-byte motif layer will cover at least 0.03 of each source's heldout final 40%, improve motif-covered top-1 next-byte accuracy by at least 0.05 on every source, reduce effective event count by at least 0.02 on every source, and worsen heldout bits-per-byte by no more than 0.05. In leave-one-domain-out transfer, mean motif-covered accuracy gain will be nonnegative, minimum coverage will be at least 0.005, and maximum adaptive-minus-baseline bits-per-byte will be at most 0.10.",
+  "exact_parent_sha": "e36a552f7480421a84bfc726b565c04632b87544",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-r1",
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "plan_receipt_run_id": "37079956943",
+    "plan_receipt_sha256": "e1585e948b8640d50a3acd8bcea416dff764d32f7994d20aa6867e9e9e1b82aa",
+    "fetch_receipt_run_id": "37080155190",
+    "fetch_authority_receipt_sha256": "f9b763527699f042322b6aeece814c0fe9d67a3f2e8db02e20dad1b796f54dc6",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "sources": [
+    {
+      "domain": "code",
+      "uri": "https://raw.githubusercontent.com/python/cpython/ebf955df7a89ed0c7968f79faec1de49f61ed7cb/Lib/fractions.py",
+      "sha256": "7a95f1c506c9ac4b2277df5f2bdd9d61cc67b520c45021a5a961939770221ef6",
+      "bytes": 41453,
+      "license": "Python Software Foundation License Version 2"
+    },
+    {
+      "domain": "structured",
+      "uri": "https://raw.githubusercontent.com/json-schema-org/JSON-Schema-Test-Suite/5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8/tests/draft2020-12/type.json",
+      "sha256": "4c5cbe6cbcd28af73761091367b20e07d0403847e236c06c31fc27061bd81192",
+      "bytes": 14365,
+      "license": "MIT"
+    },
+    {
+      "domain": "technical-prose",
+      "uri": "https://raw.githubusercontent.com/golang/go/6f5c275ebdc454197fff5f1496521c8f81e20eef/README.md",
+      "sha256": "8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",
+      "bytes": 1454,
+      "license": "BSD-3-Clause"
+    }
+  ],
+  "split": {
+    "rule": "for each exact source byte array, training is bytes [0:floor(0.60*N)] and heldout evaluation is bytes [floor(0.60*N):N]",
+    "file_boundary_policy": "reset all byte context/window state at source boundaries",
+    "contamination": "no heldout byte may enter model construction, motif scoring, smoothing counts, threshold selection, or capacity selection"
+  },
+  "learner": {
+    "reuse": "byte-for-byte reuse of WLM-LM-REAL-UTF8-BYTE-PILOT-R2 baseline, four-byte motif candidate/filter/score, 256 motif capacity, Jeffreys smoothing, adaptive prediction, and event-reduction metric",
+    "baseline": "256x256 previous-byte successor counts",
+    "motif_capacity": 256,
+    "motif_filter": "training occurrence count >=4",
+    "motif_score": "best-successor count descending, then consistency descending, then lexicographic raw four-byte key",
+    "tokenizer": false,
+    "capacity_growth": false
+  },
+  "arms": {
+    "pooled_within_domain": "train one model on first-60% segments from all three sources; evaluate each source's final 40% separately",
+    "leave_one_domain_out": "for each heldout domain, train on first-60% segments of the other two sources only; evaluate final 40% of the heldout source"
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "pooled_selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "minimum_pooled_motif_coverage_fraction",
+      ">=",
+      0.03
+    ],
+    [
+      "minimum_pooled_motif_covered_accuracy_gain",
+      ">=",
+      0.05
+    ],
+    [
+      "minimum_pooled_effective_event_reduction_fraction",
+      ">=",
+      0.02
+    ],
+    [
+      "maximum_pooled_adaptive_minus_baseline_bits_per_byte",
+      "<=",
+      0.05
+    ],
+    [
+      "cross_domain_eval_count",
+      "==",
+      3
+    ],
+    [
+      "minimum_cross_domain_motif_coverage_fraction",
+      ">=",
+      0.005
+    ],
+    [
+      "mean_cross_domain_motif_covered_accuracy_gain",
+      ">=",
+      0
+    ],
+    [
+      "maximum_cross_domain_adaptive_minus_baseline_bits_per_byte",
+      "<=",
+      0.1
+    ],
+    [
+      "maximum_learned_motif_capacity",
+      "==",
+      256
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_byte_rows",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_rows",
+      "==",
+      0
+    ]
+  ],
+  "validity_criteria": [
+    "Exact parent, North Star, ckb-plane authority lineage, manifest identity, source SHA-256 values, and source byte counts match.",
+    "Execution occurs only on GitHub-hosted compute after ckb-plane READY_RESEARCH for this exact preregistration SHA.",
+    "All three sources are fetched directly from the frozen manifest URIs and verified before use.",
+    "The split is byte-index based with exactly 60% train prefix and 40% heldout suffix per source.",
+    "No heldout bytes enter training for the pooled arm; the heldout domain contributes no bytes at all to its leave-one-domain-out training arm.",
+    "The existing R2 learner semantics and capacity are reused without tuning.",
+    "Raw bytes are consumed exactly; no decoding, tokenization, normalization, lowercasing, whitespace canonicalization, or inserted boundary tokens.",
+    "No external model calls, persistent corpus storage, capacity growth, production authority, or LINKDEADKB execution occurs.",
+    "The complete run is deterministic and all metrics are finite."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all frozen pooled and cross-domain thresholds pass.",
+    "mixed": "Validity passes and pooled within-domain thresholds pass, but at least one cross-domain transfer threshold fails.",
+    "negative": "Validity passes but the pooled external-byte mechanism fails at least one core coverage, accuracy-gain, event-reduction, or bits-per-byte threshold.",
+    "incomplete": "Authority, network, source retrieval, or compute interruption prevents the frozen matrix.",
+    "invalid": "Any authority, source identity, split, contamination, learner drift, tokenizer, host-isolation, capacity, or determinism criterion fails."
+  },
+  "no_post_result_tuning_rule": "Do not alter sources, source identities, byte split, learner, capacity, smoothing, metrics, thresholds, authority requirements, or classification after any primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-raw-byte-generalization-r1.json",
+    "unitary/wlm_lm_external_raw_byte_generalization_r1.go",
+    "cmd/wlm-lm-external-raw-byte-generalization-r1/main.go",
+    ".github/workflows/external-raw-byte-generalization-r1.yml"
+  ]
+}
