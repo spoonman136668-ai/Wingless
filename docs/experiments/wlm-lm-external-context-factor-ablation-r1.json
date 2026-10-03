@@ -1,0 +1,118 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-CONTEXT-FACTOR-ABLATION-R1",
+  "program": "Wingless external raw-input to representation to context-factor attribution",
+  "question": "Which role factor caused the fixed-budget Cartesian context alias failure: previous-motif aliasing, current-motif aliasing, or their conjunction?",
+  "hypothesis": "Reconstruct the sealed R2 training-only alias induction exactly, but score two diagnostic predictors separately: previous-role alias -> next motif and current-role alias -> next motif. At least one factor will recover at least 0.05 pooled top-1 accuracy relative to the failed Cartesian alias predictor. A factor is dominant if it exceeds the other by at least 0.02 pooled accuracy. No factor may use more predictive counters than the failed parent and no factor may alter the representation or alias induction.",
+  "exact_parent_sha": "a9b8313e8d57145e08208caa4d3c3ca6e6ba12e9",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-context-factor-ablation-r1",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-CONTEXT-ALIAS-GENERALIZATION-R2",
+    "github_run_id": "37109822960",
+    "classification": "negative",
+    "observation": {
+      "pooled_alias_top1_accuracy": 0.33841626538255754,
+      "pooled_current_top1_accuracy": 0.5136436597110754,
+      "pooled_alias_minus_current_accuracy": -0.17522739432851786,
+      "overflow_unseen_alias_minus_exact_backoff_accuracy": -0.2602409638554217
+    },
+    "diagnosis": "Cartesian aliasing destroys predictive specificity. Factor attribution is required before changing representation or capacity."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical R2 source manifest",
+    "split": "byte-identical first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "motif_stream_decode": "byte-identical non-overlapping scanner",
+    "previous_alias_induction": "byte-identical R2 16-alias outgoing-distribution farthest-first mapping",
+    "current_alias_induction": "byte-identical R2 32-alias incoming-distribution farthest-first mapping",
+    "current_only_control": "byte-identical 512x512 relation predictor",
+    "cartesian_alias_reference": "byte-identical R2 16x32 alias-state predictor"
+  },
+  "factor_predictors": {
+    "previous_only": {
+      "state_count": 16,
+      "predictor": "16 x 512 uint32 previous-alias -> next-motif counts",
+      "counter_capacity": 8192
+    },
+    "current_only_alias": {
+      "state_count": 32,
+      "predictor": "32 x 512 uint32 current-alias -> next-motif counts",
+      "counter_capacity": 16384
+    },
+    "fallback": "same pooled training successor unigram argmax as parent",
+    "heldout_updates": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["previous_alias_count","==",16],
+    ["current_alias_count","==",32],
+    ["previous_predictive_counter_capacity","==",8192],
+    ["current_alias_predictive_counter_capacity","==",16384],
+    ["cartesian_alias_reference_accuracy",">",0],
+    ["maximum_factor_minus_cartesian_accuracy",">=",0.05],
+    ["factor_dominance_gap",">=",0.02],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "diagnostic_metrics": [
+    "pooled and per-source previous-only alias accuracy",
+    "pooled and per-source current-only alias accuracy",
+    "current exact relation accuracy",
+    "cartesian alias reference accuracy",
+    "previous-minus-cartesian and current-alias-minus-cartesian deltas",
+    "previous-minus-current-alias dominance gap",
+    "factor training row occupancy"
+  ],
+  "classification_rules": {
+    "supported": "Validity passes, at least one isolated factor recovers >=0.05 pooled accuracy over Cartesian alias, and one factor dominates the other by >=0.02 absolute pooled accuracy.",
+    "mixed": "Validity passes and at least one isolated factor recovers >=0.05 over Cartesian alias, but dominance is <0.02 or both factors recover similarly.",
+    "negative": "Validity passes but neither isolated factor recovers >=0.05 over Cartesian alias.",
+    "invalid": "Any sealed-parent, authority, source, split, representation, alias-induction, capacity, deterministic, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact sealed parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and manifest.",
+    "R2 alias induction is reconstructed byte-for-byte from training prefixes only.",
+    "Only the predictor factorization changes; representation and alias mappings do not.",
+    "Previous-only and current-alias-only predictors score identical heldout triples.",
+    "No predictor exceeds the parent's 262144-counter budget.",
+    "Full Go regression passes before probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, alias induction, factor definitions, capacities, fallback, controls, metrics, thresholds, or classification after primary output.",
+  "successor_if_previous_factor_dominant": {
+    "experiment_family": "WLM-LM-EXTERNAL-PREVIOUS-CONTEXT-BACKOFF",
+    "intent": "combine the informative previous-context factor with the proven exact current-motif relation under a fixed budget"
+  },
+  "successor_if_current_factor_dominant": {
+    "experiment_family": "WLM-LM-EXTERNAL-CURRENT-ALIAS-REFINEMENT",
+    "intent": "refine current-role aliasing while leaving previous context out"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-SIGNAL-ATTRIBUTION",
+    "intent": "measure whether useful context information exists outside these distributional alias features before any new representation"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-context-factor-ablation-r1.json",
+    "unitary/wlm_lm_external_context_factor_ablation_r1.go",
+    "cmd/wlm-lm-external-context-factor-ablation-r1/main.go",
+    ".github/workflows/external-context-factor-ablation-r1.yml"
+  ]
+}
