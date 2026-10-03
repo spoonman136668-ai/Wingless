@@ -1,0 +1,132 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-RAW-REP-COMPOSITIONAL-REASONING-R1",
+  "program": "Wingless external raw-input to representation to prediction to reasoning chain",
+  "question": "Can representations learned directly from independently sourced external raw bytes feed the already-qualified Wingless factorized compositional-reasoning mechanism and generalize to exact operand pairs never observed during reasoning training?",
+  "hypothesis": "Learn the unchanged 512-entry raw-byte representation from the first 60% of each verified external source exactly as in WLM-LM-EXTERNAL-RAW-REP-PRED-R1. Deterministically take the top eight learned four-byte motifs under the same R2 ranking as a raw value alphabet. Using the unchanged factorized three-bit reasoning learner and the frozen heldout-pair rule, factorized heldout accuracy and raw-output exact accuracy will each be at least 0.95 on sixteen unseen operand pairs, while an exact represented-pair lookup control will remain at or below 0.25.",
+  "exact_parent_sha": "13bf0de18304d199d5f712f88ae92f489b579c60",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-r1",
+  "portfolio_context": {
+    "allocation": "majority chain / minority substrate falsification",
+    "slot": "chain",
+    "frontier": "external raw-input -> learned representation -> qualified prediction -> compositional reasoning"
+  },
+  "prior_evidence": [
+    {
+      "experiment": "WLM-LM-EXTERNAL-RAW-REP-PRED-R1",
+      "github_run_id": "37085240951",
+      "classification": "supported",
+      "qualified_head_sha": "e4a399c1b1d465032d2f87470fae96870df3c08c",
+      "observation": {
+        "selected_motif_count": 512,
+        "minimum_eval_representation_coverage_fraction": 0.1522491349480969,
+        "minimum_covered_top1_accuracy_gain": 0.23192707229171083,
+        "minimum_effective_event_reduction_fraction": 0.19072164948453607,
+        "maximum_representation_minus_baseline_bits_per_byte": -0.01772764524199033,
+        "sources_with_positive_covered_top1_gain": 3,
+        "sources_with_nonworse_bits_per_byte": 3
+      }
+    },
+    {
+      "experiment": "WLM-LM-RAW-REP-COMPOSITIONAL-REASONING-R1",
+      "github_run_id": "37064194956",
+      "observation": {
+        "factorized_heldout_accuracy": 1.0,
+        "lookup_heldout_accuracy": 0.0,
+        "raw_output_exact_accuracy": 1.0,
+        "factorized_counter_count": 24,
+        "lookup_counter_count": 512
+      }
+    }
+  ],
+  "scope_statement": "This is an interface-integration reasoning gate. External bytes determine the learned raw representation alphabet, while the compositional target relation remains a frozen controlled benchmark. Passing does not establish open-domain semantic reasoning; it establishes that externally learned raw representations can feed the qualified compositional inference stage without tokenization or model calls.",
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "representation_stage": {
+    "sources": "same three exact SHA-256-verified external sources as the supported prediction gate",
+    "input": "first floor(0.60*N) raw bytes from each source only, with source boundaries resetting byte windows",
+    "learner": "byte-for-byte WLM-LM-RAW-REP-PRED-FRESH-HOLDOUT-R2 512-motif learner",
+    "representation_pool_capacity": 512,
+    "reasoning_value_selection": "rank the learned 512 motifs by the same best-successor-count, consistency, lexicographic order and take the first eight; then assign value IDs 0..7 by lexicographic order of those eight raw motifs",
+    "semantic_labels": "none"
+  },
+  "reasoning_benchmark": {
+    "value_count": 8,
+    "raw_value_width_bytes": 4,
+    "record_encoding": "three fixed-width four-byte slots: operand A motif, operand B motif, observed target motif; heldout queries contain only the two operand slots",
+    "target_law": "target_id = operand_a_id XOR operand_b_id; used only by benchmark construction/scoring, never prediction",
+    "training_pair_rule": "(a+b) mod 4 != 1",
+    "heldout_pair_rule": "(a+b) mod 4 == 1",
+    "training_pair_count": 48,
+    "heldout_pair_count": 16,
+    "training_repetitions_per_pair": 32,
+    "slot_decoding": "map each exact four-byte slot to the lexicographic ID of the learned external motif; no parser, tokenizer, semantic labels, or target law is available to prediction"
+  },
+  "reasoning_learner": {
+    "identity": "byte-for-byte factorized mechanism of WLM-LM-RAW-REP-COMPOSITIONAL-REASONING-R1",
+    "factorized_state": "three 2x2x2 integer count tensors over operand-bit pair and target bit, 24 counters total",
+    "prediction": "independently argmax target bit for each bit position and reassemble one value ID",
+    "lookup_control": "8x8x8 exact-pair target counts, 512 counters, lowest-ID tie break",
+    "capacity_growth": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count", "==", 0],
+    ["source_count", "==", 3],
+    ["total_source_bytes", "==", 57272],
+    ["external_representation_pool_count", "==", 512],
+    ["reasoning_value_count", "==", 8],
+    ["reasoning_value_distinct_count", "==", 8],
+    ["training_record_count", "==", 1536],
+    ["heldout_pair_count", "==", 16],
+    ["training_representation_decode_failure_count", "==", 0],
+    ["heldout_representation_decode_failure_count", "==", 0],
+    ["heldout_context_leak_count", "==", 0],
+    ["factorized_bit_coverage_missing_count", "==", 0],
+    ["factorized_heldout_accuracy", ">=", 0.95],
+    ["lookup_heldout_accuracy", "<=", 0.25],
+    ["raw_output_exact_accuracy", ">=", 0.95],
+    ["factorized_counter_count", "==", 24],
+    ["lookup_counter_count", "==", 512],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["capacity_growth_event_count", "==", 0],
+    ["invalid_row_count", "==", 0],
+    ["counter_overflow_count", "==", 0]
+  ],
+  "validity_criteria": [
+    "Exact sealed external-prediction parent and North Star identities match.",
+    "A fresh CKB-plane READY_RESEARCH receipt is bound to this exact preregistration commit and the frozen external manifest.",
+    "All external source hashes and byte lengths match before representation learning; only first-60% prefixes enter representation learning.",
+    "The external representation learner is scientifically identical to the qualified 512-motif R2 learner.",
+    "The eight reasoning values are selected deterministically before reasoning benchmark generation using the frozen representation ranking and are distinct.",
+    "The factorized learner sees only decoded learned representation IDs and observed training target IDs; prediction cannot call XOR or evaluator target code.",
+    "Every exact heldout operand pair is absent from reasoning training, while every per-bit input combination needed by the factorized learner occurs in training.",
+    "The exact-pair lookup control receives the same represented training examples.",
+    "Raw-output scoring maps the predicted value ID back to the learned external four-byte motif and requires exact byte equality.",
+    "Full Go regression passes before the probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, semantic parser, external model, persistent corpus, capacity growth, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and all frozen thresholds pass.",
+    "mixed": "Validity passes and factorized heldout accuracy exceeds lookup accuracy, but one or more representation-interface, 0.95 reasoning, or raw-output thresholds fail.",
+    "negative": "Validity passes but factorized heldout accuracy does not exceed lookup accuracy or the external learned representation cannot support the bounded compositional inference.",
+    "invalid": "Any authority, source identity, representation-equivalence, leakage, target-law isolation, deterministic-state, capacity, or host-isolation criterion fails.",
+    "incomplete": "Authority, source retrieval, or hosted compute interruption prevents the frozen matrix."
+  },
+  "no_post_result_tuning_rule": "Do not alter external sources, 60% representation prefixes, 512/8 capacities, ranking, value-ID assignment, reasoning law, split, repetitions, factorization, lookup control, metrics, thresholds, classification, or authority requirements after any primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-raw-rep-compositional-reasoning-r1.json",
+    "unitary/wlm_lm_external_raw_rep_compositional_reasoning_r1.go",
+    "cmd/wlm-lm-external-raw-rep-compositional-reasoning-r1/main.go",
+    ".github/workflows/external-raw-rep-compositional-reasoning-r1.yml"
+  ]
+}
