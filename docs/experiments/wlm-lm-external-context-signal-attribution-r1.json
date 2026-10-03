@@ -1,0 +1,99 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-CONTEXT-SIGNAL-ATTRIBUTION-R1",
+  "program": "Wingless external raw-input to representation to contextual prediction attribution",
+  "question": "Is the useful exact-pair context signal concentrated in training-side ambiguous current motifs, rather than captured by marginal distributional aliases?",
+  "hypothesis": "Reconstruct the sealed current-only and exact-pair predictors with identical sources, split, representation, and top-511 exact-pair dictionary. Using training-prefix counts only, compute each current motif's successor top1-minus-top2 probability margin. Define the ambiguity cutoff as the median margin across current motifs with at least four training transitions. Among heldout triples whose exact pair has training support >=3, exact-pair prediction will outperform current-only by at least 0.02 on the ambiguous half and by no more than 0.01 on the confident half, yielding at least a 0.02 signal-concentration gap.",
+  "exact_parent_sha": "5c29a1b151650bb37635747f0f5dad9470dafe55",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-context-signal-attribution-r1",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-CONTEXT-FACTOR-ABLATION-R1",
+    "github_run_id": "37110165841",
+    "classification": "negative",
+    "attribution": "no_factor_recovery",
+    "observation": {
+      "pooled_previous_factor_accuracy": 0.3130016051364366,
+      "pooled_current_alias_factor_accuracy": 0.32049224184055647,
+      "cartesian_alias_reference_accuracy": 0.33841626538255754,
+      "pooled_current_exact_accuracy": 0.5136436597110754
+    },
+    "diagnosis": "Marginal transition-distribution aliases do not capture the useful context signal. Diagnose when exact supported pair context helps before changing representation or capacity."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical sealed external manifest",
+    "split": "first 60% training / final 40% scoring-only",
+    "representation": "byte-identical sealed 512-motif learner",
+    "motif_stream_decode": "byte-identical non-overlapping exact-motif scanner",
+    "current_only_predictor": "byte-identical 512x512 current-motif successor counts",
+    "exact_pair_predictor": "byte-identical top-511 exact-pair contexts plus one overflow row",
+    "pair_support": "training-prefix pair occurrence count only"
+  },
+  "ambiguity_definition": {
+    "eligible_current_row": "at least four training successor observations",
+    "row_margin": "(top1 successor count - top2 successor count) / total successor count",
+    "cutoff": "median row_margin across eligible current rows, computed from training prefixes only",
+    "ambiguous": "row_margin <= frozen median cutoff",
+    "confident": "row_margin > frozen median cutoff",
+    "evaluated_pairs": "exact-pair training support >=3 only",
+    "heldout_in_cutoff": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["eligible_current_row_count",">",0],
+    ["supported_pair_query_count",">",0],
+    ["ambiguous_supported_query_count",">",0],
+    ["confident_supported_query_count",">",0],
+    ["ambiguous_supported_exact_minus_current_accuracy",">=",0.02],
+    ["confident_supported_exact_minus_current_accuracy","<=",0.01],
+    ["context_signal_concentration_gap",">=",0.02],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and frozen concentration thresholds pass.",
+    "mixed": "Validity passes and ambiguous supported pairs show positive exact-context gain, but the concentration gap or confident-row ceiling fails.",
+    "negative": "Validity passes but exact supported pair context is not positively concentrated in ambiguous current states.",
+    "invalid": "Any sealed-parent, authority, source, split, representation, ambiguity-cutoff, support, capacity, determinism, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact sealed parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and manifest.",
+    "All predictors and pair support are reconstructed from training prefixes only.",
+    "Ambiguity median is computed before heldout scoring and is never changed afterward.",
+    "Only diagnostic partitioning is new; no predictor or representation changes.",
+    "Full Go regression passes before probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, pair support threshold, ambiguity formula, median rule, predictors, metrics, thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-AMBIGUITY-GATED-EXACT-CONTEXT",
+    "intent": "use exact supported pair context only for training-side ambiguous current states while retaining current-only relation elsewhere"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-SEQUENCE-CONTEXT-ATTRIBUTION",
+    "intent": "test whether useful context requires longer sequence state rather than pair identity or marginal aliases"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-context-signal-attribution-r1.json",
+    "unitary/wlm_lm_external_context_signal_attribution_r1.go",
+    "cmd/wlm-lm-external-context-signal-attribution-r1/main.go",
+    ".github/workflows/external-context-signal-attribution-r1.yml"
+  ]
+}
