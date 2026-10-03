@@ -1,0 +1,111 @@
+name: Wingless future-data mechanism-guided allocation R13
+on:
+  push:
+    branches: [research/external-hosted-wingless-future-data-mechanism-guided-allocation-r13]
+    paths:
+      - 'unitary/wlm_lm_external_future_data_mechanism_guided_allocation_r13.go'
+      - 'cmd/wlm-lm-external-future-data-mechanism-guided-allocation-r13/main.go'
+      - '.github/workflows/external-future-data-mechanism-guided-allocation-r13.yml'
+permissions: {contents: read}
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-go@v5
+        with: {go-version: '1.25.x'}
+      - name: Validate frozen package
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "9698a7a014cb93eceffbc3b55c006ea694330b35" HEAD
+          python3 - <<'PY'
+          import subprocess
+          prereg="9698a7a014cb93eceffbc3b55c006ea694330b35"; parent="ab6277d50036c19da4d9a6f5baa82d6747bdd8e9"
+          pp="docs/experiments/wlm-lm-external-future-data-mechanism-guided-allocation-r13.json"
+          assert subprocess.check_output(["git","rev-parse",prereg+"^"],text=True).strip()==parent
+          changed=set(subprocess.check_output(["git","diff","--name-only",parent+"..HEAD"],text=True).splitlines())
+          expected={pp,"unitary/wlm_lm_external_future_data_mechanism_guided_allocation_r13.go","cmd/wlm-lm-external-future-data-mechanism-guided-allocation-r13/main.go",".github/workflows/external-future-data-mechanism-guided-allocation-r13.yml"}
+          assert changed==expected,(sorted(changed),sorted(expected))
+          PY
+      - name: Verify READY_RESEARCH receipt
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          raw=r'''{"schema":"ckb-plane.external-exposure-ready-research-receipt.v1","project":"Wingless","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-MECHANISM-GUIDED-ALLOCATION-R13","preregistration_sha":"9698a7a014cb93eceffbc3b55c006ea694330b35","research_host":"runnervm8df0l","runner_id":"GitHub Actions 1000001822","manifest_sha256":"75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4","plan_decision":{"schema":"ckb-plane.external-exposure.v1","disposition":"READY_PLAN","scope":"plan-only","reasons":null},"fetch_decision":{"schema":"ckb-plane.external-exposure-fetch.v1","disposition":"READY_FETCH","scope":"fetch-verify-only","reasons":null},"research_decision":{"schema":"ckb-plane.external-exposure-research.v1","disposition":"READY_RESEARCH","scope":"research-consume-once","reasons":null},"ckb_plane_main_sha":"36d99a0257120ede57bb96638660d35014dd529e"}'''
+          assert hashlib.sha256(raw.encode()).hexdigest()=="d7768a816de017d40397ca305fd2feb8611b3c493a038f4260c33d0081d7a2b3"
+          pathlib.Path("/tmp/authority.json").write_text(raw)
+          PY
+      - name: Fetch exact external sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          export EXTERNAL_ROOT="$RUNNER_TEMP/wingless-r13"; mkdir -p "$EXTERNAL_ROOT"
+          python3 - <<'PY'
+          import hashlib,os,pathlib,urllib.request
+          src=[
+            ("code","https://raw.githubusercontent.com/python/cpython/ebf955df7a89ed0c7968f79faec1de49f61ed7cb/Lib/fractions.py","7a95f1c506c9ac4b2277df5f2bdd9d61cc67b520c45021a5a961939770221ef6",41453),
+            ("structured","https://raw.githubusercontent.com/json-schema-org/JSON-Schema-Test-Suite/5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8/tests/draft2020-12/type.json","4c5cbe6cbcd28af73761091367b20e07d0403847e236c06c31fc27061bd81192",14365),
+            ("technical-prose","https://raw.githubusercontent.com/golang/go/6f5c275ebdc454197fff5f1496521c8f81e20eef/README.md","8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",1454)]
+          root=pathlib.Path(os.environ["EXTERNAL_ROOT"])
+          for n,u,h,s in src:
+            b=urllib.request.urlopen(urllib.request.Request(u,headers={"User-Agent":"wingless-r13"}),timeout=30).read(s+1)
+            assert len(b)==s and hashlib.sha256(b).hexdigest()==h
+            (root/(n+".bin")).write_bytes(b)
+          PY
+          echo "EXTERNAL_ROOT=$EXTERNAL_ROOT" >> "$GITHUB_ENV"
+      - name: Full Go regression
+        run: go test ./...
+      - name: Run frozen mechanism-guided allocation twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/wlm-lm-external-future-data-mechanism-guided-allocation-r13 --code "$EXTERNAL_ROOT/code.bin" --structured "$EXTERNAL_ROOT/structured.bin" --technical-prose "$EXTERNAL_ROOT/technical-prose.bin" > /tmp/result1.json
+          go run ./cmd/wlm-lm-external-future-data-mechanism-guided-allocation-r13 --code "$EXTERNAL_ROOT/code.bin" --structured "$EXTERNAL_ROOT/structured.bin" --technical-prose "$EXTERNAL_ROOT/technical-prose.bin" > /tmp/result2.json
+          cmp /tmp/result1.json /tmp/result2.json
+          cat /tmp/result1.json
+      - name: Classify
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math,pathlib
+          m=json.loads(pathlib.Path("/tmp/result1.json").read_text())["metrics"]
+          valid=(
+            m["source_identity_mismatch_count"]==0 and m["source_count"]==3 and m["total_source_bytes"]==57272 and
+            m["arm_count"]==3 and m["non_target_training_byte_budget_per_arm"]==15819 and
+            m["motif_capacity"]==256 and m["target_window_bytes_per_arm"]==1454 and
+            m["target_evaluation_bytes_per_arm"]==582 and m["target_adaptation_reservoir_bytes_per_arm"]==872 and
+            m["total_adaptation_budget_equal"]==1744 and m["total_adaptation_budget_guided"]==1744 and
+            m["allocation_target_label_use_count"]==0 and m["allocation_post_result_choice_count"]==0 and
+            m["capacity_growth_event_count"]==0 and m["tokenizer_use_count"]==0 and
+            m["external_model_call_count"]==0 and m["counter_overflow_count"]==0 and
+            m["invalid_row_count"]==0 and all(math.isfinite(float(v)) for v in m.values())
+          )
+          delta=m["guided_aggregate_exact_hit_delta_vs_equal"]
+          below=m["guided_domain_below_packet0_count"]
+          code=m["guided_code_exact_hit_delta_vs_equal"]
+          if not valid: cls="invalid"
+          elif delta>=1 and below==0: cls="supported"
+          elif delta>0 or (delta==0 and code>0): cls="mixed"
+          else: cls="negative"
+          out={"schema":"wingless.research-classification.v1","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-MECHANISM-GUIDED-ALLOCATION-R13","classification":cls,"validity_pass":valid,"authority_receipt_sha256":"d7768a816de017d40397ca305fd2feb8611b3c493a038f4260c33d0081d7a2b3","metrics":m}
+          pathlib.Path("/tmp/classification.json").write_text(json.dumps(out,separators=(",",":")));print(json.dumps(out,separators=(",",":")))
+          if not valid: raise SystemExit(2)
+          PY
+      - name: Delete external bytes
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/wingless-r13"
+      - name: Upload evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-future-data-mechanism-guided-allocation-r13
+          path: |
+            /tmp/authority.json
+            /tmp/result1.json
+            /tmp/result2.json
+            /tmp/classification.json
+          if-no-files-found: error
