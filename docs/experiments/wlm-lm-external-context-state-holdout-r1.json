@@ -1,0 +1,134 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-CONTEXT-STATE-HOLDOUT-R1",
+  "program": "Wingless external raw-input to representation to context-conditioned relation frontier",
+  "question": "Does a fixed-capacity context state built from the previous and current learned motifs resolve the external relation ambiguity that remained after distributional multi-step composition?",
+  "hypothesis": "Reuse the exact verified external sources, 60/40 split, 512-motif representation learner, and non-overlapping motif stream from the sealed relation experiments. Build exactly 512 context states from training prefixes only: the 511 most frequent ordered (previous motif,current motif) pairs receive dedicated state IDs and all remaining pairs share one overflow state. Train a 512x512 context-state -> next-motif count matrix. On untouched suffixes, the context-conditioned predictor will improve pooled top-1 accuracy by at least 0.01 and code accuracy by at least 0.01 over the sealed current-motif-only relation control, without materially degrading structured or technical-prose accuracy.",
+  "exact_parent_sha": "f58d2021ce2b7b7bbd6022117ac3478a4360f1f9",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-context-state-r1",
+  "portfolio_context": {
+    "slot": "chain",
+    "frontier": "external raw bytes -> learned motif representation -> context-conditioned source-derived relation",
+    "reason_for_gate": "Distributional composition removed greedy state-collapse loss, but depth-3 code remained slightly below unigram. The remaining hypothesis is relation-state ambiguity rather than uncertainty propagation."
+  },
+  "prior_evidence": [
+    {
+      "experiment": "WLM-LM-EXTERNAL-MOTIF-RELATION-HOLDOUT-R1",
+      "github_run_id": "37087072647",
+      "classification": "supported",
+      "observation": {
+        "pooled_conditional_top1_accuracy": 0.5134990644212777,
+        "eval_code_conditional_top1_accuracy": 0.4562987279441937,
+        "eval_structured_conditional_top1_accuracy": 0.637223974763407,
+        "eval_technical_prose_conditional_top1_accuracy": 0.027777777777777776
+      }
+    },
+    {
+      "experiment": "WLM-LM-EXTERNAL-MOTIF-RELATION-DISTRIBUTIONAL-COMPOSITION-R1",
+      "github_run_id": "37088011392",
+      "classification": "mixed",
+      "observation": {
+        "depth2_pooled_distributional_accuracy_gain": 0.04467574131400115,
+        "depth3_pooled_distributional_accuracy_gain": 0.0032131285140562513,
+        "depth3_eval_code_distributional_accuracy_gain": -0.006583278472020838
+      },
+      "diagnosis": "Preserving probability mass fixed most depth loss; residual code weakness points to ambiguous one-motif state identity."
+    }
+  ],
+  "scope_statement": "This is a one-step context-state holdout gate. It tests whether a previous+current raw-motif context improves relation identity at fixed predictive counter capacity. It does not yet claim successful multi-step context composition.",
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "same exact three-source SHA-256 manifest as relation R1",
+    "split": "first floor(0.60*N) bytes of each source for all training; final 40% suffixes scoring-only",
+    "representation": "byte-for-byte qualified 512-motif R2 learner",
+    "motif_stream_decode": "byte-for-byte non-overlapping exact-motif scanner from relation R1",
+    "source_boundaries": "reset motif history and never create pairs or transitions across sources"
+  },
+  "context_state": {
+    "training_pair_definition": "every ordered adjacent motif pair (previous,current) in decoded training-prefix streams",
+    "selection": "rank distinct pairs by occurrence count descending, then previous motif ID ascending, then current motif ID ascending",
+    "dedicated_pair_context_count": 511,
+    "overflow_context_count": 1,
+    "total_context_state_count": 512,
+    "mapping": "selected pairs map to IDs 0..510 in frozen rank order; every unselected or unseen pair maps to ID 511",
+    "predictive_state": "512 x 512 uint32 context-state -> next-motif counts",
+    "prediction": "argmax successor count for the context row; ties choose lowest motif ID; zero-row fallback uses the same pooled training successor unigram argmax as relation R1",
+    "predictive_counter_capacity": 262144,
+    "capacity_growth_after_freeze": false
+  },
+  "control": {
+    "identity": "sealed current-motif-only relation-R1 predictor reconstructed from the same prefixes",
+    "state": "512 x 512 current-motif -> next-motif counts",
+    "purpose": "paired same-data control; it does not feed context predictions"
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count", "==", 0],
+    ["source_count", "==", 3],
+    ["total_source_bytes", "==", 57272],
+    ["selected_motif_count", "==", 512],
+    ["context_state_count", "==", 512],
+    ["dedicated_pair_context_count", "==", 511],
+    ["context_predictive_counter_capacity", "==", 262144],
+    ["eval_source_count_with_triples", "==", 3],
+    ["pooled_context_top1_accuracy", ">", 0],
+    ["pooled_context_minus_current_accuracy", ">=", 0.01],
+    ["eval_code_context_minus_current_accuracy", ">=", 0.01],
+    ["eval_structured_context_minus_current_accuracy", ">=", -0.02],
+    ["eval_technical_prose_context_minus_current_accuracy", ">=", -0.05],
+    ["capacity_growth_event_count", "==", 0],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["invalid_row_count", "==", 0],
+    ["counter_overflow_count", "==", 0]
+  ],
+  "diagnostic_metrics": [
+    "training distinct pair count",
+    "training pair coverage captured by dedicated contexts",
+    "per-source dedicated-context evaluation fraction",
+    "per-source context and current-only top-1 accuracy",
+    "pooled context and current-only top-1 accuracy",
+    "overflow-context query fraction"
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and frozen thresholds pass.",
+    "mixed": "Validity passes and context improves pooled or code accuracy, but one or more frozen improvement/nondegradation thresholds fail.",
+    "negative": "Validity passes but context does not improve either pooled or code accuracy over the current-only control.",
+    "invalid": "Any authority, source identity, split contamination, representation drift, pair-selection drift, predictive-capacity drift, determinism, or host-isolation criterion fails.",
+    "incomplete": "Authority, source retrieval, or hosted compute interruption prevents the frozen matrix."
+  },
+  "validity_criteria": [
+    "Exact sealed distributional-composition parent and North Star identities match.",
+    "A fresh CKB-plane READY_RESEARCH receipt is bound to this exact preregistration commit and frozen external manifest.",
+    "All representation learning, motif decoding, source splitting, current-only control construction, unigram fallback, and source-boundary behavior match sealed relation R1.",
+    "Only training-prefix motif pairs determine the 511 dedicated contexts; suffix motifs never affect selection, mapping, counts, thresholds, or stopping.",
+    "Context predictor uses exactly 512 rows and 512 successor columns; no dynamic row creation occurs.",
+    "Current-only control and context predictor score the same suffix triples.",
+    "Full Go regression passes before the probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter external sources, hashes, 60/40 split, motif representation, motif decoding, 511+1 context budget, pair ranking, overflow mapping, predictor capacity, fallback, control, metrics, thresholds, classification, or authority requirements after any primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-STATE-DISTRIBUTIONAL-COMPOSITION",
+    "intent": "compose the supported fixed-capacity context relation over depth two and three while preserving probability mass and the 512-state context budget"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-STATE-ATTRIBUTION",
+    "intent": "attribute failure to overflow collisions versus genuinely non-Markov local context before changing capacity or adding semantic structure"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-context-state-holdout-r1.json",
+    "unitary/wlm_lm_external_context_state_holdout_r1.go",
+    "cmd/wlm-lm-external-context-state-holdout-r1/main.go",
+    ".github/workflows/external-context-state-holdout-r1.yml"
+  ]
+}
