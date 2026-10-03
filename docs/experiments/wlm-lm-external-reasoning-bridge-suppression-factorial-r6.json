@@ -1,0 +1,181 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-BRIDGE-SUPPRESSION-FACTORIAL-R6",
+  "program": "Wingless repaired-bridge 2x2 suppression factorial under fixed future-data budget",
+  "question": "For the R5 selected code-target queries containing raw class-5/6 motifs, is suppression primarily caused by the low-support fallback branch, the exact-context branch, their interaction, or neither?",
+  "hypothesis": "Replay the exact R5/R4 training sources, 15,819-byte training budget, 256 motifs, 8x32 classes, 1,454-byte code target, selected-query criterion, relation/exact tables, row eligibility, margins, and depth-3 cap. Add a diagnostic-only 2x2 bridge evaluator with two frozen binary factors: L=enable the low-support (<3 pair-count) fallback mixture; E=enable exact-context replacement for dedicated eligible low-margin pairs. Evaluate B00 (L0,E0), B10 (L1,E0), B01 (L0,E1), and B11 (L1,E1, byte-identical full R5 repair). For each selected query, compare the best rank of raw-focus classes 5/6 against B00 and classify exactly one frozen effect category: low_support_main if only B10 worsens; exact_context_main if only B01 worsens; additive_shared if both B10 and B01 worsen; interaction_only if neither single factor worsens but B11 does; full_no_suppression if B11 does not worsen; unresolved if accounting cannot assign exactly one category. No representation, capacity, data, thresholds, or final production bridge changes occur.",
+  "exact_parent_sha": "085dac1f44b99c7a2653986fd32d411996fb6696",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-bridge-suppression-factorial-r6",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; optimize transfer-efficient learning, not self-modification"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-BRIDGE-SUPPRESSION-ATTRIBUTION-R5",
+    "github_run_id": "37144142188",
+    "classification": "supported",
+    "observation": {
+      "selected_query_count": 21,
+      "base_relation_absence_count": 5,
+      "exact_context_suppression_count": 1,
+      "repair_selection_suppression_count": 11,
+      "final_competition_count": 4,
+      "class5_repaired_top1_count": 0,
+      "class6_repaired_top1_count": 0
+    },
+    "diagnosis": "Repair-selection suppression dominates the stage attribution; factorial separation is required before proposing any bridge change."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "training_domains": [
+      "structured",
+      "technical_prose"
+    ],
+    "target_domain": "code",
+    "training_byte_budget": 15819,
+    "target_eval_byte_budget": 1454,
+    "selected_motif_capacity": 256,
+    "reasoning_class_count": 8,
+    "motifs_per_reasoning_class": 32,
+    "suppressed_classes": [
+      5,
+      6
+    ],
+    "selected_query_rule": "byte-identical R5 raw-presence criterion",
+    "depth3_runtime_cap": 2048
+  },
+  "factorial": {
+    "B00": "low_support_fallback=false, exact_context=false",
+    "B10": "low_support_fallback=true, exact_context=false",
+    "B01": "low_support_fallback=false, exact_context=true",
+    "B11": "low_support_fallback=true, exact_context=true; must be byte-identical full R5 repair",
+    "suppression_test": "best rank of a raw-focus class-5/6 member is worse than B00 and greater than 1",
+    "categories": [
+      "low_support_main",
+      "exact_context_main",
+      "additive_shared",
+      "interaction_only",
+      "full_no_suppression",
+      "unresolved"
+    ],
+    "prediction_change": false
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "reasoning_class_count",
+      "==",
+      8
+    ],
+    [
+      "selected_query_count",
+      "==",
+      21
+    ],
+    [
+      "factorial_record_count",
+      "==",
+      21
+    ],
+    [
+      "factorial_accounting_error_count",
+      "==",
+      0
+    ],
+    [
+      "B11_repaired_top1_class5_count",
+      "==",
+      0
+    ],
+    [
+      "B11_repaired_top1_class6_count",
+      "==",
+      0
+    ],
+    [
+      "B11_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "relation_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "adaptive_readout_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes; all 21 selected queries receive exactly one frozen factorial category; B11 reproduces R5 exactly; and at least one of low_support_main, exact_context_main, additive_shared, or interaction_only occurs.",
+    "negative": "Validity passes and B11 reproduces R5, but every selected query is full_no_suppression despite R5's stage attribution.",
+    "invalid": "Any parent, authority, source, budget, selected-query identity, bridge-factor identity, B11 identity, accounting, determinism, provenance, or qualification criterion fails."
+  },
+  "successor_if_low_support_main_dominates": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-LOW-SUPPORT-FALLBACK-COUNTERFACTUAL-R7",
+    "intent": "test a bounded low-support fallback alternative against no-change under the same fixed data/compute/capacity budget, with later disjoint transfer required before retention"
+  },
+  "successor_if_exact_or_interaction_dominates": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-BRIDGE-INTERACTION-ATTRIBUTION-R7",
+    "intent": "attribute the exact-context or interaction mechanism further before proposing any bounded change"
+  },
+  "no_post_result_tuning_rule": "Do not alter source identities, budgets, 256 capacity, 8x32 classes, selected-query set, factor definitions, suppression test, categories, metrics, thresholds, classification, or authority after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-bridge-suppression-factorial-r6.json",
+    "unitary/wlm_lm_external_reasoning_bridge_suppression_factorial_r6.go",
+    "cmd/wlm-lm-external-reasoning-bridge-suppression-factorial-r6/main.go",
+    ".github/workflows/external-reasoning-bridge-suppression-factorial-r6.yml"
+  ]
+}
