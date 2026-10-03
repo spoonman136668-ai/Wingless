@@ -1,0 +1,101 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-MOTIF-RELATION-COMPOSITION-R1",
+  "program": "Wingless external raw-input to representation to relation to multi-step prediction chain",
+  "question": "Can Wingless compose the source-derived one-step motif relation learned from external prefixes to predict two- and three-step motif futures on untouched external suffixes without training depth-specific programs?",
+  "hypothesis": "Reuse the exact 512-motif representation, non-overlapping motif stream, one-step conditional relation, fallback, and unigram baseline from WLM-LM-EXTERNAL-MOTIF-RELATION-HOLDOUT-R1. Repeatedly applying only the learned one-step relation will produce positive pooled top-1 accuracy gain over the unigram baseline at both depth two and depth three, with positive gain on at least two of three sources at each depth. Direct depth-specific lookup trained from the same prefixes is diagnostic only and does not participate in composed prediction.",
+  "exact_parent_sha": "ecfb276a5c74e9ea8925f98f26f78214edaf20f2",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-relation-composition-r1",
+  "portfolio_context": {
+    "slot": "chain",
+    "frontier": "external raw bytes -> learned motif representation -> source-derived relation -> multi-step composition"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-MOTIF-RELATION-HOLDOUT-R1",
+    "github_run_id": "37087072647",
+    "classification": "supported",
+    "observation": {
+      "pooled_conditional_top1_accuracy": 0.5134990644212777,
+      "pooled_unigram_top1_accuracy": 0.2991178829190056,
+      "pooled_relation_top1_accuracy_gain": 0.2143811815022721,
+      "sources_with_positive_relation_accuracy_gain": 3,
+      "unseen_current_motif_query_fraction": 0.0045442395081529
+    }
+  },
+  "scope_statement": "This is bounded multi-step composition of a relation induced from real external byte sequences. It tests whether the learned one-step relation composes predictively; it does not claim semantic or open-domain reasoning.",
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "source_bytes": "same exact verified three-source manifest as relation R1",
+    "split": "same first floor(0.60*N) train / final 40% evaluation split",
+    "representation": "same qualified 512-motif R2 learner",
+    "motif_stream_decode": "same non-overlapping exact-motif scanner",
+    "one_step_relation": "same 512x512 conditional transition counts and lowest-ID tie break",
+    "fallback": "same pooled next-motif unigram argmax when a state has zero trained outgoing count"
+  },
+  "composition": {
+    "depths": [2,3],
+    "prediction": "starting from the observed current motif ID, apply the frozen one-step relation predictor exactly depth times; intermediate predictions are fed forward and never corrected from evaluation bytes",
+    "evaluation_target": "actual motif ID at current_index + depth in the untouched decoded suffix stream",
+    "unigram_control": "pooled training next-motif unigram argmax predicts the target at every depth",
+    "direct_depth_lookup_control": "for diagnostics only, train separate current-motif -> motif-at-depth count tables from prefix streams for depth two and three; these controls receive no evaluation updates",
+    "evaluation_updates": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["depth2_query_count",">",0],
+    ["depth3_query_count",">",0],
+    ["depth2_sources_with_positive_composed_gain",">=",2],
+    ["depth3_sources_with_positive_composed_gain",">=",2],
+    ["depth2_pooled_composed_accuracy_gain",">",0.0],
+    ["depth3_pooled_composed_accuracy_gain",">",0.0],
+    ["maximum_chain_fallback_fraction","<=",0.25],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "diagnostic_metrics": [
+    "per-source composed, unigram, and direct-depth top-1 accuracy at depth two",
+    "per-source composed, unigram, and direct-depth top-1 accuracy at depth three",
+    "per-depth pooled direct-depth lookup accuracy",
+    "per-source chain fallback fraction"
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and frozen composition thresholds pass.",
+    "mixed": "Validity passes and at least one depth has positive pooled composed gain while the other depth or source-count threshold fails.",
+    "negative": "Validity passes but composed prediction has no positive pooled gain at either depth.",
+    "invalid": "Any authority, source identity, split contamination, representation/relation drift, feed-forward composition drift, capacity, determinism, or host-isolation criterion fails.",
+    "incomplete": "Authority, source retrieval, or hosted compute interruption prevents the frozen matrix."
+  },
+  "validity_criteria": [
+    "Exact sealed relation-R1 parent and North Star identities match.",
+    "A fresh CKB-plane READY_RESEARCH receipt is bound to this exact preregistration commit and external manifest.",
+    "Representation learning, motif decoding, one-step relation learning, fallback, and unigram baseline are identical to relation R1.",
+    "Only prefix streams contribute any training counts; suffix streams are scoring-only.",
+    "Composed prediction uses only repeated one-step predictions; actual intermediate suffix motifs are never supplied.",
+    "Direct-depth lookup controls are trained from prefix streams only and never feed the composed predictor.",
+    "Full Go regression passes before the probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, semantic parser, external model, persistent corpus, capacity growth, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, motif decoding, relation counts, fallback, depths, feed-forward rule, controls, metrics, thresholds, classification, or authority requirements after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-motif-relation-composition-r1.json",
+    "unitary/wlm_lm_external_motif_relation_composition_r1.go",
+    "cmd/wlm-lm-external-motif-relation-composition-r1/main.go",
+    ".github/workflows/external-motif-relation-composition-r1.yml"
+  ]
+}
