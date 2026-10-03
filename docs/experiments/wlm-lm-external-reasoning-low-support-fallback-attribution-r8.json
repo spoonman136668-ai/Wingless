@@ -1,0 +1,207 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-LOW-SUPPORT-FALLBACK-ATTRIBUTION-R8",
+  "program": "Wingless low-support fallback counterfactual loss attribution under fixed budget",
+  "question": "Why did disabling the low-support fallback reduce total code-target exact hits from 11 to 8 while leaving the 21 raw class-5/6 selected-query exact hits unchanged at 2?",
+  "hypothesis": "Replay the exact R7 training data, 15,819-byte budget, 256 motifs, 8x32 classes, 1,454-byte code target, depth-3 cap, baseline B11 full repaired bridge and candidate B01 exact-context-only bridge. Add attribution only. For each of the 63 frozen target queries, record baseline/candidate exact-hit state and the initial pair support used at the query start. Freeze four transition categories: baseline_only_hit, candidate_only_hit, both_hit, neither_hit. Split baseline_only_hit and candidate_only_hit by pair support <3 versus >=3 and by membership in R7's frozen raw class-5/6 selected-query set. Supported requires complete accounting and that the net -3 exact-hit delta is fully explained by the frozen transition buckets, with no representation, bridge, data, capacity, threshold, runtime, or evaluator change.",
+  "exact_parent_sha": "60a43e6a604b5f77c7f952b3e9795b8b39dfe278",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-low-support-fallback-attribution-r8",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; attribution only; future-data learning efficiency remains primary"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-LOW-SUPPORT-FALLBACK-COUNTERFACTUAL-R7",
+    "github_run_id": "37149853785",
+    "classification": "negative",
+    "observation": {
+      "baseline_total_exact_hit_count": 11,
+      "candidate_total_exact_hit_count": 8,
+      "candidate_total_exact_hit_delta": -3,
+      "baseline_selected_query_exact_hit_count": 2,
+      "candidate_selected_query_exact_hit_count": 2,
+      "candidate_selected_query_exact_hit_delta": 0,
+      "candidate_class5_or6_top1_delta": 0
+    },
+    "interpretation": "The low-support fallback causes the R6 suppression pattern, but removing it harms overall exact prediction; the loss occurs outside the originally selected class-5/6 query subset."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "training_domains": [
+      "structured",
+      "technical_prose"
+    ],
+    "target_domain": "code",
+    "training_byte_budget": 15819,
+    "target_eval_byte_budget": 1454,
+    "selected_motif_capacity": 256,
+    "reasoning_class_count": 8,
+    "motifs_per_reasoning_class": 32,
+    "depth3_runtime_cap": 2048,
+    "baseline": "byte-identical R7 B11",
+    "candidate": "byte-identical R7 B01",
+    "target_query_count": 63,
+    "selected_query_count": 21
+  },
+  "attribution": {
+    "transition_categories": [
+      "baseline_only_hit",
+      "candidate_only_hit",
+      "both_hit",
+      "neither_hit"
+    ],
+    "support_buckets": [
+      "pair_support_lt3",
+      "pair_support_ge3"
+    ],
+    "selected_membership": [
+      "raw_class5_or6_selected",
+      "other_query"
+    ],
+    "accounting_identity": "baseline_only_hit_count - candidate_only_hit_count must equal 3 and baseline_hit_count - candidate_hit_count must equal 3",
+    "intervention": "none"
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "reasoning_class_count",
+      "==",
+      8
+    ],
+    [
+      "target_query_count",
+      "==",
+      63
+    ],
+    [
+      "selected_query_count",
+      "==",
+      21
+    ],
+    [
+      "baseline_total_exact_hit_count",
+      "==",
+      11
+    ],
+    [
+      "candidate_total_exact_hit_count",
+      "==",
+      8
+    ],
+    [
+      "baseline_only_hit_minus_candidate_only_hit",
+      "==",
+      3
+    ],
+    [
+      "transition_accounting_count",
+      "==",
+      63
+    ],
+    [
+      "transition_accounting_error_count",
+      "==",
+      0
+    ],
+    [
+      "selected_query_net_hit_delta",
+      "==",
+      0
+    ],
+    [
+      "nonselected_query_net_hit_delta",
+      "==",
+      -3
+    ],
+    [
+      "baseline_B11_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "candidate_B01_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "relation_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "adaptive_readout_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes; all 63 queries receive exactly one frozen transition attribution; the net three-hit loss is exactly reconstructed; selected-query net hit delta remains zero and nonselected-query net hit delta is -3.",
+    "negative": "Validity passes but the frozen support/selection transition accounting cannot reconstruct the R7 loss.",
+    "invalid": "Any parent, authority, source, budget, representation, baseline/candidate identity, target-query identity, accounting, determinism, provenance, capacity, or qualification criterion fails."
+  },
+  "successor_if_low_support_nonselected_dominates": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-LOW-SUPPORT-FALLBACK-CONDITIONAL-R9",
+    "intent": "test one frozen training-only conditional fallback rule that preserves the helpful low-support cases while avoiding the attributed suppressive cases; originating-task only, with later disjoint transfer required before retention"
+  },
+  "successor_otherwise": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-LOW-SUPPORT-FALLBACK-FACTORIAL-R9",
+    "intent": "factor the dominant transition/support bucket further before proposing another candidate mechanism"
+  },
+  "no_post_result_tuning_rule": "Do not alter R7 data, budgets, 256 capacity, 8x32 classes, baseline/candidate variants, target queries, selected-query identity, support buckets, transition categories, metrics, thresholds, classification, or authority after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-low-support-fallback-attribution-r8.json",
+    "unitary/wlm_lm_external_reasoning_low_support_fallback_attribution_r8.go",
+    "cmd/wlm-lm-external-reasoning-low-support-fallback-attribution-r8/main.go",
+    ".github/workflows/external-reasoning-low-support-fallback-attribution-r8.yml"
+  ]
+}
