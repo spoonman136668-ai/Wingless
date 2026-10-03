@@ -57,9 +57,9 @@ func RunWlmLmExternalReasoningLowSupportFallbackCounterfactualR7(code,structured
 		"baseline_selected_query_exact_hit_count":0,
 		"candidate_selected_query_exact_hit_count":0,
 		"candidate_selected_query_exact_hit_delta":0,
-		"baseline_class5_or6_top1_count":0,
-		"candidate_class5_or6_top1_count":0,
-		"candidate_class5_or6_top1_delta":0,
+		"baseline_class5_or_6_top1_count":0,
+		"candidate_class5_or_6_top1_count":0,
+		"candidate_class5_or_6_top1_delta":0,
 		"candidate_maximum_probability_mass_error":0,
 		"candidate_minimum_repaired_retained_mass":1,
 		"selected_query_base_class_mass_sum":0,
@@ -225,8 +225,6 @@ func RunWlmLmExternalReasoningLowSupportFallbackCounterfactualR7(code,structured
 	// Target bytes are used scientifically only after the training-only preflight is frozen.
 	target:=code[:1454]
 	targetStream:=wlmLmExternalMotifRelationHoldoutR1Decode(target,index)
-	target:=code[:1454]
-	targetStream:=wlmLmExternalMotifRelationHoldoutR1Decode(target,index)
 	for j:=0;j+4<len(targetStream);j++ {
 		truth:=targetStream[j+4]
 		rawFocus:=false
@@ -270,8 +268,8 @@ func RunWlmLmExternalReasoningLowSupportFallbackCounterfactualR7(code,structured
 		m["target_query_count"]++
 		if baseTop==truth { m["baseline_total_exact_hit_count"]++ }
 		if candTop==truth { m["candidate_total_exact_hit_count"]++ }
-		if classes[baseTop]==5 || classes[baseTop]==6 { m["baseline_class5_or6_top1_count"]++ }
-		if classes[candTop]==5 || classes[candTop]==6 { m["candidate_class5_or6_top1_count"]++ }
+		if classes[baseTop]==5 || classes[baseTop]==6 { m["baseline_class5_or_6_top1_count"]++ }
+		if classes[candTop]==5 || classes[candTop]==6 { m["candidate_class5_or_6_top1_count"]++ }
 		if rawFocus {
 			m["selected_query_count"]++
 			if baseTop==truth { m["baseline_selected_query_exact_hit_count"]++ }
@@ -280,7 +278,7 @@ func RunWlmLmExternalReasoningLowSupportFallbackCounterfactualR7(code,structured
 	}
 	m["candidate_total_exact_hit_delta"]=m["candidate_total_exact_hit_count"]-m["baseline_total_exact_hit_count"]
 	m["candidate_selected_query_exact_hit_delta"]=m["candidate_selected_query_exact_hit_count"]-m["baseline_selected_query_exact_hit_count"]
-	m["candidate_class5_or6_top1_delta"]=m["candidate_class5_or6_top1_count"]-m["baseline_class5_or6_top1_count"]
+	m["candidate_class5_or_6_top1_delta"]=m["candidate_class5_or_6_top1_count"]-m["baseline_class5_or_6_top1_count"]
 	if m["maximum_probability_mass_error"]>1e-9 { m["invalid_row_count"]++ }
 	for _,v:=range m {
 		if math.IsNaN(v)||math.IsInf(v,0) { m["invalid_row_count"]++ }
