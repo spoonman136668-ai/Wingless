@@ -1,0 +1,113 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-CONTEXT-SUPPORT-BACKOFF-R1",
+  "program": "Wingless external raw-input to representation to context-conditioned relation frontier",
+  "question": "Can a training-support-gated selector retain the useful dedicated pair-context signal while avoiding the overflow and low-support failures identified by attribution?",
+  "hypothesis": "Reconstruct byte-for-byte the parent attribution experiment's 512-motif representation, top-511 pair-context mapping, 512x512 context predictor, and 512x512 current-only relation. For an evaluation pair, use the context predictor only if the pair is dedicated and its frozen training occurrence count is at least three; otherwise use the current-only relation. This selector will improve pooled top-1 accuracy by at least 0.005 over current-only, improve by at least 0.05 over the ungated context predictor, and avoid degrading any source by more than 0.01 versus current-only.",
+  "exact_parent_sha": "a1444d175f3fad4d65da7f2bdbf47f892e028673",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-context-backoff-r1",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-CONTEXT-STATE-ATTRIBUTION-R1",
+    "github_run_id": "37089891621",
+    "classification": "supported",
+    "attribution": "overflow_collision_dominant",
+    "observation": {
+      "pooled_dedicated_context_minus_current_accuracy": 0.006016847172081841,
+      "pooled_overflow_context_minus_current_accuracy": -0.2353413654618474,
+      "support_1_2_context_minus_current_accuracy": -0.3207547169811321,
+      "support_3_7_context_minus_current_accuracy": 0.03703703703703709,
+      "support_8_plus_context_minus_current_accuracy": -0.004779607010090281
+    },
+    "diagnosis": "Exact context is useful when supported, but unseen/overflow and very low-support contexts destroy accuracy. The bounded next test is training-side backoff, not capacity growth."
+  },
+  "scope_statement": "One-step selector test only. No representation, context map, transition counts, or heldout behavior changes except choosing which already-frozen parent predictor supplies the top-1 answer.",
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical parent external manifest",
+    "split": "byte-identical first 60% training / final 40% scoring-only",
+    "representation": "byte-identical 512-motif learner",
+    "motif_stream_decode": "byte-identical non-overlapping exact-motif scanner",
+    "pair_selection": "byte-identical top-511 pair contexts plus overflow",
+    "context_predictor": "byte-identical 512x512 context-state successor matrix",
+    "current_predictor": "byte-identical 512x512 current-motif successor matrix",
+    "unigram_fallback": "byte-identical pooled training successor argmax",
+    "counter_state": "no counters beyond the two matrices already present in the parent attribution apparatus"
+  },
+  "selector": {
+    "context_eligible": "evaluation pair is among frozen dedicated contexts AND training pair occurrence count >= 3",
+    "backoff": "all overflow/unseen pairs and dedicated pairs with training support 1-2 use current-only relation",
+    "threshold_source": "the threshold is frozen prospectively from the sealed attribution result showing support 1-2 strongly harmful and support 3-7 positive",
+    "heldout_in_selector": false,
+    "adaptive_updates": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["context_state_count","==",512],
+    ["dedicated_pair_context_count","==",511],
+    ["context_predictive_counter_capacity","==",262144],
+    ["current_predictive_counter_capacity","==",262144],
+    ["selector_context_query_count",">",0],
+    ["selector_backoff_query_count",">",0],
+    ["selector_support_violation_count","==",0],
+    ["pooled_hybrid_minus_current_accuracy",">=",0.005],
+    ["pooled_hybrid_minus_ungated_context_accuracy",">=",0.05],
+    ["minimum_source_hybrid_minus_current_accuracy",">=",-0.01],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "diagnostic_metrics": [
+    "per-source hybrid, current-only, and ungated-context top-1 accuracy",
+    "per-source hybrid-minus-current and hybrid-minus-context delta",
+    "context-use fraction",
+    "backoff fraction separated into unseen/overflow and support-1/2",
+    "accuracy of context-eligible and backoff subsets"
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and frozen thresholds pass.",
+    "mixed": "Validity passes and gated backoff materially recovers the ungated-context loss but does not clear the pooled positive-gain or source nondegradation threshold.",
+    "negative": "Validity passes but the hybrid does not materially recover ungated-context loss or is worse than current-only pooled.",
+    "invalid": "Any authority, source identity, split contamination, parent predictor drift, selector-support drift, capacity, determinism, or host-isolation criterion fails.",
+    "incomplete": "Authority, source retrieval, or hosted compute interruption prevents the frozen matrix."
+  },
+  "validity_criteria": [
+    "Exact sealed attribution parent and North Star identities match.",
+    "A fresh CKB-plane READY_RESEARCH receipt is bound to this exact preregistration and frozen external manifest.",
+    "Both parent predictor matrices, pair map, support counts, source splits, motif representation, and fallback are scientifically unchanged.",
+    "Selector support is computed only from frozen training-prefix pair counts and never from heldout outcomes.",
+    "No evaluation update changes support, mapping, matrices, threshold, or stopping.",
+    "No new representation or predictive counter state is introduced beyond the parent attribution apparatus.",
+    "Full Go regression passes before probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, context map, support>=3 selector, parent predictors, fallback, metrics, thresholds, classification, or authority requirements after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-SUPPORT-DISTRIBUTIONAL-COMPOSITION",
+    "intent": "carry the supported training-side selector into depth-two/depth-three probability-mass composition without changing capacity"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-ALIAS-GENERALIZATION",
+    "intent": "replace exact pair identity with a learned context alias that can generalize unseen pair surfaces under a fixed state budget"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-context-support-backoff-r1.json",
+    "unitary/wlm_lm_external_context_support_backoff_r1.go",
+    "cmd/wlm-lm-external-context-support-backoff-r1/main.go",
+    ".github/workflows/external-context-support-backoff-r1.yml"
+  ]
+}
