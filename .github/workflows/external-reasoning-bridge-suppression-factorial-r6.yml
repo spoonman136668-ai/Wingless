@@ -1,0 +1,128 @@
+name: Wingless bridge suppression factorial R6
+
+on:
+  push:
+    branches:
+      - research/external-hosted-wingless-reasoning-bridge-suppression-factorial-r6
+    paths:
+      - 'unitary/wlm_lm_external_reasoning_bridge_suppression_factorial_r6.go'
+      - 'cmd/wlm-lm-external-reasoning-bridge-suppression-factorial-r6/main.go'
+      - '.github/workflows/external-reasoning-bridge-suppression-factorial-r6.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Validate frozen package
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "756f5157774259ab9087759b6e98be673a4682a2" HEAD
+          python3 - <<'PY'
+          import subprocess
+          prereg="756f5157774259ab9087759b6e98be673a4682a2"
+          parent="085dac1f44b99c7a2653986fd32d411996fb6696"
+          pp="docs/experiments/wlm-lm-external-reasoning-bridge-suppression-factorial-r6.json"
+          assert subprocess.check_output(["git","rev-parse",prereg+"^"],text=True).strip()==parent
+          assert set(subprocess.check_output(["git","diff-tree","--no-commit-id","--name-only","-r",prereg],text=True).splitlines())=={pp}
+          changed=set(subprocess.check_output(["git","diff","--name-only",parent+"..HEAD"],text=True).splitlines())
+          expected={pp,"unitary/wlm_lm_external_reasoning_bridge_suppression_factorial_r6.go","cmd/wlm-lm-external-reasoning-bridge-suppression-factorial-r6/main.go",".github/workflows/external-reasoning-bridge-suppression-factorial-r6.yml"}
+          assert changed==expected,(sorted(changed),sorted(expected))
+          print("FROZEN_PACKAGE_OK",sorted(changed))
+          PY
+      - name: Verify READY_RESEARCH receipt
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          raw=r'''{"schema":"ckb-plane.external-exposure-ready-research-receipt.v1","project":"Wingless","experiment":"WLM-LM-EXTERNAL-REASONING-BRIDGE-SUPPRESSION-FACTORIAL-R6","preregistration_sha":"756f5157774259ab9087759b6e98be673a4682a2","research_host":"runnervm8df0l","runner_id":"GitHub Actions 1000001799","manifest_sha256":"75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4","plan_decision":{"schema":"ckb-plane.external-exposure.v1","disposition":"READY_PLAN","scope":"plan-only","reasons":null},"fetch_decision":{"schema":"ckb-plane.external-exposure-fetch.v1","disposition":"READY_FETCH","scope":"fetch-verify-only","reasons":null},"research_decision":{"schema":"ckb-plane.external-exposure-research.v1","disposition":"READY_RESEARCH","scope":"research-consume-once","reasons":null},"ckb_plane_main_sha":"36d99a0257120ede57bb96638660d35014dd529e"}'''
+          assert hashlib.sha256(raw.encode()).hexdigest()=="18f4c43c6cd0ea9e7a1a55cf4d36312ef9ab9ab0cbcfe99b55c28c7043b4f2cf"
+          r=json.loads(raw)
+          assert r["preregistration_sha"]=="756f5157774259ab9087759b6e98be673a4682a2"
+          assert r["research_decision"]["disposition"]=="READY_RESEARCH"
+          pathlib.Path("/tmp/authority.json").write_text(raw)
+          PY
+      - name: Fetch exact external sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          export EXTERNAL_ROOT="$RUNNER_TEMP/wingless-suppression-r6"; mkdir -p "$EXTERNAL_ROOT"
+          python3 - <<'PY'
+          import hashlib,os,pathlib,urllib.request
+          sources=[
+            ("code","https://raw.githubusercontent.com/python/cpython/ebf955df7a89ed0c7968f79faec1de49f61ed7cb/Lib/fractions.py","7a95f1c506c9ac4b2277df5f2bdd9d61cc67b520c45021a5a961939770221ef6",41453),
+            ("structured","https://raw.githubusercontent.com/json-schema-org/JSON-Schema-Test-Suite/5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8/tests/draft2020-12/type.json","4c5cbe6cbcd28af73761091367b20e07d0403847e236c06c31fc27061bd81192",14365),
+            ("technical-prose","https://raw.githubusercontent.com/golang/go/6f5c275ebdc454197fff5f1496521c8f81e20eef/README.md","8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",1454),
+          ]
+          root=pathlib.Path(os.environ["EXTERNAL_ROOT"])
+          for d,u,h,n in sources:
+              b=urllib.request.urlopen(urllib.request.Request(u,headers={"User-Agent":"wingless-suppression-r6-class-attribution"}),timeout=30).read(n+1)
+              assert len(b)==n and hashlib.sha256(b).hexdigest()==h
+              (root/(d+".bin")).write_bytes(b)
+          PY
+          echo "EXTERNAL_ROOT=$EXTERNAL_ROOT" >> "$GITHUB_ENV"
+      - name: Full Go regression
+        run: go test ./... -count=1
+      - name: Run frozen bridge suppression factorial R6 twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/wlm-lm-external-reasoning-bridge-suppression-factorial-r6 --code "$EXTERNAL_ROOT/code.bin" --structured "$EXTERNAL_ROOT/structured.bin" --technical-prose "$EXTERNAL_ROOT/technical-prose.bin" > /tmp/result1.json
+          go run ./cmd/wlm-lm-external-reasoning-bridge-suppression-factorial-r6 --code "$EXTERNAL_ROOT/code.bin" --structured "$EXTERNAL_ROOT/structured.bin" --technical-prose "$EXTERNAL_ROOT/technical-prose.bin" > /tmp/result2.json
+          cmp /tmp/result1.json /tmp/result2.json
+          cat /tmp/result1.json
+      - name: Classify
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math,pathlib
+          r=json.loads(pathlib.Path("/tmp/result1.json").read_text());m=r["metrics"]
+          valid=(
+            m["source_identity_mismatch_count"]==0 and m["source_count"]==3 and m["total_source_bytes"]==57272 and
+            m["selected_motif_count"]==256 and m["reasoning_class_count"]==8 and
+            m["minimum_reasoning_class_size"]==32 and m["maximum_reasoning_class_size"]==32 and
+            m["selected_query_count"]==21 and m["factorial_record_count"]==21 and
+            m["factorial_accounting_error_count"]==0 and
+            m["B11_repaired_top1_class5_count"]==0 and m["B11_repaired_top1_class6_count"]==0 and
+            m["B11_identity_mismatch_count"]==0 and
+            m["relation_capacity_growth_event_count"]==0 and m["adaptive_readout_growth_event_count"]==0 and
+            m["tokenizer_use_count"]==0 and m["external_model_call_count"]==0 and
+            m["counter_overflow_count"]==0 and m["invalid_row_count"]==0 and
+            m["maximum_probability_mass_error"]<=1e-9 and
+            all(math.isfinite(float(v)) for v in m.values())
+          )
+          effect=(m["low_support_main_count"]+m["exact_context_main_count"]+
+                  m["additive_shared_count"]+m["interaction_only_count"])
+          if not valid: cls="invalid"
+          elif effect>=1: cls="supported"
+          else: cls="negative"
+          out={"schema":"wingless.research-classification.v1","experiment":"WLM-LM-EXTERNAL-REASONING-BRIDGE-SUPPRESSION-FACTORIAL-R6","classification":cls,"validity_pass":valid,"authority_receipt_sha256":"18f4c43c6cd0ea9e7a1a55cf4d36312ef9ab9ab0cbcfe99b55c28c7043b4f2cf","metrics":m}
+          pathlib.Path("/tmp/classification.json").write_text(json.dumps(out,separators=(",",":")));print(json.dumps(out,separators=(",",":")))
+          if not valid: raise SystemExit(2)
+          PY
+      - name: Delete external bytes
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/wingless-suppression-r6"
+      - name: Upload evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-bridge-suppression-factorial-r6
+          path: |
+            /tmp/authority.json
+            /tmp/result1.json
+            /tmp/result2.json
+            /tmp/classification.json
+          if-no-files-found: error
