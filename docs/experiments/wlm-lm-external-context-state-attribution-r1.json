@@ -1,0 +1,116 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-CONTEXT-STATE-ATTRIBUTION-R1",
+  "program": "Wingless external raw-input to representation to context-state attribution",
+  "question": "Was the negative fixed-capacity context-state result caused primarily by overflow/unseen pair collisions, or by sparse overconditioning even when the previous+current pair had a dedicated context state?",
+  "hypothesis": "Reconstruct byte-for-byte the sealed 511-dedicated-plus-one-overflow context map and current-only control from WLM-LM-EXTERNAL-CONTEXT-STATE-HOLDOUT-R1. Score the identical untouched suffix triples while partitioning queries into dedicated-context and overflow-context subsets and into frozen training-support bins. Attribution is resolved if either (A) dedicated contexts are nonworse than current-only while overflow contexts are at least 0.02 worse, identifying overflow collision as dominant, or (B) dedicated contexts themselves are at least 0.02 worse, identifying sparse/overconditioned dedicated state as dominant. No predictor, capacity, mapping, or evaluation behavior changes are permitted.",
+  "exact_parent_sha": "7f8bb3f0899acc69813c361522c70f0ee79d92cf",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-context-attribution-r1",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-CONTEXT-STATE-HOLDOUT-R1",
+    "github_run_id": "37089464544",
+    "classification": "negative",
+    "observation": {
+      "training_distinct_pair_count": 2009,
+      "training_pair_coverage_captured_by_dedicated_contexts": 0.7098713880073493,
+      "overflow_context_query_fraction": 0.3330658105939005,
+      "pooled_context_minus_current_accuracy": -0.07437132156233273,
+      "eval_code_context_minus_current_accuracy": -0.11699507389162561,
+      "eval_structured_context_minus_current_accuracy": 0.006314127861089203,
+      "eval_technical_prose_context_minus_current_accuracy": -0.02857142857142857
+    }
+  },
+  "scope_statement": "Diagnostic attribution only. The scientific predictor is frozen from the parent negative; this experiment only partitions already-defined heldout queries and reports which context subset caused the degradation.",
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical parent source manifest",
+    "split": "byte-identical first 60% training / final 40% scoring-only split",
+    "representation": "byte-identical 512-motif representation",
+    "motif_stream_decode": "byte-identical non-overlapping exact-motif scanner",
+    "pair_selection": "byte-identical top 511 training pair contexts by occurrence count and lexicographic tie-break",
+    "overflow_mapping": "byte-identical context ID 511",
+    "context_predictor": "byte-identical 512x512 context-state successor counts and unigram zero-row fallback",
+    "current_control": "byte-identical current-motif-only relation control"
+  },
+  "attribution_partitions": {
+    "dedicated_query": "evaluation (previous,current) pair exists among frozen top-511 dedicated contexts",
+    "overflow_query": "evaluation pair maps to frozen overflow context",
+    "support_bins": [
+      {"name":"support_1_2","training_pair_count_min":1,"training_pair_count_max":2},
+      {"name":"support_3_7","training_pair_count_min":3,"training_pair_count_max":7},
+      {"name":"support_8_plus","training_pair_count_min":8,"training_pair_count_max":null}
+    ],
+    "evaluation_updates": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["context_state_count","==",512],
+    ["dedicated_pair_context_count","==",511],
+    ["context_predictive_counter_capacity","==",262144],
+    ["dedicated_query_count",">",0],
+    ["overflow_query_count",">",0],
+    ["partition_query_count_mismatch","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "attribution_rules": {
+    "overflow_collision_dominant": "pooled_dedicated_context_minus_current_accuracy >= -0.005 and pooled_overflow_context_minus_current_accuracy <= -0.02",
+    "dedicated_overconditioning_dominant": "pooled_dedicated_context_minus_current_accuracy <= -0.02",
+    "mixed_or_unresolved": "neither dominant rule fires",
+    "supported": "Validity passes and exactly one dominant attribution rule fires.",
+    "mixed": "Validity passes but both mechanisms appear materially harmful or no single dominant rule clears the frozen boundary.",
+    "invalid": "Any frozen predictor, partition, source, authority, capacity, determinism, or heldout-isolation rule fails."
+  },
+  "diagnostic_metrics": [
+    "pooled and per-source dedicated context/current accuracy and delta",
+    "pooled and per-source overflow context/current accuracy and delta",
+    "query counts and accuracy deltas for support_1_2, support_3_7, support_8_plus",
+    "training occurrence mass captured by top-511 contexts",
+    "evaluation dedicated-context fraction"
+  ],
+  "validity_criteria": [
+    "Exact sealed negative parent and North Star identities match.",
+    "A fresh CKB-plane READY_RESEARCH receipt is bound to this exact preregistration and external manifest.",
+    "Scientific construction is byte-for-byte parent behavior; only diagnostic partition accounting is added.",
+    "No evaluation query changes context mapping, training support, counts, thresholds, or stopping.",
+    "Dedicated and overflow subsets are disjoint and together equal every valid scored suffix triple.",
+    "Support bins are determined only by frozen training pair counts.",
+    "Full Go regression passes before probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, parser, external model, persistent corpus, capacity change, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, context map, support bins, attribution thresholds, predictor/control behavior, metrics, or classification after primary output.",
+  "successor_if_overflow_collision_dominant": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-ALIAS-GENERALIZATION",
+    "intent": "replace exact pair identity with a frozen learned context alias that generalizes unseen pair surfaces without enlarging the 512 predictive-state budget"
+  },
+  "successor_if_dedicated_overconditioning_dominant": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-SUPPORT-BACKOFF",
+    "intent": "test training-support-gated backoff to the supported current-only relation while preserving the fixed 512x512 predictive budget"
+  },
+  "successor_if_mixed_or_unresolved": {
+    "experiment_family": "WLM-LM-EXTERNAL-RELATION-CONTEXT-FACTOR-ABLATION",
+    "intent": "separate previous-state information from exact pair identity using fixed-capacity factorized controls"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-context-state-attribution-r1.json",
+    "unitary/wlm_lm_external_context_state_attribution_r1.go",
+    "cmd/wlm-lm-external-context-state-attribution-r1/main.go",
+    ".github/workflows/external-context-state-attribution-r1.yml"
+  ]
+}
