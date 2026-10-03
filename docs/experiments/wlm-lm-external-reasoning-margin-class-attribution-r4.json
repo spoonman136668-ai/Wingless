@@ -1,0 +1,114 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-LM-EXTERNAL-REASONING-MARGIN-CLASS-ATTRIBUTION-R4",
+  "program":"Wingless fixed-capacity probability-margin reasoning-class attribution",
+  "question":"Is the global margin gate failing because margin scale and low-margin exact precision differ materially between the eight already-frozen reasoning classes?",
+  "hypothesis":"Replay the exact negative R3 representation, repaired relation, eight fixed 64-motif classes, pooled training-median threshold, and heldout population without changing any gate or capacity. For attribution only, compute the training margin median within each fixed top-1 reasoning class and repaired exact precision below the unchanged global threshold within each class. Among classes with at least 25 below-threshold heldout rows, the precision range will be at least 0.15, and the range of the eight class training-margin medians will be at least 0.05. All 19 same-class hidden gains will reproduce below the unchanged global threshold. This would support fixed-class calibration as the next bounded readout factor.",
+  "exact_parent_sha":"dcacafaeed01fc6973de3404b812d458f47783b4",
+  "qualification_branch":"research/external-hosted-wingless-reasoning-margin-class-attribution-r4",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence":{
+    "experiment":"WLM-LM-EXTERNAL-REASONING-MARGIN-SOURCE-ATTRIBUTION-R3",
+    "github_run_id":"37136291656",
+    "classification":"negative",
+    "observation":{
+      "training_margin_threshold":0.4329118785561704,
+      "source_training_margin_code_median":0.4329118785561704,
+      "source_training_margin_structured_median":0.4329118785561704,
+      "code_structured_training_margin_median_gap":0.0,
+      "source_below_threshold_code_exact_precision":0.20566502463054187,
+      "source_below_threshold_structured_exact_precision":0.2784090909090909,
+      "code_structured_below_threshold_precision_gap":0.07274406627854901,
+      "same_class_hidden_gain_count":19,
+      "same_class_hidden_below_threshold_count":19
+    },
+    "diagnosis":"Source-conditioned margin calibration was not supported. The next bounded attribution unit is the already-frozen eight-class reasoning partition."
+  },
+  "external_authority":{
+    "ckb_plane_main_sha":"36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256":"75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required":"READY_RESEARCH",
+    "execution_host_policy":"GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus":false,
+    "external_model_calls":false,
+    "production_authority":false
+  },
+  "frozen_reuse":{
+    "sources":"byte-identical R3 three-source manifest",
+    "split":"first 60% training / final 40% heldout",
+    "representation":"byte-identical sealed 512-motif learner",
+    "baseline_relation":"byte-identical sealed unrepaired predictor",
+    "repaired_relation":"byte-identical supported low-support repair",
+    "refined_readout":"byte-identical eight fixed 64-motif classes",
+    "global_training_margin_threshold":0.4329118785561704,
+    "relation_capacity_change":false,
+    "readout_capacity_change":false,
+    "threshold_change":false
+  },
+  "attribution_protocol":{
+    "class_training_margin_median":"median of the frozen repaired depth-3 margin statistic for training-prefix queries whose repaired top-1 motif lies in the fixed class; attribution only",
+    "class_below_threshold_precision":"repaired exact precision for heldout rows below the unchanged global threshold, grouped by repaired top-1 fixed class",
+    "precision_minimum_support":25,
+    "hidden_population":"exact 19 R3 same-class hidden gains",
+    "adaptive_changes":false
+  },
+  "metrics_and_thresholds":[
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["refined_reasoning_class_count","==",8],
+    ["motif_class_assignment_count","==",512],
+    ["minimum_refined_class_size","==",64],
+    ["maximum_refined_class_size","==",64],
+    ["training_margin_sample_count","==",5978],
+    ["training_margin_threshold","==",0.4329118785561704],
+    ["depth3_query_count","==",3732],
+    ["same_class_hidden_gain_count","==",19],
+    ["same_class_hidden_below_threshold_count","==",19],
+    ["eligible_below_threshold_class_count",">=",4],
+    ["class_training_margin_median_range",">=",0.05],
+    ["class_below_threshold_precision_range",">=",0.15],
+    ["class_attribution_accounting_error_count","==",0],
+    ["heldout_selection_use_count","==",0],
+    ["relation_capacity_growth_event_count","==",0],
+    ["adaptive_readout_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules":{
+    "supported":"Validity passes and both preregistered class-calibration ranges pass.",
+    "mixed":"Validity passes and exactly one class-calibration range passes.",
+    "negative":"Validity passes but neither class-calibration range passes.",
+    "invalid":"Any sealed-parent, authority, source, threshold/population reproduction, class identity/accounting, determinism, capacity, or heldout-isolation criterion fails."
+  },
+  "validity_criteria":[
+    "Exact qualified negative R3 parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and manifest.",
+    "Representation, relation, eight class assignments, margin formula, pooled threshold, runtime cap, and horizons are unchanged.",
+    "Class medians and class precision are attribution outputs only and never influence heldout behavior.",
+    "The 3732 heldout rows and 19 same-class hidden gains reproduce exactly.",
+    "Each of the 512 motifs remains assigned to exactly one fixed 64-motif class.",
+    "Heldout labels affect attribution only and never threshold selection or behavior.",
+    "Duplicate complete executions are byte-identical.",
+    "No new learned state, tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule":"Do not alter sources, split, representation, relation, classes, margin formula, global threshold, 25-row support floor, 0.05/0.15 attribution floors, metrics, classification, or authority after primary output.",
+  "successor_if_supported":{
+    "experiment_family":"WLM-LM-EXTERNAL-REASONING-CLASS-CALIBRATED-MARGIN-READOUT-R1",
+    "intent":"test fixed-class training-only margin thresholds while keeping relation and class capacity unchanged"
+  },
+  "successor_if_mixed_or_negative":{
+    "experiment_family":"WLM-LM-EXTERNAL-REASONING-MARGIN-RELATION-STATE-ATTRIBUTION-R5",
+    "intent":"attribute low-margin hidden gains by frozen relation/context state before changing the gate"
+  },
+  "changed_paths":[
+    "docs/experiments/wlm-lm-external-reasoning-margin-class-attribution-r4.json",
+    "unitary/wlm_lm_external_reasoning_margin_class_attribution_r4.go",
+    "cmd/wlm-lm-external-reasoning-margin-class-attribution-r4/main.go",
+    ".github/workflows/external-reasoning-margin-class-attribution-r4.yml"
+  ]
+}
