@@ -1,0 +1,195 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-EFFICIENCY-SIGNAL-R10",
+  "program": "Wingless fixed-budget future-data learning-efficiency signal validation",
+  "question": "Does a training-only representation-headroom signal predict which sealed future domain requires more equal-budget adaptation data to improve held-out prediction at fixed capacity?",
+  "hypothesis": "Run three leave-one-domain-out arms over the exact original external manifest. Before opening any target bytes, use the same 15,819-byte proportional non-target training budget and fixed 256-motif capacity from R2/R3. Compute one frozen native signal only: representation_headroom = eligible_motif_count_before_truncation - 256. Then freeze the signal and open a common 1,454-byte target window per domain. The first 872 target bytes are an adaptation stream divided into eight cumulative 109-byte packets; the final 582 bytes are sealed evaluation. At packet 0 and after each packet, rebuild the fixed-capacity representation/relation model from the unchanged non-target base plus the revealed target prefix and evaluate the same deterministic next-motif prediction metric on the 582-byte sealed suffix. Define packets_to_first_gain as the first packet whose exact-hit count exceeds packet-0 by at least one; failure value 9. The hypothesis predicts lower training-only headroom -> greater packets_to_first_gain. No candidate modification is selected or retained.",
+  "exact_parent_sha": "b1083811b2924a2c674eb56260885d9d3eb36251",
+  "qualification_branch": "research/external-hosted-wingless-future-data-learning-efficiency-signal-r10",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; primary objective is efficient learning of unseen future data under fixed budgets"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-LOW-SUPPORT-FALLBACK-CONDITIONAL-R9",
+    "github_run_id": "37150498366",
+    "classification": "mixed",
+    "observation": {
+      "baseline_total_exact_hit_count": 11,
+      "candidate_total_exact_hit_count": 11,
+      "candidate_total_exact_hit_delta": 0,
+      "candidate_prediction_change_count": 1,
+      "conditional_B01_query_count": 6
+    },
+    "interpretation": "The bounded bridge condition changed behavior without improving task performance; per contract, stop optimizing that originating-dataset mechanism and return to native signals for future-data learning efficiency."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "fixed_budget": {
+    "arm_count": 3,
+    "non_target_training_bytes_per_arm": 15819,
+    "non_target_allocation_rule": "same proportional exact-prefix rule as R2/R3",
+    "motif_capacity": 256,
+    "target_window_bytes": 1454,
+    "target_adaptation_bytes": 872,
+    "target_evaluation_bytes": 582,
+    "adaptation_packet_count": 8,
+    "bytes_per_packet": 109,
+    "packet_failure_value": 9,
+    "compute_rule": "same deterministic fixed-capacity representation/relation rebuild and evaluator at every packet; no extra runtime for any arm",
+    "authority": "unchanged"
+  },
+  "signal": {
+    "name": "representation_headroom",
+    "definition": "eligible_motif_count_before_truncation - 256 using non-target training bytes only",
+    "lower_means": "less representational support and predicted slower future adaptation",
+    "target_byte_use_count": 0,
+    "target_label_use_count": 0,
+    "post_result_choice_count": 0
+  },
+  "evaluation": {
+    "target_domains": [
+      "code",
+      "structured",
+      "technical_prose"
+    ],
+    "adaptation_split": "bytes [0:872] of each exact source",
+    "sealed_eval_split": "bytes [872:1454] of each exact source",
+    "metric": "deterministic next-motif exact-hit count on sealed evaluation using the fixed-capacity learned relation model",
+    "packets_to_first_gain": "first packet 1..8 with exact hits >= packet0+1; otherwise 9",
+    "rank_test": "For every pair of arms with unequal representation_headroom and unequal packets_to_first_gain, count agreement when lower headroom has greater packets_to_first_gain. supported requires at least 2 agreeing pairwise comparisons and zero reversed comparisons; ties are neutral."
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "arm_count",
+      "==",
+      3
+    ],
+    [
+      "non_target_training_byte_budget_per_arm",
+      "==",
+      15819
+    ],
+    [
+      "motif_capacity",
+      "==",
+      256
+    ],
+    [
+      "target_window_bytes_per_arm",
+      "==",
+      1454
+    ],
+    [
+      "target_adaptation_bytes_per_arm",
+      "==",
+      872
+    ],
+    [
+      "target_evaluation_bytes_per_arm",
+      "==",
+      582
+    ],
+    [
+      "adaptation_packet_count",
+      "==",
+      8
+    ],
+    [
+      "signal_target_byte_use_count",
+      "==",
+      0
+    ],
+    [
+      "signal_target_label_use_count",
+      "==",
+      0
+    ],
+    [
+      "signal_post_result_choice_count",
+      "==",
+      0
+    ],
+    [
+      "pairwise_signal_agreement_count",
+      ">=",
+      2
+    ],
+    [
+      "pairwise_signal_reversal_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes; representation headroom correctly orders at least two pairwise future-adaptation comparisons with zero reversals under equal budgets.",
+    "mixed": "Validity passes; at least one pair agrees and at least one pair reverses or too many ties prevent the supported criterion.",
+    "negative": "Validity passes but there is no agreeing non-tied pair or reversals dominate.",
+    "invalid": "Any parent, authority, source, budget, split, signal-freeze, evaluator identity, deterministic replay, capacity, provenance, or qualification criterion fails."
+  },
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-HEADROOM-GUIDED-ALLOCATION-R11",
+    "intent": "test whether a preregistered fixed total data budget allocated using the validated training-only headroom signal improves aggregate learning across multiple unseen future datasets versus equal allocation; no self-modification"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-EFFICIENCY-SIGNAL-FACTORIAL-R11",
+    "intent": "factor representation headroom, class-support deficit, and relation-margin statistics prospectively under the same fixed adaptation budgets before any allocation policy"
+  },
+  "no_post_result_tuning_rule": "Do not alter source identities, 15,819-byte base budget, 256 capacity, 1,454-byte target window, 872/582 split, eight 109-byte packets, signal formula, evaluator, packet gain rule, rank test, metrics, thresholds, classification, or authority after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-learning-efficiency-signal-r10.json",
+    "unitary/wlm_lm_external_future_data_learning_efficiency_signal_r10.go",
+    "cmd/wlm-lm-external-future-data-learning-efficiency-signal-r10/main.go",
+    ".github/workflows/external-future-data-learning-efficiency-signal-r10.yml"
+  ]
+}
