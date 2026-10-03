@@ -1,0 +1,115 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REPAIRED-RELATION-REASONING-BRIDGE-R1",
+  "program": "Wingless external raw-input to representation to repaired prediction to bounded abstract reasoning",
+  "question": "Can the supported repaired relation distribution drive an unseen downstream abstract query about the eventual motif state, rather than only predicting the exact motif identity?",
+  "hypothesis": "Freeze a three-class motif commonality abstraction from training prefixes only by sorting the 512 learned motifs by total training occurrence count descending and motif ID ascending, then assigning ranks 0..170 to COMMON, 171..341 to MID, and 342..511 to RARE. On untouched heldout depth-2 and depth-3 queries, sum predicted terminal probability mass by these three classes. The repaired relation will improve pooled depth-3 abstract-query accuracy by at least 0.005 over the sealed unrepaired baseline, will not degrade pooled depth-2 abstract accuracy by more than 0.005, and will remain within 0.005 of or exceed the repaired top-1-only class projection control.",
+  "exact_parent_sha": "5ff13975f0f38a80e1b180f183ffa4e7760c68f9",
+  "qualification_branch": "research/external-hosted-wingless-repaired-relation-reasoning-bridge-r1",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-CONTEXT-TRANSITION-QUALITY-REPAIR-R1",
+    "github_run_id": "37118451395",
+    "classification": "supported",
+    "observation": {
+      "depth3_low_support_repair_minus_baseline_accuracy": 0.013996889580093319,
+      "depth3_pooled_repair_minus_baseline_accuracy": 0.008842443729903504,
+      "depth2_pooled_repair_minus_baseline_accuracy": 0.016064257028112428,
+      "minimum_source_depth3_repair_minus_baseline_accuracy": 0
+    },
+    "diagnosis": "A fixed training-only pooled low-support backoff improved multi-step relation prediction with no learned-capacity growth. The next North-Star step is to feed that predictive distribution into a bounded downstream abstraction query."
+  },
+  "scope_statement": "This is a controlled prediction-to-reasoning bridge over a training-frozen commonality abstraction. Passing shows that an externally learned raw-motif transition distribution can support an unseen downstream aggregate predicate; it does not establish semantic or open-domain reasoning.",
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical sealed three-source manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "baseline_relation": "byte-identical sealed unrepaired context-transition predictor",
+    "repaired_relation": "byte-identical supported 0.5 current-row plus 0.5 overflow-row backoff for exact-pair support below 3",
+    "pair_support_threshold": 3,
+    "runtime_pair_state_cap": 2048,
+    "horizons": [2,3]
+  },
+  "reasoning_readout": {
+    "selection_data": "training prefixes only",
+    "motif_ranking": "total decoded training occurrence count descending, then motif ID ascending",
+    "class_count": 3,
+    "classes": [
+      {"name":"COMMON","rank_start":0,"rank_end":170,"count":171},
+      {"name":"MID","rank_start":171,"rank_end":341,"count":171},
+      {"name":"RARE","rank_start":342,"rank_end":511,"count":170}
+    ],
+    "ground_truth": "class of the actual heldout terminal motif under the frozen training-only ranking",
+    "distributional_answer": "sum terminal probability mass over motifs in each frozen class; choose largest class mass, ties COMMON then MID then RARE",
+    "top1_projection_control": "take terminal top-1 motif from the same repaired distribution and return its frozen class",
+    "learned_relation_capacity_change": false,
+    "fixed_readout_assignment_count": 512,
+    "adaptive_readout_growth": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["reasoning_class_count","==",3],
+    ["motif_class_assignment_count","==",512],
+    ["common_class_count","==",171],
+    ["mid_class_count","==",171],
+    ["rare_class_count","==",170],
+    ["depth2_query_count",">",0],
+    ["depth3_query_count",">",0],
+    ["depth3_repaired_reasoning_minus_baseline_accuracy",">=",0.005],
+    ["depth2_repaired_reasoning_minus_baseline_accuracy",">=",-0.005],
+    ["depth3_repaired_reasoning_minus_top1_projection_accuracy",">=",-0.005],
+    ["minimum_source_depth3_repaired_reasoning_minus_baseline_accuracy",">=",-0.01],
+    ["maximum_probability_mass_error","<=",1e-9],
+    ["heldout_selection_use_count","==",0],
+    ["relation_capacity_growth_event_count","==",0],
+    ["readout_capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and all frozen depth-3 gain, depth-2 nondegradation, top-1 projection, and per-source thresholds pass.",
+    "mixed": "Validity passes and repaired distributional reasoning improves pooled depth-3 over baseline, but at least one nondegradation/control threshold fails.",
+    "negative": "Validity passes but repaired distributional reasoning does not improve pooled depth-3 abstract-query accuracy over baseline.",
+    "invalid": "Any sealed-parent, authority, source, split, representation, training-only abstraction, relation identity, capacity, determinism, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact sealed repair parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and external manifest.",
+    "The 512 motif-class assignments are computed entirely from training-prefix decoded occurrence counts and frozen before heldout scoring.",
+    "Baseline and repaired relation distributions use identical heldout queries and runtime cap 2048.",
+    "The repaired relation mechanism is byte-identical in semantics to the supported repair; no new transition rows or counters are learned.",
+    "The reasoning readout has exactly 512 frozen motif assignments and three scalar class accumulators; it cannot grow or update on heldout data.",
+    "Duplicate complete probes are byte-identical and probability mass remains normalized within tolerance.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, repair rule, support threshold, motif ranking, class boundaries, runtime cap, horizons, readout, controls, metrics, thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-REPAIRED-RELATION-PREDICATE-COMPOSITION-R1",
+    "intent": "compose multiple training-frozen abstract predicates over the repaired predictive state without widening the learned relation substrate"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-BRIDGE-ATTRIBUTION-R1",
+    "intent": "attribute whether failure lies in transition prediction, probability aggregation, or the frozen abstraction readout before adding capacity"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-repaired-relation-reasoning-bridge-r1.json",
+    "unitary/wlm_lm_external_repaired_relation_reasoning_bridge_r1.go",
+    "cmd/wlm-lm-external-repaired-relation-reasoning-bridge-r1/main.go",
+    ".github/workflows/external-repaired-relation-reasoning-bridge-r1.yml"
+  ]
+}
