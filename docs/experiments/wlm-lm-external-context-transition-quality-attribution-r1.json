@@ -1,0 +1,145 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-CONTEXT-TRANSITION-QUALITY-ATTRIBUTION-R1",
+  "program": "Wingless external raw-input to representation to multi-step context transition attribution",
+  "question": "Which frozen training-only context partition most strongly explains the depth-2/depth-3 transition errors once beam truncation is removed as the limiting factor?",
+  "hypothesis": "Using the sealed 512-motif representation and identical heldout queries, stratify transition predictions by training-only exact-pair support and ambiguity margin. If transition quality is the bottleneck, low-support and/or high-ambiguity strata will account for a disproportionate share of depth-3 top-1 errors without changing learned capacity.",
+  "exact_parent_sha": "57625010aea2feb82352a806b3a44eba6851dc61",
+  "qualification_branch": "research/external-hosted-wingless-context-transition-quality-attribution-r1",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-COMPOSITION-ERROR-ATTRIBUTION-R2",
+    "github_run_id": "37113764618",
+    "classification": "negative",
+    "attribution": "transition_quality",
+    "observation": "runtime cap 512->2048 raised minimum retained mass 0.710419->1.0 while depth-2/depth-3 pooled top-1 accuracy was unchanged"
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical sealed three-source manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "current_relation": "byte-identical current-motif successor counts",
+    "exact_pair_relation": "byte-identical top-511 exact-pair successor counts plus overflow",
+    "pair_support_threshold": 3,
+    "current_row_minimum_count": 4,
+    "ambiguity_cutoff": "training-only median top1-minus-top2 probability margin",
+    "horizons": [
+      2,
+      3
+    ],
+    "runtime_pair_state_cap": 2048
+  },
+  "attribution_protocol": {
+    "strata": [
+      "exact_pair_support_below_3",
+      "exact_pair_support_at_least_3",
+      "ambiguity_margin_below_training_median",
+      "ambiguity_margin_at_least_training_median"
+    ],
+    "selection_data": "training prefix only",
+    "heldout_updates": false,
+    "capacity_growth": false
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      512
+    ],
+    [
+      "depth2_query_count",
+      ">",
+      0
+    ],
+    [
+      "depth3_query_count",
+      ">",
+      0
+    ],
+    [
+      "stratified_error_count_sum",
+      "==",
+      "total_error_count"
+    ],
+    [
+      "heldout_selection_use_count",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and a frozen training-only support/ambiguity stratum accounts for a disproportionate share of depth-3 errors relative to its query share, identifying a bounded transition-quality target.",
+    "mixed": "Validity passes but attribution is distributed across multiple frozen strata.",
+    "negative": "Validity passes but neither frozen support nor ambiguity strata explain transition error concentration.",
+    "invalid": "Any sealed-parent, authority, source, split, representation, stratum, capacity, determinism, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact sealed parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and manifest.",
+    "All stratum definitions are computed from training-prefix statistics only and frozen before heldout scoring.",
+    "The learned 512-motif substrate and all relation tables are unchanged.",
+    "Runtime cap remains 2048 for all comparisons; no capacity experiment is performed.",
+    "Duplicate complete probes are byte-identical.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, relations, support threshold, ambiguity cutoff, strata, horizons, runtime cap, controls, metrics, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-TRANSITION-QUALITY-REPAIR-R1",
+    "intent": "apply one bounded training-only context transition repair to the attributed stratum without capacity growth"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-CONTEXT-STATE-ATTRIBUTION-R1",
+    "intent": "test bounded context-conditioned state attribution before changing capacity"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-context-transition-quality-attribution-r1.json",
+    "unitary/wlm_lm_external_context_transition_quality_attribution_r1.go",
+    "cmd/wlm-lm-external-context-transition-quality-attribution-r1/main.go",
+    ".github/workflows/external-context-transition-quality-attribution-r1.yml"
+  ]
+}
