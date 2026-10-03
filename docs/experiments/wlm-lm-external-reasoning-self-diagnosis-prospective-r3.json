@@ -1,0 +1,186 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-SELF-DIAGNOSIS-PROSPECTIVE-R3",
+  "program": "Wingless fixed-budget prospective support diagnosis on still-sealed code target",
+  "question": "At the training-only common capacity selected by R2, does the zero-support diagnostic prospectively identify a structural risk that the still-sealed code target actually exercises?",
+  "hypothesis": "Use only the structured and technical-prose sources for training, with the exact 15,819-byte budget and proportional exact-prefix allocation from R1/R2. Select exactly 256 motifs using the unchanged occurrence>=4 and best-successor-count/consistency/lexicographic ranking. Preserve eight reasoning classes by assigning the 256 selected motifs into eight deterministic 32-motif classes ranked by training decoded-motif frequency. Build the unchanged repaired-relation/depth-3 bridge on training bytes only, freeze each class's training-margin sample count and the zero-support class set, then open exactly the first 1,454 bytes of the still-sealed code source. Supported requires at least one zero-support class before target access and at least one target depth-3 query whose repaired top-1 falls in that frozen unsupported set. No target bytes or labels may influence capacity, motif selection, class assignment, thresholds, or the preflight decision. No modification is selected or retained.",
+  "exact_parent_sha": "8a66c8960566542169a3fc4440cb272c239420be",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-self-diagnosis-prospective-r3",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "e2955498cd272bd62e9ae7f8e76363eaaef06452",
+    "role": "advisory-only; transfer-efficient learning objective, no self-modification retention"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-TRANSFER-CAPACITY-FEASIBILITY-R2",
+    "github_run_id": "37142744507",
+    "classification": "supported",
+    "observation": {
+      "training_byte_budget_per_arm": 15819,
+      "minimum_eligible_motif_count_across_arms": 377,
+      "selected_common_capacity": 256,
+      "code_target_eligible_motif_count": 377,
+      "target_byte_use_count": 0,
+      "target_label_use_count": 0
+    },
+    "interpretation": "256 is the largest preregistered candidate motif capacity supported by every leave-one-domain-out arm under the fixed 15,819-byte budget."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_design": {
+    "training_domains": [
+      "structured",
+      "technical_prose"
+    ],
+    "target_domain": "code",
+    "training_byte_budget": 15819,
+    "training_allocation_rule": "same proportional exact-prefix rule as R1/R2",
+    "target_eval_byte_budget": 1454,
+    "target_open_after_preflight_only": true,
+    "selected_motif_capacity": 256,
+    "motif_occurrence_floor": 4,
+    "motif_ranking": "unchanged best-successor-count then consistency then lexicographic",
+    "reasoning_class_count": 8,
+    "motifs_per_reasoning_class": 32,
+    "class_assignment": "sort selected motif IDs by descending training decoded-motif frequency, tie lower motif ID; assign rank//32",
+    "repaired_relation": "same exact-pair repaired relation and depth-3 runtime cap as R5",
+    "risk_rule": "flag iff at least one of the eight frozen classes has zero training depth-3 repaired-margin samples",
+    "modification": "none"
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "training_byte_budget",
+      "==",
+      15819
+    ],
+    [
+      "target_eval_byte_budget",
+      "==",
+      1454
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      256
+    ],
+    [
+      "reasoning_class_count",
+      "==",
+      8
+    ],
+    [
+      "minimum_reasoning_class_size",
+      "==",
+      32
+    ],
+    [
+      "maximum_reasoning_class_size",
+      "==",
+      32
+    ],
+    [
+      "preflight_target_byte_use_count",
+      "==",
+      0
+    ],
+    [
+      "preflight_target_label_use_count",
+      "==",
+      0
+    ],
+    [
+      "preflight_decision_frozen_flag",
+      "==",
+      1
+    ],
+    [
+      "target_query_count",
+      ">=",
+      1
+    ],
+    [
+      "zero_training_margin_class_count",
+      ">=",
+      1
+    ],
+    [
+      "unsupported_target_query_count",
+      ">=",
+      1
+    ],
+    [
+      "relation_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "adaptive_readout_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ],
+    [
+      "invalid_row_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes; the training-only 256-motif/8x32 diagnostic freezes at least one zero-support class before target access and the still-sealed code target later exercises at least one of those unsupported classes.",
+    "negative": "Validity passes but the prospective diagnostic is not confirmed on the code target.",
+    "invalid": "Any parent, authority, source, fixed-budget, motif-capacity, class-partition, target-isolation, decision-ordering, determinism, provenance, or qualification criterion fails."
+  },
+  "no_post_result_tuning_rule": "Do not alter source identities, training/target budgets, 256 capacity, occurrence floor, motif ranking, 8x32 class partition, repaired relation, risk rule, metrics, thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNING-EFFICIENCY-R1",
+    "intent": "compare no-change against a frozen bounded learning mechanism on a new preregistered future-data task under identical budgets; require a second disjoint transfer before retention"
+  },
+  "successor_if_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-TRANSFER-DIAGNOSTIC-ATTRIBUTION-R4",
+    "intent": "attribute why the fixed-budget support diagnostic did not transfer to the code target before any modification-selection experiment"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-self-diagnosis-prospective-r3.json",
+    "unitary/wlm_lm_external_reasoning_self_diagnosis_prospective_r3.go",
+    "cmd/wlm-lm-external-reasoning-self-diagnosis-prospective-r3/main.go",
+    ".github/workflows/external-reasoning-self-diagnosis-prospective-r3.yml"
+  ]
+}
