@@ -1,0 +1,124 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-PROBABILITY-READOUT-ATTRIBUTION-R3",
+  "program": "Wingless external raw-input to repaired prediction to fixed refined abstract reasoning probability/source attribution",
+  "question": "Are the residual hidden exact-repair gains primarily intra-class probability geometry plus source-specific coarsening rather than missing relation or readout capacity?",
+  "hypothesis": "Without changing the sealed 512-motif representation, repaired relation, eight fixed 64-motif classes, runtime cap, horizons, or any learned/readout capacity, re-evaluate the exact 49 hidden depth-3 repair-gain rows from R2. For the frozen 19 same-class hidden-gain rows, at least 0.75 will increase the repaired truth-motif share within the fixed truth-class probability mass relative to baseline, and the absolute difference between code and structured same-class hidden-gain rates will be at least 0.20. This would localize the remaining washout to intra-class probability geometry plus source specificity rather than justify capacity growth.",
+  "exact_parent_sha": "4d3506d0585ef85e177cc400f7126e270109da8b",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-probability-readout-attribution-r3-fixa",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-READOUT-REFINEMENT-ATTRIBUTION-R2",
+    "github_run_id": "37128502966",
+    "classification": "mixed",
+    "observation": {
+      "depth3_exact_repair_gain_query_count": 61,
+      "depth3_exact_gain_hidden_by_refined_readout_count": 49,
+      "hidden_gain_same_class_count": 19,
+      "hidden_gain_cross_class_count": 30,
+      "hidden_gain_truth_class_mass_decrease_count": 2,
+      "hidden_gain_distributional_agrees_with_top1_projection_count": 49,
+      "hidden_gain_source_code_count": 37,
+      "hidden_gain_source_structured_count": 12,
+      "hidden_gain_source_technical_prose_count": 0
+    },
+    "diagnosis": "R2 showed that 30/49 hidden gains are cross-class ceiling cases while 19/49 are same-class coarsening cases, with repaired truth-class mass non-decreasing on 47/49 rows. The next bounded step is within-class probability-share and source-rate attribution only."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical sealed three-source manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "baseline_relation": "byte-identical sealed unrepaired predictor",
+    "repaired_relation": "byte-identical supported low-support repair",
+    "pair_support_threshold": 3,
+    "runtime_pair_state_cap": 2048,
+    "horizons": [2, 3],
+    "refined_readout": "byte-identical fixed eight training-rank classes of 64 motifs each",
+    "hidden_gain_population_count": 49,
+    "same_class_hidden_gain_count": 19,
+    "cross_class_hidden_gain_count": 30,
+    "relation_capacity_change": false,
+    "readout_capacity_change": false
+  },
+  "attribution_protocol": {
+    "primary_population": "the exact 49 R2 heldout depth-3 hidden exact-repair gain rows",
+    "same_class_population": "the exact 19 R2 rows where baseline and repaired top-1 motifs are in the same fixed refined class",
+    "probability_geometry": [
+      "baseline truth-motif probability divided by baseline truth-class mass",
+      "repaired truth-motif probability divided by repaired truth-class mass",
+      "whether repaired within-class truth-motif share strictly increases"
+    ],
+    "source_specificity": [
+      "same-class hidden-gain count by source",
+      "same-class hidden-gain rate within each source hidden-gain population",
+      "absolute code-versus-structured same-class rate gap"
+    ],
+    "selection_data": "none; attribution is post hoc over frozen heldout scoring rows only",
+    "adaptive_changes": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count", "==", 0],
+    ["source_count", "==", 3],
+    ["total_source_bytes", "==", 57272],
+    ["selected_motif_count", "==", 512],
+    ["refined_reasoning_class_count", "==", 8],
+    ["motif_class_assignment_count", "==", 512],
+    ["minimum_refined_class_size", "==", 64],
+    ["maximum_refined_class_size", "==", 64],
+    ["depth3_exact_repair_gain_query_count", "==", 61],
+    ["hidden_gain_count", "==", 49],
+    ["same_class_hidden_gain_count", "==", 19],
+    ["cross_class_hidden_gain_count", "==", 30],
+    ["same_class_truth_motif_share_increase_fraction", ">=", 0.75],
+    ["source_rate_denominator_nonzero_count", "==", 2],
+    ["code_structured_same_class_rate_gap", ">=", 0.20],
+    ["attribution_accounting_error_count", "==", 0],
+    ["heldout_selection_use_count", "==", 0],
+    ["relation_capacity_growth_event_count", "==", 0],
+    ["adaptive_readout_growth_event_count", "==", 0],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["invalid_row_count", "==", 0]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and both frozen attribution thresholds pass: at least 0.75 of same-class hidden gains increase within-class truth-motif probability share, and the code-versus-structured same-class hidden-gain rate gap is at least 0.20.",
+    "mixed": "Validity passes and exactly one of the two attribution thresholds passes.",
+    "negative": "Validity passes but neither attribution threshold passes.",
+    "invalid": "Any sealed-parent, authority, source, frozen-readout, population-accounting, determinism, capacity, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact qualified mixed R2 parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and external manifest.",
+    "Representation, baseline relation, repaired relation, eight class assignments, support threshold, runtime cap, and horizons are unchanged.",
+    "The 49-row hidden-gain population, 19-row same-class subset, and 30-row cross-class subset reproduce R2 exactly before new attribution metrics are accepted.",
+    "Attribution introduces no learned state, adaptive thresholds, labels for selection, or additional readout capacity.",
+    "Heldout data is used only to score and categorize already-frozen predictions.",
+    "Duplicate complete probes are byte-identical and all attribution rows account exactly once.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, relation repair, class boundaries, runtime cap, horizons, hidden populations, within-class share definition, 0.75 share-increase floor, 0.20 source-rate-gap floor, metrics, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-PROBABILITY-MARGIN-READOUT-R1",
+    "intent": "test one preregistered training-only fixed intra-class probability-margin rule with unchanged class count and relation capacity"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-SOURCE-STRATIFIED-ATTRIBUTION-R4",
+    "intent": "factor the residual by source and same-class transition before any capacity change"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-probability-readout-attribution-r3.json",
+    "unitary/wlm_lm_external_reasoning_probability_readout_attribution_r3.go",
+    "cmd/wlm-lm-external-reasoning-probability-readout-attribution-r3/main.go",
+    ".github/workflows/external-reasoning-probability-readout-attribution-r3.yml"
+  ]
+}
