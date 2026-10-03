@@ -30,11 +30,20 @@ jobs:
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "5b2b603afe9b6394e6067be189e31ac478e71335" HEAD
-          test "$(git rev-parse 5b2b603afe9b6394e6067be189e31ac478e71335^)" = "1fa8099ce6fce693c06369f8eae888052d10a922"
-          test "$(git diff-tree --no-commit-id --name-only -r 5b2b603afe9b6394e6067be189e31ac478e71335)" = "docs/experiments/wlm-lm-external-reasoning-readout-refinement-attribution-r2.json"
-          changed="$(git diff --name-only 1fa8099ce6fce693c06369f8eae888052d10a922..HEAD | sort)"
-          expected="$(printf '%s\\n' '.github/workflows/external-reasoning-readout-refinement-attribution-r2.yml' 'cmd/wlm-lm-external-reasoning-readout-refinement-attribution-r2/main.go' 'docs/experiments/wlm-lm-external-reasoning-readout-refinement-attribution-r2.json' 'unitary/wlm_lm_external_reasoning_readout_refinement_attribution_r2.go' | sort)"
-          test "$changed" = "$expected"
+          python3 - <<'PY'
+          import subprocess
+          prereg="5b2b603afe9b6394e6067be189e31ac478e71335"
+          parent="1fa8099ce6fce693c06369f8eae888052d10a922"
+          prereg_path="docs/experiments/wlm-lm-external-reasoning-readout-refinement-attribution-r2.json"
+          actual_parent=subprocess.check_output(["git","rev-parse",prereg+"^"],text=True).strip()
+          assert actual_parent==parent,(actual_parent,parent)
+          prereg_files=set(subprocess.check_output(["git","diff-tree","--no-commit-id","--name-only","-r",prereg],text=True).splitlines())
+          assert prereg_files=={prereg_path},prereg_files
+          changed=set(subprocess.check_output(["git","diff","--name-only",parent+"..HEAD"],text=True).splitlines())
+          expected=set([".github/workflows/external-reasoning-readout-refinement-attribution-r2.yml","cmd/wlm-lm-external-reasoning-readout-refinement-attribution-r2/main.go","docs/experiments/wlm-lm-external-reasoning-readout-refinement-attribution-r2.json","unitary/wlm_lm_external_reasoning_readout_refinement_attribution_r2.go"])
+          assert changed==expected,(sorted(changed),sorted(expected))
+          print("FROZEN_PACKAGE_OK",sorted(changed))
+          PY
       - name: Verify READY_RESEARCH receipt
         shell: bash
         run: |
