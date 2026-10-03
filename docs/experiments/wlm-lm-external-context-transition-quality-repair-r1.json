@@ -1,0 +1,111 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-CONTEXT-TRANSITION-QUALITY-REPAIR-R1",
+  "program": "Wingless external raw-input to representation to repaired multi-step relation chain",
+  "question": "Can the attributed low-support transition errors be reduced with one fixed training-only pooled backoff that reuses the existing relation tables and adds no learned capacity?",
+  "hypothesis": "For exact-pair contexts with training support below 3, replace the sealed current-row-only fallback with an equal-probability mixture of the normalized current-motif successor row and the normalized existing overflow exact-pair successor row. Leave all support-at-least-3 behavior byte-identical to the sealed baseline. At runtime pair-state cap 2048, the repair will improve depth-3 low-support top-1 accuracy by at least 0.01 and pooled depth-3 top-1 accuracy by at least 0.005 while depth-2 pooled accuracy degrades by no more than 0.005 and no source degrades by more than 0.01.",
+  "exact_parent_sha": "c9c746030d22f6d62bb814212949b9460dd83f5b",
+  "qualification_branch": "research/external-hosted-wingless-context-transition-quality-repair-r1",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-CONTEXT-TRANSITION-QUALITY-ATTRIBUTION-R1",
+    "github_run_id": "37117799408",
+    "classification": "supported",
+    "attribution": "low_support",
+    "observation": {
+      "depth3_low_support_query_share": 0.3445873526259378,
+      "depth3_low_support_error_share": 0.3623853211009174,
+      "depth3_low_support_error_excess": 0.01779796847497961,
+      "depth3_high_ambiguity_error_excess": 0.015143022901363878
+    },
+    "diagnosis": "Training exact-pair support below 3 is the strongest frozen depth-3 transition-error concentration and is therefore the bounded repair target."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical sealed three-source manifest",
+    "split": "first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "current_relation": "byte-identical 512x512 current-motif successor counts",
+    "exact_pair_relation": "byte-identical top-511 exact-pair successor rows plus one overflow row",
+    "pair_support_threshold": 3,
+    "current_row_minimum_count": 4,
+    "ambiguity_cutoff": "training-only median top1-minus-top2 probability margin",
+    "runtime_pair_state_cap": 2048,
+    "horizons": [2,3]
+  },
+  "repair": {
+    "target": "only heldout/runtime states whose training exact-pair support is below 3",
+    "stored_state_change": "none",
+    "current_distribution": "normalized sealed current-motif successor row",
+    "pooled_low_support_distribution": "normalized existing exact-pair overflow row 511",
+    "combination": "0.5 * current_distribution + 0.5 * pooled_low_support_distribution when both are nonempty; otherwise use the nonempty distribution",
+    "non_target_behavior": "byte-identical sealed baseline transition rule",
+    "tie_break": "lowest motif ID",
+    "capacity_growth": false
+  },
+  "controls": {
+    "baseline": "sealed context-transition attribution predictor with identical cap 2048 and no low-support pooled repair",
+    "paired_queries": "repair and baseline score identical untouched suffix queries",
+    "heldout_updates": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["depth2_query_count",">",0],
+    ["depth3_query_count",">",0],
+    ["depth3_low_support_query_count",">",0],
+    ["depth3_low_support_repair_minus_baseline_accuracy",">=",0.01],
+    ["depth3_pooled_repair_minus_baseline_accuracy",">=",0.005],
+    ["depth2_pooled_repair_minus_baseline_accuracy",">=",-0.005],
+    ["minimum_source_depth3_repair_minus_baseline_accuracy",">=",-0.01],
+    ["maximum_probability_mass_error","<=",1e-9],
+    ["heldout_selection_use_count","==",0],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes and all frozen low-support, pooled depth-3, depth-2 nondegradation, and per-source nondegradation thresholds pass.",
+    "mixed": "Validity passes and low-support depth-3 accuracy improves, but at least one pooled or nondegradation threshold fails.",
+    "negative": "Validity passes but low-support depth-3 accuracy does not improve over the sealed baseline.",
+    "invalid": "Any sealed-parent, authority, source, split, representation, repair-target, capacity, determinism, or heldout-isolation criterion fails."
+  },
+  "validity_criteria": [
+    "Exact sealed attribution parent and North Star identities match.",
+    "Fresh READY_RESEARCH is bound to this exact preregistration and manifest.",
+    "Only training-prefix counts determine pair support, current rows, overflow row, ambiguity cutoff, and all repair behavior.",
+    "No new motif, relation row, counter table, context state, or runtime pair-state capacity is introduced.",
+    "Support-at-least-3 runtime states use the sealed baseline byte-for-byte.",
+    "Repair and baseline score the same heldout suffix queries at cap 2048.",
+    "Duplicate complete probes are byte-identical and all probability mass checks pass.",
+    "No tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, support threshold, current/exact tables, overflow identity, 0.5 mixture weight, cap 2048, horizons, controls, metrics, thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-REPAIRED-RELATION-REASONING-BRIDGE-R1",
+    "intent": "carry the supported fixed-capacity low-support repair into the next raw-representation -> relation -> reasoning bridge without changing substrate capacity"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-LOW-SUPPORT-POOLING-ATTRIBUTION-R1",
+    "intent": "attribute whether the pooled overflow distribution is too heterogeneous before introducing any additional state"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-context-transition-quality-repair-r1.json",
+    "unitary/wlm_lm_external_context_transition_quality_repair_r1.go",
+    "cmd/wlm-lm-external-context-transition-quality-repair-r1/main.go",
+    ".github/workflows/external-context-transition-quality-repair-r1.yml"
+  ]
+}
