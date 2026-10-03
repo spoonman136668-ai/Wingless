@@ -1,0 +1,105 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-MOTIF-RELATION-DISTRIBUTIONAL-COMPOSITION-R1",
+  "program": "Wingless external raw-input to representation to stochastic-relation composition chain",
+  "question": "Was the multi-step failure in greedy external motif-relation composition caused by collapsing a genuinely stochastic relation to a single argmax state at every intermediate step?",
+  "hypothesis": "Reuse the exact relation-R1 external sources, 60/40 split, 512-motif representation, decoded motif streams, and one-step transition counts. Instead of feeding forward only the one-step argmax, propagate the full empirical successor distribution through the same one-step relation for depth two and depth three, using the pooled training unigram distribution only for states with zero outgoing counts. The final argmax of the propagated distribution will have positive pooled accuracy gain over the unigram baseline at both depths and will equal or exceed the sealed greedy-composition accuracy at both depths.",
+  "exact_parent_sha": "9d2586e83f77bfd8fae7790266c2972ce91266ba",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-relation-distributional-r1",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-MOTIF-RELATION-COMPOSITION-R1",
+    "github_run_id": "37087458891",
+    "classification": "mixed",
+    "observation": {
+      "depth2_pooled_composed_top1_accuracy": 0.323167469234885,
+      "depth2_pooled_unigram_top1_accuracy": 0.2990904226859283,
+      "depth2_pooled_composed_accuracy_gain": 0.024077046548956704,
+      "depth3_pooled_composed_top1_accuracy": 0.2508701472556894,
+      "depth3_pooled_unigram_top1_accuracy": 0.29933065595716196,
+      "depth3_pooled_composed_accuracy_gain": -0.04846050870147256,
+      "maximum_chain_fallback_fraction": 0.006160164271047228
+    },
+    "diagnosis": "The one-step relation itself is supported, but repeated top-1 collapse loses uncertainty and degrades by depth three."
+  },
+  "scope_statement": "This is a bounded stochastic relation-composition gate over relations learned from external raw-byte motif sequences. It does not claim semantic reasoning.",
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "source_bytes": "byte-identical relation-R1 manifest",
+    "split": "byte-identical first 60% train / final 40% evaluation",
+    "representation": "byte-identical qualified 512-motif learner",
+    "motif_stream_decode": "byte-identical non-overlapping exact-motif scanner",
+    "one_step_relation_counts": "byte-identical 512x512 prefix transition counts",
+    "unigram_counts": "byte-identical pooled training successor counts",
+    "evaluation_queries": "same untouched suffix motif streams and depth-two/depth-three targets as greedy composition R1"
+  },
+  "distributional_composition": {
+    "row_probability": "for a state with nonzero outgoing count, empirical count / row total over the 512 successors; no smoothing or added pseudo-counts",
+    "zero_row": "use the normalized pooled training successor unigram distribution",
+    "initial_state": "unit probability mass on the observed current motif",
+    "propagation": "multiply the state distribution by the frozen one-step transition distribution exactly depth times; no intermediate argmax or evaluation correction",
+    "prediction": "lowest motif ID among maximum final probability mass",
+    "depths": [2,3],
+    "capacity_growth": false
+  },
+  "controls": {
+    "unigram": "pooled training successor unigram argmax",
+    "greedy_reference": {
+      "depth2_accuracy": 0.323167469234885,
+      "depth3_accuracy": 0.2508701472556894
+    },
+    "direct_depth_lookup": "same diagnostic depth-specific prefix lookup as greedy R1; never feeds the distributional predictor"
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count","==",0],
+    ["source_count","==",3],
+    ["total_source_bytes","==",57272],
+    ["selected_motif_count","==",512],
+    ["depth2_query_count",">",0],
+    ["depth3_query_count",">",0],
+    ["depth2_pooled_distributional_accuracy_gain",">",0.0],
+    ["depth3_pooled_distributional_accuracy_gain",">",0.0],
+    ["depth2_distributional_minus_greedy_accuracy",">=",0.0],
+    ["depth3_distributional_minus_greedy_accuracy",">=",0.0],
+    ["depth2_sources_with_positive_distributional_gain",">=",2],
+    ["depth3_sources_with_positive_distributional_gain",">=",2],
+    ["capacity_growth_event_count","==",0],
+    ["tokenizer_use_count","==",0],
+    ["external_model_call_count","==",0],
+    ["invalid_row_count","==",0],
+    ["counter_overflow_count","==",0]
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and frozen thresholds pass.",
+    "mixed": "Validity passes and distributional propagation improves on greedy composition at least at one depth, but one or more positive-gain/source-count thresholds fail.",
+    "negative": "Validity passes but distributional propagation does not improve the sealed greedy behavior at either depth.",
+    "invalid": "Any authority, source identity, split contamination, representation/relation drift, probability-normalization, feed-forward isolation, capacity, determinism, or host-isolation criterion fails.",
+    "incomplete": "Authority, source retrieval, or hosted compute interruption prevents the frozen matrix."
+  },
+  "validity_criteria": [
+    "Exact sealed greedy-composition parent and North Star identities match.",
+    "A fresh CKB-plane READY_RESEARCH receipt is bound to this exact preregistration commit and external manifest.",
+    "All source/split/representation/motif-stream/relation-count construction is unchanged from relation R1.",
+    "Row probabilities are derived only from prefix transition counts and each nonzero row sums to one within floating tolerance.",
+    "Evaluation suffixes never update transition probabilities, unigram probabilities, representation, thresholds, or stopping.",
+    "Intermediate probability distributions are propagated without observing actual intermediate evaluation motifs.",
+    "Full Go regression passes before the probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, parser, external model, persistent corpus, capacity growth, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, motif decoding, transition counts, probability normalization, zero-row fallback, depths, controls, metrics, thresholds, classification, or authority requirements after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-motif-relation-distributional-composition-r1.json",
+    "unitary/wlm_lm_external_motif_relation_distributional_composition_r1.go",
+    "cmd/wlm-lm-external-motif-relation-distributional-composition-r1/main.go",
+    ".github/workflows/external-motif-relation-distributional-composition-r1.yml"
+  ]
+}
