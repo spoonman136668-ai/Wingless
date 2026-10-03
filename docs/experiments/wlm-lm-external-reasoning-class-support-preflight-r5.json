@@ -1,0 +1,192 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-REASONING-CLASS-SUPPORT-PREFLIGHT-R5",
+  "program": "Wingless training-only reasoning-class support preflight",
+  "question": "Can Wingless detect from preregistered training-only internal support signals that the frozen R4 class-conditioned margin attribution is structurally unevaluable before any held-out labels are consumed?",
+  "hypothesis": "Replay the exact R4 representation, repaired relation, eight fixed 64-motif reasoning classes, pooled training-median margin statistic, runtime cap, and source split without changing any learned state, class assignment, threshold, capacity, or held-out behavior. Before opening the held-out labels, compute only per-class training-margin sample counts. The preflight rule is structural rather than tuned: if any fixed class has zero training-margin samples, its class training median is undefined, so the class-conditioned attribution contract is not evaluable as specified. The preflight must therefore flag the R4 package as unevaluable from training-only native state and identify the zero-support class set. After the preflight decision is frozen, replay the byte-identical R4 held-out evaluator only to verify that the previously observed invalidity reproduces. This is retrospective self-diagnosis evidence only and does not count as autonomous or recursive self-improvement.",
+  "exact_parent_sha": "e00635d27a262a1c927dedac7c13a58b10b828cb",
+  "qualification_branch": "research/external-hosted-wingless-reasoning-class-support-preflight-r5",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "portfolio_context": {
+    "branch": "research/portfolio-rsi-v1",
+    "commit": "0c840430e93238a63739be6d675e603563e4d6fe",
+    "role": "advisory-only; not scientific ancestry"
+  },
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-REASONING-MARGIN-CLASS-ATTRIBUTION-R4",
+    "github_run_id": "37137737400",
+    "classification": "invalid",
+    "observation": {
+      "training_margin_sample_count": 5978,
+      "refined_reasoning_class_count": 8,
+      "motif_class_assignment_count": 512,
+      "minimum_refined_class_size": 64,
+      "maximum_refined_class_size": 64,
+      "class_7_training_margin_sample_count": 0,
+      "eligible_below_threshold_class_count": 1,
+      "invalid_row_count": 1
+    },
+    "interpretation": "R4's fixed class-conditioned attribution could not satisfy its own frozen evaluability contract. The next bounded question is whether that invalidity could have been detected prospectively from native training-only support before held-out evaluation."
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "sources": "byte-identical R4 three-source manifest",
+    "split": "byte-identical R4 first 60% training / final 40% heldout",
+    "representation": "byte-identical sealed 512-motif learner",
+    "repaired_relation": "byte-identical R4 repaired relation",
+    "refined_readout": "byte-identical R4 eight fixed 64-motif classes",
+    "global_training_margin_threshold": 0.4329118785561704,
+    "relation_capacity_change": false,
+    "readout_capacity_change": false,
+    "threshold_change": false
+  },
+  "preflight_protocol": {
+    "diagnostic_inputs": "training-prefix native state only; no held-out labels or held-out outcome statistics",
+    "per_class_signal": "count of training depth-3 repaired-margin samples whose repaired top-1 motif belongs to the fixed class",
+    "structural_invalidity_rule": "flag unevaluable iff any fixed reasoning class has zero training-margin samples",
+    "decision_freeze": "the preflight decision and zero-support class set are serialized before held-out evaluation executes",
+    "heldout_role": "reproduce the frozen parent evaluator after the diagnostic decision solely to verify the known invalidity; not used to choose or tune the diagnostic",
+    "intervention": "none; diagnosis only",
+    "self_improvement_label": "self-improvement precursor"
+  },
+  "metrics_and_thresholds": [
+    [
+      "source_identity_mismatch_count",
+      "==",
+      0
+    ],
+    [
+      "source_count",
+      "==",
+      3
+    ],
+    [
+      "total_source_bytes",
+      "==",
+      57272
+    ],
+    [
+      "selected_motif_count",
+      "==",
+      512
+    ],
+    [
+      "refined_reasoning_class_count",
+      "==",
+      8
+    ],
+    [
+      "motif_class_assignment_count",
+      "==",
+      512
+    ],
+    [
+      "minimum_refined_class_size",
+      "==",
+      64
+    ],
+    [
+      "maximum_refined_class_size",
+      "==",
+      64
+    ],
+    [
+      "training_margin_sample_count",
+      "==",
+      5978
+    ],
+    [
+      "training_margin_threshold",
+      "==",
+      0.4329118785561704
+    ],
+    [
+      "zero_training_margin_class_count",
+      ">=",
+      1
+    ],
+    [
+      "preflight_unevaluable_flag",
+      "==",
+      1
+    ],
+    [
+      "preflight_heldout_label_use_count",
+      "==",
+      0
+    ],
+    [
+      "parent_r4_invalid_reproduced_flag",
+      "==",
+      1
+    ],
+    [
+      "diagnostic_serialization_error_count",
+      "==",
+      0
+    ],
+    [
+      "relation_capacity_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "adaptive_readout_growth_event_count",
+      "==",
+      0
+    ],
+    [
+      "tokenizer_use_count",
+      "==",
+      0
+    ],
+    [
+      "external_model_call_count",
+      "==",
+      0
+    ],
+    [
+      "counter_overflow_count",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "Validity passes; training-only preflight flags unevaluable before held-out evaluation, at least one fixed class has zero training-margin support, no held-out labels influence the decision, and the byte-identical parent R4 invalidity reproduces after the decision is frozen.",
+    "negative": "Validity passes but the training-only preflight does not flag the structurally unevaluable parent despite the reproduced R4 invalidity.",
+    "invalid": "Any parent, authority, source, class identity, threshold, decision-ordering, determinism, capacity, provenance, or held-out-isolation requirement fails."
+  },
+  "validity_criteria": [
+    "Exact R4 package head and North Star identities match.",
+    "Fresh READY_RESEARCH binds this exact preregistration and manifest.",
+    "Representation, relation, eight class assignments, margin formula, threshold, runtime cap, source bytes, and split are unchanged.",
+    "The preflight uses training-prefix native state only and serializes its decision before any held-out labels are consumed.",
+    "The held-out evaluator is byte-identical R4 and is used only after the preflight decision is frozen.",
+    "Duplicate complete executions are byte-identical.",
+    "No learned-state change, candidate modification, tokenizer, parser, external model, persistent corpus, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter sources, split, representation, relation, class assignments, margin formula, global threshold, zero-support structural rule, metrics, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-SELF-DIAGNOSIS-PROSPECTIVE-R1",
+    "intent": "test a preregistered native-state diagnosis prospectively on a different sealed failure class before any held-out outcome is observed"
+  },
+  "successor_if_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-REASONING-CLASS-SUPPORT-SIGNAL-ATTRIBUTION-R6",
+    "intent": "attribute why the training-only support signal failed to identify the structural invalidity before attempting any modification-selection experiment"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-reasoning-class-support-preflight-r5.json",
+    "unitary/wlm_lm_external_reasoning_class_support_preflight_r5.go",
+    "cmd/wlm-lm-external-reasoning-class-support-preflight-r5/main.go",
+    ".github/workflows/external-reasoning-class-support-preflight-r5.yml"
+  ]
+}
