@@ -1,0 +1,137 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-MOTIF-RELATION-HOLDOUT-R1",
+  "program": "Wingless external raw-input to representation to predictive-relation frontier",
+  "question": "Do relationships between externally learned raw-byte motifs remain predictive on untouched external suffixes, rather than only supporting local next-byte prediction?",
+  "hypothesis": "Learn the unchanged 512-motif representation from the first floor(0.60*N) bytes of each verified external source. Decode non-overlapping motif occurrences in those prefixes and estimate a motif-to-next-motif transition relation within each source boundary. On the untouched final 40% suffixes, the learned conditional relation will outperform a pooled motif-unigram baseline in top-1 next-motif accuracy on at least two of three sources, with positive pooled accuracy gain and no source-identity, contamination, tokenizer, model-call, or capacity-growth failures.",
+  "exact_parent_sha": "a33900e0ca0743e3777d241af939413b7f3377fe",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "qualification_branch": "research/external-hosted-wingless-relation-r1",
+  "portfolio_context": {
+    "slot": "chain",
+    "frontier": "external raw bytes -> learned motif representation -> source-derived relation",
+    "reason_for_gate": "Establish that the relation to be composed later is itself learned from and stable on external content before testing multi-step relation composition."
+  },
+  "prior_evidence": [
+    {
+      "experiment": "WLM-LM-EXTERNAL-RAW-REP-PRED-R1",
+      "github_run_id": "37085240951",
+      "classification": "supported",
+      "observation": {
+        "selected_motif_count": 512,
+        "minimum_eval_representation_coverage_fraction": 0.1522491349480969,
+        "minimum_covered_top1_accuracy_gain": 0.23192707229171083,
+        "minimum_effective_event_reduction_fraction": 0.19072164948453607,
+        "sources_with_positive_covered_top1_gain": 3
+      }
+    },
+    {
+      "experiment": "WLM-LM-EXTERNAL-RAW-REP-COMPOSITIONAL-REASONING-R1",
+      "github_run_id": "37085672666",
+      "classification": "supported",
+      "observation": {
+        "factorized_heldout_accuracy": 1.0,
+        "lookup_heldout_accuracy": 0.0,
+        "raw_output_exact_accuracy": 1.0
+      },
+      "interpretation": "The interface chain works under a controlled relation law; R1 now moves the relation itself onto external content."
+    }
+  ],
+  "scope_statement": "This experiment tests source-derived sequential relations between learned raw motifs. It is a relation-induction/holdout gate, not yet a multi-step reasoning claim.",
+  "external_authority": {
+    "ckb_plane_main_sha": "36d99a0257120ede57bb96638660d35014dd529e",
+    "manifest_sha256": "75cdb3b97dbb7017299f573d506f07095ed89c06264b29724b78f29c909d4da4",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host must be distinct from LINKDEADKB",
+    "persistent_corpus": false,
+    "external_model_calls": false,
+    "production_authority": false
+  },
+  "sources": [
+    {
+      "domain": "code",
+      "sha256": "7a95f1c506c9ac4b2277df5f2bdd9d61cc67b520c45021a5a961939770221ef6",
+      "bytes": 41453
+    },
+    {
+      "domain": "structured",
+      "sha256": "4c5cbe6cbcd28af73761091367b20e07d0403847e236c06c31fc27061bd81192",
+      "bytes": 14365
+    },
+    {
+      "domain": "technical-prose",
+      "sha256": "8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",
+      "bytes": 1454
+    }
+  ],
+  "frozen_input_protocol": {
+    "representation_train_split": "first floor(0.60*N) bytes of each source",
+    "evaluation_split": "remaining 40% bytes of each source",
+    "representation_learner": "byte-for-byte WLM-LM-RAW-REP-PRED-FRESH-HOLDOUT-R2 512-motif learner",
+    "motif_index": "selected motifs sorted lexicographically by exact four-byte key after frozen R2 selection",
+    "motif_stream_decode": "scan left-to-right; when the next four raw bytes exactly match a selected motif emit its motif ID and advance four bytes; otherwise advance one byte; reset at every source boundary",
+    "relation": "directed transition from each emitted motif ID to the immediately next emitted motif ID within the same decoded source stream",
+    "train_relation": "transition counts and pooled next-motif unigram counts from decoded 60% prefixes only",
+    "holdout_relation": "decoded 40% suffixes are scoring-only and never update counts, ranking, capacity, thresholds, or stopping"
+  },
+  "relation_learner": {
+    "state": "512 x 512 uint32 conditional next-motif counts plus 512-entry pooled next-motif unigram counts",
+    "prediction": "for a current motif, choose the highest-count conditional successor; ties choose lowest motif ID; if the current motif has zero training outgoing count, use the unigram argmax",
+    "baseline": "pooled training next-motif unigram argmax for every query",
+    "capacity_growth": false
+  },
+  "metrics_and_thresholds": [
+    ["source_identity_mismatch_count", "==", 0],
+    ["source_count", "==", 3],
+    ["total_source_bytes", "==", 57272],
+    ["selected_motif_count", "==", 512],
+    ["train_relation_transition_count", ">", 0],
+    ["eval_relation_transition_count", ">", 0],
+    ["eval_source_count_with_transitions", "==", 3],
+    ["sources_with_positive_relation_accuracy_gain", ">=", 2],
+    ["pooled_relation_top1_accuracy_gain", ">", 0.0],
+    ["minimum_source_relation_accuracy_gain", ">=", -0.05],
+    ["unseen_current_motif_query_fraction", "<=", 0.25],
+    ["capacity_growth_event_count", "==", 0],
+    ["tokenizer_use_count", "==", 0],
+    ["external_model_call_count", "==", 0],
+    ["invalid_row_count", "==", 0],
+    ["counter_overflow_count", "==", 0]
+  ],
+  "diagnostic_metrics": [
+    "per-source decoded train motif count",
+    "per-source decoded eval motif count",
+    "per-source relation transition count",
+    "per-source conditional top-1 accuracy",
+    "per-source unigram top-1 accuracy",
+    "per-source relation accuracy gain",
+    "pooled conditional and unigram accuracy",
+    "unseen-current-motif query count"
+  ],
+  "classification_rules": {
+    "supported": "All validity criteria and frozen thresholds pass.",
+    "mixed": "Validity passes and pooled conditional relation accuracy exceeds the unigram baseline, but one or more per-source support thresholds fail.",
+    "negative": "Validity passes but pooled conditional relation accuracy does not exceed the unigram baseline.",
+    "invalid": "Any authority, source identity, split contamination, representation drift, relation-definition drift, capacity, determinism, or host-isolation criterion fails.",
+    "incomplete": "Authority, source retrieval, or hosted compute interruption prevents the frozen matrix."
+  },
+  "validity_criteria": [
+    "Exact sealed parent and North Star identities match.",
+    "A fresh CKB-plane READY_RESEARCH receipt is bound to this exact preregistration commit and external manifest.",
+    "All source hashes and exact byte lengths match before learner construction.",
+    "The 512-motif representation learner is scientifically identical to the qualified external prediction gate.",
+    "Motif decoding and transition counting use training prefixes only; suffix bytes are scoring-only.",
+    "Every source boundary resets motif decoding and no transition crosses a source boundary.",
+    "Conditional relation and unigram baseline receive identical training relation events.",
+    "Full Go regression passes before the probe; duplicate probes are byte-identical; all metrics are finite.",
+    "No tokenizer, semantic parser, external model, persistent corpus, capacity growth, LINKDEADKB execution, production authority, or post-result tuning occurs."
+  ],
+  "no_post_result_tuning_rule": "Do not alter source bytes, hashes, 60/40 split, 512-motif representation mechanics, motif-stream decoding, relation definition, fallback behavior, baseline, metrics, thresholds, classification, or authority requirements after any primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-motif-relation-holdout-r1.json",
+    "unitary/wlm_lm_external_motif_relation_holdout_r1.go",
+    "cmd/wlm-lm-external-motif-relation-holdout-r1/main.go",
+    ".github/workflows/external-motif-relation-holdout-r1.yml"
+  ]
+}
