@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-DEFICIENCY-CONDITIONED-RESPONSE-ATTRIBUTION-R42",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-TARGET-CONDITIONAL-RESPONSE-ATTRIBUTION-R41",
+  "parent_sha": "8e9c0fd9df2d4a8b9fb0f3c25fd82f90a401c513",
+  "preregistered_at_utc": "2026-10-04T20:30:00Z",
+  "hypothesis": "Residual marginal-learning-value error may be conditioned on which domain is deprived relative to equal allocation rather than which domain receives the added budget. Keep GLOBAL_BASE6 byte-identical and add exactly three training-only scalar mean-residual offsets keyed by the deterministic deficiency domain.",
+  "frozen_design": {
+    "manifests": [
+      "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250",
+      "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7",
+      "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+      "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    ],
+    "total_adaptation_budget": 1744,
+    "outer_holdouts": 4,
+    "training_manifests_per_holdout": 3,
+    "global_base6": "byte-identical R41/R40 six-feature raw-target predictor",
+    "deficiency_domain": "largest positive equal-allocation-minus-candidate allocation delta; ties resolve code then structured then technical_prose",
+    "offsets": "exactly one arithmetic-mean (actual allocation advantage minus GLOBAL_BASE6 predicted advantage) scalar per deficiency domain over the 27 non-equal training cases, frozen before held-out outcomes",
+    "evaluation_cases": "same 33 R30-excluded unstable-sign held-out cases used by R41",
+    "heldout_outcome_use_before_deficiency_condition_freeze": 0,
+    "post_result_deficiency_condition_choice_count": 0,
+    "external_model_calls": 0,
+    "tokenizer_use_count": 0,
+    "capacity_growth_event_count": 0
+  },
+  "candidate_set": [
+    "GLOBAL_BASE6",
+    "DEFICIENCY_DOMAIN_OFFSET"
+  ],
+  "thresholds": {
+    "deficiency_conditional_sign_error_improvement": 0.1,
+    "deficiency_conditional_mae_ratio": 1,
+    "provenance": "frozen at preregistration"
+  },
+  "classification_rules": {
+    "supported": "valid and deficiency-conditioned sign-error improvement>=0.10 with MAE ratio<=1.00",
+    "mixed": "valid, support false, but deficiency-conditioned sign error and MAE are both lower than GLOBAL_BASE6",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "any frozen identity, GLOBAL_BASE6 identity, deficiency-domain rule, three scalar residual offsets, R30 exclusion, held-out ordering, provenance or accounting rule fails"
+  },
+  "successors": {
+    "supported": "R43 bounded deficiency-conditioned calibration correction",
+    "mixed": "R43 deficiency-conditioned response disambiguation",
+    "negative": "R43 state-conditioned response attribution"
+  },
+  "rsi_success": false,
+  "codex_usage": "DISABLED",
+  "production_authority": false,
+  "accepted_ref_mutation": false,
+  "runtime_launch": false,
+  "capacity_change_authorized": false,
+  "authority_expansion": false,
+  "broker_access": false,
+  "ktrade_access": false
+}
