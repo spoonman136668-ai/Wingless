@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.research-successor-policy.v1",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-PAIRWISE-FIXED-BUDGET-ACTION-VALUE-RANKING-R44",
+  "parent_preregistration_sha": "458923251e4cc3e6f45041152ed7a89b78b34ff9",
+  "frozen_before_parent_execution": true,
+  "independence": "Wingless-only; Yggdrasil cannot validate, alter, or route this policy.",
+  "global_constraints": [
+    "preregister before execution",
+    "no post-result tuning",
+    "preserve scientific negatives",
+    "infra failure distinct from scientific negative",
+    "no data/compute/capacity expansion",
+    "genuinely unseen manifests",
+    "one high-information architectural discriminator; no parameter sweep"
+  ],
+  "routes": {
+    "supported": {
+      "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-PAIRWISE-RANKING-DISJOINT-REPLICATION-R45",
+      "hypothesis": "The R44 pairwise intervention-choice effect replicates without refitting or richer allocation machinery on fresh disjoint manifests.",
+      "design": "Freeze three additional untouched manifests before R44 execution; reuse the exact R44 state, action set, pair set, scoring rule, thresholds, and budgets. No richer allocator.",
+      "decision": "Replication required before any richer allocator is authorized.",
+      "next_if_supported": "R46 prospective chooser under unchanged ranking rule",
+      "next_if_mixed": "R46 replication-boundary attribution",
+      "next_if_negative": "R46 treat R44 support as non-replicated and return to representation diagnosis"
+    },
+    "mixed": {
+      "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-PAIRWISE-STATE-COMPONENT-ABLATION-R45",
+      "hypothesis": "R44's partial ranking signal is carried by a bounded preregistered subset of existing R43 state components.",
+      "design": "One fixed ablation only: remove the transition-activity group (entry, exit, active-motif components) from the existing six-component state while leaving pair set, unseen manifests, budgets, readout capacity, and thresholds fixed. No alternate ablations after results.",
+      "supported_interpretation": "Ablated ranking accuracy falls and regret rises by preregistered margins, identifying necessary existing-state information.",
+      "negative_interpretation": "Partial R44 signal is not localized to the preregistered component group; do not sweep other subsets.",
+      "next": "Escalate according to the fixed result without a feature-subset sweep."
+    },
+    "negative": {
+      "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-LEARNING-STATE-REPRESENTATION-R45",
+      "hypothesis": "The current R43 representation loses decision-relevant causal trajectory information; a deterministic richer causal/latent state representation with unchanged readout capacity can expose pairwise action value.",
+      "design": "Replace, rather than augment, the six R43 state components with a fixed six-dimensional causal-trajectory representation computed from within-budget state transitions. Keep candidate actions, unseen manifests, total data/compute budget, and linear readout parameter count unchanged.",
+      "prohibited": "No further scalar calibration, offset, threshold, pair-selection, or current-representation ranking tweaks.",
+      "next_if_negative": "Stop representation-local ranking work and move to upstream learning-state formation."
+    }
+  }
+}
