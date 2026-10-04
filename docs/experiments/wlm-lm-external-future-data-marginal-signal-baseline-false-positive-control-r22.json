@@ -1,0 +1,99 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-BASELINE-FALSE-POSITIVE-CONTROL-R22",
+  "program": "Wingless training-only control for baseline-only marginal-signal false positives",
+  "question": "Can a training-only confidence margin distinguish productive baseline-argmax-only adaptation intervals from the false-positive technical-prose interval identified by R21, before any allocator signal is revised?",
+  "hypothesis": "Replay the exact third manifest and R21 budget grids. Restrict analysis to adjacent intervals with baseline_argmax_change_count>0 and motif_churn_count==0. For each changed predecessor row, compute at the upper budget the argmax support margin = best_successor_count - runner_up_count, and divide the summed margin by interval bytes. Freeze control_signal = summed_upper_argmax_margin/bytes_added. R21 sealed three baseline-only intervals on this manifest: code 582→727 (gain +1), technical prose 0→291 (gain +15), and technical prose 581→726 (gain 0 false positive). Supported requires the false-positive interval's control_signal to be strictly lower than both productive intervals, with no evaluation bytes or labels used in control computation. This experiment does not change R19 weights or make an allocation choice.",
+  "exact_parent_sha": "001a36d3aec21971c3776ab34b51c22e8558bb79",
+  "qualification_branch": "research/external-hosted-wingless-future-data-marginal-signal-baseline-false-positive-control-r22",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-ALLOCATION-ATTRIBUTION-R21",
+    "github_run_id": 37164430685,
+    "classification": "supported",
+    "observation": {
+      "code_582_727": {
+        "gain": 1,
+        "baseline_argmax_change_count": 1,
+        "motif_churn_count": 0
+      },
+      "technical_prose_0_291": {
+        "gain": 15,
+        "baseline_argmax_change_count": 4,
+        "motif_churn_count": 0
+      },
+      "technical_prose_581_726": {
+        "gain": 0,
+        "baseline_argmax_change_count": 1,
+        "motif_churn_count": 0
+      },
+      "false_positive_interval": "technical_prose 581→726"
+    }
+  },
+  "external_manifest": {
+    "path": "docs/experiments/wlm-lm-external-future-data-third-manifest-r20.json",
+    "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7",
+    "source_count": 3,
+    "effective_total_bytes": 57272
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "2518306c74ff426278f31b1199f8ad9891299d14",
+    "manifest_sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_contract": {
+    "source_identities": "byte-identical R20/R21 third manifest",
+    "non_target_training_byte_budget_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "analyzed_intervals": [
+      [
+        "code",
+        582,
+        727
+      ],
+      [
+        "technical_prose",
+        0,
+        291
+      ],
+      [
+        "technical_prose",
+        581,
+        726
+      ]
+    ],
+    "interval_selection_basis": "R21 sealed baseline-only intervals; no R22 result-based inclusion or exclusion",
+    "control_signal": "sum over changed predecessor rows of (upper-budget best successor count - upper-budget runner-up count) / interval bytes",
+    "control_evaluation_byte_use_count": 0,
+    "control_evaluation_label_use_count": 0,
+    "control_post_result_choice_count": 0
+  },
+  "classification_rules": {
+    "supported": "valid and false-positive technical_prose 581→726 control_signal is strictly lower than code 582→727 and technical_prose 0→291 control_signal",
+    "mixed": "valid and false-positive interval is lower than exactly one productive interval",
+    "negative": "valid and false-positive interval is not lower than either productive interval",
+    "invalid": "any parent, authority, source identity, split, analyzed-interval identity, margin formula, label isolation, deterministic replay, capacity, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter sources, analyzed intervals, margin formula, 15,819-byte non-target budget, 256 capacity, 582/872 split, evaluator, comparison rule, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-CONFIDENCE-GATED-ALLOCATION-R23",
+    "intent": "preregister a confidence-gated baseline component while leaving motif-churn evidence unchanged, then validate on a new disjoint manifest"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-BASELINE-CONTROL-FACTORIAL-R23",
+    "intent": "factor alternative training-only baseline-change confidence features before any weight revision"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-marginal-signal-baseline-false-positive-control-r22.json",
+    "unitary/wlm_lm_external_future_data_marginal_signal_baseline_false_positive_control_r22.go",
+    "cmd/wlm-lm-external-future-data-marginal-signal-baseline-false-positive-control-r22/main.go",
+    ".github/workflows/external-future-data-marginal-signal-baseline-false-positive-control-r22.yml"
+  ]
+}
