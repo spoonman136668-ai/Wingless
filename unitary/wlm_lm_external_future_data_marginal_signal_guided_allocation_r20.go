@@ -68,6 +68,7 @@ func RunWlmLmExternalFutureDataMarginalSignalGuidedAllocationR20(code,structured
 	}
 	if len(arms)!=3 {m["invalid_row_count"]++}
 	candidates:=[][3]int{{582,436,726},{582,581,581},{582,726,436},{727,291,726},{727,436,581},{727,581,436},{727,726,291},{872,291,581},{872,436,436},{872,581,291}}
+	equal:=[3]int{582,581,581}
 	bestScore:=math.Inf(-1);best:=[3]int{}
 	for _,c:=range candidates {
 		if len(arms)!=3 {break}
@@ -77,11 +78,10 @@ func RunWlmLmExternalFutureDataMarginalSignalGuidedAllocationR20(code,structured
 	if math.IsInf(bestScore,-1) {m["invalid_row_count"]++} else {
 		m["selected_code_budget"]=float64(best[0]);m["selected_structured_budget"]=float64(best[1]);m["selected_technical_prose_budget"]=float64(best[2])
 		m["selected_predicted_value"]=bestScore;m["total_adaptation_budget_selected"]=float64(best[0]+best[1]+best[2])
-		if best!=[3]int{582,581,581} {m["selected_differs_equal"]=1}
+		if best!=equal {m["selected_differs_equal"]=1}
 	}
 	if m["total_adaptation_budget_selected"]!=1744 {m["invalid_row_count"]++}
 	if len(arms)==3 {
-		equal:=[3]int{582,581,581}
 		for i,arm:=range arms {
 			p0b:=arm.bases[0];eqb:=arm.bases[equal[i]];sb:=arm.bases[best[i]]
 			p0:=wlmLmR10Hits(arm.eval,&p0b,arm.sels[0])
