@@ -1,0 +1,120 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-OUTCOME-MECHANISM-ATTRIBUTION-R29",
+  "program": "Wingless corrective RSI tranche: mechanism attribution for cross-manifest calibration failure",
+  "question": "Are R28 sign/scale errors primarily explained by feature extrapolation, historical policy nonstationarity, or domain-level prediction cancellation rather than by lack of ensemble consensus?",
+  "hypothesis": "Reuse the exact four sealed manifests, R27 six-feature representation, ridge lambda=1 and ten fixed policies. For each outer held-out manifest, before reading its policy outcomes: (A) FEATURE_EXTRAPOLATION is true when the held-out policy delta-feature vector has at least one component outside the min/max range observed for that same policy across the other three manifests; report excursion count and normalized excursion magnitude using training range with 1e-12 floor. (B) HISTORICAL_SIGN_INSTABILITY is true when the three training-manifest actual policy advantages do not share one sign class among {-1,0,+1}; training outcomes are permitted because they are not held-out. (C) DOMAIN_CONTRIBUTION_CONFLICT is true when the main model's three predicted domain-level allocation deltas contain both positive and negative nonzero signs before aggregation. Freeze all three flags for all 40 held-out policy cases, then open held-out actual advantages and compare sign-error rate and MAE between flagged and unflagged cases. This is causal attribution only; no flag changes allocation or confidence policy.",
+  "exact_parent_sha": "22b3608320e9b87065b52d4670759288356e98d8",
+  "qualification_branch": "research/external-hosted-wingless-future-data-calibration-outcome-mechanism-attribution-r29",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-CONFIDENCE-ATTRIBUTION-R28",
+    "github_run_id": 37168510377,
+    "classification": "negative",
+    "validity_pass": true,
+    "exact_predecessor_sha": "22b3608320e9b87065b52d4670759288356e98d8",
+    "observation": {
+      "ungated_sign_accuracy": 0.55,
+      "ungated_mean_absolute_error": 9.219594413938847,
+      "ungated_false_positive_reallocation_rate": 0.5384615384615384,
+      "consensus_only_coverage": 0.45,
+      "consensus_only_sign_accuracy": 0.2777777777777778,
+      "consensus_only_mean_absolute_error": 13.879207034550802,
+      "consensus_relative_spread_coverage": 0.4,
+      "consensus_relative_spread_sign_accuracy": 0.3125,
+      "consensus_relative_spread_mean_absolute_error": 15.224274144332,
+      "robust_lower_bound_coverage": 0
+    },
+    "eliminated_hypothesis": "prediction agreement/spread alone is a sufficient pre-outcome reliability discriminator",
+    "strengthened_hypothesis": "calibration failure may be caused by regime extrapolation and policy nonstationarity rather than uncertainty in the narrow ensemble sense"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R28 consensus predicates covered substantial cases but had worse sign accuracy and MAE than ungated predictions; robust lower bound covered none.",
+    "internal_diagnostic": "same-policy cross-manifest feature position, known training-manifest policy outcomes, and pre-outcome domain-level predicted contributions",
+    "attributed_causes_under_test": [
+      "feature-space extrapolation",
+      "historical policy sign nonstationarity",
+      "domain-level contribution cancellation"
+    ],
+    "candidate_corrective_mechanisms": "none in R29; attribution only",
+    "frozen_candidate_selection_rule": "none; evaluate all three preregistered mechanisms",
+    "exact_bounded_delta": "derive three diagnostic flags from already-qualified data/model state; no feature/model/allocator/capacity/authority change",
+    "qualification": "deterministic double replay over exact four manifests; held-out outcomes hidden until flags freeze",
+    "held_out_result": "sign error and absolute error evaluated after flag freeze",
+    "retain_revert": "nothing retained or modified in R29",
+    "next_hypothesis": "supported cause must be converted into one preregistered correction and validated prospectively on a sixth manifest; otherwise inspect outcome-generation mechanism without relaxing confidence"
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_model": {
+    "features": "byte-identical R27 six features",
+    "ridge_lambda": 1,
+    "intercept": true,
+    "solver": "byte-identical R27",
+    "outer_holdouts": 4,
+    "policies_per_holdout": 10,
+    "case_count": 40
+  },
+  "mechanism_definitions": {
+    "FEATURE_EXTRAPOLATION": {
+      "flag": "held-out policy delta-feature vector has >=1 feature outside the training-manifest min/max for the same policy",
+      "magnitude": "sum outside-range distance / max(training_range,1e-12) across six features"
+    },
+    "HISTORICAL_SIGN_INSTABILITY": {
+      "flag": "training-manifest actual policy advantages occupy more than one sign class among {-1,0,+1}",
+      "heldout_outcome_use": false
+    },
+    "DOMAIN_CONTRIBUTION_CONFLICT": {
+      "flag": "main-model predicted domain allocation deltas include at least one positive and one negative nonzero domain contribution",
+      "heldout_outcome_use": false
+    }
+  },
+  "metrics": [
+    "mechanism_coverage",
+    "flagged_sign_error_rate",
+    "unflagged_sign_error_rate",
+    "flagged_mean_absolute_error",
+    "unflagged_mean_absolute_error",
+    "sign_error_rate_delta",
+    "mae_ratio",
+    "feature_extrapolation_mean_magnitude"
+  ],
+  "classification_rules": {
+    "supported": "valid and at least one mechanism has coverage>=0.20, flagged sign-error rate >= unflagged + 0.15, and flagged MAE >= unflagged*1.25",
+    "mixed": "valid and at least one mechanism has both higher flagged sign-error rate and higher flagged MAE than unflagged but misses a supported threshold",
+    "negative": "valid and no mechanism shows both directional enrichments",
+    "invalid": "any parent, manifest/model identity, flag definition, training-vs-heldout boundary, outcome ordering, deterministic replay, provenance, capacity or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter manifests, six features, ridge model, policy set, mechanism definitions, sign classes, excursion formula, coverage/error thresholds, evaluator or classification after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-MECHANISM-CORRECTION-R30",
+    "intent": "freeze one correction derived from supported causal mechanism and validate it prospectively on a sixth disjoint manifest with equal fallback"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-OUTCOME-STRUCTURE-ATTRIBUTION-R30",
+    "intent": "inspect why identical diagnostic states map to different realized gains without tuning an allocator"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-calibration-outcome-mechanism-attribution-r29.json",
+    "unitary/wlm_lm_external_future_data_calibration_outcome_mechanism_attribution_r29.go",
+    "cmd/wlm-lm-external-future-data-calibration-outcome-mechanism-attribution-r29/main.go",
+    ".github/workflows/external-future-data-calibration-outcome-mechanism-attribution-r29.yml"
+  ]
+}
