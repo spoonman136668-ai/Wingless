@@ -1,0 +1,154 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-RESIDUAL-MAGNITUDE-CALIBRATION-ATTRIBUTION-R32",
+  "program": "Wingless RSI corrective tranche: residual magnitude calibration attribution",
+  "question": "Within the exact R30-excluded candidate cases, do training-only net historical advantage magnitude conflict or prediction-magnitude extrapolation identify residual held-out calibration error after R31 showed that sign-count polarity does not?",
+  "hypothesis": "R31 ruled out majority-positive sign count as a useful discriminator. Residual calibration error may instead arise when the unchanged R27 predictor disagrees with the magnitude-weighted net historical advantage, or when the predicted held-out advantage magnitude exceeds the entire training-manifest actual-advantage envelope. For each outer holdout, reproduce the exact R30-excluded non-equal candidate set, fit the unchanged R27 predictor on the other three manifests, freeze both magnitude diagnostics from training outcomes plus held-out features only, and open held-out outcomes only after all flags and predictions are frozen.",
+  "exact_parent_sha": "876f1ff924468c2c8b66989ae2aa915e95ae14bc",
+  "qualification_branch": "research/external-hosted-wingless-future-data-residual-magnitude-calibration-attribution-r32",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-RESIDUAL-CALIBRATION-ATTRIBUTION-R31",
+    "github_run_id": 37193997435,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "excluded_case_count": 33,
+      "majority_positive_excluded_case_count": 13,
+      "majority_positive_excluded_positive_rate": 0.23076923076923078,
+      "other_excluded_positive_rate": 0.55,
+      "majority_positive_positive_rate_delta": -0.31923076923076926,
+      "majority_positive_excluded_mean_actual_advantage": -2.4615384615384617,
+      "other_excluded_mean_actual_advantage": 10.45,
+      "majority_positive_mean_advantage_delta": -12.911538461538461
+    },
+    "eliminated_hypothesis": "majority-positive training sign count identifies productive candidates inside the exact R30-excluded set",
+    "strengthened_hypothesis": "candidate calibration depends on magnitude structure rather than vote-count sign polarity"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R31's majority-positive subgroup was materially worse than the remaining R30-excluded candidates on both held-out positive rate and mean held-out actual advantage.",
+    "residual_causes_under_test": [
+      "NET_MAGNITUDE_SIGN_CONFLICT",
+      "PREDICTION_MAGNITUDE_EXTRAPOLATION"
+    ],
+    "diagnostic_definitions": {
+      "NET_MAGNITUDE_SIGN_CONFLICT": "sign(predicted held-out advantage) differs from sign(sum of the three training-manifest actual advantages); the sum is magnitude-weighted and uses no held-out outcome",
+      "PREDICTION_MAGNITUDE_EXTRAPOLATION": "absolute predicted held-out advantage exceeds max absolute actual advantage observed across the three training manifests"
+    },
+    "exact_bounded_delta": "diagnostic accounting only; unchanged manifests, candidate allocations, equal baseline, R27 model/features, budgets, capacity and held-out ordering",
+    "qualification": "same four sealed manifests, exact 1744 budget, deterministic double replay, full Go regression, READY_RESEARCH, all diagnostics frozen before held-out outcomes open",
+    "held_out_result": "compare flagged versus unflagged held-out predictor sign-error rate and mean absolute prediction error",
+    "retain_revert": "R32 cannot change allocator behavior. A supported mechanism may justify a separately preregistered magnitude-aware correction; mixed/negative does not.",
+    "next_hypothesis": "supported -> test only the supported magnitude-aware correction; mixed/negative -> continue residual calibration-structure attribution without capacity growth"
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "non_equal_candidates_per_holdout": 9,
+    "exact_r30_excluded_cases_expected": 33,
+    "equal_allocation": [
+      582,
+      581,
+      581
+    ],
+    "total_adaptation_budget": 1744,
+    "model": "unchanged R27 ridge fit and six features",
+    "tie_break": "unchanged lexical allocation order",
+    "capacity": "unchanged",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "diagnostic_definitions": {
+    "R30_EXCLUDED": "training actual-advantage signs are not exactly one distinct non-zero sign",
+    "NET_MAGNITUDE_SIGN_CONFLICT": "sign(predicted held-out advantage) != sign(sum(training actual advantages))",
+    "PREDICTION_MAGNITUDE_EXTRAPOLATION": "abs(predicted held-out advantage) > max(abs(training actual advantages))"
+  },
+  "outcome_definition": {
+    "sign_error": "sign(predicted held-out advantage) != sign(held-out actual advantage)",
+    "absolute_error": "abs(predicted held-out advantage - held-out actual advantage)"
+  },
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "excluded_case_count",
+    "net_magnitude_sign_conflict_coverage",
+    "net_magnitude_sign_conflict_flagged_sign_error_rate",
+    "net_magnitude_sign_conflict_unflagged_sign_error_rate",
+    "net_magnitude_sign_conflict_flagged_mean_absolute_error",
+    "net_magnitude_sign_conflict_unflagged_mean_absolute_error",
+    "net_magnitude_sign_conflict_sign_error_rate_delta",
+    "net_magnitude_sign_conflict_mae_ratio",
+    "prediction_magnitude_extrapolation_coverage",
+    "prediction_magnitude_extrapolation_flagged_sign_error_rate",
+    "prediction_magnitude_extrapolation_unflagged_sign_error_rate",
+    "prediction_magnitude_extrapolation_flagged_mean_absolute_error",
+    "prediction_magnitude_extrapolation_unflagged_mean_absolute_error",
+    "prediction_magnitude_extrapolation_sign_error_rate_delta",
+    "prediction_magnitude_extrapolation_mae_ratio",
+    "heldout_outcome_use_before_flags",
+    "post_result_mechanism_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "classification_rules": {
+    "supported": "valid AND at least one preregistered magnitude diagnostic has coverage>=0.20, flagged sign-error rate >= unflagged+0.15, and flagged MAE >= unflagged*1.25",
+    "mixed": "valid AND at least one magnitude diagnostic has both flagged sign-error rate > unflagged and flagged MAE > unflagged but none meets all supported thresholds",
+    "negative": "valid AND neither magnitude diagnostic has both directional enrichments",
+    "invalid": "any parent, manifest identity, 1744 budget, candidate set, exact R30 exclusion reproduction, model/features, training-only magnitude calculation, held-out ordering, deterministic replay, capacity, provenance or accounting requirement fails"
+  },
+  "thresholds": {
+    "coverage_floor": 0.2,
+    "sign_error_rate_delta": 0.15,
+    "mae_ratio": 1.25,
+    "provenance": "reuse R29 enrichment thresholds; no threshold selected from R31 outcomes"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R32 is calibration attribution on already studied manifests and cannot establish allocator success.",
+  "no_post_result_tuning_rule": "Do not alter manifests, candidates, exact R30 exclusion rule, R27 model/features, magnitude diagnostics, thresholds, budgets/capacity, held-out ordering, classification, or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r33-magnitude-aware-calibration-correction",
+      "experiment_family": "bounded-correction"
+    },
+    "mixed": {
+      "contract_id": "wingless-r33-calibration-residual-structure-attribution",
+      "experiment_family": "attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r33-calibration-residual-structure-attribution",
+      "experiment_family": "attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-residual-magnitude-calibration-attribution-r32.json"
+  ]
+}
