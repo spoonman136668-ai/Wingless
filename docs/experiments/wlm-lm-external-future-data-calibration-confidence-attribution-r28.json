@@ -123,5 +123,47 @@
     "false_positive_reallocation_rate": "among predicate-covered cases with reference_prediction > 0, fraction whose actual advantage <= 0; 0 when denominator is zero and positive_recommendation_count is reported separately",
     "mean_absolute_error": "mean abs(reference_prediction - actual advantage) over predicate-covered cases",
     "prediction_median": "arithmetic mean of the two middle values after sorting the four model predictions"
+  },
+  "pre_execution_amendment": {
+    "reason": "Make historical replay authority explicit before any R28 execution; scientific hypothesis, model, predicates, thresholds, manifests and classification are unchanged.",
+    "amended_before_any_hosted_run": true,
+    "prior_prereg_commit": "9717cea9d3b45bff7d5108a7125b4e0b3f94df2a"
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "c499c28c2c62c675350c56c7301f62c89a0bc1e5",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "research_decision_required": "READY_RESEARCH",
+    "authority_form": "four independent exact one-shot receipts; one per already-admitted manifest; no wildcard or bundle authority",
+    "replay_manifests": [
+      {
+        "name": "transfer",
+        "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250",
+        "source_count": 3,
+        "total_max_bytes": 57272
+      },
+      {
+        "name": "third",
+        "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7",
+        "source_count": 3,
+        "total_max_bytes": 57272
+      },
+      {
+        "name": "fourth",
+        "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+        "source_count": 3,
+        "total_max_bytes": 57272
+      },
+      {
+        "name": "fifth",
+        "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+        "source_count": 3,
+        "total_max_bytes": 57272
+      }
+    ],
+    "total_replay_bytes": 229088,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false,
+    "substrate_capacity_growth": false
   }
 }
