@@ -1,0 +1,139 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-TARGET-DEFINITION-ATTRIBUTION-R37",
+  "program": "Wingless RSI corrective tranche: calibration target-definition attribution",
+  "question": "After R36 ruled out raw-composition locality, is the residual calibration failure caused by fitting BASE6 directly to heavy-tailed raw allocation advantage rather than a monotone robust target that preserves sign while compressing magnitude outliers?",
+  "hypothesis": "R36 showed that choosing raw-composition-nearest training manifests worsened sign error while leaving MAE essentially unchanged. The remaining error may therefore come from objective mismatch rather than representation locality: raw advantage contains large held-out magnitudes that can dominate ridge calibration despite the operational decision depending strongly on sign. Freeze one attribution using the unchanged global three-manifest BASE6 fit and exact R30 exclusion set. RAW_ADVANTAGE_TARGET is byte-identical to the R36 GLOBAL3 baseline. SIGNED_LOG1P_TARGET changes only the training target to sign(y)*log1p(abs(y)); prediction is mapped back to raw scale as sign(p)*expm1(abs(p)) for MAE while sign is read directly from p. Features, examples, ridge lambda, manifests, exclusion logic, candidates, budget and held-out ordering remain unchanged.",
+  "exact_parent_sha": "4c6212f663eb157dec328cc7e9b61aaa38e389ed",
+  "qualification_branch": "research/external-hosted-wingless-future-data-calibration-target-definition-attribution-r37",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CROSS-MANIFEST-REPRESENTATION-LOCALITY-ATTRIBUTION-R36",
+    "github_run_id": 37219510036,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "excluded_case_count": 33,
+      "global3_sign_error_rate": 0.5151515151515151,
+      "global3_mean_absolute_error": 10.731783167689903,
+      "local2_sign_error_rate": 0.7878787878787878,
+      "local2_mean_absolute_error": 10.781322538683668,
+      "local2_sign_error_improvement": -0.2727272727272727,
+      "local2_mae_ratio": 1.0046161360344021,
+      "locality_selection_mismatch_count": 0,
+      "fit_failure_count": 0,
+      "invalid_row_count": 0
+    },
+    "eliminated_hypothesis": "raw-composition-nearest two-manifest locality improves the unchanged BASE6 calibration map",
+    "strengthened_hypothesis": "the calibration objective/target definition may be misaligned with the sign-sensitive allocation decision because raw magnitude is heavy-tailed"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R36 LOCAL2 increased sign-error rate from 0.5152 to 0.7879 and increased MAE from 10.7318 to 10.7813 on the exact 33 R30-excluded cases.",
+    "residual_cause_under_test": "RAW_ADVANTAGE_TARGET_OBJECTIVE_MISMATCH",
+    "exact_bounded_delta": "training target transform only; BASE6 features, all-three-manifest training set, ridge lambda, candidates, budgets, exclusion rule, held-out ordering and capacity remain byte-identical",
+    "raw_target_rule": "y_raw = allocation actual advantage relative to equal allocation, byte-identical R36 GLOBAL3 target",
+    "transformed_target_rule": "y_log = sign(y_raw)*log1p(abs(y_raw)); zero maps to zero; no fitted or tuned transform parameter",
+    "inverse_rule": "for raw-scale MAE only, p_raw = sign(p_log)*expm1(abs(p_log)); sign-error uses sign(p_log) directly",
+    "baseline_identity_rule": "RAW_ADVANTAGE_TARGET must reproduce R36 GLOBAL3 predictions and aggregate metrics within 1e-9",
+    "attribution_rule": "support requires preregistered improvement in both sign-error and raw-scale MAE; no post-result target choice",
+    "retain_revert": "R37 cannot alter allocator behavior. Support authorizes only a separately preregistered target-aware correction or prospective replication."
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "non_equal_candidates_per_holdout": 9,
+    "exact_r30_excluded_cases_expected": 33,
+    "total_adaptation_budget": 1744,
+    "representation": "unchanged R27/R36 BASE6",
+    "training_manifests_per_holdout": 3,
+    "ridge_lambda": 1,
+    "intercept": true,
+    "exclusion_source": "all three training manifests, byte-identical R30/R36 rule",
+    "target_cells": [
+      "RAW_ADVANTAGE_TARGET",
+      "SIGNED_LOG1P_TARGET"
+    ],
+    "target_transform_parameter_count": 0,
+    "capacity": "unchanged",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "excluded_case_count",
+    "raw_target_sign_error_rate",
+    "raw_target_mean_absolute_error",
+    "signed_log_target_sign_error_rate",
+    "signed_log_target_mean_absolute_error",
+    "signed_log_sign_error_improvement",
+    "signed_log_mae_ratio",
+    "raw_baseline_identity_mismatch_count",
+    "target_transform_mismatch_count",
+    "fit_failure_count",
+    "heldout_outcome_use_before_target_freeze",
+    "post_result_target_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "classification_rules": {
+    "supported": "valid AND signed_log_sign_error_improvement>=0.10 AND signed_log_mae_ratio<=0.90",
+    "mixed": "valid AND SIGNED_LOG1P_TARGET improves both sign-error and raw-scale MAE versus RAW_ADVANTAGE_TARGET but misses one or both supported thresholds",
+    "negative": "valid AND SIGNED_LOG1P_TARGET does not improve both sign-error and raw-scale MAE versus RAW_ADVANTAGE_TARGET",
+    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, BASE6 identity, global three-manifest training set, signed-log transform/inverse, ridge solver, held-out ordering, deterministic replay, capacity, provenance or accounting requirement fails"
+  },
+  "thresholds": {
+    "sign_error_improvement": 0.1,
+    "mae_ratio": 0.9,
+    "provenance": "same support thresholds as R36; frozen before R37 execution"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R37 is target-definition attribution on already studied manifests; prospective disjoint validation remains required.",
+  "no_post_result_tuning_rule": "Do not alter manifests, BASE6, training-set scope, raw or signed-log target definitions, transform/inverse, R30 exclusion rule, thresholds, budgets/capacity, held-out ordering, classification or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r38-target-aware-calibration-correction",
+      "experiment_family": "bounded-target-aware-correction"
+    },
+    "mixed": {
+      "contract_id": "wingless-r38-target-definition-disambiguation",
+      "experiment_family": "target-definition-attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r38-calibration-label-stability-attribution",
+      "experiment_family": "label-stability-attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-calibration-target-definition-attribution-r37.json"
+  ]
+}
