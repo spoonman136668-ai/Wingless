@@ -1,0 +1,119 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-CONFIDENCE-ATTRIBUTION-R28",
+  "program": "Wingless corrective RSI tranche: pre-outcome reliability attribution for calibrated allocation estimates",
+  "question": "Can model-consensus and prediction-disagreement statistics, computed before held-out outcomes, identify which calibrated policy-advantage estimates are reliable enough to justify future reallocation?",
+  "hypothesis": "Use the exact four already-sealed manifests available after R27: transfer, third, fourth, fifth. For each manifest in turn, hold it out completely. Fit the frozen R27 six-feature ridge model (lambda=1, intercept) on the other three manifests, plus three submodels each omitting one of those three training manifests. For every one of the ten fixed allocation policies, compute four predictions of advantage versus equal on the held-out manifest before reading its actual advantage. Freeze three reliability predicates: CONSENSUS_ONLY = all four predictions have the same nonzero sign; CONSENSUS_RELATIVE_SPREAD = CONSENSUS_ONLY and prediction_range <= abs(prediction_median); ROBUST_LOWER_BOUND = all four predictions are positive and min_prediction > prediction_range. After all reliability flags are frozen, open actual policy advantages and evaluate sign accuracy, false-positive reallocation rate, absolute-error means, and coverage for each predicate. This is attribution only: no predicate changes R27 or is installed as an allocator. A supported predicate must later be preregistered unchanged and validated prospectively on a sixth disjoint manifest.",
+  "exact_parent_sha": "50d7e374801407b3712c18feb9b74675babcfcdf",
+  "qualification_branch": "research/external-hosted-wingless-future-data-calibration-confidence-attribution-r28",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-PROSPECTIVE-CALIBRATION-R27",
+    "github_run_id": 37167847969,
+    "classification": "mixed",
+    "validity_pass": true,
+    "decision": "FALLBACK_EQUAL",
+    "exact_predecessor_sha": "50d7e374801407b3712c18feb9b74675babcfcdf",
+    "metrics": {
+      "historical_uncertainty_radius": 13.310174045713637,
+      "historical_policy_advantage_rmse": 8.184071285594573,
+      "historical_policy_sign_accuracy": 0.6,
+      "selected_predicted_advantage_full": 0.47750022460257924,
+      "selected_predicted_advantage_min_loo": 0.2086892629451853,
+      "actual_aggregate_exact_hit_delta_vs_equal": 0,
+      "equal_aggregate_exact_hits": 407
+    },
+    "infra_note": "R27 run 37167747596 was INFRA_INVALID due classifier KeyError on omitted zero counters; run 37167847969 reran the unchanged frozen computation and sealed the valid mixed result."
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R27 calibration predicted only weak positive advantage while historical worst-overprediction remained 13.31 hits, forcing correct fallback to equal",
+    "internal_diagnostic": "cross-manifest ridge predictions from existing six internal signals",
+    "attributed_cause": "policy estimates lack a validated pre-outcome reliability discriminator; global worst-case uncertainty is too coarse",
+    "candidate_corrective_mechanisms": [
+      "prediction sign consensus",
+      "relative ensemble spread",
+      "robust positive lower-bound across nested leave-one-manifest-out models"
+    ],
+    "frozen_candidate_selection_rule": "none; all three reliability predicates are evaluated descriptively and none is installed post hoc",
+    "exact_bounded_delta": "reliability attribution only; no allocator threshold, feature, capacity, data, compute or authority change",
+    "qualification": "deterministic replay over four sealed manifests; no heldout outcome use before reliability flags; exact provenance",
+    "held_out_result": "actual policy advantages revealed only after all reliability flags are computed per heldout manifest",
+    "retain_revert": "no policy retained in R28; supported reliability forms must be prospectively validated before use",
+    "next_hypothesis": "freeze supported reliability predicate(s) and validate on sixth disjoint manifest, or move to outcome-mechanism diagnostics if none separate reliable estimates"
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_model": {
+    "features": "byte-identical R27 six features",
+    "ridge_lambda": 1,
+    "intercept": true,
+    "solver": "byte-identical R27",
+    "outer_holdout_manifest_count": 4,
+    "policies_per_holdout": 10,
+    "prospective_case_count": 40,
+    "models_per_case": 4,
+    "main_model": "trained on other 3 manifests",
+    "submodels": "three models, each trained on 2 of the other 3 manifests",
+    "heldout_outcome_use_before_flags": 0
+  },
+  "reliability_predicates": {
+    "CONSENSUS_ONLY": "all four predictions share the same nonzero sign",
+    "CONSENSUS_RELATIVE_SPREAD": "CONSENSUS_ONLY and (max_prediction-min_prediction) <= abs(median_prediction)",
+    "ROBUST_LOWER_BOUND": "all four predictions > 0 and min_prediction > (max_prediction-min_prediction)"
+  },
+  "metrics": [
+    "ungated_sign_accuracy",
+    "ungated_false_positive_reallocation_rate",
+    "ungated_mean_absolute_error",
+    "consensus_only_coverage",
+    "consensus_only_sign_accuracy",
+    "consensus_only_false_positive_reallocation_rate",
+    "consensus_only_mean_absolute_error",
+    "consensus_relative_spread_coverage",
+    "consensus_relative_spread_sign_accuracy",
+    "consensus_relative_spread_false_positive_reallocation_rate",
+    "consensus_relative_spread_mean_absolute_error",
+    "robust_lower_bound_coverage",
+    "robust_lower_bound_sign_accuracy",
+    "robust_lower_bound_false_positive_reallocation_rate",
+    "robust_lower_bound_mean_absolute_error"
+  ],
+  "classification_rules": {
+    "supported": "valid and at least one predicate has coverage >=0.20, sign accuracy >= ungated + 0.15, false-positive reallocation rate <= ungated false-positive rate, and mean absolute error < ungated mean absolute error",
+    "mixed": "valid and at least one predicate improves sign accuracy and mean absolute error over ungated but misses the supported margin or coverage requirement",
+    "negative": "valid and no preregistered reliability predicate improves both sign accuracy and mean absolute error over ungated",
+    "invalid": "any parent, manifest identity, feature/model identity, outer-holdout isolation, reliability-predicate definition, outcome-ordering, deterministic replay, provenance, capacity or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not change manifests, features, ridge model, outer folds, submodel construction, predicates, coverage threshold, accuracy margin, evaluator, classification or interpretation after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-RELIABILITY-PROSPECTIVE-R29",
+    "intent": "freeze supported predicate(s) before seeing a sixth disjoint manifest and test confidence-gated reallocation prospectively"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-OUTCOME-MECHANISM-ATTRIBUTION-R29",
+    "intent": "diagnose residual policy-error mechanisms without lowering confidence or tuning coefficients post hoc"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-calibration-confidence-attribution-r28.json",
+    "unitary/wlm_lm_external_future_data_calibration_confidence_attribution_r28.go",
+    "cmd/wlm-lm-external-future-data-calibration-confidence-attribution-r28/main.go",
+    ".github/workflows/external-future-data-calibration-confidence-attribution-r28.yml"
+  ]
+}
