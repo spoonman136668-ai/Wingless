@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.external-research-prereg.v1",
+  "project": "Wingless",
+  "experiment_id": "REPLACE_ME",
+  "contributor": "github-handle-or-team",
+  "contribution_class": "replication|disjoint-replication|falsification|ablation|control|robustness|successor-proposal",
+  "question": "Frozen scientific question",
+  "hypothesis": "Frozen hypothesis before primary execution",
+  "exact_parent_sha": "40-hex commit SHA",
+  "predecessor_evidence": [],
+  "changed_paths": [],
+  "inputs": [
+    {
+      "name": "dataset-or-context",
+      "sha256": "64-hex sha256",
+      "source": "document provenance/license separately"
+    }
+  ],
+  "frozen_design": {
+    "seeds": [],
+    "split": "describe exact split",
+    "ordering": "describe exact ordering",
+    "data_budget": "exact value/unit",
+    "compute_budget": "exact value/unit",
+    "capacity": "exact fixed capacity",
+    "evaluator": "exact evaluator/scoring identity",
+    "deterministic_expected": true
+  },
+  "controls": [],
+  "metrics": [],
+  "classification_rules": {
+    "supported": "explicit preregistered rule",
+    "mixed": "explicit preregistered rule",
+    "negative": "explicit preregistered rule",
+    "invalid": "identity/provenance/accounting/leakage/control failures"
+  },
+  "prohibited_after_primary_run": [
+    "threshold changes",
+    "split changes",
+    "post-result policy selection",
+    "capacity growth",
+    "extra data/compute/model calls unless preregistered",
+    "held-out/evaluator leakage"
+  ],
+  "authority": {
+    "research_only": true,
+    "production_authority": false,
+    "accepted_ref_mutation": false,
+    "promotion_authority": false,
+    "scheduler_or_queue_authority": false
+  },
+  "preregistration_note": "Commit this file before producing or inspecting the primary outcome."
+}
