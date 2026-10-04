@@ -1,0 +1,163 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-FEATURE-REPRESENTATION-ATTRIBUTION-R34",
+  "program": "Wingless RSI corrective tranche: calibration feature representation attribution",
+  "question": "Are residual cross-manifest calibration errors caused by R27 omitting domain identity, adaptation-budget position, or their combination from the six-feature representation?",
+  "hypothesis": "R31-R33 ruled out sign-count polarity, magnitude conflict/extrapolation, and jackknife instability as useful residual-error discriminators. R27 currently pools code, structured, and technical-prose intervals and all adaptation stages into one six-feature ridge mapping. Freeze a 2x2 representation factorial before held-out outcomes: BASE6 uses the unchanged six R27 rates; DOMAIN augments BASE6 with two fixed domain indicators (code and structured, technical-prose reference); BUDGET augments BASE6 with normalized upper-budget position hi/max_budget_for_domain; DOMAIN_BUDGET includes both. For each outer holdout, fit every representation on the other three manifests with ridge lambda=1 and deterministic elimination, predict the exact R30-excluded candidate set, then open held-out outcomes. This is diagnostic attribution only and cannot change allocator behavior.",
+  "exact_parent_sha": "5bf293cd2f3d1730b8fa98c4803c73cde86b4d7a",
+  "qualification_branch": "research/external-hosted-wingless-future-data-calibration-feature-representation-attribution-r34",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-RESIDUAL-STRUCTURE-ATTRIBUTION-R33",
+    "github_run_id": 37197712256,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "excluded_case_count": 33,
+      "jackknife_sign_instability_coverage": 0.48484848484848486,
+      "jackknife_sign_instability_sign_error_rate_delta": -0.3933823529411765,
+      "jackknife_sign_instability_mae_ratio": 0.451362522502032,
+      "high_relative_jackknife_spread_coverage": 0.45454545454545453,
+      "high_relative_jackknife_spread_sign_error_rate_delta": -0.0888888888888889,
+      "high_relative_jackknife_spread_mae_ratio": 3.0957347260749826,
+      "heldout_outcome_use_before_flags": 0,
+      "post_result_mechanism_choice_count": 0,
+      "invalid_row_count": 0
+    },
+    "eliminated_hypothesis": "jackknife sign instability or high relative jackknife spread identifies residual calibration error inside the exact R30-excluded set",
+    "strengthened_hypothesis": "the remaining calibration error may be representational: domain and adaptation-stage information are absent from the pooled R27 six-feature vector"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R33's sign-instability cases were substantially less error-prone than controls, while high-spread cases had larger MAE but lower sign-error rate; neither preregistered diagnostic enriched both error dimensions.",
+    "residual_causes_under_test": [
+      "MISSING_DOMAIN_IDENTITY",
+      "MISSING_BUDGET_POSITION",
+      "DOMAIN_BUDGET_INTERACTION"
+    ],
+    "exact_bounded_delta": "representation attribution only; same four sealed manifests, exact R30 exclusion rule, ten candidate allocations, 1744-byte budget, ridge lambda, outcome labels, held-out ordering, substrate capacity and evaluator",
+    "representation_factorial": {
+      "BASE6": "unchanged R27 six per-byte structural rates",
+      "DOMAIN": "BASE6 plus two fixed one-hot domain indicators: code and structured; technical-prose is reference",
+      "BUDGET": "BASE6 plus normalized upper-budget position hi/max_budget_for_domain",
+      "DOMAIN_BUDGET": "BASE6 plus both fixed domain indicators and normalized budget position"
+    },
+    "fit_rule": "each representation is fitted independently on the same three training manifests for each outer holdout; ridge lambda=1 on non-intercept coefficients; deterministic Gaussian elimination; no representation selected from outcomes",
+    "attribution_rule": "compare held-out sign-error rate and MAE of each preregistered representation on the exact 33 R30-excluded cases; factor effects require paired improvement across the factorial, not a single post-hoc best arm",
+    "retain_revert": "R34 cannot alter allocator behavior. Supported representation evidence only authorizes a separately preregistered correction/replication."
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "non_equal_candidates_per_holdout": 9,
+    "exact_r30_excluded_cases_expected": 33,
+    "total_adaptation_budget": 1744,
+    "base_features": "unchanged R27 six features",
+    "ridge_lambda": 1,
+    "intercept": true,
+    "domain_encoding": "code=[1,0], structured=[0,1], technical_prose=[0,0]",
+    "budget_position": "upper interval budget divided by that domain's maximum preregistered adaptation budget",
+    "code_max_budget": 872,
+    "structured_max_budget": 726,
+    "technical_prose_max_budget": 726,
+    "capacity": "unchanged",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "representation_cells": [
+    "BASE6",
+    "DOMAIN",
+    "BUDGET",
+    "DOMAIN_BUDGET"
+  ],
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "excluded_case_count",
+    "base6_sign_error_rate",
+    "base6_mean_absolute_error",
+    "domain_sign_error_rate",
+    "domain_mean_absolute_error",
+    "budget_sign_error_rate",
+    "budget_mean_absolute_error",
+    "domain_budget_sign_error_rate",
+    "domain_budget_mean_absolute_error",
+    "domain_main_sign_error_improvement_min",
+    "domain_main_mae_ratio_max",
+    "budget_main_sign_error_improvement_min",
+    "budget_main_mae_ratio_max",
+    "interaction_sign_error_improvement",
+    "interaction_mae_ratio",
+    "fit_failure_count",
+    "heldout_outcome_use_before_representation_freeze",
+    "post_result_representation_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "effect_rules": {
+    "domain_main_effect": "DOMAIN improves sign-error by >=0.10 and MAE ratio <=0.90 versus BASE6, AND DOMAIN_BUDGET improves sign-error by >=0.10 and MAE ratio <=0.90 versus BUDGET",
+    "budget_main_effect": "BUDGET improves sign-error by >=0.10 and MAE ratio <=0.90 versus BASE6, AND DOMAIN_BUDGET improves sign-error by >=0.10 and MAE ratio <=0.90 versus DOMAIN",
+    "interaction_effect": "DOMAIN_BUDGET improves sign-error by >=0.15 and MAE ratio <=0.80 versus BASE6 while neither domain_main_effect nor budget_main_effect holds"
+  },
+  "classification_rules": {
+    "supported": "valid AND at least one of domain_main_effect, budget_main_effect, interaction_effect is true",
+    "mixed": "valid AND at least one augmented representation improves both sign-error and MAE versus BASE6 but no preregistered factor effect meets its full threshold",
+    "negative": "valid AND no augmented representation improves both sign-error and MAE versus BASE6",
+    "invalid": "any parent, manifest identity, 1744 budget, candidate set, exact R30 exclusion reproduction, BASE6 identity, domain encoding, budget-position formula, ridge lambda/solver, representation freezing, held-out ordering, deterministic replay, capacity, provenance or accounting requirement fails"
+  },
+  "thresholds": {
+    "paired_sign_error_improvement": 0.1,
+    "paired_mae_ratio": 0.9,
+    "interaction_sign_error_improvement": 0.15,
+    "interaction_mae_ratio": 0.8,
+    "provenance": "fixed before R34 execution; no threshold selected from R33 outcomes beyond choosing the preregistered feature-representation successor family"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R34 is attribution on already studied manifests and cannot establish prospective allocator success.",
+  "no_post_result_tuning_rule": "Do not alter manifests, exact R30 exclusion rule, candidate allocations, BASE6 features, domain encoding, budget-position formula, ridge lambda/solver, factorial cells, thresholds, budgets/capacity, held-out ordering, classification, or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r35-feature-representation-correction",
+      "experiment_family": "bounded-correction"
+    },
+    "mixed": {
+      "contract_id": "wingless-r35-feature-representation-disambiguation",
+      "experiment_family": "attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r35-raw-representation-attribution",
+      "experiment_family": "raw-representation-attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-calibration-feature-representation-attribution-r34.json"
+  ]
+}
