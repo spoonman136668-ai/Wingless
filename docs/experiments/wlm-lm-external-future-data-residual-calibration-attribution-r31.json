@@ -1,0 +1,157 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-RESIDUAL-CALIBRATION-ATTRIBUTION-R31",
+  "program": "Wingless RSI corrective tranche: residual calibration attribution after failed hard instability gate",
+  "question": "Within historically sign-unstable candidate allocations, does training-only majority-positive sign polarity identify a productive subgroup that the R30 hard gate incorrectly excluded, relative to the remaining unstable candidates, before any held-out outcome is opened?",
+  "hypothesis": "R30 failed because binary sign stability is too coarse: some unstable candidates are still systematically productive. For each outer holdout, use only the other three manifests to count each non-equal candidate's positive, negative, and zero actual-advantage signs and freeze a majority-positive-unstable flag before held-out outcomes open. After the flag set is frozen, evaluate held-out actual advantage. A supported result requires majority-positive unstable candidates to cover at least 20% of unstable cases, exceed the remaining unstable candidates' held-out positive rate by at least 0.15, and have higher mean held-out actual advantage. This is attribution only; no selection policy changes.",
+  "exact_parent_sha": "ab1d7467edc021d70a96fcc3b749651e4bb46fea",
+  "qualification_branch": "research/external-hosted-wingless-future-data-residual-calibration-attribution-r31",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-HISTORICAL-SIGN-INSTABILITY-CORRECTION-R30",
+    "github_run_id": 37190495179,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "corrected_total_actual_advantage": 5,
+      "uncorrected_total_actual_advantage": 31,
+      "corrected_delta_vs_uncorrected": -26,
+      "corrected_negative_holdout_count": 1,
+      "uncorrected_negative_holdout_count": 1,
+      "unstable_candidate_count": 33,
+      "stable_candidate_count": 3
+    },
+    "holdout_deltas": [
+      {
+        "manifest": "transfer",
+        "corrected_actual_advantage": 6,
+        "uncorrected_actual_advantage": 28,
+        "delta": -22
+      },
+      {
+        "manifest": "third",
+        "corrected_actual_advantage": 0,
+        "uncorrected_actual_advantage": 1,
+        "delta": -1
+      },
+      {
+        "manifest": "fourth",
+        "corrected_actual_advantage": -1,
+        "uncorrected_actual_advantage": 5,
+        "delta": -6
+      },
+      {
+        "manifest": "fifth",
+        "corrected_actual_advantage": 0,
+        "uncorrected_actual_advantage": -3,
+        "delta": 3
+      }
+    ],
+    "eliminated_hypothesis": "historical sign instability should be treated as a universal hard exclusion criterion",
+    "strengthened_hypothesis": "historical sign instability is heterogeneous; training-only sign polarity inside the unstable class may distinguish productive from harmful instability"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "The R30 hard instability gate reduced total actual advantage from +31 to +5. It avoided one harmful fifth-manifest reallocation but forfeited larger positive opportunities on transfer, third, and fourth.",
+    "internal_diagnostic": "R30 collapsed 33 unstable candidate cases into one forbidden class and only 3 non-equal cases were stable across outer holdouts.",
+    "attributed_residual_candidate": "coarse instability grouping hides asymmetric sign structure",
+    "diagnostic_mechanism": "for every unstable non-equal candidate, count positive/negative/zero training-manifest actual-advantage signs and freeze majority_positive_unstable = positive_count >= 2 before held-out outcome construction",
+    "exact_bounded_delta": "diagnostic grouping and accounting only; no selection, model, feature, budget, capacity, candidate, manifest, or tie-break changes",
+    "qualification": "same four sealed manifests, exact 1744 budget, deterministic double replay, full Go regression, READY_RESEARCH, all diagnostic flags frozen before held-out outcomes open",
+    "retain_revert": "R31 cannot change allocator behavior. A supported attribution may justify a separately preregistered bounded asymmetric-instability correction; mixed/negative does not.",
+    "next_hypothesis": "supported -> test a bounded asymmetric-instability correction; mixed/negative -> continue residual magnitude/calibration attribution"
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "non_equal_candidates_per_holdout": 9,
+    "equal_allocation": [
+      582,
+      581,
+      581
+    ],
+    "total_adaptation_budget": 1744,
+    "model": "unchanged R27 ridge fit and features",
+    "capacity": "unchanged",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "diagnostic_rule": {
+    "unstable": "training actual-advantage signs across the three non-held-out manifests contain more than one distinct sign",
+    "majority_positive_unstable": "unstable AND positive training sign count >= 2",
+    "other_unstable": "unstable AND positive training sign count < 2",
+    "heldout_ordering": "all sign counts and subgroup flags freeze before held-out outcomes are constructed"
+  },
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "unstable_case_count",
+    "majority_positive_unstable_case_count",
+    "other_unstable_case_count",
+    "majority_positive_unstable_coverage",
+    "majority_positive_unstable_positive_rate",
+    "other_unstable_positive_rate",
+    "majority_positive_unstable_mean_actual_advantage",
+    "other_unstable_mean_actual_advantage",
+    "majority_positive_positive_rate_delta",
+    "majority_positive_mean_advantage_delta",
+    "heldout_outcome_use_before_flags",
+    "post_result_mechanism_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "classification_rules": {
+    "supported": "valid AND majority_positive_unstable_coverage >= 0.20 AND majority_positive_positive_rate_delta >= 0.15 AND majority_positive_mean_advantage_delta > 0",
+    "mixed": "valid AND majority_positive_positive_rate_delta > 0 AND majority_positive_mean_advantage_delta > 0 but supported criterion is not met",
+    "negative": "valid AND (majority_positive_positive_rate_delta <= 0 OR majority_positive_mean_advantage_delta <= 0)",
+    "invalid": "any parent, manifest identity, 1744 budget, candidate set, training-only sign-count calculation, held-out ordering, deterministic replay, capacity, provenance, or accounting requirement fails"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R31 is attribution on already studied manifests and cannot establish allocator success.",
+  "no_post_result_tuning_rule": "Do not alter manifests, candidates, subgroup definition, thresholds, budgets/capacity, model/features, held-out ordering, classification, or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r32-asymmetric-instability-correction",
+      "experiment_family": "bounded-correction"
+    },
+    "mixed": {
+      "contract_id": "wingless-r32-residual-magnitude-calibration-attribution",
+      "experiment_family": "attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r32-residual-magnitude-calibration-attribution",
+      "experiment_family": "attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-residual-calibration-attribution-r31.json"
+  ]
+}
