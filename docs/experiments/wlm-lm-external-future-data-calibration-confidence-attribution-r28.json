@@ -115,5 +115,13 @@
     "unitary/wlm_lm_external_future_data_calibration_confidence_attribution_r28.go",
     "cmd/wlm-lm-external-future-data-calibration-confidence-attribution-r28/main.go",
     ".github/workflows/external-future-data-calibration-confidence-attribution-r28.yml"
-  ]
+  ],
+  "metric_semantics": {
+    "reference_prediction": "prediction from the model trained on the other three manifests",
+    "sign_accuracy": "fraction of cases where sign(reference_prediction) equals sign(actual advantage), with exact zero matching only exact zero",
+    "coverage": "predicate-covered cases / 40 total heldout-manifest policy cases",
+    "false_positive_reallocation_rate": "among predicate-covered cases with reference_prediction > 0, fraction whose actual advantage <= 0; 0 when denominator is zero and positive_recommendation_count is reported separately",
+    "mean_absolute_error": "mean abs(reference_prediction - actual advantage) over predicate-covered cases",
+    "prediction_median": "arithmetic mean of the two middle values after sorting the four model predictions"
+  }
 }
