@@ -34,7 +34,7 @@ jobs:
             '.github/workflows/external-future-data-raw-representation-attribution-r35.yml' \
             'cmd/wlm-lm-external-future-data-raw-representation-attribution-r35/main.go' \
             'docs/experiments/wlm-lm-external-future-data-raw-representation-attribution-r35.json' \
-            'unitary/wlm_lm_external_future_data_calibration_feature_representation_attribution_r35.go' | sort)"
+            'unitary/wlm_lm_external_future_data_raw_representation_attribution_r35.go' | sort)"
           test "$changed" = "$expected"
           test "$(git rev-parse 'fb95a73c861f8ff96199735669f7a4e950d60a80:docs/experiments/wlm-lm-external-future-data-raw-representation-attribution-r35.json')" = 'afcb98a799b8bd3c924bb270071c973d5159f5e7'
       - name: Verify exact READY_RESEARCH receipt
