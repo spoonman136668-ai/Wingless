@@ -1,0 +1,109 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-PREQUENTIAL-GAIN-ATTRIBUTION-R29",
+  "program": "Wingless corrective RSI tranche: training-only outcome-mechanism diagnostic",
+  "question": "Can training-only prequential gain predict the sign and value of future held-out marginal learning better than the static calibrated state signals that failed in R27-R28?",
+  "hypothesis": "For each of the four sealed manifests and each of the 12 adjacent adaptation-budget intervals, freeze a prequential diagnostic without reading the 582-byte evaluation slice. Let [lo,hi) be the candidate interval in the 872-byte adaptation reservoir and mid=lo+floor((hi-lo)/2). Train LOWER at budget lo and MID at budget mid. Evaluate both models only on the second half of the same adaptation interval [mid,hi), which MID has not seen. PREQUENTIAL_GAIN = exact_hits(MID on [mid,hi)) - exact_hits(LOWER on [mid,hi)); PREQUENTIAL_EFFICIENCY = gain/(hi-mid). After all 12 interval diagnostics for a manifest are frozen, integrate interval gains for each of the same ten 1,744-byte allocation policies and compute predicted policy advantage versus equal. Only then open the sealed evaluation slice and compute actual policy advantage. No fitted coefficient, threshold search, feature selection, or cross-manifest tuning is allowed.",
+  "exact_parent_sha": "22b3608320e9b87065b52d4670759288356e98d8",
+  "qualification_branch": "research/external-hosted-wingless-future-data-prequential-gain-attribution-r29",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-CONFIDENCE-ATTRIBUTION-R28",
+    "github_run_id": 37168510377,
+    "classification": "negative",
+    "validity_pass": true,
+    "exact_predecessor_sha": "22b3608320e9b87065b52d4670759288356e98d8",
+    "observation": {
+      "ungated_sign_accuracy": 0.55,
+      "ungated_false_positive_reallocation_rate": 0.5384615384615384,
+      "ungated_mean_absolute_error": 9.219594413938847,
+      "consensus_only_coverage": 0.45,
+      "consensus_only_sign_accuracy": 0.2777777777777778,
+      "consensus_only_false_positive_reallocation_rate": 0.75,
+      "consensus_relative_spread_coverage": 0.4,
+      "consensus_relative_spread_sign_accuracy": 0.3125,
+      "consensus_relative_spread_false_positive_reallocation_rate": 0.7,
+      "robust_lower_bound_coverage": 0
+    },
+    "eliminated_hypothesis": "prediction sign consensus or low ensemble spread is sufficient to identify reliable calibrated policy estimates"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "static six-signal ridge calibration has large cross-manifest sign errors, and prediction-consensus filters amplify rather than suppress false positives",
+    "internal_diagnostic": "prequential within-training-stream generalization after a bounded partial update",
+    "attributed_cause": "static state-change magnitudes may not encode whether a candidate update actually generalizes even one step beyond the bytes that caused it",
+    "candidate_corrective_mechanism": "measure immediate unseen-within-training-stream predictive gain before allocation outcome labels",
+    "frozen_candidate_selection_rule": "none; all intervals/policies are evaluated, no threshold is installed",
+    "exact_bounded_delta": "diagnostic evaluation only; same raw data, capacity, policy set, total allocation budget, no persistent state or authority growth",
+    "qualification": "deterministic double replay, exact source identities, no evaluation-slice access before policy predictions",
+    "held_out_result": "sealed 582-byte policy advantages revealed after prequential predictions are frozen",
+    "retain_revert": "no diagnostic retained as policy in R29; supported mechanism must be prospectively validated on a new disjoint manifest",
+    "next_hypothesis": "prospective prequential-gated allocator on sixth manifest if supported; otherwise localize outcome mechanism further"
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_diagnostic": {
+    "interval_count_per_manifest": 12,
+    "total_interval_count": 48,
+    "midpoint": "lo + floor((hi-lo)/2)",
+    "lower_model": "same fixed R27 training construction at budget lo",
+    "mid_model": "same construction at budget mid",
+    "probe": "adaptation reservoir bytes [mid,hi), excluded from MID training",
+    "metric": "exact_hits(mid_model, probe)-exact_hits(lower_model, probe)",
+    "policy_prediction": "sum PREQUENTIAL_GAIN for all complete adjacent intervals whose hi <= policy budget, per arm, summed across arms; advantage subtracts equal policy prediction",
+    "evaluation_slice_use_before_prediction": 0,
+    "coefficient_fit_count": 0,
+    "threshold_search_count": 0,
+    "post_result_policy_choice_count": 0
+  },
+  "policy_metrics": {
+    "case_count": 40,
+    "sign_accuracy": "sign predicted policy advantage == sign actual held-out policy advantage",
+    "false_positive_reallocation_rate": "predicted advantage >0 cases with actual advantage <=0 divided by predicted-positive cases",
+    "mean_absolute_error": "abs(predicted advantage-actual advantage)",
+    "rank_concordance": "pairwise concordance of predicted vs actual policy advantage within each manifest, averaged across manifests"
+  },
+  "classification_rules": {
+    "supported": "valid and policy sign accuracy >=0.70, false-positive reallocation rate <=0.30, mean absolute error < R28 ungated 9.219594413938847, and mean rank concordance >=0.65",
+    "mixed": "valid and prequential diagnostic improves at least two of sign accuracy, false-positive rate, mean absolute error, rank concordance versus the frozen R28/static reference, but misses supported thresholds",
+    "negative": "valid and fewer than two preregistered reliability metrics improve",
+    "invalid": "any parent, manifest identity, interval split, probe leakage, training construction, policy integration, evaluation ordering, deterministic replay, capacity, provenance or accounting requirement fails"
+  },
+  "frozen_reference": {
+    "sign_accuracy": 0.55,
+    "false_positive_reallocation_rate": 0.5384615384615384,
+    "mean_absolute_error": 9.219594413938847,
+    "rank_concordance_baseline": "computed and reported from R29 static comparison only if needed; not used as a mutable threshold"
+  },
+  "no_post_result_tuning_rule": "Do not change manifests, interval grids, midpoint rule, probe region, model construction, policy set, equal baseline, metrics, thresholds, classification or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-PREQUENTIAL-ALLOCATOR-PROSPECTIVE-R30",
+    "intent": "freeze the prequential policy rule before a sixth disjoint manifest and test whether it beats equal under identical budgets"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-PREQUENTIAL-MECHANISM-ATTRIBUTION-R30",
+    "intent": "factor domain/locality and learning-curve shape without installing a policy"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-prequential-gain-attribution-r29.json",
+    "unitary/wlm_lm_external_future_data_prequential_gain_attribution_r29.go",
+    "cmd/wlm-lm-external-future-data-prequential-gain-attribution-r29/main.go",
+    ".github/workflows/external-future-data-prequential-gain-attribution-r29.yml"
+  ]
+}
