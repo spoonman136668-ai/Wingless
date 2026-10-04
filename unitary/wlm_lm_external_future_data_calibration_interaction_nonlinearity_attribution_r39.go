@@ -53,7 +53,8 @@ func wlmLmR39PolicyPred(man wlmLmR27Manifest,beta []float64,alloc [3]int,m map[s
 			hi:=arm.budgets[i]
 			if hi<=alloc[ai] {
 				x:=make([]float64,6)
-				copy(x,arm.features[hi][:6])
+				fv:=arm.features[hi]
+				copy(x,fv[:])
 				px:=wlmLmR39PairwiseVec(x,m)
 				total+=wlmLmR34Predict(beta,px)
 			}
