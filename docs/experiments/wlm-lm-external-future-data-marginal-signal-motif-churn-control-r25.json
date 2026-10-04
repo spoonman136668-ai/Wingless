@@ -1,0 +1,103 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-MOTIF-CHURN-CONTROL-R25",
+  "program": "Wingless training-only control for productive versus false-positive motif churn",
+  "question": "Can prediction-active motif churn distinguish productive adaptation intervals from zero-gain motif-churn false positives on the fourth manifest before any allocator signal is revised?",
+  "hypothesis": "Replay the exact fourth manifest and R23 budget grids. For every adjacent interval with motif_entry_count+motif_exit_count>0, freeze a training-only prediction-active-churn control: an entering motif is active iff its upper-budget motif.best differs from the upper-budget baseline argmax for motif.key[3]; an exiting motif is active iff its lower-budget motif.best differs from the lower-budget baseline argmax for motif.key[3]. control_signal=active_churn_count/interval_bytes. Compute all control values before any sealed evaluation hit count. Then open the same 582-byte sealed evaluation slices only to label each churn interval as PRODUCTIVE when actual gain>0 or ZERO_GAIN when actual gain==0. No interval is excluded after labels are seen. Supported requires at least one PRODUCTIVE and one ZERO_GAIN churn interval, mean control_signal(PRODUCTIVE)>mean control_signal(ZERO_GAIN), and pairwise AUC>=0.75. This experiment does not change the R23 baseline confidence gate, motif weight, candidate allocations, or allocator.",
+  "exact_parent_sha": "5de23570f0af1daf37c714b003fb554d49dbf5da",
+  "qualification_branch": "research/external-hosted-wingless-future-data-marginal-signal-motif-churn-control-r25",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CONFIDENCE-GATED-ALLOCATION-ATTRIBUTION-R24",
+    "github_run_id": 37165791072,
+    "classification": "supported",
+    "observation": {
+      "predicted_net": 5,
+      "actual_net": -13,
+      "code_727_872": {
+        "motif_entry_count": 1,
+        "motif_exit_count": 1,
+        "gated_baseline_count": 0,
+        "predicted_contribution": 6,
+        "actual_gain": 0
+      },
+      "omitted_structured_actual_gain": 14
+    },
+    "interpretation": "Baseline confidence gating removed the R21 baseline-only false-positive class but a motif-churn-only interval still produced positive predicted value with zero sealed gain."
+  },
+  "external_manifest": {
+    "path": "docs/experiments/wlm-lm-external-future-data-fourth-manifest-r23.json",
+    "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+    "source_count": 3,
+    "effective_total_bytes": 57272
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "c591f97184e22565e8ccfc230a70a58f62b26d5c",
+    "manifest_sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_contract": {
+    "source_identities": "byte-identical R23/R24 fourth manifest",
+    "non_target_training_byte_budget_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "code_budgets": [
+      0,
+      436,
+      582,
+      727,
+      872
+    ],
+    "structured_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "technical_prose_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "interval_inclusion": "all adjacent intervals with motif_entry_count+motif_exit_count>0; inclusion is determined before evaluation labels",
+    "entering_active_rule": "upper-budget motif.best != upper-budget baseline argmax for motif.key[3]",
+    "exiting_active_rule": "lower-budget motif.best != lower-budget baseline argmax for motif.key[3]",
+    "control_signal": "prediction_active_churn_count / interval_bytes",
+    "productive_label": "sealed actual exact-hit gain > 0",
+    "zero_gain_label": "sealed actual exact-hit gain == 0",
+    "negative_gain_label": "sealed actual exact-hit gain < 0; reported separately and included as nonproductive in diagnostics but not silently dropped",
+    "control_evaluation_byte_use_count": 0,
+    "control_evaluation_label_use_count": 0,
+    "control_post_result_choice_count": 0
+  },
+  "classification_rules": {
+    "supported": "valid, at least one productive and one zero-gain churn interval exist, mean productive control_signal > mean zero-gain control_signal, and productive-vs-zero pairwise AUC >= 0.75",
+    "mixed": "valid and mean productive control_signal > mean zero-gain control_signal with AUC > 0.5 but < 0.75",
+    "negative": "valid and the prediction-active-churn control does not rank productive intervals above zero-gain intervals",
+    "invalid": "any parent, authority, source identity, split, grid, interval inclusion, active-churn definition, label isolation, deterministic replay, capacity, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter sources, budgets, baseline argmax definition, active-churn rules, interval inclusion, control formula, sealed-gain labels, AUC threshold, evaluator, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-DUAL-CONTROL-VALIDATION-R26",
+    "intent": "combine the already frozen baseline-margin gate and prediction-active-churn control without refitting either component, then validate prospectively on another disjoint manifest before allocator use"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MOTIF-CHURN-CONTROL-FACTORIAL-R26",
+    "intent": "factor motif support, consistency and baseline-disagreement features before changing the allocator signal"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-marginal-signal-motif-churn-control-r25.json",
+    "unitary/wlm_lm_external_future_data_marginal_signal_motif_churn_control_r25.go",
+    "cmd/wlm-lm-external-future-data-marginal-signal-motif-churn-control-r25/main.go",
+    ".github/workflows/external-future-data-marginal-signal-motif-churn-control-r25.yml"
+  ]
+}
