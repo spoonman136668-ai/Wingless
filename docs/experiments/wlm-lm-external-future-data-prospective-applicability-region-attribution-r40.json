@@ -3,7 +3,7 @@
   "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-PROSPECTIVE-APPLICABILITY-REGION-ATTRIBUTION-R40",
   "program": "Wingless RSI corrective tranche: prospective applicability-region attribution",
   "question": "After R39 showed that adding all fixed pairwise BASE6 interactions leaves held-out sign error unchanged, is the residual failure concentrated outside the support region represented by the three training manifests rather than caused by missing low-order feature interactions?",
-  "hypothesis": "R39 falsified a bounded pairwise-interaction explanation: BASE6_PAIRWISE preserved sign error at 0.5151515 and slightly worsened MAE. Freeze a support-region attribution with no learned threshold. For each outer holdout, build the byte-identical R39/R38 BASE6 training examples from the three training manifests. For each of the six BASE6 coordinates, freeze the closed interval [training minimum, training maximum] before any held-out outcome is read. A held-out R30-excluded case is IN_ENVELOPE only if all six held-out BASE6 coordinates lie within their frozen intervals; otherwise it is OUT_OF_ENVELOPE. Evaluate the byte-identical raw BASE6 predictor separately in those regions. This tests whether the learned marginal-value signal has a bounded applicability domain already implied by observed training support.",
+  "hypothesis": "R39 falsified a bounded pairwise-interaction explanation: BASE6_PAIRWISE preserved sign error at 0.5151515 and slightly worsened MAE. Freeze a support-region attribution with no learned threshold. For each outer holdout and every non-equal allocation, define one six-dimensional POLICY_DELTA_BASE6 vector as the sum of the frozen BASE6 incremental feature rows included by that allocation minus the corresponding sum for the equal allocation. Build these vectors for all non-equal allocation cases from the three training manifests only. For each of the six coordinates, freeze the closed interval [training minimum, training maximum] before any held-out outcome is read. A held-out R30-excluded allocation case is IN_ENVELOPE only if all six coordinates of its held-out POLICY_DELTA_BASE6 vector lie within those frozen intervals; otherwise it is OUT_OF_ENVELOPE. Evaluate the byte-identical raw BASE6 predictor separately in those regions. This tests whether the learned marginal-value signal has a bounded applicability domain already implied by observed training support.",
   "exact_parent_sha": "f662c0beb7dd4e496b1cae4797bba3e2ccba1e3c",
   "qualification_branch": "research/external-hosted-wingless-future-data-prospective-applicability-region-attribution-r40",
   "predecessor": {
@@ -29,9 +29,9 @@
   "cause_effect_trace": {
     "observed_failure": "R39's 15 fixed pairwise interactions changed neither sign error nor materially changed MAE, despite clean identity and deterministic replay.",
     "residual_cause_under_test": "HELDOUT_CASES_OUTSIDE_TRAINING_SUPPORT_REGION",
-    "exact_bounded_delta": "add only a deterministic training-envelope applicability label to the byte-identical BASE6 predictor; predictor, targets, manifests, solver, budget, exact R30 exclusion and held-out ordering remain unchanged",
+    "exact_bounded_delta": "add only a deterministic training-envelope applicability label over POLICY_DELTA_BASE6 while keeping the byte-identical BASE6 predictor, targets, manifests, solver, budget, exact R30 exclusion and held-out ordering unchanged",
     "control_rule": "GLOBAL_BASE6 reports the byte-identical R39/R38 raw BASE6 predictor on all exact R30-excluded cases",
-    "applicability_rule": "IN_ENVELOPE iff every one of the six held-out BASE6 feature coordinates is within the inclusive minimum/maximum observed over all training examples from the three training manifests for that outer holdout; otherwise OUT_OF_ENVELOPE",
+    "applicability_rule": "for each candidate allocation, POLICY_DELTA_BASE6 is the sum of frozen BASE6 incremental feature rows used by that allocation minus the sum used by the equal allocation; IN_ENVELOPE iff every one of the six held-out policy-delta coordinates lies within the inclusive minimum/maximum observed over all non-equal training allocation cases from the three training manifests for that outer holdout; otherwise OUT_OF_ENVELOPE",
     "no_threshold_rule": "no quantile, margin threshold, normalization, distance weight, learned boundary, held-out tuning, or post-result region choice",
     "retain_revert": "R40 is attribution only. Support authorizes only separately preregistered support-gated correction or prospective validation; allocator behavior remains unchanged."
   },
@@ -63,12 +63,14 @@
     "predictor": "byte-identical R39/R38 raw-target ridge lambda=1",
     "training_manifests_per_holdout": 3,
     "envelope_dimensions": 6,
-    "envelope_bounds": "inclusive coordinate-wise min/max over frozen training BASE6 examples",
+    "envelope_bounds": "inclusive coordinate-wise min/max over frozen training POLICY_DELTA_BASE6 vectors",
     "heldout_outcome_use_before_region_freeze": 0,
     "post_result_region_choice_count": 0,
     "capacity": "unchanged",
     "tokenizer_use_count": 0,
-    "external_model_call_count": 0
+    "external_model_call_count": 0,
+    "policy_case_representation": "POLICY_DELTA_BASE6 = candidate allocation summed incremental BASE6 rows minus equal-allocation summed incremental BASE6 rows",
+    "envelope_training_cases": "all 27 non-equal allocation cases across the three training manifests for each outer holdout"
   },
   "metrics": [
     "outer_holdout_manifest_count",
@@ -105,11 +107,11 @@
     "supported": "valid AND in_envelope_coverage>=0.25 AND in_envelope_sign_error_improvement>=0.15 AND out_minus_in_sign_error_gap>=0.15",
     "mixed": "valid AND in_envelope_coverage>=0.25 AND in_envelope_sign_error_rate<global_sign_error_rate AND out_of_envelope_sign_error_rate>in_envelope_sign_error_rate but one or more supported thresholds are missed",
     "negative": "valid AND supported is false AND mixed is false",
-    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, BASE6 predictor identity, six-dimensional inclusive min/max envelope, held-out ordering, deterministic replay, provenance or accounting requirement fails"
+    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, BASE6 predictor identity, POLICY_DELTA_BASE6 construction, six-dimensional inclusive min/max envelope over the 27 training non-equal allocation cases, held-out ordering, deterministic replay, provenance or accounting requirement fails"
   },
   "rsi_success": false,
   "rsi_success_note": "R40 is applicability attribution on studied manifests. No policy is changed and any support requires separately frozen prospective validation on disjoint future contexts.",
-  "no_post_result_tuning_rule": "Do not alter manifests, BASE6, training envelope definition, predictor, thresholds, exclusion set, budget/capacity, held-out ordering, classification or authority after primary output.",
+  "no_post_result_tuning_rule": "Do not alter manifests, BASE6, POLICY_DELTA_BASE6 construction, the 27-case training envelope, predictor, thresholds, exclusion set, budget/capacity, held-out ordering, classification or authority after primary output.",
   "successors": {
     "supported": {
       "contract_id": "wingless-r41-support-region-gated-calibration-correction",
