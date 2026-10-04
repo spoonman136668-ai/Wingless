@@ -1,0 +1,125 @@
+name: Wingless marginal signal guided allocation R20
+on:
+  push:
+    branches:
+      - research/external-hosted-wingless-future-data-marginal-signal-guided-allocation-r20
+    paths:
+      - 'docs/experiments/wlm-lm-external-future-data-third-manifest-r20.json'
+      - 'docs/experiments/wlm-lm-external-future-data-marginal-signal-guided-allocation-r20.json'
+      - 'unitary/wlm_lm_external_future_data_marginal_signal_guided_allocation_r20.go'
+      - 'cmd/wlm-lm-external-future-data-marginal-signal-guided-allocation-r20/main.go'
+      - '.github/workflows/external-future-data-marginal-signal-guided-allocation-r20.yml'
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+      - name: Validate frozen package
+        shell: bash
+        run: |
+          set -euo pipefail
+          prereg="7fa63ad2631ef643fa2a1671877c7997d9193596"
+          parent="1412336e62270adde3bc1e4d2c7d24b0214b8b35"
+          test "$(git rev-parse "$prereg^")" = "$parent"
+          git merge-base --is-ancestor "$prereg" HEAD
+          changed="$(git diff --name-only "$parent..HEAD" | sort)"
+          expected="$(printf '%s\n'             '.github/workflows/external-future-data-marginal-signal-guided-allocation-r20.yml'             'cmd/wlm-lm-external-future-data-marginal-signal-guided-allocation-r20/main.go'             'docs/experiments/wlm-lm-external-future-data-marginal-signal-guided-allocation-r20.json'             'docs/experiments/wlm-lm-external-future-data-third-manifest-r20.json'             'unitary/wlm_lm_external_future_data_marginal_signal_guided_allocation_r20.go' | sort)"
+          test "$changed" = "$expected"
+          printf '%s  %s\n' 'e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7' 'docs/experiments/wlm-lm-external-future-data-third-manifest-r20.json' | sha256sum -c -
+      - name: Verify READY_RESEARCH receipt
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          raw=r'''{"schema":"ckb-plane.external-exposure-ready-research-receipt.v1","project":"Wingless","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-GUIDED-ALLOCATION-R20","preregistration_sha":"7fa63ad2631ef643fa2a1671877c7997d9193596","research_host":"runnervm8df0l","runner_id":"GitHub Actions 1000001855","manifest_sha256":"e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7","plan_decision":{"schema":"ckb-plane.external-exposure.v1","disposition":"READY_PLAN","scope":"plan-only","reasons":null},"fetch_decision":{"schema":"ckb-plane.external-exposure-fetch.v1","disposition":"READY_FETCH","scope":"fetch-verify-only","reasons":null},"research_decision":{"schema":"ckb-plane.external-exposure-research.v1","disposition":"READY_RESEARCH","scope":"research-consume-once","reasons":null},"ckb_plane_main_sha":"2518306c74ff426278f31b1199f8ad9891299d14"}'''
+          assert hashlib.sha256(raw.encode()).hexdigest()=="63baac2d796fb07373c8aa0412cd9f24a6e84d48daaf649a587f1d17c19de708"
+          r=json.loads(raw)
+          assert r["preregistration_sha"]=="7fa63ad2631ef643fa2a1671877c7997d9193596"
+          assert r["manifest_sha256"]=="e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+          assert r["ckb_plane_main_sha"]=="2518306c74ff426278f31b1199f8ad9891299d14"
+          assert r["research_decision"]["disposition"]=="READY_RESEARCH"
+          pathlib.Path("/tmp/authority.json").write_text(raw)
+          PY
+      - name: Fetch exact third-manifest sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          export EXTERNAL_ROOT="$RUNNER_TEMP/wingless-r20"; mkdir -p "$EXTERNAL_ROOT"
+          python3 - <<'PY'
+          import hashlib,os,pathlib,urllib.request
+          sources=[
+            ("code","https://raw.githubusercontent.com/torvalds/linux/a74306e2e676f9775457366fc047a660fbf02f26/kernel/sched/core.c",303863,"9297982652b9810b3508993c06d3c6e097ebca5cbe1ef3a6246bccfa0c1128b1",41453,"50744a9e70d67d62c97f3f434f4f05788b6b8514c6bce46cf7dafbaf49e2abff"),
+            ("structured","https://raw.githubusercontent.com/SchemaStore/schemastore/de76181a2ab215431d3e9314bc14f83cc3b01ad2/src/schemas/json/github-workflow.json",118601,"d10c9f4656e1bd5bc6727e9b35080e017dc167154726fca93da33c7a6bd1c4f3",14365,"2a97ba02bc5e479b1738f6f0c3e09318bb5a255350c84de014ddbcebea46af56"),
+            ("technical-prose","https://raw.githubusercontent.com/rust-lang/book/1500248d8f230566e4ec9f27fcbb8fe9e2898ab1/src/ch01-03-hello-cargo.md",11025,"61369f359b84b646fc3773eb569a26bc18ba6edb4cf2be06a84472c7054c0e39",1454,"23c002a1984ed065abfdbafa82100ed54d6bf6276a947676e710a30c75d96017"),
+          ]
+          root=pathlib.Path(os.environ["EXTERNAL_ROOT"])
+          for name,url,full_n,full_h,prefix_n,prefix_h in sources:
+              b=urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"wingless-r20"}),timeout=30).read(full_n+1)
+              assert len(b)==full_n and hashlib.sha256(b).hexdigest()==full_h,(name,len(b),hashlib.sha256(b).hexdigest())
+              p=b[:prefix_n]
+              assert len(p)==prefix_n and hashlib.sha256(p).hexdigest()==prefix_h
+              (root/(name+".bin")).write_bytes(p)
+          PY
+          echo "EXTERNAL_ROOT=$EXTERNAL_ROOT" >> "$GITHUB_ENV"
+      - name: Full Go regression
+        run: go test ./...
+      - name: Run frozen allocator twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/wlm-lm-external-future-data-marginal-signal-guided-allocation-r20 --code "$EXTERNAL_ROOT/code.bin" --structured "$EXTERNAL_ROOT/structured.bin" --technical-prose "$EXTERNAL_ROOT/technical-prose.bin" > /tmp/result1.json
+          go run ./cmd/wlm-lm-external-future-data-marginal-signal-guided-allocation-r20 --code "$EXTERNAL_ROOT/code.bin" --structured "$EXTERNAL_ROOT/structured.bin" --technical-prose "$EXTERNAL_ROOT/technical-prose.bin" > /tmp/result2.json
+          cmp /tmp/result1.json /tmp/result2.json
+          cat /tmp/result1.json
+      - name: Classify
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math,pathlib
+          m=json.loads(pathlib.Path("/tmp/result1.json").read_text())["metrics"]
+          valid=(
+            m["source_identity_mismatch_count"]==0 and m["third_manifest_identity_mismatch_count"]==0 and
+            m["source_count"]==3 and m["total_source_bytes"]==57272 and m["arm_count"]==3 and
+            m["non_target_training_byte_budget_per_arm"]==15819 and m["motif_capacity"]==256 and
+            m["target_evaluation_bytes_per_arm"]==582 and m["target_adaptation_reservoir_bytes_per_arm"]==872 and
+            m["signal_weight_baseline_argmax_change"]==1 and m["signal_weight_motif_churn"]==3 and
+            m["signal_weight_retained_best_change"]==0 and m["candidate_allocation_count"]==10 and
+            m["total_adaptation_budget_equal"]==1744 and m["total_adaptation_budget_selected"]==1744 and
+            m["selection_evaluation_byte_use_count"]==0 and m["selection_evaluation_label_use_count"]==0 and
+            m["allocation_post_result_choice_count"]==0 and m["capacity_growth_event_count"]==0 and
+            m["tokenizer_use_count"]==0 and m["external_model_call_count"]==0 and
+            m["counter_overflow_count"]==0 and m["invalid_row_count"]==0 and
+            all(math.isfinite(float(v)) for v in m.values())
+          )
+          diff=m["selected_differs_equal"];delta=m["selected_aggregate_exact_hit_delta_vs_equal"];below=m["selected_domain_below_packet0_count"]
+          if not valid: cls="invalid"
+          elif diff==1 and delta>=1 and below==0: cls="supported"
+          elif diff==1 and delta>=0: cls="mixed"
+          else: cls="negative"
+          out={"schema":"wingless.research-classification.v1","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-GUIDED-ALLOCATION-R20","classification":cls,"validity_pass":valid,"authority_receipt_sha256":"63baac2d796fb07373c8aa0412cd9f24a6e84d48daaf649a587f1d17c19de708","metrics":m}
+          pathlib.Path("/tmp/classification.json").write_text(json.dumps(out,separators=(",",":")));print(json.dumps(out,separators=(",",":")))
+          if not valid: raise SystemExit(2)
+          PY
+      - name: Delete external bytes
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/wingless-r20"
+      - name: Upload evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-marginal-signal-guided-allocation-r20
+          path: |
+            /tmp/authority.json
+            /tmp/result1.json
+            /tmp/result2.json
+            /tmp/classification.json
+          if-no-files-found: error
