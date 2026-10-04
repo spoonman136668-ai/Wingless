@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.external-research-result.v1",
+  "project": "Wingless",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT",
+  "contributor": "chatgpt-external",
+  "contribution_class": "falsification",
+  "classification": "INVALID",
+  "validity_pass": false,
+  "scientific_negative": false,
+  "scientific_supported": false,
+  "mixed": false,
+  "accepted_state_changed": false,
+  "adoption_candidate_only": true,
+  "rsi_success": false,
+  "exact_parent_sha": "ab1d7467edc021d70a96fcc3b749651e4bb46fea",
+  "preregistration_commit": "c9f8765bb4870834dc1667a1ce8ec0add0825754",
+  "final_pre_run_identity_commit": "08ed30192d73ca6b69ef5cea524a1ffc145c823c",
+  "run_head_sha": "884e4e99512c5bdfe2394e45c579becc7dc64896",
+  "workflow_run_id": 37243786526,
+  "workflow_job_id": 111557550102,
+  "invalid_reason": {
+    "code": "REQUIRED_FOLD_SINGLE_CLASS",
+    "statement": "The preregistered prospective sixth-manifest evaluator required both positive and non-positive actual-advantage classes. During the frozen primary run, class_metrics for the sixth manifest returned valid=false because one of those classes was absent. The result serializer then attempted to read sign_accuracy from that invalid metric object and raised KeyError: sign_accuracy.",
+    "preregistered_rule": "invalid if any required fold is missing a positive/non-positive class",
+    "scientific_interpretation": "No representation-sufficiency conclusion may be drawn from this run."
+  },
+  "execution_evidence": {
+    "checkout": "PASS",
+    "preregistration_and_code_identity": "PASS",
+    "frozen_manifest_fetch_and_full_prefix_hash_verification": "PASS",
+    "primary_execution": "INVALIDATED_BEFORE_RESULT_SERIALIZATION",
+    "deterministic_replay": "NOT_COMPLETED",
+    "provenance_step": "SKIPPED_AFTER_PRIMARY_FAILURE",
+    "artifact_upload": "SKIPPED_AFTER_PRIMARY_FAILURE"
+  },
+  "frozen_code_identity": {
+    "path": "research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/run.py",
+    "sha256": "d7d0b4c1409026c9d378ed791acd4a9f2a7d659eab8706ee60a765b305795c75"
+  },
+  "observed_failure": {
+    "exception": "KeyError",
+    "key": "sign_accuracy",
+    "location": "final result construction for stage2 latent_sign_accuracy_minus_control",
+    "cause_inference": "class_metrics returns only {valid:false} when either actual-positive or actual-nonpositive class is absent; the failing object was the sixth-manifest latent metric, so the preregistered required prospective fold was class-degenerate."
+  },
+  "metrics": null,
+  "no_post_result_tuning": true,
+  "rerun_after_outcome": false,
+  "successor_recommendation": "Preregister a new experiment before execution with a prospective manifest-admission/evaluator contract that remains defined under class degeneracy. Do not retrofit this R31 result or reuse its observed sixth-manifest outcome as confirmatory evidence.",
+  "authority": {
+    "research_only": true,
+    "production_authority": false,
+    "accepted_ref_mutation": false,
+    "promotion_authority": false,
+    "scheduler_or_queue_authority": false
+  }
+}
