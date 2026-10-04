@@ -1,0 +1,107 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CONFIDENCE-GATED-ALLOCATION-ATTRIBUTION-R24",
+  "program": "Wingless attribution of confidence-gated fourth-manifest allocation failure",
+  "question": "Why did the R23 confidence-gated allocator prefer [872,291,581] over equal [582,581,581] even though the selected allocation lost 13 sealed-evaluation hits?",
+  "hypothesis": "Replay the exact R23 fourth manifest, construction, grids and frozen confidence-gated signal without making a new allocation choice. Measure the four intervals that distinguish SELECTED=[872,291,581] from EQUAL=[582,581,581]: added code 582→727 and 727→872; omitted structured 291→436 and 436→581. For each interval record confidence-gated predicted contribution and sealed actual hit gain. Freeze predicted_net=(added code predicted contributions)-(omitted structured predicted contributions) and actual_net=(added code actual gains)-(omitted structured actual gains). R23 already sealed predicted_net>0 and actual_net=-13. Also isolate code 727→872, whose R23 signal is motif-churn-only because gated_baseline_count=0 while motif churn>0. Supported attribution requires predicted_net>0, actual_net<0, and code 727→872 has positive confidence-gated signal but actual gain<=0, demonstrating that baseline confidence gating removed one false-positive class but left a motif-churn false-positive/opportunity-cost failure. No weights or allocation policy are changed.",
+  "exact_parent_sha": "e7d16bcbafe241d85870120de0d84892eaba2551",
+  "qualification_branch": "research/external-hosted-wingless-future-data-confidence-gated-allocation-attribution-r24",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-CONFIDENCE-GATED-ALLOCATION-R23",
+    "github_run_id": 37165420921,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "selected_allocation": [
+        872,
+        291,
+        581
+      ],
+      "equal_allocation": [
+        582,
+        581,
+        581
+      ],
+      "selected_aggregate_exact_hits": 387,
+      "equal_aggregate_exact_hits": 400,
+      "selected_delta": -13,
+      "code_selected_delta_vs_equal": 1,
+      "structured_selected_delta_vs_equal": -14,
+      "technical_prose_selected_delta_vs_equal": 0,
+      "code_727_872": {
+        "gated_baseline_count": 0,
+        "motif_entry_count": 1,
+        "motif_exit_count": 1,
+        "confidence_gated_signal": 0.041379310344827586
+      }
+    }
+  },
+  "external_manifest": {
+    "path": "docs/experiments/wlm-lm-external-future-data-fourth-manifest-r23.json",
+    "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+    "source_count": 3,
+    "effective_total_bytes": 57272
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "c591f97184e22565e8ccfc230a70a58f62b26d5c",
+    "manifest_sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "construction": "byte-identical R23",
+    "signal": "byte-identical R23 confidence-gated signal",
+    "target_intervals": {
+      "added_code": [
+        [
+          582,
+          727
+        ],
+        [
+          727,
+          872
+        ]
+      ],
+      "omitted_structured": [
+        [
+          291,
+          436
+        ],
+        [
+          436,
+          581
+        ]
+      ]
+    },
+    "predicted_net": "sum added-code interval predicted contribution minus sum omitted-structured predicted contribution",
+    "actual_net": "sum added-code actual hit gains minus sum omitted-structured actual hit gains",
+    "selection": "none; attribution only",
+    "evaluation_isolation": "sealed evaluation used only after frozen interval signals are computed"
+  },
+  "classification_rules": {
+    "supported": "valid and predicted_net>0, actual_net<0, and code 727→872 has positive signal with gated_baseline_count=0, motif churn>0, and actual gain<=0",
+    "mixed": "valid and predicted_net>0 with actual_net<0, but the code 727→872 motif-only interval is not itself a nonproductive false positive",
+    "negative": "valid and the four differentiating intervals do not explain the R23 sign reversal",
+    "invalid": "any parent, authority, source identity, split, interval identity, signal formula, evaluation isolation, deterministic replay, capacity, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter sources, R23 signal, weights, gate, intervals, evaluator, attribution formulas, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-MOTIF-CHURN-CONTROL-R25",
+    "intent": "test a training-only control for productive versus false-positive motif churn before any allocator signal revision"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-CONFIDENCE-GATED-ALLOCATION-INTERACTION-ATTRIBUTION-R25",
+    "intent": "attribute the remaining opportunity-cost error without refitting the allocator"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-confidence-gated-allocation-attribution-r24.json",
+    "unitary/wlm_lm_external_future_data_confidence_gated_allocation_attribution_r24.go",
+    "cmd/wlm-lm-external-future-data-confidence-gated-allocation-attribution-r24/main.go",
+    ".github/workflows/external-future-data-confidence-gated-allocation-attribution-r24.yml"
+  ]
+}
