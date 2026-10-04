@@ -1,0 +1,138 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-LABEL-STABILITY-ATTRIBUTION-R38",
+  "program": "Wingless RSI corrective tranche: calibration label-stability attribution",
+  "question": "After R37 showed that robust magnitude compression slightly improves MAE but worsens sign error, are the residual calibration failures driven by unstable sign labels across the three training manifests rather than by the regression target magnitude itself?",
+  "hypothesis": "The exact R30-excluded set is defined by failure of unanimous nonzero training-manifest sign stability. Freeze a label-stability attribution without changing BASE6 or fitting another model. RAW_BASE6_SIGN is the byte-identical R37 raw-target baseline. TRAIN_MAJORITY_SIGN is defined before held-out outcomes as the unique nonzero sign held by at least two of the three training manifests for that candidate; cases without such a majority are uncovered and are not used to score the majority predictor. If covered cases show materially lower error under TRAIN_MAJORITY_SIGN than RAW_BASE6_SIGN, the missing signal is label consensus/stability rather than magnitude calibration.",
+  "exact_parent_sha": "af121cbeaa72bc6a808981c57308162568626764",
+  "qualification_branch": "research/external-hosted-wingless-future-data-calibration-label-stability-attribution-r38",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-TARGET-DEFINITION-ATTRIBUTION-R37",
+    "github_run_id": 37220311890,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "excluded_case_count": 33,
+      "raw_target_sign_error_rate": 0.5151515151515151,
+      "raw_target_mean_absolute_error": 10.731783167689903,
+      "signed_log_target_sign_error_rate": 0.5454545454545454,
+      "signed_log_target_mean_absolute_error": 10.700431715913858,
+      "signed_log_sign_error_improvement": -0.030303030303030276,
+      "signed_log_mae_ratio": 0.9970786353687768,
+      "raw_baseline_identity_mismatch_count": 0,
+      "target_transform_mismatch_count": 0,
+      "invalid_row_count": 0
+    },
+    "eliminated_hypothesis": "a parameter-free signed-log target transform resolves the residual calibration failure",
+    "strengthened_hypothesis": "the dominant failure may be instability of the sign label across training manifests rather than raw target magnitude"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R37 reduced raw-scale MAE by only about 0.29% while increasing sign error from 0.5152 to 0.5455.",
+    "residual_cause_under_test": "TRAINING_LABEL_SIGN_INSTABILITY",
+    "exact_bounded_delta": "no new fitted model and no feature change; add only a deterministic training-manifest sign-consensus attribution alongside the byte-identical R37 raw BASE6 baseline",
+    "baseline_rule": "RAW_BASE6_SIGN is the sign of the byte-identical R37 RAW_ADVANTAGE_TARGET prediction",
+    "label_rule": "for each candidate and outer holdout, compute actual allocation-advantage signs independently on the three training manifests; TRAIN_MAJORITY_SIGN exists only when exactly one nonzero sign occurs in at least two manifests; zeros do not vote for either sign",
+    "coverage_rule": "majority-covered cases are frozen before held-out outcomes; uncovered cases remain reported separately and cannot be moved after results",
+    "attribution_rule": "compare held-out sign error of TRAIN_MAJORITY_SIGN versus RAW_BASE6_SIGN only on the frozen majority-covered subset; also report raw-baseline error on uncovered cases as an error-concentration diagnostic",
+    "retain_revert": "R38 is attribution only. Support authorizes only a separately preregistered consensus-label correction/replication; allocator behavior remains unchanged."
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "non_equal_candidates_per_holdout": 9,
+    "exact_r30_excluded_cases_expected": 33,
+    "total_adaptation_budget": 1744,
+    "representation": "unchanged R27/R37 BASE6",
+    "training_manifests_per_holdout": 3,
+    "ridge_lambda": 1,
+    "intercept": true,
+    "exclusion_source": "all three training manifests, byte-identical R30/R37 rule",
+    "baseline": "byte-identical R37 RAW_ADVANTAGE_TARGET",
+    "consensus": "unique nonzero 2-of-3 or 3-of-3 training-manifest sign; exact R30 exclusion means unanimous nonzero cases are not in the scored excluded set",
+    "heldout_outcome_use_before_consensus_freeze": 0,
+    "capacity": "unchanged",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "excluded_case_count",
+    "majority_covered_case_count",
+    "majority_uncovered_case_count",
+    "majority_coverage",
+    "raw_baseline_sign_error_rate",
+    "raw_covered_sign_error_rate",
+    "raw_uncovered_sign_error_rate",
+    "majority_sign_error_rate",
+    "majority_sign_error_improvement",
+    "raw_baseline_identity_mismatch_count",
+    "consensus_definition_mismatch_count",
+    "fit_failure_count",
+    "heldout_outcome_use_before_consensus_freeze",
+    "post_result_consensus_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "classification_rules": {
+    "supported": "valid AND majority_coverage>=0.50 AND majority_sign_error_improvement>=0.15",
+    "mixed": "valid AND majority_covered_case_count>0 AND majority_sign_error_improvement>0 but one or both supported thresholds are missed",
+    "negative": "valid AND majority_sign_error_improvement<=0 on the frozen covered subset, or majority_covered_case_count==0",
+    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, BASE6/raw-baseline identity, training-sign computation, 2-of-3 nonzero consensus rule, frozen coverage, held-out ordering, deterministic replay, capacity, provenance or accounting requirement fails"
+  },
+  "thresholds": {
+    "majority_coverage": 0.5,
+    "majority_sign_error_improvement": 0.15,
+    "provenance": "frozen before R38 execution"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R38 is label-stability attribution on studied manifests; prospective disjoint validation remains required.",
+  "no_post_result_tuning_rule": "Do not alter manifests, BASE6/raw baseline, training-sign definition, majority rule, covered subset, R30 exclusion, thresholds, budgets/capacity, held-out ordering, classification or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r39-consensus-label-calibration-correction",
+      "experiment_family": "bounded-consensus-label-correction"
+    },
+    "mixed": {
+      "contract_id": "wingless-r39-label-stability-disambiguation",
+      "experiment_family": "label-stability-attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r39-calibration-interaction-nonlinearity-attribution",
+      "experiment_family": "calibration-interaction-attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-calibration-label-stability-attribution-r38.json"
+  ]
+}
