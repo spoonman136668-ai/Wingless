@@ -1,0 +1,141 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-PAIRWISE-FIXED-BUDGET-ACTION-VALUE-RANKING-R44",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-STATE-CONDITIONED-RESPONSE-ATTRIBUTION-R43",
+  "parent_sha": "fb911b5193e6b8e45b42dcd301e040beab90d0d5",
+  "preregistered_at_utc": "2026-10-04T23:29:00Z",
+  "independence": "Wingless-only. No Yggdrasil evidence, manifests, thresholds, representations, outcomes, or successor decisions may be consumed.",
+  "hypothesis": "The frozen R43 learning state contains enough ordinal decision information to choose the better of two competing fixed-total-budget interventions on genuinely unseen manifests even though its absolute-value calibration is inadequate.",
+  "competing_explanation": "Any apparent ranking ability is explained by intervention identity/prior performance alone rather than target-manifest learning state.",
+  "frozen_budget": {
+    "total_adaptation_budget": 1744,
+    "capacity_growth": 0,
+    "external_model_calls": 0,
+    "tokenizer_use": 0
+  },
+  "historical_fit_partition": "Existing R43 historical manifests only; no new-manifest outcomes or labels may enter state construction, offsets, pair selection, controls, or thresholds.",
+  "unseen_manifests": [
+    {
+      "name": "sixth",
+      "code": {
+        "repo": "redis/redis",
+        "commit": "b540ca49cba815f3fbe634363c3df68d4f4f127a",
+        "path": "src/server.c",
+        "git_blob": "0ddd2c4241d259c1e8ed91d7ea30b30e255c6c67",
+        "prefix_bytes": 41453
+      },
+      "structured": {
+        "repo": "rust-lang/rust",
+        "commit": "28221559263a3976766cf305940e80e30cf9ba8a",
+        "path": "Cargo.lock",
+        "git_blob": "49ab9451ba5e00d0f04bb3efdec5bff2512219b8",
+        "prefix_bytes": 14365
+      },
+      "technical_prose": {
+        "repo": "postgres/postgres",
+        "commit": "3ff475ac12ec8d8d07cf3fd86144659285a59d83",
+        "path": "doc/src/sgml/ref/select.sgml",
+        "git_blob": "18392f7caec3667c3e2e510715c62fa90256980d",
+        "prefix_bytes": 1454
+      }
+    },
+    {
+      "name": "seventh",
+      "code": {
+        "repo": "llvm/llvm-project",
+        "commit": "9c8979d1bb551949cf7985bf36c53e55aaf57ee2",
+        "path": "clang/lib/Sema/SemaExpr.cpp",
+        "git_blob": "9b3384cdbdac8cf1a2ced41109b35f292fdf9861",
+        "prefix_bytes": 41453
+      },
+      "structured": {
+        "repo": "webpack/webpack",
+        "commit": "63f2330a19e7dfd3ec683265171f48c2e617ea6e",
+        "path": "yarn.lock",
+        "git_blob": "9bac271a65bbd760da305f12aa16f943b8537ea9",
+        "prefix_bytes": 14365
+      },
+      "technical_prose": {
+        "repo": "curl/curl",
+        "commit": "6d013631195b1c349e5f783ac8b58ad376c0bdde",
+        "path": "docs/libcurl/curl_easy_setopt.md",
+        "git_blob": "23eda35203339b36d08956d1c17d8ea8924ae65d",
+        "prefix_bytes": 1454
+      }
+    },
+    {
+      "name": "eighth",
+      "code": {
+        "repo": "rust-lang/rust",
+        "commit": "28221559263a3976766cf305940e80e30cf9ba8a",
+        "path": "compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs",
+        "git_blob": "1ad6225a8c467e4b0d8eb101faf62023949c353e",
+        "prefix_bytes": 41453
+      },
+      "structured": {
+        "repo": "vitejs/vite",
+        "commit": "10033218d239c927cdc375970b5741cce408e81b",
+        "path": "pnpm-lock.yaml",
+        "git_blob": "1429512d32326cad970a993ab6832080e5579292",
+        "prefix_bytes": 14365
+      },
+      "technical_prose": {
+        "repo": "git/git",
+        "commit": "8103b446517e0c44e67561b9d0ccce56efa60a71",
+        "path": "Documentation/git.adoc",
+        "git_blob": "3abb4701c308f0956a4058061352fae7fdba7884",
+        "prefix_bytes": 1454
+      }
+    }
+  ],
+  "candidate_actions": "Exact existing R27 ten-allocation fixed-total candidate set; evaluate all 36 unordered pairs among the nine non-equal allocations. Pair order canonicalized lexicographically before outcomes.",
+  "treatment": "For each unseen manifest and action pair A,B, choose the action with larger frozen R43 state-conditional predicted value. Evaluation uses only pairwise winner correctness and regret; no magnitude calibration is performed or tuned.",
+  "controls": {
+    "action_only": "Rank A versus B by historical R43-partition mean realized value for each allocation, computed before unseen outcomes.",
+    "state_shuffled": "Deterministic preregistered permutation of historical manifest-state bindings before recomputing the same R43 scoring machinery; diagnostic only."
+  },
+  "metrics": [
+    "non_tie_pair_count",
+    "r43_pairwise_winner_accuracy",
+    "action_only_pairwise_winner_accuracy",
+    "state_shuffled_pairwise_winner_accuracy",
+    "r43_minus_action_only_accuracy",
+    "per_manifest_r43_accuracy",
+    "per_manifest_r43_minus_action_only_accuracy",
+    "r43_mean_decision_regret",
+    "action_only_mean_decision_regret",
+    "exact_tie_count",
+    "heldout_outcome_use_before_pair_freeze",
+    "post_result_pair_or_threshold_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "external_model_call_count",
+    "tokenizer_use_count",
+    "invalid_row_count"
+  ],
+  "thresholds": {
+    "minimum_non_tie_pairs": 72,
+    "aggregate_r43_accuracy": 0.65,
+    "minimum_accuracy_advantage_over_action_only": 0.1,
+    "minimum_mixed_advantage": 0.05
+  },
+  "classification_rules": {
+    "supported": "valid; >=72 non-tie cases; aggregate R43 pairwise accuracy >=0.65; R43 exceeds action-only by >=0.10; R43 exceeds action-only on all three unseen manifests; and R43 mean decision regret is lower than action-only.",
+    "mixed": "valid; support false; R43 exceeds action-only by >=0.05 and has lower mean decision regret, but misses absolute-accuracy or all-manifest consistency requirement.",
+    "negative": "valid and neither supported nor mixed.",
+    "invalid": "any frozen source/blob/prefix, candidate set, fixed budget, R43 identity, pair set/order, heldout ordering, capacity, deterministic replay, provenance, or accounting rule fails."
+  },
+  "negative_interpretation": "Stop further calibration/ranking tweaks over the current R43 representation. Escalate to a richer causal/latent learning-state representation under the same fixed resource envelope.",
+  "successors": {
+    "supported": "WLM-LM-EXTERNAL-FUTURE-DATA-PAIRWISE-RANKING-DISJOINT-REPLICATION-R45",
+    "mixed": "WLM-LM-EXTERNAL-FUTURE-DATA-PAIRWISE-STATE-COMPONENT-ABLATION-R45",
+    "negative": "WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-LEARNING-STATE-REPRESENTATION-R45"
+  },
+  "infra_failure_policy": "Exact infrastructure repair and deterministic rerun only. Scientific negative/mixed outcomes are immutable evidence.",
+  "post_result_tuning": false,
+  "rsi_success": false,
+  "production_authority": false,
+  "accepted_ref_mutation": false,
+  "runtime_launch": false,
+  "capacity_change_authorized": false
+}
