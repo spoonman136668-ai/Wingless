@@ -1,0 +1,132 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-HISTORICAL-SIGN-INSTABILITY-CORRECTION-R30",
+  "program": "Wingless RSI corrective tranche: bounded calibration-mechanism correction",
+  "question": "Does excluding historically sign-unstable reallocation candidates before a held-out outcome is opened improve out-of-fold allocation choice relative to the uncorrected predictor while preserving equal allocation as the safe fallback?",
+  "hypothesis": "R29 supported HISTORICAL_SIGN_INSTABILITY as a pre-outcome attribution of calibration failure. A bounded correction that permits reallocation only for candidates whose actual advantage sign is stable across all three training manifests, and otherwise assigns no positive selectable advantage, will reduce harmful selection. For each outer holdout the corrected selector freezes from the other three manifests plus held-out features only. Equal allocation is selected unless at least one stable non-equal candidate has strictly positive predicted advantage. No held-out outcome participates in instability detection, model fitting, scoring, tie-breaking, or selection.",
+  "exact_parent_sha": "7a6a10d071032fb8a4c21e95f2916858e017724c",
+  "qualification_branch": "research/external-hosted-wingless-future-data-historical-sign-instability-correction-r30",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-OUTCOME-MECHANISM-ATTRIBUTION-R29",
+    "github_run_id": 37169293020,
+    "classification": "supported",
+    "validity_pass": true,
+    "supported_mechanism": "historical_sign_instability",
+    "observation": {
+      "historical_sign_instability_coverage": 0.825,
+      "historical_sign_instability_sign_error_rate_delta": 0.3722943722943723
+    },
+    "eliminated_hypothesis": "pre-outcome prediction agreement/spread alone is sufficient to determine whether reallocation is safe",
+    "strengthened_hypothesis": "historical cross-manifest sign stability is necessary evidence before a predicted positive advantage may alter allocation"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R27 safely fell back to equal because predicted advantage was below calibration uncertainty; R29 then localized a major calibration error mode to historical sign instability.",
+    "internal_diagnostic": "candidate policies whose training-manifest advantage sign changed across manifests were strongly enriched for held-out sign error.",
+    "attributed_cause": "historical sign instability",
+    "candidate_corrective_mechanism": "hard eligibility gate: unstable candidates cannot trigger reallocation",
+    "frozen_candidate_selection_rule": "for each outer holdout fit the unchanged R27 predictor on the other three manifests; compute each candidate's actual-advantage sign on those same training manifests; among non-equal candidates with one stable nonzero sign and strictly positive predicted held-out advantage select the highest prediction with unchanged lexical tie-break; otherwise select equal",
+    "exact_bounded_delta": "selection eligibility only; no feature, model, budget, capacity, data, candidate allocation, or outcome definition changes",
+    "qualification": "same four sealed manifests, exact 1744 budget, deterministic double replay, full Go regression, READY_RESEARCH, held-out outcomes opened only after corrected and uncorrected selections freeze",
+    "held_out_result": "compare corrected and uncorrected selected actual advantage versus equal on each held-out manifest",
+    "retain_revert": "retain the instability gate only if the preregistered supported criterion passes; otherwise do not use it operationally",
+    "next_hypothesis": "supported -> prospectively validate the unchanged gate on a newly admitted disjoint manifest; mixed/negative -> attribute residual calibration error before another correction"
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "equal_allocation": [
+      582,
+      581,
+      581
+    ],
+    "total_adaptation_budget": 1744,
+    "model": "unchanged R27 ridge fit and features",
+    "tie_break": "unchanged lexical allocation order",
+    "capacity": "unchanged",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "corrected_selection_rule": {
+    "instability": "training actual-advantage signs across the three non-held-out manifests contain more than one distinct sign",
+    "eligible_non_equal": "not unstable AND predicted held-out advantage > 0",
+    "selection": "highest predicted advantage among eligible non-equal candidates, lexical tie-break",
+    "fallback": "FALLBACK_EQUAL when no eligible non-equal candidate exists"
+  },
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "case_count",
+    "heldout_outcome_use_before_selection",
+    "post_result_policy_choice_count",
+    "unstable_candidate_count",
+    "stable_candidate_count",
+    "corrected_reallocation_count",
+    "uncorrected_reallocation_count",
+    "corrected_fallback_equal_count",
+    "corrected_positive_holdout_count",
+    "corrected_negative_holdout_count",
+    "uncorrected_positive_holdout_count",
+    "uncorrected_negative_holdout_count",
+    "corrected_total_actual_advantage",
+    "uncorrected_total_actual_advantage",
+    "corrected_delta_vs_uncorrected",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "classification_rules": {
+    "supported": "valid AND corrected_total_actual_advantage >= 1 AND corrected_delta_vs_uncorrected >= 1 AND corrected_negative_holdout_count <= uncorrected_negative_holdout_count",
+    "mixed": "valid AND corrected_delta_vs_uncorrected > 0 but supported criterion is not met",
+    "negative": "valid AND corrected_delta_vs_uncorrected <= 0",
+    "invalid": "any parent, manifest identity, 1744 budget, candidate set, model/features, training-only instability calculation, held-out ordering, deterministic replay, capacity, provenance, or accounting requirement fails"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R30 is a cross-validated correction test on already studied manifests. Even supported does not satisfy the unseen-manifest and disjoint-replication requirements for RSI allocator success.",
+  "no_post_result_tuning_rule": "Do not alter manifests, candidates, equal allocation, model/features, instability definition, eligibility rule, tie-break, thresholds, budgets/capacity, held-out ordering, classification, or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r31-prospective-instability-gate-validation",
+      "experiment_family": "prospective-validation"
+    },
+    "mixed": {
+      "contract_id": "wingless-r31-residual-calibration-attribution",
+      "experiment_family": "attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r31-residual-calibration-attribution",
+      "experiment_family": "attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-historical-sign-instability-correction-r30.json"
+  ]
+}
