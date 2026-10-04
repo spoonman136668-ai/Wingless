@@ -1,0 +1,96 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-ALLOCATION-ATTRIBUTION-R21",
+  "program": "Wingless attribution of third-manifest marginal-signal allocation tie",
+  "question": "Did the frozen R19 state-change signal overpredict the selected R20 reallocation because a baseline-argmax-only state change on technical prose 581→726 produced no sealed prediction gain?",
+  "hypothesis": "Replay the exact R20 third manifest, leave-one-domain-out construction, 15,819 non-target bytes, 256 motifs, 582-byte sealed evaluation, 872-byte adaptation reservoir, and R19 weights (1,3,0), but make no allocation choice. Measure the two intervals that distinguish R20 SELECTED=[582,436,726] from EQUAL=[582,581,581]: structured 436→581 and technical_prose 581→726. R20 already sealed zero selected-vs-equal change in both domains. Supported attribution requires structured interval actual gain=0 and signal=0; technical-prose interval actual gain=0 while rank_signal>0, baseline_argmax_change_count>0, motif_entry_count+motif_exit_count==0, and retained_best_change_count==0. This identifies a baseline-only false-positive contribution without changing any weights.",
+  "exact_parent_sha": "0c125544164b028516f1470238779fe633645256",
+  "qualification_branch": "research/external-hosted-wingless-future-data-marginal-signal-allocation-attribution-r21",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-GUIDED-ALLOCATION-R20",
+    "github_run_id": 37164052312,
+    "classification": "mixed",
+    "validity_pass": true,
+    "observation": {
+      "selected_allocation": [
+        582,
+        436,
+        726
+      ],
+      "equal_allocation": [
+        582,
+        581,
+        581
+      ],
+      "selected_aggregate_exact_hit_delta_vs_equal": 0,
+      "arm_structured_selected_delta_vs_equal": 0,
+      "arm_technical_prose_selected_delta_vs_equal": 0,
+      "structured_interval_436_581_rank_signal": 0,
+      "technical_prose_interval_581_726_rank_signal": 0.006896551724137931,
+      "technical_prose_interval_581_726_baseline_argmax_change_count": 1,
+      "technical_prose_interval_581_726_motif_entry_count": 0,
+      "technical_prose_interval_581_726_motif_exit_count": 0
+    }
+  },
+  "external_manifest": {
+    "path": "docs/experiments/wlm-lm-external-future-data-third-manifest-r20.json",
+    "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7",
+    "source_count": 3,
+    "effective_total_bytes": 57272
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "2518306c74ff426278f31b1199f8ad9891299d14",
+    "manifest_sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_reuse": {
+    "source_identities": "byte-identical R20 third manifest",
+    "non_target_training_byte_budget_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "signal_weights": {
+      "baseline_argmax_change": 1,
+      "motif_churn": 3,
+      "retained_best_change": 0
+    },
+    "target_intervals": {
+      "structured": [
+        436,
+        581
+      ],
+      "technical_prose": [
+        581,
+        726
+      ]
+    },
+    "selection": "none; attribution only"
+  },
+  "classification_rules": {
+    "supported": "valid and structured 436→581 has gain=0 and signal=0; technical prose 581→726 has gain=0, rank_signal>0, baseline_argmax_change_count>0, motif churn=0, retained-best changes=0",
+    "mixed": "valid and technical prose 581→726 is a zero-gain positive-signal interval, but more than the baseline-only component contributes",
+    "negative": "valid and the R20 tie is not attributable to a zero-gain positive-signal technical-prose interval",
+    "invalid": "any parent, authority, source identity, split, interval, weight, evaluation-isolation, deterministic replay, capacity, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter sources, 15,819-byte non-target budget, 256 capacity, 582/872 split, target intervals, weights (1,3,0), evaluator, attribution predicates, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-BASELINE-FALSE-POSITIVE-CONTROL-R22",
+    "intent": "test a preregistered training-only control that distinguishes productive baseline-argmax changes from baseline-only false positives before any allocator weight revision"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-ALLOCATION-INTERACTION-ATTRIBUTION-R22",
+    "intent": "attribute the remaining tie mechanism without changing weights or candidate allocations"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-marginal-signal-allocation-attribution-r21.json",
+    "unitary/wlm_lm_external_future_data_marginal_signal_allocation_attribution_r21.go",
+    "cmd/wlm-lm-external-future-data-marginal-signal-allocation-attribution-r21/main.go",
+    ".github/workflows/external-future-data-marginal-signal-allocation-attribution-r21.yml"
+  ]
+}
