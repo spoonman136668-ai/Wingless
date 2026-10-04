@@ -1,0 +1,92 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MOTIF-CHURN-CONTROL-FACTORIAL-R26",
+  "program": "Wingless training-only factorial attribution of motif-churn control features",
+  "question": "Which training-only motif features, if any, explain why raw prediction-active churn failed to separate productive from zero-gain adaptation intervals in R25?",
+  "hypothesis": "Replay the exact fourth-manifest R25 construction and include every adjacent interval with motif churn before evaluation labels are opened. For each entering/exiting motif compute only frozen training-state features: baseline_disagreement (motif.best differs the corresponding-budget baseline argmax for key[3]), support=motif.bestCount, and consistency=motif.consistency. Evaluate the complete 2×2×2 factorial over feature toggles GATE∈{off,on}, SUPPORT∈{off,on}, CONSISTENCY∈{off,on}. Each motif contribution is zero when GATE=on and baseline_disagreement=false; otherwise contribution=(bestCount if SUPPORT=on else 1)*(consistency if CONSISTENCY=on else 1). Interval score is sum contributions / interval_bytes. All eight scores for all churn intervals are frozen before sealed actual gains are computed. Afterward label intervals PRODUCTIVE when gain>0, ZERO_GAIN when gain==0, NEGATIVE when gain<0. For each cell report productive-vs-zero pairwise AUC and means. This is attribution only: no cell is installed into the allocator and no fourth-manifest result changes R23/R25 policies.",
+  "exact_parent_sha": "a1f7f2a49377138b8ada6c66c2633726c7d2dd63",
+  "qualification_branch": "research/external-hosted-wingless-future-data-motif-churn-control-factorial-r26",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-MOTIF-CHURN-CONTROL-R25",
+    "github_run_id": 37166317193,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "churn_interval_count": 4,
+      "productive_churn_interval_count": 2,
+      "zero_gain_churn_interval_count": 1,
+      "negative_gain_churn_interval_count": 1,
+      "productive_control_signal_mean": 0.01375755421258443,
+      "zero_gain_control_signal_mean": 0.013793103448275862,
+      "productive_vs_zero_pairwise_auc": 0.5
+    },
+    "interpretation": "Binary prediction-active churn alone does not rank productive intervals above the zero-gain interval; support and consistency must be factored before any signal revision."
+  },
+  "external_manifest": {
+    "path": "docs/experiments/wlm-lm-external-future-data-fourth-manifest-r23.json",
+    "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+    "source_count": 3,
+    "effective_total_bytes": 57272
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "c591f97184e22565e8ccfc230a70a58f62b26d5c",
+    "manifest_sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_factors": {
+    "baseline_disagreement_gate": [
+      false,
+      true
+    ],
+    "support_weighting": [
+      false,
+      true
+    ],
+    "consistency_weighting": [
+      false,
+      true
+    ],
+    "cell_count": 8,
+    "motif_support_definition": "motif.bestCount from the corresponding lower budget for exiting motifs or upper budget for entering motifs",
+    "motif_consistency_definition": "motif.consistency from the corresponding lower budget for exiting motifs or upper budget for entering motifs",
+    "baseline_disagreement_definition": "motif.best != corresponding-budget baseline argmax for motif.key[3]",
+    "contribution": "if gate=true and baseline_disagreement=false then 0 else (bestCount if support=true else 1)*(consistency if consistency=true else 1)",
+    "interval_score": "sum motif contributions / interval_bytes",
+    "interval_inclusion": "all R25 adjacent intervals with motif_entry_count+motif_exit_count>0, determined before evaluation labels",
+    "heldout_feature_selection_count": 0,
+    "post_result_cell_install_count": 0
+  },
+  "labels": {
+    "productive": "sealed actual exact-hit gain > 0",
+    "zero_gain": "sealed actual exact-hit gain == 0",
+    "negative": "sealed actual exact-hit gain < 0"
+  },
+  "classification_rules": {
+    "supported": "valid and at least one factorial cell has productive-vs-zero pairwise AUC >=0.75 with mean productive score > mean zero-gain score",
+    "mixed": "valid and at least one cell has AUC >0.5 with mean productive score > mean zero-gain score, but no cell reaches 0.75",
+    "negative": "valid and no cell ranks productive intervals above zero-gain intervals",
+    "invalid": "any parent, authority, source identity, split, budget grid, churn-interval inclusion, feature definition, factorial completeness, label isolation, deterministic replay, capacity, provenance, or accounting requirement fails"
+  },
+  "attribution_rule": "Report every cell meeting AUC>=0.75. Feature attribution is descriptive only; no winner is selected for deployment or allocator revision.",
+  "no_post_result_tuning_rule": "Do not alter sources, budgets, motif support/consistency definitions, baseline-disagreement rule, eight factorial cells, interval inclusion, label definitions, AUC threshold, evaluator, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MOTIF-CHURN-FACTORIAL-PROSPECTIVE-VALIDATION-R27",
+    "intent": "preregister one or more supported feature forms and validate prospectively on a new disjoint manifest before any allocator signal revision"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MOTIF-CHURN-OUTCOME-MECHANISM-ATTRIBUTION-R27",
+    "intent": "move from structural churn features to training-only outcome-mechanism diagnostics rather than repeatedly reweighting motif churn"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-motif-churn-control-factorial-r26.json",
+    "unitary/wlm_lm_external_future_data_motif_churn_control_factorial_r26.go",
+    "cmd/wlm-lm-external-future-data-motif-churn-control-factorial-r26/main.go",
+    ".github/workflows/external-future-data-motif-churn-control-factorial-r26.yml"
+  ]
+}
