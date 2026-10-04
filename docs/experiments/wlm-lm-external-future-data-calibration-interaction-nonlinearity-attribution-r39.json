@@ -1,0 +1,137 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-INTERACTION-NONLINEARITY-ATTRIBUTION-R39",
+  "program": "Wingless RSI corrective tranche: bounded calibration interaction attribution",
+  "question": "After R38 showed that simple 2-of-3 sign consensus covers most excluded cases but predicts held-out sign worse than the raw BASE6 model, is the residual failure caused by missing bounded interactions among the existing BASE6 internal conditions rather than by unstable labels alone?",
+  "hypothesis": "R38 rejects simple transferable sign consensus: majority coverage was 29/33 but majority sign error was 0.6897 versus 0.4828 for RAW_BASE6 on the same covered subset. Freeze a bounded nonlinear attribution without changing data, budget, labels, or solver. BASE6_LINEAR is the byte-identical R38/R37 raw-target ridge model. BASE6_PAIRWISE appends exactly the 15 unique pairwise products x_i*x_j for the six frozen BASE6 features (i<j), with no squares, learned basis, feature selection, normalization tuning, or hidden capacity. Fit the same ridge lambda=1 on the same three training manifests per outer holdout and score only the exact 33 R30-excluded cases. This tests whether marginal learning value is a fixed low-order interaction of existing internal conditions.",
+  "exact_parent_sha": "e5f0006e492f332e3485ea3d5aae24b928c7fb2f",
+  "qualification_branch": "research/external-hosted-wingless-future-data-calibration-interaction-nonlinearity-attribution-r39",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-LABEL-STABILITY-ATTRIBUTION-R38",
+    "github_run_id": 37223382413,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "excluded_case_count": 33,
+      "majority_covered_case_count": 29,
+      "majority_uncovered_case_count": 4,
+      "majority_coverage": 0.8787878787878788,
+      "raw_baseline_sign_error_rate": 0.5151515151515151,
+      "raw_covered_sign_error_rate": 0.4827586206896552,
+      "raw_uncovered_sign_error_rate": 0.75,
+      "majority_sign_error_rate": 0.6896551724137931,
+      "majority_sign_error_improvement": -0.20689655172413796,
+      "raw_baseline_identity_mismatch_count": 0,
+      "consensus_definition_mismatch_count": 0,
+      "invalid_row_count": 0
+    },
+    "eliminated_hypothesis": "a simple nonzero 2-of-3 training-manifest sign consensus provides a transferable allocation-value label on the excluded cases",
+    "strengthened_hypothesis": "marginal future learning value may depend on bounded interactions among existing internal conditions rather than a context-independent sign label"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R38's majority label covered 87.9% of excluded cases but increased held-out sign error by 20.69 points relative to the raw BASE6 predictor on the same covered subset.",
+    "residual_cause_under_test": "MISSING_LOW_ORDER_INTERACTION_IN_LINEAR_CALIBRATION",
+    "exact_bounded_delta": "append only the 15 deterministic pairwise products of the six frozen BASE6 features; keep targets, solver, ridge lambda, manifests, candidates, budget, exclusion, and held-out ordering unchanged",
+    "control_rule": "BASE6_LINEAR is byte-identical R38/R37 RAW_BASE6 raw-target predictor",
+    "interaction_rule": "BASE6_PAIRWISE = six BASE6 features plus x_i*x_j for every unique i<j pair; exactly 21 total features including intercept; no squares and no data-dependent feature construction",
+    "retain_revert": "R39 is attribution only. Support authorizes only a separately preregistered bounded interaction-aware correction/replication; allocator behavior remains unchanged."
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "non_equal_candidates_per_holdout": 9,
+    "exact_r30_excluded_cases_expected": 33,
+    "total_adaptation_budget": 1744,
+    "base_representation": "byte-identical R27/R38 BASE6",
+    "training_manifests_per_holdout": 3,
+    "raw_target": "byte-identical R37/R38 raw allocation-advantage target",
+    "ridge_lambda": 1,
+    "intercept": true,
+    "pairwise_features": 15,
+    "total_nonintercept_features": 21,
+    "heldout_outcome_use_before_feature_freeze": 0,
+    "post_result_feature_choice_count": 0,
+    "capacity": "bounded fixed feature expansion only",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "excluded_case_count",
+    "base6_sign_error_rate",
+    "base6_mean_absolute_error",
+    "pairwise_sign_error_rate",
+    "pairwise_mean_absolute_error",
+    "pairwise_sign_error_improvement",
+    "pairwise_mae_ratio",
+    "base6_identity_mismatch_count",
+    "pairwise_feature_count_mismatch_count",
+    "fit_failure_count",
+    "heldout_outcome_use_before_feature_freeze",
+    "post_result_feature_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "thresholds": {
+    "pairwise_sign_error_improvement": 0.1,
+    "pairwise_mae_ratio": 1,
+    "provenance": "frozen before R39 execution"
+  },
+  "classification_rules": {
+    "supported": "valid AND pairwise_sign_error_improvement>=0.10 AND pairwise_mae_ratio<=1.00",
+    "mixed": "valid AND pairwise_sign_error_improvement>0 AND pairwise_mae_ratio<1.10 but one or both supported thresholds are missed",
+    "negative": "valid AND supported is false AND mixed is false",
+    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, BASE6 identity, fixed 15-pair construction, raw target, ridge lambda, held-out ordering, deterministic replay, provenance or accounting requirement fails"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R39 is interaction attribution on studied manifests; no allocator policy is changed and prospective disjoint validation remains required.",
+  "no_post_result_tuning_rule": "Do not alter manifests, BASE6, the 15 pair list, target, ridge lambda, thresholds, exclusion set, budget/capacity, held-out ordering, classification or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r40-interaction-calibration-correction",
+      "experiment_family": "bounded-interaction-calibration-correction"
+    },
+    "mixed": {
+      "contract_id": "wingless-r40-interaction-calibration-disambiguation",
+      "experiment_family": "calibration-interaction-attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r40-prospective-applicability-region-attribution",
+      "experiment_family": "prospective-applicability-attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-calibration-interaction-nonlinearity-attribution-r39.json"
+  ]
+}
