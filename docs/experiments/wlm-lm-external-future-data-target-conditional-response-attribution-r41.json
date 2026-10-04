@@ -1,0 +1,155 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-TARGET-CONDITIONAL-RESPONSE-ATTRIBUTION-R41",
+  "program": "Wingless RSI corrective tranche: target-conditional marginal-learning-value attribution",
+  "question": "After R40 showed that a fixed training-support envelope does not identify a lower-sign-error applicability region, is residual marginal-learning-value error caused by using one global calibration response across different budget target domains?",
+  "hypothesis": "R40 falsified the fixed support-envelope explanation: IN_ENVELOPE covered 19/33 excluded cases but had sign error 0.578947 versus 0.515152 globally, while OUT_OF_ENVELOPE sign error was lower at 0.428571. Freeze a bounded target-conditional response attribution with no new learned representation. GLOBAL_BASE6 is the byte-identical R40 raw-target ridge model. TARGET_DOMAIN_BASE6 uses the same six BASE6 features, same raw target, same ridge lambda=1, same three training manifests per holdout, same 1744 total budget, and exact R30 exclusion, but fits exactly three separate ridge responses keyed only by the candidate allocation's deterministic target domain: the domain with the largest positive budget delta from equal allocation (code, structured, or technical_prose; exact ties break code→structured→technical_prose). Each held-out excluded allocation is scored by the model for its frozen target domain. This tests whether the marginal value of spending the next unit of budget depends on where that unit is directed, without adding unrestricted capacity or meta-learning.",
+  "exact_parent_sha": "de04517b53e8b72ceaeb15fbaf02960b2e8804c2",
+  "qualification_branch": "research/external-hosted-wingless-future-data-target-conditional-response-attribution-r41",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-PROSPECTIVE-APPLICABILITY-REGION-ATTRIBUTION-R40",
+    "github_run_id": 37226078607,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "excluded_case_count": 33,
+      "global_sign_error_rate": 0.5151515151515151,
+      "global_mean_absolute_error": 10.731783167689903,
+      "in_envelope_case_count": 19,
+      "out_of_envelope_case_count": 14,
+      "in_envelope_coverage": 0.5757575757575758,
+      "in_envelope_sign_error_rate": 0.5789473684210527,
+      "in_envelope_mean_absolute_error": 4.272819665305908,
+      "out_of_envelope_sign_error_rate": 0.42857142857142855,
+      "out_of_envelope_mean_absolute_error": 19.49751934949676,
+      "in_envelope_sign_error_improvement": -0.06379585326953752,
+      "out_minus_in_sign_error_gap": -0.1503759398496241,
+      "invalid_row_count": 0
+    },
+    "eliminated_hypothesis": "the residual BASE6 sign error is concentrated outside a fixed coordinate-wise training support envelope",
+    "strengthened_hypothesis": "marginal future learning value may be target-conditional: the same internal state can imply different response depending on which data domain receives the next budget increment"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R40's in-envelope region had lower MAE but worse sign error than the global baseline, so geometric support alone does not identify where allocation advantage transfers.",
+    "residual_cause_under_test": "GLOBAL_CALIBRATION_COLLAPSES_TARGET_DOMAIN_CONDITIONAL_RESPONSE",
+    "exact_bounded_delta": "replace one global BASE6 ridge response with exactly three target-domain-specific BASE6 ridge responses; do not change features, target, manifests, budget, candidate allocations, ridge lambda, exclusion set, or held-out ordering",
+    "target_domain_rule": "for each non-equal allocation compute allocation minus equal allocation per domain; choose the domain with largest positive delta; exact ties break code, then structured, then technical_prose",
+    "control_rule": "GLOBAL_BASE6 is byte-identical R40/R39 raw-target predictor",
+    "conditional_rule": "TARGET_DOMAIN_BASE6 fits one ridge-lambda=1 BASE6 response for each frozen target-domain stratum using training-manifest allocation cases from that stratum only; held-out case chooses its model from its allocation before held-out outcome is read",
+    "fallback_rule": "if a training target-domain stratum is rank-deficient or contains fewer than six training rows, mark the experiment invalid rather than borrow another stratum or change capacity",
+    "retain_revert": "R41 is attribution only. Support authorizes only a separately preregistered bounded target-conditional correction/replication; allocator behavior remains unchanged."
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "non_equal_candidates_per_holdout": 9,
+    "exact_r30_excluded_cases_expected": 33,
+    "total_adaptation_budget": 1744,
+    "base_representation": "byte-identical R40/R39 BASE6",
+    "raw_target": "byte-identical R40/R39 raw allocation-advantage target",
+    "training_manifests_per_holdout": 3,
+    "ridge_lambda": 1,
+    "intercept": true,
+    "target_domains": [
+      "code",
+      "structured",
+      "technical_prose"
+    ],
+    "target_domain_tie_break": [
+      "code",
+      "structured",
+      "technical_prose"
+    ],
+    "heldout_outcome_use_before_target_condition_freeze": 0,
+    "post_result_target_condition_choice_count": 0,
+    "capacity": "three fixed BASE6 ridge fits only; no feature growth",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "excluded_case_count",
+    "global_sign_error_rate",
+    "global_mean_absolute_error",
+    "target_conditional_sign_error_rate",
+    "target_conditional_mean_absolute_error",
+    "target_conditional_sign_error_improvement",
+    "target_conditional_mae_ratio",
+    "code_case_count",
+    "structured_case_count",
+    "technical_prose_case_count",
+    "code_sign_error_rate",
+    "structured_sign_error_rate",
+    "technical_prose_sign_error_rate",
+    "base6_identity_mismatch_count",
+    "target_domain_definition_mismatch_count",
+    "target_stratum_insufficient_count",
+    "fit_failure_count",
+    "heldout_outcome_use_before_target_condition_freeze",
+    "post_result_target_condition_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "thresholds": {
+    "target_conditional_sign_error_improvement": 0.1,
+    "target_conditional_mae_ratio": 1,
+    "provenance": "frozen before R41 execution"
+  },
+  "classification_rules": {
+    "supported": "valid AND target_conditional_sign_error_improvement>=0.10 AND target_conditional_mae_ratio<=1.00",
+    "mixed": "valid AND target_conditional_sign_error_rate<global_sign_error_rate AND target_conditional_mean_absolute_error<global_mean_absolute_error but one or both supported thresholds are missed",
+    "negative": "valid AND supported is false AND mixed is false",
+    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, BASE6 identity, deterministic target-domain rule, three fixed target-domain fits, raw target, ridge lambda, held-out ordering, minimum-stratum requirement, provenance or accounting rule fails"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R41 is bounded target-conditional attribution on studied manifests; no allocation policy is changed and prospective disjoint validation remains required.",
+  "no_post_result_tuning_rule": "Do not alter manifests, BASE6, target-domain rule/tie-break, raw target, ridge lambda, thresholds, exclusion set, budget/capacity, held-out ordering, classification or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r42-target-conditional-calibration-correction",
+      "experiment_family": "bounded-target-conditional-calibration-correction"
+    },
+    "mixed": {
+      "contract_id": "wingless-r42-target-conditional-disambiguation",
+      "experiment_family": "target-conditional-response-attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r42-deficiency-conditioned-response-attribution",
+      "experiment_family": "deficiency-conditioned-response-attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-target-conditional-response-attribution-r41.json"
+  ]
+}
