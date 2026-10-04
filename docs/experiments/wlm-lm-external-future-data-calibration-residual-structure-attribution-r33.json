@@ -1,0 +1,154 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-RESIDUAL-STRUCTURE-ATTRIBUTION-R33",
+  "program": "Wingless RSI corrective tranche: residual calibration structure attribution",
+  "question": "Inside the exact R30-excluded candidate set, do training-manifest jackknife instability or high prediction spread identify held-out calibration error after R32 ruled out magnitude conflict and magnitude extrapolation?",
+  "hypothesis": "R32 found no useful magnitude-based residual discriminator: net historical magnitude-sign conflict was not enriched for error and prediction-magnitude extrapolation had zero coverage. The remaining error may come from unstable cross-manifest support in the unchanged R27 predictor. For each outer holdout, reproduce the exact R30-excluded candidate set and the unchanged full R27 fit. Before opening held-out outcomes, fit three jackknife submodels by omitting one of the three training manifests at a time, predict each held-out candidate with all three submodels, and freeze two diagnostics: JACKKNIFE_SIGN_INSTABILITY when submodel advantage signs are not unanimous, and HIGH_RELATIVE_JACKKNIFE_SPREAD when a candidate's submodel prediction range exceeds the within-holdout median range across the fixed non-equal candidates. Only after all diagnostics freeze may held-out outcomes be opened for sign-error and absolute-error attribution.",
+  "exact_parent_sha": "a7a994c9f09cf48295457ce02965abb389e4eb3a",
+  "qualification_branch": "research/external-hosted-wingless-future-data-calibration-residual-structure-attribution-r33",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-RESIDUAL-MAGNITUDE-CALIBRATION-ATTRIBUTION-R32",
+    "github_run_id": 37195475979,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "excluded_case_count": 33,
+      "net_magnitude_sign_conflict_coverage": 0.3939393939393939,
+      "net_magnitude_sign_conflict_sign_error_rate_delta": -0.3423076923076923,
+      "net_magnitude_sign_conflict_mae_ratio": 0.7062235500312348,
+      "prediction_magnitude_extrapolation_coverage": 0,
+      "prediction_magnitude_extrapolation_sign_error_rate_delta": -0.5151515151515151,
+      "heldout_outcome_use_before_flags": 0,
+      "post_result_mechanism_choice_count": 0,
+      "invalid_row_count": 0
+    },
+    "eliminated_hypothesis": "training net-advantage magnitude conflict or prediction-magnitude extrapolation identifies residual calibration error inside the exact R30-excluded set",
+    "strengthened_hypothesis": "residual calibration failure may instead arise from instability of the learned predictor across training-manifest composition"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R32's magnitude-conflict subgroup was less error-prone than its control, and no candidate exceeded the training actual-advantage magnitude envelope.",
+    "residual_causes_under_test": [
+      "JACKKNIFE_SIGN_INSTABILITY",
+      "HIGH_RELATIVE_JACKKNIFE_SPREAD"
+    ],
+    "diagnostic_definitions": {
+      "JACKKNIFE_SIGN_INSTABILITY": "the three leave-one-training-manifest submodels do not produce one unanimous non-zero sign for predicted held-out advantage",
+      "HIGH_RELATIVE_JACKKNIFE_SPREAD": "max(submodel predicted advantages)-min(submodel predicted advantages) is greater than the median jackknife spread across the nine fixed non-equal candidates for the same holdout; the median is frozen before held-out outcomes open"
+    },
+    "exact_bounded_delta": "diagnostic accounting only; unchanged four manifests, R30 exclusion rule, R27 features/model family, candidate allocations, 1744 budget, capacity and held-out ordering",
+    "qualification": "same four sealed manifests, deterministic replay, all jackknife fits/diagnostics frozen before held-out outcomes, full Go regression, one-shot READY_RESEARCH",
+    "held_out_result": "compare flagged versus unflagged held-out predictor sign-error rate and mean absolute prediction error",
+    "retain_revert": "R33 cannot alter allocator behavior. Supported instability only authorizes a separately preregistered stability-aware correction.",
+    "next_hypothesis": "supported -> test only supported stability-aware correction; mixed/negative -> move to feature/representation calibration attribution without capacity growth"
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "non_equal_candidates_per_holdout": 9,
+    "exact_r30_excluded_cases_expected": 33,
+    "total_adaptation_budget": 1744,
+    "model": "unchanged R27 ridge family and six features",
+    "full_fit": "unchanged R27 fit on all three training manifests",
+    "jackknife_submodels": "exactly three fits per holdout; each omits one training manifest and trains on the other two",
+    "spread_threshold": "within-holdout median jackknife spread across all nine fixed non-equal candidates, computed before held-out outcomes",
+    "tie_break": "unchanged lexical allocation order",
+    "capacity": "unchanged",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "diagnostic_definitions": {
+    "R30_EXCLUDED": "training actual-advantage signs are not exactly one distinct non-zero sign",
+    "JACKKNIFE_SIGN_INSTABILITY": "three jackknife predicted advantage signs are not one unanimous non-zero sign",
+    "HIGH_RELATIVE_JACKKNIFE_SPREAD": "candidate jackknife spread exceeds the frozen within-holdout median spread"
+  },
+  "outcome_definition": {
+    "sign_error": "sign(full-fit predicted held-out advantage) != sign(held-out actual advantage)",
+    "absolute_error": "abs(full-fit predicted held-out advantage - held-out actual advantage)"
+  },
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "excluded_case_count",
+    "jackknife_sign_instability_coverage",
+    "jackknife_sign_instability_flagged_sign_error_rate",
+    "jackknife_sign_instability_unflagged_sign_error_rate",
+    "jackknife_sign_instability_flagged_mean_absolute_error",
+    "jackknife_sign_instability_unflagged_mean_absolute_error",
+    "jackknife_sign_instability_sign_error_rate_delta",
+    "jackknife_sign_instability_mae_ratio",
+    "high_relative_jackknife_spread_coverage",
+    "high_relative_jackknife_spread_flagged_sign_error_rate",
+    "high_relative_jackknife_spread_unflagged_sign_error_rate",
+    "high_relative_jackknife_spread_flagged_mean_absolute_error",
+    "high_relative_jackknife_spread_unflagged_mean_absolute_error",
+    "high_relative_jackknife_spread_sign_error_rate_delta",
+    "high_relative_jackknife_spread_mae_ratio",
+    "jackknife_fit_failure_count",
+    "heldout_outcome_use_before_flags",
+    "post_result_mechanism_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "classification_rules": {
+    "supported": "valid AND at least one preregistered instability diagnostic has coverage>=0.20, flagged sign-error rate >= unflagged+0.15, and flagged MAE >= unflagged*1.25",
+    "mixed": "valid AND at least one instability diagnostic has both flagged sign-error rate > unflagged and flagged MAE > unflagged but none meets all supported thresholds",
+    "negative": "valid AND neither instability diagnostic has both directional enrichments",
+    "invalid": "any parent, manifest identity, 1744 budget, candidate set, exact R30 exclusion reproduction, R27 model/features, jackknife composition, median-spread freezing, held-out ordering, deterministic replay, capacity, provenance or accounting requirement fails"
+  },
+  "thresholds": {
+    "coverage_floor": 0.2,
+    "sign_error_rate_delta": 0.15,
+    "mae_ratio": 1.25,
+    "provenance": "reuse R29 enrichment thresholds; jackknife spread threshold is training-only within-holdout median and is not selected from held-out outcomes"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R33 is residual calibration attribution on already studied manifests and cannot establish allocator success.",
+  "no_post_result_tuning_rule": "Do not alter manifests, candidates, exact R30 exclusion rule, R27 model/features, jackknife composition, instability diagnostics, within-holdout median rule, enrichment thresholds, budgets/capacity, held-out ordering, classification, or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r34-stability-aware-calibration-correction",
+      "experiment_family": "bounded-correction"
+    },
+    "mixed": {
+      "contract_id": "wingless-r34-calibration-feature-representation-attribution",
+      "experiment_family": "attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r34-calibration-feature-representation-attribution",
+      "experiment_family": "attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-calibration-residual-structure-attribution-r33.json"
+  ]
+}
