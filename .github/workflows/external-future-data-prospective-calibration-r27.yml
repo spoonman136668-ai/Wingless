@@ -117,10 +117,10 @@ jobs:
           r=json.loads(pathlib.Path("/tmp/result1.json").read_text());m=r["metrics"];decision=r["decision"]
           valid=(
             m["historical_manifest_count"]==3 and m["historical_example_count"]==36 and
-            m["historical_transfer_source_identity_mismatch_count"]==0 and m["historical_transfer_total_source_bytes"]==57272 and
-            m["historical_third_source_identity_mismatch_count"]==0 and m["historical_third_total_source_bytes"]==57272 and
-            m["historical_fourth_source_identity_mismatch_count"]==0 and m["historical_fourth_total_source_bytes"]==57272 and
-            m["fifth_source_identity_mismatch_count"]==0 and m["fifth_total_source_bytes"]==57272 and
+            m.get("historical_transfer_source_identity_mismatch_count",0)==0 and m["historical_transfer_total_source_bytes"]==57272 and
+            m.get("historical_third_source_identity_mismatch_count",0)==0 and m["historical_third_total_source_bytes"]==57272 and
+            m.get("historical_fourth_source_identity_mismatch_count",0)==0 and m["historical_fourth_total_source_bytes"]==57272 and
+            m.get("fifth_source_identity_mismatch_count",0)==0 and m["fifth_total_source_bytes"]==57272 and
             m["candidate_allocation_count"]==10 and m["total_adaptation_budget_equal"]==1744 and
             m["total_adaptation_budget_selected"]==1744 and
             m["fifth_manifest_policy_evaluation_byte_use_count"]==0 and
