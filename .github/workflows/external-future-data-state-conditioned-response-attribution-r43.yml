@@ -1,0 +1,168 @@
+name: Wingless state conditioned response attribution R43
+on:
+  push:
+    branches:
+      - research/external-hosted-wingless-future-data-state-conditioned-response-attribution-r43
+    paths:
+      - 'docs/experiments/wlm-lm-external-future-data-state-conditioned-response-attribution-r43.json'
+      - 'unitary/wlm_lm_external_future_data_state_conditioned_response_attribution_r43.go'
+      - 'cmd/wlm-lm-external-future-data-state-conditioned-response-attribution-r43/main.go'
+      - '.github/workflows/external-future-data-state-conditioned-response-attribution-r43.yml'
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Validate frozen package
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 'af4319ace0b39a15f1dee6f0d4d617cc43d3ff59' HEAD
+          git merge-base --is-ancestor '54679aa099ea1a56c877a754ab4d9a53efaa8096' HEAD
+          changed="$(git diff --name-only 'af4319ace0b39a15f1dee6f0d4d617cc43d3ff59..HEAD' | sort)"
+          expected="$(printf '%s\n' \
+            '.github/workflows/external-future-data-state-conditioned-response-attribution-r43.yml' \
+            'cmd/wlm-lm-external-future-data-state-conditioned-response-attribution-r43/main.go' \
+            'docs/experiments/wlm-lm-external-future-data-state-conditioned-response-attribution-r43.json' \
+            'unitary/wlm_lm_external_future_data_state_conditioned_response_attribution_r43.go' | sort)"
+          test "$changed" = "$expected"
+          test "$(git rev-parse '54679aa099ea1a56c877a754ab4d9a53efaa8096:docs/experiments/wlm-lm-external-future-data-state-conditioned-response-attribution-r43.json')" = '3d541c5ab9ed7827d960755a074c1c8c7ace739c'
+      - name: Verify exact READY_RESEARCH receipt
+        shell: bash
+        env:
+          AUTHORITY_RECEIPT_SHA256: '8323fc90cef6fa3c69cf704f22f39f04e66b3a5d4f0ac0495c25732b3d1ba192'
+          AUTHORITY_RECEIPT_B64: 'eyJja2JfcGxhbmVfbWFpbl9zaGEiOiIwMTQ0MTA3ZTgwNjU2ZjQwOWI3MDZlYzQ4OGIwZGJlYzdlOWU5MmRhIiwiZXhwZXJpbWVudCI6IldMTS1MTS1FWFRFUk5BTC1GVVRVUkUtREFUQS1TVEFURS1DT05ESVRJT05FRC1SRVNQT05TRS1BVFRSSUJVVElPTi1SNDMiLCJmZXRjaF9kZWNpc2lvbiI6eyJzY2hlbWEiOiJja2ItcGxhbmUuZXh0ZXJuYWwtZXhwb3N1cmUtZmV0Y2gudjEiLCJkaXNwb3NpdGlvbiI6IlJFQURZX0ZFVENIIiwic2NvcGUiOiJmZXRjaC12ZXJpZnktb25seSIsInJlYXNvbnMiOm51bGx9LCJtYW5pZmVzdF9zaGEyNTYiOiI3MDc3ZDJiNzJkODk1NGFmYzI0ZjM2YjI5NzEzOTNhY2MxMWUzYjM0NWY3YzM1MjExMDJjMjAzNDdiOWM2MTcxIiwicGxhbl9kZWNpc2lvbiI6eyJzY2hlbWEiOiJja2ItcGxhbmUuZXh0ZXJuYWwtZXhwb3N1cmUudjEiLCJkaXNwb3NpdGlvbiI6IlJFQURZX1BMQU4iLCJzY29wZSI6InBsYW4tb25seSIsInJlYXNvbnMiOm51bGx9LCJwcmVyZWdpc3RyYXRpb25fc2hhIjoiNTQ2NzlhYTA5OWVhMWE1NmM4NzdhNzU0YWI0ZDlhNTNlZmFhODA5NiIsInByb2plY3QiOiJXaW5nbGVzcyIsInJlcXVlc3RfaWQiOiIxNDEzNDViYzAwZGI0YWUzMWJmMjc1MmFiZGY4YjYxYiIsInJlc2VhcmNoX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1yZXNlYXJjaC52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfUkVTRUFSQ0giLCJzY29wZSI6InJlc2VhcmNoLWNvbnN1bWUtb25jZSIsInJlYXNvbnMiOm51bGx9LCJyZXNlYXJjaF9ob3N0IjoiR2l0SHViIEFjdGlvbnMgMTAwMDAwMjMyNSIsInJ1bm5lcl9pZCI6IkdpdEh1YiBBY3Rpb25zIDEwMDAwMDIzMjUiLCJzY2hlbWEiOiJja2ItcGxhbmUuZXh0ZXJuYWwtZXhwb3N1cmUtcmVhZHktcmVzZWFyY2gtcmVjZWlwdC52MSJ9'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64,hashlib,json,os,pathlib
+          raw=base64.b64decode(os.environ["AUTHORITY_RECEIPT_B64"],validate=True)
+          assert hashlib.sha256(raw).hexdigest()==os.environ["AUTHORITY_RECEIPT_SHA256"]
+          r=json.loads(raw)
+          assert r["schema"]=="ckb-plane.external-exposure-ready-research-receipt.v1"
+          assert r["project"]=="Wingless"
+          assert r["experiment"]=="WLM-LM-EXTERNAL-FUTURE-DATA-STATE-CONDITIONED-RESPONSE-ATTRIBUTION-R43"
+          assert r["preregistration_sha"]=="54679aa099ea1a56c877a754ab4d9a53efaa8096"
+          assert r["manifest_sha256"]=="7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+          assert r["ckb_plane_main_sha"]=="0144107e80656f409b706ec488b0dbec7e9e92da"
+          assert r["plan_decision"]["disposition"]=="READY_PLAN"
+          assert r["fetch_decision"]["disposition"]=="READY_FETCH"
+          assert r["research_decision"]["disposition"]=="READY_RESEARCH"
+          pathlib.Path("/tmp/authority.json").write_bytes(raw)
+          PY
+      - name: Fetch exact sealed manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          export TRANSFER_ROOT="$RUNNER_TEMP/r43-transfer"
+          export THIRD_ROOT="$RUNNER_TEMP/r43-third"
+          export FOURTH_ROOT="$RUNNER_TEMP/r43-fourth"
+          export FIFTH_ROOT="$RUNNER_TEMP/r43-fifth"
+          mkdir -p "$TRANSFER_ROOT" "$THIRD_ROOT" "$FOURTH_ROOT" "$FIFTH_ROOT"
+          python3 - <<'PY'
+          import hashlib,os,pathlib,urllib.request
+          groups={
+            "TRANSFER_ROOT":[
+              ("code","https://raw.githubusercontent.com/python/cpython/ebf955df7a89ed0c7968f79faec1de49f61ed7cb/Lib/statistics.py",61896,"3023ec949802c2e880a000775bfd1a6b70c21b5423881118141e3ec69d8e3336",41453,"66bb25b24a0316b4965c64798494de93a1d7332672b15b5f430ab6a2fb4b9d45"),
+              ("structured","https://raw.githubusercontent.com/json-schema-org/JSON-Schema-Test-Suite/5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8/tests/draft2020-12/uniqueItems.json",14490,"ed84ef6ddc827659e257ba64cbe9679f06932b6320bea5c07622bf3d2cc4daa5",14365,"95ddbd0eaef29aad5ecfc74f9da21b795481f58b2c59380324a445fcd4d08932"),
+              ("technical-prose","https://raw.githubusercontent.com/golang/go/6f5c275ebdc454197fff5f1496521c8f81e20eef/doc/README.md",3124,"c1bf000e7a873b3afed329c5b9f9c07f7692b1d7fb2bfca2d7600cec8b1d1407",1454,"48c3d95b8b03864a4af41d892710675956cde85afd0d5d6c331594de9f17881b"),
+            ],
+            "THIRD_ROOT":[
+              ("code","https://raw.githubusercontent.com/torvalds/linux/a74306e2e676f9775457366fc047a660fbf02f26/kernel/sched/core.c",303863,"9297982652b9810b3508993c06d3c6e097ebca5cbe1ef3a6246bccfa0c1128b1",41453,"50744a9e70d67d62c97f3f434f4f05788b6b8514c6bce46cf7dafbaf49e2abff"),
+              ("structured","https://raw.githubusercontent.com/SchemaStore/schemastore/de76181a2ab215431d3e9314bc14f83cc3b01ad2/src/schemas/json/github-workflow.json",118601,"d10c9f4656e1bd5bc6727e9b35080e017dc167154726fca93da33c7a6bd1c4f3",14365,"2a97ba02bc5e479b1738f6f0c3e09318bb5a255350c84de014ddbcebea46af56"),
+              ("technical-prose","https://raw.githubusercontent.com/rust-lang/book/1500248d8f230566e4ec9f27fcbb8fe9e2898ab1/src/ch01-03-hello-cargo.md",11025,"61369f359b84b646fc3773eb569a26bc18ba6edb4cf2be06a84472c7054c0e39",1454,"23c002a1984ed065abfdbafa82100ed54d6bf6276a947676e710a30c75d96017"),
+            ],
+            "FOURTH_ROOT":[
+              ("code","https://raw.githubusercontent.com/kubernetes/kubernetes/e7967bb9b76d43a6388abb7a4e90d2f899ef97ff/pkg/kubelet/kubelet.go",156626,"e0f247ef45cb281166b58ba1a013dc6925023388193bd74c1f126c695b770d34",41453,"283073d9f6c0dd868c39a913364bce6744ff1e29c038f6920197c0d33e0c2ac1"),
+              ("structured","https://raw.githubusercontent.com/microsoft/TypeScript/50d70a3f5f453a79a4323b263165da51f656a4e3/package-lock.json",143844,"52b6c9bd0a26ef1b0fc27dfbfaa00df6a047cdddd587d07c4f6c1c3345faf5cf",14365,"a46fcfb7d862b03b750b61a5f667d4ac25a064df9ccb746e395db7e864068933"),
+              ("technical-prose","https://raw.githubusercontent.com/django/django/a461af8ce48762d7ec602260aaff81014ddccbcb/docs/intro/tutorial01.txt",10844,"1cf1817e6211b7c0fa9e8044ee808fde1e8f16ca5f9d5ab5358510a5c9591b96",1454,"5d0c2efd139bd6094098bc893ed746020f03e0860a25f278348f43f47c236222"),
+            ],
+            "FIFTH_ROOT":[
+              ("code","https://raw.githubusercontent.com/pytorch/pytorch/496340f06ef7bda2800522429ba3f4e3473a92fa/torch/_inductor/scheduler.py",539420,"b13a89d0fd77430e2a637dae41980086909c4ad4a855b8418dc17286c39953b8",41453,"504b68653b5478b88216f6342a74bacc5982549657005fb486dd00d753b4ea9a"),
+              ("structured","https://raw.githubusercontent.com/microsoft/vscode/6fad7188e7dbf7db564e5e4a85960eb2bf69bdf4/package-lock.json",784171,"73224989048e176e7eeafa8aa729df7e4d510f4bd453018902d95345db0fe886",14365,"5c0f3a215ba35b7fbcaae212d27a33ba5109e16d89809987d16fa89072534281"),
+              ("technical-prose","https://raw.githubusercontent.com/numpy/numpy/2f1eca306857b641fb0fef0ab854a2d4137e1581/doc/source/user/absolute_beginners.rst",52653,"945a0a598d080ee7526c9bd5459ce615a5b49fe0331adfdf8bbd8812e908e7e3",1454,"527e21110a7f84a1939ccf6063fdfeb77905d9ec180e5fde18488d21b90c4f49"),
+            ],
+          }
+          for env,sources in groups.items():
+              root=pathlib.Path(os.environ[env])
+              for name,url,full_n,full_h,prefix_n,prefix_h in sources:
+                  b=urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"wingless-r43"}),timeout=60).read(full_n+1)
+                  assert len(b)==full_n and hashlib.sha256(b).hexdigest()==full_h
+                  p=b[:prefix_n]
+                  assert len(p)==prefix_n and hashlib.sha256(p).hexdigest()==prefix_h
+                  (root/(name+".bin")).write_bytes(p)
+          PY
+          echo "TRANSFER_ROOT=$TRANSFER_ROOT" >> "$GITHUB_ENV"
+          echo "THIRD_ROOT=$THIRD_ROOT" >> "$GITHUB_ENV"
+          echo "FOURTH_ROOT=$FOURTH_ROOT" >> "$GITHUB_ENV"
+          echo "FIFTH_ROOT=$FIFTH_ROOT" >> "$GITHUB_ENV"
+      - name: Full Go regression
+        run: go test ./... -count=1
+      - name: Run frozen state conditioned response attribution twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--transfer-root "$TRANSFER_ROOT" --third-root "$THIRD_ROOT" --fourth-root "$FOURTH_ROOT" --fifth-root "$FIFTH_ROOT")
+          go run ./cmd/wlm-lm-external-future-data-state-conditioned-response-attribution-r43 "${args[@]}" > /tmp/result1.json
+          go run ./cmd/wlm-lm-external-future-data-state-conditioned-response-attribution-r43 "${args[@]}" > /tmp/result2.json
+          cmp /tmp/result1.json /tmp/result2.json
+          cat /tmp/result1.json
+      - name: Classify
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math,pathlib
+          r=json.loads(pathlib.Path("/tmp/result1.json").read_text());m=r["metrics"]
+          valid=(m["outer_holdout_manifest_count"]==4 and m["excluded_case_count"]==33 and
+                 m["state_582_case_count"]+m["state_727_case_count"]+m["state_872_case_count"]==33 and
+                 m["base6_identity_mismatch_count"]==0 and m["state_definition_mismatch_count"]==0 and
+                 m["state_stratum_insufficient_count"]==0 and m["fit_failure_count"]==0 and
+                 m["heldout_outcome_use_before_state_condition_freeze"]==0 and
+                 m["post_result_state_condition_choice_count"]==0 and
+                 m["source_identity_mismatch_count"]==0 and m["capacity_growth_event_count"]==0 and
+                 m["tokenizer_use_count"]==0 and m["external_model_call_count"]==0 and
+                 m["counter_overflow_count"]==0 and m["invalid_row_count"]==0 and
+                 all(math.isfinite(float(v)) for v in m.values()))
+          supported=(valid and m["state_conditional_sign_error_improvement"]>=0.10 and
+                     m["state_conditional_mae_ratio"]<=1.00)
+          mixed=(valid and not supported and
+                 m["state_conditional_sign_error_rate"]<m["global_sign_error_rate"] and
+                 m["state_conditional_mean_absolute_error"]<m["global_mean_absolute_error"])
+          if not valid: cls="invalid"
+          elif supported: cls="supported"
+          elif mixed: cls="mixed"
+          else: cls="negative"
+          out={"schema":"wingless.research-classification.v1",
+               "experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-STATE-CONDITIONED-RESPONSE-ATTRIBUTION-R43",
+               "classification":cls,"validity_pass":valid,"state_conditional_support":supported,
+               "mixed_signal":mixed,"authority_receipt_sha256":"8323fc90cef6fa3c69cf704f22f39f04e66b3a5d4f0ac0495c25732b3d1ba192","rsi_success":False,
+               "rsi_success_reason":"R43 is bounded code-budget-state response attribution on studied manifests; prospective disjoint validation remains required.",
+               "metrics":m}
+          pathlib.Path("/tmp/classification.json").write_text(json.dumps(out,separators=(",",":")))
+          print(json.dumps(out,separators=(",",":")))
+          if not valid: raise SystemExit(2)
+          PY
+      - name: Delete external bytes
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/r43-transfer" "$RUNNER_TEMP/r43-third" "$RUNNER_TEMP/r43-fourth" "$RUNNER_TEMP/r43-fifth"
+      - name: Upload evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-state-conditioned-response-attribution-r43
+          path: |
+            /tmp/authority.json
+            /tmp/result1.json
+            /tmp/result2.json
+            /tmp/classification.json
+          if-no-files-found: error
