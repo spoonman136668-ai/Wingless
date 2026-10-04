@@ -1,0 +1,145 @@
+name: Research controller user-principal handoff R1
+on:
+  push:
+    branches:
+      - research/controller-handoff-r1
+    paths:
+      - '.research-handoff/**'
+      - '.github/workflows/research-controller-user-handoff.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: research-controller-user-principal-handoff
+  cancel-in-progress: false
+
+jobs:
+  handoff:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Verify exact user principal and qualified controller source
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 3.0
+
+          $who=(& whoami.exe).Trim()
+          Write-Host "principal=$who"
+          if($who -ine 'LINKDEADKB\camar'){throw "HANDOFF_PRINCIPAL_MISMATCH:$who"}
+
+          $src=(Resolve-Path '.research-handoff\Invoke-ResearchLoop.ps1').Path
+          $blob=(& git.exe hash-object -- $src).Trim()
+          if($blob -ne 'd639d558158363a2da55b7010e65b2b30c2b2fea'){throw "QUALIFIED_CONTROLLER_BLOB_MISMATCH:$blob"}
+
+          $root='C:\ProgramData\CKBR\research'
+          $dest=Join-Path $root 'Invoke-ResearchLoop.ps1'
+          $config=Join-Path $root 'controller.json'
+          if(!(Test-Path -LiteralPath $dest -PathType Leaf)){throw "INSTALLED_CONTROLLER_MISSING:$dest"}
+          if(!(Test-Path -LiteralPath $config -PathType Leaf)){throw "INSTALLED_CONTROLLER_CONFIG_MISSING:$config"}
+
+          $cfg=Get-Content -LiteralPath $config -Raw|ConvertFrom-Json
+          if($cfg.schema -ne 'ckb-plane.research-loop-controller-config.v1'){throw 'CONFIG_SCHEMA_INVALID'}
+          if(!$cfg.contract_source_sync){throw 'CONTRACT_SOURCE_SYNC_DISABLED'}
+          if([string]$cfg.mutex_name -ne 'Global\CKBResearchLoopControllerV1'){throw "MUTEX_IDENTITY_DRIFT:$($cfg.mutex_name)"}
+
+          & gh.exe auth status
+          if($LASTEXITCODE -ne 0){throw 'USER_GITHUB_AUTH_UNAVAILABLE'}
+          $view=& gh.exe repo view spoonman136668-ai/ckb-plane --json nameWithOwner 2>&1
+          if($LASTEXITCODE -ne 0){throw "CKB_REPO_ACCESS_FAILED:$($view -join ' ')"}
+          Write-Host 'user_principal_guard=PASS'
+          Write-Host 'qualified_source_guard=PASS'
+          Write-Host 'github_access_guard=PASS'
+
+      - name: Install exact qualified controller under research mutex
+        shell: powershell
+        env:
+          QUALIFIED_CONTROLLER_SHA: 2b903722557df87e6cf1c69369fa399ff870cf6a
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 3.0
+
+          $root='C:\ProgramData\CKBR\research'
+          $src=(Resolve-Path '.research-handoff\Invoke-ResearchLoop.ps1').Path
+          $dest=Join-Path $root 'Invoke-ResearchLoop.ps1'
+          $identity=Join-Path $root 'controller-qualified-sha.txt'
+          $config=Join-Path $root 'controller.json'
+          $cfg=Get-Content -LiteralPath $config -Raw|ConvertFrom-Json
+
+          $created=$false
+          $mutex=New-Object Threading.Mutex($false,[string]$cfg.mutex_name,[ref]$created)
+          try{
+            try{
+              if(!$mutex.WaitOne([TimeSpan]::FromMinutes(2))){throw 'RESEARCH_MUTEX_TIMEOUT'}
+            }catch [Threading.AbandonedMutexException]{}
+
+            $sourceHash=(Get-FileHash -Algorithm SHA256 -LiteralPath $src).Hash.ToLowerInvariant()
+            $tmp=$dest+'.handoff.tmp'
+            Copy-Item -LiteralPath $src -Destination $tmp -Force
+            $tmpHash=(Get-FileHash -Algorithm SHA256 -LiteralPath $tmp).Hash.ToLowerInvariant()
+            if($tmpHash -ne $sourceHash){throw 'CONTROLLER_STAGE_HASH_MISMATCH'}
+
+            $backup=$dest+'.handoff.bak'
+            Remove-Item -LiteralPath $backup -Force -ErrorAction SilentlyContinue
+            [IO.File]::Replace($tmp,$dest,$backup)
+            $destHash=(Get-FileHash -Algorithm SHA256 -LiteralPath $dest).Hash.ToLowerInvariant()
+            if($destHash -ne $sourceHash){
+              if(Test-Path -LiteralPath $backup){[IO.File]::Replace($backup,$dest,$null)}
+              throw 'CONTROLLER_INSTALL_HASH_MISMATCH'
+            }
+            Remove-Item -LiteralPath $backup -Force -ErrorAction SilentlyContinue
+
+            $idTmp=$identity+'.handoff.tmp'
+            [IO.File]::WriteAllText($idTmp,($env:QUALIFIED_CONTROLLER_SHA+[Environment]::NewLine),(New-Object Text.UTF8Encoding($false)))
+            if(Test-Path -LiteralPath $identity){
+              $idBackup=$identity+'.handoff.bak'
+              Remove-Item -LiteralPath $idBackup -Force -ErrorAction SilentlyContinue
+              [IO.File]::Replace($idTmp,$identity,$idBackup)
+              Remove-Item -LiteralPath $idBackup -Force -ErrorAction SilentlyContinue
+            }else{
+              [IO.File]::Move($idTmp,$identity)
+            }
+            $round=([IO.File]::ReadAllText($identity,[Text.Encoding]::UTF8)).Trim()
+            if($round -ne $env:QUALIFIED_CONTROLLER_SHA){throw 'CONTROLLER_IDENTITY_INSTALL_MISMATCH'}
+            Write-Host "installed_controller_sha=$round"
+            Write-Host "installed_controller_sha256=$destHash"
+          }finally{
+            try{$mutex.ReleaseMutex()}catch{}
+            $mutex.Dispose()
+          }
+
+      - name: Run one qualified user-context controller cycle
+        shell: powershell
+        env:
+          QUALIFIED_CONTROLLER_SHA: 2b903722557df87e6cf1c69369fa399ff870cf6a
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 3.0
+          $dest='C:\ProgramData\CKBR\research\Invoke-ResearchLoop.ps1'
+          $out=Join-Path $env:RUNNER_TEMP 'qualified-research-cycle.json'
+          $err=Join-Path $env:RUNNER_TEMP 'qualified-research-cycle.stderr.txt'
+          Remove-Item -LiteralPath $out,$err -Force -ErrorAction SilentlyContinue
+
+          $p=Start-Process -FilePath 'powershell.exe' -ArgumentList @(
+            '-NoProfile','-ExecutionPolicy','Bypass','-File',$dest
+          ) -Wait -PassThru -NoNewWindow -RedirectStandardOutput $out -RedirectStandardError $err
+
+          if(Test-Path -LiteralPath $err){
+            $stderr=Get-Content -LiteralPath $err -Raw
+            if($stderr){Write-Host $stderr}
+          }
+          $raw=Get-Content -LiteralPath $out -Raw
+          Write-Host $raw
+          if($p.ExitCode -ne 0){throw "QUALIFIED_CONTROLLER_CYCLE_FAILED:$($p.ExitCode)"}
+          $receipt=$raw|ConvertFrom-Json
+          if([string]$receipt.controller_sha -ne $env:QUALIFIED_CONTROLLER_SHA){throw "CONTROLLER_RECEIPT_SHA_MISMATCH:$($receipt.controller_sha)"}
+          if($receipt.codex_used -or $receipt.production_authority_changed -or $receipt.accepted_ref_mutated -or $receipt.runtime_launched){throw 'FORBIDDEN_SIDE_EFFECT_FLAG'}
+          if([string]$receipt.status -eq 'HARD_BLOCKER'){throw "QUALIFIED_CONTROLLER_HARD_BLOCKER:$($receipt|ConvertTo-Json -Depth 20 -Compress)"}
+          Write-Host "qualified_cycle_status=$($receipt.status)"
+          Write-Host 'research_user_handoff=PASS'
