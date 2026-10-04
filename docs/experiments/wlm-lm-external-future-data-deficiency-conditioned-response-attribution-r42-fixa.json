@@ -1,0 +1,75 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-DEFICIENCY-CONDITIONED-RESPONSE-ATTRIBUTION-R42-FIXA",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-TARGET-CONDITIONAL-RESPONSE-ATTRIBUTION-R41",
+  "parent_sha": "8e9c0fd9df2d4a8b9fb0f3c25fd82f90a401c513",
+  "supersedes_invalid_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-DEFICIENCY-CONDITIONED-RESPONSE-ATTRIBUTION-R42",
+  "preregistered_at_utc": "2026-10-04T21:14:00Z",
+  "defect_basis": {
+    "source": "frozen allocation table only; no held-out outcomes used",
+    "equal_allocation": [
+      582,
+      581,
+      581
+    ],
+    "candidate_code_allocations": [
+      582,
+      727,
+      872
+    ],
+    "code_deficiency_possible": false,
+    "conclusion": "a three-stratum deficiency model is structurally infeasible because code is never below equal allocation"
+  },
+  "hypothesis": "Among the only deficiency strata that can occur under the frozen candidate set—structured and technical_prose—residual marginal-learning-value error may be conditioned on the deprived domain. Keep GLOBAL_BASE6 byte-identical and add exactly two training-only scalar mean-residual offsets keyed by the feasible deficiency domain.",
+  "frozen_design": {
+    "manifests": [
+      "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250",
+      "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7",
+      "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+      "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    ],
+    "total_adaptation_budget": 1744,
+    "outer_holdouts": 4,
+    "global_base6": "byte-identical R41/R40 six-feature raw-target predictor",
+    "feasible_deficiency_domains": [
+      "structured",
+      "technical_prose"
+    ],
+    "deficiency_domain": "largest positive equal-allocation-minus-candidate delta over feasible domains; ties structured then technical_prose",
+    "offsets": "exactly one arithmetic-mean (actual allocation advantage minus GLOBAL_BASE6 predicted advantage) scalar per feasible deficiency domain over training non-equal cases",
+    "heldout_outcome_use_before_deficiency_condition_freeze": 0,
+    "post_result_deficiency_condition_choice_count": 0,
+    "external_model_calls": 0,
+    "tokenizer_use_count": 0,
+    "capacity_growth_event_count": 0
+  },
+  "candidate_set": [
+    "GLOBAL_BASE6",
+    "FEASIBLE_DEFICIENCY_DOMAIN_OFFSET"
+  ],
+  "thresholds": {
+    "deficiency_conditional_sign_error_improvement": 0.1,
+    "deficiency_conditional_mae_ratio": 1,
+    "provenance": "unchanged from R42 preregistration"
+  },
+  "classification_rules": {
+    "supported": "valid and feasible-deficiency sign-error improvement>=0.10 with MAE ratio<=1.00",
+    "mixed": "valid, support false, but feasible-deficiency sign error and MAE are both lower than GLOBAL_BASE6",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "any frozen identity, GLOBAL_BASE6 identity, feasible-domain rule, exactly two scalar residual offsets, R30 exclusion, held-out ordering, provenance or accounting rule fails"
+  },
+  "successors": {
+    "supported": "R43 bounded feasible-deficiency calibration correction",
+    "mixed": "R43 feasible-deficiency response disambiguation",
+    "negative": "R43 state-conditioned response attribution"
+  },
+  "rsi_success": false,
+  "codex_usage": "DISABLED",
+  "production_authority": false,
+  "accepted_ref_mutation": false,
+  "runtime_launch": false,
+  "capacity_change_authorized": false,
+  "authority_expansion": false,
+  "broker_access": false,
+  "ktrade_access": false
+}
