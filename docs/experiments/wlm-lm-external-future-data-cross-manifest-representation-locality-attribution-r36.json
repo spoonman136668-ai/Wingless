@@ -1,0 +1,137 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-CROSS-MANIFEST-REPRESENTATION-LOCALITY-ATTRIBUTION-R36",
+  "program": "Wingless RSI corrective tranche: cross-manifest representation locality attribution",
+  "question": "After R35 showed that appending fixed raw-byte composition features worsens residual calibration, is the error caused instead by fitting one global BASE6 calibration map across manifests whose local response surfaces differ?",
+  "hypothesis": "R31-R35 ruled out polarity, magnitude conflict/extrapolation, jackknife instability, domain/budget metadata, and direct raw-byte feature augmentation. Freeze a locality attribution that leaves BASE6 itself unchanged. For each outer holdout, GLOBAL3 fits the exact R27/R35 BASE6 ridge map on all three training manifests. LOCAL2 first computes a deterministic raw-composition distance from the held-out manifest to each of the three training manifests using only the five R35 raw descriptors on the three domain eval slices, sums squared descriptor differences across corresponding domains, chooses the two nearest training manifests with fixed transfer→third→fourth→fifth tie-break, and fits the unchanged BASE6 ridge map on only those two manifests. The exact R30 exclusion set is still defined from all three training manifests before held-out outcomes open. Compare GLOBAL3 and LOCAL2 only on the exact 33 excluded cases. This is attribution only.",
+  "exact_parent_sha": "9ae5e4a53fe645e37cea934f47a27a7bab3d6a22",
+  "qualification_branch": "research/external-hosted-wingless-future-data-cross-manifest-representation-locality-attribution-r36",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-RAW-REPRESENTATION-ATTRIBUTION-R35",
+    "github_run_id": 37208517017,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "excluded_case_count": 33,
+      "base6_sign_error_rate": 0.5151515151515151,
+      "base6_mean_absolute_error": 10.731783167689903,
+      "rawbyte_sign_error_rate": 0.696969696969697,
+      "rawbyte_mean_absolute_error": 13.14615931094717,
+      "rawbyte_sign_error_improvement": -0.18181818181818188,
+      "rawbyte_mae_ratio": 1.2249743687075425,
+      "fit_failure_count": 0,
+      "source_identity_mismatch_count": 0,
+      "invalid_row_count": 0
+    },
+    "eliminated_hypothesis": "direct fixed raw-byte composition augmentation of the pooled BASE6 calibration map explains the residual cross-manifest errors",
+    "strengthened_hypothesis": "raw composition may identify local response regimes even if it is harmful when injected directly into one pooled regression"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R35 RAWBYTE increased sign-error rate from 0.5152 to 0.6970 and MAE from 10.7318 to 13.1462 on the exact R30-excluded set.",
+    "residual_cause_under_test": "CROSS_MANIFEST_CALIBRATION_NONLOCALITY",
+    "exact_bounded_delta": "training-manifest subset selection only; BASE6 features, ridge lambda, candidates, budgets, exclusion rule, held-out ordering, capacity and outcome labels remain byte-identical",
+    "manifest_distance": "for each corresponding code/structured/technical-prose arm, compute the five frozen R35 raw descriptors on eval bytes; sum squared differences across all 15 descriptor coordinates",
+    "local_fit_rule": "choose exactly two of the three training manifests with smallest frozen manifest distance to held-out raw composition; tie order transfer, third, fourth, fifth; fit unchanged BASE6 ridge lambda=1 on those two manifests only",
+    "control_fit_rule": "GLOBAL3 is byte-identical R35 BASE6 fit on all three training manifests",
+    "attribution_rule": "LOCAL2 support requires preregistered improvement in both sign-error and MAE on the exact 33 R30-excluded cases; no post-result choice between local subsets",
+    "retain_revert": "R36 cannot alter allocator behavior. Support authorizes only a separately preregistered locality-aware correction or prospective replication."
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "non_equal_candidates_per_holdout": 9,
+    "exact_r30_excluded_cases_expected": 33,
+    "total_adaptation_budget": 1744,
+    "representation": "unchanged R27/R35 BASE6",
+    "ridge_lambda": 1,
+    "intercept": true,
+    "locality_selection": "two nearest of three training manifests by frozen 15-coordinate R35 raw-composition squared distance",
+    "exclusion_source": "all three training manifests, byte-identical R35/R30 rule",
+    "capacity": "unchanged",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "representation_cells": [
+    "GLOBAL3_BASE6",
+    "LOCAL2_BASE6"
+  ],
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "excluded_case_count",
+    "global3_sign_error_rate",
+    "global3_mean_absolute_error",
+    "local2_sign_error_rate",
+    "local2_mean_absolute_error",
+    "local2_sign_error_improvement",
+    "local2_mae_ratio",
+    "locality_selection_mismatch_count",
+    "base6_identity_mismatch_count",
+    "fit_failure_count",
+    "heldout_outcome_use_before_locality_freeze",
+    "post_result_locality_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "classification_rules": {
+    "supported": "valid AND local2_sign_error_improvement>=0.10 AND local2_mae_ratio<=0.90",
+    "mixed": "valid AND LOCAL2 improves both sign-error and MAE versus GLOBAL3 but misses one or both supported thresholds",
+    "negative": "valid AND LOCAL2 does not improve both sign-error and MAE versus GLOBAL3",
+    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, BASE6 identity, R35 raw-descriptor identity, manifest-distance formula, two-nearest selection/tie-break, ridge solver, held-out ordering, deterministic replay, capacity, provenance or accounting requirement fails"
+  },
+  "thresholds": {
+    "sign_error_improvement": 0.1,
+    "mae_ratio": 0.9,
+    "provenance": "fixed before R36 execution"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R36 is locality attribution on already studied manifests; prospective disjoint validation remains required.",
+  "no_post_result_tuning_rule": "Do not alter manifests, BASE6, raw descriptors, locality distance, two-nearest rule/tie-break, R30 exclusion rule, thresholds, budgets/capacity, held-out ordering, classification or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r37-locality-aware-calibration-correction",
+      "experiment_family": "bounded-locality-correction"
+    },
+    "mixed": {
+      "contract_id": "wingless-r37-locality-disambiguation",
+      "experiment_family": "locality-attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r37-calibration-target-definition-attribution",
+      "experiment_family": "target-definition-attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-cross-manifest-representation-locality-attribution-r36.json"
+  ]
+}
