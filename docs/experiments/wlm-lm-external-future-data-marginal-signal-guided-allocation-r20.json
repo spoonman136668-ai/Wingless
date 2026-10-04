@@ -1,0 +1,161 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-GUIDED-ALLOCATION-R20",
+  "program": "Wingless training-only marginal-signal allocation on a third disjoint future manifest",
+  "question": "Can the cross-manifest calibrated R19 training-only state-change signal choose a fixed-total future-data allocation on a third disjoint manifest that improves sealed-evaluation prediction versus equal allocation without target-label use, capacity growth, or post-result selection?",
+  "hypothesis": "Use only the immutable third manifest e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7. Preserve the R15-R19 three leave-one-domain-out construction, 15,819 non-target training bytes per arm, 256 motifs, target bytes [0:582] sealed for evaluation, and [582:1454] as the adaptation reservoir. For each domain compute the same frozen budget grid and, for each adjacent interval, rank_signal=(baseline_argmax_change_count + 3*(motif_entry_count+motif_exit_count))/bytes_added using training/adaptation state only. Enumerate exactly the ten preregistered budget triples whose total is 1,744 bytes. For each triple, predicted_value is the sum over all included adjacent intervals of rank_signal*interval_bytes. Choose the triple with maximum predicted_value; ties choose lexicographically lowest [code,structured,technical_prose]. Freeze that choice before any evaluation hit count is computed. Compare it to EQUAL=[582,581,581] on the sealed evaluation bytes.",
+  "exact_parent_sha": "1412336e62270adde3bc1e4d2c7d24b0214b8b35",
+  "qualification_branch": "research/external-hosted-wingless-future-data-marginal-signal-guided-allocation-r20",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-RANK-CALIBRATION-R19",
+    "github_run_id": 37162569566,
+    "classification": "supported",
+    "observation": {
+      "positive_vs_zero_auc": 0.7962962962962963,
+      "marginal_efficiency_pairwise_concordance": 0.6854838709677419,
+      "mean_positive_rank_signal": 0.08319649875066541,
+      "mean_zero_rank_signal": 0.02873168226883122
+    },
+    "frozen_signal_weights": {
+      "baseline_argmax_change": 1,
+      "motif_churn": 3,
+      "retained_best_change": 0
+    }
+  },
+  "external_manifest": {
+    "path": "docs/experiments/wlm-lm-external-future-data-third-manifest-r20.json",
+    "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7",
+    "source_count": 3,
+    "effective_total_bytes": 57272
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "pending exact qualified third-manifest admission",
+    "manifest_sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "fixed_contract": {
+    "source_count": 3,
+    "total_source_bytes": 57272,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "code_budgets": [
+      0,
+      436,
+      582,
+      727,
+      872
+    ],
+    "structured_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "technical_prose_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "signal_weights": {
+      "baseline_argmax_change": 1,
+      "motif_churn": 3,
+      "retained_best_change": 0
+    },
+    "candidate_allocations": [
+      [
+        582,
+        436,
+        726
+      ],
+      [
+        582,
+        581,
+        581
+      ],
+      [
+        582,
+        726,
+        436
+      ],
+      [
+        727,
+        291,
+        726
+      ],
+      [
+        727,
+        436,
+        581
+      ],
+      [
+        727,
+        581,
+        436
+      ],
+      [
+        727,
+        726,
+        291
+      ],
+      [
+        872,
+        291,
+        581
+      ],
+      [
+        872,
+        436,
+        436
+      ],
+      [
+        872,
+        581,
+        291
+      ]
+    ],
+    "selection_objective": "maximize sum(rank_signal * interval_bytes) over included contiguous intervals",
+    "tie_break": "lexicographically lowest [code,structured,technical_prose]",
+    "equal_allocation": [
+      582,
+      581,
+      581
+    ],
+    "total_adaptation_budget_each": 1744,
+    "signal_evaluation_byte_use_count": 0,
+    "signal_evaluation_label_use_count": 0,
+    "allocation_post_result_choice_count": 0
+  },
+  "classification_rules": {
+    "supported": "valid, selected allocation differs from equal, selected aggregate exact hits exceed equal by at least 1, and no selected domain falls below packet0 baseline",
+    "mixed": "valid and selected allocation differs from equal but aggregate ties or improves with at least one domain below packet0 baseline",
+    "negative": "valid and selected allocation equals equal or selected aggregate is below equal",
+    "invalid": "any parent, authority, third-manifest/source identity, split, budget-grid, candidate-set, signal-weight, selection-isolation, fixed-total, capacity, deterministic replay, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter third-manifest identities, 15,819-byte non-target budget, 256 capacity, 582/872 split, budget grids, ten candidate triples, weights (1,3,0), predicted-value formula, tie-break, equal baseline, 1,744-byte total budget, evaluator, thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-ALLOCATOR-RETAIN-REVERT-R21",
+    "intent": "verify bounded retain/revert of the training-only allocation rule before any autonomous budget-management claim"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-ALLOCATION-ATTRIBUTION-R21",
+    "intent": "attribute signal-selection failure on the third manifest before changing weights, candidate allocations, or capacity"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-third-manifest-r20.json",
+    "docs/experiments/wlm-lm-external-future-data-marginal-signal-guided-allocation-r20.json",
+    "unitary/wlm_lm_external_future_data_marginal_signal_guided_allocation_r20.go",
+    "cmd/wlm-lm-external-future-data-marginal-signal-guided-allocation-r20/main.go",
+    ".github/workflows/external-future-data-marginal-signal-guided-allocation-r20.yml"
+  ]
+}
