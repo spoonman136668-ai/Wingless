@@ -1,0 +1,105 @@
+name: External contributor R31 causal-state sufficiency
+on:
+  push:
+    branches:
+      - contrib/chatgpt-external/wingless-r31-causal-state-sufficiency
+    paths:
+      - 'research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/prereg.json'
+      - 'research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/run.py'
+      - '.github/workflows/contrib-r31-causal-state-sufficiency.yml'
+permissions:
+  contents: read
+jobs:
+  external-contribution:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify preregistration boundary and code identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/run.py | awk '{print $1}')" = 'd7d0b4c1409026c9d378ed791acd4a9f2a7d659eab8706ee60a765b305795c75'
+          python3 -m py_compile research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/run.py
+          git merge-base --is-ancestor 'ab1d7467edc021d70a96fcc3b749651e4bb46fea' HEAD
+      - name: Fetch and verify frozen manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/r31-data"
+          mkdir -p "$ROOT"
+          python3 - "$ROOT" <<'PY'
+          import hashlib,pathlib,sys,urllib.request
+          root=pathlib.Path(sys.argv[1])
+          specs={
+          'transfer':[
+          ('code','https://raw.githubusercontent.com/python/cpython/ebf955df7a89ed0c7968f79faec1de49f61ed7cb/Lib/statistics.py',61896,'3023ec949802c2e880a000775bfd1a6b70c21b5423881118141e3ec69d8e3336',41453,'66bb25b24a0316b4965c64798494de93a1d7332672b15b5f430ab6a2fb4b9d45'),
+          ('structured','https://raw.githubusercontent.com/json-schema-org/JSON-Schema-Test-Suite/5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8/tests/draft2020-12/uniqueItems.json',14490,'ed84ef6ddc827659e257ba64cbe9679f06932b6320bea5c07622bf3d2cc4daa5',14365,'95ddbd0eaef29aad5ecfc74f9da21b795481f58b2c59380324a445fcd4d08932'),
+          ('technical_prose','https://raw.githubusercontent.com/golang/go/6f5c275ebdc454197fff5f1496521c8f81e20eef/doc/README.md',3124,'c1bf000e7a873b3afed329c5b9f9c07f7692b1d7fb2bfca2d7600cec8b1d1407',1454,'48c3d95b8b03864a4af41d892710675956cde85afd0d5d6c331594de9f17881b')],
+          'third':[
+          ('code','https://raw.githubusercontent.com/torvalds/linux/a74306e2e676f9775457366fc047a660fbf02f26/kernel/sched/core.c',303863,'9297982652b9810b3508993c06d3c6e097ebca5cbe1ef3a6246bccfa0c1128b1',41453,'50744a9e70d67d62c97f3f434f4f05788b6b8514c6bce46cf7dafbaf49e2abff'),
+          ('structured','https://raw.githubusercontent.com/SchemaStore/schemastore/de76181a2ab215431d3e9314bc14f83cc3b01ad2/src/schemas/json/github-workflow.json',118601,'d10c9f4656e1bd5bc6727e9b35080e017dc167154726fca93da33c7a6bd1c4f3',14365,'2a97ba02bc5e479b1738f6f0c3e09318bb5a255350c84de014ddbcebea46af56'),
+          ('technical_prose','https://raw.githubusercontent.com/rust-lang/book/1500248d8f230566e4ec9f27fcbb8fe9e2898ab1/src/ch01-03-hello-cargo.md',11025,'61369f359b84b646fc3773eb569a26bc18ba6edb4cf2be06a84472c7054c0e39',1454,'23c002a1984ed065abfdbafa82100ed54d6bf6276a947676e710a30c75d96017')],
+          'fourth':[
+          ('code','https://raw.githubusercontent.com/kubernetes/kubernetes/e7967bb9b76d43a6388abb7a4e90d2f899ef97ff/pkg/kubelet/kubelet.go',156626,'e0f247ef45cb281166b58ba1a013dc6925023388193bd74c1f126c695b770d34',41453,'283073d9f6c0dd868c39a913364bce6744ff1e29c038f6920197c0d33e0c2ac1'),
+          ('structured','https://raw.githubusercontent.com/microsoft/TypeScript/50d70a3f5f453a79a4323b263165da51f656a4e3/package-lock.json',143844,'52b6c9bd0a26ef1b0fc27dfbfaa00df6a047cdddd587d07c4f6c1c3345faf5cf',14365,'a46fcfb7d862b03b750b61a5f667d4ac25a064df9ccb746e395db7e864068933'),
+          ('technical_prose','https://raw.githubusercontent.com/django/django/a461af8ce48762d7ec602260aaff81014ddccbcb/docs/intro/tutorial01.txt',10844,'1cf1817e6211b7c0fa9e8044ee808fde1e8f16ca5f9d5ab5358510a5c9591b96',1454,'5d0c2efd139bd6094098bc893ed746020f03e0860a25f278348f43f47c236222')],
+          'fifth':[
+          ('code','https://raw.githubusercontent.com/pytorch/pytorch/496340f06ef7bda2800522429ba3f4e3473a92fa/torch/_inductor/scheduler.py',539420,'b13a89d0fd77430e2a637dae41980086909c4ad4a855b8418dc17286c39953b8',41453,'504b68653b5478b88216f6342a74bacc5982549657005fb486dd00d753b4ea9a'),
+          ('structured','https://raw.githubusercontent.com/microsoft/vscode/6fad7188e7dbf7db564e5e4a85960eb2bf69bdf4/package-lock.json',784171,'73224989048e176e7eeafa8aa729df7e4d510f4bd453018902d95345db0fe886',14365,'5c0f3a215ba35b7fbcaae212d27a33ba5109e16d89809987d16fa89072534281'),
+          ('technical_prose','https://raw.githubusercontent.com/numpy/numpy/2f1eca306857b641fb0fef0ab854a2d4137e1581/doc/source/user/absolute_beginners.rst',52653,'945a0a598d080ee7526c9bd5459ce615a5b49fe0331adfdf8bbd8812e908e7e3',1454,'527e21110a7f84a1939ccf6063fdfeb77905d9ec180e5fde18488d21b90c4f49')],
+          'sixth':[
+          ('code','https://raw.githubusercontent.com/prometheus/prometheus/961c9ba40923ca4d7adf4a7a9167e56d0406df83/promql/engine.go',172537,'aa6a3c4b8a84b716c558936f92fd046e78cc2c02a819a024240f82bc4b956db0',41453,'ef50a59fbffad91d3ee1e03834dc8d295f5a847464ce8ead4a1366859a766f3a'),
+          ('structured','https://raw.githubusercontent.com/OAI/OpenAPI-Specification/aebfd1370825c08f605681f0b3e87bf604c731f4/yarn.lock',146808,'643fa0c84b2c3947a647e9d2b93c1dc8595278417219f763a43632a5d94c0153',14365,'5bc95ef524c23ec2df24d3d811058abd0c341921d2e1ed4ed29af2abed9b4974'),
+          ('technical_prose','https://raw.githubusercontent.com/pallets/flask/d73fa1cdcbd8b1465c151db8924ba58b1dd14e35/docs/quickstart.rst',30055,'c17e0dac53c25f5cca0c18fd00e4f9549038f16d6ac5569ec2c97c7178744629',1454,'51085ab94eef524982bcb7858c573d1c5cb041decc27ccc137970111efec1592')]
+          }
+          for name,rows in specs.items():
+              d=root/name; d.mkdir(parents=True,exist_ok=True)
+              for dom,url,n,h,pn,ph in rows:
+                  data=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'wingless-external-r31'}),timeout=90).read(n+1)
+                  assert len(data)==n,(name,dom,len(data),n)
+                  assert hashlib.sha256(data).hexdigest()==h,(name,dom,'full-hash')
+                  p=data[:pn]
+                  assert hashlib.sha256(p).hexdigest()==ph,(name,dom,'prefix-hash')
+                  (d/(dom+'.bin')).write_bytes(p)
+          PY
+          echo "R31_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Run frozen external experiment twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/run.py --root "$R31_ROOT" > /tmp/result1.json
+          python3 research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/run.py --root "$R31_ROOT" > /tmp/result2.json
+          cmp /tmp/result1.json /tmp/result2.json
+          python3 - <<'PY'
+          import json,pathlib
+          r=json.loads(pathlib.Path('/tmp/result1.json').read_text())
+          assert r['validity_pass']
+          assert r['classification'] in {'SCIENTIFIC_SUPPORTED','MIXED','SCIENTIFIC_NEGATIVE'}
+          print(json.dumps({'classification':r['classification'],'stage1_delta':r['stage1']['latent_minus_control_balanced_accuracy'],'stage2_delta':r['stage2']['latent_sign_accuracy_minus_control']},sort_keys=True))
+          PY
+      - name: Write provenance
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,platform,sys
+          p=pathlib.Path('research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/run.py')
+          out={'schema':'wingless.external-research-provenance.v1','experiment_id':'WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT','repository':'spoonman136668-ai/Wingless','run_commit_sha':os.environ.get('GITHUB_SHA'),'workflow_run_id':os.environ.get('GITHUB_RUN_ID'),'workflow_attempt':os.environ.get('GITHUB_RUN_ATTEMPT'),'runner_os':os.environ.get('RUNNER_OS'),'python':sys.version,'platform':platform.platform(),'run_py_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'replay_byte_identical':True,'accepted_state_changed':False,'production_authority':False,'external_model_calls':0}
+          pathlib.Path('/tmp/provenance.json').write_text(json.dumps(out,sort_keys=True,separators=(',',':')))
+          PY
+      - name: Delete external bytes
+        if: always()
+        run: rm -rf "$R31_ROOT"
+      - name: Upload contributor evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-contrib-r31-causal-state-sufficiency
+          path: |
+            /tmp/result1.json
+            /tmp/result2.json
+            /tmp/provenance.json
+          if-no-files-found: error
