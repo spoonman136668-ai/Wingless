@@ -1,0 +1,221 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-PROSPECTIVE-CALIBRATION-R26",
+  "program": "Wingless corrective RSI tranche: prospective calibration of internal diagnostics into conservative future-data allocation",
+  "corrective_tranche_path": "docs/experiments/wlm-rsi-corrective-tranche-2026-10-04.json",
+  "question": "Can a calibration model frozen entirely from three already-sealed disjoint manifests convert existing Wingless internal diagnostics into a future-data allocation decision that beats equal allocation on a fifth unseen manifest, while falling back to equal allocation whenever historical transfer evidence is insufficient?",
+  "hypothesis": "Build a fixed ridge calibrator from three historical manifests only: transfer manifest c79f09..., third manifest e46907..., and fourth manifest 974ecf.... Each historical example is one adjacent adaptation-budget interval. Frozen features are per-byte rates of baseline argmax changes, upper-budget changed-row margin sum, motif entries, motif exits, prediction-active motif churn, and retained-motif best changes. Label is sealed exact-hit marginal gain for that historical interval. Use ridge lambda=1.0 with intercept and no feature/threshold tuning. Estimate a conservative uncertainty radius by leave-one-manifest-out calibration: for every held-out historical manifest and every one of the ten fixed 1,744-byte allocation triples, compute predicted advantage vs equal and actual advantage vs equal; uncertainty_radius=max(0,max(predicted_advantage-actual_advantage)). On the fifth manifest, compute all diagnostics without opening the 582-byte evaluation slices, fit the full historical calibrator, score the same ten candidate allocations, choose the maximum predicted advantage with lexicographic tie-break, then require the selected candidate's predicted advantage to be strictly greater than uncertainty_radius under the full model AND under each of the three leave-one-manifest-out models. If any confidence predicate fails or the best candidate is equal allocation, freeze decision=FALLBACK_EQUAL. Otherwise freeze decision=REALLOCATE and the selected triple. Only after that frozen decision may fifth-manifest evaluation bytes be opened.",
+  "exact_parent_sha": "a1f7f2a49377138b8ada6c66c2633726c7d2dd63",
+  "qualification_branch": "research/external-hosted-wingless-future-data-prospective-calibration-r26",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-MOTIF-CHURN-CONTROL-R25",
+    "github_run_id": 37166317193,
+    "classification": "negative",
+    "validity_pass": true,
+    "exact_predecessor_sha": "a1f7f2a49377138b8ada6c66c2633726c7d2dd63",
+    "eliminated_or_weakened_hypothesis": "prediction-active motif churn by itself is sufficient to distinguish productive from zero-gain intervals",
+    "strengthened_hypothesis": "internal signals require cross-manifest calibration and explicit reliability estimation before controlling allocation"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R23 confidence-gated allocation lost 13 hits vs equal; R24 localized opportunity-cost error; R25 showed prediction-active churn AUC=0.5 and failed to separate productive from zero-gain intervals",
+    "internal_diagnostic": "existing baseline-change, margin, motif-entry/exit, active-churn, and retained-best-change observables",
+    "attributed_cause": "single handcrafted signal mappings are not sufficiently calibrated across manifests and can overpredict marginal value",
+    "candidate_corrective_mechanisms": [
+      "multi-signal historical calibration",
+      "leave-one-manifest-out reliability estimation",
+      "mandatory equal-allocation fallback under insufficient confidence"
+    ],
+    "frozen_candidate_selection_rule": "ridge lambda=1.0 plus historical worst-overprediction radius and unanimous positive advantage across full+LOO models",
+    "exact_bounded_delta": "replace the unexecuted R26 single-signal factorial with one prospective calibrator/fallback experiment; same substrate, capacity, candidate allocation set, total data budget, and authority",
+    "qualification": "bounded branch package, exact source identities, deterministic double run, full Go regression, exact READY_RESEARCH receipt",
+    "held_out_result": "fifth manifest sealed evaluation opened only after policy freeze",
+    "retain_revert": "policy is not retention-eligible after this run; negative/reallocation failure reverts to equal, supported result requires sixth-manifest replication before retention eligibility",
+    "next_hypothesis": "if supported, repeat unchanged calibrator/fallback rule on a sixth disjoint manifest; otherwise attribute calibration error without post-result coefficient tuning"
+  },
+  "calibration_manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    }
+  ],
+  "prospective_manifest": {
+    "path": "docs/experiments/wlm-lm-external-future-data-fifth-manifest-r26.json",
+    "sha256": "2ad455850dfc4a10744df6632fc0e16197825bd65c6aa23c7b76f7e177cecf94",
+    "source_count": 3,
+    "effective_total_bytes": 57272
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "pending exact qualified fifth-manifest admission",
+    "manifest_sha256": "2ad455850dfc4a10744df6632fc0e16197825bd65c6aa23c7b76f7e177cecf94",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_model": {
+    "features": [
+      "baseline_argmax_change_count / interval_bytes",
+      "upper_changed_row_margin_sum / interval_bytes",
+      "motif_entry_count / interval_bytes",
+      "motif_exit_count / interval_bytes",
+      "prediction_active_churn_count / interval_bytes",
+      "retained_motif_best_change_count / interval_bytes"
+    ],
+    "target": "sealed exact-hit marginal gain on historical manifests only",
+    "ridge_lambda": 1,
+    "intercept": true,
+    "solver": "deterministic Gaussian elimination with fixed pivot rule; fail invalid on singular/nonfinite solve",
+    "historical_example_count_expected": 36,
+    "reliability": "three leave-one-manifest-out ridge models plus full historical model",
+    "uncertainty_radius": "max(0,max(predicted policy advantage - actual policy advantage)) across all 3 held-out historical manifests x 10 fixed policies",
+    "confidence_rule": "chosen candidate predicted advantage > uncertainty_radius under full model and all 3 leave-one-manifest-out models",
+    "fallback_rule": "otherwise choose equal allocation"
+  },
+  "fixed_contract": {
+    "source_count": 3,
+    "total_source_bytes": 57272,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "code_budgets": [
+      0,
+      436,
+      582,
+      727,
+      872
+    ],
+    "structured_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "technical_prose_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "candidate_allocations": [
+      [
+        582,
+        436,
+        726
+      ],
+      [
+        582,
+        581,
+        581
+      ],
+      [
+        582,
+        726,
+        436
+      ],
+      [
+        727,
+        291,
+        726
+      ],
+      [
+        727,
+        436,
+        581
+      ],
+      [
+        727,
+        581,
+        436
+      ],
+      [
+        727,
+        726,
+        291
+      ],
+      [
+        872,
+        291,
+        581
+      ],
+      [
+        872,
+        436,
+        436
+      ],
+      [
+        872,
+        581,
+        291
+      ]
+    ],
+    "equal_allocation": [
+      582,
+      581,
+      581
+    ],
+    "total_adaptation_budget_each": 1744,
+    "fifth_manifest_policy_evaluation_byte_use_count": 0,
+    "fifth_manifest_policy_evaluation_label_use_count": 0,
+    "post_result_policy_choice_count": 0,
+    "capacity_growth_event_count": 0
+  },
+  "primary_metrics": [
+    "decision_REALLOCATE_or_FALLBACK_EQUAL",
+    "historical_uncertainty_radius",
+    "selected_predicted_advantage_full",
+    "selected_predicted_advantage_min_loo",
+    "actual_aggregate_exact_hit_delta_vs_equal",
+    "selected_domain_below_packet0_count",
+    "fifth_manifest_policy_evaluation_label_use_count",
+    "total_adaptation_budget_selected"
+  ],
+  "secondary_metrics": [
+    "per-domain exact-hit delta vs equal",
+    "historical leave-one-manifest-out policy sign accuracy",
+    "historical policy advantage RMSE",
+    "fifth-manifest per-domain packet0/equal/selected exact hits"
+  ],
+  "classification_rules": {
+    "supported": "valid, decision=REALLOCATE, selected allocation differs from equal, actual aggregate exact hits exceed equal by >=1, no selected domain falls below packet0 baseline, and all fixed budget/isolation/authority predicates pass",
+    "mixed": "valid and decision=FALLBACK_EQUAL; conservative fallback behaved as designed but no unseen-data improvement was demonstrated",
+    "negative": "valid, decision=REALLOCATE, and selected aggregate exact hits do not exceed equal or any selected domain falls below packet0 baseline",
+    "invalid": "any parent, authority, manifest identity, historical calibration identity, feature/label boundary, model formula, LOO reliability calculation, candidate-set, fixed-total, deterministic replay, capacity, provenance, or accounting requirement fails"
+  },
+  "rsi_success_for_this_experiment": false,
+  "rsi_success_note": "Even a supported R26 is only one prospective transfer. The policy becomes retention-eligible only after an unchanged replication on a different sixth manifest.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-PROSPECTIVE-CALIBRATION-REPLICATION-R27",
+    "intent": "repeat the unchanged calibration/reliability/fallback policy on a sixth disjoint manifest; only repeated support may make the policy retention-eligible"
+  },
+  "successor_if_mixed": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-CONFIDENCE-ATTRIBUTION-R27",
+    "intent": "attribute why confidence was insufficient while preserving equal fallback and without lowering confidence thresholds post hoc"
+  },
+  "successor_if_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-ERROR-ATTRIBUTION-R27",
+    "intent": "attribute cross-manifest calibration error without post-result coefficient, feature, or threshold tuning"
+  },
+  "no_post_result_tuning_rule": "Do not change historical manifests, fifth-manifest sources, features, ridge lambda, solver, uncertainty construction, confidence rule, candidate allocations, equal fallback, budgets, evaluator, thresholds, classification, or authority after primary output.",
+  "changed_paths": [
+    "docs/experiments/wlm-rsi-corrective-tranche-2026-10-04.json",
+    "docs/experiments/wlm-lm-external-future-data-fifth-manifest-r26.json",
+    "docs/experiments/wlm-lm-external-future-data-prospective-calibration-r26.json",
+    "unitary/wlm_lm_external_future_data_prospective_calibration_r26.go",
+    "cmd/wlm-lm-external-future-data-prospective-calibration-r26/main.go",
+    ".github/workflows/external-future-data-prospective-calibration-r26.yml"
+  ]
+}
