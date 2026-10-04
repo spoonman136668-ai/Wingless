@@ -1,0 +1,105 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MOTIF-CHURN-FACTORIAL-PROSPECTIVE-VALIDATION-R27",
+  "program": "Wingless prospective validation of the R26 raw-motif-churn control",
+  "question": "Does the sole R26 supported feature form—raw motif churn per interval byte with no gate or weighting—prospectively rank productive adaptation intervals above zero-gain intervals on a wholly new fifth manifest?",
+  "hypothesis": "Use only fifth manifest bcd603af361f4882961346fa39f6cad0c1be7ea8cced9685c882be83394fd835. Preserve the R25/R26 leave-one-domain-out construction, 15,819 non-target training bytes per arm, 256 motifs, 582-byte sealed evaluation slice, 872-byte adaptation reservoir, and the same domain-specific budget grids. Freeze the only control under test to R26 cell 0: for every adjacent interval whose motif entry+exit count is >0, raw_churn_signal=(motif_entry_count+motif_exit_count)/interval_bytes. Determine all interval scores before opening sealed evaluation bytes. Then label intervals PRODUCTIVE if actual exact-hit gain>0, ZERO_GAIN if gain==0, and NEGATIVE if gain<0. No baseline-disagreement gate, support weight, consistency weight, candidate allocation, or fifth-manifest outcome may modify the signal. This is prospective validation only and does not install the control into an allocator.",
+  "exact_parent_sha": "511077cfdc4e7a95f8e2cefaed565168d2b2429e",
+  "qualification_branch": "research/external-hosted-wingless-future-data-motif-churn-factorial-prospective-validation-r27",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MOTIF-CHURN-CONTROL-FACTORIAL-R26",
+    "github_run_id": 37166705070,
+    "classification": "supported",
+    "validity_pass": true,
+    "supported_cells": [
+      0
+    ],
+    "observation": {
+      "cell_0_productive_vs_zero_auc": 0.75,
+      "cell_0_productive_mean": 0.024078682308330372,
+      "cell_0_zero_gain_mean": 0.013793103448275862
+    },
+    "supported_form": {
+      "baseline_disagreement_gate": false,
+      "support_weighting": false,
+      "consistency_weighting": false,
+      "signal": "raw motif entry+exit count / interval bytes"
+    }
+  },
+  "external_manifest": {
+    "path": "docs/experiments/wlm-lm-external-future-data-fifth-manifest-r27.json",
+    "sha256": "bcd603af361f4882961346fa39f6cad0c1be7ea8cced9685c882be83394fd835",
+    "source_count": 3,
+    "effective_total_bytes": 57272
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "pending exact qualified fifth-manifest admission",
+    "manifest_sha256": "bcd603af361f4882961346fa39f6cad0c1be7ea8cced9685c882be83394fd835",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "frozen_contract": {
+    "source_count": 3,
+    "total_source_bytes": 57272,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "code_budgets": [
+      0,
+      436,
+      582,
+      727,
+      872
+    ],
+    "structured_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "technical_prose_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "interval_inclusion": "all adjacent intervals with motif_entry_count+motif_exit_count>0, determined before evaluation labels",
+    "raw_churn_signal": "(motif_entry_count+motif_exit_count)/interval_bytes",
+    "baseline_disagreement_gate": false,
+    "support_weighting": false,
+    "consistency_weighting": false,
+    "control_evaluation_byte_use_count": 0,
+    "control_evaluation_label_use_count": 0,
+    "post_result_signal_change_count": 0
+  },
+  "classification_rules": {
+    "supported": "valid, at least one PRODUCTIVE and one ZERO_GAIN churn interval exist, mean productive raw_churn_signal > mean zero-gain signal, and productive-vs-zero pairwise AUC >=0.75",
+    "mixed": "valid and either label diversity is insufficient for the preregistered AUC test or the direction is positive with AUC>0.5 but below 0.75",
+    "negative": "valid with sufficient label diversity but raw motif churn does not rank productive intervals above zero-gain intervals",
+    "invalid": "any parent, authority, fifth-manifest/source identity, split, budget grid, interval inclusion, frozen signal identity, label isolation, deterministic replay, capacity, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter fifth-manifest identities, budgets, motif capacity, interval inclusion, raw-churn signal, label definitions, AUC threshold, evaluator, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-RAW-CHURN-ALLOCATOR-COUNTERFACTUAL-R28",
+    "intent": "test whether raw churn would have avoided the R23 allocation failure across previously sealed manifests before any live allocator revision"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-MOTIF-OUTCOME-MECHANISM-ATTRIBUTION-R28",
+    "intent": "stop structural churn reweighting and investigate training-only outcome mechanisms instead"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-fifth-manifest-r27.json",
+    "docs/experiments/wlm-lm-external-future-data-motif-churn-factorial-prospective-validation-r27.json",
+    "unitary/wlm_lm_external_future_data_motif_churn_factorial_prospective_validation_r27.go",
+    "cmd/wlm-lm-external-future-data-motif-churn-factorial-prospective-validation-r27/main.go",
+    ".github/workflows/external-future-data-motif-churn-factorial-prospective-validation-r27.yml"
+  ]
+}
