@@ -1,0 +1,150 @@
+{
+  "schema": "wingless.external-research-prereg.v1",
+  "project": "Wingless",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT",
+  "contributor": "chatgpt-external",
+  "contribution_class": "falsification",
+  "question": "Does a representation preserving domain-specific temporal pre-intervention learning dynamics predict the sign of fixed-budget counterfactual marginal value on held-out and genuinely disjoint manifests better than the existing six-feature aggregate representation?",
+  "hypothesis": "A deterministic six-dimensional latent encoding of the frozen 72-dimensional domain-by-time learning-state trajectory will improve sign/balanced-accuracy prediction of intervention value relative to the byte-identical R27/R30 six-feature control, including on one prospectively admitted disjoint sixth manifest, without additional intervention budget, capacity, model calls, held-out outcomes, or post-result tuning.",
+  "competing_explanations": [
+    "representation bottleneck: useful causal-value information exists in the pre-intervention trajectory but aggregation discards it",
+    "cross-manifest invariance/evidence bottleneck: richer state predicts known regimes but does not transfer",
+    "observability bottleneck: current pre-intervention state does not contain sufficient variables to predict intervention value"
+  ],
+  "exact_parent_sha": "ab1d7467edc021d70a96fcc3b749651e4bb46fea",
+  "predecessor_evidence": [
+    {
+      "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-HISTORICAL-SIGN-INSTABILITY-CORRECTION-R30",
+      "classification": "negative",
+      "validity_pass": true,
+      "corrected_total_actual_advantage": 5,
+      "uncorrected_total_actual_advantage": 31,
+      "corrected_delta_vs_uncorrected": -26,
+      "github_run_id": 37190495179
+    }
+  ],
+  "code_identity": {
+    "path": "research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/run.py",
+    "sha256": "ab911de5f6e0766a3cb010af688c9a770ad8d5420c0d688526e9a83159a9b768",
+    "language": "python3-stdlib-only"
+  },
+  "changed_paths": [
+    "research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/prereg.json",
+    "research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/run.py",
+    "research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/result.json",
+    "research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/provenance.json",
+    "research/contrib/chatgpt-external/WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-STATE-SUFFICIENCY-R31-CONTRIB-CGPT/README.md",
+    ".github/workflows/contrib-r31-causal-state-sufficiency.yml"
+  ],
+  "inputs": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250",
+      "source": "sealed R27/R30 manifest; constituent prefixes independently hash-verified in workflow"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7",
+      "source": "sealed R27/R30 manifest; constituent prefixes independently hash-verified in workflow"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+      "source": "sealed R27/R30 manifest; constituent prefixes independently hash-verified in workflow"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+      "source": "sealed R27/R30 manifest; constituent prefixes independently hash-verified in workflow"
+    },
+    {
+      "name": "sixth-code-prefix",
+      "sha256": "ef50a59fbffad91d3ee1e03834dc8d295f5a847464ce8ead4a1366859a766f3a",
+      "source": "prometheus/prometheus@961c9ba40923ca4d7adf4a7a9167e56d0406df83:promql/engine.go first 41453 bytes; full sha256 aa6a3c4b8a84b716c558936f92fd046e78cc2c02a819a024240f82bc4b956db0"
+    },
+    {
+      "name": "sixth-structured-prefix",
+      "sha256": "5bc95ef524c23ec2df24d3d811058abd0c341921d2e1ed4ed29af2abed9b4974",
+      "source": "OAI/OpenAPI-Specification@aebfd1370825c08f605681f0b3e87bf604c731f4:yarn.lock first 14365 bytes; full sha256 643fa0c84b2c3947a647e9d2b93c1dc8595278417219f763a43632a5d94c0153"
+    },
+    {
+      "name": "sixth-technical-prose-prefix",
+      "sha256": "51085ab94eef524982bcb7858c573d1c5cb041decc27ccc137970111efec1592",
+      "source": "pallets/flask@d73fa1cdcbd8b1465c151db8924ba58b1dd14e35:docs/quickstart.rst first 1454 bytes; full sha256 c17e0dac53c25f5cca0c18fd00e4f9549038f16d6ac5569ec2c97c7178744629"
+    }
+  ],
+  "frozen_design": {
+    "seeds": [
+      31031
+    ],
+    "split": "Stage 1: four outer leave-one-manifest-out folds over transfer/third/fourth/fifth. Stage 2: fit only on all four existing manifests, then evaluate once on sixth; sixth outcomes unavailable to fitting/selection.",
+    "ordering": "manifest order transfer,third,fourth,fifth,sixth; candidate allocations in the byte-identical R27 lexical list; domain order code,structured,technical_prose; temporal transitions low-to-high budget.",
+    "data_budget": "1744 adaptation bytes per candidate allocation; source prefixes exactly R27/R30 sizes",
+    "compute_budget": "one deterministic primary run plus one byte-identical replay; PCA power iteration max 256 iterations/component; no hyperparameter search",
+    "capacity": "R27 motif capacity 256; raw trajectory 72 dims; latent dimension exactly 6; ridge lambda exactly 1; no external model calls",
+    "evaluator": "positive marginal value iff actual advantage > 0; balanced accuracy and sign accuracy from frozen predictions; false-positive rate over actual non-positive candidates",
+    "deterministic_expected": true,
+    "representations": {
+      "A_control": "byte-identical R27 marginal six-feature ridge model, lambda=1, policy value obtained by summing marginal predictions versus equal allocation",
+      "B_raw": "72-D signed domain x temporal-step x six-feature policy trajectory; ridge regression lambda=1 on policy actual advantage",
+      "C_latent": "deterministic unsupervised PCA learned from training-manifest 72-D trajectories only, exactly 6 components, then ridge regression lambda=1 on policy actual advantage"
+    },
+    "falsification_controls": [
+      "held-out temporal reversal applied after training",
+      "deterministic 6-D Rademacher random projection seed 31031",
+      "policy-allocation-only ridge control",
+      "within-manifest one-position cyclic label permutation"
+    ]
+  },
+  "controls": [
+    "six-feature R27/R30 aggregate control",
+    "raw 72-D trajectory diagnostic",
+    "random projection",
+    "policy-only",
+    "label permutation",
+    "temporal permutation"
+  ],
+  "metrics": [
+    "macro leave-one-manifest-out balanced accuracy",
+    "macro sign accuracy",
+    "macro false-positive rate",
+    "latent-minus-control balanced-accuracy delta",
+    "positive latent-delta holdout count",
+    "sixth-manifest sign accuracy",
+    "sixth latent-minus-control sign-accuracy delta",
+    "sixth false-positive count"
+  ],
+  "classification_rules": {
+    "supported": "valid AND Stage1 latent macro balanced_accuracy >=0.65 AND latent-control >=+0.10 AND positive latent delta on >=3/4 heldouts AND latent macro false-positive rate <= control; AND Stage2 latent sign_accuracy >=0.80 AND latent-control sign_accuracy >=+0.20 AND latent false-positive count <= control.",
+    "mixed": "valid AND not supported AND (Stage1 supported OR raw-control macro balanced_accuracy >=+0.05 OR latent-control macro balanced_accuracy >=+0.05 OR latent improves Stage1 but prospective Stage2 fails).",
+    "negative": "valid AND neither supported nor mixed; specifically no >=+0.05 raw or latent macro balanced-accuracy improvement sufficient to establish additional usable state information.",
+    "invalid": "any parent/input/code identity mismatch, missing positive/non-positive class in a required fold, held-out leakage, post-freeze tuning, budget/capacity/model-call drift, replay mismatch, provenance/accounting failure."
+  },
+  "expected_information_gain": {
+    "supported": "observable pre-intervention dynamics contain transferable intervention-value information lost by aggregate representation; next test is frozen latent-state bounded intervention selection.",
+    "raw_positive_latent_negative": "information exists but the frozen 6-D encoder is inadequate; improve representation architecture, not allocator rules.",
+    "seen_positive_disjoint_negative": "cross-manifest invariance/evidence is the bottleneck.",
+    "negative": "weaken current-observable-state sufficiency; escalate to causal observability/hidden-state instrumentation rather than more calibration gates."
+  },
+  "prohibited_after_primary_run": [
+    "threshold changes",
+    "split changes",
+    "post-result policy selection",
+    "capacity growth",
+    "extra data/compute/model calls",
+    "held-out/evaluator leakage",
+    "encoder or latent-dimension changes",
+    "candidate or budget changes",
+    "sixth-manifest replacement",
+    "classification reinterpretation"
+  ],
+  "rsi_relevance": "precursor only; even supported is not autonomous or recursive improvement",
+  "authority": {
+    "research_only": true,
+    "production_authority": false,
+    "accepted_ref_mutation": false,
+    "promotion_authority": false,
+    "scheduler_or_queue_authority": false
+  },
+  "preregistration_note": "This preregistration and executable code must be committed together before the primary workflow run. Contributor evidence is adoption-candidate-only until independently reproduced and officially qualified."
+}
