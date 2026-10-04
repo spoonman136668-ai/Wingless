@@ -1,0 +1,170 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-CONFIDENCE-GATED-ALLOCATION-R23",
+  "program": "Wingless prospective confidence-gated marginal allocation on a fourth disjoint manifest",
+  "question": "Does the R22 training-only confidence gate suppress baseline-only false-positive allocation signal while preserving productive motif-churn evidence strongly enough to improve sealed-evaluation allocation versus equal allocation on a new fourth manifest?",
+  "hypothesis": "Use only fourth manifest 974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5. Preserve the R20 construction, budgets, ten exact 1,744-byte candidate triples, 15,819 non-target bytes, 256 motifs, 582-byte sealed evaluation, and 872-byte adaptation reservoir. For each adjacent interval compute motif_churn=entry+exit exactly as R19. For baseline argmax changes compute the R22 upper-budget margin sum over changed predecessor rows. Freeze gated_baseline_count = baseline_argmax_change_count when upper_margin_sum>0, otherwise 0. Freeze confidence_gated_signal=(gated_baseline_count + 3*motif_churn)/interval_bytes. Integrate that signal over each candidate allocation, choose the maximum with the existing lexicographic tie-break, freeze the allocation before opening evaluation bytes, and compare to EQUAL=[582,581,581]. No fourth-manifest label or result may change the gate, weights, candidate set, or tie-break.",
+  "exact_parent_sha": "84c76b9dd955d4a352937f9fdf88efb985f6619b",
+  "qualification_branch": "research/external-hosted-wingless-future-data-marginal-signal-confidence-gated-allocation-r23",
+  "north_star_path": "research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-MARGINAL-SIGNAL-BASELINE-FALSE-POSITIVE-CONTROL-R22",
+    "github_run_id": 37164831941,
+    "classification": "supported",
+    "observation": {
+      "false_positive_technical_prose_581_726": {
+        "actual_gain": 0,
+        "baseline_argmax_change_count": 1,
+        "upper_margin_sum": 0,
+        "control_signal": 0
+      },
+      "productive_code_582_727": {
+        "actual_gain": 1,
+        "baseline_argmax_change_count": 1,
+        "upper_margin_sum": 5,
+        "control_signal": 0.034482758620689655
+      },
+      "productive_technical_prose_0_291": {
+        "actual_gain": 15,
+        "baseline_argmax_change_count": 4,
+        "upper_margin_sum": 7,
+        "control_signal": 0.024054982817869417
+      }
+    },
+    "frozen_gate": "baseline argmax contribution is admitted iff upper_margin_sum > 0"
+  },
+  "external_manifest": {
+    "path": "docs/experiments/wlm-lm-external-future-data-fourth-manifest-r23.json",
+    "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+    "source_count": 3,
+    "effective_total_bytes": 57272
+  },
+  "external_authority": {
+    "ckb_plane_main_sha": "pending exact qualified fourth-manifest admission",
+    "manifest_sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5",
+    "research_decision_required": "READY_RESEARCH",
+    "execution_host_policy": "GitHub-hosted compute only; host distinct from LINKDEADKB",
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "fixed_contract": {
+    "source_count": 3,
+    "total_source_bytes": 57272,
+    "non_target_training_bytes_per_arm": 15819,
+    "motif_capacity": 256,
+    "evaluation_bytes_per_arm": 582,
+    "adaptation_reservoir_bytes_per_arm": 872,
+    "code_budgets": [
+      0,
+      436,
+      582,
+      727,
+      872
+    ],
+    "structured_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "technical_prose_budgets": [
+      0,
+      291,
+      436,
+      581,
+      726
+    ],
+    "motif_churn_weight": 3,
+    "baseline_argmax_weight": 1,
+    "baseline_gate": "upper_margin_sum > 0",
+    "gated_signal": "(gated_baseline_count + 3*(motif_entry_count+motif_exit_count))/interval_bytes",
+    "candidate_allocations": [
+      [
+        582,
+        436,
+        726
+      ],
+      [
+        582,
+        581,
+        581
+      ],
+      [
+        582,
+        726,
+        436
+      ],
+      [
+        727,
+        291,
+        726
+      ],
+      [
+        727,
+        436,
+        581
+      ],
+      [
+        727,
+        581,
+        436
+      ],
+      [
+        727,
+        726,
+        291
+      ],
+      [
+        872,
+        291,
+        581
+      ],
+      [
+        872,
+        436,
+        436
+      ],
+      [
+        872,
+        581,
+        291
+      ]
+    ],
+    "selection_objective": "maximize sum(confidence_gated_signal * interval_bytes) over included contiguous intervals",
+    "tie_break": "lexicographically lowest [code,structured,technical_prose]",
+    "equal_allocation": [
+      582,
+      581,
+      581
+    ],
+    "total_adaptation_budget_each": 1744,
+    "selection_evaluation_byte_use_count": 0,
+    "selection_evaluation_label_use_count": 0,
+    "allocation_post_result_choice_count": 0
+  },
+  "classification_rules": {
+    "supported": "valid, selected allocation differs from equal, selected aggregate exact hits exceed equal by at least 1, and no selected domain falls below packet0 baseline",
+    "mixed": "valid and selected allocation differs from equal but aggregate ties or improves with at least one domain below packet0 baseline",
+    "negative": "valid and selected allocation equals equal or selected aggregate is below equal",
+    "invalid": "any parent, authority, fourth-manifest/source identity, split, budget-grid, candidate-set, frozen confidence gate, selection-isolation, fixed-total, capacity, deterministic replay, provenance, or accounting requirement fails"
+  },
+  "no_post_result_tuning_rule": "Do not alter fourth-manifest identities, 15,819-byte non-target budget, 256 capacity, 582/872 split, budget grids, ten candidate triples, baseline gate, weights, signal formula, tie-break, equal baseline, 1,744-byte budget, evaluator, thresholds, classification, or authority after primary output.",
+  "successor_if_supported": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-CONFIDENCE-GATED-ALLOCATOR-RETAIN-REVERT-R24",
+    "intent": "verify bounded retain/revert of the confidence-gated allocation rule across qualified manifests before any adaptive allocator claim"
+  },
+  "successor_if_mixed_or_negative": {
+    "experiment_family": "WLM-LM-EXTERNAL-FUTURE-DATA-CONFIDENCE-GATED-ALLOCATION-ATTRIBUTION-R24",
+    "intent": "attribute remaining transfer error without refitting the gate or increasing capacity"
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-fourth-manifest-r23.json",
+    "docs/experiments/wlm-lm-external-future-data-marginal-signal-confidence-gated-allocation-r23.json",
+    "unitary/wlm_lm_external_future_data_marginal_signal_confidence_gated_allocation_r23.go",
+    "cmd/wlm-lm-external-future-data-marginal-signal-confidence-gated-allocation-r23/main.go",
+    ".github/workflows/external-future-data-marginal-signal-confidence-gated-allocation-r23.yml"
+  ]
+}
