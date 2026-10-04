@@ -99,8 +99,8 @@ jobs:
         run: |
           set -euo pipefail
           args=(--transfer-root "$TRANSFER_ROOT" --third-root "$THIRD_ROOT" --fourth-root "$FOURTH_ROOT" --fifth-root "$FIFTH_ROOT")
-          go run ./cmd/wlm-lm-external-future-data-calibration-confidence-attribution-r28 "${args[@]}" > /tmp/result1.json
-          go run ./cmd/wlm-lm-external-future-data-calibration-confidence-attribution-r28 "${args[@]}" > /tmp/result2.json
+          go run ./cmd/wlm-lm-external-future-data-calibration-outcome-mechanism-attribution-r29 "${args[@]}" > /tmp/result1.json
+          go run ./cmd/wlm-lm-external-future-data-calibration-outcome-mechanism-attribution-r29 "${args[@]}" > /tmp/result2.json
           cmp /tmp/result1.json /tmp/result2.json
           cat /tmp/result1.json
       - name: Classify
