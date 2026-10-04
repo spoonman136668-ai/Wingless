@@ -1,0 +1,126 @@
+name: Wingless confidence-gated allocation attribution R24
+on:
+  push:
+    branches:
+      - research/external-hosted-wingless-future-data-confidence-gated-allocation-attribution-r24
+    paths:
+      - 'docs/experiments/wlm-lm-external-future-data-confidence-gated-allocation-attribution-r24.json'
+      - 'unitary/wlm_lm_external_future_data_confidence_gated_allocation_attribution_r24.go'
+      - 'cmd/wlm-lm-external-future-data-confidence-gated-allocation-attribution-r24/main.go'
+      - '.github/workflows/external-future-data-confidence-gated-allocation-attribution-r24.yml'
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Validate frozen package
+        shell: bash
+        run: |
+          set -euo pipefail
+          prereg="02f1c1679c734d21392b5d90ec706147c5307de2"
+          parent="e7d16bcbafe241d85870120de0d84892eaba2551"
+          pp="docs/experiments/wlm-lm-external-future-data-confidence-gated-allocation-attribution-r24.json"
+          test "$(git rev-parse "$prereg^")" = "$parent"
+          git merge-base --is-ancestor "$prereg" HEAD
+          changed="$(git diff --name-only "$parent..HEAD" | sort)"
+          expected="$(printf '%s\n'             '.github/workflows/external-future-data-confidence-gated-allocation-attribution-r24.yml'             'cmd/wlm-lm-external-future-data-confidence-gated-allocation-attribution-r24/main.go'             "$pp"             'unitary/wlm_lm_external_future_data_confidence_gated_allocation_attribution_r24.go' | sort)"
+          test "$changed" = "$expected"
+      - name: Verify READY_RESEARCH receipt
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          raw=r'''{"schema":"ckb-plane.external-exposure-ready-research-receipt.v1","project":"Wingless","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-CONFIDENCE-GATED-ALLOCATION-ATTRIBUTION-R24","preregistration_sha":"02f1c1679c734d21392b5d90ec706147c5307de2","research_host":"runnervm8df0l","runner_id":"GitHub Actions 1000001876","manifest_sha256":"974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5","plan_decision":{"schema":"ckb-plane.external-exposure.v1","disposition":"READY_PLAN","scope":"plan-only","reasons":null},"fetch_decision":{"schema":"ckb-plane.external-exposure-fetch.v1","disposition":"READY_FETCH","scope":"fetch-verify-only","reasons":null},"research_decision":{"schema":"ckb-plane.external-exposure-research.v1","disposition":"READY_RESEARCH","scope":"research-consume-once","reasons":null},"ckb_plane_main_sha":"c591f97184e22565e8ccfc230a70a58f62b26d5c"}'''
+          assert hashlib.sha256(raw.encode()).hexdigest()=="18f1bf1912e3e3579f9027c18a6f313aa6a610fcaf4bdfce2d1f2efdbf367659"
+          r=json.loads(raw)
+          assert r["preregistration_sha"]=="02f1c1679c734d21392b5d90ec706147c5307de2"
+          assert r["manifest_sha256"]=="974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+          assert r["ckb_plane_main_sha"]=="c591f97184e22565e8ccfc230a70a58f62b26d5c"
+          assert r["research_decision"]["disposition"]=="READY_RESEARCH"
+          pathlib.Path("/tmp/authority.json").write_text(raw)
+          PY
+      - name: Fetch exact fourth-manifest sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          export EXTERNAL_ROOT="$RUNNER_TEMP/wingless-r24"; mkdir -p "$EXTERNAL_ROOT"
+          python3 - <<'PY'
+          import hashlib,os,pathlib,urllib.request
+          sources=[
+            ("code","https://raw.githubusercontent.com/kubernetes/kubernetes/e7967bb9b76d43a6388abb7a4e90d2f899ef97ff/pkg/kubelet/kubelet.go","e0f247ef45cb281166b58ba1a013dc6925023388193bd74c1f126c695b770d34",156626,41453,"283073d9f6c0dd868c39a913364bce6744ff1e29c038f6920197c0d33e0c2ac1"),
+            ("structured","https://raw.githubusercontent.com/microsoft/TypeScript/50d70a3f5f453a79a4323b263165da51f656a4e3/package-lock.json","52b6c9bd0a26ef1b0fc27dfbfaa00df6a047cdddd587d07c4f6c1c3345faf5cf",143844,14365,"a46fcfb7d862b03b750b61a5f667d4ac25a064df9ccb746e395db7e864068933"),
+            ("technical-prose","https://raw.githubusercontent.com/django/django/a461af8ce48762d7ec602260aaff81014ddccbcb/docs/intro/tutorial01.txt","1cf1817e6211b7c0fa9e8044ee808fde1e8f16ca5f9d5ab5358510a5c9591b96",10844,1454,"5d0c2efd139bd6094098bc893ed746020f03e0860a25f278348f43f47c236222"),
+          ]
+          root=pathlib.Path(os.environ["EXTERNAL_ROOT"])
+          for d,u,full_h,full_n,prefix_n,prefix_h in sources:
+              b=urllib.request.urlopen(urllib.request.Request(u,headers={"User-Agent":"wingless-r24"}),timeout=30).read(full_n+1)
+              assert len(b)==full_n and hashlib.sha256(b).hexdigest()==full_h
+              p=b[:prefix_n]
+              assert len(p)==prefix_n and hashlib.sha256(p).hexdigest()==prefix_h
+              (root/(d+".bin")).write_bytes(p)
+          PY
+          echo "EXTERNAL_ROOT=$EXTERNAL_ROOT" >> "$GITHUB_ENV"
+      - name: Full Go regression
+        run: go test ./... -count=1
+      - name: Run frozen attribution twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/wlm-lm-external-future-data-confidence-gated-allocation-attribution-r24 --code "$EXTERNAL_ROOT/code.bin" --structured "$EXTERNAL_ROOT/structured.bin" --technical-prose "$EXTERNAL_ROOT/technical-prose.bin" > /tmp/result1.json
+          go run ./cmd/wlm-lm-external-future-data-confidence-gated-allocation-attribution-r24 --code "$EXTERNAL_ROOT/code.bin" --structured "$EXTERNAL_ROOT/structured.bin" --technical-prose "$EXTERNAL_ROOT/technical-prose.bin" > /tmp/result2.json
+          cmp /tmp/result1.json /tmp/result2.json
+          cat /tmp/result1.json
+      - name: Classify
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math,pathlib
+          r=json.loads(pathlib.Path("/tmp/result1.json").read_text());m=r["metrics"]
+          valid=(
+            m["source_identity_mismatch_count"]==0 and m["fourth_manifest_identity_mismatch_count"]==0 and
+            m["source_count"]==3 and m["total_source_bytes"]==57272 and
+            m["non_target_training_byte_budget_per_arm"]==15819 and m["motif_capacity"]==256 and
+            m["target_evaluation_bytes_per_arm"]==582 and m["target_adaptation_reservoir_bytes_per_arm"]==872 and
+            m["baseline_argmax_weight"]==1 and m["motif_churn_weight"]==3 and
+            m["target_interval_count"]==4 and
+            m["selection_evaluation_byte_use_count"]==0 and m["selection_evaluation_label_use_count"]==0 and
+            m["allocation_post_result_choice_count"]==0 and m["capacity_growth_event_count"]==0 and
+            m["tokenizer_use_count"]==0 and m["external_model_call_count"]==0 and
+            m["counter_overflow_count"]==0 and m["invalid_row_count"]==0 and
+            all(math.isfinite(float(v)) for v in m.values())
+          )
+          ck="interval_code_727_872"
+          supported=(valid and m["predicted_net"]>0 and m["actual_net"]<0 and
+            m[ck+"_confidence_gated_signal"]>0 and m[ck+"_gated_baseline_count"]==0 and
+            m[ck+"_motif_entry_count"]+m[ck+"_motif_exit_count"]>0 and
+            m[ck+"_actual_gain"]<=0)
+          mixed=(valid and m["predicted_net"]>0 and m["actual_net"]<0)
+          cls="supported" if supported else ("mixed" if mixed else ("negative" if valid else "invalid"))
+          out={"schema":"wingless.research-classification.v1","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-CONFIDENCE-GATED-ALLOCATION-ATTRIBUTION-R24","classification":cls,"validity_pass":valid,"authority_receipt_sha256":"18f1bf1912e3e3579f9027c18a6f313aa6a610fcaf4bdfce2d1f2efdbf367659","metrics":m}
+          pathlib.Path("/tmp/classification.json").write_text(json.dumps(out,separators=(",",":")));print(json.dumps(out,separators=(",",":")))
+          if not valid: raise SystemExit(2)
+          PY
+      - name: Delete external bytes
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/wingless-r24"
+      - name: Upload evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-confidence-gated-allocation-attribution-r24
+          path: |
+            /tmp/authority.json
+            /tmp/result1.json
+            /tmp/result2.json
+            /tmp/classification.json
+          if-no-files-found: error
