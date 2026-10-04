@@ -1,0 +1,137 @@
+{
+  "schema": "wingless.direct-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-RAW-REPRESENTATION-ATTRIBUTION-R35",
+  "program": "Wingless RSI corrective tranche: raw-derived representation attribution",
+  "question": "After R34 ruled out domain identity and budget position, do fixed raw-byte composition features explain residual cross-manifest calibration error that the pooled six R27 structural rates miss?",
+  "hypothesis": "R31-R34 eliminated sign-count polarity, magnitude conflict/extrapolation, jackknife instability, domain identity, budget position, and their interaction as useful residual-error explanations. Freeze a representation comparison that leaves the R27 allocator, candidates, budget, ridge solver and held-out ordering unchanged: BASE6 is the exact R27 vector; RAWBYTE augments BASE6 with fixed raw-byte composition descriptors computed from each source interval before outcomes are opened: whitespace fraction, ASCII-letter fraction, digit fraction, structural-punctuation fraction, and byte entropy normalized by 8. Fit both representations independently on the other three manifests for each outer holdout and evaluate the exact R30-excluded cases. This is attribution only.",
+  "exact_parent_sha": "587db023c95d8e0861c57a287a6e58b17747a5e3",
+  "qualification_branch": "research/external-hosted-wingless-future-data-raw-representation-attribution-r35",
+  "predecessor": {
+    "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-CALIBRATION-FEATURE-REPRESENTATION-ATTRIBUTION-R34",
+    "github_run_id": 37199958802,
+    "classification": "negative",
+    "validity_pass": true,
+    "observation": {
+      "excluded_case_count": 33,
+      "base6_sign_error_rate": 0.5151515151515151,
+      "base6_mean_absolute_error": 10.731783167689903,
+      "budget_sign_error_rate": 0.45454545454545453,
+      "budget_mean_absolute_error": 11.797789216378444,
+      "domain_sign_error_rate": 0.6363636363636364,
+      "domain_mean_absolute_error": 24.20026967886269,
+      "domain_budget_sign_error_rate": 0.6060606060606061,
+      "domain_budget_mean_absolute_error": 21.333035940313465
+    },
+    "eliminated_hypothesis": "missing domain identity, adaptation-budget position, or their interaction explains residual calibration error",
+    "strengthened_hypothesis": "the missing information may live in fixed raw-input composition rather than hand-labeled domain or stage metadata"
+  },
+  "cause_effect_trace": {
+    "observed_failure": "R34's augmented metadata representations failed to improve both sign error and MAE over BASE6.",
+    "residual_cause_under_test": "MISSING_RAW_INPUT_COMPOSITION",
+    "exact_bounded_delta": "five fixed raw-derived descriptors appended to BASE6; no tokenizer, learned embedding, external model call, allocator change, candidate change, budget change, capacity growth or post-result feature selection",
+    "raw_features": [
+      "whitespace_fraction",
+      "ascii_letter_fraction",
+      "digit_fraction",
+      "structural_punctuation_fraction",
+      "byte_entropy_over_8"
+    ],
+    "attribution_rule": "RAWBYTE is supported only if it improves both aggregate held-out sign-error rate and MAE on the exact 33 R30-excluded cases by preregistered margins",
+    "retain_revert": "R35 cannot alter allocator behavior; support only authorizes a separately preregistered raw-representation correction or replication."
+  },
+  "manifests": [
+    {
+      "name": "transfer",
+      "sha256": "c79f09eb3841309b38827ceffee6a14eb87973c8aa2cf817908ed05f10e5c250"
+    },
+    {
+      "name": "third",
+      "sha256": "e46907e74ce92564bab657afc8d28b1a39b269bac88fb9b21092716c7ff53cb7"
+    },
+    {
+      "name": "fourth",
+      "sha256": "974ecf332c019ac094ecb7098f371001fa7e37fd4b476ac7513341fff6f812e5"
+    },
+    {
+      "name": "fifth",
+      "sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171"
+    }
+  ],
+  "frozen_reuse": {
+    "outer_holdouts": 4,
+    "candidate_allocations": 10,
+    "non_equal_candidates_per_holdout": 9,
+    "exact_r30_excluded_cases_expected": 33,
+    "total_adaptation_budget": 1744,
+    "base_features": "unchanged R27 six features",
+    "ridge_lambda": 1,
+    "intercept": true,
+    "raw_feature_scaling": "all composition fractions in [0,1], entropy normalized by 8; no held-out outcome normalization",
+    "capacity": "unchanged",
+    "tokenizer_use_count": 0,
+    "external_model_call_count": 0
+  },
+  "representation_cells": [
+    "BASE6",
+    "BASE6_RAWBYTE"
+  ],
+  "metrics": [
+    "outer_holdout_manifest_count",
+    "excluded_case_count",
+    "base6_sign_error_rate",
+    "base6_mean_absolute_error",
+    "rawbyte_sign_error_rate",
+    "rawbyte_mean_absolute_error",
+    "rawbyte_sign_error_improvement",
+    "rawbyte_mae_ratio",
+    "fit_failure_count",
+    "heldout_outcome_use_before_representation_freeze",
+    "post_result_representation_choice_count",
+    "source_identity_mismatch_count",
+    "capacity_growth_event_count",
+    "tokenizer_use_count",
+    "external_model_call_count",
+    "invalid_row_count"
+  ],
+  "classification_rules": {
+    "supported": "valid AND rawbyte_sign_error_improvement>=0.10 AND rawbyte_mae_ratio<=0.90",
+    "mixed": "valid AND RAWBYTE improves both sign-error and MAE versus BASE6 but misses one or both supported thresholds",
+    "negative": "valid AND RAWBYTE does not improve both sign-error and MAE versus BASE6",
+    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, BASE6 identity, raw-byte feature definition, ridge solver, held-out ordering, deterministic replay, capacity, provenance or accounting requirement fails"
+  },
+  "thresholds": {
+    "sign_error_improvement": 0.1,
+    "mae_ratio": 0.9,
+    "provenance": "fixed before R35 execution"
+  },
+  "rsi_success": false,
+  "rsi_success_note": "R35 is representation attribution on already studied manifests; prospective disjoint validation remains required.",
+  "no_post_result_tuning_rule": "Do not alter manifests, candidates, BASE6, raw-byte descriptors, thresholds, budgets or capacity, held-out ordering, classification or authority after primary output.",
+  "successors": {
+    "supported": {
+      "contract_id": "wingless-r36-raw-representation-correction",
+      "experiment_family": "bounded-correction"
+    },
+    "mixed": {
+      "contract_id": "wingless-r36-raw-representation-disambiguation",
+      "experiment_family": "attribution"
+    },
+    "negative": {
+      "contract_id": "wingless-r36-cross-manifest-representation-locality-attribution",
+      "experiment_family": "raw-representation-locality-attribution"
+    }
+  },
+  "required_authority": {
+    "disposition": "READY_RESEARCH",
+    "manifest_sha256": "7077d2b72d8954afc24f36b2971393acc11e3b345f7c3521102c20347b9c6171",
+    "hosted_compute": true,
+    "research_only": true,
+    "one_shot": true,
+    "external_model_calls": false,
+    "persistent_corpus": false,
+    "production_authority": false
+  },
+  "changed_paths": [
+    "docs/experiments/wlm-lm-external-future-data-raw-representation-attribution-r35.json"
+  ]
+}
