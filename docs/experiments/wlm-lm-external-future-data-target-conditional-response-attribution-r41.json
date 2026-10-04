@@ -84,7 +84,8 @@
     "tokenizer_use_count": 0,
     "external_model_call_count": 0,
     "target_domain_training_cases": "all 27 non-equal allocation cases across the three training manifests per outer holdout",
-    "target_domain_response": "one arithmetic-mean residual offset per target domain; no additional ridge fit or features"
+    "target_domain_response": "one arithmetic-mean residual offset per target domain; no additional ridge fit or features",
+    "reported_domain_offsets": "code_offset, structured_offset, and technical_prose_offset are arithmetic means of the four outer-holdout-specific frozen offsets; per-case output records the exact offset used"
   },
   "metrics": [
     "outer_holdout_manifest_count",
@@ -104,12 +105,14 @@
     "base6_identity_mismatch_count",
     "target_domain_definition_mismatch_count",
     "target_stratum_insufficient_count",
+    "fit_failure_count",
     "heldout_outcome_use_before_target_condition_freeze",
     "post_result_target_condition_choice_count",
     "source_identity_mismatch_count",
     "capacity_growth_event_count",
     "tokenizer_use_count",
     "external_model_call_count",
+    "counter_overflow_count",
     "invalid_row_count"
   ],
   "thresholds": {
@@ -121,7 +124,7 @@
     "supported": "valid AND target_conditional_sign_error_improvement>=0.10 AND target_conditional_mae_ratio<=1.00",
     "mixed": "valid AND target_conditional_sign_error_rate<global_sign_error_rate AND target_conditional_mean_absolute_error<global_mean_absolute_error but one or both supported thresholds are missed",
     "negative": "valid AND supported is false AND mixed is false",
-    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, GLOBAL_BASE6 identity, deterministic target-domain rule, three scalar residual-offset definitions, raw target, ridge lambda, held-out ordering, minimum-stratum requirement, provenance or accounting rule fails"
+    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, GLOBAL_BASE6 identity, deterministic target-domain rule, three scalar residual-offset definitions, raw target, ridge lambda, base-fit success, held-out ordering, minimum-stratum requirement, provenance or accounting rule fails"
   },
   "rsi_success": false,
   "rsi_success_note": "R41 is bounded target-conditional attribution on studied manifests; no allocation policy is changed and prospective disjoint validation remains required.",
