@@ -3,7 +3,7 @@
   "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-TARGET-CONDITIONAL-RESPONSE-ATTRIBUTION-R41",
   "program": "Wingless RSI corrective tranche: target-conditional marginal-learning-value attribution",
   "question": "After R40 showed that a fixed training-support envelope does not identify a lower-sign-error applicability region, is residual marginal-learning-value error caused by using one global calibration response across different budget target domains?",
-  "hypothesis": "R40 falsified the fixed support-envelope explanation: IN_ENVELOPE covered 19/33 excluded cases but had sign error 0.578947 versus 0.515152 globally, while OUT_OF_ENVELOPE sign error was lower at 0.428571. Freeze a bounded target-conditional response attribution with no new learned representation. GLOBAL_BASE6 is the byte-identical R40 raw-target ridge model. TARGET_DOMAIN_BASE6 uses the same six BASE6 features, same raw target, same ridge lambda=1, same three training manifests per holdout, same 1744 total budget, and exact R30 exclusion, but fits exactly three separate ridge responses keyed only by the candidate allocation's deterministic target domain: the domain with the largest positive budget delta from equal allocation (code, structured, or technical_prose; exact ties break code→structured→technical_prose). Each held-out excluded allocation is scored by the model for its frozen target domain. This tests whether the marginal value of spending the next unit of budget depends on where that unit is directed, without adding unrestricted capacity or meta-learning.",
+  "hypothesis": "R40 falsified the fixed support-envelope explanation: IN_ENVELOPE covered 19/33 excluded cases but had sign error 0.578947 versus 0.515152 globally, while OUT_OF_ENVELOPE sign error was lower at 0.428571. Freeze a bounded target-conditional residual calibration with no new learned representation. GLOBAL_BASE6 is the byte-identical R40 raw-target ridge predictor. TARGET_DOMAIN_OFFSET keeps that predictor unchanged and learns exactly three scalar residual offsets from training allocations only, keyed by the candidate allocation's deterministic target domain: the domain with the largest positive budget delta from equal allocation (code, structured, or technical_prose; exact ties break code→structured→technical_prose). For each outer holdout, compute the global BASE6 prediction and actual allocation advantage for all 27 non-equal training allocation cases, freeze each target-domain offset as the arithmetic mean of (actual advantage - global prediction) within that target-domain stratum, then add the corresponding frozen offset to each held-out excluded case's global prediction. This tests whether the marginal value of spending the next unit of budget has a domain-specific response bias without adding new features, nonlinear capacity, or meta-learning.",
   "exact_parent_sha": "de04517b53e8b72ceaeb15fbaf02960b2e8804c2",
   "qualification_branch": "research/external-hosted-wingless-future-data-target-conditional-response-attribution-r41",
   "predecessor": {
@@ -32,11 +32,11 @@
   "cause_effect_trace": {
     "observed_failure": "R40's in-envelope region had lower MAE but worse sign error than the global baseline, so geometric support alone does not identify where allocation advantage transfers.",
     "residual_cause_under_test": "GLOBAL_CALIBRATION_COLLAPSES_TARGET_DOMAIN_CONDITIONAL_RESPONSE",
-    "exact_bounded_delta": "replace one global BASE6 ridge response with exactly three target-domain-specific BASE6 ridge responses; do not change features, target, manifests, budget, candidate allocations, ridge lambda, exclusion set, or held-out ordering",
+    "exact_bounded_delta": "add exactly three training-only scalar residual offsets to the byte-identical global BASE6 predictor; do not change BASE6 features, global fit, target, manifests, budget, candidate allocations, ridge lambda, exclusion set, or held-out ordering",
     "target_domain_rule": "for each non-equal allocation compute allocation minus equal allocation per domain; choose the domain with largest positive delta; exact ties break code, then structured, then technical_prose",
     "control_rule": "GLOBAL_BASE6 is byte-identical R40/R39 raw-target predictor",
-    "conditional_rule": "TARGET_DOMAIN_BASE6 fits one ridge-lambda=1 BASE6 response for each frozen target-domain stratum using training-manifest allocation cases from that stratum only; held-out case chooses its model from its allocation before held-out outcome is read",
-    "fallback_rule": "if a training target-domain stratum is rank-deficient or contains fewer than six training rows, mark the experiment invalid rather than borrow another stratum or change capacity",
+    "conditional_rule": "TARGET_DOMAIN_OFFSET freezes one scalar mean residual per target domain from the 27 non-equal training allocation cases: mean(actual allocation advantage - GLOBAL_BASE6 predicted advantage). Each held-out case selects its target domain from allocation alone before held-out outcome and adds only that frozen scalar to GLOBAL_BASE6.",
+    "fallback_rule": "if any target-domain stratum has fewer than three training allocation cases or any offset is non-finite, mark the experiment invalid; do not borrow another stratum, tune a threshold, or add capacity",
     "retain_revert": "R41 is attribution only. Support authorizes only a separately preregistered bounded target-conditional correction/replication; allocator behavior remains unchanged."
   },
   "manifests": [
@@ -80,9 +80,11 @@
     ],
     "heldout_outcome_use_before_target_condition_freeze": 0,
     "post_result_target_condition_choice_count": 0,
-    "capacity": "three fixed BASE6 ridge fits only; no feature growth",
+    "capacity": "byte-identical GLOBAL_BASE6 plus exactly three scalar offsets",
     "tokenizer_use_count": 0,
-    "external_model_call_count": 0
+    "external_model_call_count": 0,
+    "target_domain_training_cases": "all 27 non-equal allocation cases across the three training manifests per outer holdout",
+    "target_domain_response": "one arithmetic-mean residual offset per target domain; no additional ridge fit or features"
   },
   "metrics": [
     "outer_holdout_manifest_count",
@@ -96,13 +98,12 @@
     "code_case_count",
     "structured_case_count",
     "technical_prose_case_count",
-    "code_sign_error_rate",
-    "structured_sign_error_rate",
-    "technical_prose_sign_error_rate",
+    "code_offset",
+    "structured_offset",
+    "technical_prose_offset",
     "base6_identity_mismatch_count",
     "target_domain_definition_mismatch_count",
     "target_stratum_insufficient_count",
-    "fit_failure_count",
     "heldout_outcome_use_before_target_condition_freeze",
     "post_result_target_condition_choice_count",
     "source_identity_mismatch_count",
@@ -120,11 +121,11 @@
     "supported": "valid AND target_conditional_sign_error_improvement>=0.10 AND target_conditional_mae_ratio<=1.00",
     "mixed": "valid AND target_conditional_sign_error_rate<global_sign_error_rate AND target_conditional_mean_absolute_error<global_mean_absolute_error but one or both supported thresholds are missed",
     "negative": "valid AND supported is false AND mixed is false",
-    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, BASE6 identity, deterministic target-domain rule, three fixed target-domain fits, raw target, ridge lambda, held-out ordering, minimum-stratum requirement, provenance or accounting rule fails"
+    "invalid": "any parent, manifest identity, 1744 budget, exact R30 exclusion, GLOBAL_BASE6 identity, deterministic target-domain rule, three scalar residual-offset definitions, raw target, ridge lambda, held-out ordering, minimum-stratum requirement, provenance or accounting rule fails"
   },
   "rsi_success": false,
   "rsi_success_note": "R41 is bounded target-conditional attribution on studied manifests; no allocation policy is changed and prospective disjoint validation remains required.",
-  "no_post_result_tuning_rule": "Do not alter manifests, BASE6, target-domain rule/tie-break, raw target, ridge lambda, thresholds, exclusion set, budget/capacity, held-out ordering, classification or authority after primary output.",
+  "no_post_result_tuning_rule": "Do not alter manifests, GLOBAL_BASE6, target-domain rule/tie-break, residual-offset definition, thresholds, exclusion set, budget/capacity, held-out ordering, classification or authority after primary output.",
   "successors": {
     "supported": {
       "contract_id": "wingless-r42-target-conditional-calibration-correction",
