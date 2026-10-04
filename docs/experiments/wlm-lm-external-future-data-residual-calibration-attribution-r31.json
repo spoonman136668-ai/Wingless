@@ -2,8 +2,8 @@
   "schema": "wingless.direct-preregistration.v1",
   "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-RESIDUAL-CALIBRATION-ATTRIBUTION-R31",
   "program": "Wingless RSI corrective tranche: residual calibration attribution after failed hard instability gate",
-  "question": "Within historically sign-unstable candidate allocations, does training-only majority-positive sign polarity identify a productive subgroup that the R30 hard gate incorrectly excluded, relative to the remaining unstable candidates, before any held-out outcome is opened?",
-  "hypothesis": "R30 failed because binary sign stability is too coarse: some unstable candidates are still systematically productive. For each outer holdout, use only the other three manifests to count each non-equal candidate's positive, negative, and zero actual-advantage signs and freeze a majority-positive-unstable flag before held-out outcomes open. After the flag set is frozen, evaluate held-out actual advantage. A supported result requires majority-positive unstable candidates to cover at least 20% of unstable cases, exceed the remaining unstable candidates' held-out positive rate by at least 0.15, and have higher mean held-out actual advantage. This is attribution only; no selection policy changes.",
+  "question": "Within the candidates excluded by the exact R30 hard eligibility gate, does training-only majority-positive sign polarity identify a productive subgroup relative to the remaining excluded candidates, before any held-out outcome is opened?",
+  "hypothesis": "R30 failed because its binary eligibility gate is too coarse: some candidates excluded for lacking exactly one stable non-zero training sign are still systematically productive. For each outer holdout, use only the other three manifests to count each non-equal candidate's positive, negative, and zero actual-advantage signs; reproduce the exact R30 excluded set as candidates whose training signs are not exactly one distinct non-zero sign; then freeze a majority-positive-excluded flag when positive_count >= 2 before held-out outcomes open. After the flag set is frozen, evaluate held-out actual advantage. A supported result requires majority-positive excluded candidates to cover at least 20% of excluded cases, exceed the remaining excluded candidates' held-out positive rate by at least 0.15, and have higher mean held-out actual advantage. This is attribution only; no selection policy changes.",
   "exact_parent_sha": "ab1d7467edc021d70a96fcc3b749651e4bb46fea",
   "qualification_branch": "research/external-hosted-wingless-future-data-residual-calibration-attribution-r31",
   "predecessor": {
@@ -51,9 +51,9 @@
   },
   "cause_effect_trace": {
     "observed_failure": "The R30 hard instability gate reduced total actual advantage from +31 to +5. It avoided one harmful fifth-manifest reallocation but forfeited larger positive opportunities on transfer, third, and fourth.",
-    "internal_diagnostic": "R30 collapsed 33 unstable candidate cases into one forbidden class and only 3 non-equal cases were stable across outer holdouts.",
+    "internal_diagnostic": "R30 collapsed 33 candidates excluded by the exact hard eligibility rule into one forbidden class and only 3 non-equal candidate cases satisfied exactly one stable non-zero training sign across outer holdouts.",
     "attributed_residual_candidate": "coarse instability grouping hides asymmetric sign structure",
-    "diagnostic_mechanism": "for every unstable non-equal candidate, count positive/negative/zero training-manifest actual-advantage signs and freeze majority_positive_unstable = positive_count >= 2 before held-out outcome construction",
+    "diagnostic_mechanism": "for every non-equal candidate, reproduce the exact R30 eligibility test: stable only when the three training-manifest actual-advantage signs contain exactly one distinct non-zero sign; all others are excluded. Within the excluded set, freeze majority_positive_excluded = positive_count >= 2 before held-out outcome construction.",
     "exact_bounded_delta": "diagnostic grouping and accounting only; no selection, model, feature, budget, capacity, candidate, manifest, or tie-break changes",
     "qualification": "same four sealed manifests, exact 1744 budget, deterministic double replay, full Go regression, READY_RESEARCH, all diagnostic flags frozen before held-out outcomes open",
     "retain_revert": "R31 cannot change allocator behavior. A supported attribution may justify a separately preregistered bounded asymmetric-instability correction; mixed/negative does not.",
@@ -93,21 +93,22 @@
     "external_model_call_count": 0
   },
   "diagnostic_rule": {
-    "unstable": "training actual-advantage signs across the three non-held-out manifests contain more than one distinct sign",
-    "majority_positive_unstable": "unstable AND positive training sign count >= 2",
-    "other_unstable": "unstable AND positive training sign count < 2",
-    "heldout_ordering": "all sign counts and subgroup flags freeze before held-out outcomes are constructed"
+    "r30_stable_nonzero": "training actual-advantage signs across the three non-held-out manifests contain exactly one distinct sign and that sign is +1 or -1",
+    "r30_excluded": "NOT r30_stable_nonzero; this includes mixed-sign histories and all-zero histories exactly as R30 did",
+    "majority_positive_excluded": "r30_excluded AND positive training sign count >= 2",
+    "other_excluded": "r30_excluded AND positive training sign count < 2",
+    "heldout_ordering": "all sign counts, exact-R30 exclusion flags, and subgroup flags freeze before held-out outcomes are constructed"
   },
   "metrics": [
     "outer_holdout_manifest_count",
-    "unstable_case_count",
-    "majority_positive_unstable_case_count",
-    "other_unstable_case_count",
-    "majority_positive_unstable_coverage",
-    "majority_positive_unstable_positive_rate",
-    "other_unstable_positive_rate",
-    "majority_positive_unstable_mean_actual_advantage",
-    "other_unstable_mean_actual_advantage",
+    "excluded_case_count",
+    "majority_positive_excluded_case_count",
+    "other_excluded_case_count",
+    "majority_positive_excluded_coverage",
+    "majority_positive_excluded_positive_rate",
+    "other_excluded_positive_rate",
+    "majority_positive_excluded_mean_actual_advantage",
+    "other_excluded_mean_actual_advantage",
     "majority_positive_positive_rate_delta",
     "majority_positive_mean_advantage_delta",
     "heldout_outcome_use_before_flags",
@@ -119,10 +120,10 @@
     "invalid_row_count"
   ],
   "classification_rules": {
-    "supported": "valid AND majority_positive_unstable_coverage >= 0.20 AND majority_positive_positive_rate_delta >= 0.15 AND majority_positive_mean_advantage_delta > 0",
+    "supported": "valid AND majority_positive_excluded_coverage >= 0.20 AND majority_positive_positive_rate_delta >= 0.15 AND majority_positive_mean_advantage_delta > 0",
     "mixed": "valid AND majority_positive_positive_rate_delta > 0 AND majority_positive_mean_advantage_delta > 0 but supported criterion is not met",
     "negative": "valid AND (majority_positive_positive_rate_delta <= 0 OR majority_positive_mean_advantage_delta <= 0)",
-    "invalid": "any parent, manifest identity, 1744 budget, candidate set, training-only sign-count calculation, held-out ordering, deterministic replay, capacity, provenance, or accounting requirement fails"
+    "invalid": "any parent, manifest identity, 1744 budget, candidate set, exact R30 stable-nonzero eligibility reproduction, training-only sign-count calculation, held-out ordering, deterministic replay, capacity, provenance, or accounting requirement fails"
   },
   "rsi_success": false,
   "rsi_success_note": "R31 is attribution on already studied manifests and cannot establish allocator success.",
