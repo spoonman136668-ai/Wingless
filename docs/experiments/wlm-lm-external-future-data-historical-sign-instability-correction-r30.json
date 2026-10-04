@@ -27,7 +27,7 @@
     "frozen_candidate_selection_rule": "for each outer holdout fit the unchanged R27 predictor on the other three manifests; compute each candidate's actual-advantage sign on those same training manifests; among non-equal candidates with one stable nonzero sign and strictly positive predicted held-out advantage select the highest prediction with unchanged lexical tie-break; otherwise select equal",
     "exact_bounded_delta": "selection eligibility only; no feature, model, budget, capacity, data, candidate allocation, or outcome definition changes",
     "qualification": "same four sealed manifests, exact 1744 budget, deterministic double replay, full Go regression, READY_RESEARCH, held-out outcomes opened only after corrected and uncorrected selections freeze",
-    "held_out_result": "compare corrected and uncorrected selected actual advantage versus equal on each held-out manifest",
+    "held_out_result": "compare corrected and uncorrected selections, both frozen from training-only state plus held-out features, against equal allocation after the held-out outcome opens",
     "retain_revert": "retain the instability gate only if the preregistered supported criterion passes; otherwise do not use it operationally",
     "next_hypothesis": "supported -> prospectively validate the unchanged gate on a newly admitted disjoint manifest; mixed/negative -> attribute residual calibration error before another correction"
   },
@@ -128,5 +128,10 @@
   },
   "changed_paths": [
     "docs/experiments/wlm-lm-external-future-data-historical-sign-instability-correction-r30.json"
-  ]
+  ],
+  "uncorrected_selection_rule": {
+    "eligible_non_equal": "predicted held-out advantage > 0",
+    "selection": "highest predicted advantage among non-equal candidates with predicted advantage > 0, lexical tie-break",
+    "fallback": "FALLBACK_EQUAL when no non-equal candidate has predicted advantage > 0"
+  }
 }
