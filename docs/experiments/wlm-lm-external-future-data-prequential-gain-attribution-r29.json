@@ -81,15 +81,14 @@
   },
   "classification_rules": {
     "supported": "valid and policy sign accuracy >=0.70, false-positive reallocation rate <=0.30, mean absolute error < R28 ungated 9.219594413938847, and mean rank concordance >=0.65",
-    "mixed": "valid and prequential diagnostic improves at least two of sign accuracy, false-positive rate, mean absolute error, rank concordance versus the frozen R28/static reference, but misses supported thresholds",
-    "negative": "valid and fewer than two preregistered reliability metrics improve",
+    "mixed": "valid and at least two of four fixed criteria improve: sign accuracy >0.55; false-positive reallocation rate <0.5384615384615384; mean absolute error <9.219594413938847; mean rank concordance >0.50, while supported thresholds are not all met",
+    "negative": "valid and fewer than two of those four fixed improvement criteria are met",
     "invalid": "any parent, manifest identity, interval split, probe leakage, training construction, policy integration, evaluation ordering, deterministic replay, capacity, provenance or accounting requirement fails"
   },
   "frozen_reference": {
     "sign_accuracy": 0.55,
     "false_positive_reallocation_rate": 0.5384615384615384,
-    "mean_absolute_error": 9.219594413938847,
-    "rank_concordance_baseline": "computed and reported from R29 static comparison only if needed; not used as a mutable threshold"
+    "mean_absolute_error": 9.219594413938847
   },
   "no_post_result_tuning_rule": "Do not change manifests, interval grids, midpoint rule, probe region, model construction, policy set, equal baseline, metrics, thresholds, classification or authority after primary output.",
   "successor_if_supported": {
@@ -105,5 +104,11 @@
     "unitary/wlm_lm_external_future_data_prequential_gain_attribution_r29.go",
     "cmd/wlm-lm-external-future-data-prequential-gain-attribution-r29/main.go",
     ".github/workflows/external-future-data-prequential-gain-attribution-r29.yml"
-  ]
+  ],
+  "metric_semantics": {
+    "sign_accuracy": "exact sign(predicted policy advantage) equals exact sign(actual policy advantage); zero matches only zero",
+    "false_positive_reallocation_rate": "predicted advantage >0 cases with actual advantage <=0 divided by predicted-positive cases; zero if no predicted-positive cases",
+    "mean_absolute_error": "mean abs(predicted advantage-actual advantage) over all 40 policy cases",
+    "rank_concordance": "within each manifest, over unordered policy pairs with unequal actual advantages: 1 for matching predicted ordering, 0.5 for predicted tie, 0 otherwise; report mean of the four manifest concordances"
+  }
 }
