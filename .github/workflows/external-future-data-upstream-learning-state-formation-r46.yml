@@ -1,0 +1,183 @@
+name: Wingless upstream learning-state formation R46
+on:
+  push:
+    branches:
+      - research/external-hosted-wingless-future-data-upstream-learning-state-formation-r46
+    paths:
+      - 'docs/experiments/wlm-lm-external-future-data-upstream-learning-state-formation-r46.json'
+      - 'docs/experiments/wlm-lm-external-future-data-r46-manifest.json'
+      - 'unitary/wlm_lm_external_future_data_upstream_learning_state_formation_r46.go'
+      - 'cmd/wlm-lm-external-future-data-upstream-learning-state-formation-r46/main.go'
+      - '.github/workflows/external-future-data-upstream-learning-state-formation-r46.yml'
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Validate frozen package
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 'abf2488262dc5bbd0273f141e7a7f3d389a59b6b' HEAD
+          git merge-base --is-ancestor '002fd4e30b4589a5eab2b2ec3a1ae72c2e7d0be3' HEAD
+          changed="$(git diff --name-only 'abf2488262dc5bbd0273f141e7a7f3d389a59b6b..HEAD' | sort)"
+          expected="$(printf '%s\n' \
+            '.github/workflows/external-future-data-upstream-learning-state-formation-r46.yml' \
+            'cmd/wlm-lm-external-future-data-upstream-learning-state-formation-r46/main.go' \
+            'docs/experiments/wlm-lm-external-future-data-upstream-learning-state-formation-r46.json' \
+            'docs/experiments/wlm-lm-external-future-data-r46-manifest.json' \
+            'unitary/wlm_lm_external_future_data_upstream_learning_state_formation_r46.go' | sort)"
+          test "$changed" = "$expected"
+          test "$(git rev-parse '002fd4e30b4589a5eab2b2ec3a1ae72c2e7d0be3:docs/experiments/wlm-lm-external-future-data-upstream-learning-state-formation-r46.json')" = 'e1bd0f0bf9e58fb083852a40c0c6444e5f784fa9'
+          test "$(git rev-parse '002fd4e30b4589a5eab2b2ec3a1ae72c2e7d0be3:docs/experiments/wlm-lm-external-future-data-r46-manifest.json')" = '0587e69da82d9ef26e9e6a168bbeb0bfb8c2332d'
+      - name: Verify exact READY_RESEARCH receipt
+        shell: bash
+        env:
+          AUTHORITY_RECEIPT_SHA256: 'e36228a842bf6613d55bed602e1def3d3489f4c2d264dc88108b91d3832e5303'
+          AUTHORITY_RECEIPT_B64: 'eyJhdXRob3JpdHlfd29ya2Zsb3dfcmVmIjoicmVzZWFyY2gvZGV0ZXJtaW5pc3RpYy1yZXNlYXJjaC1sb29wLWNvbnRyb2xsZXItcjc3IiwiYXV0aG9yaXR5X3dvcmtmbG93X3JlZl9zaGEiOiIyNGZlNzkzZjAzZjUzODFhOTQxMDg0OWYyM2E5YTkzNjcyZjkwY2JjIiwiY2tiX3BsYW5lX21haW5fc2hhIjoiMDAyYjVlNjgzZTRkNWVhMjgwMWM2ZWVhN2MwNWRhNmNjNzNiYjk5YiIsImV4cGVyaW1lbnQiOiJXTE0tTE0tRVhURVJOQUwtRlVUVVJFLURBVEEtVVBTVFJFQU0tTEVBUk5JTkctU1RBVEUtRk9STUFUSU9OLVI0NiIsImZldGNoX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1mZXRjaC52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfRkVUQ0giLCJzY29wZSI6ImZldGNoLXZlcmlmeS1vbmx5IiwicmVhc29ucyI6bnVsbH0sIm1hbmlmZXN0X3NoYTI1NiI6IjcxOTQ0ZDg4MDZiYWNlNWEyNDI2ZWVmNjkyNWU4NjhkZDc1NTY3NWQxMzQ4OWUzZDY2Y2Y2NzU0MjllMjZhMGYiLCJwbGFuX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfUExBTiIsInNjb3BlIjoicGxhbi1vbmx5IiwicmVhc29ucyI6bnVsbH0sInByZXJlZ2lzdHJhdGlvbl9zaGEiOiIwMDJmZDRlMzBiNDU4OWE1ZWFiMmIyZWMzYTFhZTcyYzJlN2QwYmUzIiwicHJvamVjdCI6IldpbmdsZXNzIiwicmVxdWVzdF9pZCI6IjAyMDlkOTQxYTEzMWViOWNiZmY5M2ZlMzhkNWZmOGI2IiwicmVzZWFyY2hfZGVjaXNpb24iOnsic2NoZW1hIjoiY2tiLXBsYW5lLmV4dGVybmFsLWV4cG9zdXJlLXJlc2VhcmNoLnYxIiwiZGlzcG9zaXRpb24iOiJSRUFEWV9SRVNFQVJDSCIsInNjb3BlIjoicmVzZWFyY2gtY29uc3VtZS1vbmNlIiwicmVhc29ucyI6bnVsbH0sInJlc2VhcmNoX2hvc3QiOiJHaXRIdWIgQWN0aW9ucyAxMDAwMDAyNTQzIiwicnVubmVyX2lkIjoiR2l0SHViIEFjdGlvbnMgMTAwMDAwMjU0MyIsInNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1yZWFkeS1yZXNlYXJjaC1yZWNlaXB0LnYxIn0='
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64,hashlib,json,os,pathlib
+          raw=base64.b64decode(os.environ["AUTHORITY_RECEIPT_B64"],validate=True)
+          assert hashlib.sha256(raw).hexdigest()==os.environ["AUTHORITY_RECEIPT_SHA256"]
+          r=json.loads(raw)
+          assert r["schema"]=="ckb-plane.external-exposure-ready-research-receipt.v1"
+          assert r["project"]=="Wingless"
+          assert r["experiment"]=="WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-LEARNING-STATE-REPRESENTATION-R46"
+          assert r["preregistration_sha"]=="002fd4e30b4589a5eab2b2ec3a1ae72c2e7d0be3"
+          assert r["manifest_sha256"]=="a7f5aa73efecaa382ae50c0b8a27696cb97e39e4da8e2669191d075559d86d1e"
+          assert r["ckb_plane_main_sha"]=="002b5e683e4d5ea2801c6eea7c05da6cc73bb99b"
+          assert r["plan_decision"]["disposition"]=="READY_PLAN"
+          assert r["fetch_decision"]["disposition"]=="READY_FETCH"
+          assert r["research_decision"]["disposition"]=="READY_RESEARCH"
+          pathlib.Path("/tmp/authority.json").write_bytes(raw)
+          PY
+      - name: Fetch historical and unseen sealed manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for n in transfer third fourth fifth twelfth thirteenth fourteenth; do mkdir -p "$RUNNER_TEMP/r46-$n"; done
+          python3 - <<'PY'
+          import hashlib,pathlib,urllib.request,urllib.parse,os
+          roots={n:pathlib.Path(os.environ["RUNNER_TEMP"])/("r46-"+n) for n in ("transfer","third","fourth","fifth","twelfth","thirteenth","fourteenth")}
+          historical={
+            "transfer":[
+              ("code","https://raw.githubusercontent.com/python/cpython/ebf955df7a89ed0c7968f79faec1de49f61ed7cb/Lib/statistics.py",61896,"3023ec949802c2e880a000775bfd1a6b70c21b5423881118141e3ec69d8e3336",41453,"66bb25b24a0316b4965c64798494de93a1d7332672b15b5f430ab6a2fb4b9d45"),
+              ("structured","https://raw.githubusercontent.com/json-schema-org/JSON-Schema-Test-Suite/5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8/tests/draft2020-12/uniqueItems.json",14490,"ed84ef6ddc827659e257ba64cbe9679f06932b6320bea5c07622bf3d2cc4daa5",14365,"95ddbd0eaef29aad5ecfc74f9da21b795481f58b2c59380324a445fcd4d08932"),
+              ("technical-prose","https://raw.githubusercontent.com/golang/go/6f5c275ebdc454197fff5f1496521c8f81e20eef/doc/README.md",3124,"c1bf000e7a873b3afed329c5b9f9c07f7692b1d7fb2bfca2d7600cec8b1d1407",1454,"48c3d95b8b03864a4af41d892710675956cde85afd0d5d6c331594de9f17881b")],
+            "third":[
+              ("code","https://raw.githubusercontent.com/torvalds/linux/a74306e2e676f9775457366fc047a660fbf02f26/kernel/sched/core.c",303863,"9297982652b9810b3508993c06d3c6e097ebca5cbe1ef3a6246bccfa0c1128b1",41453,"50744a9e70d67d62c97f3f434f4f05788b6b8514c6bce46cf7dafbaf49e2abff"),
+              ("structured","https://raw.githubusercontent.com/SchemaStore/schemastore/de76181a2ab215431d3e9314bc14f83cc3b01ad2/src/schemas/json/github-workflow.json",118601,"d10c9f4656e1bd5bc6727e9b35080e017dc167154726fca93da33c7a6bd1c4f3",14365,"2a97ba02bc5e479b1738f6f0c3e09318bb5a255350c84de014ddbcebea46af56"),
+              ("technical-prose","https://raw.githubusercontent.com/rust-lang/book/1500248d8f230566e4ec9f27fcbb8fe9e2898ab1/src/ch01-03-hello-cargo.md",11025,"61369f359b84b646fc3773eb569a26bc18ba6edb4cf2be06a84472c7054c0e39",1454,"23c002a1984ed065abfdbafa82100ed54d6bf6276a947676e710a30c75d96017")],
+            "fourth":[
+              ("code","https://raw.githubusercontent.com/kubernetes/kubernetes/e7967bb9b76d43a6388abb7a4e90d2f899ef97ff/pkg/kubelet/kubelet.go",156626,"e0f247ef45cb281166b58ba1a013dc6925023388193bd74c1f126c695b770d34",41453,"283073d9f6c0dd868c39a913364bce6744ff1e29c038f6920197c0d33e0c2ac1"),
+              ("structured","https://raw.githubusercontent.com/microsoft/TypeScript/50d70a3f5f453a79a4323b263165da51f656a4e3/package-lock.json",143844,"52b6c9bd0a26ef1b0fc27dfbfaa00df6a047cdddd587d07c4f6c1c3345faf5cf",14365,"a46fcfb7d862b03b750b61a5f667d4ac25a064df9ccb746e395db7e864068933"),
+              ("technical-prose","https://raw.githubusercontent.com/django/django/a461af8ce48762d7ec602260aaff81014ddccbcb/docs/intro/tutorial01.txt",10844,"1cf1817e6211b7c0fa9e8044ee808fde1e8f16ca5f9d5ab5358510a5c9591b96",1454,"5d0c2efd139bd6094098bc893ed746020f03e0860a25f278348f43f47c236222")],
+            "fifth":[
+              ("code","https://raw.githubusercontent.com/pytorch/pytorch/496340f06ef7bda2800522429ba3f4e3473a92fa/torch/_inductor/scheduler.py",539420,"b13a89d0fd77430e2a637dae41980086909c4ad4a855b8418dc17286c39953b8",41453,"504b68653b5478b88216f6342a74bacc5982549657005fb486dd00d753b4ea9a"),
+              ("structured","https://raw.githubusercontent.com/microsoft/vscode/6fad7188e7dbf7db564e5e4a85960eb2bf69bdf4/package-lock.json",784171,"73224989048e176e7eeafa8aa729df7e4d510f4bd453018902d95345db0fe886",14365,"5c0f3a215ba35b7fbcaae212d27a33ba5109e16d89809987d16fa89072534281"),
+              ("technical-prose","https://raw.githubusercontent.com/numpy/numpy/2f1eca306857b641fb0fef0ab854a2d4137e1581/doc/source/user/absolute_beginners.rst",52653,"945a0a598d080ee7526c9bd5459ce615a5b49fe0331adfdf8bbd8812e908e7e3",1454,"527e21110a7f84a1939ccf6063fdfeb77905d9ec180e5fde18488d21b90c4f49")]}
+          for group,sources in historical.items():
+            for name,url,full_n,full_h,prefix_n,prefix_h in sources:
+              data=urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"wingless-r46"}),timeout=90).read(full_n+1)
+              assert len(data)==full_n and hashlib.sha256(data).hexdigest()==full_h
+              p=data[:prefix_n];assert hashlib.sha256(p).hexdigest()==prefix_h
+              (roots[group]/(name+".bin")).write_bytes(p)
+          unseen={
+            "twelfth":[
+              ("code","llvm/llvm-project","f59949b688b508821402adc5d69b26811a777fc6","llvm/lib/Transforms/Scalar/LoopStrengthReduce.cpp","95117d9758958340aaa880b1bf7b00036dab3d5e",41453,"861250d5122dd4730e4c06431fe95c474e0c08536f18197905fccf81994c9200"),
+              ("structured","rust-lang/rust","602727f26878dcf9eb2999e2f58e5df1269ff47e","Cargo.lock","71086e7203470f289fb882269689b402803dad5a",14365,"b6561ecbbbf6683e8ab7307e8180612b55d1d8bb38636d81c1042ac52a088d81"),
+              ("technical-prose","openssl/openssl","06739307f135799f266b23ddabe669e45f856fe1","README.md","d009d8e42d5d64dd6cf038bfad0136f22074dc2a",1454,"a00d850ded61b9c9cbfd18cb26ee5f62cd8d723379ea780ac1ccc8563952c55a")],
+            "thirteenth":[
+              ("code","torvalds/linux","67f0943b394d920b6c142aad8c6af94340342ae7","mm/memory.c","8b0c2c735d3de76617dcf6d47239e92af15acc61",41453,"e54d402b5e13aacbc40a1d8917e9abb0315819306601d3adc0c1a8fdd635b0e2"),
+              ("structured","home-assistant/core","42a3d42de76a44959e91fc3155a8126fa5e6aa31","requirements_all.txt","1a66a77553d744d27036dfeaaa76c42da6ad57c4",14365,"5562dc8afa6505662e7d0e1cf0abf87a997c975365573a15ee5c6984b8283c6e"),
+              ("technical-prose","helix-editor/helix","ba40e547426b0f9896c8bdc699a4ab11f2b37dbc","README.md","c1beb780a8b7515c791aceac992b391a039fa4a7",1454,"62a75c11878920086235c3d6862284fce12af8448437e8878e878ee00a177b73")],
+            "fourteenth":[
+              ("code","redis/redis","b540ca49cba815f3fbe634363c3df68d4f4f127a","src/server.c","0ddd2c4241d259c1e8ed91d7ea30b30e255c6c67",41453,"3e8d985c87b5677a963e9be4db2c8305fddddf37949c95ec7e049e908d8dc21d"),
+              ("structured","astral-sh/uv","e7cb965943d3220095d85d9c017021e1f6d2ee4b","Cargo.lock","206fab281f2194498cff0c10fa04c1f9ec080914",14365,"e9ea638e5f4910867d4bbcaa0e6d94752760685345797af235a93124a09770fb"),
+              ("technical-prose","neovim/neovim","7a8b7c04778d334f60766a0c83933b74e4e237b3","README.md","e92d0961d7307a7e539b68d5b5ba840727000e00",1454,"15d8e5279840fceaca514bc4e747316e3b542d3c112405c98b6c72907fc0b1eb")]}
+          for group,sources in unseen.items():
+            for name,repo,commit,path,blob,prefix_n,prefix_h in sources:
+              url=f"https://raw.githubusercontent.com/{repo}/{commit}/{urllib.parse.quote(path)}"
+              data=urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"wingless-r46"}),timeout=90).read()
+              got=hashlib.sha1((f"blob {len(data)}\0").encode()+data).hexdigest()
+              assert got==blob and len(data)>=prefix_n,(group,name,got,blob,len(data))
+              p=data[:prefix_n]
+              assert hashlib.sha256(p).hexdigest()==prefix_h,(group,name,"prefix-sha256")
+              (roots[group]/(name+".bin")).write_bytes(p)
+          PY
+          for n in transfer third fourth fifth twelfth thirteenth fourteenth; do
+            key="$(echo "$n" | tr '[:lower:]' '[:upper:]')_ROOT"
+            echo "$key=$RUNNER_TEMP/r46-$n" >> "$GITHUB_ENV"
+          done
+      - name: Full Go regression
+        run: go test ./... -count=1
+      - name: Run frozen R46 twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--transfer-root "$TRANSFER_ROOT" --third-root "$THIRD_ROOT" --fourth-root "$FOURTH_ROOT" --fifth-root "$FIFTH_ROOT" --twelfth-root "$NINTH_ROOT" --thirteenth-root "$TENTH_ROOT" --fourteenth-root "$ELEVENTH_ROOT")
+          go run ./cmd/wlm-lm-external-future-data-upstream-learning-state-formation-r46 "${args[@]}" > /tmp/result1.json
+          go run ./cmd/wlm-lm-external-future-data-upstream-learning-state-formation-r46 "${args[@]}" > /tmp/result2.json
+          cmp /tmp/result1.json /tmp/result2.json
+          cat /tmp/result1.json
+      - name: Classify frozen R46
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,math,pathlib
+          r=json.loads(pathlib.Path("/tmp/result1.json").read_text());m=r["metrics"]
+          valid=(m["historical_manifest_count"]==4 and m["unseen_manifest_count"]==3 and m["candidate_action_count"]==9 and
+                 m["candidate_pair_count"]==108 and m["non_tie_pair_count"]>=72 and
+                 m["formation_state_dimension"]==6 and m["formation_readout_parameter_count"]==7 and m["base6_readout_parameter_count"]==7 and
+                 m["fit_failure_count"]==0 and m["formation_definition_mismatch_count"]==0 and
+                 m["readout_parameter_count_mismatch_count"]==0 and m["fixed_budget_mismatch_count"]==0 and
+                 m["heldout_outcome_use_before_pair_freeze"]==0 and m["post_result_representation_or_threshold_choice_count"]==0 and
+                 m["source_identity_mismatch_count"]==0 and m["capacity_growth_event_count"]==0 and
+                 m["tokenizer_use_count"]==0 and m["external_model_call_count"]==0 and
+                 m["counter_overflow_count"]==0 and m["invalid_row_count"]==0 and
+                 all(math.isfinite(float(v)) for v in m.values()))
+          supported=(valid and m["formation_minus_base6_accuracy"]>=0.05 and m["positive_manifest_count"]>=2 and
+                     m["formation_mean_decision_regret"]<=0.90*m["base6_mean_decision_regret"])
+          mixed=(valid and not supported and m["formation_minus_base6_accuracy"]>=0.015 and m["positive_manifest_count"]>=2 and
+                 m["formation_mean_decision_regret"]<m["base6_mean_decision_regret"])
+          cls="invalid" if not valid else "supported" if supported else "mixed" if mixed else "negative"
+          failure_class=None;failing_step=None;error_signature=None
+          if cls=="invalid":
+              failure_class="FROZEN_VALIDITY_FAILURE";failing_step="classification"
+              error_signature=hashlib.sha256(json.dumps(m,sort_keys=True,separators=(",",":")).encode()).hexdigest()
+          out={"schema":"wingless.research-classification.v1","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-LEARNING-STATE-REPRESENTATION-R46",
+               "classification":cls,"validity_pass":valid,"upstream_formation_support":supported,"mixed_signal":mixed,
+               "failure_class":failure_class,"failing_step":failing_step,"error_signature":error_signature,
+               "authority_receipt_sha256":"e36228a842bf6613d55bed602e1def3d3489f4c2d264dc88108b91d3832e5303","rsi_success":False,
+               "rsi_success_reason":"R46 tests one frozen six-dimensional causal-formation replacement representation under the unchanged fixed budget; it does not authorize allocator enrichment or capacity growth.","metrics":m}
+          pathlib.Path("/tmp/classification.json").write_text(json.dumps(out,separators=(",",":")),encoding="utf-8")
+          print(json.dumps(out,separators=(",",":")))
+          PY
+      - name: Delete external bytes
+        if: always()
+        shell: bash
+        run: rm -rf "$RUNNER_TEMP"/r46-*
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-upstream-learning-state-formation-r46
+          path: |
+            /tmp/authority.json
+            /tmp/result1.json
+            /tmp/result2.json
+            /tmp/classification.json
+          if-no-files-found: error
