@@ -1,0 +1,181 @@
+name: Wingless causal latent learning-state representation R45
+on:
+  push:
+    branches:
+      - research/external-hosted-wingless-future-data-causal-latent-learning-state-representation-r45
+    paths:
+      - 'docs/experiments/wlm-lm-external-future-data-causal-latent-learning-state-representation-r45.json'
+      - 'docs/experiments/wlm-lm-external-future-data-r45-manifest.json'
+      - 'unitary/wlm_lm_external_future_data_causal_latent_learning_state_representation_r45.go'
+      - 'cmd/wlm-lm-external-future-data-causal-latent-learning-state-representation-r45/main.go'
+      - '.github/workflows/external-future-data-causal-latent-learning-state-representation-r45.yml'
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Validate frozen package
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 'af11f095bedf2607314e911831cc8b78fe2bc35d' HEAD
+          git merge-base --is-ancestor 'e1b8bf19475414fd5354d45975cceff77b6f796f' HEAD
+          changed="$(git diff --name-only 'af11f095bedf2607314e911831cc8b78fe2bc35d..HEAD' | sort)"
+          expected="$(printf '%s\n' \
+            '.github/workflows/external-future-data-causal-latent-learning-state-representation-r45.yml' \
+            'cmd/wlm-lm-external-future-data-causal-latent-learning-state-representation-r45/main.go' \
+            'docs/experiments/wlm-lm-external-future-data-causal-latent-learning-state-representation-r45.json' \
+            'docs/experiments/wlm-lm-external-future-data-r45-manifest.json' \
+            'unitary/wlm_lm_external_future_data_causal_latent_learning_state_representation_r45.go' | sort)"
+          test "$changed" = "$expected"
+          test "$(git rev-parse 'e1b8bf19475414fd5354d45975cceff77b6f796f:docs/experiments/wlm-lm-external-future-data-causal-latent-learning-state-representation-r45.json')" = 'e1bd0f0bf9e58fb083852a40c0c6444e5f784fa9'
+          test "$(git rev-parse 'e1b8bf19475414fd5354d45975cceff77b6f796f:docs/experiments/wlm-lm-external-future-data-r45-manifest.json')" = '0587e69da82d9ef26e9e6a168bbeb0bfb8c2332d'
+      - name: Verify exact READY_RESEARCH receipt
+        shell: bash
+        env:
+          AUTHORITY_RECEIPT_SHA256: 'f2f4a7c2b421bd169ac67574e1e9944e20e0376557b1ae7ecddf403e220d95dc'
+          AUTHORITY_RECEIPT_B64: 'eyJhdXRob3JpdHlfd29ya2Zsb3dfcmVmIjoicmVzZWFyY2gvcmVzZWFyY2gtYXV0aG9yaXR5LW1hbmlmZXN0LXJlZ2lzdHJ5LXIzIiwiYXV0aG9yaXR5X3dvcmtmbG93X3JlZl9zaGEiOiI3ODM3NmY4OWRiZjgwYzkxMzQyMTQ5Y2Q1MmMwNDFmZTFkYmRlNzI5IiwiY2tiX3BsYW5lX21haW5fc2hhIjoiNzgzNzZmODlkYmY4MGM5MTM0MjE0OWNkNTJjMDQxZmUxZGJkZTcyOSIsImV4cGVyaW1lbnQiOiJXTE0tTE0tRVhURVJOQUwtRlVUVVJFLURBVEEtQ0FVU0FMLUxBVEVOVC1MRUFSTklORy1TVEFURS1SRVBSRVNFTlRBVElPTi1SNDUiLCJmZXRjaF9kZWNpc2lvbiI6eyJzY2hlbWEiOiJja2ItcGxhbmUuZXh0ZXJuYWwtZXhwb3N1cmUtZmV0Y2gudjEiLCJkaXNwb3NpdGlvbiI6IlJFQURZX0ZFVENIIiwic2NvcGUiOiJmZXRjaC12ZXJpZnktb25seSIsInJlYXNvbnMiOm51bGx9LCJtYW5pZmVzdF9zaGEyNTYiOiJhN2Y1YWE3M2VmZWNhYTM4MmFlNTBjMGI4YTI3Njk2Y2I5N2UzOWU0ZGE4ZTI2NjkxOTFkMDc1NTU5ZDg2ZDFlIiwicGxhbl9kZWNpc2lvbiI6eyJzY2hlbWEiOiJja2ItcGxhbmUuZXh0ZXJuYWwtZXhwb3N1cmUudjEiLCJkaXNwb3NpdGlvbiI6IlJFQURZX1BMQU4iLCJzY29wZSI6InBsYW4tb25seSIsInJlYXNvbnMiOm51bGx9LCJwcmVyZWdpc3RyYXRpb25fc2hhIjoiZTFiOGJmMTk0NzU0MTRmZDUzNTRkNDU5NzVjY2VmZjc3YjZmNzk2ZiIsInByb2plY3QiOiJXaW5nbGVzcyIsInJlcXVlc3RfaWQiOiJiNWQyNWRhMTE0NDM4ZmM1MTk5ZWYwOTlmZDRhZjI4OCIsInJlc2VhcmNoX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1yZXNlYXJjaC52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfUkVTRUFSQ0giLCJzY29wZSI6InJlc2VhcmNoLWNvbnN1bWUtb25jZSIsInJlYXNvbnMiOm51bGx9LCJyZXNlYXJjaF9ob3N0IjoiR2l0SHViIEFjdGlvbnMgMTAwMDAwMjUxMiIsInJ1bm5lcl9pZCI6IkdpdEh1YiBBY3Rpb25zIDEwMDAwMDI1MTIiLCJzY2hlbWEiOiJja2ItcGxhbmUuZXh0ZXJuYWwtZXhwb3N1cmUtcmVhZHktcmVzZWFyY2gtcmVjZWlwdC52MSJ9'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64,hashlib,json,os,pathlib
+          raw=base64.b64decode(os.environ["AUTHORITY_RECEIPT_B64"],validate=True)
+          assert hashlib.sha256(raw).hexdigest()==os.environ["AUTHORITY_RECEIPT_SHA256"]
+          r=json.loads(raw)
+          assert r["schema"]=="ckb-plane.external-exposure-ready-research-receipt.v1"
+          assert r["project"]=="Wingless"
+          assert r["experiment"]=="WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-LEARNING-STATE-REPRESENTATION-R45"
+          assert r["preregistration_sha"]=="e1b8bf19475414fd5354d45975cceff77b6f796f"
+          assert r["manifest_sha256"]=="a7f5aa73efecaa382ae50c0b8a27696cb97e39e4da8e2669191d075559d86d1e"
+          assert r["ckb_plane_main_sha"]=="78376f89dbf80c91342149cd52c041fe1dbde729"
+          assert r["plan_decision"]["disposition"]=="READY_PLAN"
+          assert r["fetch_decision"]["disposition"]=="READY_FETCH"
+          assert r["research_decision"]["disposition"]=="READY_RESEARCH"
+          pathlib.Path("/tmp/authority.json").write_bytes(raw)
+          PY
+      - name: Fetch historical and unseen sealed manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for n in transfer third fourth fifth ninth tenth eleventh; do mkdir -p "$RUNNER_TEMP/r45-$n"; done
+          python3 - <<'PY'
+          import hashlib,pathlib,urllib.request,urllib.parse,os
+          roots={n:pathlib.Path(os.environ["RUNNER_TEMP"])/("r45-"+n) for n in ("transfer","third","fourth","fifth","ninth","tenth","eleventh")}
+          historical={
+            "transfer":[
+              ("code","https://raw.githubusercontent.com/python/cpython/ebf955df7a89ed0c7968f79faec1de49f61ed7cb/Lib/statistics.py",61896,"3023ec949802c2e880a000775bfd1a6b70c21b5423881118141e3ec69d8e3336",41453,"66bb25b24a0316b4965c64798494de93a1d7332672b15b5f430ab6a2fb4b9d45"),
+              ("structured","https://raw.githubusercontent.com/json-schema-org/JSON-Schema-Test-Suite/5b0ee1613e45fcc2bddac00e07c19cd49b00d8a8/tests/draft2020-12/uniqueItems.json",14490,"ed84ef6ddc827659e257ba64cbe9679f06932b6320bea5c07622bf3d2cc4daa5",14365,"95ddbd0eaef29aad5ecfc74f9da21b795481f58b2c59380324a445fcd4d08932"),
+              ("technical-prose","https://raw.githubusercontent.com/golang/go/6f5c275ebdc454197fff5f1496521c8f81e20eef/doc/README.md",3124,"c1bf000e7a873b3afed329c5b9f9c07f7692b1d7fb2bfca2d7600cec8b1d1407",1454,"48c3d95b8b03864a4af41d892710675956cde85afd0d5d6c331594de9f17881b")],
+            "third":[
+              ("code","https://raw.githubusercontent.com/torvalds/linux/a74306e2e676f9775457366fc047a660fbf02f26/kernel/sched/core.c",303863,"9297982652b9810b3508993c06d3c6e097ebca5cbe1ef3a6246bccfa0c1128b1",41453,"50744a9e70d67d62c97f3f434f4f05788b6b8514c6bce46cf7dafbaf49e2abff"),
+              ("structured","https://raw.githubusercontent.com/SchemaStore/schemastore/de76181a2ab215431d3e9314bc14f83cc3b01ad2/src/schemas/json/github-workflow.json",118601,"d10c9f4656e1bd5bc6727e9b35080e017dc167154726fca93da33c7a6bd1c4f3",14365,"2a97ba02bc5e479b1738f6f0c3e09318bb5a255350c84de014ddbcebea46af56"),
+              ("technical-prose","https://raw.githubusercontent.com/rust-lang/book/1500248d8f230566e4ec9f27fcbb8fe9e2898ab1/src/ch01-03-hello-cargo.md",11025,"61369f359b84b646fc3773eb569a26bc18ba6edb4cf2be06a84472c7054c0e39",1454,"23c002a1984ed065abfdbafa82100ed54d6bf6276a947676e710a30c75d96017")],
+            "fourth":[
+              ("code","https://raw.githubusercontent.com/kubernetes/kubernetes/e7967bb9b76d43a6388abb7a4e90d2f899ef97ff/pkg/kubelet/kubelet.go",156626,"e0f247ef45cb281166b58ba1a013dc6925023388193bd74c1f126c695b770d34",41453,"283073d9f6c0dd868c39a913364bce6744ff1e29c038f6920197c0d33e0c2ac1"),
+              ("structured","https://raw.githubusercontent.com/microsoft/TypeScript/50d70a3f5f453a79a4323b263165da51f656a4e3/package-lock.json",143844,"52b6c9bd0a26ef1b0fc27dfbfaa00df6a047cdddd587d07c4f6c1c3345faf5cf",14365,"a46fcfb7d862b03b750b61a5f667d4ac25a064df9ccb746e395db7e864068933"),
+              ("technical-prose","https://raw.githubusercontent.com/django/django/a461af8ce48762d7ec602260aaff81014ddccbcb/docs/intro/tutorial01.txt",10844,"1cf1817e6211b7c0fa9e8044ee808fde1e8f16ca5f9d5ab5358510a5c9591b96",1454,"5d0c2efd139bd6094098bc893ed746020f03e0860a25f278348f43f47c236222")],
+            "fifth":[
+              ("code","https://raw.githubusercontent.com/pytorch/pytorch/496340f06ef7bda2800522429ba3f4e3473a92fa/torch/_inductor/scheduler.py",539420,"b13a89d0fd77430e2a637dae41980086909c4ad4a855b8418dc17286c39953b8",41453,"504b68653b5478b88216f6342a74bacc5982549657005fb486dd00d753b4ea9a"),
+              ("structured","https://raw.githubusercontent.com/microsoft/vscode/6fad7188e7dbf7db564e5e4a85960eb2bf69bdf4/package-lock.json",784171,"73224989048e176e7eeafa8aa729df7e4d510f4bd453018902d95345db0fe886",14365,"5c0f3a215ba35b7fbcaae212d27a33ba5109e16d89809987d16fa89072534281"),
+              ("technical-prose","https://raw.githubusercontent.com/numpy/numpy/2f1eca306857b641fb0fef0ab854a2d4137e1581/doc/source/user/absolute_beginners.rst",52653,"945a0a598d080ee7526c9bd5459ce615a5b49fe0331adfdf8bbd8812e908e7e3",1454,"527e21110a7f84a1939ccf6063fdfeb77905d9ec180e5fde18488d21b90c4f49")]}
+          for group,sources in historical.items():
+            for name,url,full_n,full_h,prefix_n,prefix_h in sources:
+              data=urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"wingless-r45"}),timeout=90).read(full_n+1)
+              assert len(data)==full_n and hashlib.sha256(data).hexdigest()==full_h
+              p=data[:prefix_n];assert hashlib.sha256(p).hexdigest()==prefix_h
+              (roots[group]/(name+".bin")).write_bytes(p)
+          unseen={
+            "ninth":[
+              ("code","kubernetes/kubernetes","124542b5c43355e9e7cf0a2b14221b3ad2d24e1a","pkg/kubelet/kubelet.go","3441aac96f44d6495cb1c883c4c0c717507b570f",41453),
+              ("structured","nodejs/node","c56cb0947f9e67fe4bfd07f69bba82f6109d4416","deps/undici/src/package-lock.json","b4b31465c51de5f9d6f6569422eba4b862c52db1",14365),
+              ("technical-prose","python/cpython","84b0669f81c0cf9b0b1accdbf02cf06747bccb04","Doc/tutorial/introduction.rst","465c32d0b72431cc446aae7edeb6b829c657b243",1454)],
+            "tenth":[
+              ("code","nodejs/node","c56cb0947f9e67fe4bfd07f69bba82f6109d4416","src/node.cc","ff4cb4b6ac581bbeb2889c344efb0c3f1d5b9cc1",41453),
+              ("structured","microsoft/TypeScript","50d70a3f5f453a79a4323b263165da51f656a4e3","package-lock.json","d693c42e440d213bb9bdd25948e98dd6d350a691",14365),
+              ("technical-prose","prometheus/prometheus","961c9ba40923ca4d7adf4a7a9167e56d0406df83","docs/querying/basics.md","e173a427a6ccd35b6d51e22ea280db1ff3cd0abe",1454)],
+            "eleventh":[
+              ("code","pytorch/pytorch","cf2cd3d06f8381f5503ccba4afbae7386f6d4e70","torch/csrc/jit/runtime/interpreter.cpp","b96d46fef6745faa9c445ea27f331636841c7626",41453),
+              ("structured","docker/docs","3c998056c4e6fee09cd58a6cfb83ac9fc8873c5f","package-lock.json","53d434980a393eed387d55912f09f4ba208ce32e",14365),
+              ("technical-prose","grpc/grpc","daa899ed7e3a0c2f12451c90fdc3eb4d7e03aa54","doc/PROTOCOL-HTTP2.md","835c044f0ab766b43f14be91195d8b94fe9a42c1",1454)]}
+          for group,sources in unseen.items():
+            for name,repo,commit,path,blob,prefix_n in sources:
+              url=f"https://raw.githubusercontent.com/{repo}/{commit}/{urllib.parse.quote(path)}"
+              data=urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"wingless-r45"}),timeout=90).read()
+              got=hashlib.sha1((f"blob {len(data)}\0").encode()+data).hexdigest()
+              assert got==blob and len(data)>=prefix_n,(group,name,got,blob,len(data))
+              (roots[group]/(name+".bin")).write_bytes(data[:prefix_n])
+          PY
+          for n in transfer third fourth fifth ninth tenth eleventh; do
+            key="$(echo "$n" | tr '[:lower:]' '[:upper:]')_ROOT"
+            echo "$key=$RUNNER_TEMP/r45-$n" >> "$GITHUB_ENV"
+          done
+      - name: Full Go regression
+        run: go test ./... -count=1
+      - name: Run frozen R45 twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--transfer-root "$TRANSFER_ROOT" --third-root "$THIRD_ROOT" --fourth-root "$FOURTH_ROOT" --fifth-root "$FIFTH_ROOT" --ninth-root "$NINTH_ROOT" --tenth-root "$TENTH_ROOT" --eleventh-root "$ELEVENTH_ROOT")
+          go run ./cmd/wlm-lm-external-future-data-causal-latent-learning-state-representation-r45 "${args[@]}" > /tmp/result1.json
+          go run ./cmd/wlm-lm-external-future-data-causal-latent-learning-state-representation-r45 "${args[@]}" > /tmp/result2.json
+          cmp /tmp/result1.json /tmp/result2.json
+          cat /tmp/result1.json
+      - name: Classify frozen R45
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,math,pathlib
+          r=json.loads(pathlib.Path("/tmp/result1.json").read_text());m=r["metrics"]
+          valid=(m["historical_manifest_count"]==4 and m["unseen_manifest_count"]==3 and m["candidate_action_count"]==9 and
+                 m["candidate_pair_count"]==108 and m["non_tie_pair_count"]>=72 and
+                 m["representation_dimension"]==6 and m["trajectory_readout_parameter_count"]==7 and m["base6_readout_parameter_count"]==7 and
+                 m["fit_failure_count"]==0 and m["trajectory_definition_mismatch_count"]==0 and
+                 m["readout_parameter_count_mismatch_count"]==0 and m["fixed_budget_mismatch_count"]==0 and
+                 m["heldout_outcome_use_before_pair_freeze"]==0 and m["post_result_representation_or_threshold_choice_count"]==0 and
+                 m["source_identity_mismatch_count"]==0 and m["capacity_growth_event_count"]==0 and
+                 m["tokenizer_use_count"]==0 and m["external_model_call_count"]==0 and
+                 m["counter_overflow_count"]==0 and m["invalid_row_count"]==0 and
+                 all(math.isfinite(float(v)) for v in m.values()))
+          supported=(valid and m["trajectory_minus_base6_accuracy"]>=0.08 and m["positive_manifest_count"]>=2 and
+                     m["trajectory_mean_decision_regret"]<=0.90*m["base6_mean_decision_regret"])
+          mixed=(valid and not supported and m["trajectory_minus_base6_accuracy"]>=0.02 and m["positive_manifest_count"]>=2 and
+                 m["trajectory_mean_decision_regret"]<m["base6_mean_decision_regret"])
+          cls="invalid" if not valid else "supported" if supported else "mixed" if mixed else "negative"
+          failure_class=None;failing_step=None;error_signature=None
+          if cls=="invalid":
+              failure_class="FROZEN_VALIDITY_FAILURE";failing_step="classification"
+              error_signature=hashlib.sha256(json.dumps(m,sort_keys=True,separators=(",",":")).encode()).hexdigest()
+          out={"schema":"wingless.research-classification.v1","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-LEARNING-STATE-REPRESENTATION-R45",
+               "classification":cls,"validity_pass":valid,"causal_latent_support":supported,"mixed_signal":mixed,
+               "failure_class":failure_class,"failing_step":failing_step,"error_signature":error_signature,
+               "authority_receipt_sha256":"f2f4a7c2b421bd169ac67574e1e9944e20e0376557b1ae7ecddf403e220d95dc","rsi_success":False,
+               "rsi_success_reason":"R45 tests one frozen six-dimensional causal-trajectory replacement representation under the unchanged fixed budget; it does not authorize allocator enrichment or capacity growth.","metrics":m}
+          pathlib.Path("/tmp/classification.json").write_text(json.dumps(out,separators=(",",":")),encoding="utf-8")
+          print(json.dumps(out,separators=(",",":")))
+          PY
+      - name: Delete external bytes
+        if: always()
+        shell: bash
+        run: rm -rf "$RUNNER_TEMP"/r45-*
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-causal-latent-learning-state-representation-r45
+          path: |
+            /tmp/authority.json
+            /tmp/result1.json
+            /tmp/result2.json
+            /tmp/classification.json
+          if-no-files-found: error
