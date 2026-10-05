@@ -1,0 +1,25 @@
+name: Disable legacy autonomy once
+on:
+  push:
+    branches:
+      - ops/disable-legacy-autonomy-r2
+    paths:
+      - '.github/workflows/disable-legacy-autonomy-once.yml'
+permissions:
+  actions: write
+  contents: read
+jobs:
+  disable:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Disable legacy continuation controller
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh api -X PUT "repos/$REPO/actions/workflows/research-continuation-controller.yml/disable"
+          state="$(gh api "repos/$REPO/actions/workflows/research-continuation-controller.yml" --jq .state)"
+          test "$state" = "disabled_manually"
+          printf '{"repo":"%s","workflow":"research-continuation-controller.yml","state":"%s"}\n' "$REPO" "$state"
