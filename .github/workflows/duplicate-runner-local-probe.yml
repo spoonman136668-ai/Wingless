@@ -1,0 +1,30 @@
+name: Wingless duplicate runner local probe
+on:
+  push:
+    branches:
+      - ops/duplicate-runner-local-probe-20261005-r1
+    paths:
+      - '.github/workflows/duplicate-runner-local-probe.yml'
+permissions:
+  contents: read
+jobs:
+  probe_up_b:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - name: Report runner B
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Write-Host "runner=$env:RUNNER_NAME"
+          Write-Host 'duplicate_runner_probe=PASS'
+  probe_up_c:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 10
+    steps:
+      - name: Report runner C
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Write-Host "runner=$env:RUNNER_NAME"
+          Write-Host 'duplicate_runner_probe=PASS'
