@@ -58,7 +58,7 @@ jobs:
           }
           $C=Get-Content -Raw '.research-autonomy\config.json'|ConvertFrom-Json
           if($C.schema -cne 'research.autonomy.v2'){throw 'CONFIG_SCHEMA_FAILED'}
-          if(-not[bool]$C.enabled){throw 'CONFIG_MUST_BE_ENABLED_POST_CUTOVER'}
+          if([bool]$C.enabled){throw 'CONFIG_MUST_BE_DISABLED_AFTER_CKB_PLANE_HANDOFF'}
           if($C.mode -cne 'repo-local-self-chain'){throw 'CONFIG_MODE_FAILED'}
           if($C.authority -cne 'research-only'){throw 'CONFIG_AUTHORITY_FAILED'}
           if($C.ckb_plane_role -cne 'governance-only'){throw 'CONFIG_CKB_ROLE_FAILED'}
@@ -97,6 +97,8 @@ jobs:
           }
           if($AgentText.Contains('Invoke-Expression')){throw 'NEMOTRON_AGENT_INVOKE_EXPRESSION_FORBIDDEN'}
           $WorkflowText=Get-Content -Raw '.github/workflows/research-continuation-controller.yml'
+          if($WorkflowText -match '(?m)^\s*schedule\s*:'){throw 'LEGACY_SCHEDULE_MUST_BE_REMOVED'}
+          if($WorkflowText.Contains('contents: write') -or $WorkflowText.Contains('actions: write')){throw 'LEGACY_WORKFLOW_WRITE_PERMISSION_FORBIDDEN'}
           if(-not$WorkflowText.Contains('NVIDIA_API_KEY:') -or -not$WorkflowText.Contains('secrets.NVIDIA_API_KEY')){throw 'NVIDIA_CYCLE_SECRET_BINDING_MISSING'}
           $NvidiaIndex=$Text.IndexOf('provider=nvidia')
           $OpenRouterIndex=$Text.IndexOf('provider=openrouter')
