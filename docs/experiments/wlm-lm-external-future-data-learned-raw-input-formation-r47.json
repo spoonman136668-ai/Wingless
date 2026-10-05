@@ -1,0 +1,98 @@
+{
+  "schema": "wingless.rsi-learned-mechanism-pilot.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-RAW-INPUT-FORMATION-R47",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-UPSTREAM-LEARNING-STATE-FORMATION-R46",
+  "parent_sha": "4721b17fc7f19c2cb54323ed58e8e1ceadc56916",
+  "hypothesis": "A bounded learned raw-input recurrent state former selected only from historical replay can beat the frozen R46 hand-designed alpha=0.5 recurrent formation baseline on three sealed unseen manifests without increasing inference-state size, readout capacity, or the fixed adaptation budget.",
+  "mutable_interface": "state_former(raw_input, history) -> fixed_size_state",
+  "candidate_search": {
+    "candidate_count": 4,
+    "families": [
+      {
+        "id": "shared-alpha",
+        "learned_scalars": 1,
+        "grouping": "all six raw statistics share one alpha"
+      },
+      {
+        "id": "two-group-alpha",
+        "learned_scalars": 2,
+        "grouping": "distribution statistics vs character/repetition statistics"
+      },
+      {
+        "id": "three-group-alpha",
+        "learned_scalars": 3,
+        "grouping": "two state dimensions per alpha"
+      },
+      {
+        "id": "fieldwise-alpha",
+        "learned_scalars": 6,
+        "grouping": "one alpha per state dimension"
+      }
+    ],
+    "alpha_grid": [
+      0.125,
+      0.25,
+      0.5,
+      0.75,
+      1
+    ],
+    "training_only_data": "exact R46 historical transfer/third/fourth/fifth manifests; no fifteenth/sixteenth/seventeenth outcome access",
+    "selection": "deterministic leave-one-historical-manifest-out replay score = pairwise winner accuracy - fixed complexity penalty; lexicographic tie break",
+    "failure_history": "all four candidate identities, learned alpha values, historical scores, complexity/resource eligibility, and final unseen classifications retained in result evidence",
+    "dream_rsi_replay": "R46 and earlier frozen historical outcomes may be replayed; unexplored outcomes are never synthesized"
+  },
+  "raw_state": {
+    "state_dimension": 6,
+    "statistics": [
+      "byte_mean",
+      "byte_variance",
+      "printable_fraction",
+      "digit_fraction",
+      "whitespace_fraction",
+      "adjacent_repeat_fraction"
+    ],
+    "history": "causal recurrence state_k=(1-alpha)*state_(k-1)+alpha*raw_stats_k",
+    "readout_parameters_including_intercept": 7
+  },
+  "resource_envelope": {
+    "total_adaptation_budget": 1744,
+    "state_dimension": 6,
+    "baseline_effective_state_former_scalars": 1,
+    "max_candidate_learned_scalars": 6,
+    "support_requires_effective_state_former_scalars_lte_baseline": true,
+    "candidate_count": 4,
+    "external_model_calls": 0,
+    "tokenizer_use_count": 0,
+    "gpu_required": false,
+    "capacity_growth_events": 0,
+    "resource_telemetry": "reuse Wingless resources host/process telemetry; exact user hardware is not assumed",
+    "no_material_ram_vram_model_context_agent_compute_growth": true
+  },
+  "frozen_evaluation": {
+    "unseen_manifests": [
+      "fifteenth",
+      "sixteenth",
+      "seventeenth"
+    ],
+    "candidate_and_readout_frozen_before_unseen_outcomes": true,
+    "supported": "valid; selected candidate is resource-eligible at equal/lower effective inference cost; learned pairwise winner accuracy exceeds R46 baseline by >=0.05; learned wins on >=2/3 unseen manifests; learned mean decision regret <=0.90*R46 baseline",
+    "mixed": "valid; support false; learned accuracy exceeds R46 baseline by >=0.015; learned wins on >=2/3 manifests; learned regret < baseline; or best mechanism is scientifically stronger but resource-ineligible",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "identity/budget/state-size/readout/candidate-count/history-seal/determinism/provenance/resource-accounting failure"
+  },
+  "governance": {
+    "no_post_result_tuning": true,
+    "no_capacity_growth": true,
+    "sealed_negatives": true,
+    "deterministic_replay": true,
+    "no_oracle_or_label_leakage": true,
+    "no_accepted_ref_mutation": true,
+    "no_live_or_production_authority": true,
+    "broad_continual_training": false
+  },
+  "successors": {
+    "supported": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-DISJOINT-REPLICATION-R48",
+    "mixed": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-RESOURCE-ATTRIBUTION-R48",
+    "negative": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-FEATURE-ATTRIBUTION-R48"
+  }
+}
