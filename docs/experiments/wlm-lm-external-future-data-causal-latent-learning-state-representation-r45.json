@@ -1,0 +1,170 @@
+{
+  "schema": "wingless.research-preregistration.v1",
+  "experiment_id": "WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-LEARNING-STATE-REPRESENTATION-R45",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-PAIRWISE-FIXED-BUDGET-ACTION-VALUE-RANKING-R44",
+  "parent_sha": "af11f095bedf2607314e911831cc8b78fe2bc35d",
+  "preregistered_at_utc": "2026-10-05T08:36:16Z",
+  "independence": "Wingless-only. No Yggdrasil evidence, manifests, thresholds, representations, outcomes, or successor decisions may be consumed.",
+  "hypothesis": "The current base-six/R43 representation loses decision-relevant causal trajectory information; replacing it with a fixed six-dimensional causal-trajectory representation at unchanged linear readout capacity will improve pairwise fixed-budget action choice on genuinely unseen manifests.",
+  "competing_explanation": "Any apparent gain is explained by intervention identity or the old instantaneous base-six representation rather than temporally ordered within-budget state transitions.",
+  "frozen_budget": {
+    "total_adaptation_budget": 1744,
+    "capacity_growth": 0,
+    "external_model_calls": 0,
+    "tokenizer_use": 0,
+    "representation_dimension": 6,
+    "linear_readout_parameters_including_intercept": 7
+  },
+  "historical_fit_partition": "Exact R44 historical transfer/third/fourth/fifth manifests only. Fresh ninth/tenth/eleventh outcomes may not enter representation construction, fitting, pair selection, thresholds, or controls.",
+  "manifest_digest": "a7f5aa73efecaa382ae50c0b8a27696cb97e39e4da8e2669191d075559d86d1e",
+  "unseen_manifests": [
+    {
+      "name": "ninth",
+      "code": {
+        "repo": "kubernetes/kubernetes",
+        "commit": "124542b5c43355e9e7cf0a2b14221b3ad2d24e1a",
+        "path": "pkg/kubelet/kubelet.go",
+        "git_blob": "3441aac96f44d6495cb1c883c4c0c717507b570f",
+        "prefix_bytes": 41453
+      },
+      "structured": {
+        "repo": "nodejs/node",
+        "commit": "c56cb0947f9e67fe4bfd07f69bba82f6109d4416",
+        "path": "deps/undici/src/package-lock.json",
+        "git_blob": "b4b31465c51de5f9d6f6569422eba4b862c52db1",
+        "prefix_bytes": 14365
+      },
+      "technical_prose": {
+        "repo": "python/cpython",
+        "commit": "84b0669f81c0cf9b0b1accdbf02cf06747bccb04",
+        "path": "Doc/tutorial/introduction.rst",
+        "git_blob": "465c32d0b72431cc446aae7edeb6b829c657b243",
+        "prefix_bytes": 1454
+      }
+    },
+    {
+      "name": "tenth",
+      "code": {
+        "repo": "nodejs/node",
+        "commit": "c56cb0947f9e67fe4bfd07f69bba82f6109d4416",
+        "path": "src/node.cc",
+        "git_blob": "ff4cb4b6ac581bbeb2889c344efb0c3f1d5b9cc1",
+        "prefix_bytes": 41453
+      },
+      "structured": {
+        "repo": "microsoft/TypeScript",
+        "commit": "50d70a3f5f453a79a4323b263165da51f656a4e3",
+        "path": "package-lock.json",
+        "git_blob": "d693c42e440d213bb9bdd25948e98dd6d350a691",
+        "prefix_bytes": 14365
+      },
+      "technical_prose": {
+        "repo": "prometheus/prometheus",
+        "commit": "961c9ba40923ca4d7adf4a7a9167e56d0406df83",
+        "path": "docs/querying/basics.md",
+        "git_blob": "e173a427a6ccd35b6d51e22ea280db1ff3cd0abe",
+        "prefix_bytes": 1454
+      }
+    },
+    {
+      "name": "eleventh",
+      "code": {
+        "repo": "pytorch/pytorch",
+        "commit": "cf2cd3d06f8381f5503ccba4afbae7386f6d4e70",
+        "path": "torch/csrc/jit/runtime/interpreter.cpp",
+        "git_blob": "b96d46fef6745faa9c445ea27f331636841c7626",
+        "prefix_bytes": 41453
+      },
+      "structured": {
+        "repo": "docker/docs",
+        "commit": "3c998056c4e6fee09cd58a6cfb83ac9fc8873c5f",
+        "path": "package-lock.json",
+        "git_blob": "53d434980a393eed387d55912f09f4ba208ce32e",
+        "prefix_bytes": 14365
+      },
+      "technical_prose": {
+        "repo": "grpc/grpc",
+        "commit": "daa899ed7e3a0c2f12451c90fdc3eb4d7e03aa54",
+        "path": "doc/PROTOCOL-HTTP2.md",
+        "git_blob": "835c044f0ab766b43f14be91195d8b94fe9a42c1",
+        "prefix_bytes": 1454
+      }
+    }
+  ],
+  "representation": {
+    "name": "causal_trajectory_6",
+    "replacement_not_augmentation": true,
+    "source": "Only the within-budget transition statistics already produced before heldout outcomes: base-table change rate, top-margin movement, motif entry, motif exit, active nonbaseline motif change, and best-choice change.",
+    "channels": [
+      "state_reconfiguration_rate=(base_table_change+best_choice_change)/step_width",
+      "confidence_movement_rate=top_margin_movement/step_width",
+      "motif_turnover_rate=(motif_entry+motif_exit+active_nonbaseline_change)/step_width"
+    ],
+    "features": [
+      "time-weighted historical level of state_reconfiguration_rate through current budget step",
+      "current-minus-first state_reconfiguration_rate through current budget step",
+      "time-weighted historical level of confidence_movement_rate through current budget step",
+      "current-minus-first confidence_movement_rate through current budget step",
+      "time-weighted historical level of motif_turnover_rate through current budget step",
+      "current-minus-first motif_turnover_rate through current budget step"
+    ],
+    "time_weighting": "For budget step j=1..k, level=sum(j*rate_j)/sum(j); trend=rate_k-rate_1. At k=1 trend=0.",
+    "outcome_independent": true
+  },
+  "candidate_actions": "Exact existing R27 ten-allocation fixed-total candidate set; evaluate all 36 unordered pairs among the nine non-equal allocations. Pair order lexicographically frozen before fresh outcomes.",
+  "treatment": "Fit a seven-parameter ridge-linear marginal-hit readout on the six causal-trajectory features using the four historical manifests. For each fresh manifest, freeze all nine action scores and pair choices before revealing actual hits.",
+  "controls": {
+    "base6_same_capacity": "Fit the same seven-parameter ridge-linear readout on the existing six instantaneous R27/base-six features using the identical historical partition.",
+    "action_only": "Rank by historical mean realized value for each allocation using the identical historical partition."
+  },
+  "metrics": [
+    "non_tie_pair_count",
+    "trajectory_pairwise_winner_accuracy",
+    "base6_pairwise_winner_accuracy",
+    "action_only_pairwise_winner_accuracy",
+    "trajectory_minus_base6_accuracy",
+    "trajectory_minus_action_only_accuracy",
+    "per_manifest_trajectory_minus_base6_accuracy",
+    "trajectory_mean_decision_regret",
+    "base6_mean_decision_regret",
+    "action_only_mean_decision_regret",
+    "representation_dimension",
+    "trajectory_readout_parameter_count",
+    "base6_readout_parameter_count",
+    "heldout_outcome_use_before_pair_freeze",
+    "post_result_representation_or_threshold_choice_count",
+    "source_identity_mismatch_count",
+    "fixed_budget_mismatch_count",
+    "capacity_growth_event_count",
+    "external_model_call_count",
+    "tokenizer_use_count",
+    "invalid_row_count"
+  ],
+  "thresholds": {
+    "minimum_non_tie_pairs": 72,
+    "supported_minimum_accuracy_gain_over_base6": 0.08,
+    "supported_maximum_regret_ratio_vs_base6": 0.9,
+    "supported_minimum_positive_manifest_count": 2,
+    "mixed_minimum_accuracy_gain_over_base6": 0.02,
+    "mixed_minimum_positive_manifest_count": 2
+  },
+  "classification_rules": {
+    "supported": "valid; >=72 non-tie pairs; trajectory accuracy exceeds base6 by >=0.08; trajectory beats base6 on at least two of three fresh manifests; and trajectory mean regret <=0.90*base6 mean regret.",
+    "mixed": "valid; support false; trajectory accuracy exceeds base6 by >=0.02; trajectory beats base6 on at least two of three fresh manifests; and trajectory mean regret is lower than base6.",
+    "negative": "valid and neither supported nor mixed.",
+    "invalid": "any exact source/blob/prefix, historical partition, candidate action/pair order, fixed budget, six-dimensional representation, seven-parameter readout, heldout ordering, deterministic replay, provenance, or accounting rule fails."
+  },
+  "negative_interpretation": "Stop representation-local ranking work and move upstream to learning-state formation; do not tune or sweep additional trajectory transforms over this result.",
+  "successors": {
+    "supported": "WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-DISJOINT-REPLICATION-R46",
+    "mixed": "WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-LEVEL-TREND-ATTRIBUTION-R46",
+    "negative": "WLM-LM-EXTERNAL-FUTURE-DATA-UPSTREAM-LEARNING-STATE-FORMATION-R46"
+  },
+  "infra_failure_policy": "Exact infrastructure repair and deterministic rerun only. Scientific negative/mixed outcomes are immutable evidence.",
+  "post_result_tuning": false,
+  "rsi_success": false,
+  "production_authority": false,
+  "accepted_ref_mutation": false,
+  "runtime_launch": false,
+  "capacity_change_authorized": false
+}
