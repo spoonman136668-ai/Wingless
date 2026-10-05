@@ -38,13 +38,13 @@ jobs:
             'docs/experiments/wlm-lm-external-future-data-r46-manifest.json' \
             'unitary/wlm_lm_external_future_data_upstream_learning_state_formation_r46.go' | sort)"
           test "$changed" = "$expected"
-          test "$(git rev-parse '002fd4e30b4589a5eab2b2ec3a1ae72c2e7d0be3:docs/experiments/wlm-lm-external-future-data-upstream-learning-state-formation-r46.json')" = 'e1bd0f0bf9e58fb083852a40c0c6444e5f784fa9'
-          test "$(git rev-parse '002fd4e30b4589a5eab2b2ec3a1ae72c2e7d0be3:docs/experiments/wlm-lm-external-future-data-r46-manifest.json')" = '0587e69da82d9ef26e9e6a168bbeb0bfb8c2332d'
+          test "$(git rev-parse '002fd4e30b4589a5eab2b2ec3a1ae72c2e7d0be3:docs/experiments/wlm-lm-external-future-data-upstream-learning-state-formation-r46.json')" = '0cfe0e31ce8a0579df74456c6b6a9b3804a91e5f'
+          test "$(git rev-parse '002fd4e30b4589a5eab2b2ec3a1ae72c2e7d0be3:docs/experiments/wlm-lm-external-future-data-r46-manifest.json')" = '6afc6e8ed5fd0c1b4960fa96610e94f6b886c605'
       - name: Verify exact READY_RESEARCH receipt
         shell: bash
         env:
-          AUTHORITY_RECEIPT_SHA256: 'e36228a842bf6613d55bed602e1def3d3489f4c2d264dc88108b91d3832e5303'
-          AUTHORITY_RECEIPT_B64: 'eyJhdXRob3JpdHlfd29ya2Zsb3dfcmVmIjoicmVzZWFyY2gvZGV0ZXJtaW5pc3RpYy1yZXNlYXJjaC1sb29wLWNvbnRyb2xsZXItcjc3IiwiYXV0aG9yaXR5X3dvcmtmbG93X3JlZl9zaGEiOiIyNGZlNzkzZjAzZjUzODFhOTQxMDg0OWYyM2E5YTkzNjcyZjkwY2JjIiwiY2tiX3BsYW5lX21haW5fc2hhIjoiMDAyYjVlNjgzZTRkNWVhMjgwMWM2ZWVhN2MwNWRhNmNjNzNiYjk5YiIsImV4cGVyaW1lbnQiOiJXTE0tTE0tRVhURVJOQUwtRlVUVVJFLURBVEEtVVBTVFJFQU0tTEVBUk5JTkctU1RBVEUtRk9STUFUSU9OLVI0NiIsImZldGNoX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1mZXRjaC52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfRkVUQ0giLCJzY29wZSI6ImZldGNoLXZlcmlmeS1vbmx5IiwicmVhc29ucyI6bnVsbH0sIm1hbmlmZXN0X3NoYTI1NiI6IjcxOTQ0ZDg4MDZiYWNlNWEyNDI2ZWVmNjkyNWU4NjhkZDc1NTY3NWQxMzQ4OWUzZDY2Y2Y2NzU0MjllMjZhMGYiLCJwbGFuX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfUExBTiIsInNjb3BlIjoicGxhbi1vbmx5IiwicmVhc29ucyI6bnVsbH0sInByZXJlZ2lzdHJhdGlvbl9zaGEiOiIwMDJmZDRlMzBiNDU4OWE1ZWFiMmIyZWMzYTFhZTcyYzJlN2QwYmUzIiwicHJvamVjdCI6IldpbmdsZXNzIiwicmVxdWVzdF9pZCI6IjAyMDlkOTQxYTEzMWViOWNiZmY5M2ZlMzhkNWZmOGI2IiwicmVzZWFyY2hfZGVjaXNpb24iOnsic2NoZW1hIjoiY2tiLXBsYW5lLmV4dGVybmFsLWV4cG9zdXJlLXJlc2VhcmNoLnYxIiwiZGlzcG9zaXRpb24iOiJSRUFEWV9SRVNFQVJDSCIsInNjb3BlIjoicmVzZWFyY2gtY29uc3VtZS1vbmNlIiwicmVhc29ucyI6bnVsbH0sInJlc2VhcmNoX2hvc3QiOiJHaXRIdWIgQWN0aW9ucyAxMDAwMDAyNTQzIiwicnVubmVyX2lkIjoiR2l0SHViIEFjdGlvbnMgMTAwMDAwMjU0MyIsInNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1yZWFkeS1yZXNlYXJjaC1yZWNlaXB0LnYxIn0='
+          AUTHORITY_RECEIPT_SHA256: 'ec4a3452d0f51ab9622e08ca22d547cd7b3aa510dcd4582a56f55486ff328d6e'
+          AUTHORITY_RECEIPT_B64: 'eyJhdXRob3JpdHlfd29ya2Zsb3dfcmVmIjoicmVzZWFyY2gvZGV0ZXJtaW5pc3RpYy1yZXNlYXJjaC1sb29wLWNvbnRyb2xsZXItcjg2IiwiYXV0aG9yaXR5X3dvcmtmbG93X3JlZl9zaGEiOiIwY2JiMTIzMmFmNWQ2M2VhOTJjZDM0NmQ4NmFmZTA1MDgxZjUyMWE5IiwiY2tiX3BsYW5lX21haW5fc2hhIjoiMDAyYjVlNjgzZTRkNWVhMjgwMWM2ZWVhN2MwNWRhNmNjNzNiYjk5YiIsImV4cGVyaW1lbnQiOiJXTE0tTE0tRVhURVJOQUwtRlVUVVJFLURBVEEtVVBTVFJFQU0tTEVBUk5JTkctU1RBVEUtRk9STUFUSU9OLVI0NiIsImZldGNoX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1mZXRjaC52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfRkVUQ0giLCJzY29wZSI6ImZldGNoLXZlcmlmeS1vbmx5IiwicmVhc29ucyI6bnVsbH0sIm1hbmlmZXN0X3NoYTI1NiI6IjcxOTQ0ZDg4MDZiYWNlNWEyNDI2ZWVmNjkyNWU4NjhkZDc1NTY3NWQxMzQ4OWUzZDY2Y2Y2NzU0MjllMjZhMGYiLCJwbGFuX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfUExBTiIsInNjb3BlIjoicGxhbi1vbmx5IiwicmVhc29ucyI6bnVsbH0sInByZXJlZ2lzdHJhdGlvbl9zaGEiOiIwMDJmZDRlMzBiNDU4OWE1ZWFiMmIyZWMzYTFhZTcyYzJlN2QwYmUzIiwicHJvamVjdCI6IldpbmdsZXNzIiwicmVxdWVzdF9pZCI6Ijg2MjYxZGRlYjQxZjY2OTZlNzcxM2ExNjUxMzUwN2VkIiwicmVzZWFyY2hfZGVjaXNpb24iOnsic2NoZW1hIjoiY2tiLXBsYW5lLmV4dGVybmFsLWV4cG9zdXJlLXJlc2VhcmNoLnYxIiwiZGlzcG9zaXRpb24iOiJSRUFEWV9SRVNFQVJDSCIsInNjb3BlIjoicmVzZWFyY2gtY29uc3VtZS1vbmNlIiwicmVhc29ucyI6bnVsbH0sInJlc2VhcmNoX2hvc3QiOiJHaXRIdWIgQWN0aW9ucyAxMDAwMDAyNjA5IiwicnVubmVyX2lkIjoiR2l0SHViIEFjdGlvbnMgMTAwMDAwMjYwOSIsInNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1yZWFkeS1yZXNlYXJjaC1yZWNlaXB0LnYxIn0='
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -54,9 +54,9 @@ jobs:
           r=json.loads(raw)
           assert r["schema"]=="ckb-plane.external-exposure-ready-research-receipt.v1"
           assert r["project"]=="Wingless"
-          assert r["experiment"]=="WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-LEARNING-STATE-REPRESENTATION-R46"
+          assert r["experiment"]=="WLM-LM-EXTERNAL-FUTURE-DATA-UPSTREAM-LEARNING-STATE-FORMATION-R46"
           assert r["preregistration_sha"]=="002fd4e30b4589a5eab2b2ec3a1ae72c2e7d0be3"
-          assert r["manifest_sha256"]=="a7f5aa73efecaa382ae50c0b8a27696cb97e39e4da8e2669191d075559d86d1e"
+          assert r["manifest_sha256"]=="71944d8806bace5a2426eef6925e868dd755675d13489e3d66cf675429e26a0f"
           assert r["ckb_plane_main_sha"]=="002b5e683e4d5ea2801c6eea7c05da6cc73bb99b"
           assert r["plan_decision"]["disposition"]=="READY_PLAN"
           assert r["fetch_decision"]["disposition"]=="READY_FETCH"
@@ -127,7 +127,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          args=(--transfer-root "$TRANSFER_ROOT" --third-root "$THIRD_ROOT" --fourth-root "$FOURTH_ROOT" --fifth-root "$FIFTH_ROOT" --twelfth-root "$NINTH_ROOT" --thirteenth-root "$TENTH_ROOT" --fourteenth-root "$ELEVENTH_ROOT")
+          args=(--transfer-root "$TRANSFER_ROOT" --third-root "$THIRD_ROOT" --fourth-root "$FOURTH_ROOT" --fifth-root "$FIFTH_ROOT" --twelfth-root "$TWELFTH_ROOT" --thirteenth-root "$THIRTEENTH_ROOT" --fourteenth-root "$FOURTEENTH_ROOT")
           go run ./cmd/wlm-lm-external-future-data-upstream-learning-state-formation-r46 "${args[@]}" > /tmp/result1.json
           go run ./cmd/wlm-lm-external-future-data-upstream-learning-state-formation-r46 "${args[@]}" > /tmp/result2.json
           cmp /tmp/result1.json /tmp/result2.json
@@ -158,10 +158,10 @@ jobs:
           if cls=="invalid":
               failure_class="FROZEN_VALIDITY_FAILURE";failing_step="classification"
               error_signature=hashlib.sha256(json.dumps(m,sort_keys=True,separators=(",",":")).encode()).hexdigest()
-          out={"schema":"wingless.research-classification.v1","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-CAUSAL-LATENT-LEARNING-STATE-REPRESENTATION-R46",
+          out={"schema":"wingless.research-classification.v1","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-UPSTREAM-LEARNING-STATE-FORMATION-R46",
                "classification":cls,"validity_pass":valid,"upstream_formation_support":supported,"mixed_signal":mixed,
                "failure_class":failure_class,"failing_step":failing_step,"error_signature":error_signature,
-               "authority_receipt_sha256":"e36228a842bf6613d55bed602e1def3d3489f4c2d264dc88108b91d3832e5303","rsi_success":False,
+               "authority_receipt_sha256":"ec4a3452d0f51ab9622e08ca22d547cd7b3aa510dcd4582a56f55486ff328d6e","rsi_success":False,
                "rsi_success_reason":"R46 tests one frozen six-dimensional causal-formation replacement representation under the unchanged fixed budget; it does not authorize allocator enrichment or capacity growth.","metrics":m}
           pathlib.Path("/tmp/classification.json").write_text(json.dumps(out,separators=(",",":")),encoding="utf-8")
           print(json.dumps(out,separators=(",",":")))
