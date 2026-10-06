@@ -1,0 +1,46 @@
+name: Diagnose Wingless runner user/auth
+on:
+  push:
+    branches:
+      - diag/runner-user-auth-r1
+    paths:
+      - '.github/workflows/runner-user-auth-diagnostic.yml'
+permissions:
+  contents: read
+jobs:
+  up-b:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - name: Inspect identity and gh auth
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference='Continue'
+          Write-Host ('runner='+$env:RUNNER_NAME)
+          Write-Host ('machine='+$env:COMPUTERNAME)
+          Write-Host ('whoami=' + (& whoami.exe))
+          Write-Host ('userprofile=' + $env:USERPROFILE)
+          & gh.exe auth status
+          Write-Host ('gh_auth_exit=' + $LASTEXITCODE)
+          foreach($repo in @('spoonman136668-ai/ckb-plane','spoonman136668-ai/Wingless','spoonman136668-ai/Yggdrasil')){
+            $out=& gh.exe repo view $repo --json nameWithOwner 2>&1
+            Write-Host ("repo=$repo exit=$LASTEXITCODE output="+($out -join ' '))
+          }
+  up-c:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 5
+    steps:
+      - name: Inspect identity and gh auth
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference='Continue'
+          Write-Host ('runner='+$env:RUNNER_NAME)
+          Write-Host ('machine='+$env:COMPUTERNAME)
+          Write-Host ('whoami=' + (& whoami.exe))
+          Write-Host ('userprofile=' + $env:USERPROFILE)
+          & gh.exe auth status
+          Write-Host ('gh_auth_exit=' + $LASTEXITCODE)
+          foreach($repo in @('spoonman136668-ai/ckb-plane','spoonman136668-ai/Wingless','spoonman136668-ai/Yggdrasil')){
+            $out=& gh.exe repo view $repo --json nameWithOwner 2>&1
+            Write-Host ("repo=$repo exit=$LASTEXITCODE output="+($out -join ' '))
+          }
