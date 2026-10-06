@@ -1,10 +1,15 @@
 name: Dormant Wingless free fanout sidecar
+run-name: CKB fanout Wingless ${{ inputs.package_sha }} ${{ inputs.manifest_ref }}
 
 on:
   workflow_dispatch:
     inputs:
       package_sha:
         description: Exact frozen 40-hex Wingless package commit
+        required: true
+        type: string
+      manifest_ref:
+        description: Exact immutable 40-hex commit containing the frozen fanout manifest
         required: true
         type: string
       manifest_path:
@@ -27,7 +32,7 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
-      - name: Checkout sidecar and manifest revision
+      - name: Checkout sidecar implementation
         uses: actions/checkout@v4
         with:
           path: sidecar
@@ -40,28 +45,58 @@ jobs:
           path: frozen-package
           persist-credentials: false
           fetch-depth: 1
+      - name: Checkout exact immutable manifest ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.manifest_ref }}
+          path: manifest-package
+          persist-credentials: false
+          fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Validate immutable package identity
+      - name: Validate immutable package and manifest identity
         shell: bash
         env:
           PACKAGE_SHA: ${{ inputs.package_sha }}
+          MANIFEST_REF: ${{ inputs.manifest_ref }}
         run: |
           set -euo pipefail
           [[ "$PACKAGE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$MANIFEST_REF" =~ ^[0-9a-f]{40}$ ]]
           [[ "$(git -C frozen-package rev-parse HEAD)" == "$PACKAGE_SHA" ]]
+          [[ "$(git -C manifest-package rev-parse HEAD)" == "$MANIFEST_REF" ]]
       - name: Build bounded candidate matrix
         id: matrix
         shell: bash
         env:
           PACKAGE_SHA: ${{ inputs.package_sha }}
-          MANIFEST: ${{ inputs.manifest_path }}
+          MANIFEST_REF: ${{ inputs.manifest_ref }}
+          MANIFEST_PATH: ${{ inputs.manifest_path }}
         run: |
           set -euo pipefail
+          python - "$MANIFEST_PATH" "$MANIFEST_REF" <<'PY'
+import pathlib, re, shutil, subprocess, sys
+value, expected_ref = sys.argv[1], sys.argv[2]
+if not re.fullmatch(r"research/fanout/[A-Za-z0-9._/-]+\\.json", value) or ".." in pathlib.PurePosixPath(value).parts:
+    raise SystemExit("FANOUT_MANIFEST_PATH_INVALID")
+root = pathlib.Path("manifest-package").resolve(strict=True)
+src = root / pathlib.PurePosixPath(value)
+if src.is_symlink():
+    raise SystemExit("FANOUT_MANIFEST_SYMLINK_FORBIDDEN")
+resolved = src.resolve(strict=True)
+if root not in resolved.parents:
+    raise SystemExit("FANOUT_MANIFEST_ESCAPE")
+actual = subprocess.check_output(["git","-C","manifest-package","rev-parse","HEAD"], text=True).strip()
+if actual != expected_ref:
+    raise SystemExit("FANOUT_MANIFEST_REF_MISMATCH")
+dst = pathlib.Path("sidecar/research/fanout/controller.manifest.json")
+dst.parent.mkdir(parents=True, exist_ok=True)
+shutil.copyfile(resolved, dst)
+PY
           cd sidecar
           MATRIX="$(python scripts/free_fanout_sidecar.py prepare \
-            --manifest "$MANIFEST" \
+            --manifest "research/fanout/controller.manifest.json" \
             --program Wingless \
             --package-sha "$PACKAGE_SHA")"
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
@@ -75,7 +110,7 @@ jobs:
       max-parallel: 8
       matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
     steps:
-      - name: Checkout sidecar and manifest revision
+      - name: Checkout sidecar implementation
         uses: actions/checkout@v4
         with:
           path: sidecar
@@ -86,6 +121,13 @@ jobs:
         with:
           ref: ${{ inputs.package_sha }}
           path: frozen-package
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact immutable manifest ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.manifest_ref }}
+          path: manifest-package
           persist-credentials: false
           fetch-depth: 1
       - uses: actions/setup-go@v5
@@ -99,13 +141,33 @@ jobs:
         shell: bash
         env:
           PACKAGE_SHA: ${{ inputs.package_sha }}
-          MANIFEST: ${{ inputs.manifest_path }}
+          MANIFEST_REF: ${{ inputs.manifest_ref }}
+          MANIFEST_PATH: ${{ inputs.manifest_path }}
           CANDIDATE_ID: ${{ matrix.id }}
         run: |
           set -euo pipefail
+          python - "$MANIFEST_PATH" "$MANIFEST_REF" <<'PY'
+import pathlib, re, shutil, subprocess, sys
+value, expected_ref = sys.argv[1], sys.argv[2]
+if not re.fullmatch(r"research/fanout/[A-Za-z0-9._/-]+\\.json", value) or ".." in pathlib.PurePosixPath(value).parts:
+    raise SystemExit("FANOUT_MANIFEST_PATH_INVALID")
+root = pathlib.Path("manifest-package").resolve(strict=True)
+src = root / pathlib.PurePosixPath(value)
+if src.is_symlink():
+    raise SystemExit("FANOUT_MANIFEST_SYMLINK_FORBIDDEN")
+resolved = src.resolve(strict=True)
+if root not in resolved.parents:
+    raise SystemExit("FANOUT_MANIFEST_ESCAPE")
+actual = subprocess.check_output(["git","-C","manifest-package","rev-parse","HEAD"], text=True).strip()
+if actual != expected_ref:
+    raise SystemExit("FANOUT_MANIFEST_REF_MISMATCH")
+dst = pathlib.Path("sidecar/research/fanout/controller.manifest.json")
+dst.parent.mkdir(parents=True, exist_ok=True)
+shutil.copyfile(resolved, dst)
+PY
           cd sidecar
           python scripts/free_fanout_sidecar.py run \
-            --manifest "$MANIFEST" \
+            --manifest "research/fanout/controller.manifest.json" \
             --program Wingless \
             --package-sha "$PACKAGE_SHA" \
             --package-root ../frozen-package \
@@ -126,10 +188,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout sidecar and manifest revision
+      - name: Checkout sidecar implementation
         uses: actions/checkout@v4
         with:
           path: sidecar
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact frozen package
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.package_sha }}
+          path: frozen-package
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact immutable manifest ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.manifest_ref }}
+          path: manifest-package
           persist-credentials: false
           fetch-depth: 1
       - uses: actions/setup-python@v5
@@ -143,12 +219,32 @@ jobs:
         shell: bash
         env:
           PACKAGE_SHA: ${{ inputs.package_sha }}
-          MANIFEST: ${{ inputs.manifest_path }}
+          MANIFEST_REF: ${{ inputs.manifest_ref }}
+          MANIFEST_PATH: ${{ inputs.manifest_path }}
         run: |
           set -euo pipefail
+          python - "$MANIFEST_PATH" "$MANIFEST_REF" <<'PY'
+import pathlib, re, shutil, subprocess, sys
+value, expected_ref = sys.argv[1], sys.argv[2]
+if not re.fullmatch(r"research/fanout/[A-Za-z0-9._/-]+\\.json", value) or ".." in pathlib.PurePosixPath(value).parts:
+    raise SystemExit("FANOUT_MANIFEST_PATH_INVALID")
+root = pathlib.Path("manifest-package").resolve(strict=True)
+src = root / pathlib.PurePosixPath(value)
+if src.is_symlink():
+    raise SystemExit("FANOUT_MANIFEST_SYMLINK_FORBIDDEN")
+resolved = src.resolve(strict=True)
+if root not in resolved.parents:
+    raise SystemExit("FANOUT_MANIFEST_ESCAPE")
+actual = subprocess.check_output(["git","-C","manifest-package","rev-parse","HEAD"], text=True).strip()
+if actual != expected_ref:
+    raise SystemExit("FANOUT_MANIFEST_REF_MISMATCH")
+dst = pathlib.Path("sidecar/research/fanout/controller.manifest.json")
+dst.parent.mkdir(parents=True, exist_ok=True)
+shutil.copyfile(resolved, dst)
+PY
           cd sidecar
           python scripts/free_fanout_sidecar.py aggregate \
-            --manifest "$MANIFEST" \
+            --manifest "research/fanout/controller.manifest.json" \
             --program Wingless \
             --package-sha "$PACKAGE_SHA" \
             --artifacts ../fanout-artifacts \
