@@ -1,0 +1,174 @@
+name: Wingless R48 evidence-only fanout R1
+run-name: R48 fanout ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - research/aux-wingless-r48-free-fanout-r1
+    paths:
+      - '.github/workflows/r48-free-fanout-r1.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-r48-free-fanout-r1
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout qualified sidecar implementation
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: sidecar
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact auxiliary R48 package
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: frozen-package
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact fanout manifest
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: manifest-package
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Build bounded evidence matrix
+        id: matrix
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git -C frozen-package rev-parse HEAD)" = "$PACKAGE_SHA"
+          test "$(git -C manifest-package rev-parse HEAD)" = "$PACKAGE_SHA"
+          mkdir -p sidecar/research/fanout
+          cp manifest-package/research/fanout/r48-package-audit.manifest.json sidecar/research/fanout/controller.manifest.json
+          cd sidecar
+          MATRIX="$(python scripts/free_fanout_sidecar.py prepare --manifest research/fanout/controller.manifest.json --program Wingless --package-sha "$PACKAGE_SHA")"
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+  screen:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+      - name: Checkout qualified sidecar implementation
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: sidecar
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact auxiliary R48 package
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: frozen-package
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact fanout manifest
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: manifest-package
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: frozen-package/go.mod
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Run one historical package-audit candidate
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ github.sha }}
+          CANDIDATE_ID: ${{ matrix.id }}
+        run: |
+          set -euo pipefail
+          mkdir -p sidecar/research/fanout
+          cp manifest-package/research/fanout/r48-package-audit.manifest.json sidecar/research/fanout/controller.manifest.json
+          cd sidecar
+          python scripts/free_fanout_sidecar.py run \
+            --manifest research/fanout/controller.manifest.json \
+            --program Wingless \
+            --package-sha "$PACKAGE_SHA" \
+            --package-root ../frozen-package \
+            --candidate-id "$CANDIDATE_ID" \
+            --output "../fanout-output/$CANDIDATE_ID"
+      - name: Upload evidence-only candidate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-r48-fanout-${{ matrix.id }}-${{ github.run_id }}
+          path: fanout-output/${{ matrix.id }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  aggregate:
+    if: always() && needs.prepare.result == 'success'
+    needs: [prepare, screen]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout qualified sidecar implementation
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: sidecar
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact fanout manifest
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: manifest-package
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wingless-r48-fanout-*-${{ github.run_id }}
+          path: fanout-artifacts
+      - name: Aggregate evidence only
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p sidecar/research/fanout
+          cp manifest-package/research/fanout/r48-package-audit.manifest.json sidecar/research/fanout/controller.manifest.json
+          cd sidecar
+          python scripts/free_fanout_sidecar.py aggregate \
+            --manifest research/fanout/controller.manifest.json \
+            --program Wingless \
+            --package-sha "$PACKAGE_SHA" \
+            --artifacts ../fanout-artifacts \
+            --output ../fanout-summary/summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wingless-r48-fanout-summary-${{ github.run_id }}
+          path: fanout-summary/
+          if-no-files-found: error
+          retention-days: 14
