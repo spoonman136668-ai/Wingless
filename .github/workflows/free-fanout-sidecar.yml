@@ -1,0 +1,126 @@
+name: Dormant Wingless free fanout sidecar
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_sha:
+        description: Exact frozen 40-hex Wingless package commit
+        required: true
+        type: string
+      manifest_path:
+        description: Frozen manifest under research/fanout/
+        required: true
+        default: research/fanout/manifest.json
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-free-fanout-${{ inputs.package_sha }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.package_sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: false
+      - name: Validate frozen identity and manifest path
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ inputs.package_sha }}
+          MANIFEST: ${{ inputs.manifest_path }}
+        run: |
+          set -euo pipefail
+          [[ "$PACKAGE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$MANIFEST" == research/fanout/*.json ]]
+          [[ "$(git rev-parse HEAD)" == "$PACKAGE_SHA" ]]
+      - name: Build bounded candidate matrix
+        id: matrix
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ inputs.package_sha }}
+          MANIFEST: ${{ inputs.manifest_path }}
+        run: |
+          set -euo pipefail
+          MATRIX="$(python scripts/free_fanout_sidecar.py prepare             --manifest "$MANIFEST"             --program Wingless             --package-sha "$PACKAGE_SHA")"
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+  screen:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.package_sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: false
+      - name: Run one historical/replay-only candidate
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ inputs.package_sha }}
+          MANIFEST: ${{ inputs.manifest_path }}
+          CANDIDATE_ID: ${{ matrix.id }}
+        run: |
+          set -euo pipefail
+          python scripts/free_fanout_sidecar.py run             --manifest "$MANIFEST"             --program Wingless             --package-sha "$PACKAGE_SHA"             --candidate-id "$CANDIDATE_ID"             --output "fanout-output/$CANDIDATE_ID"
+      - name: Upload external-evidence-only candidate artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-fanout-${{ matrix.id }}-${{ github.run_id }}
+          path: fanout-output/${{ matrix.id }}/
+          if-no-files-found: warn
+          retention-days: 14
+
+  aggregate:
+    if: always() && needs.prepare.result == 'success'
+    needs: [prepare, screen]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.package_sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: false
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wingless-fanout-*-${{ github.run_id }}
+          path: fanout-artifacts
+      - name: Aggregate evidence without classification or promotion
+        run: |
+          python scripts/free_fanout_sidecar.py aggregate             --artifacts fanout-artifacts             --output fanout-summary/summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wingless-fanout-summary-${{ github.run_id }}
+          path: fanout-summary/
+          retention-days: 14
