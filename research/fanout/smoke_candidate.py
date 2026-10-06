@@ -31,16 +31,13 @@ def main():
         "fixed_state_dimension": STATE_DIMENSION,
         "fixed_readout_capacity": READOUT_CAPACITY,
         "fixture_class": "synthetic-replay",
-        "metric": {
-            "name": "synthetic_state_checksum",
-            "value": round(sum(state) / (STATE_DIMENSION * 256.0), 12),
-        },
+        "metric": {"name": "synthetic_state_checksum", "value": round(sum(state) / (STATE_DIMENSION * 256.0), 12)},
         "resource_usage": {
             "parameters": 0,
             "context_bytes": len(json.dumps(fixture, sort_keys=True).encode("utf-8")),
-            "model_calls": 0,
+            "model_calls": 0
         },
-        "state_sha256": hashlib.sha256(json.dumps(state, separators=(",", ":")).encode("utf-8")).hexdigest(),
+        "state_sha256": hashlib.sha256(json.dumps(state, separators=(",", ":")).encode("utf-8")).hexdigest()
     }
     Path(a.output).write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
