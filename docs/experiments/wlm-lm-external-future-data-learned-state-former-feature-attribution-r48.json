@@ -1,0 +1,144 @@
+{
+  "schema": "wingless.rsi-feature-attribution.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-FEATURE-ATTRIBUTION-R48",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-RAW-INPUT-FORMATION-R47",
+  "parent_sha": "465609d9845adfa464af363d00313b9d1d10698e",
+  "hypothesis": "R47 failed because one paired raw-statistic group under the frozen selected three-group alpha mechanism contributes disproportionate transfer error. Holding state size, readout capacity, historical fit procedure, and the 1744 action budget fixed, resetting exactly one learned alpha group to the R46 baseline alpha=0.5 should localize that failure on three fresh sealed manifests.",
+  "mutable_interface": "state_former(raw_input, history) -> fixed_size_state; attribution only",
+  "r47_frozen_mechanism": {
+    "selected_candidate": "three-group-alpha",
+    "selected_group_alphas": [
+      0.75,
+      0.125,
+      1
+    ],
+    "expanded_alphas": [
+      0.75,
+      0.75,
+      0.125,
+      0.125,
+      1,
+      1
+    ]
+  },
+  "attribution_arms": {
+    "count": 4,
+    "arms": [
+      {
+        "id": "full-selected",
+        "alphas": [
+          0.75,
+          0.75,
+          0.125,
+          0.125,
+          1,
+          1
+        ],
+        "change": "none"
+      },
+      {
+        "id": "reset-distribution",
+        "alphas": [
+          0.5,
+          0.5,
+          0.125,
+          0.125,
+          1,
+          1
+        ],
+        "change": "byte_mean and byte_variance alpha reset only"
+      },
+      {
+        "id": "reset-character",
+        "alphas": [
+          0.75,
+          0.75,
+          0.5,
+          0.5,
+          1,
+          1
+        ],
+        "change": "printable_fraction and digit_fraction alpha reset only"
+      },
+      {
+        "id": "reset-layout-repetition",
+        "alphas": [
+          0.75,
+          0.75,
+          0.125,
+          0.125,
+          0.5,
+          0.5
+        ],
+        "change": "whitespace_fraction and adjacent_repeat_fraction alpha reset only"
+      }
+    ]
+  },
+  "baseline_anchor": {
+    "id": "r46-alpha-0.5",
+    "alphas": [
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "classification_candidate": false
+  },
+  "fit_and_evaluation": {
+    "historical_fit": "refit the same 7-parameter ridge readout independently for each predeclared arm on exact R47 transfer/third/fourth/fifth only",
+    "sealed_unseen": [
+      "eighteenth",
+      "nineteenth",
+      "twentieth"
+    ],
+    "arm_set_frozen_before_unseen": true,
+    "thresholds_inherited_from_r47": true
+  },
+  "raw_state": {
+    "state_dimension": 6,
+    "statistics": [
+      "byte_mean",
+      "byte_variance",
+      "printable_fraction",
+      "digit_fraction",
+      "whitespace_fraction",
+      "adjacent_repeat_fraction"
+    ],
+    "readout_parameters_including_intercept": 7
+  },
+  "resource_envelope": {
+    "total_adaptation_budget": 1744,
+    "state_dimension": 6,
+    "readout_parameters_including_intercept": 7,
+    "attribution_arm_count": 4,
+    "baseline_anchor_count": 1,
+    "external_model_calls": 0,
+    "tokenizer_use_count": 0,
+    "gpu_required": false,
+    "capacity_growth_events": 0,
+    "no_material_ram_vram_model_context_agent_compute_growth": true
+  },
+  "frozen_evaluation": {
+    "supported": "valid; exactly one reset arm improves aggregate pairwise winner accuracy over full-selected by >=0.05, improves on >=2/3 unseen manifests, has mean regret <=0.90*full-selected, and exceeds the second-best reset arm by >=0.015 accuracy",
+    "mixed": "valid; support false; best reset improves aggregate accuracy by >=0.015 with >=2/3 positive manifests and lower regret, or multiple reset arms reach >=0.05 improvement without the 0.015 uniqueness margin, or the all-0.5 baseline beats full-selected by >=0.05 while no single reset reaches 0.05",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "identity/budget/state-size/readout/arm-set/history-seal/determinism/provenance/resource-accounting failure"
+  },
+  "governance": {
+    "no_post_result_tuning": true,
+    "no_capacity_growth": true,
+    "sealed_negatives": true,
+    "deterministic_replay": true,
+    "no_oracle_or_label_leakage": true,
+    "no_accepted_ref_mutation": true,
+    "no_live_or_production_authority": true,
+    "broad_continual_training": false
+  },
+  "successors": {
+    "supported": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-TARGETED-GROUP-CORRECTION-R49",
+    "mixed": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-INTERACTION-ATTRIBUTION-R49",
+    "negative": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-ATTRIBUTION-R49"
+  }
+}
