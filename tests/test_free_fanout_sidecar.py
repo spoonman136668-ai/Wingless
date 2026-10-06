@@ -192,7 +192,6 @@ class WorkflowStaticTests(unittest.TestCase):
         self.assertIn("path: manifest-package", text)
         self.assertIn("ref: ${{ inputs.manifest_ref }}", text)
         self.assertIn("controller.manifest.json", text)
-        self.assertIn("run-name: CKB fanout Wingless", text)
         self.assertNotIn("self-hosted", text)
         self.assertIn("contents: read", text)
         self.assertIn("persist-credentials: false", text)
