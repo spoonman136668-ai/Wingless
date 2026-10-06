@@ -1,0 +1,161 @@
+name: Dormant Wingless free fanout sidecar
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_sha:
+        description: Exact frozen 40-hex Wingless package commit
+        required: true
+        type: string
+      manifest_path:
+        description: Frozen screening manifest under research/fanout/
+        required: true
+        default: research/fanout/smoke.manifest.json
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-free-fanout-${{ inputs.package_sha }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout sidecar and manifest revision
+        uses: actions/checkout@v4
+        with:
+          path: sidecar
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact frozen package
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.package_sha }}
+          path: frozen-package
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Validate immutable package identity
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ inputs.package_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$PACKAGE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$(git -C frozen-package rev-parse HEAD)" == "$PACKAGE_SHA" ]]
+      - name: Build bounded candidate matrix
+        id: matrix
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ inputs.package_sha }}
+          MANIFEST: ${{ inputs.manifest_path }}
+        run: |
+          set -euo pipefail
+          cd sidecar
+          MATRIX="$(python scripts/free_fanout_sidecar.py prepare \
+            --manifest "$MANIFEST" \
+            --program Wingless \
+            --package-sha "$PACKAGE_SHA")"
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+  screen:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+      - name: Checkout sidecar and manifest revision
+        uses: actions/checkout@v4
+        with:
+          path: sidecar
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact frozen package
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.package_sha }}
+          path: frozen-package
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Run one historical/replay-only candidate
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ inputs.package_sha }}
+          MANIFEST: ${{ inputs.manifest_path }}
+          CANDIDATE_ID: ${{ matrix.id }}
+        run: |
+          set -euo pipefail
+          cd sidecar
+          python scripts/free_fanout_sidecar.py run \
+            --manifest "$MANIFEST" \
+            --program Wingless \
+            --package-sha "$PACKAGE_SHA" \
+            --package-root ../frozen-package \
+            --candidate-id "$CANDIDATE_ID" \
+            --output "../fanout-output/$CANDIDATE_ID"
+      - name: Upload external-evidence-only candidate artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-fanout-${{ matrix.id }}-${{ github.run_id }}
+          path: fanout-output/${{ matrix.id }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  aggregate:
+    if: always() && needs.prepare.result == 'success'
+    needs: [prepare, screen]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout sidecar and manifest revision
+        uses: actions/checkout@v4
+        with:
+          path: sidecar
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wingless-fanout-*-${{ github.run_id }}
+          path: fanout-artifacts
+      - name: Aggregate evidence without classification or promotion
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ inputs.package_sha }}
+          MANIFEST: ${{ inputs.manifest_path }}
+        run: |
+          set -euo pipefail
+          cd sidecar
+          python scripts/free_fanout_sidecar.py aggregate \
+            --manifest "$MANIFEST" \
+            --program Wingless \
+            --package-sha "$PACKAGE_SHA" \
+            --artifacts ../fanout-artifacts \
+            --output ../fanout-summary/summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wingless-fanout-summary-${{ github.run_id }}
+          path: fanout-summary/
+          if-no-files-found: error
+          retention-days: 14
