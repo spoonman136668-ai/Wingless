@@ -1,0 +1,38 @@
+{
+  "schema": "research.free-fanout.v1",
+  "program": "Wingless",
+  "package_sha": "BOUND_AT_DISPATCH",
+  "authority": "external-evidence-only",
+  "data_class": "historical-replay",
+  "sealed_inputs": false,
+  "accepted_state_mutation": false,
+  "successor_dispatch": false,
+  "queue_write": false,
+  "production_access": false,
+  "promotion_authority": false,
+  "candidate_timeout_seconds": 60,
+  "entrypoint": "research/fanout/smoke_candidate.py",
+  "candidate_interface": {
+    "signature": "state_former(raw_input, history) -> fixed_size_state",
+    "fixed_state_dimension": 8,
+    "fixed_readout_capacity": 1,
+    "training_data_class": "historical-replay",
+    "sealed_outcome_exposure": false,
+    "post_result_tuning": false,
+    "capacity_growth": false
+  },
+  "resource_envelope": {
+    "comparison": "equal-or-lower-than-baseline",
+    "baseline_id": "auto-main-inheritance-qualification-r1",
+    "max_parameters": 0,
+    "max_context_bytes": 8192,
+    "max_model_calls": 0,
+    "max_peak_rss_kib": 262144,
+    "max_elapsed_seconds": 10
+  },
+  "candidates": [
+    {"id": "smoke-a", "config": {"variant": 0}},
+    {"id": "smoke-b", "config": {"variant": 1}},
+    {"id": "smoke-c", "config": {"variant": 2}}
+  ]
+}
