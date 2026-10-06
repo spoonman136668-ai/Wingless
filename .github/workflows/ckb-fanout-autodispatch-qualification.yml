@@ -51,25 +51,19 @@ jobs:
           set -euo pipefail
           test "$(git -C frozen-package rev-parse HEAD)" = "$PACKAGE_SHA"
           test "$(git -C manifest-package rev-parse HEAD)" = "$MANIFEST_REF"
-          python - "$MANIFEST_PATH" "$MANIFEST_REF" <<'PY'
-import pathlib, re, shutil, subprocess, sys
-value, expected_ref = sys.argv[1], sys.argv[2]
-if not re.fullmatch(r"research/fanout/[A-Za-z0-9._/-]+\.json", value) or ".." in pathlib.PurePosixPath(value).parts:
-    raise SystemExit("FANOUT_MANIFEST_PATH_INVALID")
-root = pathlib.Path("manifest-package").resolve(strict=True)
-src = root / pathlib.PurePosixPath(value)
-if src.is_symlink():
-    raise SystemExit("FANOUT_MANIFEST_SYMLINK_FORBIDDEN")
-resolved = src.resolve(strict=True)
-if root not in resolved.parents:
-    raise SystemExit("FANOUT_MANIFEST_ESCAPE")
-actual = subprocess.check_output(["git","-C","manifest-package","rev-parse","HEAD"], text=True).strip()
-if actual != expected_ref:
-    raise SystemExit("FANOUT_MANIFEST_REF_MISMATCH")
-dst = pathlib.Path("sidecar/research/fanout/controller.manifest.json")
-dst.parent.mkdir(parents=True, exist_ok=True)
-shutil.copyfile(resolved, dst)
-PY
+          case "$MANIFEST_PATH" in
+            research/fanout/*.json) ;;
+            *) echo "FANOUT_MANIFEST_PATH_INVALID" >&2; exit 1 ;;
+          esac
+          [[ "$MANIFEST_PATH" != *".."* ]]
+          src="manifest-package/$MANIFEST_PATH"
+          test -f "$src"
+          test ! -L "$src"
+          root="$(realpath manifest-package)"
+          resolved="$(realpath "$src")"
+          [[ "$resolved" == "$root"/research/fanout/* ]]
+          mkdir -p sidecar/research/fanout
+          cp -- "$resolved" sidecar/research/fanout/controller.manifest.json
           cd sidecar
           python scripts/free_fanout_sidecar.py prepare --manifest research/fanout/controller.manifest.json --program Wingless --package-sha "$PACKAGE_SHA" > /tmp/matrix.json
           for id in smoke-a smoke-b smoke-c; do
@@ -78,14 +72,7 @@ PY
             cp "../fanout-output/$id/candidate-envelope.json" "../fanout-artifacts/$id/"
           done
           python scripts/free_fanout_sidecar.py aggregate --manifest research/fanout/controller.manifest.json --program Wingless --package-sha "$PACKAGE_SHA" --artifacts ../fanout-artifacts --output ../fanout-summary.json
-          python - <<'PY'
-import json
-s=json.load(open("../fanout-summary.json"))
-assert s["candidate_count"]==3
-assert s["scientific_classification"] is None
-assert s["promotion_authority"] is False
-assert s["successor_authority"] is False
-PY
+          python -c 'import json; s=json.load(open("../fanout-summary.json")); assert s["candidate_count"]==3; assert s["scientific_classification"] is None; assert s["promotion_authority"] is False; assert s["successor_authority"] is False'
       - name: Full Wingless Go regression and build
         shell: bash
         working-directory: sidecar
