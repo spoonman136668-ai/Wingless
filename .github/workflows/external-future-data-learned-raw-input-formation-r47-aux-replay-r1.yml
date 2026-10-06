@@ -1,0 +1,101 @@
+name: Wingless R47 auxiliary frozen-package replay
+on:
+  push:
+    branches:
+      - 'research/external-hosted-wingless-r47-aux-replay-r1'
+    paths:
+      - 'unitary/wlm_lm_external_future_data_learned_raw_input_formation_r47.go'
+      - 'cmd/wlm-lm-external-future-data-learned-raw-input-formation-r47/main.go'
+      - '.github/workflows/external-future-data-learned-raw-input-formation-r47-aux-replay-r1.yml'
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: [self-hosted, Windows, X64, 'wingless-up-c']
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Verify frozen R47 package identity
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        env:
+          AUTHORITY_RECEIPT_SHA256: 'd382f4595cd455386da94868293c7a6b0db3dcb00d586103f21184c9966614e4'
+          AUTHORITY_RECEIPT_B64: 'eyJhdXRob3JpdHlfd29ya2Zsb3dfcmVmIjoicmVzZWFyY2gvZGV0ZXJtaW5pc3RpYy1yZXNlYXJjaC1sb29wLWNvbnRyb2xsZXItcjg5IiwiYXV0aG9yaXR5X3dvcmtmbG93X3JlZl9zaGEiOiJlNzQ4YzAxYjZiODIyNDUxODhlYWY4ZmJiNDU4ZGVjODIzZWUxZGJhIiwiY2tiX3BsYW5lX21haW5fc2hhIjoiNjkxNmMzYzgwNDI4YjJmYTExMWJiYzYzNjAyNWIyOWZjMWJiNDMwNCIsImV4cGVyaW1lbnQiOiJXTE0tTE0tRVhURVJOQUwtRlVUVVJFLURBVEEtTEVBUk5FRC1SQVctSU5QVVQtRk9STUFUSU9OLVI0NyIsImZldGNoX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1mZXRjaC52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfRkVUQ0giLCJzY29wZSI6ImZldGNoLXZlcmlmeS1vbmx5IiwicmVhc29ucyI6bnVsbH0sIm1hbmlmZXN0X3NoYTI1NiI6ImI3MWZmN2RiMzk0NTBhMTIwYTcwMDEyOWRmYjJlZDNmMzhhNmIxMzRmNWMyM2U1YWYxMzkxNjg1ZWQ4ODAxZDUiLCJwbGFuX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfUExBTiIsInNjb3BlIjoicGxhbi1vbmx5IiwicmVhc29ucyI6bnVsbH0sInByZXJlZ2lzdHJhdGlvbl9zaGEiOiJiZGQxNDYxNzhmMDZkNGE3MWZjNmVhMDk0NGYxMmJlZjFlYWZjZDllIiwicHJvamVjdCI6IldpbmdsZXNzIiwicmVxdWVzdF9pZCI6IjEzYWI0YjA2ZjdmMWM3YjkxNTQzY2Y2YWY5MTJhMGQ4IiwicmVzZWFyY2hfZGVjaXNpb24iOnsic2NoZW1hIjoiY2tiLXBsYW5lLmV4dGVybmFsLWV4cG9zdXJlLXJlc2VhcmNoLnYxIiwiZGlzcG9zaXRpb24iOiJSRUFEWV9SRVNFQVJDSCIsInNjb3BlIjoicmVzZWFyY2gtY29uc3VtZS1vbmNlIiwicmVhc29ucyI6bnVsbH0sInJlc2VhcmNoX2hvc3QiOiJHaXRIdWIgQWN0aW9ucyAxMDAwMDAyNjQxIiwicnVubmVyX2lkIjoiR2l0SHViIEFjdGlvbnMgMTAwMDAwMjY0MSIsInNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1yZWFkeS1yZXNlYXJjaC1yZWNlaXB0LnYxIn0='
+        run: |
+          $ErrorActionPreference='Stop'
+          $Experiment='WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-RAW-INPUT-FORMATION-R47'
+          $Manifest='b71ff7db39450a120a700129dfb2ed3f38a6b134f5c23e5af1391685ed8801d5'
+          $Prereg='bdd146178f06d4a71fc6ea0944f12bef1eafcd9e'
+          git merge-base --is-ancestor $Prereg HEAD
+          if($LASTEXITCODE-ne0){throw 'AUX_PREREG_ANCESTRY_FAILED'}
+          $Expected=@{
+            'docs/experiments/wlm-lm-external-future-data-learned-raw-input-formation-r47.json'='298aa28db39bf5920c8036c3a42821ffa3879991'
+            'docs/experiments/wlm-lm-external-future-data-r47-manifest.json'='fe2cd2a8d72074985f7e526b0ba6da2528c42c6f'
+            'unitary/wlm_lm_external_future_data_learned_raw_input_formation_r47.go'='0be3d96640f0b2eaed0dd49bab643add90fbe592'
+            'cmd/wlm-lm-external-future-data-learned-raw-input-formation-r47/main.go'='697d2aecd79851c1088f20b011d52152eb512357'
+          }
+          foreach($Path in $Expected.Keys){
+            $Got=(git rev-parse ("HEAD:"+$Path)).Trim()
+            if($LASTEXITCODE-ne0 -or $Got-cne $Expected[$Path]){throw "AUX_FROZEN_BLOB_MISMATCH $Path got=$Got"}
+          }
+          $Raw=[Convert]::FromBase64String($env:AUTHORITY_RECEIPT_B64)
+          $H=[Security.Cryptography.SHA256]::Create()
+          try{$GotSha=([BitConverter]::ToString($H.ComputeHash($Raw))).Replace('-','').ToLowerInvariant()}finally{$H.Dispose()}
+          if($GotSha-cne$env:AUTHORITY_RECEIPT_SHA256){throw 'AUX_AUTHORITY_RECEIPT_HASH_MISMATCH'}
+          $R=[Text.Encoding]::UTF8.GetString($Raw)|ConvertFrom-Json
+          if($R.experiment-cne$Experiment -or $R.manifest_sha256-cne$Manifest -or $R.preregistration_sha-cne$Prereg){throw 'AUX_AUTHORITY_RECEIPT_BINDING_MISMATCH'}
+          if($R.research_decision.disposition-cne'READY_RESEARCH'){throw 'AUX_AUTHORITY_NOT_READY_RESEARCH'}
+      - name: Focused frozen package tests
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          go test ./unitary -count=1
+          if($LASTEXITCODE-ne0){throw 'AUX_UNITARY_TEST_FAILED'}
+          go test ./cmd/wlm-lm-external-future-data-learned-raw-input-formation-r47 -count=1
+          if($LASTEXITCODE-ne0){throw 'AUX_COMMAND_TEST_FAILED'}
+      - name: Full Wingless regression
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          go test ./... -count=1
+          if($LASTEXITCODE-ne0){throw 'AUX_FULL_REGRESSION_FAILED'}
+      - name: Classify evidence-only replay
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Out=[ordered]@{
+            schema='wingless.auxiliary-evidence-classification.v1'
+            experiment='WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-RAW-INPUT-FORMATION-R47'
+            classification='supported'
+            validity_pass=$true
+            evidence_only=$true
+            primary_successor_authority=$false
+            primary_state_mutation=$false
+            scientific_outcome_access_count=0
+            metrics=[ordered]@{
+              frozen_blob_mismatch_count=0
+              focused_test_pass=1
+              full_regression_pass=1
+              scientific_outcome_access_count=0
+              primary_state_mutation_count=0
+              successor_authority_count=0
+            }
+          }
+          $Path=Join-Path $env:RUNNER_TEMP 'classification.json'
+          $Out|ConvertTo-Json -Depth 8 -Compress|Set-Content -LiteralPath $Path -Encoding UTF8
+          Get-Content -LiteralPath $Path -Raw
+      - name: Upload auxiliary evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-r47-auxiliary-frozen-package-replay-r1
+          path: ${{ runner.temp }}\classification.json
+          if-no-files-found: error
+# experiment: WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-RAW-INPUT-FORMATION-R47
+# manifest: b71ff7db39450a120a700129dfb2ed3f38a6b134f5c23e5af1391685ed8801d5
+# preregistration: bdd146178f06d4a71fc6ea0944f12bef1eafcd9e
