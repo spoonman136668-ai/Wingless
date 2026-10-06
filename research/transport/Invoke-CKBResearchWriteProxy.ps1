@@ -89,12 +89,6 @@ $controller=([IO.File]::ReadAllText($ControllerIdentityPath,[Text.Encoding]::UTF
 Assert-Sha $controller "PROXY_CONTROLLER_IDENTITY_INVALID"
 
 if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
-$oldHome=$env:HOME
-$tempHome=Join-Path $env:RUNNER_TEMP ("ckb-research-proxy-"+$Lane.ToLowerInvariant())
-Remove-Item -LiteralPath $tempHome -Recurse -Force -ErrorAction SilentlyContinue
-[IO.Directory]::CreateDirectory($tempHome)|Out-Null
-$env:HOME=$tempHome
-try{
   & gh.exe auth status | Out-Null
   if($LASTEXITCODE-ne0){throw "PROXY_GH_AUTH_FAILED"}
   & gh.exe auth setup-git | Out-Null
@@ -108,7 +102,12 @@ try{
   foreach($file in $requests){
     $requestSha=Get-Sha256File $file.FullName
     $responsePath=Join-Path $responseDir $file.Name
-    if(Test-Path -LiteralPath $responsePath){continue}
+    if(Test-Path -LiteralPath $responsePath){
+      try{
+        $existingResponse=Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json
+        if($existingResponse.status -eq "PASS"){continue}
+      }catch{}
+    }
     $request=$null
     try{
       $request=Get-Content -LiteralPath $file.FullName -Raw|ConvertFrom-Json
@@ -130,6 +129,10 @@ try{
           & git.exe -c "safe.directory=$safe" -C $RepositoryPath cat-file -e ($source+"^{commit}")
           if($LASTEXITCODE-ne0){throw "PROXY_SOURCE_COMMIT_MISSING:$source"}
           $before=Get-RemoteHead $branch
+          if($before -eq $source){
+            Write-Response $request $requestSha "PASS" "" @{remote_sha=$before}
+            continue
+          }
           if($before -ne $expected){throw "PROXY_EXPECTED_REMOTE_MISMATCH:${expected}:$before"}
           $out=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath push origin ($source+":refs/heads/"+$branch) 2>&1)
           if($LASTEXITCODE-ne0){throw "PROXY_PUSH_FAILED:"+($out -join " ")}
@@ -167,7 +170,4 @@ try{
       }
     }
   }
-}finally{
-  $env:HOME=$oldHome
-  Remove-Item -LiteralPath $tempHome -Recurse -Force -ErrorAction SilentlyContinue
 }
