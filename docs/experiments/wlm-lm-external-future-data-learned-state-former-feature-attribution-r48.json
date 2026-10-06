@@ -1,0 +1,113 @@
+{
+  "schema": "wingless.rsi-feature-attribution.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-FEATURE-ATTRIBUTION-R48",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-RAW-INPUT-FORMATION-R47",
+  "parent_sha": "465609d9845adfa464af363d00313b9d1d10698e",
+  "hypothesis": "R47 failed because at least one of the three frozen learned recurrence groups degraded transfer; reverting exactly one learned group at a time to the hand-designed alpha=0.5 baseline will identify a harmful group on fresh disjoint unseen manifests without increasing state size, readout capacity, candidate count, or adaptation budget.",
+  "frozen_parent_mechanism": {
+    "candidate_id": "three-group-alpha",
+    "group_mapping": [
+      0,
+      0,
+      1,
+      1,
+      2,
+      2
+    ],
+    "learned_alphas": [
+      0.75,
+      0.125,
+      1
+    ],
+    "learned_scalars": 3,
+    "r47_classification": "negative",
+    "r47_resource_eligible": false
+  },
+  "attribution_candidates": [
+    {
+      "id": "frozen-r47",
+      "alphas": [
+        0.75,
+        0.125,
+        1
+      ],
+      "reverted_group": null,
+      "effective_learned_scalars": 3
+    },
+    {
+      "id": "revert-group-0",
+      "alphas": [
+        0.5,
+        0.125,
+        1
+      ],
+      "reverted_group": 0,
+      "effective_learned_scalars": 2
+    },
+    {
+      "id": "revert-group-1",
+      "alphas": [
+        0.75,
+        0.5,
+        1
+      ],
+      "reverted_group": 1,
+      "effective_learned_scalars": 2
+    },
+    {
+      "id": "revert-group-2",
+      "alphas": [
+        0.75,
+        0.125,
+        0.5
+      ],
+      "reverted_group": 2,
+      "effective_learned_scalars": 2
+    }
+  ],
+  "training_and_freeze": {
+    "historical_data": "exact R47 transfer/third/fourth/fifth historical manifests",
+    "readout_fit": "fit the same seven-parameter ridge readout separately for each preregistered alpha vector on historical data only",
+    "candidate_choice": "none; all four preregistered candidates are evaluated",
+    "heldout_use_before_freeze": false,
+    "post_result_tuning": false
+  },
+  "resource_envelope": {
+    "candidate_count": 4,
+    "state_dimension": 6,
+    "readout_parameters_including_intercept": 7,
+    "total_adaptation_budget": 1744,
+    "max_effective_learned_scalars": 3,
+    "external_model_calls": 0,
+    "tokenizer_use_count": 0,
+    "gpu_required": false,
+    "capacity_growth_events": 0
+  },
+  "frozen_evaluation": {
+    "unseen_manifests": [
+      "eighteenth",
+      "nineteenth",
+      "twentieth"
+    ],
+    "supported": "valid; at least one single-group reversion beats frozen-r47 by >=0.05 pairwise winner accuracy, is positive on >=2/3 unseen manifests, and has lower mean decision regret; exactly one best harmful-group attribution is selected by preregistered lexicographic tie break",
+    "mixed": "valid; support false; at least one single-group reversion beats frozen-r47 by >=0.015 with >=2/3 nonnegative manifests and lower mean regret",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "any source identity, parent mechanism, budget, state-size, readout, candidate-count, heldout ordering, determinism, provenance, or resource-accounting rule fails"
+  },
+  "governance": {
+    "diagnostic_only": true,
+    "no_post_result_tuning": true,
+    "no_capacity_growth": true,
+    "sealed_negatives": true,
+    "deterministic_replay": true,
+    "no_oracle_or_label_leakage": true,
+    "no_accepted_ref_mutation": true,
+    "no_live_or_production_authority": true,
+    "broad_continual_training": false
+  },
+  "successors": {
+    "supported": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-GROUP-CONSTRAINED-PILOT-R49",
+    "mixed": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-ATTRIBUTION-REPLICATION-R49",
+    "negative": "WLM-LM-EXTERNAL-FUTURE-DATA-RAW-STATISTIC-REPRESENTATION-ATTRIBUTION-R49"
+  }
+}
