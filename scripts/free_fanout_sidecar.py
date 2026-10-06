@@ -16,6 +16,7 @@ ENVELOPE_SCHEMA = "research.free-fanout-envelope.v1"
 SUMMARY_SCHEMA = "research.free-fanout-summary.v1"
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+BOUND_PACKAGE_SHA = "BOUND_AT_DISPATCH"
 ALLOWED_DATA = {"historical", "replay", "historical-replay"}
 MAX_CANDIDATES = 32
 MAX_TIMEOUT_SECONDS = 1800
@@ -105,8 +106,12 @@ def validate_manifest(m, program, package_sha):
         fail("FREE_FANOUT_MANIFEST_PROGRAM")
     if not isinstance(package_sha, str) or not SHA_RE.fullmatch(package_sha):
         fail("FREE_FANOUT_PACKAGE_SHA_FORMAT")
-    if m.get("package_sha") != package_sha:
+    declared_package_sha = m.get("package_sha")
+    if declared_package_sha not in (package_sha, BOUND_PACKAGE_SHA):
         fail("FREE_FANOUT_PACKAGE_SHA_MISMATCH")
+    if declared_package_sha == BOUND_PACKAGE_SHA:
+        m = dict(m)
+        m["package_sha"] = package_sha
     if m.get("authority") != "external-evidence-only":
         fail("FREE_FANOUT_AUTHORITY")
     if m.get("data_class") not in ALLOWED_DATA:
