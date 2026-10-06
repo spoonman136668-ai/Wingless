@@ -76,6 +76,13 @@ class ManifestValidationTests(unittest.TestCase):
     def test_valid_manifest_accepted(self):
         ff.validate_manifest(base_manifest(), PROGRAM, PACKAGE_SHA)
 
+    def test_bound_at_dispatch_manifest_normalizes_exact_sha(self):
+        m = base_manifest()
+        m["package_sha"] = "BOUND_AT_DISPATCH"
+        validated = ff.validate_manifest(m, PROGRAM, PACKAGE_SHA)
+        self.assertEqual(validated["package_sha"], PACKAGE_SHA)
+        self.assertEqual(m["package_sha"], "BOUND_AT_DISPATCH")
+
     def test_invalid_sha_rejected(self):
         self.assertRejected(base_manifest(), "FREE_FANOUT_PACKAGE_SHA_FORMAT", package_sha="not-a-sha")
 
