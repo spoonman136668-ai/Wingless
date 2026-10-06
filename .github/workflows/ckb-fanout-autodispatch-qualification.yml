@@ -1,0 +1,95 @@
+name: Temporary CKB fanout autodispatch qualification
+on:
+  push:
+    branches: ['infra/ckb-fanout-autodispatch-r1']
+    paths: ['research/fanout/.autodispatch-qualification-trigger']
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: sidecar
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/checkout@v4
+        with:
+          ref: 24d88a08468a0df8124b6fe4dabb2eaa5d74fb7c
+          path: frozen-package
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: manifest-package
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Static and unit qualification
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd sidecar
+          python -m py_compile scripts/free_fanout_sidecar.py tests/test_free_fanout_sidecar.py
+          python -m unittest -v tests.test_free_fanout_sidecar
+      - name: Exercise immutable manifest-ref screening
+        shell: bash
+        env:
+          PACKAGE_SHA: 24d88a08468a0df8124b6fe4dabb2eaa5d74fb7c
+          MANIFEST_REF: ${{ github.sha }}
+          MANIFEST_PATH: research/fanout/smoke.manifest.json
+        run: |
+          set -euo pipefail
+          test "$(git -C frozen-package rev-parse HEAD)" = "$PACKAGE_SHA"
+          test "$(git -C manifest-package rev-parse HEAD)" = "$MANIFEST_REF"
+          python - "$MANIFEST_PATH" "$MANIFEST_REF" <<'PY'
+import pathlib, re, shutil, subprocess, sys
+value, expected_ref = sys.argv[1], sys.argv[2]
+if not re.fullmatch(r"research/fanout/[A-Za-z0-9._/-]+\.json", value) or ".." in pathlib.PurePosixPath(value).parts:
+    raise SystemExit("FANOUT_MANIFEST_PATH_INVALID")
+root = pathlib.Path("manifest-package").resolve(strict=True)
+src = root / pathlib.PurePosixPath(value)
+if src.is_symlink():
+    raise SystemExit("FANOUT_MANIFEST_SYMLINK_FORBIDDEN")
+resolved = src.resolve(strict=True)
+if root not in resolved.parents:
+    raise SystemExit("FANOUT_MANIFEST_ESCAPE")
+actual = subprocess.check_output(["git","-C","manifest-package","rev-parse","HEAD"], text=True).strip()
+if actual != expected_ref:
+    raise SystemExit("FANOUT_MANIFEST_REF_MISMATCH")
+dst = pathlib.Path("sidecar/research/fanout/controller.manifest.json")
+dst.parent.mkdir(parents=True, exist_ok=True)
+shutil.copyfile(resolved, dst)
+PY
+          cd sidecar
+          python scripts/free_fanout_sidecar.py prepare --manifest research/fanout/controller.manifest.json --program Wingless --package-sha "$PACKAGE_SHA" > /tmp/matrix.json
+          for id in smoke-a smoke-b smoke-c; do
+            python scripts/free_fanout_sidecar.py run --manifest research/fanout/controller.manifest.json --program Wingless --package-sha "$PACKAGE_SHA" --package-root ../frozen-package --candidate-id "$id" --output "../fanout-output/$id"
+            mkdir -p "../fanout-artifacts/$id"
+            cp "../fanout-output/$id/candidate-envelope.json" "../fanout-artifacts/$id/"
+          done
+          python scripts/free_fanout_sidecar.py aggregate --manifest research/fanout/controller.manifest.json --program Wingless --package-sha "$PACKAGE_SHA" --artifacts ../fanout-artifacts --output ../fanout-summary.json
+          python - <<'PY'
+import json
+s=json.load(open("../fanout-summary.json"))
+assert s["candidate_count"]==3
+assert s["scientific_classification"] is None
+assert s["promotion_authority"] is False
+assert s["successor_authority"] is False
+PY
+      - name: Full Wingless Go regression and build
+        shell: bash
+        working-directory: sidecar
+        run: |
+          set -euo pipefail
+          go test -buildvcs=false -race ./... -count=1 -timeout 90s
+          go build -buildvcs=false ./cmd/wingless
