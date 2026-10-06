@@ -1,0 +1,42 @@
+name: CKB research write proxy
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - infra/ckb-research-write-proxy-r1
+    paths:
+      - '.github/workflows/ckb-research-write-proxy.yml'
+      - 'research/transport/Invoke-CKBResearchWriteProxy.ps1'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: ckb-research-write-proxy-wingless
+  cancel-in-progress: false
+
+jobs:
+  proxy:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Static proxy self-test
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          if($LASTEXITCODE-ne0){throw 'PROXY_SELFTEST_FAILED'}
+      - name: Process exact CKB write requests
+        if: github.event_name != 'push' || github.ref_name == 'infra/ckb-research-write-proxy-r1'
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless'
+          if($LASTEXITCODE-ne0){throw 'PROXY_PROCESS_FAILED'}
