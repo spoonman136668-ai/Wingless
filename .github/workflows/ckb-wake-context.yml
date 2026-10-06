@@ -1,4 +1,4 @@
-name: Diagnose CKB wake context
+name: Diagnose CKB shared transport checkout
 on:
   push:
     branches: [diag/ckb-wake-context-r1]
@@ -10,39 +10,19 @@ jobs:
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
     timeout-minutes: 5
     steps:
-      - name: Inspect wake-only prerequisites
+      - name: Inspect shared target checkout
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          Write-Host ('whoami=' + (& whoami.exe))
-          $Root='C:\ProgramData\CKBR\research'
-          $Controller=Join-Path $Root 'Invoke-ResearchLoop.ps1'
-          $Config=Join-Path $Root 'controller.json'
-          $Identity=Join-Path $Root 'controller-qualified-sha.txt'
-          foreach($p in @($Controller,$Config,$Identity)){Write-Host ((Split-Path $p -Leaf)+'_exists='+(Test-Path -LiteralPath $p -PathType Leaf))}
-          if(!(Test-Path -LiteralPath $Config -PathType Leaf)){throw 'RESEARCH_CONFIG_MISSING'}
-          $c=Get-Content -LiteralPath $Config -Raw|ConvertFrom-Json
-          Write-Host ('github_cli_config_dir_set=' + (-not[string]::IsNullOrWhiteSpace([string]$c.github_cli_config_dir)))
-          Write-Host ('github_token_dpapi_file=' + [string]$c.github_token_dpapi_file)
-          if($c.github_token_dpapi_file -and (Test-Path -LiteralPath ([string]$c.github_token_dpapi_file) -PathType Leaf)){
-            Add-Type -AssemblyName System.Security -ErrorAction Stop
-            try{
-              $cipher=[IO.File]::ReadAllBytes([string]$c.github_token_dpapi_file)
-              $plain=[System.Security.Cryptography.ProtectedData]::Unprotect($cipher,$null,[System.Security.Cryptography.DataProtectionScope]::LocalMachine)
-              try{
-                $token=[Text.Encoding]::UTF8.GetString($plain).Trim()
-                Write-Host ('machine_dpapi_decryptable=' + (-not[string]::IsNullOrWhiteSpace($token)))
-              } finally { if($plain){[Array]::Clear($plain,0,$plain.Length)} }
-            } catch { Write-Host ('machine_dpapi_decryptable=false reason='+$_.Exception.GetType().Name) }
-          } else {
-            Write-Host 'machine_dpapi_decryptable=false reason=file_missing_or_unset'
-          }
-          $UserToken='C:\Users\camar\GolandProjects\ckb-plane\state\control-auth\github-token.dpapi'
-          Write-Host ('user_dpapi_file_exists='+(Test-Path -LiteralPath $UserToken -PathType Leaf))
-          if(Test-Path -LiteralPath $UserToken -PathType Leaf){
-            try{
-              $sec=((Get-Content -LiteralPath $UserToken -Raw).Trim())|ConvertTo-SecureString
-              $ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($sec)
-              try{$v=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr);Write-Host ('user_dpapi_decryptable='+(-not[string]::IsNullOrWhiteSpace($v)))}finally{if($ptr-ne[IntPtr]::Zero){[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)}}
-            } catch { Write-Host ('user_dpapi_decryptable=false reason='+$_.Exception.GetType().Name) }
-          }
+          $p='C:\ProgramData\CKBR\research\repos\Wingless'
+          Write-Host ('repo_path='+$p)
+          Write-Host ('exists='+(Test-Path -LiteralPath (Join-Path $p '.git')))
+          if(!(Test-Path -LiteralPath (Join-Path $p '.git'))){throw 'SHARED_REPO_MISSING'}
+          $head=(& git.exe -C $p rev-parse HEAD).Trim()
+          if($LASTEXITCODE-ne0){throw 'SHARED_REPO_HEAD_FAILED'}
+          Write-Host ('head='+$head)
+          $origin=(& git.exe -C $p remote get-url origin).Trim()
+          if($LASTEXITCODE-ne0){throw 'SHARED_REPO_ORIGIN_FAILED'}
+          Write-Host ('origin_kind='+(if($origin -match '^https://'){'https'}elseif($origin -match '^git@'){'ssh'}else{'other'}))
+          $dirty=(& git.exe -C $p status --porcelain) -join ''
+          Write-Host ('dirty='+(-not[string]::IsNullOrWhiteSpace($dirty)))
