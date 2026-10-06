@@ -75,25 +75,19 @@ jobs:
           MANIFEST_PATH: ${{ inputs.manifest_path }}
         run: |
           set -euo pipefail
-          python - "$MANIFEST_PATH" "$MANIFEST_REF" <<'PY'
-import pathlib, re, shutil, subprocess, sys
-value, expected_ref = sys.argv[1], sys.argv[2]
-if not re.fullmatch(r"research/fanout/[A-Za-z0-9._/-]+\\.json", value) or ".." in pathlib.PurePosixPath(value).parts:
-    raise SystemExit("FANOUT_MANIFEST_PATH_INVALID")
-root = pathlib.Path("manifest-package").resolve(strict=True)
-src = root / pathlib.PurePosixPath(value)
-if src.is_symlink():
-    raise SystemExit("FANOUT_MANIFEST_SYMLINK_FORBIDDEN")
-resolved = src.resolve(strict=True)
-if root not in resolved.parents:
-    raise SystemExit("FANOUT_MANIFEST_ESCAPE")
-actual = subprocess.check_output(["git","-C","manifest-package","rev-parse","HEAD"], text=True).strip()
-if actual != expected_ref:
-    raise SystemExit("FANOUT_MANIFEST_REF_MISMATCH")
-dst = pathlib.Path("sidecar/research/fanout/controller.manifest.json")
-dst.parent.mkdir(parents=True, exist_ok=True)
-shutil.copyfile(resolved, dst)
-PY
+          case "$MANIFEST_PATH" in
+            research/fanout/*.json) ;;
+            *) echo "FANOUT_MANIFEST_PATH_INVALID" >&2; exit 1 ;;
+          esac
+          [[ "$MANIFEST_PATH" != *".."* ]] || { echo "FANOUT_MANIFEST_PATH_INVALID" >&2; exit 1; }
+          src="manifest-package/$MANIFEST_PATH"
+          [[ -f "$src" && ! -L "$src" ]] || { echo "FANOUT_MANIFEST_MISSING_OR_SYMLINK" >&2; exit 1; }
+          root="$(realpath manifest-package)"
+          resolved="$(realpath "$src")"
+          [[ "$resolved" == "$root"/research/fanout/* ]] || { echo "FANOUT_MANIFEST_ESCAPE" >&2; exit 1; }
+          [[ "$(git -C manifest-package rev-parse HEAD)" == "$MANIFEST_REF" ]] || { echo "FANOUT_MANIFEST_REF_MISMATCH" >&2; exit 1; }
+          mkdir -p sidecar/research/fanout
+          cp -- "$resolved" sidecar/research/fanout/controller.manifest.json
           cd sidecar
           MATRIX="$(python scripts/free_fanout_sidecar.py prepare \
             --manifest "research/fanout/controller.manifest.json" \
@@ -146,25 +140,19 @@ PY
           CANDIDATE_ID: ${{ matrix.id }}
         run: |
           set -euo pipefail
-          python - "$MANIFEST_PATH" "$MANIFEST_REF" <<'PY'
-import pathlib, re, shutil, subprocess, sys
-value, expected_ref = sys.argv[1], sys.argv[2]
-if not re.fullmatch(r"research/fanout/[A-Za-z0-9._/-]+\\.json", value) or ".." in pathlib.PurePosixPath(value).parts:
-    raise SystemExit("FANOUT_MANIFEST_PATH_INVALID")
-root = pathlib.Path("manifest-package").resolve(strict=True)
-src = root / pathlib.PurePosixPath(value)
-if src.is_symlink():
-    raise SystemExit("FANOUT_MANIFEST_SYMLINK_FORBIDDEN")
-resolved = src.resolve(strict=True)
-if root not in resolved.parents:
-    raise SystemExit("FANOUT_MANIFEST_ESCAPE")
-actual = subprocess.check_output(["git","-C","manifest-package","rev-parse","HEAD"], text=True).strip()
-if actual != expected_ref:
-    raise SystemExit("FANOUT_MANIFEST_REF_MISMATCH")
-dst = pathlib.Path("sidecar/research/fanout/controller.manifest.json")
-dst.parent.mkdir(parents=True, exist_ok=True)
-shutil.copyfile(resolved, dst)
-PY
+          case "$MANIFEST_PATH" in
+            research/fanout/*.json) ;;
+            *) echo "FANOUT_MANIFEST_PATH_INVALID" >&2; exit 1 ;;
+          esac
+          [[ "$MANIFEST_PATH" != *".."* ]] || { echo "FANOUT_MANIFEST_PATH_INVALID" >&2; exit 1; }
+          src="manifest-package/$MANIFEST_PATH"
+          [[ -f "$src" && ! -L "$src" ]] || { echo "FANOUT_MANIFEST_MISSING_OR_SYMLINK" >&2; exit 1; }
+          root="$(realpath manifest-package)"
+          resolved="$(realpath "$src")"
+          [[ "$resolved" == "$root"/research/fanout/* ]] || { echo "FANOUT_MANIFEST_ESCAPE" >&2; exit 1; }
+          [[ "$(git -C manifest-package rev-parse HEAD)" == "$MANIFEST_REF" ]] || { echo "FANOUT_MANIFEST_REF_MISMATCH" >&2; exit 1; }
+          mkdir -p sidecar/research/fanout
+          cp -- "$resolved" sidecar/research/fanout/controller.manifest.json
           cd sidecar
           python scripts/free_fanout_sidecar.py run \
             --manifest "research/fanout/controller.manifest.json" \
@@ -194,13 +182,6 @@ PY
           path: sidecar
           persist-credentials: false
           fetch-depth: 1
-      - name: Checkout exact frozen package
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.package_sha }}
-          path: frozen-package
-          persist-credentials: false
-          fetch-depth: 1
       - name: Checkout exact immutable manifest ref
         uses: actions/checkout@v4
         with:
@@ -223,25 +204,19 @@ PY
           MANIFEST_PATH: ${{ inputs.manifest_path }}
         run: |
           set -euo pipefail
-          python - "$MANIFEST_PATH" "$MANIFEST_REF" <<'PY'
-import pathlib, re, shutil, subprocess, sys
-value, expected_ref = sys.argv[1], sys.argv[2]
-if not re.fullmatch(r"research/fanout/[A-Za-z0-9._/-]+\\.json", value) or ".." in pathlib.PurePosixPath(value).parts:
-    raise SystemExit("FANOUT_MANIFEST_PATH_INVALID")
-root = pathlib.Path("manifest-package").resolve(strict=True)
-src = root / pathlib.PurePosixPath(value)
-if src.is_symlink():
-    raise SystemExit("FANOUT_MANIFEST_SYMLINK_FORBIDDEN")
-resolved = src.resolve(strict=True)
-if root not in resolved.parents:
-    raise SystemExit("FANOUT_MANIFEST_ESCAPE")
-actual = subprocess.check_output(["git","-C","manifest-package","rev-parse","HEAD"], text=True).strip()
-if actual != expected_ref:
-    raise SystemExit("FANOUT_MANIFEST_REF_MISMATCH")
-dst = pathlib.Path("sidecar/research/fanout/controller.manifest.json")
-dst.parent.mkdir(parents=True, exist_ok=True)
-shutil.copyfile(resolved, dst)
-PY
+          case "$MANIFEST_PATH" in
+            research/fanout/*.json) ;;
+            *) echo "FANOUT_MANIFEST_PATH_INVALID" >&2; exit 1 ;;
+          esac
+          [[ "$MANIFEST_PATH" != *".."* ]] || { echo "FANOUT_MANIFEST_PATH_INVALID" >&2; exit 1; }
+          src="manifest-package/$MANIFEST_PATH"
+          [[ -f "$src" && ! -L "$src" ]] || { echo "FANOUT_MANIFEST_MISSING_OR_SYMLINK" >&2; exit 1; }
+          root="$(realpath manifest-package)"
+          resolved="$(realpath "$src")"
+          [[ "$resolved" == "$root"/research/fanout/* ]] || { echo "FANOUT_MANIFEST_ESCAPE" >&2; exit 1; }
+          [[ "$(git -C manifest-package rev-parse HEAD)" == "$MANIFEST_REF" ]] || { echo "FANOUT_MANIFEST_REF_MISMATCH" >&2; exit 1; }
+          mkdir -p sidecar/research/fanout
+          cp -- "$resolved" sidecar/research/fanout/controller.manifest.json
           cd sidecar
           python scripts/free_fanout_sidecar.py aggregate \
             --manifest "research/fanout/controller.manifest.json" \
