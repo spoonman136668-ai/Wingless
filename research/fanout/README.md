@@ -4,7 +4,7 @@ This directory defines a dormant, external-evidence-only screening lane for Wing
 
 ## Authority and isolation
 
-The sidecar is not the accepted research loop and cannot classify, promote, dispatch successors, mutate accepted state, write CKB-plane/KTRADE queues, touch production, or use sealed unseen outcomes for candidate selection. The workflow is manual `workflow_dispatch` only, uses GitHub-hosted `ubuntu-latest`, has read-only repository permission, and runs candidates with a minimal scrubbed environment rather than inherited job credentials.
+The sidecar is not the accepted research loop and cannot classify, promote, dispatch successors, mutate accepted state, write CKB-plane/KTRADE queues, touch production, or use sealed unseen outcomes for candidate selection. The manual workflow remains `workflow_dispatch`-only. A separate repo-local automatic workflow may start on `research/**` pushes that change `research/fanout/*.manifest.json`; it requires exactly one manifest bound to the exact pushed package SHA (or `BOUND_AT_DISPATCH`). Both routes use GitHub-hosted `ubuntu-latest`, read-only repository permission, exact package identity, and a minimal scrubbed candidate environment rather than inherited job credentials.
 
 CKB-plane remains the sole official execution/governance authority. Sidecar artifacts are advisory external evidence only.
 
@@ -56,8 +56,17 @@ The aggregate fails closed unless exactly one valid envelope exists for every pr
 Do not scale immediately to 32 candidates. Start with 3-5 when a real experiment opts in, preserve failed candidates as search history, and keep all preregistration/freeze/no-post-result-tuning rules intact.
 
 
-## CKB-plane automatic launch
+## Automatic launch without authority expansion
 
-CKB-plane may invoke this manual-only workflow through GitHub workflow dispatch after it has frozen an exact package SHA and created an immutable fanout manifest ref. The sidecar itself remains non-autonomous: it has no schedule, push trigger, queue write, successor dispatch, classification, promotion, accepted-state mutation, or production authority.
+CKB-plane remains the sole scientific/package authority. After CKB-plane (or another already-authorized package-producing path) creates a frozen research package containing a valid fanout manifest, the repository-local `.github/workflows/free-fanout-auto.yml` may observe that package push and run the external-evidence-only fanout automatically. It does not create packages, choose successors, write queues, classify results, promote refs, mutate accepted state, or access production.
 
-The launch identity is the tuple `(package_sha, manifest_ref, manifest_path)`. The workflow checks out the candidate package and manifest from those exact commits independently; it never reads a mutable manifest from the default branch.
+The automatic route is intentionally narrow:
+
+- branch must match `research/**`;
+- the push must change `research/fanout/*.manifest.json`;
+- the exact pushed commit is the frozen package identity;
+- exactly one `*.manifest.json` in that package may bind to the pushed SHA or `BOUND_AT_DISPATCH`;
+- the trusted sidecar implementation is pinned to one exact `main` SHA at run start;
+- repository permissions remain read-only and candidate artifacts remain advisory evidence only.
+
+The existing manual `workflow_dispatch` route remains available for explicit immutable tuple launches `(package_sha, manifest_ref, manifest_path)`.
