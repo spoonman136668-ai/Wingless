@@ -1,28 +1,43 @@
-name: Diagnose CKB shared transport checkout
+name: Qualify CKB write proxy transport
 on:
   push:
     branches: [diag/ckb-wake-context-r1]
     paths: ['.github/workflows/ckb-wake-context.yml']
 permissions:
-  contents: read
+  contents: write
+  actions: write
 jobs:
-  inspect:
+  qualify:
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
-    timeout-minutes: 5
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Inspect shared target checkout
+      - name: Qualify exact push and rerun permissions
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           $p='C:\ProgramData\CKBR\research\repos\Wingless'
-          Write-Host ('repo_path='+$p)
-          Write-Host ('exists='+(Test-Path -LiteralPath (Join-Path $p '.git')))
           if(!(Test-Path -LiteralPath (Join-Path $p '.git'))){throw 'SHARED_REPO_MISSING'}
-          $head=(& git.exe -C $p rev-parse HEAD).Trim()
-          if($LASTEXITCODE-ne0){throw 'SHARED_REPO_HEAD_FAILED'}
-          Write-Host ('head='+$head)
-          $origin=(& git.exe -C $p remote get-url origin).Trim()
-          if($LASTEXITCODE-ne0){throw 'SHARED_REPO_ORIGIN_FAILED'}
-          Write-Host ('origin_kind='+(if($origin -match '^https://'){'https'}elseif($origin -match '^git@'){'ssh'}else{'other'}))
-          $dirty=(& git.exe -C $p status --porcelain) -join ''
-          Write-Host ('dirty='+(-not[string]::IsNullOrWhiteSpace($dirty)))
+          $safe='C:/ProgramData/CKBR/research/repos/Wingless'
+          $head=(& git.exe -c safe.directory=$safe -C $p rev-parse HEAD).Trim()
+          if($LASTEXITCODE-ne0 -or $head -notmatch '^[0-9a-f]{40}$'){throw 'SHARED_HEAD_INVALID'}
+          & gh.exe auth setup-git
+          if($LASTEXITCODE-ne0){throw 'GH_SETUP_GIT_FAILED'}
+          $branch='diag/proxy-transport-proof-r1'
+          $before=(& git.exe -c safe.directory=$safe -C $p ls-remote --heads origin ('refs/heads/'+$branch)) -join ''
+          if($LASTEXITCODE-ne0){throw 'PROXY_REMOTE_READ_FAILED'}
+          if($before){
+            $old=($before -split '\s+')[0]
+            if($old -ne $head){throw ('PROXY_PROOF_BRANCH_DRIFT:'+ $old + ':' + $head)}
+          } else {
+            & git.exe -c safe.directory=$safe -C $p push origin ($head+':refs/heads/'+$branch)
+            if($LASTEXITCODE-ne0){throw 'PROXY_EXACT_PUSH_FAILED'}
+          }
+          $after=(& git.exe -c safe.directory=$safe -C $p ls-remote --heads origin ('refs/heads/'+$branch)) -join ''
+          if($LASTEXITCODE-ne0 -or !$after){throw 'PROXY_PUSH_VERIFY_MISSING'}
+          if((($after -split '\s+')[0]) -ne $head){throw 'PROXY_PUSH_VERIFY_MISMATCH'}
+          Write-Host ('exact_push=PASS sha='+$head)
+          & gh.exe run rerun '37545384011' --repo 'spoonman136668-ai/Wingless'
+          if($LASTEXITCODE-ne0){throw 'PROXY_RERUN_FAILED'}
+          Write-Host 'workflow_rerun=PASS'
