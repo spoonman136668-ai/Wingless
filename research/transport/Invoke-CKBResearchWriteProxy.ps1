@@ -26,7 +26,7 @@ function Write-AtomicUtf8([string]$Path,[string]$Text){
 }
 function Assert-Sha([string]$Value,[string]$Code,[switch]$AllowEmpty){
   if($AllowEmpty -and [string]::IsNullOrWhiteSpace($Value)){return}
-  if($Value -notmatch '^[0-9a-f]{40}$'){throw "$Code:$Value"}
+  if($Value -notmatch '^[0-9a-f]{40}$'){throw "${Code}:$Value"}
 }
 function Assert-Branch([string]$Branch){
   if([string]::IsNullOrWhiteSpace($Branch) -or $Branch.Contains("\") -or $Branch.Contains("..") -or $Branch.Contains("//")){
@@ -130,11 +130,11 @@ try{
           & git.exe -c "safe.directory=$safe" -C $RepositoryPath cat-file -e ($source+"^{commit}")
           if($LASTEXITCODE-ne0){throw "PROXY_SOURCE_COMMIT_MISSING:$source"}
           $before=Get-RemoteHead $branch
-          if($before -ne $expected){throw "PROXY_EXPECTED_REMOTE_MISMATCH:$expected:$before"}
+          if($before -ne $expected){throw "PROXY_EXPECTED_REMOTE_MISMATCH:${expected}:$before"}
           $out=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath push origin ($source+":refs/heads/"+$branch) 2>&1)
           if($LASTEXITCODE-ne0){throw "PROXY_PUSH_FAILED:"+($out -join " ")}
           $after=Get-RemoteHead $branch
-          if($after -ne $source){throw "PROXY_PUSH_VERIFY_MISMATCH:$source:$after"}
+          if($after -ne $source){throw "PROXY_PUSH_VERIFY_MISMATCH:${source}:$after"}
           Write-Response $request $requestSha "PASS" "" @{remote_sha=$after}
         }
         "rerun" {
