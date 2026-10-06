@@ -41,7 +41,7 @@ def verify_identity():
         fail("R48_FANOUT_MANIFEST_BLOB_MISMATCH")
     prereg = json.loads(PREREG_PATH.read_text(encoding="utf-8"))
     manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
-    if prereg.get("experiment_id") != EXPECTED_EXPERIMENT:
+    if prereg.get("experiment_id", prereg.get("experiment")) != EXPECTED_EXPERIMENT:
         fail("R48_FANOUT_EXPERIMENT_ID_MISMATCH")
     if prereg.get("parent_sha") != EXPECTED_PARENT_SHA:
         fail("R48_FANOUT_PARENT_SHA_MISMATCH")
