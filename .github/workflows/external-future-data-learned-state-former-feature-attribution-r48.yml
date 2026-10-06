@@ -8,6 +8,7 @@ on:
       - 'docs/experiments/wlm-lm-external-future-data-r48-manifest.json'
       - 'unitary/wlm_lm_external_future_data_learned_state_former_feature_attribution_r48.go'
       - 'cmd/wlm-lm-external-future-data-learned-state-former-feature-attribution-r48/main.go'
+      - 'research/fanout/r48_package_audit.py'
       - '.github/workflows/external-future-data-learned-state-former-feature-attribution-r48.yml'
 permissions:
   contents: read
@@ -36,6 +37,7 @@ jobs:
             'cmd/wlm-lm-external-future-data-learned-state-former-feature-attribution-r48/main.go' \
             'docs/experiments/wlm-lm-external-future-data-learned-state-former-feature-attribution-r48.json' \
             'docs/experiments/wlm-lm-external-future-data-r48-manifest.json' \
+            'research/fanout/r48_package_audit.py' \
             'unitary/wlm_lm_external_future_data_learned_state_former_feature_attribution_r48.go' | sort)"
           test "$changed" = "$expected"
           test "$(git rev-parse 'd39cd28bcf2543f331ac4557ac5e6a3cc37500c5:docs/experiments/wlm-lm-external-future-data-learned-state-former-feature-attribution-r48.json')" = '2d63f093e9b7d06b7f5ad1ef6d427bbb12496301'
