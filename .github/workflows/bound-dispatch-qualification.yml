@@ -1,0 +1,38 @@
+name: Temporary fanout dispatch-binding qualification
+on:
+  push:
+    branches: ['infra/fanout-bound-at-dispatch-r1']
+    paths: ['research/fanout/.bound-dispatch-qualification-trigger']
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Unit and sentinel smoke
+        env:
+          PACKAGE_SHA: 24d88a08468a0df8124b6fe4dabb2eaa5d74fb7c
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/free_fanout_sidecar.py tests/test_free_fanout_sidecar.py
+          python -m unittest -v tests.test_free_fanout_sidecar
+          python -c 'import json; p="research/fanout/smoke.manifest.json"; m=json.load(open(p)); m["package_sha"]="BOUND_AT_DISPATCH"; json.dump(m,open("/tmp/bound.json","w"))'
+          mkdir -p /tmp/research/fanout
+          cp /tmp/bound.json /tmp/research/fanout/bound.json
+          python scripts/free_fanout_sidecar.py prepare --manifest /tmp/research/fanout/bound.json --program Wingless --package-sha "$PACKAGE_SHA" > /tmp/matrix.json
+      - name: Full regression and build
+        run: |
+          go test -buildvcs=false -race ./... -count=1 -timeout 90s
+          go build -buildvcs=false ./cmd/wingless
