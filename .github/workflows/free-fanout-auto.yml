@@ -51,36 +51,34 @@ jobs:
           echo "package_sha=$PACKAGE_SHA" >> "$GITHUB_OUTPUT"
           echo "sidecar_sha=$SIDECAR_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Resolve exactly one changed frozen fanout manifest
+      - name: Resolve exactly one package-bound frozen fanout manifest
         id: manifest
         shell: bash
+        env:
+          PACKAGE_SHA: ${{ steps.identity.outputs.package_sha }}
         run: |
           set -euo pipefail
           mapfile -t manifests < <(
-            python - "$GITHUB_EVENT_PATH" <<'PY'
+            python - "$PACKAGE_SHA" <<'PY'
           import json
+          import pathlib
           import sys
 
-          with open(sys.argv[1], "r", encoding="utf-8") as handle:
-              event = json.load(handle)
+          package_sha = sys.argv[1]
+          root = pathlib.Path("frozen-package/research/fanout")
+          matches = []
+          for path in sorted(root.glob("*.manifest.json")):
+              with path.open("r", encoding="utf-8") as handle:
+                  manifest = json.load(handle)
+              if manifest.get("package_sha") in (package_sha, "BOUND_AT_DISPATCH"):
+                  matches.append(path.as_posix().removeprefix("frozen-package/"))
 
-          paths = set()
-          for commit in event.get("commits", []):
-              for key in ("added", "modified"):
-                  for path in commit.get(key, []):
-                      if (
-                          isinstance(path, str)
-                          and path.startswith("research/fanout/")
-                          and path.endswith(".manifest.json")
-                      ):
-                          paths.add(path)
-
-          for path in sorted(paths):
+          for path in matches:
               print(path)
           PY
           )
           if (( ${#manifests[@]} != 1 )); then
-            echo "FANOUT_CHANGED_MANIFEST_COUNT_${#manifests[@]}" >&2
+            echo "FANOUT_PACKAGE_BOUND_MANIFEST_COUNT_${#manifests[@]}" >&2
             exit 1
           fi
           MANIFEST_PATH="${manifests[0]}"
