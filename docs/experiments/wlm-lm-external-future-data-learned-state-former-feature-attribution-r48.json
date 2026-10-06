@@ -1,0 +1,125 @@
+{
+  "schema": "wingless.rsi-feature-attribution.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-FEATURE-ATTRIBUTION-R48",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-RAW-INPUT-FORMATION-R47",
+  "parent_sha": "465609d9845adfa464af363d00313b9d1d10698e",
+  "hypothesis": "R47's negative result is attributable to at least one of the three frozen learned alpha groups; reverting exactly one group at a time to the hand-designed alpha=0.5 baseline will identify a harmful group without changing state size, readout capacity, adaptation budget, or broadening training.",
+  "mutable_interface": "none during evaluation; four fixed state-former mechanisms are frozen before fresh unseen outcomes",
+  "frozen_r47_mechanism": {
+    "candidate": "three-group-alpha",
+    "group_alphas": [
+      0.75,
+      0.125,
+      1
+    ],
+    "expanded_state_alphas": [
+      0.75,
+      0.75,
+      0.125,
+      0.125,
+      1,
+      1
+    ],
+    "learned_scalars": 3,
+    "resource_eligible_under_r47": false
+  },
+  "attribution_candidates": [
+    {
+      "id": "frozen-full",
+      "learned_scalars": 3,
+      "expanded_state_alphas": [
+        0.75,
+        0.75,
+        0.125,
+        0.125,
+        1,
+        1
+      ],
+      "interpretation": "exact frozen R47 selected mechanism"
+    },
+    {
+      "id": "revert-distribution",
+      "learned_scalars": 2,
+      "expanded_state_alphas": [
+        0.5,
+        0.5,
+        0.125,
+        0.125,
+        1,
+        1
+      ],
+      "interpretation": "revert byte_mean/byte_variance group only"
+    },
+    {
+      "id": "revert-printable-digit",
+      "learned_scalars": 2,
+      "expanded_state_alphas": [
+        0.75,
+        0.75,
+        0.5,
+        0.5,
+        1,
+        1
+      ],
+      "interpretation": "revert printable_fraction/digit_fraction group only"
+    },
+    {
+      "id": "revert-whitespace-repeat",
+      "learned_scalars": 2,
+      "expanded_state_alphas": [
+        0.75,
+        0.75,
+        0.125,
+        0.125,
+        0.5,
+        0.5
+      ],
+      "interpretation": "revert whitespace_fraction/adjacent_repeat_fraction group only"
+    }
+  ],
+  "historical_fit": {
+    "data": "exact R47 transfer/third/fourth/fifth historical manifests",
+    "readout": "same seven-parameter linear readout, independently fit for each frozen candidate",
+    "candidate_search": false,
+    "fresh_unseen_outcome_access_before_freeze": 0
+  },
+  "resource_envelope": {
+    "total_adaptation_budget": 1744,
+    "state_dimension": 6,
+    "readout_parameters_including_intercept": 7,
+    "candidate_count": 4,
+    "max_learned_scalars": 3,
+    "external_model_calls": 0,
+    "tokenizer_use_count": 0,
+    "gpu_required": false,
+    "capacity_growth_events": 0,
+    "no_material_ram_vram_model_context_agent_compute_growth": true
+  },
+  "frozen_evaluation": {
+    "unseen_manifests": [
+      "eighteenth",
+      "nineteenth",
+      "twentieth"
+    ],
+    "supported": "valid; a one-group reversion beats frozen-full pairwise winner accuracy by >=0.05, improves on >=2/3 unseen manifests, and has mean decision regret <=0.90*frozen-full",
+    "mixed": "valid; support false; a one-group reversion beats frozen-full accuracy by >=0.015, improves on >=2/3 unseen manifests, and has lower mean decision regret",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "identity/budget/state-size/readout/candidate-freeze/determinism/provenance/resource-accounting failure"
+  },
+  "governance": {
+    "no_post_result_tuning": true,
+    "no_capacity_growth": true,
+    "sealed_negatives": true,
+    "deterministic_replay": true,
+    "no_oracle_or_label_leakage": true,
+    "no_accepted_ref_mutation": true,
+    "no_live_or_production_authority": true,
+    "broad_continual_training": false
+  },
+  "successors": {
+    "supported": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-TARGETED-SIMPLIFICATION-REPLICATION-R49",
+    "mixed": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-TARGETED-SIMPLIFICATION-RESOURCE-ATTRIBUTION-R49",
+    "negative": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-INTERACTION-ATTRIBUTION-R49"
+  },
+  "manifest_sha256": "7cf679650be302d0070a6731ce206d6393435c1dd5477c2f0389316a566919c2"
+}
