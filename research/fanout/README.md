@@ -54,3 +54,10 @@ The aggregate fails closed unless exactly one valid envelope exists for every pr
 `frozen historical/replay package -> bounded candidate fanout -> resource/complexity filtering -> frozen shortlist -> official sealed evaluation through existing authority`
 
 Do not scale immediately to 32 candidates. Start with 3-5 when a real experiment opts in, preserve failed candidates as search history, and keep all preregistration/freeze/no-post-result-tuning rules intact.
+
+
+## CKB-plane automatic launch
+
+CKB-plane may invoke this manual-only workflow through GitHub workflow dispatch after it has frozen an exact package SHA and created an immutable fanout manifest ref. The sidecar itself remains non-autonomous: it has no schedule, push trigger, queue write, successor dispatch, classification, promotion, accepted-state mutation, or production authority.
+
+The launch identity is the tuple `(package_sha, manifest_ref, manifest_path)`. The workflow checks out the candidate package and manifest from those exact commits independently; it never reads a mutable manifest from the default branch.
