@@ -1,0 +1,93 @@
+{
+  "schema": "wingless.rsi-readout-interface-disjoint-replication.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-DISJOINT-REPLICATION-R51",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-ATTRIBUTION-R50",
+  "parent_sha": "1d9ded192dacb3dcf2230eeb5ee3c580d4e13660",
+  "hypothesis": "R50 supported the frozen two-group-2 lower-capacity readout on attribution-only contexts. If that readout-interface mechanism is real rather than context-specific, the exact frozen two-group-2 readout must outperform full-6 on fresh disjoint contexts at equal or lower resource cost without changing the six-dimensional state former or adaptation budget.",
+  "r50_frozen_observation": {
+    "classification": "supported",
+    "validity_pass": true,
+    "best_lower_capacity_readout": "two-group-2",
+    "accuracy_delta_vs_full": 0.07920792079207928,
+    "positive_manifest_count": 2,
+    "best_vs_second_margin": 0.05940594059405946,
+    "best_mean_regret": 6.287128712871287,
+    "full_mean_regret": 17.643564356435643
+  },
+  "fixed_state_former": {
+    "id": "r48-full-selected",
+    "alphas": [
+      0.75,
+      0.75,
+      0.125,
+      0.125,
+      1,
+      1
+    ],
+    "state_dimension": 6
+  },
+  "readout_arms": {
+    "count": 2,
+    "baseline": "full-6",
+    "candidate": "two-group-2",
+    "full_groups": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "candidate_groups": [
+      0,
+      0,
+      1,
+      1,
+      1,
+      1
+    ],
+    "maximum_parameters_including_intercept": 7,
+    "candidate_parameters_including_intercept": 3
+  },
+  "fit_and_evaluation": {
+    "historical_fit": "fit both preregistered readouts only on exact R47 transfer/third/fourth/fifth examples with ridge penalty 1.0 on non-intercept groups",
+    "sealed_unseen_contexts": [
+      "twenty-fourth",
+      "twenty-fifth",
+      "twenty-sixth"
+    ],
+    "fresh_disjoint": true,
+    "no_heldout_outcome_use_in_fit": true
+  },
+  "resource_envelope": {
+    "total_adaptation_budget": 1744,
+    "state_dimension": 6,
+    "maximum_readout_parameters_including_intercept": 7,
+    "candidate_readout_count": 2,
+    "external_model_calls": 0,
+    "tokenizer_use_count": 0,
+    "gpu_required": false,
+    "capacity_growth_events": 0
+  },
+  "frozen_evaluation": {
+    "supported": "valid; two-group-2 improves aggregate pairwise winner accuracy over full-6 by >=0.05, improves on >=2/3 fresh contexts, and mean decision regret <= full-6",
+    "mixed": "valid; support false; two-group-2 improves aggregate accuracy by >=0.015 with >=2/3 positive fresh contexts and mean regret <= full-6",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "identity/budget/state-size/readout-arm/history-seal/fresh-manifest/determinism/provenance/resource-accounting failure"
+  },
+  "manifest_sha256": "ac3465598a595d4a88d3ea5974fa1229c1f176347f04033e46c0739973092ac0",
+  "governance": {
+    "no_post_result_tuning": true,
+    "no_capacity_growth": true,
+    "deterministic_replay": true,
+    "no_oracle_or_label_leakage": true,
+    "no_accepted_ref_mutation": true,
+    "no_live_or_production_authority": true,
+    "broad_continual_training": false
+  },
+  "successor_policy": {
+    "supported": "fresh replication supports promotion-candidate qualification; continue with one bounded transfer confirmation",
+    "mixed": "bounded readout-interface stability attribution",
+    "negative": "representation/readout coupling attribution without capacity growth"
+  }
+}
