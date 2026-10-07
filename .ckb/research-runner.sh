@@ -3,18 +3,18 @@ set -euo pipefail
 export E="$RUNNER_TEMP/ckb-research-evidence"; rm -rf "$E"; mkdir -p "$E"
 test "$(git rev-parse HEAD)" = "$PACKAGE_SHA"
 git merge-base --is-ancestor '1d9ded192dacb3dcf2230eeb5ee3c580d4e13660' HEAD
-git merge-base --is-ancestor '4595c30daf9ba8d264368b745aa7a5ceef5b368d' HEAD
+git merge-base --is-ancestor '4401f24bfe70a78fcf397ded2124e43c9e61a29f' HEAD
 python3 - <<'PY'
 import base64,hashlib,json,os,pathlib
-raw=base64.b64decode("eyJhdXRob3JpdHlfd29ya2Zsb3dfcmVmIjoibWFpbiIsImF1dGhvcml0eV93b3JrZmxvd19yZWZfc2hhIjoiM2JmZDBkNmJmZGNjZjI2Yzc1ZDc0MDI5NzllYzk2NThmMDVmMzkwMiIsImNrYl9wbGFuZV9tYWluX3NoYSI6ImU1MzI0MDU5MmViMjA5MWIwYjhmMDQ1ZDc1OGMzNDE3NzQ4NDYzZTIiLCJleHBlcmltZW50IjoiV0xNLUxNLUVYVEVSTkFMLUZVVFVSRS1EQVRBLUxFQVJORUQtU1RBVEUtRk9STUVSLVJFQURPVVQtSU5URVJGQUNFLUZSRVNILVJFUExJQ0FUSU9OLVI1MSIsImZldGNoX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1mZXRjaC52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfRkVUQ0giLCJzY29wZSI6ImZldGNoLXZlcmlmeS1vbmx5IiwicmVhc29ucyI6bnVsbH0sIm1hbmlmZXN0X3NoYTI1NiI6IjgyYjRmZGMwMzc2NmZiMTZlYTIwMTE5MzU2YTA0NjRlZDI1NmNiNTU0ZWMxMzg3ZWQ4Nzg5ZjUxZGI4MDYwNzIiLCJwbGFuX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfUExBTiIsInNjb3BlIjoicGxhbi1vbmx5IiwicmVhc29ucyI6bnVsbH0sInByZXJlZ2lzdHJhdGlvbl9zaGEiOiI0NTk1YzMwZGFmOWJhOGQyNjQzNjhiNzQ1YWE3YTVjZWVmNWIzNjhkIiwicHJvamVjdCI6IldpbmdsZXNzIiwicmVxdWVzdF9pZCI6Ijk5YTJhODg0MzE1Y2FkYWJlZTU1M2RiZDk5Yzc4MjdiIiwicmVzZWFyY2hfZGVjaXNpb24iOnsic2NoZW1hIjoiY2tiLXBsYW5lLmV4dGVybmFsLWV4cG9zdXJlLXJlc2VhcmNoLnYxIiwiZGlzcG9zaXRpb24iOiJSRUFEWV9SRVNFQVJDSCIsInNjb3BlIjoicmVzZWFyY2gtY29uc3VtZS1vbmNlIiwicmVhc29ucyI6bnVsbH0sInJlc2VhcmNoX2hvc3QiOiJDS0ItUExBTkUtUkVNT1RFIiwicnVubmVyX2lkIjoiQ0tCLVBMQU5FLVJFTU9URSIsInNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1yZWFkeS1yZXNlYXJjaC1yZWNlaXB0LnYxIn0=",validate=True)
-assert hashlib.sha256(raw).hexdigest()=="01a27addf3b9cae05a872d2a734bf6299693a02733c4c4a6913c2430ba1a56af"
+raw=base64.b64decode("eyJhdXRob3JpdHlfd29ya2Zsb3dfcmVmIjoibWFpbiIsImF1dGhvcml0eV93b3JrZmxvd19yZWZfc2hhIjoiYTNhOGMzYWRhMWU0ZmYyYzI4NjUxY2Y0YTc5ZmIxNGE2MDZhZWRlOSIsImNrYl9wbGFuZV9tYWluX3NoYSI6ImUwYTgyNmQ0ZWE5NTI2NWUxZTRmYzg5YzM0MTZjYjNjZjBhZmMyMjAiLCJleHBlcmltZW50IjoiV0xNLUxNLUVYVEVSTkFMLUZVVFVSRS1EQVRBLUxFQVJORUQtU1RBVEUtRk9STUVSLVJFUFJFU0VOVEFUSU9OLVJFQURPVVQtQ09VUExJTkctRElBR05PU0lTLVI1MiIsImZldGNoX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1mZXRjaC52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfRkVUQ0giLCJzY29wZSI6ImZldGNoLXZlcmlmeS1vbmx5IiwicmVhc29ucyI6bnVsbH0sIm1hbmlmZXN0X3NoYTI1NiI6IjgyYjRmZGMwMzc2NmZiMTZlYTIwMTE5MzU2YTA0NjRlZDI1NmNiNTU0ZWMxMzg3ZWQ4Nzg5ZjUxZGI4MDYwNzIiLCJwbGFuX2RlY2lzaW9uIjp7InNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS52MSIsImRpc3Bvc2l0aW9uIjoiUkVBRFlfUExBTiIsInNjb3BlIjoicGxhbi1vbmx5IiwicmVhc29ucyI6bnVsbH0sInByZXJlZ2lzdHJhdGlvbl9zaGEiOiI0NDAxZjI0YmZlNzBhNzhmY2YzOTdkZWQyMTI0ZTQzYzllNjFhMjlmIiwicHJvamVjdCI6IldpbmdsZXNzIiwicmVxdWVzdF9pZCI6IjI1MGMyMzgwNWUzZDE4Y2U1ODIwMjBjNDk2MWRkZjNjIiwicmVzZWFyY2hfZGVjaXNpb24iOnsic2NoZW1hIjoiY2tiLXBsYW5lLmV4dGVybmFsLWV4cG9zdXJlLXJlc2VhcmNoLnYxIiwiZGlzcG9zaXRpb24iOiJSRUFEWV9SRVNFQVJDSCIsInNjb3BlIjoicmVzZWFyY2gtY29uc3VtZS1vbmNlIiwicmVhc29ucyI6bnVsbH0sInJlc2VhcmNoX2hvc3QiOiJDS0ItUExBTkUtUkVNT1RFIiwicnVubmVyX2lkIjoiQ0tCLVBMQU5FLVJFTU9URSIsInNjaGVtYSI6ImNrYi1wbGFuZS5leHRlcm5hbC1leHBvc3VyZS1yZWFkeS1yZXNlYXJjaC1yZWNlaXB0LnYxIn0=",validate=True)
+assert hashlib.sha256(raw).hexdigest()=="caa0be5e24eb58431bc20ca8b41ccd31012490672de709eeb9fad9adf6c1dd6f"
 r=json.loads(raw)
 assert r["schema"]=="ckb-plane.external-exposure-ready-research-receipt.v1"
 assert r["project"]=="Wingless"
-assert r["experiment"]=="WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-FRESH-REPLICATION-R51"
-assert r["preregistration_sha"]=="4595c30daf9ba8d264368b745aa7a5ceef5b368d"
+assert r["experiment"]=="WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-REPRESENTATION-READOUT-COUPLING-DIAGNOSIS-R52"
+assert r["preregistration_sha"]=="4401f24bfe70a78fcf397ded2124e43c9e61a29f"
 assert r["manifest_sha256"]=="82b4fdc03766fb16ea20119356a0464ed256cb554ec1387ed8789f51db806072"
-assert r["ckb_plane_main_sha"]=="e53240592eb2091b0b8f045d758c3417748463e2"
+assert r["ckb_plane_main_sha"]=="e0a826d4ea95265e1e4fc89c3416cb3cf0afc220"
 assert r["research_decision"]["disposition"]=="READY_RESEARCH"
 (pathlib.Path(os.environ["E"])/"authority.json").write_bytes(raw)
 PY
@@ -45,21 +45,27 @@ for group in m["unseen"]:
     (dirs[group["name"]]/{"code":"code.bin","structured":"structured.bin","technical_prose":"technical-prose.bin"}[src["domain"]]).write_bytes(p)
 PY
 go test ./unitary -count=1
-go test ./cmd/wlm-lm-external-future-data-learned-state-former-readout-interface-fresh-replication-r51 -count=1
+go test ./cmd/wlm-lm-external-future-data-learned-state-former-representation-readout-coupling-diagnosis-r52 -count=1
 go test ./... -count=1
 args=()
 for n in transfer third fourth fifth twenty-fourth twenty-fifth twenty-sixth; do key="${n//-/_}"; args+=("--${n}-root" "$RUNNER_TEMP/r51-$n"); done
-go run ./cmd/wlm-lm-external-future-data-learned-state-former-readout-interface-fresh-replication-r51 "${args[@]}" --resource-out "$E/resource.json" > "$E/result1.json"
-go run ./cmd/wlm-lm-external-future-data-learned-state-former-readout-interface-fresh-replication-r51 "${args[@]}" > "$E/result2.json"
+go run ./cmd/wlm-lm-external-future-data-learned-state-former-representation-readout-coupling-diagnosis-r52 "${args[@]}" --resource-out "$E/resource.json" > "$E/result1.json"
+go run ./cmd/wlm-lm-external-future-data-learned-state-former-representation-readout-coupling-diagnosis-r52 "${args[@]}" > "$E/result2.json"
 cmp "$E/result1.json" "$E/result2.json"
 python3 - <<'PY'
 import json,math,os,pathlib
-E=pathlib.Path(os.environ["RUNNER_TEMP"])/"ckb-research-evidence";r=json.loads((E/"result1.json").read_text());m=r["metrics"];a={x["id"]:x for x in r["arms"]};full=a["full-6"];sel=a["two-group-2"]
-valid=(m["invalid_row_count"]==0 and m["source_identity_mismatch_count"]==0 and m["readout_arm_count"]==2 and m["state_dimension"]==6 and m["total_adaptation_budget"]==1744 and m["heldout_outcome_use_before_arm_freeze"]==0 and m["post_result_arm_or_threshold_choice_count"]==0 and all(math.isfinite(float(v)) for v in m.values()))
-support=valid and sel["accuracy_delta_vs_full"]>=0.05 and sel["positive_manifest_count_vs_full"]>=2 and sel["mean_decision_regret"]<=full["mean_decision_regret"]
-mixed=valid and not support and sel["accuracy_delta_vs_full"]>=0.015 and sel["positive_manifest_count_vs_full"]>=2 and sel["mean_decision_regret"]<=full["mean_decision_regret"]
+E=pathlib.Path(os.environ["RUNNER_TEMP"])/"ckb-research-evidence";r=json.loads((E/"result1.json").read_text());m=r["metrics"];a={x["id"]:x for x in r["arms"]}
+sf,st,rf,rt=a["selected-full6"],a["selected-two-group2"],a["r46-full6"],a["r46-two-group2"]
+valid=(m["invalid_row_count"]==0 and m["source_identity_mismatch_count"]==0 and m["representation_arm_count"]==2 and m["readout_arm_count"]==2 and m["coupling_arm_count"]==4 and m["state_dimension"]==6 and m["max_readout_parameter_count"]==7 and m["total_adaptation_budget"]==1744 and m["heldout_outcome_use_before_arm_freeze"]==0 and m["post_result_arm_or_threshold_choice_count"]==0 and all(math.isfinite(float(v)) for v in m.values()))
+selected_qual=(m["selected_tied_accuracy_delta"]>=0.05 and m["selected_tied_positive_manifest_count"]>=2 and st["mean_decision_regret"]<=sf["mean_decision_regret"])
+r46_qual=(m["r46_tied_accuracy_delta"]>=0.05 and m["r46_tied_positive_manifest_count"]>=2 and rt["mean_decision_regret"]<=rf["mean_decision_regret"])
+interaction=abs(m["coupling_interaction_accuracy_delta"])
+support=valid and (selected_qual != r46_qual) and interaction>=0.05
+selected_weak=(m["selected_tied_accuracy_delta"]>=0.015 and m["selected_tied_positive_manifest_count"]>=2 and st["mean_decision_regret"]<=sf["mean_decision_regret"])
+r46_weak=(m["r46_tied_accuracy_delta"]>=0.015 and m["r46_tied_positive_manifest_count"]>=2 and rt["mean_decision_regret"]<=rf["mean_decision_regret"])
+mixed=valid and not support and (interaction>=0.05 or selected_weak or r46_weak)
 cls="invalid" if not valid else "supported" if support else "mixed" if mixed else "negative"
-out={"schema":"wingless.research-classification.v1","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-FRESH-REPLICATION-R51","classification":cls,"validity_pass":valid,"selected_readout":"two-group-2","fresh_replication":True,"rsi_success":bool(support),"next_successor":None,"package_sha":os.environ["PACKAGE_SHA"],"metrics":m,"arms":r["arms"]}
+out={"schema":"wingless.research-classification.v1","experiment":"WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-REPRESENTATION-READOUT-COUPLING-DIAGNOSIS-R52","classification":cls,"validity_pass":valid,"diagnostic_only":True,"representation_readout_interaction":m["coupling_interaction_accuracy_delta"],"rsi_success":False,"next_successor":None,"package_sha":os.environ["PACKAGE_SHA"],"metrics":m,"arms":r["arms"]}
 (E/"classification.json").write_text(json.dumps(out,separators=(",",":")),encoding="utf-8")
 print(json.dumps(out,separators=(",",":")))
 PY
