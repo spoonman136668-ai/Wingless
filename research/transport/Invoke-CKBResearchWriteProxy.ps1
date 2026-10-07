@@ -162,10 +162,224 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
             $oldNativeEap=$ErrorActionPreference
             try{
               $ErrorActionPreference="Continue"
-              $fetchOut=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath fetch --no-tags origin $source 2>&1)
+              $lsOut=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath ls-remote --heads origin 2>&1)
+              $lsExit=$LASTEXITCODE
+            }finally{$ErrorActionPreference=$oldNativeEap}
+            if($lsExit-ne0){throw "PROXY_SOURCE_REF_DISCOVERY_FAILED:"+($lsOut -join " ")}
+            $matches=@()
+            foreach($line in $lsOut){
+              $s=[string]$line
+              if($s -match '^([0-9a-f]{40})\s+(refs/heads/repair/[A-Za-z0-9._/-]+)
+          $before=Get-RemoteHead $branch
+          if($before -eq $source){
+            Write-Response $request $requestSha "PASS" "" @{remote_sha=$before}
+            continue
+          }
+          if($before -ne $expected){throw "PROXY_EXPECTED_REMOTE_MISMATCH:${expected}:$before"}
+          $oldNativeEap=$ErrorActionPreference
+          try{
+            $ErrorActionPreference="Continue"
+            $out=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath push origin ($source+":refs/heads/"+$branch) 2>&1)
+            $pushExit=$LASTEXITCODE
+          }finally{
+            $ErrorActionPreference=$oldNativeEap
+          }
+          if($pushExit-ne0){throw "PROXY_PUSH_FAILED:"+($out -join " ")}
+          $after=Get-RemoteHead $branch
+          if($after -ne $source){throw "PROXY_PUSH_VERIFY_MISMATCH:${source}:$after"}
+          Write-Response $request $requestSha "PASS" "" @{remote_sha=$after}
+        }
+        "create_documents_branch" {
+          $parent=[string]$request.parent_sha
+          $branch=[string]$request.branch
+          $expected=[string]$request.expected_remote_sha
+          $message=[string]$request.commit_message
+          Assert-Sha $parent "PROXY_DOCUMENT_PARENT_SHA_INVALID"
+          Assert-Sha $expected "PROXY_DOCUMENT_EXPECTED_SHA_INVALID" -AllowEmpty
+          Assert-Branch $branch
+          if(!$branch.StartsWith("research/")){throw "PROXY_DOCUMENT_BRANCH_FORBIDDEN:$branch"}
+          if([string]::IsNullOrWhiteSpace($message) -or $message.Length-gt200 -or $message.Contains([Environment]::NewLine)){throw "PROXY_DOCUMENT_COMMIT_MESSAGE_INVALID"}
+          $files=@($request.files)
+          if($files.Count-lt1 -or $files.Count-gt4){throw "PROXY_DOCUMENT_FILE_COUNT_INVALID:$($files.Count)"}
+          $paths=[System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+          $entries=[System.Collections.Generic.List[object]]::new()
+          foreach($doc in $files){
+            $path=[string]$doc.path
+            $expectedSha=[string]$doc.sha256
+            $contentB64=[string]$doc.content_b64
+            Assert-DocumentPath $path
+            if(!$paths.Add($path)){throw "PROXY_DOCUMENT_DUPLICATE_PATH:$path"}
+            if($expectedSha.Length-ne64 -or $expectedSha -match "[^0-9a-f]"){throw "PROXY_DOCUMENT_SHA256_INVALID:$path"}
+            try{$bytes=[Convert]::FromBase64String($contentB64)}catch{throw "PROXY_DOCUMENT_BASE64_INVALID:$path"}
+            if($bytes.Length-le0 -or $bytes.Length-gt262144){throw ("PROXY_DOCUMENT_SIZE_INVALID:"+$path+":"+$bytes.Length)}
+            if((Get-Sha256Bytes $bytes)-ne$expectedSha){throw "PROXY_DOCUMENT_SHA256_MISMATCH:$path"}
+            $blobBody=[ordered]@{content=$contentB64;encoding="base64"}
+            $blobSha=Invoke-GhJson "POST" ("repos/"+$Repository+"/git/blobs") $blobBody ".sha"
+            Assert-Sha $blobSha "PROXY_DOCUMENT_BLOB_SHA_INVALID"
+            [void]$entries.Add([ordered]@{path=$path;mode="100644";type="blob";sha=$blobSha})
+          }
+          $parentRaw=@(& gh.exe api ("repos/"+$Repository+"/git/commits/"+$parent) 2>&1)
+          if($LASTEXITCODE-ne0){throw "PROXY_DOCUMENT_PARENT_REMOTE_MISSING:"+($parentRaw -join " ")}
+          $parentObj=(($parentRaw -join [Environment]::NewLine)|ConvertFrom-Json)
+          if([string]$parentObj.sha-ne$parent){throw "PROXY_DOCUMENT_PARENT_REMOTE_MISMATCH"}
+          $baseTree=[string]$parentObj.tree.sha
+          Assert-Sha $baseTree "PROXY_DOCUMENT_BASE_TREE_INVALID"
+          $treeBody=[ordered]@{base_tree=$baseTree;tree=@($entries)}
+          $treeSha=Invoke-GhJson "POST" ("repos/"+$Repository+"/git/trees") $treeBody ".sha"
+          Assert-Sha $treeSha "PROXY_DOCUMENT_TREE_SHA_INVALID"
+          $before=Get-RemoteHead $branch
+          if($before){
+            $existingRaw=@(& gh.exe api ("repos/"+$Repository+"/git/commits/"+$before) 2>&1)
+            if($LASTEXITCODE-ne0){throw "PROXY_DOCUMENT_EXISTING_COMMIT_READ_FAILED"}
+            $existing=(($existingRaw -join [Environment]::NewLine)|ConvertFrom-Json)
+            $parents=@($existing.parents)
+            if($parents.Count-eq1 -and [string]$parents[0].sha-eq$parent -and [string]$existing.tree.sha-eq$treeSha){
+              Write-Response $request $requestSha "PASS" "" @{remote_sha=$before;tree_sha=$treeSha}
+              continue
+            }
+            throw "PROXY_DOCUMENT_BRANCH_EXISTS_DIFFERENT:$before"
+          }
+          if($expected){throw ("PROXY_DOCUMENT_EXPECTED_REMOTE_MISMATCH:"+$expected+":")}
+          $commitBody=[ordered]@{message=$message;tree=$treeSha;parents=@($parent)}
+          $commitSha=Invoke-GhJson "POST" ("repos/"+$Repository+"/git/commits") $commitBody ".sha"
+          Assert-Sha $commitSha "PROXY_DOCUMENT_COMMIT_SHA_INVALID"
+          $refBody=[ordered]@{ref=("refs/heads/"+$branch);sha=$commitSha}
+          $createdRef=Invoke-GhJson "POST" ("repos/"+$Repository+"/git/refs") $refBody ".object.sha"
+          if($createdRef-ne$commitSha){throw ("PROXY_DOCUMENT_REF_CREATE_MISMATCH:"+$commitSha+":"+$createdRef)}
+          $after=Get-RemoteHead $branch
+          if($after-ne$commitSha){throw ("PROXY_DOCUMENT_REF_VERIFY_MISMATCH:"+$commitSha+":"+$after)}
+          Write-Response $request $requestSha "PASS" "" @{remote_sha=$commitSha;tree_sha=$treeSha}
+        }
+        "rerun" {
+          $runId=[long]$request.run_id
+          if($runId-le0){throw "PROXY_RUN_ID_INVALID:$runId"}
+          & gh.exe run rerun ([string]$runId) --repo $Repository | Out-Null
+          if($LASTEXITCODE-ne0){throw "PROXY_RERUN_FAILED:$runId"}
+          Write-Response $request $requestSha "PASS" "" @{run_id=$runId}
+        }
+        "research_dispatch" {
+          $package=[string]$request.package_sha
+          $workflow=[string]$request.workflow
+          Assert-Sha $package "PROXY_RESEARCH_PACKAGE_INVALID"
+          if($Lane-ne"Wingless"){throw "PROXY_RESEARCH_DISPATCH_LANE_FORBIDDEN:$Lane"}
+          if($workflow-ne"research-r49-static.yml"){throw "PROXY_RESEARCH_WORKFLOW_FORBIDDEN:$workflow"}
+          $commitRaw=@(& gh.exe api ("repos/"+$Repository+"/git/commits/"+$package) 2>&1)
+          if($LASTEXITCODE-ne0){throw "PROXY_RESEARCH_PACKAGE_REMOTE_MISSING:"+($commitRaw -join " ")}
+          $commit=(($commitRaw -join [Environment]::NewLine)|ConvertFrom-Json)
+          if([string]$commit.sha-ne$package){throw "PROXY_RESEARCH_PACKAGE_REMOTE_MISMATCH"}
+          $title="CKB research R49 $([string]$request.request_id) $package"
+          $run=$null
+          $deadline=(Get-Date).AddSeconds(90)
+          $dispatched=$false
+          do{
+            $oldNativeEap=$ErrorActionPreference
+            try{
+              $ErrorActionPreference="Continue"
+              $listed=@(& gh.exe run list --repo $Repository --workflow $workflow --event workflow_dispatch --limit 50 --json databaseId,displayTitle,status,conclusion,createdAt)
+              $listExit=$LASTEXITCODE
+            }finally{$ErrorActionPreference=$oldNativeEap}
+            if($listExit-ne0){throw "PROXY_RESEARCH_LIST_FAILED"}
+            $rows=@((($listed -join [Environment]::NewLine)|ConvertFrom-Json))
+            $run=$rows|Where-Object{
+              $d=$_.PSObject.Properties["displayTitle"]
+              $d -and [string]$d.Value -ceq $title
+            }|Sort-Object {
+              $created=$_.PSObject.Properties["createdAt"]
+              if($created){[datetime]$created.Value}else{[datetime]::MinValue}
+            } -Descending|Select-Object -First 1
+            if($run){break}
+            if(!$dispatched){
+              $oldNativeEap=$ErrorActionPreference
+              try{
+                $ErrorActionPreference="Continue"
+                $dispatchOut=@(& gh.exe workflow run $workflow --repo $Repository --ref main -f ("package_sha="+$package) -f ("request_id="+[string]$request.request_id) 2>&1)
+                $dispatchExit=$LASTEXITCODE
+              }finally{$ErrorActionPreference=$oldNativeEap}
+              if($dispatchExit-ne0){throw "PROXY_RESEARCH_DISPATCH_FAILED:"+($dispatchOut -join " ")}
+              $dispatched=$true
+            }
+            Start-Sleep -Seconds 2
+          }while((Get-Date)-lt$deadline)
+          if(!$run){throw "PROXY_RESEARCH_RUN_DISCOVERY_TIMEOUT"}
+          $runId=[long]$run.databaseId
+          if($runId-le0){throw "PROXY_RESEARCH_RUN_ID_INVALID"}
+          Write-Response $request $requestSha "PASS" "" @{
+            run_id=$runId
+            hosted_status=[string]$run.status
+            conclusion=[string]$run.conclusion
+            workflow=$workflow
+            package_sha=$package
+          }
+        }
+        "fanout_dispatch" {
+          $package=[string]$request.package_sha
+          $manifestRef=[string]$request.manifest_ref
+          $manifestPath=[string]$request.manifest_path
+          Assert-Sha $package "PROXY_FANOUT_PACKAGE_INVALID"
+          Assert-Sha $manifestRef "PROXY_FANOUT_MANIFEST_REF_INVALID"
+          if($manifestPath -notmatch '^research/fanout/[A-Za-z0-9._-]+\.json$' -or $manifestPath.Contains("..")){throw "PROXY_FANOUT_MANIFEST_PATH_INVALID"}
+          $title="CKB fanout $Lane $package $manifestRef"
+          $run=$null
+          $deadline=(Get-Date).AddSeconds(60)
+          $dispatched=$false
+          do{
+            $oldNativeEap=$ErrorActionPreference
+            try{
+              $ErrorActionPreference="Continue"
+              $listed=@(& gh.exe run list --repo $Repository --workflow free-fanout-sidecar.yml --event workflow_dispatch --limit 50 --json databaseId,displayTitle,status,conclusion,createdAt)
+              $listExit=$LASTEXITCODE
+            }finally{$ErrorActionPreference=$oldNativeEap}
+            if($listExit-ne0){throw "PROXY_FANOUT_LIST_FAILED"}
+            $rows=@((($listed -join [Environment]::NewLine)|ConvertFrom-Json))
+            $run=$rows|Where-Object{
+              $d=$_.PSObject.Properties["displayTitle"]
+              $d -and [string]$d.Value -ceq $title
+            }|Sort-Object {
+              $c=$_.PSObject.Properties["createdAt"]
+              if($c){[datetime]$c.Value}else{[datetime]::MinValue}
+            } -Descending|Select-Object -First 1
+            if($run){break}
+            if(!$dispatched){
+              & gh.exe workflow run free-fanout-sidecar.yml --repo $Repository --ref main -f ("package_sha="+$package) -f ("manifest_ref="+$manifestRef) -f ("manifest_path="+$manifestPath) | Out-Null
+              if($LASTEXITCODE-ne0){throw "PROXY_FANOUT_DISPATCH_FAILED"}
+              $dispatched=$true
+            }
+            Start-Sleep -Seconds 2
+          }while((Get-Date)-lt$deadline)
+          if(!$run){throw "PROXY_FANOUT_RUN_DISCOVERY_TIMEOUT"}
+          $runId=[long]$run.databaseId
+          if($runId-le0){throw "PROXY_FANOUT_RUN_ID_INVALID"}
+          Write-Response $request $requestSha "PASS" "" @{run_id=$runId;fanout_status=[string]$run.status;conclusion=[string]$run.conclusion}
+        }
+        default {throw "PROXY_OPERATION_FORBIDDEN:$op"}
+      }
+    }catch{
+      if($null-ne$request -and $request.PSObject.Properties["request_id"] -and $request.PSObject.Properties["controller_sha"] -and $request.PSObject.Properties["operation"]){
+        $msg=$_.Exception.Message
+        if($msg.Length-gt512){$msg=$msg.Substring(0,512)}
+        Write-Response $request $requestSha "FAILED" $msg
+      }else{
+        throw
+      }
+    }
+  }
+  $global:LASTEXITCODE=0
+  exit 0
+ -and $Matches[1] -eq $source){
+                $matches+=@($Matches[2])
+              }
+            }
+            if($matches.Count-lt1){throw "PROXY_SOURCE_REMOTE_REF_MISSING:$source"}
+            $sourceRef=@($matches|Sort-Object)[0]
+            $oldNativeEap=$ErrorActionPreference
+            try{
+              $ErrorActionPreference="Continue"
+              $fetchOut=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath fetch --no-tags origin $sourceRef 2>&1)
               $fetchExit=$LASTEXITCODE
             }finally{$ErrorActionPreference=$oldNativeEap}
-            if($fetchExit-ne0){throw "PROXY_SOURCE_FETCH_FAILED:"+($fetchOut -join " ")}
+            if($fetchExit-ne0){throw "PROXY_SOURCE_REF_FETCH_FAILED:"+($fetchOut -join " ")}
+            $fetched=(& git.exe -c "safe.directory=$safe" -C $RepositoryPath rev-parse "FETCH_HEAD^{commit}").Trim()
+            if($LASTEXITCODE-ne0 -or $fetched-ne$source){throw "PROXY_SOURCE_FETCH_IDENTITY_MISMATCH:$source:$fetched"}
             & git.exe -c "safe.directory=$safe" -C $RepositoryPath cat-file -e ($source+"^{commit}")
             if($LASTEXITCODE-ne0){throw "PROXY_SOURCE_COMMIT_MISSING_AFTER_FETCH:$source"}
           }
