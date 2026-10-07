@@ -1,0 +1,46 @@
+name: Prepare CKB research write proxy native R2B
+on:
+  push:
+    branches: [repair/ckb-research-write-proxy-native-r2]
+    paths: ['.github/workflows/prepare-ckb-research-write-proxy-native-r2b.yml']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - name: Patch qualify and publish
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version 3.0
+          $path='research/transport/Invoke-CKBResearchWriteProxy.ps1'
+          $raw=[IO.File]::ReadAllText((Resolve-Path $path),[Text.Encoding]::UTF8)
+          $old='        if($existingResponse.status -eq "PASS"){continue}'
+          $new='        if($existingResponse.status -eq "PASS" -and [string]$existingResponse.request_sha256 -eq $requestSha){continue}'+[Environment]::NewLine+'        if($existingResponse.status -eq "FAILED" -and [string]$existingResponse.request_sha256 -eq $requestSha -and [string]$existingResponse.controller_sha -ne $controller){continue}'
+          if(([regex]::Matches($raw,[regex]::Escape($old))).Count-ne1){throw 'PROXY_R2_RESPONSE_SITE'}
+          $raw=$raw.Replace($old,$new)
+          $old='          $out=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath push origin ($source+":refs/heads/"+$branch) 2>&1)'
+          $new=@('          $oldNativeEap=$ErrorActionPreference','          try{','            $ErrorActionPreference="Continue"','            $out=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath push origin ($source+":refs/heads/"+$branch) 2>&1)','            $pushExit=$LASTEXITCODE','          }finally{','            $ErrorActionPreference=$oldNativeEap','          }') -join [Environment]::NewLine
+          if(([regex]::Matches($raw,[regex]::Escape($old))).Count-ne1){throw 'PROXY_R2_PUSH_SITE'}
+          $raw=$raw.Replace($old,$new)
+          $raw=$raw.TrimEnd([char[]]@("`r","`n"))+[Environment]::NewLine+'  $global:LASTEXITCODE=0'+[Environment]::NewLine+'  exit 0'+[Environment]::NewLine
+          [IO.File]::WriteAllText((Resolve-Path $path),$raw,(New-Object Text.UTF8Encoding($false)))
+          $tokens=$null;$errors=$null;[void][Management.Automation.Language.Parser]::ParseFile((Resolve-Path $path),[ref]$tokens,[ref]$errors)
+          if(@($errors).Count-ne0){throw ('PROXY_R2_PARSE:'+(@($errors|%{$_.Message})-join'|'))}
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $path -Lane Wingless -Repository spoonman136668-ai/Wingless -RepositoryPath C:\ProgramData\CKBR\research\repos\Wingless -SelfTest
+          if($LASTEXITCODE-ne0){throw 'PROXY_R2_SELFTEST'}
+          $root=Join-Path $env:RUNNER_TEMP ('native-'+[guid]::NewGuid().ToString('N'));$w=Join-Path $root w;$b=Join-Path $root b.git;New-Item -ItemType Directory -Path $w|Out-Null
+          & git.exe init --bare -q $b;& git.exe -C $w init -q;& git.exe -C $w config user.name T;& git.exe -C $w config user.email t@x;& Set-Content -LiteralPath (Join-Path $w x) -Value x -NoNewline;& git.exe -C $w add x;& git.exe -C $w commit -q -m x
+          $save=$ErrorActionPreference;try{$ErrorActionPreference='Continue';$o=@(& git.exe -C $w push $b 'HEAD:refs/heads/probe' 2>&1);$ec=$LASTEXITCODE}finally{$ErrorActionPreference=$save}
+          if($ec-ne0){throw ('PROXY_R2_NATIVE:'+($o-join' '))}
+          Remove-Item $root -Recurse -Force
+          & git.exe config user.name 'CKB Research Proxy';& git.exe config user.email 'ckb-research-proxy@local.invalid';& git.exe add -- $path
+          $s=@(& git.exe diff --cached --name-only);if($s.Count-ne1 -or $s[0]-ne$path){throw ('PROXY_R2_SCOPE:'+($s-join','))}
+          & git.exe commit -m 'repair: harden proxy native git and terminal evidence';if($LASTEXITCODE-ne0){throw 'PROXY_R2_COMMIT'}
+          $sha=(& git.exe rev-parse HEAD).Trim();& git.exe push origin ('HEAD:refs/heads/repair/ckb-research-write-proxy-native-r2-prepared');if($LASTEXITCODE-ne0){throw 'PROXY_R2_PUSH_PREPARED'}
+          Write-Host ('proxy_r2_prepared_sha='+$sha);Write-Host 'PROXY_R2_QUALIFICATION=PASS'
