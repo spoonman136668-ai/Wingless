@@ -1,0 +1,41 @@
+name: Qualify CKB research write proxy fanout R3
+on:
+  push:
+    branches: [repair/ckb-research-write-proxy-fanout-r3-prepared]
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-go@v5
+        with: {go-version: '1.25.5', cache: false}
+      - name: Verify bounded delta
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $base='0dfe5ca8d83046cf088aee9ab412e40e8a3ac11a'
+          git merge-base --is-ancestor $base HEAD;if($LASTEXITCODE-ne0){throw 'PROXY_R3_BASE_DRIFT'}
+          $changed=@(git diff --name-only "$base...HEAD")
+          $bad=@($changed|Where-Object{$_ -ne 'research/transport/Invoke-CKBResearchWriteProxy.ps1' -and !($_ -like '.ice/*') -and $_ -ne '.github/workflows/prepare-ckb-research-write-proxy-fanout-r3.yml' -and $_ -ne '.github/workflows/qualify-ckb-research-write-proxy-fanout-r3.yml'})
+          if($bad.Count){throw ('PROXY_R3_SCOPE:'+($bad-join','))}
+      - name: Proxy focused checks
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $p='research/transport/Invoke-CKBResearchWriteProxy.ps1';$raw=Get-Content $p -Raw
+          foreach($n in @('PROXY_FANOUT_RUN_DISCOVERY_TIMEOUT','fanout_status=[string]$run.status','operation -ne "fanout_dispatch"')){if(!$raw.Contains($n)){throw ('PROXY_R3_MARKER:'+ $n)}}
+          $t=$null;$e=$null;[void][Management.Automation.Language.Parser]::ParseFile((Resolve-Path $p),[ref]$t,[ref]$e);if(@($e).Count){throw 'PROXY_R3_PARSE'}
+          pwsh -NoProfile -File $p -Lane Wingless -Repository spoonman136668-ai/Wingless -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_SELFTEST'}
+      - name: Full native regression
+        shell: pwsh
+        run: |
+          ./scripts/Test-Native.ps1
