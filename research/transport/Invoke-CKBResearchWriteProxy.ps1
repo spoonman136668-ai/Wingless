@@ -88,6 +88,45 @@ function Write-Response($Request,[string]$RequestSha,[string]$Status,[string]$Er
   Write-AtomicUtf8 $path $json
 }
 
+function Select-PackageFanoutManifest($Tree) {
+  $paths=@($Tree.tree|Where-Object{
+    $_.type -eq "blob" -and
+    [string]$_.path -match '^research/fanout/[A-Za-z0-9._/-]+\.manifest\.json$' -and
+    !([string]$_.path).Contains("..")
+  }|ForEach-Object{[string]$_.path}|Sort-Object -Unique)
+  if($paths.Count-eq0){return [pscustomobject]@{status="NO_MANIFEST";path=""}}
+  if($paths.Count-ne1){return [pscustomobject]@{status="AMBIGUOUS_MANIFESTS";path=""}}
+  return [pscustomobject]@{status="ELIGIBLE";path=[string]$paths[0]}
+}
+function Request-AuxiliaryFanout([string]$PackageSha) {
+  $result=[ordered]@{status="NOT_REQUESTED";manifest_path="";attempts=0}
+  try{
+    $treeOut=@(& gh.exe api ("repos/"+$Repository+"/git/trees/"+$PackageSha+"?recursive=1") 2>&1)
+    if($LASTEXITCODE-ne0){$result.status="TREE_READ_FAILED_NONBLOCKING";return [pscustomobject]$result}
+    $tree=(($treeOut-join[Environment]::NewLine)|ConvertFrom-Json)
+    $sel=Select-PackageFanoutManifest $tree
+    if($sel.status-eq"NO_MANIFEST"){$result.status="NO_MANIFEST";return [pscustomobject]$result}
+    if($sel.status-ne"ELIGIBLE"){$result.status="AMBIGUOUS_MANIFESTS_NONBLOCKING";return [pscustomobject]$result}
+    $result.manifest_path=[string]$sel.path
+    for($attempt=1;$attempt-le3;$attempt++){
+      $result.attempts=$attempt
+      $oldNativeEap=$ErrorActionPreference
+      try{
+        $ErrorActionPreference="Continue"
+        $out=@(& gh.exe workflow run free-fanout-sidecar.yml --repo $Repository --ref main -f ("package_sha="+$PackageSha) -f ("manifest_ref="+$PackageSha) -f ("manifest_path="+[string]$sel.path) 2>&1)
+        $exit=$LASTEXITCODE
+      }finally{$ErrorActionPreference=$oldNativeEap}
+      if($exit-eq0){$result.status="DISPATCH_REQUESTED";return [pscustomobject]$result}
+      if($attempt-lt3){Start-Sleep -Seconds 1}
+    }
+    $result.status="DISPATCH_FAILED_NONBLOCKING"
+    return [pscustomobject]$result
+  }catch{
+    $result.status="DISPATCH_EXCEPTION_NONBLOCKING"
+    return [pscustomobject]$result
+  }
+}
+
 if($SelfTest){
   Assert-Branch "research/proxy-selftest-r1"
   Assert-Branch "fanout/ckb-wingless-selftest"
@@ -104,6 +143,12 @@ if($SelfTest){
     if(!$rejected){throw "PROXY_SELFTEST_DOCUMENT_PATH_NOT_REJECTED:$bad"}
   }
   if("research-r49-static.yml" -ne "research-r49-static.yml" -or "ckb-static-research-runner.yml" -ne "ckb-static-research-runner.yml"){throw "PROXY_SELFTEST_RESEARCH_WORKFLOW_ALLOWLIST"}
+  $none=Select-PackageFanoutManifest ([pscustomobject]@{tree=@([pscustomobject]@{type="blob";path="README.md"})})
+  if($none.status-ne"NO_MANIFEST"){throw "PROXY_SELFTEST_FANOUT_NONE"}
+  $one=Select-PackageFanoutManifest ([pscustomobject]@{tree=@([pscustomobject]@{type="blob";path="research/fanout/selftest.manifest.json"})})
+  if($one.status-ne"ELIGIBLE" -or $one.path-ne"research/fanout/selftest.manifest.json"){throw "PROXY_SELFTEST_FANOUT_ONE"}
+  $many=Select-PackageFanoutManifest ([pscustomobject]@{tree=@([pscustomobject]@{type="blob";path="research/fanout/a.manifest.json"},[pscustomobject]@{type="blob";path="research/fanout/b.manifest.json"})})
+  if($many.status-ne"AMBIGUOUS_MANIFESTS"){throw "PROXY_SELFTEST_FANOUT_MANY"}
   Write-Host "CKB_RESEARCH_WRITE_PROXY_SELFTEST=PASS"
   return
 }
@@ -335,12 +380,20 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           if(!$run){throw "PROXY_RESEARCH_RUN_DISCOVERY_TIMEOUT"}
           $runId=[long]$run.databaseId
           if($runId-le0){throw "PROXY_RESEARCH_RUN_ID_INVALID"}
+          $fanout=[pscustomobject]@{status="NOT_APPLICABLE";manifest_path="";attempts=0}
+          if($generic){
+            if($dispatched){$fanout=Request-AuxiliaryFanout $package}
+            else{$fanout=[pscustomobject]@{status="SKIPPED_EXISTING_PRIMARY";manifest_path="";attempts=0}}
+          }
           Write-Response $request $requestSha "PASS" "" @{
             run_id=$runId
             hosted_status=[string]$run.status
             conclusion=[string]$run.conclusion
             workflow=$workflow
             package_sha=$package
+            fanout_dispatch_status=[string]$fanout.status
+            fanout_manifest_path=[string]$fanout.manifest_path
+            fanout_dispatch_attempts=[int]$fanout.attempts
           }
         }
         "fanout_dispatch" {
