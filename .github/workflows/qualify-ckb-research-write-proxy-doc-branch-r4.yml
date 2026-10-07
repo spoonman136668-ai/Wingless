@@ -12,14 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: df83cabbc43d42c13359653f03f9cbcd434af4b0
+          ref: 983f5d2d796e78d80b61e4edfc6d40de2deca558
           persist-credentials: false
           fetch-depth: 0
       - name: Verify exact bounded delta
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
-          $expected='df83cabbc43d42c13359653f03f9cbcd434af4b0'
+          $expected='983f5d2d796e78d80b61e4edfc6d40de2deca558'
           $base='138cd24dc53fb7404b798b91e18c92100a759fa9'
           if((& git.exe rev-parse HEAD).Trim()-ne$expected){throw 'PROXY_R4_HEAD_MISMATCH'}
           $changed=@(& git.exe diff --name-only ($base+'...HEAD'))
