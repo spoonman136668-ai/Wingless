@@ -164,33 +164,32 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           }
           if($before -ne $expected){throw "PROXY_EXPECTED_REMOTE_MISMATCH:${expected}:$before"}
 
-          $localSource=$false
           $oldNativeEap=$ErrorActionPreference
           try{
             $ErrorActionPreference="Continue"
-            & git.exe -c "safe.directory=$safe" -C $RepositoryPath cat-file -e ($source+"^{commit}") 2>$null
-            $localSource=($LASTEXITCODE-eq0)
-          }finally{
-            $ErrorActionPreference=$oldNativeEap
-          }
+            $null=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath cat-file -e ($source+"^{commit}") 2>&1)
+            $localSourceExit=$LASTEXITCODE
+          }finally{$ErrorActionPreference=$oldNativeEap}
 
-          if($localSource){
-            $lease=if($before){("--force-with-lease=refs/heads/"+$branch+":"+$before)}else{("--force-with-lease=refs/heads/"+$branch+":")}
+          if($localSourceExit-eq0){
+            if($expected){
+              & git.exe -c "safe.directory=$safe" -C $RepositoryPath merge-base --is-ancestor $expected $source
+              if($LASTEXITCODE-ne0){throw "PROXY_LOCAL_SOURCE_NOT_FAST_FORWARD:${expected}:$source"}
+            }
+            & gh.exe auth setup-git | Out-Null
+            if($LASTEXITCODE-ne0){throw "PROXY_GIT_AUTH_SETUP_FAILED"}
             $oldNativeEap=$ErrorActionPreference
             try{
               $ErrorActionPreference="Continue"
-              $out=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath push --no-tags origin $lease ($source+":refs/heads/"+$branch) 2>&1)
+              $out=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath push origin ($source+":refs/heads/"+$branch) 2>&1)
               $pushExit=$LASTEXITCODE
-            }finally{
-              $ErrorActionPreference=$oldNativeEap
-            }
-            if($pushExit-ne0){throw "PROXY_LOCAL_PUSH_FAILED:"+($out -join " ")}
+            }finally{$ErrorActionPreference=$oldNativeEap}
+            if($pushExit-ne0){throw "PROXY_PUSH_FAILED:"+($out -join " ")}
           }else{
             $commitRaw=@(& gh.exe api ("repos/"+$Repository+"/git/commits/"+$source) 2>&1)
             if($LASTEXITCODE-ne0){throw "PROXY_SOURCE_COMMIT_REMOTE_MISSING:"+($commitRaw -join " ")}
             $commit=(($commitRaw -join [Environment]::NewLine)|ConvertFrom-Json)
             if([string]$commit.sha-ne$source){throw "PROXY_SOURCE_COMMIT_REMOTE_MISMATCH:$source"}
-
             if($expected){
               $cmpRaw=@(& gh.exe api ("repos/"+$Repository+"/compare/"+$expected+"..."+$source) 2>&1)
               if($LASTEXITCODE-ne0){throw "PROXY_SOURCE_COMPARE_FAILED:"+($cmpRaw -join " ")}
@@ -199,7 +198,6 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
                 throw "PROXY_SOURCE_NOT_FAST_FORWARD:${expected}:$source"
               }
             }
-
             $oldNativeEap=$ErrorActionPreference
             try{
               $ErrorActionPreference="Continue"
@@ -210,14 +208,11 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
                 $out=@(& gh.exe api --method POST ("repos/"+$Repository+"/git/refs") -f ("ref=refs/heads/"+$branch) -f ("sha="+$source) 2>&1)
               }
               $pushExit=$LASTEXITCODE
-            }finally{
-              $ErrorActionPreference=$oldNativeEap
-            }
+            }finally{$ErrorActionPreference=$oldNativeEap}
             if($pushExit-ne0){throw "PROXY_REF_UPDATE_FAILED:"+($out -join " ")}
           }
-
           $after=Get-RemoteHead $branch
-          if($after-ne$source){throw "PROXY_PUSH_VERIFY_MISMATCH:${source}:$after"}
+          if($after -ne $source){throw "PROXY_PUSH_VERIFY_MISMATCH:${source}:$after"}
           Write-Response $request $requestSha "PASS" "" @{remote_sha=$after}
         }
         "create_documents_branch" {
