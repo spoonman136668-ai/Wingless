@@ -1,0 +1,98 @@
+{
+  "schema": "wingless.rsi-readout-interface-fresh-replication.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-FRESH-REPLICATION-R51",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-ATTRIBUTION-R50",
+  "parent_sha": "1d9ded192dacb3dcf2230eeb5ee3c580d4e13660",
+  "hypothesis": "R50 supported the frozen two-group-2 tied readout on reused attribution contexts. If that lower-capacity readout is a transferable mechanism rather than attribution-set fit, it will outperform full-6 on fresh disjoint contexts at unchanged state size and adaptation budget.",
+  "r50_frozen_observation": {
+    "classification": "supported",
+    "validity_pass": true,
+    "best_lower_capacity_readout": "two-group-2",
+    "effective_parameters_including_intercept": 3,
+    "accuracy_delta_vs_full": 0.07920792079207928,
+    "positive_context_count": 2,
+    "mean_regret": 6.287128712871287,
+    "full_mean_regret": 17.643564356435643
+  },
+  "fixed_state_former": {
+    "id": "r48-full-selected",
+    "alphas": [
+      0.75,
+      0.75,
+      0.125,
+      0.125,
+      1,
+      1
+    ],
+    "state_dimension": 6
+  },
+  "readout_comparison": {
+    "arms": [
+      {
+        "id": "full-6",
+        "groups": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "effective_parameters_including_intercept": 7
+      },
+      {
+        "id": "two-group-2",
+        "groups": [
+          0,
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "effective_parameters_including_intercept": 3
+      }
+    ],
+    "arm_set_frozen_before_execution": true
+  },
+  "fit_and_evaluation": {
+    "historical_fit": "exact R50 historical fit identities and ridge=1.0; no R50 sealed attribution outcomes enter fitting",
+    "sealed_fresh_contexts": [
+      "twenty-fourth",
+      "twenty-fifth",
+      "twenty-sixth"
+    ],
+    "no_heldout_outcome_use_in_fit": true
+  },
+  "resource_envelope": {
+    "total_adaptation_budget": 1744,
+    "state_dimension": 6,
+    "maximum_readout_parameters_including_intercept": 7,
+    "candidate_readout_count": 2,
+    "external_model_calls": 0,
+    "tokenizer_use_count": 0,
+    "gpu_required": false,
+    "capacity_growth_events": 0
+  },
+  "frozen_evaluation": {
+    "supported": "valid; two-group-2 improves aggregate pairwise winner accuracy over full-6 by >=0.05, improves on >=2/3 fresh contexts, and has mean decision regret <= full-6",
+    "mixed": "valid; support false; two-group-2 improves aggregate accuracy by >=0.015 with >=2/3 positive fresh contexts and mean regret <= full-6",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "identity/budget/state-size/readout/history-seal/determinism/provenance/resource-accounting failure"
+  },
+  "manifest_sha256": "82b4fdc03766fb16ea20119356a0464ed256cb554ec1387ed8789f51db806072",
+  "governance": {
+    "no_post_result_tuning": true,
+    "no_capacity_growth": true,
+    "deterministic_replay": true,
+    "no_oracle_or_label_leakage": true,
+    "no_accepted_ref_mutation": true,
+    "no_live_or_production_authority": true,
+    "broad_continual_training": false
+  },
+  "successor_policy": {
+    "supported": "advance bounded mechanism generalization under equal/lower resource cost",
+    "mixed": "replicate once more or diagnose context dependence without capacity growth",
+    "negative": "return to representation/readout coupling diagnosis; retain R50 as attribution-only history"
+  }
+}
