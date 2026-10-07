@@ -105,7 +105,8 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
     if(Test-Path -LiteralPath $responsePath){
       try{
         $existingResponse=Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json
-        if($existingResponse.status -eq "PASS"){continue}
+        if($existingResponse.status -eq "PASS" -and [string]$existingResponse.request_sha256 -eq $requestSha){continue}
+        if($existingResponse.status -eq "FAILED" -and [string]$existingResponse.request_sha256 -eq $requestSha -and [string]$existingResponse.controller_sha -ne $controller){continue}
       }catch{}
     }
     $request=$null
@@ -134,7 +135,14 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
             continue
           }
           if($before -ne $expected){throw "PROXY_EXPECTED_REMOTE_MISMATCH:${expected}:$before"}
-          $out=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath push origin ($source+":refs/heads/"+$branch) 2>&1)
+          $oldNativeEap=$ErrorActionPreference
+          try{
+            $ErrorActionPreference="Continue"
+            $out=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath push origin ($source+":refs/heads/"+$branch) 2>&1)
+            $pushExit=$LASTEXITCODE
+          }finally{
+            $ErrorActionPreference=$oldNativeEap
+          }
           if($LASTEXITCODE-ne0){throw "PROXY_PUSH_FAILED:"+($out -join " ")}
           $after=Get-RemoteHead $branch
           if($after -ne $source){throw "PROXY_PUSH_VERIFY_MISMATCH:${source}:$after"}
@@ -170,3 +178,5 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
       }
     }
   }
+  $global:LASTEXITCODE=0
+  exit 0
