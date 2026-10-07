@@ -1,83 +1,36 @@
-name: Temporary proxy rescue R4d
+name: Temporary stale proxy pump retirement R4d
 on:
   push:
-    branches:
-      - repair/proxy-auto-fanout-r4
-    paths:
-      - '.github/workflows/temp-proxy-rescue-r4d.yml'
-
+    branches: [repair/proxy-auto-fanout-r4]
+    paths: ['.github/workflows/temp-proxy-rescue-r4d.yml']
 permissions:
-  contents: write
+  contents: read
   actions: write
-
 jobs:
-  isolate-and-converge:
+  retire:
     runs-on: [self-hosted, Windows, X64, wingless-up-c]
     timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          persist-credentials: false
-          fetch-depth: 1
-      - name: Prove isolated R52 adoption and converge shared response
+      - name: Retire only exact pre-fix UP-B runs
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference='Stop'
           Set-StrictMode -Version 3.0
-          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw ('R52_ISOLATED_HOST_MISMATCH:'+ $env:COMPUTERNAME)}
-          $head=(git rev-parse HEAD).Trim()
-          if($head -cne 'ce81fbad415fdb754d18428e8ada3a8f1c2877ee'){throw ('R52_ISOLATED_MAIN_SHA_MISMATCH:'+ $head)}
-
-          $sharedRoot='C:\ProgramData\CKBR\research-write-proxy'
-          $requestDir=Join-Path $sharedRoot 'requests\Wingless'
-          $responseDir=Join-Path $sharedRoot 'responses\Wingless'
-          $target='research/external-hosted-wingless-rsi-representation-readout-coupling-diagnosis-r52'
-          $matches=@()
-          foreach($file in @(Get-ChildItem -LiteralPath $requestDir -File -Filter '*.json')){
-            try{$req=Get-Content -LiteralPath $file.FullName -Raw|ConvertFrom-Json}catch{continue}
-            if([string]$req.operation -eq 'create_documents_branch' -and [string]$req.branch -eq $target){$matches+=@([pscustomobject]@{file=$file;req=$req})}
-          }
-          if($matches.Count-ne1){throw ('R52_ISOLATED_REQUEST_COUNT:'+ $matches.Count)}
-          $m=$matches[0]
-          if([string]$m.req.parent_sha -cne '4c35e6b4a58d9f282f58a734a02bf5e0c49d0dd6'){throw 'R52_ISOLATED_PARENT_MISMATCH'}
-          $requestSha=(Get-FileHash -LiteralPath $m.file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-
-          $isolatedRoot=Join-Path $env:RUNNER_TEMP ('r52-proxy-isolated-'+$env:GITHUB_RUN_ID)
-          $isolatedReq=Join-Path $isolatedRoot 'requests\Wingless'
-          $isolatedResp=Join-Path $isolatedRoot 'responses\Wingless'
-          New-Item -ItemType Directory -Force -Path $isolatedReq,$isolatedResp|Out-Null
-          Copy-Item -LiteralPath $m.file.FullName -Destination (Join-Path $isolatedReq $m.file.Name) -Force
-
-          & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -ProxyRoot $isolatedRoot
-          $isolatedResponsePath=Join-Path $isolatedResp $m.file.Name
-          if(!(Test-Path -LiteralPath $isolatedResponsePath -PathType Leaf)){throw 'R52_ISOLATED_RESPONSE_MISSING'}
-          $resp=Get-Content -LiteralPath $isolatedResponsePath -Raw|ConvertFrom-Json
-          if([string]$resp.request_sha256 -cne $requestSha){throw 'R52_ISOLATED_REQUEST_SHA_MISMATCH'}
-          if([string]$resp.status -cne 'PASS'){throw ('R52_ISOLATED_STATUS:'+ [string]$resp.status+':'+[string]$resp.error)}
-          if([string]$resp.remote_sha -cne '4401f24bfe70a78fcf397ded2124e43c9e61a29f'){throw ('R52_ISOLATED_REMOTE_SHA:'+ [string]$resp.remote_sha)}
-          if([string]$resp.tree_sha -cne '7ab229c95dd1026ffb081cb7aa35d15cf9777805'){throw ('R52_ISOLATED_TREE_SHA:'+ [string]$resp.tree_sha)}
-          if($resp.PSObject.Properties['adopted_existing'] -eq $null -or $resp.adopted_existing -ne $true){throw 'R52_ISOLATED_ADOPTION_FLAG_MISSING'}
-          Write-Host ('R52_ISOLATED_ADOPTION=PASS request_id='+[string]$resp.request_id)
-
-          $sharedResponsePath=Join-Path $responseDir $m.file.Name
-          $bytes=[IO.File]::ReadAllBytes($isolatedResponsePath)
-          function Seed-Pass {
-            $tmp=$sharedResponsePath+'.r4d.'+[Guid]::NewGuid().ToString('N')
-            [IO.File]::WriteAllBytes($tmp,$bytes)
-            Move-Item -LiteralPath $tmp -Destination $sharedResponsePath -Force
-          }
-          $stable=$false
-          for($round=1;$round-le3 -and !$stable;$round++){
-            for($i=0;$i-lt12;$i++){Seed-Pass;Start-Sleep -Seconds 1}
-            $stable=$true
-            for($i=0;$i-lt8;$i++){
-              Start-Sleep -Seconds 1
-              try{$s=Get-Content -LiteralPath $sharedResponsePath -Raw|ConvertFrom-Json}catch{$stable=$false;break}
-              if([string]$s.request_sha256 -cne $requestSha -or [string]$s.status -cne 'PASS' -or [string]$s.remote_sha -cne '4401f24bfe70a78fcf397ded2124e43c9e61a29f' -or [string]$s.tree_sha -cne '7ab229c95dd1026ffb081cb7aa35d15cf9777805' -or $s.adopted_existing -ne $true){$stable=$false;break}
+          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw ('STALE_PUMP_RETIRE_HOST_MISMATCH:'+ $env:COMPUTERNAME)}
+          $repo='spoonman136668-ai/Wingless'
+          $old='5766abeaab29159a090ce703d27c75c71009f3ff'
+          foreach($id in @(37693229997,37694705265)){
+            $raw=@(& gh.exe api ("repos/"+$repo+"/actions/runs/"+$id) 2>&1)
+            if($LASTEXITCODE-ne0){throw ('STALE_PUMP_READ_FAILED:'+ $id)}
+            $run=($raw-join[Environment]::NewLine)|ConvertFrom-Json
+            if([string]$run.head_sha -cne $old -or [string]$run.path -cne '.github/workflows/ckb-research-write-proxy-pump.yml'){
+              throw ('STALE_PUMP_IDENTITY_DRIFT:'+ $id)
             }
+            if([string]$run.status -eq 'completed'){Write-Host ('STALE_PUMP_ALREADY_CLOSED='+$id);continue}
+            & gh.exe run cancel $id --repo $repo
+            if($LASTEXITCODE-ne0){throw ('STALE_PUMP_CANCEL_FAILED:'+ $id)}
+            Write-Host ('STALE_PUMP_CANCEL_REQUESTED='+$id)
           }
-          if(!$stable){throw 'R52_SHARED_RESPONSE_NOT_STABLE'}
-          Write-Host ('R52_PROXY_ADOPTION_STABLE=PASS request_id='+[string]$resp.request_id+' remote_sha='+[string]$resp.remote_sha+' tree_sha='+[string]$resp.tree_sha)
+          Write-Host 'STALE_PUMP_RETIREMENT=PASS'
