@@ -1,4 +1,4 @@
-name: Inspect live research processes R4d
+name: Diagnose live Git process contention R4d
 on:
   push:
     branches: [repair/proxy-auto-fanout-r4]
@@ -10,27 +10,27 @@ jobs:
     runs-on: [self-hosted, Windows, X64, wingless-up-c]
     timeout-minutes: 3
     steps:
-      - name: Inspect running controller process identities
+      - name: Inspect bounded recent Git and PowerShell processes
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           Set-StrictMode -Version 3.0
-          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw 'PROCESS_PROBE_HOST_MISMATCH'}
+          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw 'R4D_GIT_PROCESS_HOST_MISMATCH'}
+          $cutoff=(Get-Date).AddMinutes(-12)
           $rows=@(Get-CimInstance Win32_Process -ErrorAction Stop|Where-Object{
-            [string]$_.CommandLine -match '(?i)(Invoke-ResearchLoop\.ps1|research-loop-headless|research-loop-controller)'
+            [string]$_.Name -match '^(?i:gh|git|powershell|pwsh)\.exe$' -and [datetime]$_.CreationDate -ge $cutoff
           })
           foreach($p in $rows){
-            $cl=[string]$p.CommandLine
-            $binding=if($cl -match 'controller\.json'){'PERSISTENT_CONFIG'}elseif($cl -match 'research-loop-headless-config\.json'){'HEADLESS_TEMP_CONFIG'}elseif($cl -match 'research-loop-activation-config\.json'){'ACTIVATION_TEMP_CONFIG'}else{'OTHER_RESEARCH_CONTROLLER'}
-            Write-Host ('research_process_pid='+[string]$p.ProcessId+' parent='+[string]$p.ParentProcessId+' created='+[string]$p.CreationDate+' binding='+$binding)
+            $c=[string]$p.CommandLine
+            $kind=if($c -match '(?i)auth setup-git'){'GH_SETUP_GIT'}elseif($c -match '(?i)gitconfig|\.gitconfig'){'GIT_CONFIG'}elseif($c -match '(?i)Invoke-ResearchLoop\.ps1'){'RESEARCH_CONTROLLER'}elseif($c -match '(?i)research-loop-headless-config\.json'){'HEADLESS_WAKE'}else{'OTHER'}
+            Write-Host ('process='+[string]$p.Name+' pid='+[string]$p.ProcessId+' parent='+[string]$p.ParentProcessId+' started='+[string]$p.CreationDate+' kind='+$kind)
           }
-          $root='C:\ProgramData\CKBR\research'
-          $j=Get-Content -LiteralPath (Join-Path $root 'controller.json') -Raw|ConvertFrom-Json
-          Write-Host ('persistent_proxy_enabled='+[string]$j.write_proxy_enabled)
-          Write-Host ('persistent_authority_ref='+[string]$j.authority_workflow_ref)
-          $receipt=Join-Path $root 'state\latest-receipt.json'
-          if(Test-Path $receipt){
-            $r=Get-Content -LiteralPath $receipt -Raw|ConvertFrom-Json
-            Write-Host ('receipt_time='+[string]$r.observed_at_utc+' status='+[string]$r.status+' wingless='+[string]$r.wingless.state+' blocker='+[string]$r.wingless.blocker)
+          $lock='C:\Users\CKBResearchActivator\.gitconfig.lock'
+          $serviceLock='C:\Windows\ServiceProfiles\NetworkService\.gitconfig.lock'
+          foreach($p in @($lock,$serviceLock)){
+            if(Test-Path -LiteralPath $p -PathType Leaf){
+              $f=Get-Item -LiteralPath $p
+              Write-Host ('git_config_lock_present='+$p+' modified='+$f.LastWriteTimeUtc.ToString('o'))
+            }
           }
-          Write-Host ('RESEARCH_PROCESS_INSPECTION=PASS count='+$rows.Count)
+          Write-Host ('R4D_GIT_PROCESS_INSPECTION=PASS count='+$rows.Count)
