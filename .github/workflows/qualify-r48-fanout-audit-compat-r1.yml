@@ -1,0 +1,67 @@
+name: Qualify R48 fanout audit compatibility R1
+on:
+  push:
+    branches:
+      - qualify/r48-fanout-audit-compat-r1
+    paths:
+      - '.github/workflows/qualify-r48-fanout-audit-compat-r1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact compatibility package
+        uses: actions/checkout@v4
+        with:
+          ref: e12125ef2f4ab264e387f1d71fd0a5572283e7ca
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify exact bounded delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "e12125ef2f4ab264e387f1d71fd0a5572283e7ca"
+          test "$(git merge-base 0ab4a46438d2226fefaf577fb7649d2382a73e0d HEAD)" = "0ab4a46438d2226fefaf577fb7649d2382a73e0d"
+          mapfile -t changed < <(git diff --name-only 0ab4a46438d2226fefaf577fb7649d2382a73e0d..HEAD)
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = "research/fanout/r48_package_audit.py"
+          grep -F 'prereg_experiment = prereg.get("experiment_id", prereg.get("experiment"))' research/fanout/r48_package_audit.py
+          python -m py_compile research/fanout/r48_package_audit.py
+
+      - name: Prove frozen identity compatibility
+        shell: bash
+        env:
+          FREE_FANOUT_AUTHORITY: external-evidence-only
+          FREE_FANOUT_DATA_CLASS: historical-replay
+        run: |
+          set -euo pipefail
+          d="$RUNNER_TEMP/r48-fanout-compat"
+          mkdir -p "$d"
+          printf '%s\n' '{"mode":"identity"}' > "$d/candidate.json"
+          python research/fanout/r48_package_audit.py \
+            --candidate identity \
+            --candidate-config "$d/candidate.json" \
+            --output "$d/result.json"
+          python - <<'PY'
+          import json, os, pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'r48-fanout-compat'/'result.json'
+          j=json.loads(p.read_text())
+          assert j['candidate_id']=='identity'
+          assert j['metric']=={'name':'package_audit_pass','value':1}
+          assert j['resource_usage']=={'parameters':0,'context_bytes':0,'model_calls':0}
+          print('R48_FANOUT_COMPAT_IDENTITY=PASS')
+          PY
+
+      - name: Focused and full regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./unitary -count=1
+          go test ./cmd/wlm-lm-external-future-data-learned-state-former-feature-attribution-r48 -count=1
+          go test ./... -count=1
+          echo 'R48_FANOUT_COMPAT_REGRESSION=PASS'
