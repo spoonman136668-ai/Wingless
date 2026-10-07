@@ -1,0 +1,67 @@
+name: CKB research write proxy pump
+run-name: CKB proxy pump Wingless ${{ github.run_id }}
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ckb-research-write-proxy-pump.yml'
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: ckb-research-write-proxy-pump-wingless
+  cancel-in-progress: false
+jobs:
+  pump:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 55
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Static proxy self-test
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          if($LASTEXITCODE-ne0){throw 'PROXY_PUMP_SELFTEST_FAILED'}
+
+      - name: Queue exactly one successor pump
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $rows=@(& gh.exe run list --repo 'spoonman136668-ai/Wingless' --workflow 'ckb-research-write-proxy-pump.yml' --limit 20 --json databaseId,status 2>&1)
+          if($LASTEXITCODE-ne0){throw 'PROXY_PUMP_LIST_FAILED'}
+          $j=@((($rows -join [Environment]::NewLine)|ConvertFrom-Json))
+          $other=@($j|Where-Object{
+            [long]$_.databaseId-ne[long]$env:GITHUB_RUN_ID -and
+            [string]$_.status -in @('queued','pending','waiting','in_progress')
+          })
+          if($other.Count-eq0){
+            & gh.exe workflow run 'ckb-research-write-proxy-pump.yml' --repo 'spoonman136668-ai/Wingless' --ref main
+            if($LASTEXITCODE-ne0){throw 'PROXY_PUMP_SUCCESSOR_DISPATCH_FAILED'}
+            Write-Host 'PROXY_PUMP_SUCCESSOR=QUEUED'
+          }else{
+            Write-Host ('PROXY_PUMP_SUCCESSOR=EXISTS:'+($other.databaseId -join ','))
+          }
+
+      - name: Service CKB requests continuously
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $deadline=(Get-Date).AddMinutes(48)
+          $cycles=0
+          do{
+            & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless'
+            if($LASTEXITCODE-ne0){throw ('PROXY_PUMP_PROCESS_FAILED:'+ $LASTEXITCODE)}
+            $cycles++
+            Start-Sleep -Seconds 5
+          }while((Get-Date)-lt$deadline)
+          Write-Host ('PROXY_PUMP_CYCLES='+$cycles)
+          Write-Host 'PROXY_PUMP_WINDOW=PASS'
