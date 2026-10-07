@@ -1,4 +1,4 @@
-name: Diagnose live Git process contention R4d
+name: Inspect outstanding CKB proxy requests R4d
 on:
   push:
     branches: [repair/proxy-auto-fanout-r4]
@@ -10,27 +10,39 @@ jobs:
     runs-on: [self-hosted, Windows, X64, wingless-up-c]
     timeout-minutes: 3
     steps:
-      - name: Inspect bounded recent Git and PowerShell processes
+      - name: Inspect pending requests for current qualified controller
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           Set-StrictMode -Version 3.0
-          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw 'R4D_GIT_PROCESS_HOST_MISMATCH'}
-          $cutoff=(Get-Date).AddMinutes(-12)
-          $rows=@(Get-CimInstance Win32_Process -ErrorAction Stop|Where-Object{
-            [string]$_.Name -match '^(?i:gh|git|powershell|pwsh)\.exe$' -and [datetime]$_.CreationDate -ge $cutoff
-          })
-          foreach($p in $rows){
-            $c=[string]$p.CommandLine
-            $kind=if($c -match '(?i)auth setup-git'){'GH_SETUP_GIT'}elseif($c -match '(?i)gitconfig|\.gitconfig'){'GIT_CONFIG'}elseif($c -match '(?i)Invoke-ResearchLoop\.ps1'){'RESEARCH_CONTROLLER'}elseif($c -match '(?i)research-loop-headless-config\.json'){'HEADLESS_WAKE'}else{'OTHER'}
-            Write-Host ('process='+[string]$p.Name+' pid='+[string]$p.ProcessId+' parent='+[string]$p.ParentProcessId+' started='+[string]$p.CreationDate+' kind='+$kind)
-          }
-          $lock='C:\Users\CKBResearchActivator\.gitconfig.lock'
-          $serviceLock='C:\Windows\ServiceProfiles\NetworkService\.gitconfig.lock'
-          foreach($p in @($lock,$serviceLock)){
-            if(Test-Path -LiteralPath $p -PathType Leaf){
-              $f=Get-Item -LiteralPath $p
-              Write-Host ('git_config_lock_present='+$p+' modified='+$f.LastWriteTimeUtc.ToString('o'))
+          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw 'PROXY_QUEUE_DIAGNOSTIC_HOST_DRIFT'}
+          $root='C:\ProgramData\CKBR\research-write-proxy'
+          $controller='a3a8c3ada1e4ff2c28651cf4a79fb14a606aede9'
+          $dir=Join-Path $root 'requests\Wingless'
+          $out=Join-Path $root 'responses\Wingless'
+          if(!(Test-Path -LiteralPath $dir -PathType Container)){throw 'WINGLESS_PROXY_REQUEST_DIR_MISSING'}
+          $pending=0
+          $recent=0
+          foreach($file in @(Get-ChildItem -LiteralPath $dir -File -Filter '*.json'|Sort-Object LastWriteTimeUtc -Descending|Select-Object -First 40)){
+            try{$q=Get-Content -LiteralPath $file.FullName -Raw|ConvertFrom-Json}catch{continue}
+            $responsePath=Join-Path $out $file.Name
+            $status='MISSING'
+            $errorCode=''
+            $matchSha=$false
+            if(Test-Path -LiteralPath $responsePath -PathType Leaf){
+              try{
+                $r=Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json
+                $status=[string]$r.status
+                $errorCode=([string]$r.error)
+                $digest=(Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+                $matchSha=([string]$r.request_sha256 -ceq $digest)
+                if(!$matchSha){$status='STALE_SHA'}
+              }catch{$status='INVALID_RESPONSE'}
             }
+            if([string]$q.controller_sha -cne $controller){continue}
+            $recent++
+            if($status -cne 'PASS'){$pending++}
+            $err=if($errorCode.Length-gt95){$errorCode.Substring(0,95)}else{$errorCode}
+            Write-Host ('current_request_id='+$file.BaseName+' operation='+[string]$q.operation+' status='+$status+' match_sha='+$matchSha+' lastwrite='+$file.LastWriteTimeUtc.ToString('o')+' error='+$err)
           }
-          Write-Host ('R4D_GIT_PROCESS_INSPECTION=PASS count='+$rows.Count)
+          Write-Host ('CURRENT_CONTROLLER_PROXY_QUEUE=PASS seen='+$recent+' unpassed='+$pending)
