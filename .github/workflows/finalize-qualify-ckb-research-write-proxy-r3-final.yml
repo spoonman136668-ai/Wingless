@@ -1,0 +1,105 @@
+name: Finalize and qualify Wingless proxy R3 final
+on:
+  push:
+    branches: [repair/ckb-research-write-proxy-fanout-r3]
+    paths:
+      - '.github/workflows/finalize-qualify-ckb-research-write-proxy-r3-final.yml'
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    outputs:
+      prepared_sha: ${{ steps.out.outputs.prepared_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/ckb-research-write-proxy-fanout-r3-final
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify runtime-only delta
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $base='0dfe5ca8d83046cf088aee9ab412e40e8a3ac11a'
+          git merge-base --is-ancestor $base HEAD
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_FINAL_BASE_DRIFT'}
+          $changed=@(git diff --name-only "$base...HEAD")
+          $bad=@($changed|Where-Object{$_ -ne 'research/transport/Invoke-CKBResearchWriteProxy.ps1'})
+          if($bad.Count){throw ('PROXY_R3_FINAL_PREP_SCOPE:'+($bad-join','))}
+      - name: Rebuild complete ICE
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          go run -buildvcs=false ./cmd/ice build
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_FINAL_ICE_BUILD'}
+          go run -buildvcs=false ./cmd/ice validate
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_FINAL_ICE_VALIDATE'}
+          go test -buildvcs=false -race ./... -count=1 -timeout 90s
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_FINAL_TEST'}
+      - name: Commit exact generated ICE
+        id: out
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          git config user.name 'CKB Research Proxy'
+          git config user.email 'ckb-research-proxy@local.invalid'
+          git add -- .ice
+          $staged=@(git diff --cached --name-only)
+          $bad=@($staged|Where-Object{$_ -notlike '.ice/*'})
+          if($bad.Count){throw ('PROXY_R3_FINAL_ICE_SCOPE:'+($bad-join','))}
+          if($staged.Count){
+            git commit -m 'repair: rebuild ICE for proxy R3'
+            if($LASTEXITCODE-ne0){throw 'PROXY_R3_FINAL_ICE_COMMIT'}
+            git push origin HEAD:refs/heads/repair/ckb-research-write-proxy-fanout-r3-final
+            if($LASTEXITCODE-ne0){throw 'PROXY_R3_FINAL_ICE_PUSH'}
+          }
+          $sha=(git rev-parse HEAD).Trim()
+          "prepared_sha=$sha" >> $env:GITHUB_OUTPUT
+  qualify:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.prepared_sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify exact final scope
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $base='0dfe5ca8d83046cf088aee9ab412e40e8a3ac11a'
+          $changed=@(git diff --name-only "$base...HEAD")
+          if('research/transport/Invoke-CKBResearchWriteProxy.ps1' -notin $changed){throw 'PROXY_R3_FINAL_SCRIPT_MISSING'}
+          $bad=@($changed|Where-Object{$_ -ne 'research/transport/Invoke-CKBResearchWriteProxy.ps1' -and $_ -notlike '.ice/*'})
+          if($bad.Count){throw ('PROXY_R3_FINAL_SCOPE:'+($bad-join','))}
+      - name: Proxy semantics and full native regression
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $p='research/transport/Invoke-CKBResearchWriteProxy.ps1';$raw=Get-Content $p -Raw
+          foreach($n in @('PROXY_FANOUT_RUN_DISCOVERY_TIMEOUT','fanout_status=[string]$run.status','run_id=$runId')){if(!$raw.Contains($n)){throw ('PROXY_R3_FINAL_MARKER:'+ $n)}}
+          $t=$null;$e=$null;[void][Management.Automation.Language.Parser]::ParseFile((Resolve-Path $p),[ref]$t,[ref]$e)
+          if(@($e).Count){throw 'PROXY_R3_FINAL_PARSE'}
+          pwsh -NoProfile -File $p -Lane Wingless -Repository spoonman136668-ai/Wingless -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_FINAL_SELFTEST'}
+          ./scripts/Test-Native.ps1
