@@ -1,0 +1,144 @@
+{
+  "schema": "wingless.rsi-representation-readout-coupling-diagnosis.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-REPRESENTATION-READOUT-COUPLING-DIAGNOSIS-R52",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-FRESH-REPLICATION-R51",
+  "parent_sha": "4c35e6b4a58d9f282f58a734a02bf5e0c49d0dd6",
+  "hypothesis": "R51 was a valid negative after R50 support failed to replicate on fresh contexts. A frozen 2x2 crossing of the R48 full-selected state former versus the R46 alpha-0.5 state former with full-6 versus two-group-2 readout can test whether readout benefit depends on representation without increasing state size, readout capacity, adaptation budget, or data exposure.",
+  "r51_frozen_observation": {
+    "classification": "negative",
+    "validity_pass": true,
+    "selected_readout": "two-group-2",
+    "selected_accuracy_delta": 0.04123711340206193,
+    "selected_positive_manifest_count": 1,
+    "selected_mean_regret": 0.8762886597938144,
+    "full_mean_regret": 1.597938144329897
+  },
+  "diagnostic_arm_matrix": [
+    {
+      "id": "selected-full6",
+      "alpha": [
+        0.75,
+        0.75,
+        0.125,
+        0.125,
+        1,
+        1
+      ],
+      "groups": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "effective_parameters_including_intercept": 7
+    },
+    {
+      "id": "selected-two-group2",
+      "alpha": [
+        0.75,
+        0.75,
+        0.125,
+        0.125,
+        1,
+        1
+      ],
+      "groups": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "effective_parameters_including_intercept": 3
+    },
+    {
+      "id": "r46-full6",
+      "alpha": [
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "groups": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "effective_parameters_including_intercept": 7
+    },
+    {
+      "id": "r46-two-group2",
+      "alpha": [
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "groups": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "effective_parameters_including_intercept": 3
+    }
+  ],
+  "evaluation": {
+    "contexts": [
+      "twenty-fourth",
+      "twenty-fifth",
+      "twenty-sixth"
+    ],
+    "reuse": "exact R51 sealed contexts reused only after the R51 negative for diagnosis; no fresh generalization claim",
+    "interaction": "(r46 two-group-2 minus r46 full-6) minus (selected two-group-2 minus selected full-6)",
+    "arm_set_frozen_before_execution": true,
+    "no_heldout_outcome_use_in_arm_definition": true
+  },
+  "resource_envelope": {
+    "total_adaptation_budget": 1744,
+    "state_dimension": 6,
+    "maximum_readout_parameters_including_intercept": 7,
+    "coupling_arm_count": 4,
+    "external_model_calls": 0,
+    "tokenizer_use_count": 0,
+    "gpu_required": false,
+    "capacity_growth_events": 0
+  },
+  "frozen_evaluation": {
+    "supported": "valid; exactly one representation has a two-group-2 gain >=0.05 over its full-6 control on >=2/3 diagnostic contexts with no mean-regret worsening, and the absolute difference between representation-specific readout gains is >=0.05",
+    "mixed": "valid; support false; absolute representation/readout interaction >=0.05, or either representation has a two-group-2 gain >=0.015 on >=2/3 contexts with no mean-regret worsening",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "identity/budget/state-size/arm-set/history-seal/determinism/provenance/resource-accounting failure"
+  },
+  "manifest_sha256": "82b4fdc03766fb16ea20119356a0464ed256cb554ec1387ed8789f51db806072",
+  "fanout": {
+    "authority": "external-evidence-only",
+    "data_class": "historical-replay",
+    "candidate_count": 4,
+    "sealed_outcome_exposure": false,
+    "classification_authority": false,
+    "promotion_authority": false,
+    "successor_authority": false
+  },
+  "governance": {
+    "no_post_result_tuning": true,
+    "no_capacity_growth": true,
+    "deterministic_replay": true,
+    "no_oracle_or_label_leakage": true,
+    "no_accepted_ref_mutation": true,
+    "no_live_or_production_authority": true,
+    "broad_continual_training": false
+  }
+}
