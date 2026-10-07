@@ -1,48 +1,53 @@
-name: Inspect outstanding CKB proxy requests R4d
+name: Service exact pending R52 research dispatch R4d
 on:
   push:
     branches: [repair/proxy-auto-fanout-r4]
     paths: ['.github/workflows/temp-proxy-rescue-r4d.yml']
 permissions:
-  contents: read
+  contents: write
+  actions: write
 jobs:
-  inspect:
+  service:
     runs-on: [self-hosted, Windows, X64, wingless-up-c]
-    timeout-minutes: 3
+    timeout-minutes: 6
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Inspect pending requests for current qualified controller
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Service exact R52 dispatch from fixed qualified proxy
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           Set-StrictMode -Version 3.0
-          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw 'PROXY_QUEUE_DIAGNOSTIC_HOST_DRIFT'}
-          $root='C:\ProgramData\CKBR\research-write-proxy'
+          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw 'R52_DISPATCH_HOST_MISMATCH'}
+          $head=(& git.exe rev-parse HEAD).Trim()
+          if($head -cne 'ce81fbad415fdb754d18428e8ada3a8f1c2877ee'){throw ('R52_PROXY_MAIN_DRIFT:'+ $head)}
           $controller='a3a8c3ada1e4ff2c28651cf4a79fb14a606aede9'
-          $dir=Join-Path $root 'requests\Wingless'
-          $out=Join-Path $root 'responses\Wingless'
-          if(!(Test-Path -LiteralPath $dir -PathType Container)){throw 'WINGLESS_PROXY_REQUEST_DIR_MISSING'}
-          $pending=0
-          $recent=0
-          foreach($file in @(Get-ChildItem -LiteralPath $dir -File -Filter '*.json'|Sort-Object LastWriteTimeUtc -Descending|Select-Object -First 40)){
-            try{$q=Get-Content -LiteralPath $file.FullName -Raw|ConvertFrom-Json}catch{continue}
-            $responsePath=Join-Path $out $file.Name
-            $status='MISSING'
-            $errorCode=''
-            $matchSha=$false
-            if(Test-Path -LiteralPath $responsePath -PathType Leaf){
-              try{
-                $r=Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json
-                $status=[string]$r.status
-                $errorCode=([string]$r.error)
-                $digest=(Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-                $matchSha=([string]$r.request_sha256 -ceq $digest)
-                if(!$matchSha){$status='STALE_SHA'}
-              }catch{$status='INVALID_RESPONSE'}
-            }
-            if([string]$q.controller_sha -cne $controller){continue}
-            $recent++
-            if($status -cne 'PASS'){$pending++}
-            $err=if($errorCode.Length-gt95){$errorCode.Substring(0,95)}else{$errorCode}
-            Write-Host ('current_request_id='+$file.BaseName+' operation='+[string]$q.operation+' status='+$status+' match_sha='+$matchSha+' lastwrite='+$file.LastWriteTimeUtc.ToString('o')+' error='+$err)
+          $id=([IO.File]::ReadAllText('C:\ProgramData\CKBR\research\controller-qualified-sha.txt')).Trim()
+          if($id -cne $controller){throw ('R52_CONTROLLER_DRIFT:'+ $id)}
+          $requestId='73bf430d27b68e3b1943711bce35df61'
+          $base='C:\ProgramData\CKBR\research-write-proxy'
+          $requestPath=Join-Path $base ('requests\Wingless\'+$requestId+'.json')
+          $responsePath=Join-Path $base ('responses\Wingless\'+$requestId+'.json')
+          if(!(Test-Path -LiteralPath $requestPath -PathType Leaf)){throw 'R52_DISPATCH_REQUEST_MISSING'}
+          $q=Get-Content -LiteralPath $requestPath -Raw|ConvertFrom-Json
+          if([string]$q.controller_sha -cne $controller -or [string]$q.lane -cne 'Wingless' -or [string]$q.repository -cne 'spoonman136668-ai/Wingless' -or [string]$q.operation -cne 'research_dispatch' -or [string]$q.workflow -cne 'ckb-static-research-runner.yml'){
+            throw 'R52_DISPATCH_REQUEST_IDENTITY_DRIFT'
           }
-          Write-Host ('CURRENT_CONTROLLER_PROXY_QUEUE=PASS seen='+$recent+' unpassed='+$pending)
+          if([string]$q.package_sha -notmatch '^[0-9a-f]{40}$'){throw 'R52_DISPATCH_PACKAGE_INVALID'}
+          $digest=(Get-FileHash -LiteralPath $requestPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane Wingless -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          if($LASTEXITCODE-ne0){throw 'R52_PROXY_SELFTEST_FAILED'}
+          & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane Wingless -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless'
+          if($LASTEXITCODE-ne0){throw ('R52_DISPATCH_PROXY_FAILED:'+ $LASTEXITCODE)}
+          if(!(Test-Path -LiteralPath $responsePath -PathType Leaf)){throw 'R52_DISPATCH_RESPONSE_MISSING'}
+          $r=Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json
+          if([string]$r.request_sha256 -cne $digest -or [string]$r.status -cne 'PASS'){
+            throw ('R52_DISPATCH_RESPONSE_FAILED:'+ [string]$r.status+':'+[string]$r.error)
+          }
+          if([string]$r.package_sha -cne [string]$q.package_sha -or [long]$r.run_id -le 0){throw 'R52_DISPATCH_RESPONSE_IDENTITY_INVALID'}
+          Write-Host ('R52_RESEARCH_DISPATCH=PASS run_id='+[string]$r.run_id+' package='+[string]$r.package_sha+' hosted_status='+[string]$r.hosted_status+' fanout='+[string]$r.fanout_dispatch_status)
