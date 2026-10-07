@@ -1,0 +1,78 @@
+name: Diagnose R50 fresh manifest
+on:
+  push:
+    branches:
+      - diag-r50-fresh-manifest-r1
+permissions:
+  contents: read
+jobs:
+  manifest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Build exact sealed manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,urllib.parse,urllib.request
+          EXP="WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-ATTRIBUTION-R50"
+          groups=[
+            ("twenty-fourth","prometheus/prometheus","874b1e56f4a811de98634317fbb1aeda3f1dcbe4",[
+              ("code","promql/engine.go","70d0226ba2a5b570ff16f6b3382bce64ab5731ae",41453),
+              ("structured","go.sum","868d97e350e84e78f4cb7fae62a268bf03148708",14365),
+              ("technical_prose","docs/querying/api.md","8b545634b7c1108ab3551dd851fffc027a7aff40",1454),
+            ]),
+            ("twenty-fifth","grafana/grafana","ef86925a6a05f26c036aebf61640c23b8e02d929",[
+              ("code","pkg/storage/unified/search/bleve.go","6bf33f10e647a2d6fade28a29eeff441a1a15636",41453),
+              ("structured","go.sum","86040a226a1e7451aa94b17587d5cf17aa2adb37",14365),
+              ("technical_prose","docs/sources/administration/provisioning/index.md","a6caad47dea63fb1a213a61490f8f587ad16bba2",1454),
+            ]),
+            ("twenty-sixth","hashicorp/terraform","73bf678bc9d12fb35bc8cf0c978466462dc45314",[
+              ("code","internal/terraform/context_plan_test.go","6d581449c2ddb9f46fea00428b97ec754d978cdc",41453),
+              ("structured","go.sum","be62f6851c7544d66cc825f2ebcbb3097f816d01",14365),
+              ("technical_prose","docs/architecture.md","971d32ca393a0fb0c54c0fa4dfed34e34c28b9ff",1454),
+            ]),
+          ]
+          unseen=[]
+          for name,repo,commit,sources in groups:
+            rows=[]
+            for domain,path,blob,prefix_n in sources:
+              url=f"https://raw.githubusercontent.com/{repo}/{commit}/{urllib.parse.quote(path)}"
+              req=urllib.request.Request(url,headers={"User-Agent":"wingless-r50-manifest"})
+              data=urllib.request.urlopen(req,timeout=90).read()
+              got=hashlib.sha1((f"blob {len(data)}\0").encode()+data).hexdigest()
+              assert got==blob,(repo,path,got,blob)
+              assert len(data)>=prefix_n,(repo,path,len(data),prefix_n)
+              rows.append({
+                "domain":domain,"repo":repo,"commit":commit,"path":path,
+                "git_blob":blob,"prefix_bytes":prefix_n,
+                "prefix_sha256":hashlib.sha256(data[:prefix_n]).hexdigest()
+              })
+            unseen.append({"name":name,"sources":rows})
+          m={
+            "schema":"wingless.external-future-data-manifest.v1",
+            "experiment":EXP,
+            "identity_mode":"exact repo+commit+path+git-blob+prefix length+prefix sha256",
+            "digest_rule":"sha256(compact JSON of this manifest with manifest_sha256 omitted, preserving document key order)",
+            "historical":"reuse exact R47 transfer/third/fourth/fifth historical identities only",
+            "unseen":unseen,
+            "source_count":9,
+            "total_prefix_bytes":171816,
+            "selection_basis":"fresh immutable public source identities pinned after R49 negative classification and before any R50 implementation or unseen evaluation; no R50 outcomes existed or were inspected"
+          }
+          raw=json.dumps(m,separators=(",",":"),ensure_ascii=False).encode()
+          digest=hashlib.sha256(raw).hexdigest()
+          out={"schema":m["schema"],"experiment":m["experiment"],"manifest_sha256":digest,
+               "identity_mode":m["identity_mode"],"digest_rule":m["digest_rule"],"historical":m["historical"],
+               "unseen":m["unseen"],"source_count":m["source_count"],"total_prefix_bytes":m["total_prefix_bytes"],
+               "selection_basis":m["selection_basis"]}
+          print("R50_MANIFEST_BEGIN")
+          print(json.dumps(out,indent=2))
+          print("R50_MANIFEST_END")
+          print("R50_MANIFEST_SHA256="+digest)
+          PY
