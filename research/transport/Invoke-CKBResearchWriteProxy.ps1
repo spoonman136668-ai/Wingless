@@ -105,7 +105,7 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
     if(Test-Path -LiteralPath $responsePath){
       try{
         $existingResponse=Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json
-        if($existingResponse.status -eq "PASS" -and [string]$existingResponse.request_sha256 -eq $requestSha){continue}
+        if($existingResponse.status -eq "PASS" -and [string]$existingResponse.request_sha256 -eq $requestSha -and [string]$existingResponse.operation -ne "fanout_dispatch"){continue}
         if($existingResponse.status -eq "FAILED" -and [string]$existingResponse.request_sha256 -eq $requestSha -and [string]$existingResponse.controller_sha -ne $controller){continue}
       }catch{}
     }
@@ -143,7 +143,7 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           }finally{
             $ErrorActionPreference=$oldNativeEap
           }
-          if($LASTEXITCODE-ne0){throw "PROXY_PUSH_FAILED:"+($out -join " ")}
+          if($pushExit-ne0){throw "PROXY_PUSH_FAILED:"+($out -join " ")}
           $after=Get-RemoteHead $branch
           if($after -ne $source){throw "PROXY_PUSH_VERIFY_MISMATCH:${source}:$after"}
           Write-Response $request $requestSha "PASS" "" @{remote_sha=$after}
@@ -162,9 +162,38 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           Assert-Sha $package "PROXY_FANOUT_PACKAGE_INVALID"
           Assert-Sha $manifestRef "PROXY_FANOUT_MANIFEST_REF_INVALID"
           if($manifestPath -notmatch '^research/fanout/[A-Za-z0-9._-]+\.json$' -or $manifestPath.Contains("..")){throw "PROXY_FANOUT_MANIFEST_PATH_INVALID"}
-          & gh.exe workflow run free-fanout-sidecar.yml --repo $Repository --ref main -f ("package_sha="+$package) -f ("manifest_ref="+$manifestRef) -f ("manifest_path="+$manifestPath) | Out-Null
-          if($LASTEXITCODE-ne0){throw "PROXY_FANOUT_DISPATCH_FAILED"}
-          Write-Response $request $requestSha "PASS"
+          $title="CKB fanout $Lane $package $manifestRef"
+          $run=$null
+          $deadline=(Get-Date).AddSeconds(60)
+          $dispatched=$false
+          do{
+            $oldNativeEap=$ErrorActionPreference
+            try{
+              $ErrorActionPreference="Continue"
+              $listed=@(& gh.exe run list --repo $Repository --workflow free-fanout-sidecar.yml --event workflow_dispatch --limit 50 --json databaseId,displayTitle,status,conclusion,createdAt)
+              $listExit=$LASTEXITCODE
+            }finally{$ErrorActionPreference=$oldNativeEap}
+            if($listExit-ne0){throw "PROXY_FANOUT_LIST_FAILED"}
+            $rows=@((($listed -join [Environment]::NewLine)|ConvertFrom-Json))
+            $run=$rows|Where-Object{
+              $d=$_.PSObject.Properties["displayTitle"]
+              $d -and [string]$d.Value -ceq $title
+            }|Sort-Object {
+              $c=$_.PSObject.Properties["createdAt"]
+              if($c){[datetime]$c.Value}else{[datetime]::MinValue}
+            } -Descending|Select-Object -First 1
+            if($run){break}
+            if(!$dispatched){
+              & gh.exe workflow run free-fanout-sidecar.yml --repo $Repository --ref main -f ("package_sha="+$package) -f ("manifest_ref="+$manifestRef) -f ("manifest_path="+$manifestPath) | Out-Null
+              if($LASTEXITCODE-ne0){throw "PROXY_FANOUT_DISPATCH_FAILED"}
+              $dispatched=$true
+            }
+            Start-Sleep -Seconds 2
+          }while((Get-Date)-lt$deadline)
+          if(!$run){throw "PROXY_FANOUT_RUN_DISCOVERY_TIMEOUT"}
+          $runId=[long]$run.databaseId
+          if($runId-le0){throw "PROXY_FANOUT_RUN_ID_INVALID"}
+          Write-Response $request $requestSha "PASS" "" @{run_id=$runId;fanout_status=[string]$run.status;conclusion=[string]$run.conclusion}
         }
         default {throw "PROXY_OPERATION_FORBIDDEN:$op"}
       }
