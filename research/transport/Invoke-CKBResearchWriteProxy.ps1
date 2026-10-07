@@ -143,7 +143,7 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           }finally{
             $ErrorActionPreference=$oldNativeEap
           }
-          if($LASTEXITCODE-ne0){throw "PROXY_PUSH_FAILED:"+($out -join " ")}
+          if($pushExit-ne0){throw "PROXY_PUSH_FAILED:"+($out -join " ")}
           $after=Get-RemoteHead $branch
           if($after -ne $source){throw "PROXY_PUSH_VERIFY_MISMATCH:${source}:$after"}
           Write-Response $request $requestSha "PASS" "" @{remote_sha=$after}
