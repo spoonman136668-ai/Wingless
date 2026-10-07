@@ -1,0 +1,44 @@
+name: Rebuild R4c ICE snapshot
+on:
+  push:
+    branches:
+      - ops/rebuild-proxy-r4c-ice
+permissions:
+  contents: write
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/ckb-research-write-proxy-doc-branch-r4c
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Rebuild and validate exact ICE snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected='ea21c62ad7cc311899a0367605f7f32f56112ce8'
+          branch='repair/ckb-research-write-proxy-doc-branch-r4c'
+          test "$(git rev-parse HEAD)" = "$expected"
+          go run ./cmd/ice build
+          go run ./cmd/ice validate
+          changed="$(git diff --name-only)"
+          test -n "$changed"
+          if printf '%s\n' "$changed" | grep -Ev '^\.ice/'; then
+            echo "NON_ICE_DRIFT"
+            exit 1
+          fi
+          git config user.name 'CKB Research Controller'
+          git config user.email 'ckb-research@local.invalid'
+          git add .ice
+          git commit -m 'repair: rebuild ICE for proxy R4c'
+          new_head="$(git rev-parse HEAD)"
+          git push --force-with-lease="refs/heads/$branch:$expected" origin HEAD:"refs/heads/$branch"
+          echo "R4C_ICE_HEAD=$new_head"
+          echo "R4C_ICE_REBUILD=PASS"
