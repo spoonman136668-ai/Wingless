@@ -1,0 +1,68 @@
+name: Qualify CKB research write proxy R4c
+on:
+  push:
+    branches:
+      - qualify/ckb-research-write-proxy-doc-branch-r4c-exact
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 60b4515bc064ba8ec48fdc82d87636746507d8d7
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify exact bounded R4c tree
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $expected='60b4515bc064ba8ec48fdc82d87636746507d8d7'
+          $base='5c2fc330fc7c244cba3bb6c1d614e2dbfe146a88'
+          if((& git rev-parse HEAD).Trim()-ne$expected){throw 'R4C_HEAD_MISMATCH'}
+          & git merge-base --is-ancestor $base HEAD
+          if($LASTEXITCODE-ne0){throw 'R4C_BASE_DRIFT'}
+          $changed=@(& git diff --name-only ($base+'...HEAD'))
+          $bad=@($changed|Where-Object{$_ -ne 'research/transport/Invoke-CKBResearchWriteProxy.ps1' -and !([string]$_).StartsWith('.ice/')})
+          if($bad.Count){throw ('R4C_SCOPE:'+($bad-join','))}
+          if('research/transport/Invoke-CKBResearchWriteProxy.ps1' -notin $changed){throw 'R4C_PROXY_DELTA_MISSING'}
+          if(@($changed|Where-Object{([string]$_).StartsWith('.ice/')}).Count-lt1){throw 'R4C_ICE_DELTA_MISSING'}
+      - name: Native tests and evidence
+        shell: pwsh
+        run: ./scripts/Test-Native.ps1
+  proxy:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 60b4515bc064ba8ec48fdc82d87636746507d8d7
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Parse, self-test, and constructor smoke test
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $p='research/transport/Invoke-CKBResearchWriteProxy.ps1'
+          $tokens=$null;$errors=$null
+          [void][Management.Automation.Language.Parser]::ParseFile((Resolve-Path $p),[ref]$tokens,[ref]$errors)
+          if(@($errors).Count-ne0){throw ('R4C_PARSE:'+((@($errors)|ForEach-Object{$_.Message}) -join ';'))}
+          & $p -Lane Wingless -Repository spoonman136668-ai/Wingless -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          $paths=[System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+          $entries=[System.Collections.Generic.List[object]]::new()
+          if(!$paths.Add('docs/experiments/a.json')){throw 'R4C_HASHSET_ADD_FAILED'}
+          [void]$entries.Add([ordered]@{path='docs/experiments/a.json';mode='100644';type='blob';sha='0123456789012345678901234567890123456789'})
+          if($paths.Count-ne1 -or $entries.Count-ne1){throw 'R4C_GENERIC_CONSTRUCTOR_FAILED'}
+          $raw=Get-Content $p -Raw
+          if($raw.Contains('New-Object Collections.Generic.HashSet[string]') -or $raw.Contains('New-Object Collections.Generic.List[object]')){throw 'R4C_OLD_CONSTRUCTOR_PRESENT'}
+          Write-Host 'R4C_PROXY=PASS'
