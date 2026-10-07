@@ -220,6 +220,29 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           }
 
           if($localSource){
+            $remoteProbeExit=1
+            $remoteProbe=@()
+            $oldNativeEap=$ErrorActionPreference
+            try{
+              $ErrorActionPreference="Continue"
+              $remoteProbe=@(& gh.exe api ("repos/"+$Repository+"/git/commits/"+$source) 2>&1)
+              $remoteProbeExit=$LASTEXITCODE
+            }finally{
+              $ErrorActionPreference=$oldNativeEap
+            }
+            if($remoteProbeExit-eq0){
+              try{
+                $remoteCommit=(($remoteProbe -join [Environment]::NewLine)|ConvertFrom-Json)
+                if([string]$remoteCommit.sha-ne$source){throw "PROXY_REMOTE_SOURCE_COMMIT_MISMATCH:$source"}
+                $localSource=$false
+              }catch{
+                if($_.Exception.Message -like "PROXY_REMOTE_SOURCE_COMMIT_MISMATCH:*"){throw}
+                throw "PROXY_REMOTE_SOURCE_COMMIT_PARSE_FAILED"
+              }
+            }
+          }
+
+          if($localSource){
             $lease=if($before){("--force-with-lease=refs/heads/"+$branch+":"+$before)}else{("--force-with-lease=refs/heads/"+$branch+":")}
             $oldNativeEap=$ErrorActionPreference
             try{
