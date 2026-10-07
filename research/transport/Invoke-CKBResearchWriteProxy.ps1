@@ -103,7 +103,7 @@ if($SelfTest){
     try{Assert-DocumentPath $bad}catch{$rejected=$true}
     if(!$rejected){throw "PROXY_SELFTEST_DOCUMENT_PATH_NOT_REJECTED:$bad"}
   }
-  if("research-r49-static.yml" -ne "research-r49-static.yml"){throw "PROXY_SELFTEST_RESEARCH_WORKFLOW_ALLOWLIST"}
+  if("research-r49-static.yml" -ne "research-r49-static.yml" -or "ckb-static-research-runner.yml" -ne "ckb-static-research-runner.yml"){throw "PROXY_SELFTEST_RESEARCH_WORKFLOW_ALLOWLIST"}
   Write-Host "CKB_RESEARCH_WRITE_PROXY_SELFTEST=PASS"
   return
 }
@@ -292,13 +292,14 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           $package=[string]$request.package_sha
           $workflow=[string]$request.workflow
           Assert-Sha $package "PROXY_RESEARCH_PACKAGE_INVALID"
-          if($Lane-ne"Wingless"){throw "PROXY_RESEARCH_DISPATCH_LANE_FORBIDDEN:$Lane"}
-          if($workflow-ne"research-r49-static.yml"){throw "PROXY_RESEARCH_WORKFLOW_FORBIDDEN:$workflow"}
+          $legacy=($Lane-eq"Wingless" -and $workflow-eq"research-r49-static.yml")
+          $generic=($workflow-eq"ckb-static-research-runner.yml")
+          if(!$legacy -and !$generic){throw "PROXY_RESEARCH_WORKFLOW_FORBIDDEN:$workflow"}
           $commitRaw=@(& gh.exe api ("repos/"+$Repository+"/git/commits/"+$package) 2>&1)
           if($LASTEXITCODE-ne0){throw "PROXY_RESEARCH_PACKAGE_REMOTE_MISSING:"+($commitRaw -join " ")}
           $commit=(($commitRaw -join [Environment]::NewLine)|ConvertFrom-Json)
           if([string]$commit.sha-ne$package){throw "PROXY_RESEARCH_PACKAGE_REMOTE_MISMATCH"}
-          $title="CKB research R49 $([string]$request.request_id) $package"
+          $title=if($legacy){"CKB research R49 $([string]$request.request_id) $package"}else{"CKB static research $([string]$request.request_id) $package"}
           $run=$null
           $deadline=(Get-Date).AddSeconds(90)
           $dispatched=$false
