@@ -158,7 +158,17 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           Assert-Branch $branch
           $safe=$RepositoryPath.Replace("\","/")
           & git.exe -c "safe.directory=$safe" -C $RepositoryPath cat-file -e ($source+"^{commit}")
-          if($LASTEXITCODE-ne0){throw "PROXY_SOURCE_COMMIT_MISSING:$source"}
+          if($LASTEXITCODE-ne0){
+            $oldNativeEap=$ErrorActionPreference
+            try{
+              $ErrorActionPreference="Continue"
+              $fetchOut=@(& git.exe -c "safe.directory=$safe" -C $RepositoryPath fetch --no-tags origin $source 2>&1)
+              $fetchExit=$LASTEXITCODE
+            }finally{$ErrorActionPreference=$oldNativeEap}
+            if($fetchExit-ne0){throw "PROXY_SOURCE_FETCH_FAILED:"+($fetchOut -join " ")}
+            & git.exe -c "safe.directory=$safe" -C $RepositoryPath cat-file -e ($source+"^{commit}")
+            if($LASTEXITCODE-ne0){throw "PROXY_SOURCE_COMMIT_MISSING_AFTER_FETCH:$source"}
+          }
           $before=Get-RemoteHead $branch
           if($before -eq $source){
             Write-Response $request $requestSha "PASS" "" @{remote_sha=$before}
