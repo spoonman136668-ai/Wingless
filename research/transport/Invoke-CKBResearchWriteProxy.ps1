@@ -292,16 +292,16 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           $package=[string]$request.package_sha
           $workflow=[string]$request.workflow
           Assert-Sha $package "PROXY_RESEARCH_PACKAGE_INVALID"
-          $legacy=($Lane-eq"Wingless" -and $workflow-eq"research-r49-static.yml")
-          $generic=($workflow-eq"ckb-static-research-runner.yml")
-          if(!$legacy -and !$generic){throw "PROXY_RESEARCH_WORKFLOW_FORBIDDEN:$workflow"}
+          $allowedWorkflow=if($Lane-eq"Wingless"){"research-r50-static.yml"}else{"research-y093-static.yml"}
+          $titlePrefix=if($Lane-eq"Wingless"){"CKB research R50"}else{"CKB research Y093"}
+          if($workflow-ne$allowedWorkflow){throw "PROXY_RESEARCH_WORKFLOW_FORBIDDEN:$workflow"}
           $commitRaw=@(& gh.exe api ("repos/"+$Repository+"/git/commits/"+$package) 2>&1)
           if($LASTEXITCODE-ne0){throw "PROXY_RESEARCH_PACKAGE_REMOTE_MISSING:"+($commitRaw -join " ")}
           $commit=(($commitRaw -join [Environment]::NewLine)|ConvertFrom-Json)
           if([string]$commit.sha-ne$package){throw "PROXY_RESEARCH_PACKAGE_REMOTE_MISMATCH"}
-          $title=if($legacy){"CKB research R49 $([string]$request.request_id) $package"}else{"CKB static research $([string]$request.request_id) $package"}
+          $title=$titlePrefix+" "+([string]$request.request_id)+" "+$package
           $run=$null
-          $deadline=(Get-Date).AddSeconds(90)
+          $deadline=(Get-Date).AddSeconds(120)
           $dispatched=$false
           do{
             $oldNativeEap=$ErrorActionPreference
