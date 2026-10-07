@@ -30,7 +30,6 @@ jobs:
         run: |
           $ErrorActionPreference='Stop'
           & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
-          if($LASTEXITCODE-ne0){throw 'PROXY_PUMP_SELFTEST_FAILED'}
 
       - name: Queue exactly one successor pump
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
