@@ -2,10 +2,12 @@ name: CKB research write proxy
 on:
   schedule:
     - cron: '*/5 * * * *'
+    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 * * * *'
   workflow_dispatch:
   push:
     branches:
       - infra/ckb-research-write-proxy-r1
+      - main
     paths:
       - '.github/workflows/ckb-research-write-proxy.yml'
       - 'research/transport/Invoke-CKBResearchWriteProxy.ps1'
@@ -21,7 +23,7 @@ concurrency:
 jobs:
   proxy:
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,10 +34,10 @@ jobs:
         run: |
           & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
       - name: Process exact CKB write requests
-        if: github.event_name != 'push' || github.ref_name == 'infra/ckb-research-write-proxy-r1'
+        if: github.event_name != 'push' || github.ref_name == 'infra/ckb-research-write-proxy-r1' || github.ref_name == 'main'
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless'
-# e2e-request-consumption-r1
+# bounded-wake-latency-r2
