@@ -1,0 +1,125 @@
+name: Prepare CKB research write proxy fanout R3
+on:
+  push:
+    branches: [repair/ckb-research-write-proxy-fanout-r3]
+    paths:
+      - '.github/workflows/prepare-ckb-research-write-proxy-fanout-r3.yml'
+      - '.github/workflows/qualify-ckb-research-write-proxy-fanout-r3.yml'
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true, fetch-depth: 0}
+      - uses: actions/setup-go@v5
+        with: {go-version: '1.25.5', cache: false}
+      - name: Patch exact proxy fanout transport
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $base='0dfe5ca8d83046cf088aee9ab412e40e8a3ac11a'
+          git merge-base --is-ancestor $base HEAD
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_BASE_DRIFT'}
+          $p='research/transport/Invoke-CKBResearchWriteProxy.ps1'
+          $raw=Get-Content -LiteralPath $p -Raw
+          $oldSkip='        if($existingResponse.status -eq "PASS" -and [string]$existingResponse.request_sha256 -eq $requestSha){continue}'
+          $newSkip='        if($existingResponse.status -eq "PASS" -and [string]$existingResponse.request_sha256 -eq $requestSha -and [string]$existingResponse.operation -ne "fanout_dispatch"){continue}'
+          if(([regex]::Matches($raw,[regex]::Escape($oldSkip))).Count-ne1){throw 'PROXY_R3_SKIP_SITE'}
+          $raw=$raw.Replace($oldSkip,$newSkip)
+          $old=@'
+        "fanout_dispatch" {
+          $package=[string]$request.package_sha
+          $manifestRef=[string]$request.manifest_ref
+          $manifestPath=[string]$request.manifest_path
+          Assert-Sha $package "PROXY_FANOUT_PACKAGE_INVALID"
+          Assert-Sha $manifestRef "PROXY_FANOUT_MANIFEST_REF_INVALID"
+          if($manifestPath -notmatch '^research/fanout/[A-Za-z0-9._-]+\.json$' -or $manifestPath.Contains("..")){throw "PROXY_FANOUT_MANIFEST_PATH_INVALID"}
+          & gh.exe workflow run free-fanout-sidecar.yml --repo $Repository --ref main -f ("package_sha="+$package) -f ("manifest_ref="+$manifestRef) -f ("manifest_path="+$manifestPath) | Out-Null
+          if($LASTEXITCODE-ne0){throw "PROXY_FANOUT_DISPATCH_FAILED"}
+          Write-Response $request $requestSha "PASS"
+        }
+'@
+          $new=@'
+        "fanout_dispatch" {
+          $package=[string]$request.package_sha
+          $manifestRef=[string]$request.manifest_ref
+          $manifestPath=[string]$request.manifest_path
+          Assert-Sha $package "PROXY_FANOUT_PACKAGE_INVALID"
+          Assert-Sha $manifestRef "PROXY_FANOUT_MANIFEST_REF_INVALID"
+          if($manifestPath -notmatch '^research/fanout/[A-Za-z0-9._-]+\.json$' -or $manifestPath.Contains("..")){throw "PROXY_FANOUT_MANIFEST_PATH_INVALID"}
+          $title="CKB fanout $Lane $package $manifestRef"
+          $run=$null
+          $deadline=(Get-Date).AddSeconds(60)
+          $dispatched=$false
+          do{
+            $oldNativeEap=$ErrorActionPreference
+            try{
+              $ErrorActionPreference="Continue"
+              $listed=@(& gh.exe run list --repo $Repository --workflow free-fanout-sidecar.yml --event workflow_dispatch --limit 50 --json databaseId,displayTitle,status,conclusion,createdAt)
+              $listExit=$LASTEXITCODE
+            }finally{$ErrorActionPreference=$oldNativeEap}
+            if($listExit-ne0){throw "PROXY_FANOUT_LIST_FAILED"}
+            $rows=@((($listed -join [Environment]::NewLine)|ConvertFrom-Json))
+            $run=$rows|Where-Object{
+              $d=$_.PSObject.Properties["displayTitle"]
+              $d -and [string]$d.Value -ceq $title
+            }|Sort-Object {
+              $c=$_.PSObject.Properties["createdAt"]
+              if($c){[datetime]$c.Value}else{[datetime]::MinValue}
+            } -Descending|Select-Object -First 1
+            if($run){break}
+            if(!$dispatched){
+              & gh.exe workflow run free-fanout-sidecar.yml --repo $Repository --ref main -f ("package_sha="+$package) -f ("manifest_ref="+$manifestRef) -f ("manifest_path="+$manifestPath) | Out-Null
+              if($LASTEXITCODE-ne0){throw "PROXY_FANOUT_DISPATCH_FAILED"}
+              $dispatched=$true
+            }
+            Start-Sleep -Seconds 2
+          }while((Get-Date)-lt$deadline)
+          if(!$run){throw "PROXY_FANOUT_RUN_DISCOVERY_TIMEOUT"}
+          $runId=[long]$run.databaseId
+          if($runId-le0){throw "PROXY_FANOUT_RUN_ID_INVALID"}
+          Write-Response $request $requestSha "PASS" "" @{run_id=$runId;fanout_status=[string]$run.status;conclusion=[string]$run.conclusion}
+        }
+'@
+          if(([regex]::Matches($raw,[regex]::Escape($old))).Count-ne1){throw 'PROXY_R3_FANOUT_SITE'}
+          $raw=$raw.Replace($old,$new)
+          [IO.File]::WriteAllText((Resolve-Path $p),$raw,(New-Object Text.UTF8Encoding($false)))
+      - name: Focused transport checks
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $p='research/transport/Invoke-CKBResearchWriteProxy.ps1'
+          $raw=Get-Content -LiteralPath $p -Raw
+          foreach($n in @('PROXY_FANOUT_RUN_DISCOVERY_TIMEOUT','fanout_status=[string]$run.status','operation -ne "fanout_dispatch"')){if(!$raw.Contains($n)){throw ('PROXY_R3_MARKER:'+ $n)}}
+          $t=$null;$e=$null;[void][Management.Automation.Language.Parser]::ParseFile((Resolve-Path $p),[ref]$t,[ref]$e);if(@($e).Count){throw ('PROXY_R3_PARSE:'+(@($e|% Message)-join'|'))}
+          pwsh -NoProfile -File $p -Lane Wingless -Repository spoonman136668-ai/Wingless -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_SELFTEST'}
+          $probe=@(& gh run list --repo spoonman136668-ai/Wingless --workflow free-fanout-sidecar.yml --event workflow_dispatch --limit 10 --json databaseId,displayTitle,status,conclusion,createdAt)
+          if($LASTEXITCODE-ne0 -or [string]::IsNullOrWhiteSpace(($probe-join''))){throw 'PROXY_R3_RUN_LIST_PROBE'}
+      - name: Rebuild ICE and full regression
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          go run -buildvcs=false ./cmd/ice build
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_ICE_BUILD'}
+          go run -buildvcs=false ./cmd/ice validate
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_ICE_VALIDATE'}
+          go test -buildvcs=false -race ./... -count=1 -timeout 90s
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_FULL_REGRESSION'}
+      - name: Commit prepared transport
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          git config user.name 'CKB Research Proxy'
+          git config user.email 'ckb-research-proxy@local.invalid'
+          $changed=@(git status --porcelain=v1 | ForEach-Object{($_.Substring(3)).Replace('"','')})
+          $bad=@($changed|Where-Object{$_ -ne 'research/transport/Invoke-CKBResearchWriteProxy.ps1' -and !($_ -like '.ice/*') -and $_ -ne '.github/workflows/prepare-ckb-research-write-proxy-fanout-r3.yml' -and $_ -ne '.github/workflows/qualify-ckb-research-write-proxy-fanout-r3.yml'})
+          if($bad.Count){throw ('PROXY_R3_SCOPE:'+($bad-join','))}
+          git add -- research/transport/Invoke-CKBResearchWriteProxy.ps1 .ice .github/workflows/prepare-ckb-research-write-proxy-fanout-r3.yml .github/workflows/qualify-ckb-research-write-proxy-fanout-r3.yml
+          git commit -m 'repair: return exact fanout run identity'
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_COMMIT'}
+          git push origin HEAD:refs/heads/repair/ckb-research-write-proxy-fanout-r3-prepared
+          if($LASTEXITCODE-ne0){throw 'PROXY_R3_PUSH'}
