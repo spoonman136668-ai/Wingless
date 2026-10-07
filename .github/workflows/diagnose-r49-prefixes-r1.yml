@@ -1,0 +1,34 @@
+name: Diagnose frozen R49 prefix identities
+on:
+  push:
+    branches:
+      - ops/diagnose-r49-prefixes-r1
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Measure exact pinned unseen bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,urllib.parse,urllib.request
+          manifest_url="https://raw.githubusercontent.com/spoonman136668-ai/Wingless/d28382f2bf95312c1f857b4621508d928cc2d938/docs/experiments/wlm-lm-external-future-data-r49-manifest.json"
+          m=json.load(urllib.request.urlopen(urllib.request.Request(manifest_url,headers={"User-Agent":"r49-identity-diagnostic"}),timeout=90))
+          for group in m["unseen"]:
+              for src in group["sources"]:
+                  url=f"https://raw.githubusercontent.com/{src['repo']}/{src['commit']}/{urllib.parse.quote(src['path'])}"
+                  data=urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"r49-identity-diagnostic"}),timeout=90).read()
+                  blob=hashlib.sha1((f"blob {len(data)}\0").encode()+data).hexdigest()
+                  prefix=data[:src["prefix_bytes"]]
+                  ph=hashlib.sha256(prefix).hexdigest()
+                  print("R49_IDENTITY",json.dumps({
+                      "group":group["name"],"domain":src["domain"],"repo":src["repo"],"commit":src["commit"],"path":src["path"],
+                      "length":len(data),"git_blob_expected":src["git_blob"],"git_blob_actual":blob,
+                      "prefix_bytes":src["prefix_bytes"],"prefix_sha_expected":src["prefix_sha256"],"prefix_sha_actual":ph,
+                      "blob_match":blob==src["git_blob"],"prefix_match":ph==src["prefix_sha256"]
+                  },sort_keys=True))
+          PY
