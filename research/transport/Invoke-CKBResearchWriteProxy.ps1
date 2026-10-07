@@ -186,6 +186,9 @@ $controller=([IO.File]::ReadAllText($ControllerIdentityPath,[Text.Encoding]::UTF
 Assert-Sha $controller "PROXY_CONTROLLER_IDENTITY_INVALID"
 
 if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
+  $gitConfigRoot=if(![string]::IsNullOrWhiteSpace($env:RUNNER_TEMP)){[string]$env:RUNNER_TEMP}else{Join-Path $ProxyRoot "runtime"}
+  [IO.Directory]::CreateDirectory($gitConfigRoot)|Out-Null
+  $env:GIT_CONFIG_GLOBAL=Join-Path $gitConfigRoot ("ckb-proxy-"+$Lane+"-"+$PID+".gitconfig")
   & gh.exe auth status | Out-Null
   if($LASTEXITCODE-ne0){throw "PROXY_GH_AUTH_FAILED"}
   & gh.exe auth setup-git | Out-Null
