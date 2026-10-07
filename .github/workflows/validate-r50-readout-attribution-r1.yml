@@ -1,0 +1,43 @@
+name: Qualify R50 preregistration R1
+on:
+  push:
+    branches:
+      - repair/r50-readout-attribution-r1-validation
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Validate exact R50 preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='c3f675457371f1dd91194296685473c61a630994'
+          git merge-base --is-ancestor "$base" HEAD
+          changed="$(git diff --name-only "$base..HEAD" | sort)"
+          expected='.github/workflows/validate-r50-readout-attribution-r1.yml'
+          test "$changed" = "$expected"
+          python - <<'PY'
+          import hashlib,json
+          m=json.load(open("docs/experiments/wlm-lm-external-future-data-r50-manifest.json"))
+          declared=m.pop("manifest_sha256")
+          actual=hashlib.sha256(json.dumps(m,separators=(",",":"),ensure_ascii=True).encode()).hexdigest()
+          print("manifest_sha256="+actual)
+          assert actual==declared=="712420761c43edfdfce59becfcaa11deb89bc73e9b7291d10be13f0d7d064f23"
+          p=json.load(open("docs/experiments/wlm-lm-external-future-data-learned-state-former-readout-interface-attribution-r50.json"))
+          assert p["manifest_sha256"]==declared
+          assert p["readout_arms"]["count"]==4
+          assert p["fixed_state_former"]["state_dimension"]==6
+          assert p["resource_envelope"]["maximum_readout_parameters_including_intercept"]==7
+          assert p["governance"]["positive_attribution_requires_fresh_replication_before_promotion"] is True
+          PY
+          echo R50_PREREGISTRATION_QUALIFICATION=PASS
