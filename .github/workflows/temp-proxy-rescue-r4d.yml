@@ -1,0 +1,40 @@
+name: Temporary proxy rescue R4d
+on:
+  push:
+    branches:
+      - repair/proxy-auto-fanout-r4
+    paths:
+      - '.github/workflows/temp-proxy-rescue-r4d.yml'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  rescue:
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Verify shared host and run exact main proxy once
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version 3.0
+          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw ('PROXY_RESCUE_HOST_MISMATCH:'+ $env:COMPUTERNAME)}
+          foreach($p in @(
+            'C:\ProgramData\CKBR\research\repos\Wingless\.git',
+            'C:\ProgramData\CKBR\research\controller-qualified-sha.txt',
+            'C:\ProgramData\CKBR\research-write-proxy\requests\Wingless'
+          )){if(!(Test-Path -LiteralPath $p)){throw ('PROXY_RESCUE_SHARED_PATH_MISSING:'+ $p)}}
+          $head=(git rev-parse HEAD).Trim()
+          if($head -cne 'ce81fbad415fdb754d18428e8ada3a8f1c2877ee'){throw ('PROXY_RESCUE_MAIN_SHA_MISMATCH:'+ $head)}
+          & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless'
+          Write-Host 'PROXY_RESCUE_R4D=PASS'
