@@ -72,7 +72,7 @@ jobs:
           mapfile -t changed < <(git diff --name-only "$base"...HEAD)
           for path in "${changed[@]}"; do
             case "$path" in
-              research/transport/Invoke-CKBResearchWriteProxy.ps1|.github/workflows/free-fanout-static-observer.yml|.github/workflows/qualify-proxy-auto-fanout-r4.yml) ;;
+              research/transport/Invoke-CKBResearchWriteProxy.ps1|.github/workflows/free-fanout-static-observer.yml|.github/workflows/qualify-proxy-auto-fanout-r4.yml|.ice/manifest.json|.ice/architecture-map.json) ;;
               *) echo "PROXY_R4_SCOPE_WIDENED:$path" >&2; exit 1 ;;
             esac
           done
