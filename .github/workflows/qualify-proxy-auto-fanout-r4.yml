@@ -1,0 +1,89 @@
+name: Qualify proxy automatic fanout R4
+on:
+  push:
+    branches:
+      - repair/proxy-auto-fanout-r4
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Parse and proxy self-test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $p=(Resolve-Path 'research/transport/Invoke-CKBResearchWriteProxy.ps1').Path
+          $tokens=$null;$errors=$null
+          [void][System.Management.Automation.Language.Parser]::ParseFile($p,[ref]$tokens,[ref]$errors)
+          if(@($errors).Count){throw ('PROXY_R4_PARSE:'+(@($errors|ForEach-Object{$_.Message})-join'|'))}
+          & $p -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          if($LASTEXITCODE-ne0){throw 'PROXY_R4_SELFTEST_FAILED'}
+          Write-Host 'PROXY_R4_SELFTEST=PASS'
+
+      - name: Prove nonblocking co-dispatch semantics
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $p='research/transport/Invoke-CKBResearchWriteProxy.ps1'
+          $raw=Get-Content $p -Raw
+          foreach($marker in @(
+            'function Select-PackageFanoutManifest',
+            'function Request-AuxiliaryFanout',
+            'DISPATCH_REQUESTED',
+            'DISPATCH_FAILED_NONBLOCKING',
+            'DISPATCH_EXCEPTION_NONBLOCKING',
+            'TREE_READ_FAILED_NONBLOCKING',
+            'SKIPPED_EXISTING_PRIMARY',
+            'fanout_dispatch_status=[string]$fanout.status',
+            'manifest_ref="+$PackageSha',
+            'free-fanout-sidecar.yml'
+          )){
+            if(!$raw.Contains($marker)){throw ('PROXY_R4_MARKER_MISSING:'+ $marker)}
+          }
+          $start=$raw.IndexOf('function Request-AuxiliaryFanout')
+          $end=$raw.IndexOf('if($SelfTest)',$start)
+          if($start-lt0 -or $end-le$start){throw 'PROXY_R4_HELPER_BOUNDARY_MISSING'}
+          $body=$raw.Substring($start,$end-$start)
+          if($body.Contains('gh.exe run list')){throw 'PROXY_R4_SIDECAR_DISCOVERY_PRESENT'}
+          if($body.Contains('PROXY_FANOUT_RUN_DISCOVERY_TIMEOUT')){throw 'PROXY_R4_SIDECAR_WAIT_PRESENT'}
+          if([regex]::Matches($body,'throw\s').Count-ne0){throw 'PROXY_R4_SIDECAR_THROW_PRESENT'}
+          if(Test-Path '.github/workflows/free-fanout-static-observer.yml'){throw 'PROXY_R4_OBSERVER_NOT_RETIRED'}
+          if(!(Test-Path '.github/workflows/free-fanout-sidecar.yml')){throw 'PROXY_R4_MANUAL_SIDECAR_MISSING'}
+          Write-Host 'PROXY_R4_NONBLOCKING=PASS'
+
+      - name: Verify bounded delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='cd7d974c1032f29dfb82a084f1594c419ac541e2'
+          git merge-base --is-ancestor "$base" HEAD
+          mapfile -t changed < <(git diff --name-only "$base"...HEAD)
+          for path in "${changed[@]}"; do
+            case "$path" in
+              research/transport/Invoke-CKBResearchWriteProxy.ps1|.github/workflows/free-fanout-static-observer.yml|.github/workflows/qualify-proxy-auto-fanout-r4.yml) ;;
+              *) echo "PROXY_R4_SCOPE_WIDENED:$path" >&2; exit 1 ;;
+            esac
+          done
+          printf '%s\n' "${changed[@]}" | grep -Fx 'research/transport/Invoke-CKBResearchWriteProxy.ps1'
+          printf '%s\n' "${changed[@]}" | grep -Fx '.github/workflows/free-fanout-static-observer.yml'
+          echo PROXY_R4_BOUNDED_DELTA=PASS
+
+      - name: Run sidecar regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest tests/test_free_fanout_sidecar.py
+          echo PROXY_R4_SIDECAR_REGRESSION=PASS
