@@ -1,0 +1,33 @@
+name: Promote exact qualified proxy R3C
+on:
+  push:
+    branches:
+      - ops/promote-qualified-proxy-r3c
+permissions:
+  contents: write
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+          fetch-depth: 0
+      - name: Apply exact qualified files atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_main='0dfe5ca8d83046cf088aee9ab412e40e8a3ac11a'
+          qualified='8a718756ec2a2268422ed7ad684f0a3a4fe793f2'
+          test "$(git rev-parse HEAD)" = "$expected_main"
+          git checkout "$qualified" -- research/transport/Invoke-CKBResearchWriteProxy.ps1 .ice/architecture-map.json .ice/manifest.json
+          changed="$(git diff --name-only)"
+          test "$changed" = $'.ice/architecture-map.json\n.ice/manifest.json\nresearch/transport/Invoke-CKBResearchWriteProxy.ps1'
+          git config user.name 'CKB Research Proxy'
+          git config user.email 'ckb-research-proxy@local.invalid'
+          git add -- research/transport/Invoke-CKBResearchWriteProxy.ps1 .ice/architecture-map.json .ice/manifest.json
+          git commit -m 'repair: bind fanout dispatch to exact run identity'
+          git push origin HEAD:main
+          echo "qualified_source=$qualified"
