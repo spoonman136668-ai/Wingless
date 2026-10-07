@@ -7,39 +7,68 @@ on:
       - '.github/workflows/temp-proxy-rescue-r4d.yml'
 
 permissions:
-  contents: read
+  contents: write
+  actions: write
 
 jobs:
-  verify:
+  stabilize:
     runs-on: [self-hosted, Windows, X64, wingless-up-c]
     timeout-minutes: 5
     steps:
-      - name: Verify exact R52 adoption response
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Converge exact R52 adoption against stale pump
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference='Stop'
           Set-StrictMode -Version 3.0
-          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw ('R52_VERIFY_HOST_MISMATCH:'+ $env:COMPUTERNAME)}
+          if($env:COMPUTERNAME -cne 'LINKDEADKB'){throw ('R52_STABILIZE_HOST_MISMATCH:'+ $env:COMPUTERNAME)}
+          $head=(git rev-parse HEAD).Trim()
+          if($head -cne 'ce81fbad415fdb754d18428e8ada3a8f1c2877ee'){throw ('R52_STABILIZE_MAIN_SHA_MISMATCH:'+ $head)}
+
           $requestDir='C:\ProgramData\CKBR\research-write-proxy\requests\Wingless'
           $responseDir='C:\ProgramData\CKBR\research-write-proxy\responses\Wingless'
           $target='research/external-hosted-wingless-rsi-representation-readout-coupling-diagnosis-r52'
           $matches=@()
           foreach($file in @(Get-ChildItem -LiteralPath $requestDir -File -Filter '*.json')){
             try{$req=Get-Content -LiteralPath $file.FullName -Raw|ConvertFrom-Json}catch{continue}
-            if([string]$req.operation -eq 'create_documents_branch' -and [string]$req.branch -eq $target){
-              $matches+=@([pscustomobject]@{file=$file;req=$req})
-            }
+            if([string]$req.operation -eq 'create_documents_branch' -and [string]$req.branch -eq $target){$matches+=@([pscustomobject]@{file=$file;req=$req})}
           }
-          if($matches.Count-ne1){throw ('R52_VERIFY_REQUEST_COUNT:'+ $matches.Count)}
+          if($matches.Count-ne1){throw ('R52_STABILIZE_REQUEST_COUNT:'+ $matches.Count)}
           $m=$matches[0]
-          if([string]$m.req.parent_sha -cne '4c35e6b4a58d9f282f58a734a02bf5e0c49d0dd6'){throw 'R52_VERIFY_PARENT_MISMATCH'}
+          if([string]$m.req.parent_sha -cne '4c35e6b4a58d9f282f58a734a02bf5e0c49d0dd6'){throw 'R52_STABILIZE_PARENT_MISMATCH'}
           $requestSha=(Get-FileHash -LiteralPath $m.file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
           $responsePath=Join-Path $responseDir $m.file.Name
-          if(!(Test-Path -LiteralPath $responsePath -PathType Leaf)){throw 'R52_VERIFY_RESPONSE_MISSING'}
-          $resp=Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json
-          if([string]$resp.request_sha256 -cne $requestSha){throw 'R52_VERIFY_REQUEST_SHA_MISMATCH'}
-          if([string]$resp.status -cne 'PASS'){throw ('R52_VERIFY_STATUS:'+ [string]$resp.status+':'+[string]$resp.error)}
-          if([string]$resp.remote_sha -cne '4401f24bfe70a78fcf397ded2124e43c9e61a29f'){throw ('R52_VERIFY_REMOTE_SHA:'+ [string]$resp.remote_sha)}
-          if([string]$resp.tree_sha -cne '7ab229c95dd1026ffb081cb7aa35d15cf9777805'){throw ('R52_VERIFY_TREE_SHA:'+ [string]$resp.tree_sha)}
-          if($resp.PSObject.Properties['adopted_existing'] -eq $null -or $resp.adopted_existing -ne $true){throw 'R52_VERIFY_ADOPTION_FLAG_MISSING'}
-          Write-Host ('R52_PROXY_ADOPTION=PASS request_id='+[string]$resp.request_id+' remote_sha='+[string]$resp.remote_sha+' tree_sha='+[string]$resp.tree_sha)
+          $deadline=(Get-Date).AddSeconds(40)
+          $stableSince=$null
+          do{
+            & .\research\transport\Invoke-CKBResearchWriteProxy.ps1 -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless'
+            $good=$false
+            if(Test-Path -LiteralPath $responsePath -PathType Leaf){
+              try{
+                $resp=Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json
+                $good=(
+                  [string]$resp.request_sha256 -ceq $requestSha -and
+                  [string]$resp.status -ceq 'PASS' -and
+                  [string]$resp.remote_sha -ceq '4401f24bfe70a78fcf397ded2124e43c9e61a29f' -and
+                  [string]$resp.tree_sha -ceq '7ab229c95dd1026ffb081cb7aa35d15cf9777805' -and
+                  $resp.PSObject.Properties['adopted_existing'] -ne $null -and
+                  $resp.adopted_existing -eq $true
+                )
+              }catch{$good=$false}
+            }
+            if($good){
+              if($null-eq$stableSince){$stableSince=Get-Date}
+              if(((Get-Date)-$stableSince).TotalSeconds-ge12){
+                Write-Host ('R52_PROXY_ADOPTION_STABLE=PASS request_id='+[string]$resp.request_id+' remote_sha='+[string]$resp.remote_sha+' tree_sha='+[string]$resp.tree_sha)
+                exit 0
+              }
+            }else{$stableSince=$null}
+            Start-Sleep -Seconds 1
+          }while((Get-Date)-lt$deadline)
+          throw 'R52_PROXY_ADOPTION_DID_NOT_STABILIZE'
