@@ -52,10 +52,16 @@ jobs:
                 $j=Get-Content -LiteralPath $f.FullName -Raw|ConvertFrom-Json
                 $responsePath=Join-Path $res $f.Name
                 $status=''
+                $err=''
                 if(Test-Path -LiteralPath $responsePath){
-                  try{$status=[string](Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json).status}catch{$status='UNREADABLE'}
+                  try{
+                    $resp=Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json
+                    $status=[string]$resp.status
+                    $err=[string]$resp.error
+                  }catch{$status='UNREADABLE';$err=$_.Exception.Message}
                 }
-                Write-Host ('diag_request='+$f.BaseName+' operation='+[string]$j.operation+' controller='+[string]$j.controller_sha+' branch='+[string]$j.branch+' response='+$status)
+                $branchValue=if($j.PSObject.Properties['branch']){[string]$j.branch}else{''}
+                Write-Host ('diag_request='+$f.BaseName+' operation='+[string]$j.operation+' controller='+[string]$j.controller_sha+' branch='+$branchValue+' response='+$status+' error='+$err)
               }catch{
                 Write-Host ('diag_request_parse_error='+$f.Name+' '+$_.Exception.Message)
               }
