@@ -1,0 +1,58 @@
+name: Qualify CKB research write proxy documents branch R4
+on:
+  push:
+    branches:
+      - qualify/ckb-research-write-proxy-doc-branch-r4-exact
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: df83cabbc43d42c13359653f03f9cbcd434af4b0
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify exact bounded delta
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $expected='df83cabbc43d42c13359653f03f9cbcd434af4b0'
+          $base='138cd24dc53fb7404b798b91e18c92100a759fa9'
+          if((& git.exe rev-parse HEAD).Trim()-ne$expected){throw 'PROXY_R4_HEAD_MISMATCH'}
+          $changed=@(& git.exe diff --name-only ($base+'...HEAD'))
+          if($changed.Count-ne1 -or $changed[0]-ne'research/transport/Invoke-CKBResearchWriteProxy.ps1'){throw ('PROXY_R4_SCOPE:'+($changed-join','))}
+      - name: Parse and self-test proxy
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $p='research/transport/Invoke-CKBResearchWriteProxy.ps1'
+          $tokens=$null;$errors=$null
+          [void][Management.Automation.Language.Parser]::ParseFile((Resolve-Path $p),[ref]$tokens,[ref]$errors)
+          if(@($errors).Count-ne0){throw ('PROXY_R4_PARSE:'+(@($errors)|ForEach-Object{$_.Message} -join ';'))}
+          & $p -Lane Wingless -Repository spoonman136668-ai/Wingless -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          if($LASTEXITCODE-ne0){throw 'PROXY_R4_SELFTEST_FAILED'}
+      - name: Verify create-only documents boundary
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $raw=Get-Content research/transport/Invoke-CKBResearchWriteProxy.ps1 -Raw
+          foreach($m in @(
+            '"create_documents_branch"',
+            '^docs/experiments/[A-Za-z0-9][A-Za-z0-9._-]{0,180}\.json$',
+            'if($files.Count-lt1 -or $files.Count-gt4)',
+            '$branch.StartsWith("research/")',
+            'git/trees',
+            'git/commits',
+            'git/refs',
+            'PROXY_DOCUMENT_BRANCH_EXISTS_DIFFERENT'
+          )){if(!$raw.Contains($m)){throw ('PROXY_R4_MARKER_MISSING:'+ $m)}}
+          $caseStart=$raw.IndexOf('"create_documents_branch" {')
+          $caseEnd=$raw.IndexOf('"rerun" {',$caseStart)
+          if($caseStart-lt0 -or $caseEnd-le$caseStart){throw 'PROXY_R4_CASE_BOUNDARY'}
+          $case=$raw.Substring($caseStart,$caseEnd-$caseStart)
+          if($case.Contains('git.exe') -and $case.Contains(' push ')){throw 'PROXY_R4_GIT_PUSH_FORBIDDEN'}
+          if($case.Contains('.github/')){throw 'PROXY_R4_WORKFLOW_PATH_SURFACE'}
+          Write-Host 'PROXY_R4_BOUNDARY=PASS'
