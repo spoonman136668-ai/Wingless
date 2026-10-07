@@ -189,8 +189,8 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           if([string]::IsNullOrWhiteSpace($message) -or $message.Length-gt200 -or $message.Contains([Environment]::NewLine)){throw "PROXY_DOCUMENT_COMMIT_MESSAGE_INVALID"}
           $files=@($request.files)
           if($files.Count-lt1 -or $files.Count-gt4){throw "PROXY_DOCUMENT_FILE_COUNT_INVALID:$($files.Count)"}
-          $paths=New-Object Collections.Generic.HashSet[string]([StringComparer]::Ordinal)
-          $entries=New-Object Collections.Generic.List[object]
+          $paths=[System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+          $entries=[System.Collections.Generic.List[object]]::new()
           foreach($doc in $files){
             $path=[string]$doc.path
             $expectedSha=[string]$doc.sha256
