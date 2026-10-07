@@ -1,0 +1,70 @@
+name: Diagnose CKB research proxy R139
+on:
+  push:
+    branches:
+      - infra/ckb-research-write-proxy-r1
+    paths:
+      - '.github/workflows/diagnose-ckb-research-proxy-r139.yml'
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Inspect proxy prerequisites read-only
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference='Continue'
+          Set-StrictMode -Version 3.0
+          $root='C:\ProgramData\CKBR\research-write-proxy'
+          $repo='C:\ProgramData\CKBR\research\repos\Wingless'
+          $identity='C:\ProgramData\CKBR\research\controller-qualified-sha.txt'
+          Write-Host ('diag_identity_exists='+(Test-Path -LiteralPath $identity -PathType Leaf))
+          if(Test-Path -LiteralPath $identity -PathType Leaf){
+            $id=([IO.File]::ReadAllText($identity,[Text.Encoding]::UTF8)).Trim().ToLowerInvariant()
+            Write-Host ('diag_controller_identity='+$id)
+          }
+          Write-Host ('diag_repo_git_exists='+(Test-Path -LiteralPath (Join-Path $repo '.git')))
+          if(Test-Path -LiteralPath (Join-Path $repo '.git')){
+            & git.exe -c 'safe.directory=C:/ProgramData/CKBR/research/repos/Wingless' -C $repo status --porcelain=v1
+            Write-Host ('diag_git_status_exit='+$LASTEXITCODE)
+            & git.exe -c 'safe.directory=C:/ProgramData/CKBR/research/repos/Wingless' -C $repo rev-parse HEAD
+            Write-Host ('diag_git_head_exit='+$LASTEXITCODE)
+          }
+          & gh.exe auth status
+          Write-Host ('diag_gh_auth_exit='+$LASTEXITCODE)
+          $req=Join-Path $root 'requests\Wingless'
+          $res=Join-Path $root 'responses\Wingless'
+          Write-Host ('diag_request_dir_exists='+(Test-Path -LiteralPath $req))
+          Write-Host ('diag_response_dir_exists='+(Test-Path -LiteralPath $res))
+          if(Test-Path -LiteralPath $req){
+            $files=@(Get-ChildItem -LiteralPath $req -File -Filter '*.json' -ErrorAction SilentlyContinue|Sort-Object Name)
+            Write-Host ('diag_request_count='+$files.Count)
+            foreach($f in $files){
+              try{
+                $j=Get-Content -LiteralPath $f.FullName -Raw|ConvertFrom-Json
+                $responsePath=Join-Path $res $f.Name
+                $status=''
+                if(Test-Path -LiteralPath $responsePath){
+                  try{$status=[string](Get-Content -LiteralPath $responsePath -Raw|ConvertFrom-Json).status}catch{$status='UNREADABLE'}
+                }
+                Write-Host ('diag_request='+$f.BaseName+' operation='+[string]$j.operation+' controller='+[string]$j.controller_sha+' branch='+[string]$j.branch+' response='+$status)
+              }catch{
+                Write-Host ('diag_request_parse_error='+$f.Name+' '+$_.Exception.Message)
+              }
+            }
+          }
+          foreach($lock in @(
+            (Join-Path $repo '.git\index.lock'),
+            (Join-Path $repo '.git\FETCH_HEAD.lock'),
+            (Join-Path $repo '.git\shallow.lock'),
+            (Join-Path $repo '.git\config.lock')
+          )){Write-Host ('diag_lock='+$lock+' exists='+(Test-Path -LiteralPath $lock))}
+          Write-Host 'PROXY_R139_DIAGNOSTIC=PASS'
