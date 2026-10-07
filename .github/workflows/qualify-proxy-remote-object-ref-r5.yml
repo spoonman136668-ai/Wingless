@@ -1,0 +1,94 @@
+name: Qualify proxy remote-object ref R5
+on:
+  push:
+    branches:
+      - repair/proxy-remote-object-ref-r5
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Parse and proxy self-test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $p=(Resolve-Path 'research/transport/Invoke-CKBResearchWriteProxy.ps1').Path
+          $tokens=$null;$errors=$null
+          [void][System.Management.Automation.Language.Parser]::ParseFile($p,[ref]$tokens,[ref]$errors)
+          if(@($errors).Count){throw ('PROXY_R5_PARSE:'+(@($errors|ForEach-Object{$_.Message})-join'|'))}
+          & $p -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          Write-Host 'PROXY_R5_SELFTEST=PASS'
+
+      - name: Prove remote-object ref fallback
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $raw=Get-Content 'research/transport/Invoke-CKBResearchWriteProxy.ps1' -Raw
+          foreach($marker in @(
+            '$remoteProbe=@(& gh.exe api ("repos/"+$Repository+"/git/commits/"+$source)',
+            'PROXY_REMOTE_SOURCE_COMMIT_MISMATCH',
+            'PROXY_REMOTE_SOURCE_COMMIT_PARSE_FAILED',
+            '$localSource=$false'
+          )){
+            if(!$raw.Contains($marker)){throw ('PROXY_R5_MARKER_MISSING:'+ $marker)}
+          }
+          $pushStart=$raw.IndexOf('"push" {')
+          $docStart=$raw.IndexOf('"create_documents_branch" {',$pushStart)
+          if($pushStart-lt0 -or $docStart-le$pushStart){throw 'PROXY_R5_PUSH_BOUNDARY_MISSING'}
+          $push=$raw.Substring($pushStart,$docStart-$pushStart)
+          $probe=$push.IndexOf('$remoteProbe=@(& gh.exe api')
+          $gitPush=$push.IndexOf('& git.exe -c "safe.directory=$safe" -C $RepositoryPath push')
+          $apiRef=$push.IndexOf('& gh.exe api --method POST ("repos/"+$Repository+"/git/refs")')
+          if($probe-lt0 -or $gitPush-lt0 -or $apiRef-lt0){throw 'PROXY_R5_TRANSPORT_PATH_MISSING'}
+          if($probe-gt$gitPush){throw 'PROXY_R5_REMOTE_PROBE_AFTER_GIT_PUSH'}
+          Write-Host 'PROXY_R5_REMOTE_OBJECT_FALLBACK=PASS'
+
+      - name: Prove R4 nonblocking fanout retained
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop';Set-StrictMode -Version 3.0
+          $raw=Get-Content 'research/transport/Invoke-CKBResearchWriteProxy.ps1' -Raw
+          foreach($marker in @('function Request-AuxiliaryFanout','DISPATCH_FAILED_NONBLOCKING','DISPATCH_EXCEPTION_NONBLOCKING','fanout_dispatch_status=[string]$fanout.status')){
+            if(!$raw.Contains($marker)){throw ('PROXY_R5_R4_MARKER_MISSING:'+ $marker)}
+          }
+          $start=$raw.IndexOf('function Request-AuxiliaryFanout')
+          $end=$raw.IndexOf('if($SelfTest)',$start)
+          $body=$raw.Substring($start,$end-$start)
+          if($body.Contains('gh.exe run list') -or [regex]::Matches($body,'throw\s').Count-ne0){throw 'PROXY_R5_FANOUT_BLOCKING_DRIFT'}
+          Write-Host 'PROXY_R5_NONBLOCKING_FANOUT=PASS'
+
+      - name: Verify bounded delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='5766abeaab29159a090ce703d27c75c71009f3ff'
+          git merge-base --is-ancestor "$base" HEAD
+          mapfile -t changed < <(git diff --name-only "$base"...HEAD)
+          for path in "${changed[@]}"; do
+            case "$path" in
+              research/transport/Invoke-CKBResearchWriteProxy.ps1|.github/workflows/qualify-proxy-remote-object-ref-r5.yml) ;;
+              *) echo "PROXY_R5_SCOPE_WIDENED:$path" >&2; exit 1 ;;
+            esac
+          done
+          printf '%s\n' "${changed[@]}" | grep -Fx 'research/transport/Invoke-CKBResearchWriteProxy.ps1'
+          echo PROXY_R5_BOUNDED_DELTA=PASS
+
+      - name: Run sidecar regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest tests/test_free_fanout_sidecar.py
+          echo PROXY_R5_SIDECAR_REGRESSION=PASS
