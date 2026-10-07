@@ -103,6 +103,7 @@ if($SelfTest){
     try{Assert-DocumentPath $bad}catch{$rejected=$true}
     if(!$rejected){throw "PROXY_SELFTEST_DOCUMENT_PATH_NOT_REJECTED:$bad"}
   }
+  if("research-r49-static.yml" -ne "research-r49-static.yml"){throw "PROXY_SELFTEST_RESEARCH_WORKFLOW_ALLOWLIST"}
   Write-Host "CKB_RESEARCH_WRITE_PROXY_SELFTEST=PASS"
   return
 }
@@ -244,6 +245,60 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
           & gh.exe run rerun ([string]$runId) --repo $Repository | Out-Null
           if($LASTEXITCODE-ne0){throw "PROXY_RERUN_FAILED:$runId"}
           Write-Response $request $requestSha "PASS" "" @{run_id=$runId}
+        }
+        "research_dispatch" {
+          $package=[string]$request.package_sha
+          $workflow=[string]$request.workflow
+          Assert-Sha $package "PROXY_RESEARCH_PACKAGE_INVALID"
+          if($Lane-ne"Wingless"){throw "PROXY_RESEARCH_DISPATCH_LANE_FORBIDDEN:$Lane"}
+          if($workflow-ne"research-r49-static.yml"){throw "PROXY_RESEARCH_WORKFLOW_FORBIDDEN:$workflow"}
+          $commitRaw=@(& gh.exe api ("repos/"+$Repository+"/git/commits/"+$package) 2>&1)
+          if($LASTEXITCODE-ne0){throw "PROXY_RESEARCH_PACKAGE_REMOTE_MISSING:"+($commitRaw -join " ")}
+          $commit=(($commitRaw -join [Environment]::NewLine)|ConvertFrom-Json)
+          if([string]$commit.sha-ne$package){throw "PROXY_RESEARCH_PACKAGE_REMOTE_MISMATCH"}
+          $title="CKB research R49 $([string]$request.request_id) $package"
+          $run=$null
+          $deadline=(Get-Date).AddSeconds(90)
+          $dispatched=$false
+          do{
+            $oldNativeEap=$ErrorActionPreference
+            try{
+              $ErrorActionPreference="Continue"
+              $listed=@(& gh.exe run list --repo $Repository --workflow $workflow --event workflow_dispatch --limit 50 --json databaseId,displayTitle,status,conclusion,createdAt)
+              $listExit=$LASTEXITCODE
+            }finally{$ErrorActionPreference=$oldNativeEap}
+            if($listExit-ne0){throw "PROXY_RESEARCH_LIST_FAILED"}
+            $rows=@((($listed -join [Environment]::NewLine)|ConvertFrom-Json))
+            $run=$rows|Where-Object{
+              $d=$_.PSObject.Properties["displayTitle"]
+              $d -and [string]$d.Value -ceq $title
+            }|Sort-Object {
+              $created=$_.PSObject.Properties["createdAt"]
+              if($created){[datetime]$created.Value}else{[datetime]::MinValue}
+            } -Descending|Select-Object -First 1
+            if($run){break}
+            if(!$dispatched){
+              $oldNativeEap=$ErrorActionPreference
+              try{
+                $ErrorActionPreference="Continue"
+                $dispatchOut=@(& gh.exe workflow run $workflow --repo $Repository --ref main -f ("package_sha="+$package) -f ("request_id="+[string]$request.request_id) 2>&1)
+                $dispatchExit=$LASTEXITCODE
+              }finally{$ErrorActionPreference=$oldNativeEap}
+              if($dispatchExit-ne0){throw "PROXY_RESEARCH_DISPATCH_FAILED:"+($dispatchOut -join " ")}
+              $dispatched=$true
+            }
+            Start-Sleep -Seconds 2
+          }while((Get-Date)-lt$deadline)
+          if(!$run){throw "PROXY_RESEARCH_RUN_DISCOVERY_TIMEOUT"}
+          $runId=[long]$run.databaseId
+          if($runId-le0){throw "PROXY_RESEARCH_RUN_ID_INVALID"}
+          Write-Response $request $requestSha "PASS" "" @{
+            run_id=$runId
+            hosted_status=[string]$run.status
+            conclusion=[string]$run.conclusion
+            workflow=$workflow
+            package_sha=$package
+          }
         }
         "fanout_dispatch" {
           $package=[string]$request.package_sha
