@@ -1,0 +1,32 @@
+name: Qualify CKB static research dispatch R1
+on:
+  push:
+    branches:
+      - infra/ckb-static-research-dispatch-r1
+permissions:
+  contents: read
+  actions: read
+jobs:
+  qualify:
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Parse and self-test proxy
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $p='research/transport/Invoke-CKBResearchWriteProxy.ps1'
+          $t=$null;$e=$null
+          [void][Management.Automation.Language.Parser]::ParseFile((Resolve-Path $p),[ref]$t,[ref]$e)
+          if(@($e).Count){throw ('STATIC_DISPATCH_PROXY_PARSE:'+(@($e|ForEach-Object{$_.Message})-join'|'))}
+          $raw=Get-Content $p -Raw
+          foreach($m in @('ckb-static-research-runner.yml','CKB static research','PROXY_RESEARCH_PACKAGE_REMOTE_MISSING')){
+            if(!$raw.Contains($m)){throw ('STATIC_DISPATCH_PROXY_MARKER_MISSING:'+ $m)}
+          }
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $p -Lane 'Wingless' -Repository 'spoonman136668-ai/Wingless' -RepositoryPath 'C:\ProgramData\CKBR\research\repos\Wingless' -SelfTest
+          if($LASTEXITCODE-ne0){throw 'STATIC_DISPATCH_PROXY_SELFTEST_FAILED'}
+          Write-Host 'STATIC_DISPATCH_PROXY_QUALIFICATION=PASS'
