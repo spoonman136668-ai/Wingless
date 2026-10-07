@@ -199,7 +199,7 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
             if(!$paths.Add($path)){throw "PROXY_DOCUMENT_DUPLICATE_PATH:$path"}
             if($expectedSha.Length-ne64 -or $expectedSha -match "[^0-9a-f]"){throw "PROXY_DOCUMENT_SHA256_INVALID:$path"}
             try{$bytes=[Convert]::FromBase64String($contentB64)}catch{throw "PROXY_DOCUMENT_BASE64_INVALID:$path"}
-            if($bytes.Length-le0 -or $bytes.Length-gt262144){throw "PROXY_DOCUMENT_SIZE_INVALID:$path:$($bytes.Length)"}
+            if($bytes.Length-le0 -or $bytes.Length-gt262144){throw ("PROXY_DOCUMENT_SIZE_INVALID:"+$path+":"+$bytes.Length)}
             if((Get-Sha256Bytes $bytes)-ne$expectedSha){throw "PROXY_DOCUMENT_SHA256_MISMATCH:$path"}
             $blobBody=[ordered]@{content=$contentB64;encoding="base64"}
             $blobSha=Invoke-GhJson "POST" ("repos/"+$Repository+"/git/blobs") $blobBody ".sha"
