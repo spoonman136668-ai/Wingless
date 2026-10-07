@@ -48,6 +48,23 @@ function Assert-DocumentPath([string]$Path){
     throw "PROXY_DOCUMENT_PATH_FORBIDDEN:$Path"
   }
 }
+function Test-ExactDocumentBranchIdentity(
+  [string]$ExistingParent,
+  [string]$ExistingTree,
+  [string]$RequestedParent,
+  [string]$RequestedTree,
+  [string[]]$ExistingChangedPaths,
+  [string[]]$RequestedPaths
+){
+  if($ExistingParent -cne $RequestedParent -or $ExistingTree -cne $RequestedTree){return $false}
+  $actual=@($ExistingChangedPaths|Sort-Object -Unique)
+  $wanted=@($RequestedPaths|Sort-Object -Unique)
+  if($actual.Count-ne$wanted.Count){return $false}
+  for($i=0;$i-lt$wanted.Count;$i++){
+    if([string]$actual[$i] -cne [string]$wanted[$i]){return $false}
+  }
+  return $true
+}
 function Invoke-GhJson([string]$Method,[string]$Endpoint,$Body,[string]$Jq){
   $tmp=Join-Path $env:RUNNER_TEMP ("ckb-proxy-gh-"+[Guid]::NewGuid().ToString("N")+".json")
   try{
@@ -142,6 +159,11 @@ if($SelfTest){
     try{Assert-DocumentPath $bad}catch{$rejected=$true}
     if(!$rejected){throw "PROXY_SELFTEST_DOCUMENT_PATH_NOT_REJECTED:$bad"}
   }
+  $idParent=("a"*40);$idTree=("b"*40)
+  if(!(Test-ExactDocumentBranchIdentity $idParent $idTree $idParent $idTree @("docs/experiments/a.json") @("docs/experiments/a.json"))){throw "PROXY_SELFTEST_DOCUMENT_ADOPTION_EXACT_REJECTED"}
+  if(Test-ExactDocumentBranchIdentity $idParent $idTree ("c"*40) $idTree @("docs/experiments/a.json") @("docs/experiments/a.json")){throw "PROXY_SELFTEST_DOCUMENT_ADOPTION_PARENT_DRIFT_ACCEPTED"}
+  if(Test-ExactDocumentBranchIdentity $idParent $idTree $idParent ("d"*40) @("docs/experiments/a.json") @("docs/experiments/a.json")){throw "PROXY_SELFTEST_DOCUMENT_ADOPTION_TREE_DRIFT_ACCEPTED"}
+  if(Test-ExactDocumentBranchIdentity $idParent $idTree $idParent $idTree @("docs/experiments/a.json","docs/experiments/b.json") @("docs/experiments/a.json")){throw "PROXY_SELFTEST_DOCUMENT_ADOPTION_PATH_DRIFT_ACCEPTED"}
   if("research-r49-static.yml" -ne "research-r49-static.yml" -or "ckb-static-research-runner.yml" -ne "ckb-static-research-runner.yml"){throw "PROXY_SELFTEST_RESEARCH_WORKFLOW_ALLOWLIST"}
   $none=Select-PackageFanoutManifest ([pscustomobject]@{tree=@([pscustomobject]@{type="blob";path="README.md"})})
   if($none.status-ne"NO_MANIFEST"){throw "PROXY_SELFTEST_FANOUT_NONE"}
@@ -309,11 +331,24 @@ if([string]::IsNullOrWhiteSpace($env:GH_TOKEN)){throw "PROXY_GH_TOKEN_MISSING"}
             if($LASTEXITCODE-ne0){throw "PROXY_DOCUMENT_EXISTING_COMMIT_READ_FAILED"}
             $existing=(($existingRaw -join [Environment]::NewLine)|ConvertFrom-Json)
             $parents=@($existing.parents)
-            if($parents.Count-eq1 -and [string]$parents[0].sha-eq$parent -and [string]$existing.tree.sha-eq$treeSha){
-              Write-Response $request $requestSha "PASS" "" @{remote_sha=$before;tree_sha=$treeSha}
+            $existingParent=if($parents.Count-eq1){[string]($parents[0].sha)}else{""}
+            $existingTree=[string]($existing.tree.sha)
+            $changed=[Collections.Generic.List[string]]::new()
+            if($parents.Count-eq1 -and $existingParent -ceq $parent){
+              $compareRaw=@(& gh.exe api ("repos/"+$Repository+"/compare/"+$parent+"..."+$before) 2>&1)
+              if($LASTEXITCODE-ne0){throw "PROXY_DOCUMENT_EXISTING_COMPARE_FAILED"}
+              $compare=(($compareRaw -join [Environment]::NewLine)|ConvertFrom-Json)
+              if([int]$compare.behind_by-ne0 -or [int]$compare.ahead_by-ne1 -or [string]$compare.status-ne"ahead"){
+                throw "PROXY_DOCUMENT_EXISTING_COMPARE_IDENTITY_INVALID:$before"
+              }
+              foreach($f in @($compare.files)){[void]$changed.Add([string]$f.filename)}
+            }
+            $requestedPaths=@($files|ForEach-Object{[string]$_.path})
+            if(Test-ExactDocumentBranchIdentity $existingParent $existingTree $parent $treeSha @($changed) $requestedPaths){
+              Write-Response $request $requestSha "PASS" "" @{remote_sha=$before;tree_sha=$treeSha;adopted_existing=$true}
               continue
             }
-            throw "PROXY_DOCUMENT_BRANCH_EXISTS_DIFFERENT:$before"
+            throw ("PROXY_DOCUMENT_BRANCH_EXISTS_DIFFERENT:"+$before+":parent="+$existingParent+":tree="+$existingTree+":requested_tree="+$treeSha+":paths="+(@($changed)-join","))
           }
           if($expected){throw ("PROXY_DOCUMENT_EXPECTED_REMOTE_MISMATCH:"+$expected+":")}
           $commitBody=[ordered]@{message=$message;tree=$treeSha;parents=@($parent)}
