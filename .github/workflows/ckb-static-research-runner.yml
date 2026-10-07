@@ -1,0 +1,76 @@
+name: CKB static research runner
+run-name: CKB static research ${{ inputs.request_id }} ${{ inputs.package_sha }}
+on:
+  workflow_dispatch:
+    inputs:
+      package_sha:
+        description: Exact immutable research package SHA
+        required: true
+        type: string
+      request_id:
+        description: Exact CKB research-dispatch request identity
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ckb-static-research-${{ inputs.package_sha }}
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.package_sha }}
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Validate immutable package and runner
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ inputs.package_sha }}
+          REQUEST_ID: ${{ inputs.request_id }}
+        run: |
+          set -euo pipefail
+          [[ "$PACKAGE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$REQUEST_ID" =~ ^[0-9a-f]{32}$ ]]
+          test "$(git rev-parse HEAD)" = "$PACKAGE_SHA"
+          test -f .ckb/research-runner.sh
+          test ! -L .ckb/research-runner.sh
+          case "$(git ls-files -s -- .ckb/research-runner.sh | awk '{print $1}')" in
+            100644|100755) ;;
+            *) echo "STATIC_RUNNER_MODE_INVALID" >&2; exit 1 ;;
+          esac
+          echo "CKB_STATIC_PACKAGE_IDENTITY=PASS"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - uses: actions/setup-go@v5
+        if: ${{ hashFiles('go.mod') != '' }}
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Execute frozen package runner
+        shell: bash
+        env:
+          PACKAGE_SHA: ${{ inputs.package_sha }}
+          REQUEST_ID: ${{ inputs.request_id }}
+        run: |
+          set -euo pipefail
+          bash .ckb/research-runner.sh
+
+      - name: Upload research evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ckb-static-research-${{ inputs.request_id }}
+          path: ${{ runner.temp }}/ckb-research-evidence
+          if-no-files-found: warn
