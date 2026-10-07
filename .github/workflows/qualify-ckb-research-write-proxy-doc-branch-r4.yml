@@ -40,7 +40,9 @@ jobs:
           $raw=Get-Content research/transport/Invoke-CKBResearchWriteProxy.ps1 -Raw
           foreach($m in @(
             '"create_documents_branch"',
-            '^docs/experiments/[A-Za-z0-9][A-Za-z0-9._-]{0,180}\.json$',
+            '$prefix="docs/experiments/"',
+            '$leaf=$Path.Substring($prefix.Length)',
+            '$leaf.Contains("/")',
             'if($files.Count-lt1 -or $files.Count-gt4)',
             '$branch.StartsWith("research/")',
             'git/trees',
