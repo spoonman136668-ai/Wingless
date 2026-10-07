@@ -1,0 +1,95 @@
+{
+  "schema": "wingless.rsi-readout-interface-disjoint-replication.v1",
+  "experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-DISJOINT-REPLICATION-R51",
+  "parent_experiment": "WLM-LM-EXTERNAL-FUTURE-DATA-LEARNED-STATE-FORMER-READOUT-INTERFACE-ATTRIBUTION-R50",
+  "parent_sha": "1d9ded192dacb3dcf2230eeb5ee3c580d4e13660",
+  "hypothesis": "R50 identified a lower-capacity two-group readout as a supported attribution on reused R49 contexts. If that readout-interface effect is real rather than context-specific, the frozen two-group-2 readout should outperform the full-6 readout on a disjoint source set pinned before any R50 outcomes existed, at lower effective parameter cost and without state or adaptation-budget growth.",
+  "r50_frozen_observation": {
+    "classification": "supported",
+    "validity_pass": true,
+    "best_lower_capacity_readout": "two-group-2",
+    "effective_parameters_including_intercept": 3,
+    "full_readout_parameters_including_intercept": 7,
+    "accuracy_delta": 0.07920792079207928,
+    "positive_context_count": 2,
+    "best_vs_second_margin": 0.05940594059405946
+  },
+  "fixed_state_former": {
+    "alphas": [
+      0.75,
+      0.75,
+      0.125,
+      0.125,
+      1,
+      1
+    ],
+    "state_dimension": 6
+  },
+  "replication_arms": {
+    "count": 2,
+    "arms": [
+      {
+        "id": "full-6",
+        "groups": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "effective_parameters_including_intercept": 7
+      },
+      {
+        "id": "two-group-2",
+        "groups": [
+          0,
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "effective_parameters_including_intercept": 3
+      }
+    ]
+  },
+  "fit_and_evaluation": {
+    "historical_fit": "same exact R50 historical fit surface and ridge penalty",
+    "sealed_unseen": [
+      "twenty-fourth",
+      "twenty-fifth",
+      "twenty-sixth"
+    ],
+    "source_set_pinned_before_r50_outcomes": true,
+    "arm_set_frozen_before_r51_execution": true,
+    "no_heldout_outcome_use_in_fit": true
+  },
+  "resource_envelope": {
+    "total_adaptation_budget": 1744,
+    "state_dimension": 6,
+    "maximum_readout_parameters_including_intercept": 7,
+    "selected_readout_parameters_including_intercept": 3,
+    "external_model_calls": 0,
+    "tokenizer_use_count": 0,
+    "gpu_required": false,
+    "capacity_growth_events": 0
+  },
+  "frozen_evaluation": {
+    "supported": "valid; two-group-2 improves aggregate pairwise winner accuracy over full-6 by >=0.05, improves on >=2/3 disjoint contexts, mean regret <= full-6, and uses fewer effective readout parameters",
+    "mixed": "valid; support false; two-group-2 improves aggregate accuracy by >=0.015 with >=2/3 positive contexts and mean regret <= full-6",
+    "negative": "valid and neither supported nor mixed",
+    "invalid": "identity/budget/state-size/readout/history-seal/determinism/provenance/resource-accounting failure"
+  },
+  "manifest_sha256": "2f8ba21dd5d132c9ab888ef9f35d718a2116dd4bac4503cdb22d25985cf51137",
+  "governance": {
+    "no_post_result_tuning": true,
+    "no_capacity_growth": true,
+    "sealed_negatives": true,
+    "deterministic_replay": true,
+    "no_oracle_or_label_leakage": true,
+    "no_accepted_ref_mutation": true,
+    "no_live_or_production_authority": true,
+    "broad_continual_training": false
+  }
+}
