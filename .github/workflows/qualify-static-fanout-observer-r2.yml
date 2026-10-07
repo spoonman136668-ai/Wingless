@@ -1,0 +1,104 @@
+name: Qualify static fanout observer R2
+on:
+  push:
+    branches:
+      - repair/static-fanout-observer-r2
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Verify observer authority and trigger isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          p=.github/workflows/free-fanout-static-observer.yml
+          test -f "$p"
+          grep -F 'workflow_run:' "$p"
+          grep -F 'CKB static research runner' "$p"
+          grep -F -- '- requested' "$p"
+          grep -F 'github.event.workflow_run.display_title' "$p"
+          grep -F 'contents: read' "$p"
+          grep -F 'actions: read' "$p"
+          ! grep -F 'contents: write' "$p"
+          ! grep -F 'actions: write' "$p"
+          ! grep -F 'workflow_dispatch:' "$p"
+          ! grep -F 'gh workflow run' "$p"
+          ! grep -F 'scientific_classification =' "$p"
+          test "$(grep -c 'runs-on: ubuntu-latest' "$p")" -eq 3
+          grep -F 'name: CKB static research runner' .github/workflows/ckb-static-research-runner.yml
+          echo OBSERVER_ISOLATION=PASS
+
+      - name: Verify exact title parser
+        shell: bash
+        run: |
+          set -euo pipefail
+          GOOD="CKB static research 0123456789abcdef0123456789abcdef 0123456789abcdef0123456789abcdef01234567"
+          BAD="CKB static research wrong 0123456789abcdef0123456789abcdef01234567"
+          if [[ "$GOOD" =~ ^CKB\ static\ research\ ([0-9a-f]{32})\ ([0-9a-f]{40})$ ]]; then
+            test "${BASH_REMATCH[1]}" = "0123456789abcdef0123456789abcdef"
+            test "${BASH_REMATCH[2]}" = "0123456789abcdef0123456789abcdef01234567"
+          else
+            exit 1
+          fi
+          if [[ "$BAD" =~ ^CKB\ static\ research\ ([0-9a-f]{32})\ ([0-9a-f]{40})$ ]]; then exit 1; fi
+          echo OBSERVER_IDENTITY_PARSER=PASS
+
+      - name: Verify optional manifest detection semantics
+        shell: bash
+        env:
+          PROGRAM: Wingless
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/observer-fixture"
+          rm -rf "$root"
+          mkdir -p "$root"
+          python - "$root" "$PROGRAM" <<'PY'
+          import json, pathlib, sys
+          root=pathlib.Path(sys.argv[1])
+          program=sys.argv[2]
+          package="0123456789abcdef0123456789abcdef01234567"
+          def matches():
+              d=root/"research"/"fanout"
+              if not d.exists():
+                  return []
+              out=[]
+              for p in sorted(d.glob("*.manifest.json")):
+                  m=json.loads(p.read_text())
+                  if m.get("package_sha") in (package,"BOUND_AT_DISPATCH"):
+                      out.append(p)
+              return out
+          assert matches()==[]
+          d=root/"research"/"fanout";d.mkdir(parents=True)
+          base={
+            "schema":"research.free-fanout.v1","program":program,
+            "package_sha":"BOUND_AT_DISPATCH","authority":"external-evidence-only"
+          }
+          (d/"one.manifest.json").write_text(json.dumps(base))
+          assert len(matches())==1
+          (d/"ignored.json").write_text(json.dumps(base))
+          assert len(matches())==1
+          (d/"two.manifest.json").write_text(json.dumps(base))
+          assert len(matches())==2
+          print("OBSERVER_MANIFEST_DETECTION=PASS")
+          PY
+
+      - name: Run sidecar regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest tests/test_free_fanout_sidecar.py
+          echo SIDECAR_REGRESSION=PASS
