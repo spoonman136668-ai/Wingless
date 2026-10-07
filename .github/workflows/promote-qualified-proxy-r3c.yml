@@ -23,11 +23,10 @@ jobs:
           qualified='8a718756ec2a2268422ed7ad684f0a3a4fe793f2'
           test "$(git rev-parse HEAD)" = "$expected_main"
           git checkout "$qualified" -- research/transport/Invoke-CKBResearchWriteProxy.ps1 .ice/architecture-map.json .ice/manifest.json
-          changed="$(git diff --name-only)"
+          changed="$(git diff --cached --name-only)"
           test "$changed" = $'.ice/architecture-map.json\n.ice/manifest.json\nresearch/transport/Invoke-CKBResearchWriteProxy.ps1'
           git config user.name 'CKB Research Proxy'
           git config user.email 'ckb-research-proxy@local.invalid'
-          git add -- research/transport/Invoke-CKBResearchWriteProxy.ps1 .ice/architecture-map.json .ice/manifest.json
           git commit -m 'repair: bind fanout dispatch to exact run identity'
           git push origin HEAD:main
           echo "qualified_source=$qualified"
