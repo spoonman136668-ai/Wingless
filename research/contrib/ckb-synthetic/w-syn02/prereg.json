@@ -1,0 +1,166 @@
+{
+  "schema": "wingless.external-research-prereg.v1",
+  "project": "Wingless",
+  "experiment_id": "W-SYN02-INDEPENDENT-SEED-READOUT-REPLICATION",
+  "contributor": "ckb-plane-proposed-synthetic-track",
+  "contribution_class": "falsification",
+  "evidence_class": "SYNTHETIC_ONLY_NOT_EXTERNAL_VALIDATION",
+  "status": "FROZEN_BEFORE_REPLICATION_PRIMARY",
+  "question": "Do the W-SYN01 slope-block controls replicate under four new, independently frozen paired synthetic seeds at precisely the same sampling/capacity budget?",
+  "hypothesis": "Four of four new seed pairs satisfy preregistered W-SYN01 directional slope-gap and matching baseline parity criteria at exactly unchanged capacity; failures retained as negative or mixed.",
+  "exact_parent_sha": "610b8d380f2da6dd5517c8aa39f4607b7e3bd627",
+  "predecessor_evidence": [
+    "W-SYN01 separately frozen primary at c8b8b41dc500678ba4caf1f40f86c7d2daeaa386, superseded by pre-primary infrastructure freeze at 04b1091f1d3c7f602e5850cb419e9bcff5b07827; original exact executed source 610b8d380f2da6dd5517c8aa39f4607b7e3bd627.",
+    "Original W-SYN01 primary scientific result: GitHub run 37942093421; raw result SHA256 c8ac40419f412d494c87ad9441fddea357df38dbd3cb1f76a668c9a6f59bb557; synthetic-only SUPPORTED on old seeds; no reuse of old seeds as newly unseen."
+  ],
+  "changed_paths": [
+    "research/contrib/ckb-synthetic/w-syn02/prereg.json",
+    "research/contrib/ckb-synthetic/w-syn02/synthetic_replication_test.go",
+    "research/contrib/ckb-synthetic/w-syn02/README.md"
+  ],
+  "inputs": [
+    {
+      "name": "W-SYN02 fresh synthetic seed replication",
+      "source": "Exact W-SYN01 generator/arms/regimes unchanged; 4 new training and heldout seeds disjoint with W-SYN01: 211,223,227,229 and 307,311,313,317.",
+      "sha256": null,
+      "sha_state": "Freeze this prereg alone before implementing or looking at new heldout outputs. Later fix exact source SHA and qualified workflow separately."
+    }
+  ],
+  "frozen_design": {
+    "arms": [
+      "A0",
+      "A1",
+      "A2",
+      "A3"
+    ],
+    "state_dimension": 6,
+    "alpha": [
+      0.75,
+      0.75,
+      0.125,
+      0.125,
+      1,
+      1
+    ],
+    "max_readout_parameters": 7,
+    "train_seeds": [
+      211,
+      223,
+      227,
+      229
+    ],
+    "heldout_seeds": [
+      307,
+      311,
+      313,
+      317
+    ],
+    "seed_pairing": "one-to-one in listed order; do not pick seeds after outcomes",
+    "regimes": [
+      {
+        "id": "early-only-tied",
+        "coefficients": [
+          0.8,
+          0.8,
+          -0.9,
+          0.4,
+          1,
+          -0.3
+        ]
+      },
+      {
+        "id": "late-only-tied",
+        "coefficients": [
+          0.9,
+          -0.6,
+          0.4,
+          0.4,
+          0.4,
+          0.4
+        ]
+      },
+      {
+        "id": "neither-tied",
+        "coefficients": [
+          0.8,
+          -0.6,
+          -0.9,
+          0.4,
+          1,
+          -0.3
+        ]
+      },
+      {
+        "id": "both-tied",
+        "coefficients": [
+          0.8,
+          0.8,
+          0.4,
+          0.4,
+          0.4,
+          0.4
+        ]
+      }
+    ],
+    "generator": "Unsigned 32-bit xorshift32: x ^= x << 13; x ^= x >>> 17; x ^= x << 5, 32-bit truncation after each operation. Initialize x=(seed xor 0x9E3779B9 xor (regime_index+1)*0x85EBCA6B) modulo 2^32, replace zero with 1. Consume six u32 for each row raw[j]=2*u32/2^32-1; transformed state[j]=raw[j]*alpha[j]. Consume seventh u32 for additive label noise noise=0.20*(u32/2^32-0.5). Label y=0.2+dot(state,regime coefficients)+noise. Train and heldout use separate seeds.",
+    "training_algorithm": "Per arm use the qualified research/r53prefreeze DesignRow API; form 7x7 normal equations on exactly 436 training rows and response values, add fixed ridge penalty 0.1 to active slope diagonal entries (none to intercept), solve with deterministic Gaussian elimination/pivot rule (smallest eligible row on equal pivot; reject near-zero pivots <1e-12). Inactive theta slots zero. No training on heldout.",
+    "train_rows_per_arm_per_regime_seed": 436,
+    "heldout_rows_per_arm_per_regime_seed": 256,
+    "total_training_rows_across_4_regimes_4_seeds_4_arms": 27904,
+    "total_heldout_predictions": 16384,
+    "compute_budget": "At most 35 million elementary scalar arithmetic operations, fixed four regimes, four seed pairs and four arms; no retries that multiply data budget.",
+    "capacity": "Exactly six state dimensions; <=7 effective readout coefficients including single intercept; 0 additional learned state and 0 model/tokenizer calls",
+    "metric": "Heldout mean squared prediction error per arm, regime and seed pair; fixed seed-wise comparison, no pooled winner selection",
+    "deterministic_expected": true,
+    "reference_mechanism": "Frozen W-SYN01 source contains unchanged qualified Wingless R53 mechanism (original PR #21). No modification to r53prefreeze. Use the exact external frozen R205 implementation as the algorithmic parent.",
+    "evaluator_access": "Only new 307/311/313/317 heldout seeds after immutable W-SYN02 prereg freeze, independent exact code SHA qualification and CKB one-shot research admission. R205 heldout seeds must not be accessed.",
+    "total_unique_heldout_cases": 4096
+  },
+  "controls": [
+    "A0 untied six slope equal budget control",
+    "A3 original R52 early/late two-group comparator",
+    "neither-tied and both-tied regimes deliberately challenge asymmetric tying"
+  ],
+  "metrics": [
+    "mse per arm per regime per seed",
+    "A2_mse_minus_A1_mse on early-only",
+    "A1_mse_minus_A2_mse on late-only",
+    "matched_arm_minus_A0 per regime",
+    "failed numerical solve count"
+  ],
+  "classification_rules": {
+    "supported": "For all 4 frozen seed pairs, early-only A2_MSE-A1_MSE >= 0.01 AND late-only A1_MSE-A2_MSE >= 0.01 AND matching A1 and A2 MSE <= A0 MSE + 0.01 on their respective regimes",
+    "mixed": "No INVALID condition and both directional gaps reach >=0.01 for at least 2 but fewer than 4 of the fixed seed pairs OR only one direction reaches four of four",
+    "negative": "No INVALID condition, and neither SUPPORTED nor MIXED rule holds; keep all per-arm error and no post-result retune",
+    "invalid": "Any missing or drifted prereg/code/controller binding; heldout inspection before freeze; seed/arm/cohort/budget drift; impossible or nonfinite output; solver failure; retry, capacity or authority overrun"
+  },
+  "prohibited_after_primary_run": [
+    "threshold changes",
+    "split changes",
+    "post-result policy selection",
+    "capacity growth",
+    "extra data/compute/model calls",
+    "heldout/evaluator leakage",
+    "external-data equivalence claims",
+    "relabeling negative or mixed as infra failure"
+  ],
+  "authority": {
+    "research_only": true,
+    "external_validation": false,
+    "synthetic_only": true,
+    "production_authority": false,
+    "accepted_ref_mutation": false,
+    "promotion_authority": false,
+    "scheduler_or_queue_authority": false,
+    "ckb_science_admission_required": true,
+    "official_main_lineage_acceptance": false
+  },
+  "prerequisites": [
+    "Freeze this prereg in a standalone Git commit before generator/implementation/evaluation",
+    "Implementation in a later commit; verify exact parent and source blob identities",
+    "CKB science authority separately authenticates the synthetic-only design and issues authorized run receipt",
+    "Focused mechanism tests then full Go regression; sealed primary run only through CKB scientific path",
+    "Persist all results including negatives; never contribute these results to R53 external-source claim"
+  ],
+  "preregistration_note": "W-SYN02 is an independently preregistered fixed-budget replication. R205 classification was known before selecting this REPLICATION study, but no R206 results were observed. Repeat original exact preregistered 4/4 thresholds, same mechanisms/capacities/compute. 100% data-class synthetic-only. Must qualify and dispatch through existing CKB research cadence."
+}
