@@ -1,0 +1,7 @@
+# W-SYN03 — disjoint recovery experiment, NOT a replay
+
+Original external R53 admission remains unchanged and independent. R206 S02 Wingless source ran after green admission but a PowerShell JSON key mismatch caused the result check to fail **without archiving raw primary output**. The frozen S02 seed cohort is hereby CONSERVATIVELY CONSUMED_INDETERMINATE, not reported supported/mixed/negative. No re-execution or threshold modification permitted. Y-SYN02 was skipped but this successor uses distinct seeds in both lanes.
+
+Standalone W-SYN03 prereg committed before implementation: `ef4f77faa1b148d3f03726ead182d15cb3ac51f3`. Exact parent `64b08d486fbba7c5607ecf798ac4bde47e64fe9e`. Only new W training seeds `631,641,643,647` and heldout `733,739,743,751` as frozen. Original S01 and S02 seeds excluded. No code change outside this directory, unchanged R53 module, four arms/four regimes, 6D / 7 max params, 27,904 train rows, 16,384 heldout arm predictions and all original success thresholds.
+
+Mechanic tests do NOT execute primary, which checks non-authoritative `CKB_SYN_W03_QUALIFIED_RUN=yes`; only independently SHA/qualifier-verified CKB can admit execution. Definitive repair additionally must persist raw output before parsing, upload artifact on failure, verify consumed ledger and reconcile on subsequent existing controller wakes; never repeat S02. No accepted-ref, external-source, broker, KTRADE, capacity or production permissions.
