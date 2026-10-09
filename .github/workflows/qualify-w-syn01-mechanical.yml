@@ -1,0 +1,70 @@
+name: W-SYN01 frozen mechanical + full Go qualification (no primary)
+on:
+  push:
+    branches: [qualification/w-syn01-r1]
+permissions:
+  contents: read
+concurrency:
+  group: wingless-syn01-mechanical
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 610b8d380f2da6dd5517c8aa39f4607b7e3bd627
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Exact frozen prerequisite and no primary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 610b8d380f2da6dd5517c8aa39f4607b7e3bd627
+          BASE=2e3512beeef075d846373cc813c66b774fef8437
+          PRE=b9b7944a6fe66247c87605e7db1068fcd0cd6010
+          git merge-base --is-ancestor "$BASE" HEAD
+          test "$(git rev-list --reverse "$BASE"..HEAD | head -n 1)" = "$PRE"
+          test "$(git diff-tree --no-commit-id --name-only -r "$PRE")" = research/contrib/ckb-synthetic/w-syn01/prereg.json
+          test "$(git rev-parse "$PRE":research/contrib/ckb-synthetic/w-syn01/prereg.json)" = "$(git rev-parse HEAD:research/contrib/ckb-synthetic/w-syn01/prereg.json)"
+          mapfile -t FILES < <(git diff --name-only "$BASE" HEAD)
+          test "${#FILES[@]}" -eq 3
+          for file in "${FILES[@]}"; do
+            case "$file" in
+              research/contrib/ckb-synthetic/w-syn01/prereg.json|research/contrib/ckb-synthetic/w-syn01/synthetic_pilot_test.go|research/contrib/ckb-synthetic/w-syn01/README.md) ;;
+              *) echo "SYN_W01_UNEXPECTED_SCOPE:$file"; exit 1 ;;
+            esac
+          done
+          python3 - <<'PY'
+          import json
+          d=json.load(open('research/contrib/ckb-synthetic/w-syn01/prereg.json',encoding='utf8'))
+          assert d['evidence_class']=='SYNTHETIC_ONLY_NOT_EXTERNAL_VALIDATION'
+          assert d['exact_parent_sha']=='2e3512beeef075d846373cc813c66b774fef8437'
+          assert d['frozen_design']['total_heldout_predictions']==16384
+          assert d['frozen_design']['total_unique_heldout_cases']==4096
+          assert not d['authority']['scheduler_or_queue_authority']
+          assert d['authority']['ckb_science_admission_required']
+          PY
+          test -z "${CKB_SYN_W01_QUALIFIED_RUN:-}"
+          echo W_SYN01_SOURCE_PREREG_PIN=PASS
+      - name: Focused mechanisms; assert primary skipped
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./research/r53prefreeze ./research/contrib/ckb-synthetic/w-syn01 -count=1 -v | tee "$RUNNER_TEMP/focused.log"
+          grep -F 'PRIMARY_NOT_ADMITTED_BY_CKB' "$RUNNER_TEMP/focused.log"
+          go vet ./research/r53prefreeze ./research/contrib/ckb-synthetic/w-syn01
+          echo W_SYN01_FOCUSED=PASS PRIMARY_NOT_RUN
+      - name: Full Wingless regression + build exactly once
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "${CKB_SYN_W01_QUALIFIED_RUN:-}"
+          go test ./... -count=1
+          go build ./...
+          echo W_SYN01_FULL_REGRESSION_BUILD=PASS PRIMARY_NOT_RUN
