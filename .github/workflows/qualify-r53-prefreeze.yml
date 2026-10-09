@@ -1,0 +1,89 @@
+name: R53 pre-freeze slope-block mechanism qualification
+on:
+  push:
+    branches:
+      - research/r53-slope-block-prefreeze
+    paths:
+      - 'research/r53prefreeze/mechanism.go'
+      - 'research/r53prefreeze/mechanism_test.go'
+      - '.github/workflows/qualify-r53-prefreeze.yml'
+permissions:
+  contents: read
+concurrency:
+  group: r53-prefreeze-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Exact parent and bounded mechanism-only three-file scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=ce81fbad415fdb754d18428e8ada3a8f1c2877ee
+          git merge-base --is-ancestor "$BASE" HEAD
+          test "$(git diff --name-only "$BASE" HEAD | wc -l)" -eq 3
+          while IFS= read -r file; do
+            case "$file" in
+              research/r53prefreeze/mechanism.go|research/r53prefreeze/mechanism_test.go|.github/workflows/qualify-r53-prefreeze.yml) ;;
+              *) echo "R53_SCOPE_WIDENED:$file"; exit 1 ;;
+            esac
+          done < <(git diff --name-only "$BASE" HEAD)
+          grep -Fq 'TotalAdaptationUnits = 1744' research/r53prefreeze/mechanism.go
+          grep -Fq 'AdaptationPerArm     = 436' research/r53prefreeze/mechanism.go
+          grep -Fq 'MaxReadoutParameters = 7' research/r53prefreeze/mechanism.go
+          test "$(git diff --name-only "$BASE" HEAD | grep -Ec '^(unitary|acceptance|worker|cmd)/' || :)" -eq 0
+          echo R53_PREFREEZE_SOURCE_SCOPE=PASS
+      - name: Verify actual historical R50 and R52 immutable Go implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          HISTORIC=b6716df4d94bdac07fde526de4e3a37c5b4f23ee
+          ROOT=unitary/wlm_lm_external_future_data_learned_state_former
+          R50="$(printf '%s' "$ROOT")_readout_interface_attribution_r50.go"
+          R52="$(printf '%s' "$ROOT")_representation_readout_coupling_diagnosis_r52.go"
+          git fetch --no-tags origin "$HISTORIC"
+          test "$(git rev-parse "$HISTORIC:$R50")" = 830862058680e710ea753b26bd5cd0b2930cf208
+          test "$(git rev-parse "$HISTORIC:$R52")" = 7140da82408ca6a224d51aabc97cadb857072cdb
+          git show "$HISTORIC:$R50" > "$RUNNER_TEMP/r50.go"
+          git show "$HISTORIC:$R52" > "$RUNNER_TEMP/r52.go"
+          test "$(git hash-object --no-filters "$RUNNER_TEMP/r50.go")" = 830862058680e710ea753b26bd5cd0b2930cf208
+          test "$(git hash-object --no-filters "$RUNNER_TEMP/r52.go")" = 7140da82408ca6a224d51aabc97cadb857072cdb
+          grep -Fq 'z[0]=1' "$RUNNER_TEMP/r50.go"
+          grep -Fq 'z[g+1]+=e.x[i]' "$RUNNER_TEMP/r50.go"
+          grep -Fq 'beta[0]=theta[0]' "$RUNNER_TEMP/r50.go"
+          grep -Fq 'beta[i+1]=theta[groups[i]+1]' "$RUNNER_TEMP/r50.go"
+          grep -Fq 'tiedGroups:=[6]int{0,0,1,1,1,1}' "$RUNNER_TEMP/r52.go"
+          grep -Fq 'selected:=[6]float64{0.75,0.75,0.125,0.125,1,1}' "$RUNNER_TEMP/r52.go"
+          echo R53_HISTORIC_R50_R52_SOURCE_PARITY=PASS
+      - name: Fifteen focused positive and adversarial mechanism controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./research/r53prefreeze -count=1 -v
+          go vet ./research/r53prefreeze
+          echo R53_PREFREEZE_SLOPE_BLOCK_MECHANISM=PASS
+      - name: Full Wingless Go regression and build once
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./... -count=1
+          go build ./...
+          echo R53_WINGLESS_FULL_GO_REGRESSION=PASS
+      - name: Confirm no autonomous authority or sealed evaluator installed
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -Eq '^  schedule:|^  workflow_dispatch:|^    (issues|contents|actions): write$' .github/workflows/qualify-r53-prefreeze.yml
+          ! grep -Eq '"(os|net/http|os/exec|database/sql)"' research/r53prefreeze/mechanism.go
+          ! grep -Eq 'func (Run|main|EvaluateHeldout|Dispatch|Admit)' research/r53prefreeze/mechanism.go
+          echo R53_NO_HELDOUT_READ_OR_SCIENTIFIC_AUTHORITY=PASS
