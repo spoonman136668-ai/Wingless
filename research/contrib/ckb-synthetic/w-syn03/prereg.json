@@ -1,0 +1,167 @@
+{
+  "schema": "wingless.external-research-prereg.v1",
+  "project": "Wingless",
+  "experiment_id": "W-SYN03-FRESH-COHORT-READOUT-REPLICATION",
+  "contributor": "ckb-plane-proposed-synthetic-track",
+  "contribution_class": "falsification",
+  "evidence_class": "SYNTHETIC_ONLY_NOT_EXTERNAL_VALIDATION",
+  "status": "PREREG_FROZEN_BEFORE_S03_IMPLEMENTATION_OR_OUTCOME",
+  "question": "Does the original W-SYN01 block-tying effect replicate on a third new, disjoint synthetic cohort after the S02 result-archiving infrastructure defect?",
+  "hypothesis": "Exactly four independently frozen S03 seed pairs meet the unchanged directional >=0.01 and matching baseline parity thresholds, or valid mixed/negative is retained.",
+  "exact_parent_sha": "64b08d486fbba7c5607ecf798ac4bde47e64fe9e",
+  "predecessor_evidence": [
+    "R205 S01 synthetic-only SUPPORTED primary: run 37942093421, frozen original two-lane research, no R53/Y095 external-source admission.",
+    "R206 S02 primary run 37956299235 reached Wingless primary test execution, but the JSON SeedPair versus seed_pair validation failed; no S02 raw outcome was archived; Yggdrasil primary skipped.",
+    "Treat ALL S02 W heldout seeds [307,311,313,317] as CONSUMED_INDETERMINATE. Do NOT replay S02. Preserve failure/evidence lineage without calling it scientific negative or success."
+  ],
+  "changed_paths": [
+    "research/contrib/ckb-synthetic/w-syn03/prereg.json",
+    "research/contrib/ckb-synthetic/w-syn03/synthetic_replication_test.go",
+    "research/contrib/ckb-synthetic/w-syn03/README.md"
+  ],
+  "inputs": [
+    {
+      "name": "W-SYN03 disjoint synthetic cohort",
+      "source": "W-SYN03 fixed fresh train seeds [631,641,643,647] and heldout [733,739,743,751]. Disjoint with W-SYN01 [11,13,17,19]/[101,103,107,109] and W-SYN02 [211,223,227,229]/[307,311,313,317].",
+      "sha256": null,
+      "sha_state": "Freeze this prereg alone before implementing or looking at new heldout outputs. Later fix exact source SHA and qualified workflow separately."
+    }
+  ],
+  "frozen_design": {
+    "arms": [
+      "A0",
+      "A1",
+      "A2",
+      "A3"
+    ],
+    "state_dimension": 6,
+    "alpha": [
+      0.75,
+      0.75,
+      0.125,
+      0.125,
+      1,
+      1
+    ],
+    "max_readout_parameters": 7,
+    "train_seeds": [
+      631,
+      641,
+      643,
+      647
+    ],
+    "heldout_seeds": [
+      733,
+      739,
+      743,
+      751
+    ],
+    "seed_pairing": "one-to-one in listed order; do not pick seeds after outcomes",
+    "regimes": [
+      {
+        "id": "early-only-tied",
+        "coefficients": [
+          0.8,
+          0.8,
+          -0.9,
+          0.4,
+          1,
+          -0.3
+        ]
+      },
+      {
+        "id": "late-only-tied",
+        "coefficients": [
+          0.9,
+          -0.6,
+          0.4,
+          0.4,
+          0.4,
+          0.4
+        ]
+      },
+      {
+        "id": "neither-tied",
+        "coefficients": [
+          0.8,
+          -0.6,
+          -0.9,
+          0.4,
+          1,
+          -0.3
+        ]
+      },
+      {
+        "id": "both-tied",
+        "coefficients": [
+          0.8,
+          0.8,
+          0.4,
+          0.4,
+          0.4,
+          0.4
+        ]
+      }
+    ],
+    "generator": "Unsigned 32-bit xorshift32: x ^= x << 13; x ^= x >>> 17; x ^= x << 5, 32-bit truncation after each operation. Initialize x=(seed xor 0x9E3779B9 xor (regime_index+1)*0x85EBCA6B) modulo 2^32, replace zero with 1. Consume six u32 for each row raw[j]=2*u32/2^32-1; transformed state[j]=raw[j]*alpha[j]. Consume seventh u32 for additive label noise noise=0.20*(u32/2^32-0.5). Label y=0.2+dot(state,regime coefficients)+noise. Train and heldout use separate seeds.",
+    "training_algorithm": "Per arm use the qualified research/r53prefreeze DesignRow API; form 7x7 normal equations on exactly 436 training rows and response values, add fixed ridge penalty 0.1 to active slope diagonal entries (none to intercept), solve with deterministic Gaussian elimination/pivot rule (smallest eligible row on equal pivot; reject near-zero pivots <1e-12). Inactive theta slots zero. No training on heldout.",
+    "train_rows_per_arm_per_regime_seed": 436,
+    "heldout_rows_per_arm_per_regime_seed": 256,
+    "total_training_rows_across_4_regimes_4_seeds_4_arms": 27904,
+    "total_heldout_predictions": 16384,
+    "compute_budget": "At most 35 million elementary scalar arithmetic operations, fixed four regimes, four seed pairs and four arms; no retries that multiply data budget.",
+    "capacity": "Exactly six state dimensions; <=7 effective readout coefficients including single intercept; 0 additional learned state and 0 model/tokenizer calls",
+    "metric": "Heldout mean squared prediction error per arm, regime and seed pair; fixed seed-wise comparison, no pooled winner selection",
+    "deterministic_expected": true,
+    "reference_mechanism": "Use frozen W-SYN02 implementation and unchanged R53 mechanism as source-defined algorithm. No capacity, generator, hypothesis, threshold, or budget change; only fresh seeds and experiment ID.",
+    "evaluator_access": "S03 heldout 733/739/743/751 only after S03 stand-alone prereg freeze, exact-source engineering qualification and new CKB authorization; S01/S02 heldout seeds never replayed or claimed unseen.",
+    "total_unique_heldout_cases": 4096
+  },
+  "controls": [
+    "A0 untied six slope equal budget control",
+    "A3 original R52 early/late two-group comparator",
+    "neither-tied and both-tied regimes deliberately challenge asymmetric tying"
+  ],
+  "metrics": [
+    "mse per arm per regime per seed",
+    "A2_mse_minus_A1_mse on early-only",
+    "A1_mse_minus_A2_mse on late-only",
+    "matched_arm_minus_A0 per regime",
+    "failed numerical solve count"
+  ],
+  "classification_rules": {
+    "supported": "For all 4 frozen seed pairs, early-only A2_MSE-A1_MSE >= 0.01 AND late-only A1_MSE-A2_MSE >= 0.01 AND matching A1 and A2 MSE <= A0 MSE + 0.01 on their respective regimes",
+    "mixed": "No INVALID condition and both directional gaps reach >=0.01 for at least 2 but fewer than 4 of the fixed seed pairs OR only one direction reaches four of four",
+    "negative": "No INVALID condition, and neither SUPPORTED nor MIXED rule holds; keep all per-arm error and no post-result retune",
+    "invalid": "Any missing or drifted prereg/code/controller binding; heldout inspection before freeze; seed/arm/cohort/budget drift; impossible or nonfinite output; solver failure; retry, capacity or authority overrun"
+  },
+  "prohibited_after_primary_run": [
+    "threshold changes",
+    "split changes",
+    "post-result policy selection",
+    "capacity growth",
+    "extra data/compute/model calls",
+    "heldout/evaluator leakage",
+    "external-data equivalence claims",
+    "relabeling negative or mixed as infra failure"
+  ],
+  "authority": {
+    "research_only": true,
+    "external_validation": false,
+    "synthetic_only": true,
+    "production_authority": false,
+    "accepted_ref_mutation": false,
+    "promotion_authority": false,
+    "scheduler_or_queue_authority": false,
+    "ckb_science_admission_required": true,
+    "official_main_lineage_acceptance": false
+  },
+  "prerequisites": [
+    "Freeze this prereg in a standalone Git commit before generator/implementation/evaluation",
+    "Implementation in a later commit; verify exact parent and source blob identities",
+    "CKB science authority separately authenticates the synthetic-only design and issues authorized run receipt",
+    "Focused mechanism tests then full Go regression; sealed primary run only through CKB scientific path",
+    "Persist all results including negatives; never contribute these results to R53 external-source claim"
+  ],
+  "preregistration_note": "S03 is a NEW disjoint independently frozen synthetic replication of unchanged W/Y S01 scientific mechanism, NOT a retry or relabel of S02. S02 W seeds consumed indeterminate and excluded. No S03 outcomes evaluated before freeze. Exactly same S02 capacity, generator, probability laws, arm definitions and thresholds; all negatives/mixed retained. Mechanical qualification must not run primary. A trustworthy one-shot CKB-controlled run must persist raw output before protocol parsing."
+}
