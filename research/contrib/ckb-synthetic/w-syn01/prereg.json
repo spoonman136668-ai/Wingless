@@ -1,0 +1,164 @@
+{
+  "schema": "wingless.external-research-prereg.v1",
+  "project": "Wingless",
+  "experiment_id": "W-SYN01-READOUT-SLOPE-CONSTRAINT-FALSIFICATION",
+  "contributor": "ckb-plane-proposed-synthetic-track",
+  "contribution_class": "falsification",
+  "evidence_class": "SYNTHETIC_ONLY_NOT_EXTERNAL_VALIDATION",
+  "status": "PREREGISTERED_NOT_EVALUATED",
+  "question": "Do the R53 A1 early-tied and A2 late-tied readout constraints recover their respective slope regimes without masking wrong-block bias at a frozen equal adaptation budget?",
+  "hypothesis": "A1 outperforms A2 on early-only tied truth and A2 outperforms A1 on late-only tied truth; matching constrained arms do not materially lose to A0 on the corresponding regime. Failure is a valid scientific negative.",
+  "exact_parent_sha": "2e3512beeef075d846373cc813c66b774fef8437",
+  "predecessor_evidence": [
+    "Wingless R52 mixed (historical sealed; never reread for this experiment)",
+    "Wingless PR #21 frozen R53 mechanism tests and model-free readout APIs"
+  ],
+  "changed_paths": [
+    "research/contrib/ckb-synthetic/w-syn01/prereg.json",
+    "research/contrib/ckb-synthetic/w-syn01/synthetic_pilot_test.go",
+    "research/contrib/ckb-synthetic/w-syn01/README.md"
+  ],
+  "inputs": [
+    {
+      "name": "W-SYN01 deterministic synthetic regimes",
+      "source": "New algorithm defined fully below, not drawn from R53 or R52 external datasets; no live feeds, labels, historical source corpus, or GitHub source intake",
+      "sha256": null,
+      "sha_state": "Generator/implementation and exact source tree must be SHA-pinned by CKB after implementation, BEFORE heldout test execution; cannot claim result until then."
+    }
+  ],
+  "frozen_design": {
+    "arms": [
+      "A0",
+      "A1",
+      "A2",
+      "A3"
+    ],
+    "state_dimension": 6,
+    "alpha": [
+      0.75,
+      0.75,
+      0.125,
+      0.125,
+      1,
+      1
+    ],
+    "max_readout_parameters": 7,
+    "train_seeds": [
+      11,
+      13,
+      17,
+      19
+    ],
+    "heldout_seeds": [
+      101,
+      103,
+      107,
+      109
+    ],
+    "seed_pairing": "one-to-one in listed order; do not pick seeds after outcomes",
+    "regimes": [
+      {
+        "id": "early-only-tied",
+        "coefficients": [
+          0.8,
+          0.8,
+          -0.9,
+          0.4,
+          1,
+          -0.3
+        ]
+      },
+      {
+        "id": "late-only-tied",
+        "coefficients": [
+          0.9,
+          -0.6,
+          0.4,
+          0.4,
+          0.4,
+          0.4
+        ]
+      },
+      {
+        "id": "neither-tied",
+        "coefficients": [
+          0.8,
+          -0.6,
+          -0.9,
+          0.4,
+          1,
+          -0.3
+        ]
+      },
+      {
+        "id": "both-tied",
+        "coefficients": [
+          0.8,
+          0.8,
+          0.4,
+          0.4,
+          0.4,
+          0.4
+        ]
+      }
+    ],
+    "generator": "Unsigned 32-bit xorshift32: x ^= x << 13; x ^= x >>> 17; x ^= x << 5, 32-bit truncation after each operation. Initialize x=(seed xor 0x9E3779B9 xor (regime_index+1)*0x85EBCA6B) modulo 2^32, replace zero with 1. Consume six u32 for each row raw[j]=2*u32/2^32-1; transformed state[j]=raw[j]*alpha[j]. Consume seventh u32 for additive label noise noise=0.20*(u32/2^32-0.5). Label y=0.2+dot(state,regime coefficients)+noise. Train and heldout use separate seeds.",
+    "training_algorithm": "Per arm use the qualified research/r53prefreeze DesignRow API; form 7x7 normal equations on exactly 436 training rows and response values, add fixed ridge penalty 0.1 to active slope diagonal entries (none to intercept), solve with deterministic Gaussian elimination/pivot rule (smallest eligible row on equal pivot; reject near-zero pivots <1e-12). Inactive theta slots zero. No training on heldout.",
+    "train_rows_per_arm_per_regime_seed": 436,
+    "heldout_rows_per_arm_per_regime_seed": 256,
+    "total_training_rows_across_4_regimes_4_seeds_4_arms": 27904,
+    "total_heldout_predictions": 4096,
+    "compute_budget": "At most 35 million elementary scalar arithmetic operations, fixed four regimes, four seed pairs and four arms; no retries that multiply data budget.",
+    "capacity": "Exactly six state dimensions; <=7 effective readout coefficients including single intercept; 0 additional learned state and 0 model/tokenizer calls",
+    "metric": "Heldout mean squared prediction error per arm, regime and seed pair; fixed seed-wise comparison, no pooled winner selection",
+    "deterministic_expected": true,
+    "reference_mechanism": "Qualified R53 PR #21 head SHA 2e3512beeef075d846373cc813c66b774fef8437; link direct Go package, no copied implementation",
+    "evaluator_access": "Only after prereg freeze and CKB SHA qualification; all primary heldout errors are forbidden before that point"
+  },
+  "controls": [
+    "A0 untied six slope equal budget control",
+    "A3 original R52 early/late two-group comparator",
+    "neither-tied and both-tied regimes deliberately challenge asymmetric tying"
+  ],
+  "metrics": [
+    "mse per arm per regime per seed",
+    "A2_mse_minus_A1_mse on early-only",
+    "A1_mse_minus_A2_mse on late-only",
+    "matched_arm_minus_A0 per regime",
+    "failed numerical solve count"
+  ],
+  "classification_rules": {
+    "supported": "For all 4 frozen seed pairs, early-only A2_MSE-A1_MSE >= 0.01 AND late-only A1_MSE-A2_MSE >= 0.01 AND matching A1 and A2 MSE <= A0 MSE + 0.01 on their respective regimes",
+    "mixed": "No INVALID condition and both directional gaps reach >=0.01 for at least 2 but fewer than 4 of the fixed seed pairs OR only one direction reaches four of four",
+    "negative": "No INVALID condition, and neither SUPPORTED nor MIXED rule holds; keep all per-arm error and no post-result retune",
+    "invalid": "Any missing or drifted prereg/code/controller binding; heldout inspection before freeze; seed/arm/cohort/budget drift; impossible or nonfinite output; solver failure; retry, capacity or authority overrun"
+  },
+  "prohibited_after_primary_run": [
+    "threshold changes",
+    "split changes",
+    "post-result policy selection",
+    "capacity growth",
+    "extra data/compute/model calls",
+    "heldout/evaluator leakage",
+    "external-data equivalence claims",
+    "relabeling negative or mixed as infra failure"
+  ],
+  "authority": {
+    "research_only": true,
+    "external_validation": false,
+    "synthetic_only": true,
+    "production_authority": false,
+    "accepted_ref_mutation": false,
+    "promotion_authority": false,
+    "scheduler_or_queue_authority": false,
+    "ckb_science_admission_required": true
+  },
+  "prerequisites": [
+    "Freeze this prereg in a standalone Git commit before generator/implementation/evaluation",
+    "Implementation in a later commit; verify exact parent and source blob identities",
+    "CKB science authority separately authenticates the synthetic-only design and issues authorized run receipt",
+    "Focused mechanism tests then full Go regression; sealed primary run only through CKB scientific path",
+    "Persist all results including negatives; never contribute these results to R53 external-source claim"
+  ],
+  "preregistration_note": "This immutable preregistration intentionally does not launch science; generator and code SHA are pinned in the later CKB qualification stage. Do not run heldout before that stage."
+}
