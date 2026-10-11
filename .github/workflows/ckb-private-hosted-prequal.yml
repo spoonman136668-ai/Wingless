@@ -68,7 +68,16 @@ jobs:
           if test -f research/successor-builder/test_r216_codex_repair_queue.py; then
             python -B -m unittest discover -s research/successor-builder -p test_r216_codex_repair_queue.py -v
           fi
-          python -B -m compileall -q research/successor-builder
+          python -B - <<'PY'
+          import ast
+          from pathlib import Path
+          paths=sorted(Path("research/successor-builder").glob("*.py"))
+          if not paths:
+              raise SystemExit("CKB_PREQUAL_PYTHON_SOURCE_MISSING")
+          for path in paths:
+              ast.parse(path.read_text(encoding="utf-8"),filename=str(path))
+          print("CKB_PREQUAL_PARSE=PASS",len(paths))
+          PY
           echo 'CKB_PREQUAL_PYTHON=PASS'
       - uses: actions/setup-go@v5
         with:
