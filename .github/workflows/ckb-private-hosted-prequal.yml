@@ -18,13 +18,14 @@ jobs:
     timeout-minutes: 35
     env:
       CKB_SHA: ${{ inputs.ckb_sha }}
-      CKB_READ_TOKEN: ${{ secrets.CKB_QUAL_READ_TOKEN }}
       GOMAXPROCS: '1'
       GOFLAGS: '-p=1'
       GOMEMLIMIT: '1536MiB'
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - name: Validate immutable source and credential availability
+        env:
+          CKB_READ_TOKEN: ${{ secrets.CKB_QUAL_READ_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
@@ -57,10 +58,13 @@ jobs:
         working-directory: private-ckb
         run: |
           set -euo pipefail
-          for pattern in test_s62b_progress_reconcile.py test_s61g_s13_origin_issue.py test_s61l_s13_live_preconsume.py test_r216_codex_repair_queue.py; do
-            test -f "research/successor-builder/$pattern" || { echo "CKB_PREQUAL_TEST_NOT_PRESENT:$pattern"; continue; }
+          for pattern in test_s62b_progress_reconcile.py test_s61g_s13_origin_issue.py test_s61l_s13_live_preconsume.py; do
+            test -f "research/successor-builder/$pattern" || { echo "CKB_PREQUAL_REQUIRED_TEST_MISSING:$pattern" >&2; exit 1; }
             python -B -m unittest discover -s research/successor-builder -p "$pattern" -v
           done
+          if test -f research/successor-builder/test_r216_codex_repair_queue.py; then
+            python -B -m unittest discover -s research/successor-builder -p test_r216_codex_repair_queue.py -v
+          fi
           python -B -m compileall -q research/successor-builder
           echo 'CKB_PREQUAL_PYTHON=PASS'
       - uses: actions/setup-go@v5
