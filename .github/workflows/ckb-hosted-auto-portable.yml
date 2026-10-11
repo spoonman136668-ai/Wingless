@@ -1,5 +1,8 @@
 name: CKB hosted automatic portable qualification
 on:
+  push:
+    branches: [proposal/ckb-hosted-auto-qual-r1]
+    paths: [.github/workflows/ckb-hosted-auto-portable.yml]
   schedule:
     - cron: '17,47 * * * *'
   workflow_dispatch:
