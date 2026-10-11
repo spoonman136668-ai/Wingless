@@ -1,6 +1,9 @@
 name: CKB private source hosted prequalification
 run-name: CKB hosted prequal ${{ inputs.ckb_sha }}
 on:
+  push:
+    branches: [proposal/ckb-hosted-qualification-r1]
+    paths: [.github/workflows/ckb-private-hosted-prequal.yml]
   workflow_dispatch:
     inputs:
       ckb_sha:
@@ -17,7 +20,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
-      CKB_SHA: ${{ inputs.ckb_sha }}
+      CKB_SHA: ${{ inputs.ckb_sha || 'fb96a00369b3674a9c69fff1f3d49d974d485385' }}
       GOMAXPROCS: '1'
       GOFLAGS: '-p=1'
       GOMEMLIMIT: '1536MiB'
@@ -36,7 +39,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: spoonman136668-ai/ckb-plane
-          ref: ${{ inputs.ckb_sha }}
+          ref: ${{ inputs.ckb_sha || 'fb96a00369b3674a9c69fff1f3d49d974d485385' }}
           token: ${{ secrets.CKB_QUAL_READ_TOKEN }}
           path: private-ckb
           persist-credentials: false
