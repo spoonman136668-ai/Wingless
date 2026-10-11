@@ -1,0 +1,23 @@
+name: CKB hosted qualification infrastructure smoke
+on:
+  push:
+    branches: [proposal/ckb-hosted-qualification-r1]
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Hosted runner and private-source isolation gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$RUNNER_ENVIRONMENT" == "github-hosted" ]] || { echo "NOT_GITHUB_HOSTED" >&2; exit 1; }
+          [[ "$RUNNER_OS" == "Linux" ]] || { echo "WRONG_HOSTED_OS" >&2; exit 1; }
+          test ! -d private-ckb
+          [[ -z "$(git status --porcelain)" ]]
+          echo 'CKB_HOSTED_CAPACITY_SMOKE=PASS no_private_checkout=true no_secret_used=true'
