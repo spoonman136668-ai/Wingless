@@ -1,0 +1,85 @@
+name: CKB private source hosted prequalification
+run-name: CKB hosted prequal ${{ inputs.ckb_sha }}
+on:
+  workflow_dispatch:
+    inputs:
+      ckb_sha:
+        description: Immutable 40-hex CKB commit for portable tests only
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: ckb-hosted-prequal-${{ inputs.ckb_sha }}
+  cancel-in-progress: false
+jobs:
+  portable:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      CKB_SHA: ${{ inputs.ckb_sha }}
+      CKB_READ_TOKEN: ${{ secrets.CKB_QUAL_READ_TOKEN }}
+      GOMAXPROCS: '1'
+      GOFLAGS: '-p=1'
+      GOMEMLIMIT: '1536MiB'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Validate immutable source and credential availability
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$CKB_SHA" =~ ^[a-f0-9]{40}$ ]] || { echo 'CKB_PREQUAL_SHA_INVALID' >&2; exit 1; }
+          [[ -n "$CKB_READ_TOKEN" ]] || { echo 'CKB_PREQUAL_READ_TOKEN_NOT_CONFIGURED' >&2; exit 1; }
+          echo 'CKB_PREQUAL_INPUT=PASS'
+      - name: Checkout exact private CKB commit without persisting credential
+        uses: actions/checkout@v4
+        with:
+          repository: spoonman136668-ai/ckb-plane
+          ref: ${{ inputs.ckb_sha }}
+          token: ${{ secrets.CKB_QUAL_READ_TOKEN }}
+          path: private-ckb
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Confirm exact source identity and prevent unauthorized source writes
+        shell: bash
+        working-directory: private-ckb
+        run: |
+          set -euo pipefail
+          [[ "$(git rev-parse HEAD)" == "$CKB_SHA" ]] || { echo 'CKB_PREQUAL_IDENTITY_DRIFT' >&2; exit 1; }
+          [[ -z "$(git status --porcelain)" ]] || { echo 'CKB_PREQUAL_DIRTY_CHECKOUT' >&2; exit 1; }
+          echo "CKB_PREQUAL_SHA=$CKB_SHA"
+          echo "CKB_PREQUAL_TREE=$(git rev-parse HEAD^{tree})"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Bounded S62 progression and engineering queue tests
+        shell: bash
+        working-directory: private-ckb
+        run: |
+          set -euo pipefail
+          for pattern in test_s62b_progress_reconcile.py test_s61g_s13_origin_issue.py test_s61l_s13_live_preconsume.py test_r216_codex_repair_queue.py; do
+            test -f "research/successor-builder/$pattern" || { echo "CKB_PREQUAL_TEST_NOT_PRESENT:$pattern"; continue; }
+            python -B -m unittest discover -s research/successor-builder -p "$pattern" -v
+          done
+          python -B -m compileall -q research/successor-builder
+          echo 'CKB_PREQUAL_PYTHON=PASS'
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: private-ckb/snapshot/source/go.mod
+          cache: false
+      - name: Portable CKB Go tests and build
+        shell: bash
+        working-directory: private-ckb/snapshot/source
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go build ./...
+          echo 'CKB_PREQUAL_GO=PASS'
+      - name: Confirm immutable private source remains unchanged
+        shell: bash
+        working-directory: private-ckb
+        run: |
+          set -euo pipefail
+          [[ "$(git rev-parse HEAD)" == "$CKB_SHA" ]]
+          [[ -z "$(git status --porcelain)" ]] || { echo 'CKB_PREQUAL_SOURCE_MUTATED' >&2; exit 1; }
+          echo 'CKB_PREQUAL_PORTABLE=PASS'
