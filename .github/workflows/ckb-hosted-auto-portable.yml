@@ -1,0 +1,130 @@
+name: CKB hosted automatic portable qualification
+on:
+  push:
+    branches: [proposal/ckb-hosted-auto-qual-r1]
+    paths: [.github/workflows/ckb-hosted-auto-portable.yml]
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ckb-hosted-auto-portable
+  cancel-in-progress: false
+jobs:
+  select:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+    steps:
+      - name: Discover bounded open engineering heads read-only
+        id: select
+        shell: bash
+        env:
+          CKB_READ_TOKEN: ${{ secrets.CKB_QUAL_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          [[ -n "$CKB_READ_TOKEN" ]] || { echo 'CKB_READ_TOKEN_MISSING' >&2; exit 1; }
+          python3 - <<'PY'
+          import json,os,re,urllib.request,urllib.error,urllib.parse
+          allow=['repair/r216-s62c-live-import-r2','proposal/r216-codex-repair-queue-r1']
+          selected=[]
+          for branch in allow:
+              path=urllib.parse.quote('heads/'+branch,safe='/')
+              url='https://api.github.com/repos/spoonman136668-ai/ckb-plane/git/ref/'+path
+              req=urllib.request.Request(url,headers={
+                  'Authorization':'Bearer '+os.environ['CKB_READ_TOKEN'],
+                  'Accept':'application/vnd.github+json',
+                  'X-GitHub-Api-Version':'2022-11-28'})
+              try:
+                  with urllib.request.urlopen(req,timeout=20) as response:
+                      row=json.load(response)
+              except urllib.error.HTTPError as err:
+                  if err.code==404:continue
+                  raise
+              obj=row.get('object') if isinstance(row,dict) else None
+              sha=obj.get('sha') if isinstance(obj,dict) else None
+              if (row.get('ref')!='refs/heads/'+branch or
+                  not isinstance(sha,str) or re.fullmatch('[0-9a-f]{40}',sha) is None or
+                  obj.get('type')!='commit'):
+                  raise SystemExit('CKB_AUTO_BOUND_BRANCH_IDENTITY_DRIFT')
+              selected.append({'sha':sha,'branch':branch})
+          matrix=json.dumps({'include':selected},separators=(',',':'))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
+              out.write('matrix='+matrix+'\\n')
+          print('CKB_AUTO_CANDIDATE_COUNT='+str(len(selected)))
+          PY
+  qualify:
+    needs: select
+    if: ${{ needs.select.outputs.matrix != '{"include":[]}' }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.select.outputs.matrix) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      CKB_SHA: ${{ matrix.sha }}
+      PYTHONDONTWRITEBYTECODE: '1'
+      GOMAXPROCS: '1'
+      GOFLAGS: '-p=1'
+      GOMEMLIMIT: '1536MiB'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: spoonman136668-ai/ckb-plane
+          ref: ${{ matrix.sha }}
+          token: ${{ secrets.CKB_QUAL_READ_TOKEN }}
+          persist-credentials: false
+          fetch-depth: 1
+          path: private-ckb
+      - name: Exact commit, tree and clean provenance
+        shell: bash
+        working-directory: private-ckb
+        run: |
+          set -euo pipefail
+          [[ "$CKB_SHA" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$(git rev-parse HEAD)" == "$CKB_SHA" ]]
+          [[ -z "$(git status --porcelain)" ]]
+          echo "CKB_AUTO_QUALIFIED_SOURCE=$CKB_SHA"
+          echo "CKB_AUTO_QUALIFIED_TREE=$(git rev-parse HEAD^{tree})"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Portable scoped Python tests and syntax
+        shell: bash
+        working-directory: private-ckb
+        run: |
+          set -euo pipefail
+          for pattern in test_s62b_progress_reconcile.py test_s61l_s13_live_preconsume.py; do
+            python -B -m unittest discover -s research/successor-builder -p "$pattern" -v
+          done
+          if test -f research/successor-builder/test_r216_codex_repair_queue.py; then
+            python -B -m unittest discover -s research/successor-builder -p test_r216_codex_repair_queue.py -v
+          fi
+          python -B - <<'PY'
+          import ast
+          from pathlib import Path
+          files=sorted(Path('research/successor-builder').glob('*.py'))
+          if not files:raise SystemExit('CKB_AUTO_PYTHON_SOURCE_MISSING')
+          for path in files:ast.parse(path.read_text(encoding='utf-8'),filename=str(path))
+          PY
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: private-ckb/snapshot/source/go.mod
+          cache: false
+      - name: Portable Go full tests and build
+        shell: bash
+        working-directory: private-ckb/snapshot/source
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go build ./...
+      - name: Immutable final checkout gate
+        shell: bash
+        working-directory: private-ckb
+        run: |
+          set -euo pipefail
+          [[ "$(git rev-parse HEAD)" == "$CKB_SHA" ]]
+          [[ -z "$(git status --porcelain)" ]] || { echo 'CKB_AUTO_SOURCE_MUTATED' >&2; exit 1; }
+          echo 'CKB_AUTO_HOSTED_PORTABLE_QUALIFICATION=PASS local_windows_required_for_final_acceptance=true'
