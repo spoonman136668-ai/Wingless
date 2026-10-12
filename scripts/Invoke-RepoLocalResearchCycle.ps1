@@ -172,53 +172,7 @@ $MindContext
     $Succeeded=$false
     $PrimaryAvailabilityFailure=$false
     $SecondaryAvailabilityFailure=$false
-    $NemotronAgent=Join-Path $PSScriptRoot 'Invoke-NemotronRepoAgent.ps1'
-    if(Test-Path -LiteralPath $NemotronAgent -PathType Leaf){
-        try{
-            Write-Host "RESEARCH_AGENT_ATTEMPT provider=nvidia model=z-ai/glm-5.3"
-            & $NemotronAgent -RepoPath $RepoPath -Program 'Wingless' -ActiveBranch $ActiveBranch -StartSha $StartSha -PromptPath $PromptPath -LastMessagePath $LastMessagePath -Provider nvidia -Model 'z-ai/glm-5.3'
-            $Succeeded=$true
-            Write-Host 'RESEARCH_AGENT_PRIMARY_PASS provider=nvidia model=z-ai/glm-5.3'
-        }catch{
-            $PrimaryError=$_.Exception.Message
-            $PrimaryAvailabilityFailure=Test-ProviderAvailabilityFailure $PrimaryError
-            Write-Host "RESEARCH_AGENT_PRIMARY_FAILURE_CLASS availability=$([string]$PrimaryAvailabilityFailure.ToString().ToLowerInvariant())"
-            Write-Host "RESEARCH_AGENT_PRIMARY_FAILED provider=nvidia model=z-ai/glm-5.3 error=$PrimaryError"
-            & git reset --hard $StartSha|Out-Null
-            & git clean -fd|Out-Null
-        }
-
-        if(-not$Succeeded){
-            try{
-                Write-Host "RESEARCH_AGENT_ATTEMPT provider=openrouter model=nvidia/nemotron-3-ultra-550b-a55b:free"
-                & $NemotronAgent -RepoPath $RepoPath -Program 'Wingless' -ActiveBranch $ActiveBranch -StartSha $StartSha -PromptPath $PromptPath -LastMessagePath $LastMessagePath -Provider openrouter -Model 'nvidia/nemotron-3-ultra-550b-a55b:free'
-                $Succeeded=$true
-                Write-Host 'RESEARCH_AGENT_SECONDARY_PASS provider=openrouter model=nvidia/nemotron-3-ultra-550b-a55b:free'
-            }catch{
-                $SecondaryError=$_.Exception.Message
-                $SecondaryAvailabilityFailure=Test-ProviderAvailabilityFailure $SecondaryError
-                Write-Host "RESEARCH_AGENT_SECONDARY_FAILURE_CLASS availability=$([string]$SecondaryAvailabilityFailure.ToString().ToLowerInvariant())"
-                Write-Host "RESEARCH_AGENT_SECONDARY_FAILED provider=openrouter model=nvidia/nemotron-3-ultra-550b-a55b:free error=$SecondaryError"
-                & git reset --hard $StartSha|Out-Null
-                & git clean -fd|Out-Null
-            }
-        }
-    }else{
-        Write-Host "RESEARCH_AGENT_PRIMARY_UNAVAILABLE path=$NemotronAgent"
-    }
-
-    if(-not$Succeeded -and $PrimaryAvailabilityFailure -and $SecondaryAvailabilityFailure){
-        & git reset --hard $StartSha|Out-Null
-        & git clean -fd|Out-Null
-        $DeferredHead=(& git rev-parse HEAD).Trim()
-        if($DeferredHead-cne$StartSha){throw "PROVIDER_DEFER_HEAD_DRIFT expected=$StartSha actual=$DeferredHead"}
-        if(((& git status --porcelain)-join'').Trim()){throw 'PROVIDER_DEFER_DIRTY_WORKTREE'}
-        Write-CycleResult -Advanced $false -Reason 'provider-deferred' -Head $DeferredHead
-        Write-Host 'REPO_LOCAL_PROVIDER_DEFERRED free_providers_unavailable=true codex_invoked=false'
-        Write-Host "head_sha=$DeferredHead"
-        return
-    }
-
+    Write-Host 'RESEARCH_AGENT_POLICY=CODEX_ONLY_NO_EXTERNAL_APIS'
     if(-not$Succeeded){
         $Codex=Resolve-Codex
         $OldCodeHome=$env:CODEX_HOME

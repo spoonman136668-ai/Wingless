@@ -73,7 +73,6 @@ jobs:
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         run: |
           $ErrorActionPreference='Stop'
           $Reason=if('${{ github.event_name }}' -ceq 'schedule'){'schedule'}elseif('${{ github.event_name }}' -ceq 'workflow_run'){'qualified-fanout'}else{'manual'}
