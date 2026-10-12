@@ -1,0 +1,153 @@
+{
+  "schema": "wingless.external-research-prereg.v1",
+  "project": "Wingless",
+  "experiment_id": "W-R5-PHASE-OBSERVABILITY-20261012",
+  "contributor": "ChatGPT external research contribution",
+  "contribution_class": "successor-proposal",
+  "question": "On the already frozen R4 synthetic context generator, is an independently observable episode-start context sufficient to resolve the structural entity-0/entity-8 ambiguity without entity or family labels entering induction?",
+  "hypothesis": "R4 context support alone induces eight classes with an entity-0/entity-8 collision. Adding only the first observed four-byte context as an episode boundary to each support signature yields nine clean three-member alias classes. A family-dependent rotation control removes cross-family alignment.",
+  "exact_parent_sha": "ef535451a788c8b9db328884b7d54fd4e77272be",
+  "predecessor_evidence": [
+    {
+      "experiment": "WLM-SI-RAW-REP-CONTEXT-SUPPORT-IDENTIFIABILITY-R4",
+      "qualified_head_sha": "28bfcd0e79240b1f64486f8c04479b082e3a1970",
+      "state_record_sha": "ef535451a788c8b9db328884b7d54fd4e77272be",
+      "nature": "historical synthetic mechanism evidence; not independent unseen evaluation"
+    }
+  ],
+  "changed_paths": [
+    "research/contrib/chatgpt/20261012-w-r5-phase-observability/prereg.json",
+    "research/contrib/chatgpt/20261012-w-r5-phase-observability/README.md"
+  ],
+  "source_identities": [
+    {
+      "path": "unitary/wlm_si_raw_rep_context_support_identifiability_r4.go",
+      "blob_sha": "58c8299ced7533798728ead65c5dd496ef465e63"
+    },
+    {
+      "path": "research/bootstrap/wingless-lm-north-star.txt",
+      "sha256": "e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "frozen R4 source-generated 9-entity 3-family 16-context synthetic stream",
+      "source": "Wingless immutable research/autonomy-wingless-active at exact_parent_sha",
+      "git_blob_sha": "58c8299ced7533798728ead65c5dd496ef465e63",
+      "external_dataset": false
+    }
+  ],
+  "frozen_design": {
+    "arms": {
+      "A0": "R4 exact sorted support; no episode boundary",
+      "A1": "A0 exact support concatenated with the four context bytes emitted at context_index=0 for that entity-family stream; induction sees bytes only, not entity, family or context_index labels",
+      "A2": "A1 with family-specific cyclic rotation by (5*(family+1)) mod 16 before selection of the episode-boundary context; other data unchanged"
+    },
+    "sample_rule": "For each of 9 entities and 3 families, reuse exactly R4's ordered context_index 0..15 bridge, one each, fixed byte formulas, unchanged R4 representation selection; no new corpus",
+    "data_budget": {
+      "surfaces": 27,
+      "records_per_surface": 16,
+      "bridge_records": 432,
+      "context_classes": 16,
+      "entity_pair_audit": 36,
+      "arms": 3
+    },
+    "compute_budget": {
+      "evaluated_surface_signatures": 81,
+      "ordered_context_edges": 0,
+      "task_training_records": 0,
+      "external_model_calls": 0,
+      "network_calls": 0
+    },
+    "capacity": {
+      "surface_motifs": 27,
+      "semantic_training_labels": 0,
+      "new_trainable_parameters": 0
+    },
+    "seeds": [],
+    "split": "No train/test split: deterministic mechanistic synthetic reuse only; no unseen/generalization claim",
+    "ordering": "R4 emitter order for A0 and A1; frozen family rotation for A2",
+    "evaluator": "Exact equality of canonical support signatures plus permitted observed phase four bytes; entity and family labels only in post-induction 36-pair audit",
+    "deterministic_expected": true
+  },
+  "controls": [
+    "A0 must reproduce R4's eight unique exact-support signatures and only collision pair (0,8) among nine entities.",
+    "Exactly 27 selected source surface motifs and 432 bridge records; each source has all sixteen contexts.",
+    "Induction cannot access entity/family IDs, generator context_index, transition labels, heldout samples or oracle corrections.",
+    "A2 modifies only boundary phase, not counts, context bytes, support or representation.",
+    "All three arms run before inspecting any primary outputs; no survivor selection or retuning."
+  ],
+  "metrics": [
+    [
+      "A0_entity_class_count",
+      "==",
+      8
+    ],
+    [
+      "A0_collision_pair_0_8",
+      "==",
+      1
+    ],
+    [
+      "A1_entity_class_count",
+      "==",
+      9
+    ],
+    [
+      "A1_correct_alias_triplets",
+      "==",
+      9
+    ],
+    [
+      "A1_cross_entity_collision_pairs",
+      "==",
+      0
+    ],
+    [
+      "A2_correct_alias_triplets",
+      "<",
+      9
+    ],
+    [
+      "bridge_records",
+      "==",
+      432
+    ],
+    [
+      "external_model_calls",
+      "==",
+      0
+    ],
+    [
+      "capacity_growth_events",
+      "==",
+      0
+    ]
+  ],
+  "classification_rules": {
+    "supported": "All validity and controls pass, A1 has exactly nine clean alias triplets with no collisions, and A2 loses at least one alias triplet.",
+    "mixed": "All validity passes, A1 clean but A2 does not weaken alias alignment.",
+    "negative": "All validity passes, A1 does not recover nine clean triplets.",
+    "invalid": "Any source identity, A0 frozen replication, cardinality, induction-leakage, phase-change isolation, compute/capacity or deterministic-reproduction check fails."
+  },
+  "interpretation_limits": "Synthetic phase signal is introduced as an explicitly measured boundary; it is not an entity label in the inducer but is a strong synthetic information intervention. This establishes an observability dependency, NOT a learned language mechanism, natural-corpus transfer, or LLM-class competence.",
+  "prohibited_after_primary_run": [
+    "threshold changes",
+    "split changes",
+    "post-result policy selection",
+    "capacity growth",
+    "extra data/compute/model calls",
+    "held-out/evaluator leakage",
+    "accepted-ref mutation",
+    "scheduler/queue changes"
+  ],
+  "authority": {
+    "research_only": true,
+    "production_authority": false,
+    "accepted_ref_mutation": false,
+    "promotion_authority": false,
+    "scheduler_or_queue_authority": false,
+    "official_science_launch": false
+  },
+  "preregistration_note": "This contribution freezes an external proposal only. Do not execute a primary run until independently authorized and qualified. No official acceptance from this commit."
+}
