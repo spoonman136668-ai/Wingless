@@ -1,0 +1,43 @@
+{
+  "schema":"wingless.direct-preregistration.v1",
+  "experiment":"WLM-SI-RAW-REP-CONTEXT-SUPPORT-IDENTIFIABILITY-R4",
+  "program":"Wingless substrate falsification",
+  "question":"When sampling noise is removed by exhaustively enumerating every latent context, is the R3 immediate-context support observable sufficient to identify all nine entities across three raw surface families without cross-entity collisions?",
+  "hypothesis":"The R3 observable is structurally non-identifying: exhaustive sixteen-context support will align every alias family member but will leave at least one pair of distinct entities in the same induced class. Therefore zero-collision alias abstraction is impossible for any exact learner restricted to this observable, independent of sampling budget.",
+  "exact_parent_sha":"fd6b69b7f0a40af6affc02e4f057d1c0b2c45a68",
+  "north_star_path":"research/bootstrap/wingless-lm-north-star.txt",
+  "north_star_sha256":"e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465",
+  "prior_evidence":{"experiment":"WLM-SI-RAW-REP-CONTEXT-SUPPORT-FALSIFICATION-R3","github_run_id":"38289399137","classification":"qualified-scientific-result","observation":"At sixty-four independent draws, exact support produced fifteen classes, three correct alias triplets, three cross-entity collisions, sixty-three missing transitions, and 0.20 task-untrained family-2 transfer; its matched control produced nine correct triplets and 1.0 transfer."},
+  "scope_statement":"This is one bounded identifiability diagnostic. It changes only context enumeration from sampled observations to the complete frozen sixteen-context latent support. Representation selection, exact support equality, motifs, entity/family cardinalities, and evaluator-only semantic checks remain R3-derived. It does not introduce a repair learner or claim language competence.",
+  "authority":"research-only; no deployment, external-model inference, scheduler, queue, accepted-ref, production, broker, or live-interface authority",
+  "arms_and_inputs":{
+    "exhaustive_support_arm":"For each of nine entities and three families, emit each frozen R3 context_index 0..15 exactly once, then induce classes by exact sorted positive-context-key support.",
+    "matched_sample_replication_control":"The frozen R3 matched sixty-four-draw bridge and exact-support inducer.",
+    "surface_families":3,
+    "entities":9,
+    "surface_motifs":27,
+    "motif_width_bytes":4,
+    "latent_contexts_per_entity":16,
+    "exhaustive_records_per_surface":16,
+    "exhaustive_bridge_records":432,
+    "matched_control_bridge_records":1728,
+    "seeds":"No seed is used in the exhaustive arm; the matched control retains R3/R2 seed 0x243f6a88 XOR ((entity+1)*1009).",
+    "context_bytes":["prefix0 = 192 + ((entity*7 + context_index*3) mod 16)","prefix1 = 208 + ((entity*5 + context_index*5) mod 16)","suffix0 = 224 + ((entity*11 + context_index*7) mod 16)","suffix1 = 240 + ((entity*13 + context_index*11) mod 16)"],
+    "evaluation":"Deterministic class/cardinality and evaluator-only entity-membership audit; no task model is trained."
+  },
+  "budgets":{"exhaustive_bridge_records":432,"matched_control_bridge_records":1728,"representation_capacity":27,"task_training_records":0,"evaluation_entity_pairs":36,"network_calls":0,"external_model_calls":0,"capacity_growth_events":0},
+  "representation_and_measurement":{"surface_selection":"Top twenty-seven raw four-byte windows from the frozen R3 matched bridge, occurrence count descending then lexicographic raw key.","signature":"Complete sorted set of immediate-context keys having positive occurrence count; equality is exact.","identifiability_audit":"Count induced classes, three-member same-entity alias classes, correct alias triplets, and unordered distinct-entity pairs whose surfaces share a class.","semantic_scoring":"Entity identity is used only after class induction to audit collisions."},
+  "controls":["The R3 matched-sample control must reproduce nine classes, nine three-member classes, nine correct alias triplets, and zero cross-entity collision pairs.","The exhaustive arm emits every context index exactly once for every entity-family surface and no other context.","All twenty-seven selected representations must equal the frozen true surface motifs.","Class induction receives no family label, entity label, semantic label, alias dictionary, tokenizer, task transition, external model, approximate matching, distance threshold, or oracle correction."],
+  "metrics_and_thresholds":[
+    ["exhaustive_bridge_record_count","==",432],["exhaustive_records_per_surface_min","==",16],["exhaustive_records_per_surface_max","==",16],["exhaustive_distinct_contexts_per_surface_min","==",16],["exhaustive_distinct_contexts_per_surface_max","==",16],
+    ["matched_control_bridge_record_count","==",1728],["selected_surface_representation_count","==",27],["selected_true_surface_motif_match_count","==",27],
+    ["matched_control_alias_class_count","==",9],["matched_control_three_member_class_count","==",9],["matched_control_correct_alias_triplet_count","==",9],["matched_control_cross_entity_collision_pair_count","==",0],
+    ["exhaustive_alias_class_count","<",9],["exhaustive_three_member_class_count",">=",1],["exhaustive_correct_alias_triplet_count",">=",1],["exhaustive_cross_entity_collision_pair_count",">",0],["evaluation_entity_pair_count","==",36],
+    ["task_training_record_count","==",0],["tokenizer_use_count","==",0],["external_model_call_count","==",0],["capacity_growth_event_count","==",0],["invalid_row_count","==",0],["counter_overflow_count","==",0]
+  ],
+  "validity_criteria":["Exact parent and North Star identities match.","The frozen R3 matched control reproduces its exact class and collision cardinalities before R4 scientific output is emitted.","Every exhaustive surface contributes exactly one record for each context_index 0..15.","The context-byte formulas, surface motifs, selection rule, and support-signature implementation are unchanged from R3.","Entity and family identity are unavailable to induction and enter only the post-induction audit.","All 36 unordered entity pairs are audited exactly once.","All metrics are finite and full Go regression passes before the probe.","No task training, tokenizer, external model, network call, capacity growth, approximate matching, threshold change, or adaptive evaluation occurs."],
+  "classification_rules":{"structural_nonidentifiability_supported":"Validity and controls pass; exhaustive support induces fewer than nine classes and at least one distinct-entity collision pair.","full_support_identifiability_supported":"Validity and controls pass; exhaustive support induces exactly nine correct three-member classes and zero distinct-entity collision pairs.","mixed":"Validity and controls pass, but exhaustive results satisfy neither supported rule.","negative_control_failure":"The matched R3 control fails a frozen exact cardinality.","incomplete":"Compute interruption prevents the frozen matrix.","invalid":"Any identity, exhaustive-enumeration, representation, leakage, evaluator-boundary, determinism, finite-metric, or qualification criterion fails."},
+  "stop_conditions":["Stop invalid before science on parent, North Star, R3 replication, exhaustive cardinality, construction, build, or frozen-package drift.","After R4 output begins, complete all 432 exhaustive records and all 36 entity-pair audits unless infrastructure prevents it.","Do not alter formulas, contexts, representation, controls, metrics, thresholds, budgets, capacities, or classification after observing R4 output."],
+  "no_post_result_tuning_rule":"No input formula, context cardinality, seed, representation rule, audit, control, metric, threshold, budget, capacity, or interpretation may change after primary R4 output.",
+  "changed_paths":["docs/experiments/wlm-si-raw-rep-context-support-identifiability-r4.json","unitary/wlm_si_raw_rep_context_support_identifiability_r4.go","cmd/wlm-si-raw-rep-context-support-identifiability-r4/main.go","scripts/run-wlm-si-raw-rep-context-support-identifiability-r4.ps1",".wingless/qualification-request.json"]
+}
