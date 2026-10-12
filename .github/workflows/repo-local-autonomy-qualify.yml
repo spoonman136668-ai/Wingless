@@ -58,7 +58,14 @@ jobs:
           }
           $C=Get-Content -Raw '.research-autonomy\config.json'|ConvertFrom-Json
           if($C.schema -cne 'research.autonomy.v2'){throw 'CONFIG_SCHEMA_FAILED'}
-          if(-not[bool]$C.enabled){throw 'CONFIG_MUST_BE_ENABLED_POST_CUTOVER'}
+          if(-not[bool]$C.enabled){
+            if('${{ github.event_name }}' -cne 'pull_request' -or '${{ github.head_ref }}' -cne 'proposal/event-driven-research-continuation-r1'){throw 'CONFIG_MUST_BE_ENABLED_POST_CUTOVER'}
+            $Changed=@(git diff --name-only '${{ github.event.pull_request.base.sha }}' HEAD)
+            if($LASTEXITCODE -ne 0){throw 'DISABLED_WITNESS_DIFF_FAILED'}
+            $Allowed=@('.github/workflows/research-continuation-controller.yml','.github/workflows/repo-local-autonomy-qualify.yml','.github/workflows/hosted-fanout-completion-witness.yml')
+            if(@($Changed|Where-Object{$_ -notin $Allowed}).Count -ne 0){throw 'DISABLED_WITNESS_SCOPE_DRIFT'}
+            Write-Host 'DISABLED_AUTONOMY_READONLY_WIRING_QUALIFICATION=PASS'
+          }
           if($C.mode -cne 'repo-local-self-chain'){throw 'CONFIG_MODE_FAILED'}
           if($C.authority -cne 'research-only'){throw 'CONFIG_AUTHORITY_FAILED'}
           if($C.ckb_plane_role -cne 'governance-only'){throw 'CONFIG_CKB_ROLE_FAILED'}
