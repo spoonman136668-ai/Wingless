@@ -1,0 +1,29 @@
+name: Wingless hosted fanout completion witness
+on:
+  workflow_run:
+    workflows: [Wingless automatic free fanout sidecar]
+    types: [completed]
+permissions:
+  actions: read
+  contents: read
+jobs:
+  verify:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository && startsWith(github.event.workflow_run.head_branch, 'research/') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Validate upstream GitHub identity without reading research code
+        shell: bash
+        env:
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          UPSTREAM_SHA: ${{ github.event.workflow_run.head_sha }}
+          UPSTREAM_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          [[ "$RUN_ID" =~ ^[1-9][0-9]*$ ]]
+          [[ "$UPSTREAM_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$UPSTREAM_BRANCH" == research/* ]]
+          echo "WINGLESS_UPSTREAM_HOSTED_FANOUT=PASS"
+          echo "WINGLESS_UPSTREAM_SHA=$UPSTREAM_SHA"
+          echo "WINGLESS_AUTHORITY=READ_ONLY"
