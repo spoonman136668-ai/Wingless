@@ -11,6 +11,7 @@ on:
       - 'scripts/Invoke-NemotronRepoAgent.ps1'
       - 'scripts/Invoke-RepoLocalCutover.ps1'
       - '.github/workflows/research-continuation-controller.yml'
+      - '.github/workflows/research-auto-launch.yml'
       - '.github/workflows/repo-local-autonomy-qualify.yml'
   pull_request:
     branches:
@@ -21,6 +22,7 @@ on:
       - 'scripts/Invoke-NemotronRepoAgent.ps1'
       - 'scripts/Invoke-RepoLocalCutover.ps1'
       - '.github/workflows/research-continuation-controller.yml'
+      - '.github/workflows/research-auto-launch.yml'
       - '.github/workflows/repo-local-autonomy-qualify.yml'
 
 permissions:
@@ -103,6 +105,8 @@ jobs:
             if(-not$AgentText.Contains($Needle)){throw "NEMOTRON_AGENT_INVARIANT_MISSING $Needle"}
           }
           if($AgentText.Contains('Invoke-Expression')){throw 'NEMOTRON_AGENT_INVOKE_EXPRESSION_FORBIDDEN'}
+          $LauncherText=Get-Content -Raw '.github/workflows/research-auto-launch.yml'
+          if(-not$LauncherText.Contains("cron: '49 * * * *'")){throw 'RESEARCH_QUOTA_REFRESH_WAKE_DRIFT'}
           $WorkflowText=Get-Content -Raw '.github/workflows/research-continuation-controller.yml'
           if($WorkflowText.Contains('NVIDIA_API_KEY:')){throw 'EXTERNAL_API_KEY_BINDING_FORBIDDEN'}
           if(-not$Text.Contains('RESEARCH_AGENT_POLICY=CODEX_ONLY_NO_EXTERNAL_APIS')){throw 'CODEX_ONLY_POLICY_MISSING'}
