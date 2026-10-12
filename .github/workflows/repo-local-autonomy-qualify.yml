@@ -105,14 +105,13 @@ jobs:
           if($AgentText.Contains('Invoke-Expression')){throw 'NEMOTRON_AGENT_INVOKE_EXPRESSION_FORBIDDEN'}
           $WorkflowText=Get-Content -Raw '.github/workflows/research-continuation-controller.yml'
           if(-not$WorkflowText.Contains('NVIDIA_API_KEY:') -or -not$WorkflowText.Contains('secrets.NVIDIA_API_KEY')){throw 'NVIDIA_CYCLE_SECRET_BINDING_MISSING'}
-          $NvidiaIndex=$Text.IndexOf('provider=nvidia')
-          $OpenRouterIndex=$Text.IndexOf('provider=openrouter')
-          $CodexIndex=$Text.IndexOf('provider=codex')
-          if($NvidiaIndex-lt0 -or $OpenRouterIndex-lt0 -or $CodexIndex-lt0 -or $NvidiaIndex-ge$OpenRouterIndex -or $OpenRouterIndex-ge$CodexIndex){throw 'AGENT_PROVIDER_ORDER_INVALID'}
-          if(-not$Text.Contains("-Provider nvidia -Model 'z-ai/glm-5.3'")){throw 'GLM_PRIMARY_BINDING_MISSING'}
+          if(-not$Text.Contains('RESEARCH_AGENT_POLICY=CODEX_ONLY_NO_EXTERNAL_APIS')){throw 'CODEX_ONLY_POLICY_MISSING'}
+          if($Text.Contains('-Provider nvidia') -or $Text.Contains('-Provider openrouter')){throw 'EXTERNAL_API_EXECUTION_FORBIDDEN'}
+          if(-not$Text.Contains("gpt-5.6-sol") -or -not$Text.Contains("gpt-5.6-luna")){throw 'APPROVED_CODEX_MODELS_MISSING'}
           Write-Host 'WINGLESS_REPO_LOCAL_CONTROLLER_STATIC_PASS'
 
-      - name: Verify NVIDIA GLM protocol
+      - name: Legacy external-provider probe disabled (Codex-only)
+        if: ${{ false }}
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
