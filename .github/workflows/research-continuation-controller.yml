@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - '.research-autonomy/config.json'
+  workflow_run:
+    workflows: [Wingless automatic free fanout sidecar]
+    types: [completed]
   workflow_dispatch:
     inputs:
       reason:
@@ -26,6 +29,7 @@ concurrency:
 
 jobs:
   cycle:
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository && startsWith(github.event.workflow_run.head_branch, 'research/')) }}
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
     timeout-minutes: 240
 
@@ -72,7 +76,7 @@ jobs:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         run: |
           $ErrorActionPreference='Stop'
-          $Reason=if('${{ github.event_name }}' -ceq 'schedule'){'schedule'}else{'manual'}
+          $Reason=if('${{ github.event_name }}' -ceq 'schedule'){'schedule'}elseif('${{ github.event_name }}' -ceq 'workflow_run'){'qualified-fanout'}else{'manual'}
           $Result=Join-Path $env:RUNNER_TEMP 'wingless-repo-local-cycle-result.json'
           & 'controller\scripts\Invoke-RepoLocalResearchCycle.ps1' `
             -RepoPath (Resolve-Path 'research').Path `
