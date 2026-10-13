@@ -1,0 +1,53 @@
+name: Wingless W-R45 balanced-order rank scientific correction
+on:
+  push:
+    branches: [research/w-r45-balanced-orientation-validation-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify scientific correction frozen source identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 2f762cbc51f02cfe5cee94adc6d15cdfc7fc0721 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r44-blind-scan/execute.py)" = 35fb11b5ec143589b486cd9c81ec251df79e7bf0
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r45-order-blind/prereg.json)" = c9c7153521fa59ae51d0638bb82f37b8f6474d39
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r45-order-blind/execute.py)" = 18b39645174d29d43e1813fe578c680fde156077
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r45-order-blind/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r45-order-blind/execute.py
+      - name: Original sealed first-use balanced-orientation science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r45-order-blind/execute.py >/tmp/W-R45-original.json
+          python3 -m json.tool /tmp/W-R45-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R45-original.json'))
+          assert x['development_seeds']==list(range(2336,2352))
+          assert x['sealed_heldout_seeds']==list(range(2352,2368))
+          assert len(x['results'])==6 and all(len(r['cells'])==6 for r in x['results'])
+          for condition in ('identity','xor55'):
+              n=next(r for r in x['results'] if r['arm']=='always_first_null' and r['condition']==condition)
+              assert n['balanced_accuracy']==.5
+              assert n['matched_pairs']==864 and n['presentations']==1728
+          print('CLASSIFICATION',x['classification'])
+          print('ANTISYMMETRIC_BALANCED',x['no_bias_balanced_accuracy'])
+          print('PRIOR_W43_CLAIM_STATUS',x['prior_w43_forward_only_claim_status'])
+          for r in x['results']:
+              print('ARM',r['arm'],r['condition'],r['balanced_accuracy'],r['forward_accuracy'],r['reverse_accuracy'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R45-original-blinded-order-correction
+          path: /tmp/W-R45-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full required Wingless regression and build
+        run: go test ./... && go build ./...
