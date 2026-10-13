@@ -1,0 +1,23 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R21-BOUNDED_DYNAMICS_HYPOTHESIS_SEARCH",
+  "parent_commit": "baa8e1eadde3fd10bba761735a50ff4d6944a82b",
+  "predecessor": "W-R20",
+  "question": "Can a frozen small hypothesis search distinguish previously unseen second-order transition coefficients from four labeled samples, while a context-memorization learner fails?",
+  "hypothesis": "A fixed eight-hypothesis compositional search will select the right additive or doubled-predecessor recurrence and generalize to twelve uncalibrated episodes, despite no direct examples of most contexts.",
+  "freeze": "Eight immutable candidate transitions, deterministic selection rule, four calibration labels, fresh cohort, thresholds and negative cases fixed before first-use. No experiments or simulations of sealed outcomes before freeze.",
+  "family": "Second-order modular recurrence x[t]=(x[t-1]+a*x[t-2]+b)%4 with a∈{1,2}, b∈{0,1,2,3}, eight hypotheses. For seed S in 72..75 true a=2 if S even else1 and true b=(S-72)%4; this mapping is generator-only, invisible to the model (only calibration observations given).",
+  "start": "For episode0..15 initial x0=(episode+seed)%4,x1=(episode//4+3*seed)%4, length32.",
+  "calibration": "Exactly four t2 samples from episodes e0..3, all sharing one x1 but each x0 distinct. Candidate solver evaluates all 8 hypotheses on four labels; if no unique zero-error hypothesis, classify HYPOTHESIS_AMBIGUITY without inspecting heldout.",
+  "test": "12 entirely uncalibrated episodes e4..15 times t2..31 =360 predictions per seed, heldout seeds72..75. No test-time supervised updates, no access to seed number in predictor.",
+  "arms": [
+    "fixed_previous_rule: a1 b2, no adaptation",
+    "four_example_rote: same 4 labels stored in 16x4 count table, unseen contexts fixed default0",
+    "hypothesis_selected: 8 fixed candidates x4 checks; select unique zero-error (a,b); one-two integer parameters at inference",
+    "temporal_shuffle_selected: same selected (a,b), but consume prefix-only reordered observed history rather than chronological history"
+  ],
+  "metrics": "Per seed selected a,b, candidate match count, heldout 4x4 confusion matrix, accuracy and trace hashes. Max hypotheses8; no post-result new procedures or model calls.",
+  "classification": "BOUNDED_HYPOTHESIS_TRANSFER if selected>=.95 and fixed,rote,shuffled each<=.65; PARTIAL if selected>every comparator; NEGATIVE otherwise; HYPOTHESIS_AMBIGUITY for unresolved calibration.",
+  "safeguards": "All policy predictions depend only on observed prefix, no future or labels from test, original source SHA pins, first-use archive, one full regression, no ref mutation.",
+  "claim_limit": "A preregistered eight-element hypothesis class fitted from 4 synthetic labels; not autonomous discovery of arbitrary rules."
+}
