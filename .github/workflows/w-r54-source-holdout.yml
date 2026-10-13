@@ -1,0 +1,48 @@
+name: Wingless W-R54 frozen leave-one-generator-out ridge
+on:
+  push:
+    branches: [research/w-r54-leave-one-generator-out-r1]
+permissions:
+  contents: read
+jobs:
+  scientific_trial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Validate source identity before sealed first use
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor d9da7cc2cf59d61d186be14a26ba20d532d01fe9 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r53-ridge/execute.py)" = 151e21f2a4335c64ff633bdc9c3cd0f0d006c23d
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r54-loso/prereg.json)" = bc7965aa142d4cf0187828d111165746fc25d491
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r54-loso/execute.py)" = f30f8ebfb13b7df49187e7ae95dd0f00d3a0d8d6
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r54-loso/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r54-loso/execute.py
+      - name: One original frozen unused-generator scientific test
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r54-loso/execute.py > /tmp/W-R54-original.json
+          python3 -m json.tool /tmp/W-R54-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R54-original.json'))
+          assert a['development_blocks']==[list(range(5200,5216)),list(range(5232,5248)),list(range(5264,5280))]
+          assert a['sealed_heldout_seeds']==list(range(5312,5360))
+          assert len(a['all_models_by_encoding']['identity'])==9
+          assert all(len(v['by_seed'])==48 for v in a['all_models_by_encoding']['identity'].values())
+          print('CLASSIFICATION',a['classification'])
+          for x in a['cohort_comparisons']:
+              print('UNSEEN_SOURCE',x['cohort'],x['withheld_source_accuracies'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R54-original-source-holdout
+          path: /tmp/W-R54-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Required full Wingless regression and build
+        run: go test ./... && go build ./...
