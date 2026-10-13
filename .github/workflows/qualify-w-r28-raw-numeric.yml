@@ -1,0 +1,49 @@
+name: W-R28 frozen raw numerical next-byte science
+on:
+  push:
+    branches: [research/w-r28-causal-raw-numeric-forecast-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify exact preregistered identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 859d4af60957941fa3c28dd0c41841c42296d5df HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r27-second-order/execute.py)" = 3a1b97bc63a78e57227c9d7799678b7d39d698bc
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r28-numeric-forecast/prereg.json)" = 52f5926e5e242c7dec556ef18687594d198079bb
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r28-numeric-forecast/execute.py)" = 9957dac9b454a1b33a44bfce948c081f613126cc
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r28-numeric-forecast/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r28-numeric-forecast/execute.py
+      - name: Original frozen causal next-byte experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r28-numeric-forecast/execute.py > /tmp/W-R28-original.json
+          python3 -m json.tool /tmp/W-R28-original.json > /dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R28-original.json'))
+          assert len(x['heldout_cells'])==27
+          assert x['sealed_heldout_seeds']==list(range(456,472))
+          print('CLASSIFICATION',x['classification'])
+          print('AFFINE_VELOCITY_GAIN',x['affine_velocity_gain'])
+          print('QUADRATIC_ACCELERATION_GAIN',x['quadratic_acceleration_gain'])
+          print('DEVELOPMENT_SELECTED',x['development_only_selected_model'])
+          for c in x['heldout_cells']:
+              if c['amplitude']==3:print(c['generator'],c['predictor'],c['circular_mae'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R28-original-causal-numeric
+          path: /tmp/W-R28-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Complete Wingless regression
+        run: go test ./... && go build ./...
