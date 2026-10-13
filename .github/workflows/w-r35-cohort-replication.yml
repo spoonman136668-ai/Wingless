@@ -1,0 +1,46 @@
+name: Wingless W-R35 frozen four-cohort 4-bit robustness
+on:
+  push:
+    branches: [research/w-r35-independent-cohort-replication-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Fail closed on frozen predecessor and experiment hashes
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 99cfa8607008a2616660d05d45e5022e757f02c2 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r34-codec-alignment/execute.py)" = f9eb54cbe2356b31823a4c9694288520cb84ebd2
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r35-cohort-replication/prereg.json)" = ba0f7724cb6ed9675b32fc3ae95c2abfe67c762e
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r35-cohort-replication/execute.py)" = e5ad92c199b9be99b6cfa1423220c5d73745706e
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r35-cohort-replication/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r35-cohort-replication/execute.py
+      - name: First frozen heldout science, no repeat use
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r35-cohort-replication/execute.py >/tmp/W-R35-first.json
+          python3 -m json.tool /tmp/W-R35-first.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R35-first.json'))
+          assert x['new_heldout_cohorts']==[list(range(s,s+16)) for s in (1440,1456,1472,1488)]
+          assert len(x['rows'])==8 and all(len(r['arms'])==2 for r in x['rows'])
+          print('CLASSIFICATION',x['classification'])
+          print('COHORT_DELTAS',x['cohort_deltas'])
+          print('POOLED_4_BIT_DELTA',x['pooled_four_bit_delta'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R35-original-independent-cohorts
+          path: /tmp/W-R35-first.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full repository regression and build
+        run: go test ./... && go build ./...
