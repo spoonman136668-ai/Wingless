@@ -1,0 +1,21 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R37-BOUNDED_COMPOSITIONAL_HYPOTHESIS_SEARCH",
+  "parent_commit": "fab90052e3850519f7182978876088f396d655b1",
+  "date": "2026-10-13",
+  "question": "Can a bounded grammar of modular expressions identify an AFFINE recurrence excluded from the old four-family bank, and what generalization/specificity tradeoff does this introduce under equal labeled-example budgets?",
+  "generator": "Fresh seeds248..255 with development248..251 and heldout252..255. Sixteen initial-context episodes in SHA256('W37-order/'+seed+'/'+index) sorted order. Latent x0=(context+seed)%4, x1=((context//4)+3*seed)%4; hidden alphabet permutation from SHA256('W37-perm/'+seed) byte0%24, no class label to learner. Source op determined by seed%4: ADD4 (a+b)%4, XOR4 a^b, AFFINE4 (2a+b+1)%4, MUL4 a*b%4. Each episode length32. One heldout source per operation.",
+  "candidate_banks": {
+    "BASE": "All distinct complete 16-context predictive tables formed by 4 frozen primitive operations ADD4/XOR4/MUL4/SUB4 conjugated with each of exact24 W26 hidden-label permutations. Explicitly excludes affine.",
+    "COMPOSITIONAL": "All complete 16-context predictive tables formed by bounded modular-linear grammar c0+c1*a+c2*b mod4, with each coefficient c0,c1,c2 in{0,1,2,3}, PLUS primitive XOR4; conjugate under same24 hidden-label permutations, deduplicate tables. No MUL4 primitive and no grammar expansion after first use. Source candidates not selected from observed outcomes."
+  },
+  "arms": [
+    "BASE_8 and BASE_16: active label acquisition with max8 or16 supervised t2 context labels, partition candidate tables by predicted output, minimizing worst survivor bin then squared-bin counts then episode index; accept unique complete table, reject empty set, otherwise ABSTAIN.",
+    "DSL_8 and DSL_16: identical acquisition algorithm/budgets but COMPOSITIONAL candidate table bank."
+  ],
+  "metrics": "Require all eight original raw 16x32 source fingerprints distinct excluding seed. For all heldout four source families x four arms record #unique candidate tables at start and after queries, input query sequence, labels used, ACCEPT/REJECT/ABSTAIN, accepted 464 t3..31 forecast correctness with full confusion matrix and trace SHA. Report false novel acceptance and untouched negative/abstentions; performance not equated to universal grammar synthesis.",
+  "classification": "DSL_REACH_WITH_TRADEOFF if source guard valid, at16 labels BASE accepts/perfect MUL4 and rejects AFFINE4, DSL accepts/perfect AFFINE4 and rejects MUL4, and at8 labels DSL accepts/perfect AFFINE4. PARTIAL if at16 cross-family tradeoff confirmed but DSL_8 fails, FALSE_UNSEEN_ACCEPT if either BASE16 accepts AFFINE4 or DSL16 accepts MUL4, MIXED otherwise; INVALID_IDENTITIES for raw source fingerprint collisions.",
+  "resource_limits": "Exactly8 seeds, max16 labels each of four arms (each arm is a separate prospective observation budget under same unchanged source), at most64 modular-linear grammars +1 XOR primitive x24 permutations plus dedup. No model calls, recursive operator generation, candidate invention, or source truth peek. Only explicit t2 labels train; 464 later forecasts never influence selection.",
+  "safety": "Frozen prereg before source, SHA-pinned W26 and prereg/source in one first-use GitHub workflow; original ZIP and full Go test/build. No reruns/retuning after first use, no accepted refs/production/live activation.",
+  "claim_limit": "Bounded user-defined modular arithmetic DSL over a finite synthetic symbol alphabet; not truly unconstrained program invention or general intelligence."
+}
