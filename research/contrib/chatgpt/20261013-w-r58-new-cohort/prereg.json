@@ -1,0 +1,25 @@
+{
+  "id": "W-R58-FRESH-COHORT-XORSHIFT-SOURCE-REPLICATION",
+  "parent": "52918ee3b42c517778b9b5ca906375db9f874dd4",
+  "design": "Exact W-R57 model/training/measurement procedures on new independent synthetic development and sealed cohorts. Amplitudes1,2,3 (source-valid), 9 models each with withheld generator and balanced positive/negative presentations, identity and XOR55. No adaptive tuning.",
+  "dev": [
+    [
+      6208,
+      6224
+    ],
+    [
+      6240,
+      6256
+    ],
+    [
+      6272,
+      6288
+    ]
+  ],
+  "sealed": [
+    6320,
+    6368
+  ],
+  "criterion": "SOURCE_SPECIFIC_REPLICATION iff all 9 xorshift-withheld accuracy cells>=0.65; PARTIAL_REPLICATION iff all >=0.55; OTHERWISE_NEGATIVE. Any broad generalization requires >=2 of3 withheld families >=55% in every amplitude/cohort separately. Preserve all negatives.",
+  "controls": "Previously sealed cohorts never reused. Source and prereg hash check. Original artifact and full go test/build. FORGE seed reservations disjoint. No accepted-ref, FSA or controller promotion."
+}
