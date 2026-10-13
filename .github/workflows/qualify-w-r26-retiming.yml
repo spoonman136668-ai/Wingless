@@ -1,0 +1,45 @@
+name: Wingless W-R26 frozen retiming augmentation
+on:
+  push:
+    branches: [research/w-r26-retiming-augmentation-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Fail closed on source/prereg/predecessor identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 58dc556daf8b71271981d18ff9c6f594a109d6b0 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r24-monotone-warp/execute.py)" = 916949b8f244be0275dd4a75bec332dc8e64c841
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-retiming-augmentation/prereg.json)" = c0f124b9382fc895f6bac07eafc3959a64e756fd
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-retiming-augmentation/execute.py)" = e976e35caf0b5200ec9451b0c3e4adf1533bd987
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r26-retiming-augmentation/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r26-retiming-augmentation/execute.py
+      - name: First original frozen equal-budget retiming experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r26-retiming-augmentation/execute.py >/tmp/W-R26-original.json
+          python3 -m json.tool /tmp/W-R26-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R26-original.json'))
+          assert a['sealed_heldout_seeds']==list(range(352,368))
+          assert len(a['arms'])==2 and all(len(x['cells'])==18 for x in a['arms'])
+          print('CLASSIFICATION',a['classification'],'DELTA',a['augmented_minus_control'])
+          for x in a['arms']:print('ARM',x['arm'],x['heldout_accuracy'],x['training_updates'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R26-original-retiming-augmentation
+          path: /tmp/W-R26-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full Wingless regression
+        run: go test ./... && go build ./...
