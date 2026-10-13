@@ -1,0 +1,48 @@
+name: Wingless W-R33 frozen equal-budget quantized retraining
+on:
+  push:
+    branches: [research/w-r33-equal-budget-quantization-retraining-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Exact source lineage and frozen first-use gate
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 78613735739aa99fa30b5093b9ff55389e177922 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r32-quantized-marker/execute.py)" = bb61423ff8dd9324c04c15d9e0add1f568051698
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r33-quantized-retraining/prereg.json)" = 42c9cc85e3f0f606f36ebf95dff22fb9a3c080c9
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r33-quantized-retraining/execute.py)" = 6d9c4b8cdaa2f366ab2b22d4a1ff464016caa01b
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r33-quantized-retraining/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r33-quantized-retraining/execute.py
+      - name: One original first-use quantized learning experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r33-quantized-retraining/execute.py > /tmp/W-R33-original.json
+          python3 -m json.tool /tmp/W-R33-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open("/tmp/W-R33-original.json"))
+          assert x["development_seeds"]==list(range(1136,1152))
+          assert x["sealed_heldout_seeds"]==list(range(1152,1168))
+          assert len(x["results"])==12 and all(len(r["cells"])==6 for r in x["results"])
+          print("CLASSIFICATION",x["classification"])
+          print("GAINS",x["heldout_gains_relative_to_historical_frozen"])
+          for r in x["results"]:
+              print("ARM",r["arm"],r["bits"],r["aggregate_accuracy"],r["training_updates"],r["training_identical_pairs"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R33-original-quantized-retraining
+          path: /tmp/W-R33-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full Wingless regression and build
+        run: go test ./... && go build ./...
