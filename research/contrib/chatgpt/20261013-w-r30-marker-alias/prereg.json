@@ -1,0 +1,70 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R30-OBSERVED-MARKER-LATENT-ALIAS-BOUNDARY",
+  "parent_head": "5617fd5f5a7ac4ec07b084ac08ede17e5c66f96d",
+  "hypothesis": "W-R25's observed-only marker detector can confuse truly missing rows with legitimate observations that exactly match a missing-value encoding. Construct paired latent worlds with byte-identical observed input and opposite missingness truth; show a hard observability limit, not a retraining opportunity.",
+  "freeze": "All generators, encodings, observation sites, seeds, balanced latent worlds, claims, classifications and budgets frozen before original first use. No threshold change, retry, holdout recycling or source repair after result.",
+  "data_source": "Exact W-R20 affine/quadratic/xorshift 16x4 original generators, candidate offset+79 and time-varying noise amplitude3; preserved W-R25 learned weights only if used, never refitted. Both worlds share byte-identical base and observed candidate.",
+  "heldout_seeds": [
+    1000,
+    1001,
+    1002,
+    1003,
+    1004,
+    1005,
+    1006,
+    1007,
+    1008,
+    1009,
+    1010,
+    1011,
+    1012,
+    1013,
+    1014,
+    1015
+  ],
+  "development_seeds": [],
+  "generators": [
+    "affine_prior",
+    "quadratic_irregular",
+    "xorshift_independent"
+  ],
+  "candidate_marker_encodings": [
+    "all_zero",
+    "all_255",
+    "carry_forward"
+  ],
+  "marker_tick_sites": [
+    5,
+    8
+  ],
+  "entities_per_seed": 9,
+  "paired_worlds": "For each seed, entity, generator, marker and site, create one observed candidate with the selected row replaced by the marker. Latent world A is an erasure whose real value was overwritten. Latent world B treats that identical row as a legitimate acquired observation, with no erasure. Both expose the exact same base, candidate and other supplied input features, and have opposite true hidden missingness status.",
+  "arms": [
+    "always_observed_baseline",
+    "W-R25 old all-zero detector",
+    "W-R25 multi-marker detector (zero/255/equal-previous)"
+  ],
+  "primary": "Per marker/site/generator cell (18 cells) report observed-input identity checks, erasure recall, legitimate-observation false-positive rate, and balanced latent-mask classification accuracy for all arms. Store raw per-seed counts. Classification UNIDENTIFIABLE_WITHOUT_PROVENANCE if paired inputs are byte-identical in all 2592 pairs, opposite hidden labels, and each deterministic detector gives identical predictions across the two worlds. OTHERWISE_INVALID if any pairing/invariant differs. Any classifier on same observed bytes cannot achieve >50% balanced latent-mask accuracy under this exact paired protocol.",
+  "controls": [
+    "Evidence generated from genuine prior raw generators but legitimate alias cases are deliberately constructed adversarially, not claimed to occur naturally at measured frequency",
+    "No privileged erasure bit, external mask channel, oracle or independent provenance passed to any detector",
+    "Equivalent observed candidate (including previous row and all four channels), same base for both worlds; optional model never refitted",
+    "No claim that downstream sequence-recognition accuracy is 50%; this study classifies latent missingness only",
+    "Exact parent/prereg/executor Git blobs, first-use archive and one full Go regression"
+  ],
+  "bounds": {
+    "generators": 3,
+    "marker_formats": 3,
+    "tick_sites": 2,
+    "seeds": 16,
+    "entities": 9,
+    "distinct_observed_samples": 2592,
+    "latent_worlds_per_sample": 2,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Identifiability of synthetic missing-value markers, not general cognition or natural dropout prevalence."
+}
