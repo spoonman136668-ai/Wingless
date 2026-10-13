@@ -1,0 +1,83 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "experiment": "W-R23-MISSINGNESS-SENTINEL-TRANSFER-FALSIFICATION",
+  "parent_head": "c551d41a7b8d4f77b9349033fa788d621a800519",
+  "hypothesis": "W-R22's 100% mask-aware performance may rely on the exact 4-channel zero sentinel encoding missing observations. Test the same frozen trained models without retraining on unseen missing-position patterns filled with zero, last observed row, or constant 127.",
+  "freeze": "All three imputations, mask counts, positions, exact seed cohorts, trained source and thresholds fixed before any first-use execution; never retrain on original W-R22 heldout or adapt to new results.",
+  "training": "Import W-R22 source and train exactly its four original 16-feature models on original development seeds 240..255, 1728 paired examples and 32 epochs per model. No change to model parameters/width/capacity.",
+  "heldout": {
+    "seeds": [
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "mask_counts": [
+      2,
+      4,
+      6
+    ],
+    "mask_order": [
+      1,
+      4,
+      7,
+      9,
+      15,
+      6
+    ],
+    "fill_policies": [
+      "all_four_zero",
+      "last_observed_four_channel_row",
+      "all_four_127"
+    ],
+    "swap_tail_positions": [
+      "tail_indices_10_11",
+      "tail_indices_12_13"
+    ],
+    "noise_amplitude": 3,
+    "global_offset": 79,
+    "cells_per_arm": 54
+  },
+  "mechanism": "Produce same four observed channels and positive/negative candidate multiset. Change masked rows using frozen per-policy fill prior to swapping the two untouched observation rows. No missingness flag supplied to either feature model; W-R22 mask-aware recognizes exactly all-four-zero rows.",
+  "primary": "Per model/fill x heldout cell per-seed confusion and total accuracy. ROBUST_IMPUTATION if frozen maskaware_augmented accuracy>=.80 in each of three imputation groups; SENTINEL_DEPENDENT if zero-fill accuracy>=.90 and both nonzero-fill groups<=.70; MIXED otherwise. Record naive baselines and all adverse outcomes.",
+  "controls": [
+    "Never mask anchor t0 or swapped actual observation rows t11,t12,t13,t14",
+    "Matched positive/negative candidate same first row/multiset after filling",
+    "No adaptation, training examples, model calls, extra sensors or first-use reruns",
+    "Original first-use archive before one full Go regression",
+    "Exact parent Git identity plus prereg and evaluator blob hashes"
+  ],
+  "bounds": {
+    "trained_model_arms": 4,
+    "feature_width": 16,
+    "train_pairs_per_model": 1728,
+    "epochs": 32,
+    "generators": 3,
+    "fill_policies": 3,
+    "mask_counts": 3,
+    "swap_families": 2,
+    "heldout_seeds": 16,
+    "cells_per_arm": 54,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Finite deterministic synthetic missing-data representation study, not generalized cognition."
+}
