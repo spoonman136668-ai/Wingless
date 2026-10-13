@@ -1,0 +1,25 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R24_CATALOG_SELECTIVITY_ONE_MISLABELED_CALIBRATION",
+  "parent_commit": "51304a86f4291036e87f22716397881f24ea652e",
+  "predecessor": "W-R23",
+  "question": "Can a frozen eight-hypothesis selector tolerate exactly one corrupted training label without opening the gate to structurally out-of-catalogue dynamics?",
+  "hypothesis": "The true in-catalogue modular rule differs by at least three of the four calibration labels from any competing catalogue hypothesis, so one corrupt label leaves a unique best candidate with error1, while out-of-catalogue a3 should still have minimum mismatch>1 and be rejected.",
+  "freeze": "All 8 hypotheses, three populations, corruption rule, acceptance gate and outcomes fixed before any scientific first-use; do not tune after outcomes.",
+  "catalog": "Exactly frozen W-R23/W-R22 candidate family x_t=(x[t-1]+a*x[t-2]+b)%4, a∈{1,2},b∈{0,1,2,3}. Predictive model sees only four t2 calibration labels from episodes0..3, not truth parameters or seed metadata.",
+  "cohorts": [
+    "CLEAN seeds96..99: true a2 for even seed/a1 for odd, b=(seed-96)%4, all four calibration labels correct",
+    "ONE_CORRUPTED_LABEL seeds100..103: true a2 if even/a1 if odd, b=(seed-100)%4, exactly calibration episode index (seed%4) mislabeled +1 mod4, all other calibration labels and sealed test labels correct",
+    "OUT_OF_CATALOGUE seeds104..107: true a3, b=(seed-104)%4, all calibrations correct"
+  ],
+  "generator": "Every 32-step episode starts x0=(e+seed)%4,x1=(e//4+3*seed)%4. Calibration sees only e0..3 t2. Evaluation for accepted models uses episodes4..15 t2..31 (360 predictions/seed).",
+  "arms": [
+    "strict_exact: accept unique zero-error catalogue hypothesis, reject otherwise",
+    "tolerant_at_most_one: accept unique minimum-error catalogue candidate iff error<=1, reject otherwise",
+    "forced_minimum: always accept unique deterministic best candidate even with >1 errors (negative control), evaluate outside prediction accuracy separately"
+  ],
+  "metrics": "Per seed true source category (evaluator only), corruption count, best candidate/error, strict and tolerant decision, exact accepted heldout accuracy, out-of-catalogue false acceptance, error margin to runner-up and forced accuracy.",
+  "primary": "ROBUST_CATALOG_SELECTIVITY if tolerant accepts all4 CLEAN and4 ONE_CORRUPTED_LABEL seeds at>=.95 heldout accuracy and rejects all4 OUT_OF_CATALOGUE seeds. Record strict and forced outcomes regardless. Otherwise PARTIAL/FAILURE, no after-outcome catalogue expansion.",
+  "safeguards": "Exact W-R23 pinned scientific source blob, deterministic data and no future labels in policy, no retuning, 8 unchanged hypotheses, 12 preregistered seeds, 4 labels/seed, 0 model calls, no first-use retry, original archive, full regression, accepted refs unchanged.",
+  "claim_limit": "Falsifiable synthetic single-error catalogue matching; not general safety calibration, stochastic noisy real-world learning or general reasoning."
+}
