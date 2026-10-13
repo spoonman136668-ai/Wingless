@@ -1,0 +1,49 @@
+name: Wingless W-R40 frozen position-preserving XOR temporal state
+on:
+  push:
+    branches: [research/w-r40-positional-xor-state-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Fail-closed immutable frozen source identity gate
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 9bd4d26f3fc6c47a15f73a4e222973e1c0add30f HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r39-multistat/execute.py)" = a1d29ce3397c71d96309a9f515fda5f665bff2d5
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r40-positional/prereg.json)" = 31d710697c2cf3432463914df542eaa8e1d66529
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r40-positional/execute.py)" = 1598d32e79dc386739987a93001d92a8052f96f1
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r40-positional/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r40-positional/execute.py
+      - name: Original sealed first-use position-dependent state experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r40-positional/execute.py > /tmp/W-R40-original.json
+          python3 -m json.tool /tmp/W-R40-original.json > /dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R40-original.json'))
+          assert a['development_seeds']==list(range(1856,1872))
+          assert a['sealed_heldout_seeds']==list(range(1872,1888))
+          assert len(a['results'])==6 and all(len(r['cells'])==6 for r in a['results'])
+          assert a['xor_feature_invariance']
+          print('CLASSIFICATION',a['classification'])
+          print('ACCURACY_GAINS',a['accuracy_gains_over_scalar'])
+          for r in a['results']:
+              print('ARM',r['arm'],r['condition'],r['accuracy'],r['feature_equivalence_checks'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R40-original-positional-state
+          path: /tmp/W-R40-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full required Wingless regression and build
+        run: go test ./... && go build ./...

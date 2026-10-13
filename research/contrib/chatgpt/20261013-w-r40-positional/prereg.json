@@ -1,0 +1,99 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R40-POSITION-PRESERVING-XOR-TRANSITION-STATE",
+  "parent_head": "9bd4d26f3fc6c47a15f73a4e222973e1c0add30f",
+  "hypothesis": "W-R39's histogram and top16 sorted bit-XOR summaries were exactly encoding invariant but near chance. Preserve temporal slot position in a 16-dimensional ordered state under unchanged readout parameter count and budget; compare lag1 and lag2 transition residuals against the frozen repeated-scalar baseline.",
+  "freeze": "Before first-use pin fresh dev seeds1856..1871, sealed heldout1872..1887, same 4-bit sensor quantizer and XOR55 recoding, three generators, two test swap sites, original W-R39 model training rules, 32 epochs, 1728 balanced examples per arm and pass criteria. Do not select arm or alter thresholds after outcome.",
+  "split": {
+    "development": [
+      1856,
+      1857,
+      1858,
+      1859,
+      1860,
+      1861,
+      1862,
+      1863,
+      1864,
+      1865,
+      1866,
+      1867,
+      1868,
+      1869,
+      1870,
+      1871
+    ],
+    "sealed_heldout": [
+      1872,
+      1873,
+      1874,
+      1875,
+      1876,
+      1877,
+      1878,
+      1879,
+      1880,
+      1881,
+      1882,
+      1883,
+      1884,
+      1885,
+      1886,
+      1887
+    ]
+  },
+  "arms": [
+    "scalar_repeated: exact W-R39 XOR-invariant top-two residual repeated 16 times",
+    "ordered_lag1: each of 16 state slots is the sum of four channel popcounts of XOR-of-reference-vs-observation differences across the tick and its next neighbor",
+    "ordered_lag2: each slot similarly pools four channel popcounts using neighbor tick plus two; physical time order remains unshuffled"
+  ],
+  "training": {
+    "source": "Original pinned W-R39 affine_prior paired generator",
+    "training_site_indices": [
+      2,
+      5,
+      8
+    ],
+    "amplitudes": [
+      1,
+      2
+    ],
+    "examples": 1728,
+    "weights": 16,
+    "bias": 1,
+    "epochs": 32,
+    "learning_rate": 0.1
+  },
+  "evaluation": {
+    "identity_and_XOR55_encodings": true,
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "sites": [
+      10,
+      12
+    ],
+    "seeds": 16
+  },
+  "criterion": "POSITIONAL_ROBUST_UTILITY iff either ordered arm has identity and XOR55 heldout accuracy >=0.65 and improves repeated scalar by >=0.10; PARTIAL_GAIN iff any ordered arm improves by >=0.05; NO_GAIN otherwise. All 16-slot features must be exactly invariant under same XOR55 applied to raw reference and observed candidate; violation invalidates original execution.",
+  "controls": [
+    "Identical paired train/test input and 16 numerical weights plus bias, identical fixed epochs and train order; arms differ only in source-prespecified representation",
+    "Disclose effective hypothesis-class expansion from per-time observations even without numeric capacity increase",
+    "No codec inverse, labels in features, future source knowledge, hidden readout, new sensors, retries or post-result tuning",
+    "Archive original first-use per-seed confusions and feature checks before one full Go repository regression/build"
+  ],
+  "bounds": {
+    "arms": 3,
+    "width": 16,
+    "epochs": 32,
+    "training_examples": 1728,
+    "development_seeds": 16,
+    "heldout_seeds": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Deterministic synthetic fixed-width temporal prediction under XOR codebook only; not learned general-language reasoning."
+}
