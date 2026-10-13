@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R32-CAUSAL_REGIME_SWITCH_VS_STABLE",
+  "parent_commit": "d44de8f85364b6a4b336ffddb1fbc9e1c125089e",
+  "date": "2026-10-13",
+  "prior": "W-R31 demonstrates bounded disjoint-source operation-family challenge. This tests genuine within-episode nonstationarity on a fresh cohort, not replay of previous seeds.",
+  "question": "Can strictly causal prediction-error feedback detect and adapt to a hidden, abrupt operation change while a capacity-matched frozen model cannot, without disrupting an unchanged control process?",
+  "family": "Sixteen episode initial contexts per seed, encoded by hidden SHA256('W32/'+seed) byte0%24 permutation of four symbols and new pseudorandom presentation order SHA256('W32-order/'+seed+'/'+episode). Initial latent x0=(original_episode+seed)%4,x1=((original_episode//4)+3*seed)%4. Recurrence starts ADD4 x[t]=(x[t-2]+x[t-1])%4 for t2..15. For even seeds SHIFT, switches to XOR4 x[t]=x[t-2] xor x[t-1] for t>=16; odd seeds STABLE continue ADD4. Regime change is NOT signaled to learner.",
+  "split": {
+    "development": [
+      192,
+      193,
+      194,
+      195
+    ],
+    "heldout": [
+      196,
+      197,
+      198,
+      199
+    ],
+    "shift_on_even": true,
+    "stable_on_odd": true
+  },
+  "calibration": "Only 16 separate t2 labels, one for every initial observed ordered pair, are provided before evaluation, in the fixed seed-presentation order, to choose a uniquely determined modular-ADD predictive table among 24 frozen W26 permutations. The corresponding XOR predictive table must be unique across ALL surviving permutations or the whole seed is AMBIGUOUS and excluded from supported classification. Forecast e0..15, ticks3..31 using previous true observations as causal inputs.",
+  "arms": [
+    "FROZEN_ADD: always forecast with calibrated ADD predictive table, observe true answer after forecast, never adapt",
+    "ERROR_TRIGGERED_XOR: start ADD; after the first ADD prediction error in an episode, switch to the prospectively defined XOR table for subsequent ticks in that episode, with no current-tick answer leakage and no future labels; reset mode to ADD at start of each independent episode",
+    "ABSTAIN_AFTER_ERROR: start ADD; after first forecast error, abstain on remaining ticks of that episode without increasing its observation budget; same previous-feedback observations are provided"
+  ],
+  "outcome_metrics": "Per arm and seed: calibration input/candidate tables SHA, 16x29 scored tick opportunities, before(t3..15) and after(t16..31) correct/incorrect/abstained, first error positions, false switches in STABLE, causal observation traces and source fingerprint SHA256 (excluding seed ID), 7? no such memory use. Counts distinguish forecast abstention from correct predictions.",
+  "classification": "CAUSAL_SWITCH_RECOVERY if input fingerprints distinct, calibration ADD and implied XOR tables unique, heldout SHIFT aggregate post-t16 ERROR_TRIGGERED_XOR correct > FROZEN_ADD, and STABLE ERROR_TRIGGERED_XOR has zero errors and no switches, and all arms identical correct forecasts before t16. MIXED otherwise; INVALID_IDENTITIES for source fingerprint collision; AMBIGUOUS_HYPOTHESIS for uncertain table. All predictions tested AFTER initial 16 calibration labels and true one-tick-delayed feedback.",
+  "constraints": "No past-seed reuse, no post-outcome tuning; fixed two operation families and no new candidate expansion, no oracle regime flag, no hidden FUTURE outcome to policy, frozen prereg/source exact Git blob SHA before first-use run, original artifact and complete Go regression. Invalid and negative outcomes preserved. No accepted refs, model calls, live authority or production writes.",
+  "claim_limit": "Synthetic finite two-operation within-episode change detection with supervised feedback; not open-world self-modifying cognition."
+}
