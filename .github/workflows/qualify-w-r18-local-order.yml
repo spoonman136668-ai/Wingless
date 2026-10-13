@@ -1,0 +1,37 @@
+name: Wingless W-R18 frozen hard-local-order science
+on:
+  push:
+    branches: [research/w-r18-local-order-transfer-r1]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact immutable science identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 21b3c3fee08e5af3ed6c22218d67f59ed40d60a9 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r17-true-tick-jitter/execute.py)" = bc84814a2680907a99e2e3dd7980ebaab15a681c
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-local-order/prereg.json)" = 17f1b353bcfe1814e515c24a61fbccd3f2de0e9a
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-local-order/execute.py)" = 1e58666f047c2c84cb4de1c50fd223821d8daa18
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r18-local-order/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r18-local-order/execute.py
+      - name: First-use frozen synthetic experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r18-local-order/execute.py > /tmp/wr18-original.json
+          python3 -m json.tool /tmp/wr18-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R18-first-use
+          path: /tmp/wr18-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Final full Wingless regression and build
+        run: go test ./... && go build ./...
