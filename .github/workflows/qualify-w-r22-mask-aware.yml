@@ -1,0 +1,47 @@
+name: Wingless W-R22 frozen mask-aware missing tick transfer
+on:
+  push:
+    branches: [research/w-r22-maskaware-learned-transfer-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Frozen identity and preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor fd54ad48b14aa493ee922b057f23c3b75c81fe76 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r21-occlusion/execute.py)" = a24f58099fd65fe47304c560ee15d7467f0f289f
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-maskaware/prereg.json)" = b48a31364847d57048e2dc93cc0bd9c2797fe0b5
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-maskaware/execute.py)" = e43abe25ef7b876d9138576d5184d02cde2819d8
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r22-maskaware/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r22-maskaware/execute.py
+      - name: Original frozen mask-aware experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r22-maskaware/execute.py > /tmp/W-R22-original.json
+          python3 -m json.tool /tmp/W-R22-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R22-original.json'))
+          assert x['sealed_heldout_seeds']==list(range(256,272))
+          assert len(x['arms'])==4 and all(len(a['cells'])==6 for a in x['arms'])
+          print('CLASSIFICATION',x['classification'],'GAIN',x['gain_maskaware_aug_vs_naive_aug'])
+          for a in x['arms']:
+              print('ARM',a['arm'],a['accuracy'],
+                    [(c['generator'],c['masked_ticks'],c['accuracy']) for c in a['cells']])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R22-original-mask-aware
+          path: /tmp/W-R22-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: One full Wingless regression
+        run: go test ./... && go build ./...
