@@ -1,0 +1,28 @@
+name: Wingless W-R6 frozen synthetic mechanism qualification
+on:
+  push:
+    branches: [research/w-r6-boundary-missingness-r1]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Exact prereg parent and frozen output
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 8f911b51b0f27dad1d3a97b2c699753bdda47c8a HEAD
+          test "$(git diff --name-only 8f911b51b0f27dad1d3a97b2c699753bdda47c8a HEAD | grep -v -E '^research/contrib/chatgpt/20261012-w-r6-boundary-missingness/|^\.github/workflows/qualify-w-r6-boundary-missingness.yml$' | wc -l)" -eq 0
+          python3 -B -m unittest discover -s research/contrib/chatgpt/20261012-w-r6-boundary-missingness -p test_replay.py -v
+          echo 'WR6_FROZEN_MECHANISTIC_REPLAY=PASS'
+      - name: Existing repository Go regression and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./...
+          go build ./...
