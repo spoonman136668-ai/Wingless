@@ -1,0 +1,49 @@
+name: Wingless W-R20 frozen out-of-generator transfer
+on:
+  push:
+    branches: [research/w-r20-generator-shift-falsification-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Exact predecessor and first-use frozen identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 42909d78f08e2d64007969f99224ad2d6c4915f8 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r19-multichannel/execute.py)" = 7b9833ce9744d8520f4255279709ff25f41feffe
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r20-generator-shift/prereg.json)" = 6b61fadfba4b636591d6616ae4052c21ae935ed2
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r20-generator-shift/execute.py)" = 40face8f9e51aa922da372d6dfc5f4d82bf61441
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r20-generator-shift/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r20-generator-shift/execute.py
+      - name: Original 72-cell first-use generative-shift science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r20-generator-shift/execute.py > /tmp/W-R20-original.json
+          python3 -m json.tool /tmp/W-R20-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R20-original.json'))
+          assert len(x['arms'])==4
+          assert x['sealed_heldout_seeds']==list(range(192,208))
+          assert all(len(a['cells'])==18 and a['width']==16 for a in x['arms'])
+          print("CLASSIFICATION",x['classification'])
+          print("TOP_MINUS_BASELINE",x['nonaffine_top_two_vs_first_delta'])
+          for a in x['arms']:
+              print("ARM",a['model'],a['nonaffine_accuracy'],a['aggregate_accuracy'])
+              print("CELLS",[(c['generator'],c['amplitude'],c['swap'],c['accuracy']) for c in a['cells']])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R20-original-generator-shift
+          path: /tmp/W-R20-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: One full Wingless regression
+        run: go test ./... && go build ./...

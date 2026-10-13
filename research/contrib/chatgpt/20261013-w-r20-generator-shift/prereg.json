@@ -1,0 +1,75 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "experiment": "W-R20-OUT-OF-GENERATOR-TEMPORAL-TRANSFER",
+  "parent_head": "42909d78f08e2d64007969f99224ad2d6c4915f8",
+  "hypothesis": "W-R19 top-two four-channel model's perfect score may be specific to its affine sequence generator. Train unchanged four equal-capacity models on the exact original W-R19 development generator and test on affine, quadratic-irregular, and independently seeded xorshift sequence families without retraining.",
+  "freeze": "All three generator families, unseen seed cohort, four model arms, nuisance amplitudes, swap identities, training updates, thresholds and check identities frozen before first use. No model selection or recalibration after heldout.",
+  "training": "Same W-R19 development seeds 160..175, 9 entities, three local training swap positions, noise amplitudes 1 and 2, global offset 17, 1728 paired examples per model, 32 perceptron epochs at LR=0.1, 16 trainable weights and bias. Exact old training source identity reused; no historical heldout used for training.",
+  "heldout": {
+    "seeds": [
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207
+    ],
+    "generator_families": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "noise_amplitudes": [
+      1,
+      2,
+      3
+    ],
+    "swap_families": [
+      "tail_index10_11",
+      "tail_index12_13"
+    ],
+    "nuisance_global_offset": 79,
+    "total_cells": 18
+  },
+  "quadratic_generator": "First value channel c at tick t: (43*seed+29*entity+17*c+(5+2*c)*t+(11+3*c)*t*t+7*(((seed+c)*t)%19)) %256",
+  "xorshift_generator": "For seed/entity/channel/tick, initialize uint32 z=(seed*0x9e3779b1) xor (entity*0x85ebca77) xor (channel*0xc2b2ae3d) xor ((tick+1)*0x27d4eb2f), then apply xorshift32 z ^=z<<13; z ^=z>>17; z ^=z<<5, masking to 32 bits after each shift. Value=z&255. No Python randomized hash.",
+  "arms": [
+    "first_channel_max",
+    "mean_four_max",
+    "median_four_max",
+    "mean_top_two_64"
+  ],
+  "features": "Same already-observed four input channels, 16 identical scalar derived features per arm, no additional sensors or model capacity.",
+  "outcomes": "CROSS_GENERATOR_TRANSFER if mean_top_two_64 >=0.80 accuracy in EVERY 12 non-affine heldout cells and >=0.05 aggregate accuracy above first_channel_max on non-affine cells. PARTIAL if mean_top_two_64 aggregate non-affine accuracy > first_channel_max aggregate by at least 0.03, but strict threshold fails. NEGATIVE otherwise. Report all 18 cells x 4 arms (per-seed TP/TN/FP/FN) including no-transfer controls.",
+  "controls": [
+    "Exact parent and W-R19 source/prereg Git blob identity before original execution",
+    "Original W-R19 training function called only on published development seeds; no old heldout scoring",
+    "Every positive/negative candidate pair shares anchor and multiset within seed/entity/noise family",
+    "First-use CI result artifact immutable, no rerun if invalid, one full Go integration regression",
+    "No accepted-ref mutation, production activation or unqualified FORGE optimizer"
+  ],
+  "bounds": {
+    "development_seeds": 16,
+    "heldout_seeds": 16,
+    "generator_families": 3,
+    "heldout_cells": 18,
+    "models": 4,
+    "width": 16,
+    "training_pairs_each": 1728,
+    "epochs": 32,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "production_authority": false
+  },
+  "claim_limit": "Zero-retraining transfer between deterministic synthetic input generators, not general language or reasoning."
+}
