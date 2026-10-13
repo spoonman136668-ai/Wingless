@@ -1,0 +1,71 @@
+{
+  "schema": "wingless.science.frozen-prereg.v1",
+  "experiment": "W-R25-OBSERVED-ROW-MARKER-DETECTION",
+  "parent_head": "2129317f1ad3a1247413991c68ae8c8e10da0dcd",
+  "hypothesis": "W-R24 found the frozen W-R22 model's zero-row feature is brittle. A feature-only current-observation row detector recognizing all-zero, all-255, or exact previous-row repeat can restore robustness across coding formats without changing model training, parameters, input channels or labels.",
+  "freeze": "Preserve predefined three formats, two masking counts, three generator families and two local swap sites. Freeze detector rule and every criterion before first-use. Scientific finding is a hand-engineered interface correction, not automatically learned representation.",
+  "training": "Both candidate representations use the IDENTICAL weights and bias from frozen W-R22 maskaware_augmented train() on its original development seeds240..255, 1728 paired examples and 32 perceptron epochs. No new fit or normalization. Confirm new feature agrees with prior maskaware feature on all original W-R22 training examples.",
+  "heldout": {
+    "seeds": [
+      304,
+      305,
+      306,
+      307,
+      308,
+      309,
+      310,
+      311,
+      312,
+      313,
+      314,
+      315,
+      316,
+      317,
+      318,
+      319
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "formats": [
+      "all_zero",
+      "all_255",
+      "carry_forward"
+    ],
+    "masked_tick_counts": [
+      3,
+      5
+    ],
+    "tail_swaps": [
+      10,
+      12
+    ],
+    "amplitude": 3,
+    "offset": 79
+  },
+  "arms": [
+    "old_zero_detector: fixed W-R22 maskaware_augmented featurize()",
+    "observed_multi_marker_detector: same 16 repeated top-two transition residuals, omitting edges around candidate rows equal to all0, all255, or exactly preceding observed candidate row; all decisions from input data only"
+  ],
+  "primary": "Report 18 heldout cells per arm, each with per-seed TP/TN/FP/FN. REPRESENTATION_BENEFIT iff new feature achieves >=0.80 accuracy in EVERY cell and >=0.10 aggregate accuracy gain over old feature. PARTIAL iff new aggregate > old by >=0.05 but strict threshold fails. NO_GAIN otherwise. Always retain adverse formats and controls.",
+  "controls": [
+    "No explicit mask oracle, privileged missing-position metadata or extra input channel passed to feature model",
+    "Exactly identical learned weights/bias and 16-wide trained model for both arms; any gain is rule-based preprocessing not newly learned cognition",
+    "Positive/negative candidate anchor and multiset paired-identical; swapped actual rows always unmasked",
+    "Frozen exact predecessor Git blob and original first-use artifact; one full Go integration test/build"
+  ],
+  "bounds": {
+    "arms": 2,
+    "model_width": 16,
+    "training_examples": 1728,
+    "training_epochs": 32,
+    "heldout_cells_per_arm": 18,
+    "heldout_seeds": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Controlled synthetic observed-row coding correction, not general intelligence."
+}
