@@ -1,0 +1,37 @@
+name: W-R31 disjoint source fingerprint original science
+on:
+  push:
+    branches: [research/chatgpt-isolated-w31-ordered-input-diversity-20261013]
+permissions:
+  contents: read
+jobs:
+  first-use:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Immutable parent source and prereg identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4cb666ccbdccc18f7b0f6cc91da3a572c1c827fe HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w29-independent-witness/execute.py)" = 764ea913abe31decd2dd8b4b5318b240d49525a5
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w31-diverse-input/prereg.json)" = 32b1dec068f2e62882ab3864fa0fb7c22ee11d08
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w31-diverse-input/execute.py)" = 03bedcd64fdf4112c2cc1a28d3fb01923c1ab6a6
+          python3 -m json.tool research/contrib/chatgpt/20261013-isolated-w31-diverse-input/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-isolated-w31-diverse-input/execute.py
+      - name: Original frozen W-R31 experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-isolated-w31-diverse-input/execute.py > /tmp/W-R31-original.json
+          python3 -m json.tool /tmp/W-R31-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R31-original-diverse-source
+          path: /tmp/W-R31-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless regression and build
+        run: go test ./... && go build ./...

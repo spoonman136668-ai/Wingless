@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R31-DIVERSIFIED_SOURCE_MULTIFAMILY_HOLDOUT",
+  "parent_commit": "4cb666ccbdccc18f7b0f6cc91da3a572c1c827fe",
+  "date": "2026-10-13",
+  "predecessor": "W-R30 first-use run38369156817 archived INVALID_INPUT_COLLISION after seeds147 and151 produced identical full observed trajectories. New experiment, fresh seeds176..191 and a preregistered context-order diversity mechanism; no W-R30 replay.",
+  "question": "Does four-label independent verification of a finite modular-addition model avoid false acceptance across three unknown four-symbol operations when observed episode presentation order is independently keyed per fresh source?",
+  "world": "For each seed176..191 enumerate all16 initial latent four-symbol ordered pairs in a pseudorandom PRESENTATION order keyed by SHA256('W31-order/'+seed+'/'+episode_index) ranked lexicographically. The ranked episode e maps to latent context original_e with x0=(original_e+seed)%4,x1=((original_e//4)+3*seed)%4. Operation by seed mod4: ADD4=(before+last)%4; XOR4=before^last; MUL4=(before*last)%4; SUB4=(before-last)%4. Repeat recurrence until 32 ticks. Encode outputs with seed-specific hidden alphabet permutation indexed by SHA256('W31/'+seed) byte0 mod24, not provided to learner.",
+  "cohorts": {
+    "development": [
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183
+    ],
+    "heldout": [
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191
+    ]
+  },
+  "arms": [
+    "ACTIVE_0: active query acquisition among immutable 24 modular-addition conjugacy tables, stop when unique predictive table or rejection or budget16",
+    "WITNESS_4: same frozen selected model plus up to4 independent, previously unused context labels sorted by SHA256 of observed unlabeled context, reject on first mismatch, no refitting",
+    "WITNESS_8: same with up to8 independent unused labels",
+    "WITNESS_ALL: consume all remaining unused context labels, full exhaustive16-label consistency reference"
+  ],
+  "metrics": "For each original input fingerprint (SHA256 concatenated observed full 16x32 source trajectories, WITHOUT including seed ID), require all16 fingerprints distinct or classify NONUNIQUE_FINGERPRINT without testing. For heldout two seeds per operation: family ACCEPT/REJECT/ABSTAIN, total labels, selected model identity, witness ordering, full 464-tick predictions when accepted, confusion and digest. All findings including 4-label failures preserved.",
+  "classification": "MULTIFAMILY_BOUNDED iff WITNESS_4 and WITNESS_ALL each accept both ADD4 at464/464 and reject ALL six out-of-family cases. FALSE_EXHAUSTIVE if WITNESS_ALL falsely accepts any out-of-family. FALSE_FOUR_WITNESS if WITNESS_4 accepts any out-of-family. MIXED otherwise. NONUNIQUE_FINGERPRINT if any source collision. Do not re-label after result.",
+  "controls": "Fixed 24 candidates from exact SHA-pinned W26, same active heuristic from accepted W-R29; no candidate expansion or hidden labels/holdout oracle, no model calls. Equal source cohorts and same initial SELECT step across budgets; labels 0/4/8/16 are explicitly unequal feedback costs. Input-order diversification is frozen, not selected after seeing outcomes.",
+  "safety": "Immutable prereg Git SHA before evaluator, pin parent/prereg/source prior source in first-use GitHub CI, original artifact ZIP, one full Go test/build regression. No original retries, accepted-ref mutations, production activation or posthoc tuning.",
+  "claim_limit": "Synthetic operation table discrimination across three enumerated out-of-class families under seeded presentation orders; not general cognition, unrestricted open-world anomaly detection or universal four-label sufficiency."
+}
