@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R19-CHANNEL-ABLATION-LOCAL-SWAPS",
+  "parent_commit": "a1c11d76e670a4838a7b05d2b6905d2318183394",
+  "predecessor": "W-R18",
+  "hypothesis": "W-R18 first-channel magnitude scores could not detect unseen adjacent swaps. Fourth channel has a larger +11-per-tick circular step than first channel's +3 step, so a one-parameter backward-edge statistic on fourth channel may survive stronger heldout per-tick jitter.",
+  "freeze": "New split, pair generation, one-parameter feature rules, calibration criteria, budgets and expected labels frozen before original first-use execution. Do not change thresholds or datasets based on heldout outcomes.",
+  "source": "Exact W-R11 16x4 synthetic generator, with candidate all-channel +17 offset for development and +61 heldout, plus nondegenerate training jitter ((5*t+seed+entity)%3)-1 and heldout ((7*t+seed+entity)%5)-2 to all channels.",
+  "split": {
+    "development": [
+      56,
+      57,
+      58,
+      59
+    ],
+    "heldout": [
+      60,
+      61,
+      62,
+      63
+    ]
+  },
+  "pairs": "Positive preserves jittered candidate order; negative swaps exactly one pair of adjacent candidate rows excluding the anchor and preserving the multiset. Development negative swap indices (4,5) if entity even or (10,11) if odd. Heldout negative uses previously unseen indices (7,8) if even, (12,13) if odd.",
+  "arms": [
+    "unordered first-channel anchored modulo16 histogram difference",
+    "first-channel negative signed circular temporal-step count on candidate",
+    "fourth-channel negative signed circular temporal-step count on candidate",
+    "all-four-channel mean negative signed circular step counts on candidate"
+  ],
+  "learning": "One scalar train-only threshold per arm, midpoint between maximum of development-positive feature and minimum of development-negative feature. Predict positive if feature <= threshold. All arms have one learned scalar, no heldout labels used. Thresholds unmodified even if training overlap.",
+  "metrics": "Per-seed confusion, aggregate balanced accuracy, thresholds, training positive/negative ranges. FOURTH_CHANNEL_TRANSFER if fourth >=0.85 and unordered<=0.55; PARTIAL if fourth>first and misses primary threshold; NEGATIVE otherwise.",
+  "scientific_limits": "Fourth channel has a monotonic +11 synthetic increment. Success may be a trivial signed-step cue, not general temporal understanding. Absent generality claims; preserve all negatives.",
+  "budget": {
+    "seeds": 8,
+    "dev": 4,
+    "heldout": 4,
+    "entities": 9,
+    "ticks": 16,
+    "arms": 4,
+    "learned_params_per_arm": 1,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "validation": "Exact W-R18 pinned source, data invariants, 3/5 distinct tick jitter levels, original first-use artifact, one complete go test ./... and go build ./... regression, no accepted-ref mutation."
+}
