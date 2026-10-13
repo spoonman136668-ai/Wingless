@@ -1,0 +1,51 @@
+name: Wingless W-R49 equal-data training order sensitivity
+on:
+  push:
+    branches: [research/w-r49-training-order-sensitivity-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Immutable parent and science identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 28e4b397f6fa9586e9533f59eb84074174932de0 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r48-frozen-transfer/execute.py)" = 3b960f91d693e12593d15c76284264806a128f9c
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r49-order-sensitivity/prereg.json)" = 842f1062eaee8ddd0183f46edd890cc030ca9273
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r49-order-sensitivity/execute.py)" = d04bd4de051f894929da7ee1dc13a02d066ec74a
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r49-order-sensitivity/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r49-order-sensitivity/execute.py
+      - name: Original frozen first-use three training-order experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r49-order-sensitivity/execute.py > /tmp/W-R49-original.json
+          python3 -m json.tool /tmp/W-R49-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R49-original.json'))
+          assert x['development_seeds']==list(range(2864,2880))
+          assert x['sealed_heldout_seeds']==list(range(2880,2928))
+          assert len(x['results']['identity'])==3
+          assert all(len(v['by_seed'])==48 for v in x['results']['identity'].values())
+          print('CLASSIFICATION',x['classification'])
+          print('SPREAD',x['accuracy_spread'])
+          print('EXAMPLES_SHA256',x['same_development_examples_sha256'])
+          for arm,row in x['results']['identity'].items():
+              print('ARM',arm,row['balanced_accuracy'],row['seed_cluster_interval'],
+                    row['family_accuracies'],row['training_update_count'],row['weights_sha256'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R49-original-training-order-sensitivity
+          path: /tmp/W-R49-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full Wingless regression and build
+        run: go test ./... && go build ./...
