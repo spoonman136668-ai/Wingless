@@ -1,0 +1,46 @@
+name: Wingless W-R25 frozen reference alignment
+on:
+  push:
+    branches: [research/w-r25-reference-match-imputation-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Fail-closed immutable predecessor prereg and execution source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor bf81aafa6a43b040b00ab5f5b22ceda489c217c2 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r24-missingness/execute.py)" = 67dc93782d56436793de386d4437375b3dfc87c8
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r25-alignment/prereg.json)" = 0b430e6f701f939ca13e1899c8d937418c21a262
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r25-alignment/execute.py)" = ae7b7dfd85404a79db1f82f23ce4c2a7851e6419
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r25-alignment/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r25-alignment/execute.py
+      - name: Original frozen no-oracle temporal alignment test
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r25-alignment/execute.py > /tmp/W-R25-original.json
+          python3 -m json.tool /tmp/W-R25-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/W-R25-original.json'))
+          assert len(r['arms'])==3 and all(len(a['cells'])==36 for a in r['arms'])
+          assert r['heldout_seeds']==list(range(336,352))
+          print('CLASSIFICATION',r['classification'])
+          for a in r['arms']:
+              print('ARM',a['arm'],a['accuracy'],a['by_fill'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R25-original-observed-reference
+          path: /tmp/W-R25-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Final full Wingless regression
+        run: go test ./... && go build ./...
