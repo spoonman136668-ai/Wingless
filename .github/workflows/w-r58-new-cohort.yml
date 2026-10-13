@@ -1,0 +1,41 @@
+name: Wingless frozen independent replication W-R58
+on:
+  push:
+    branches: [research/w-r58-supported-amplitude-replication-r1]
+permissions:
+  contents: read
+jobs:
+  scientific:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Immutable source identity check
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r58-new-cohort/prereg.json)" = 5418057c753adc1d757be1d76ae861045aa8aee4
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r58-new-cohort/execute.py)" = b4bfdc0ae145c1dcac8d30c97f49a7daa3f59c02
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r57-valid-amplitude/execute.py)" = 8514f986f33a2d957cf371ab3b6a73cf3b025901
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r58-new-cohort/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r58-new-cohort/execute.py
+      - name: Original sealed first-use
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r58-new-cohort/execute.py > /tmp/W-R58.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R58.json'))
+          assert x['sealed_heldout_seeds']==list(range(6320,6368)); assert x['test_amplitudes']==[1,2,3]
+          print('CLASSIFICATION',x['classification'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R58-original-sealed
+          path: /tmp/W-R58.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full repository regression
+        run: go test ./... && go build ./...
