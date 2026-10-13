@@ -45,7 +45,6 @@ def causal_feature(observed,t,arm):
 
 
 def examples(seed,generator,amp,phase,arm):
-    base,observed=w26.signature(seed,generator,amp,phase) if False else (None,None)
     rows=[]
     for entity in range(9):
         base,observed=w26.signature(seed,entity,generator,amp,phase)
