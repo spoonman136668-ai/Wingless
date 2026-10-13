@@ -1,0 +1,73 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R36-UNSEEN-BIJECTIVE-CODEBOOK-TRANSFER",
+  "parent_head": "7528b49520035347597967e476392ef4a2b97a15",
+  "hypothesis": "W-R35's reproducible asymmetric-reference advantage may be tied to the original byte-codebook rather than a transferable temporal ordering primitive. Freeze development-only W-R34 weights and test both pretrained representations under invertible label-preserving byte/channel transforms applied equally to the raw reference and quantized observation. No weights or features are refit.",
+  "freeze": "Freeze fresh seeds1600..1631, bit depth4, four nonidentity invertible coordinate transforms plus identity, six heldout generator/site cells and every classification gate before first-use. No unseen cohort screening, fitting or retuning.",
+  "heldout_seeds": [
+    1600,
+    1601,
+    1602,
+    1603,
+    1604,
+    1605,
+    1606,
+    1607,
+    1608,
+    1609,
+    1610,
+    1611,
+    1612,
+    1613,
+    1614,
+    1615,
+    1616,
+    1617,
+    1618,
+    1619,
+    1620,
+    1621,
+    1622,
+    1623,
+    1624,
+    1625,
+    1626,
+    1627,
+    1628,
+    1629,
+    1630,
+    1631
+  ],
+  "original_frozen_development_seeds": "1184..1199 W-R34 only; no new training and no previous heldout evaluation used as fit",
+  "quantization": "Pinned W-R32 top-4-bit quantizer applied to observation BEFORE the format transform; transformation T acts on raw reference and already quantized observation, not on labels or swap order",
+  "transforms": [
+    "identity",
+    "byte_invert: 255-v",
+    "xor55: v XOR 0x55",
+    "channel_rotate: rotate four channel tuple left one",
+    "offset37: (v+37) mod256"
+  ],
+  "arms": [
+    "asymmetric_refit: original W-R34 development-frozen raw-reference vs observation 16-wide model",
+    "symmetric_refit: original W-R34 development-frozen matched-codec reference 16-wide model"
+  ],
+  "primary": "Report each transform's paired TP/TN/FP/FN and observationally identical pairs for 32 seeds, 3 frozen generator families and two swap sites. Define loss per arm as accuracy(identity)-accuracy(transform) on exactly matched seeds. CODEBOOK_SENSITIVE iff at least two nonidentity transforms each lose >=0.10 in either arm; PARTIAL if at least one loses >=0.10; TRANSFER_STABLE otherwise. Explicitly retain transformations with improvements.",
+  "controls": [
+    "All transforms are bijective 4-channel bytes, do not alter class labels or order; both raw reference and candidate transformed in same way",
+    "Same fixed W-R34 1728 historical training examples, 32 epochs, 16 weights+bias and exact features; evaluation-only changes",
+    "No source birth independence claims beyond fresh deterministic seed cohorts; no model calls, oracle, unseen training or heldout repetitions",
+    "One original evidence artifact followed by full Go test/build; no accepted refs or production writes"
+  ],
+  "bounds": {
+    "bits": 4,
+    "transforms": 5,
+    "arms": 2,
+    "seeds": 32,
+    "generators": 3,
+    "sites": 2,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic zero-shot byte-relabeling transfer, not raw-language generalization."
+}
