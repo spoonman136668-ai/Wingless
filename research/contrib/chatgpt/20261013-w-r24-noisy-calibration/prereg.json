@@ -1,0 +1,29 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R24-ONE_CORRUPT_EXEMPLAR_ROBUST_HYPOTHESIS",
+  "parent_commit": "0c899bceb80f3bb54e3f98e797ed5e547c0d62bc",
+  "question": "Can a preregistered minimum-mismatch hypothesis model recover a fixed synthetic modular rule despite one corrupted calibration label, and reject when noise exceeds its tolerance?",
+  "hypothesis": "Among eight fixed (a,b) candidates, the unique minimum-mismatch candidate with <=1 error should identify the true rule after one corrupted sample and reject after two independent corrupted samples.",
+  "family": "x[t]=(x[t-1]+a*x[t-2]+b)%4; a in {1,2}, b in {0,1,2,3}. Seeds96..103; actual a2 on even and a1 on odd, actual b=(seed-96)%4, evaluator-only.",
+  "frozen_conditions": [
+    "ONE_CORRUPT: episodes0..7 provide their transition t2 labels; corrupt exactly the label of episode0 by adding 1 modulo4 before learner receives it.",
+    "TWO_CORRUPT: same 8 labeled episodes but corrupt episode0 and episode4 by +1 modulo4; two distinct context pairs. These are two separate preregistered arms without after-result selection."
+  ],
+  "calibration": "Exactly eight labeled transitions per seed/condition, including specified corrupted labels; all 8 candidates evaluated by mismatch count, deterministic lexicographic tie order. Conservative gate accepts only if unique candidate has <=1 mismatches; strict control accepts only unique candidate with 0 mismatches. Neither accesses true seed coefficients or any other labels.",
+  "heldout": "Per seed evaluate only never-calibrated episodes8..15, ticks2..31 (240 predictions) if accepted. Always record forced-best ungated predictions on same sealed test for explanatory baseline. Eight seeds (96..103); true coefficients reported by evaluator only after predictions are frozen.",
+  "primary": "Per condition counts of accepted seeds, false accepts, rejected inputs, conditional prediction accuracy and forced-best accuracy. ONE_ERROR_RECOVERY_TWO_ERROR_REJECTION only if robust gate accepts all 8 ONE_CORRUPT with 100% prediction accuracy and rejects all 8 TWO_CORRUPT, strict zero-error gate rejects all noisy cohorts; otherwise PARTIAL or NEGATIVE according to exact coverage and errors.",
+  "safeguards": "Only one original trial for both conditions with immutable prereg/sources. Fixture-only synthetic preflight confirms mismatch ordering; no full scientific seed execution before freeze. Full Go regression/build and original hash-addressed artifact, no capacity changes, additional budget, tuning, retries or accepted-ref edits.",
+  "budget": {
+    "seeds": 8,
+    "candidates": 8,
+    "labels_per_seed_per_condition": 8,
+    "heldout_episodes_per_seed": 8,
+    "heldout_ticks_per_episode": 30,
+    "arms": 3,
+    "conditions": 2,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Predefined one-error tolerance in a tiny modular candidate family; not learning from noisy natural language or general robust model selection."
+}
