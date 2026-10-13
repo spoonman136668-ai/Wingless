@@ -1,0 +1,22 @@
+{
+  "id": "W-R22-CORRECTED_HYPOTHESIS_NEW_COHORT",
+  "previous_invalid": "W-R21 run38358152995 invalid before result: unbound variable offset; never retry or reinterpret.",
+  "base": "baa8e1eadde3fd10bba761735a50ff4d6944a82b",
+  "cohort": [
+    80,
+    81,
+    82,
+    83
+  ],
+  "hypotheses": "a in 1,2; b in 0,1,2,3; recurrence next=(last + a*second_last+b)%4",
+  "true_source": "seed parity maps a=2 if even else 1; b=(seed-80)%4",
+  "calibration": "Exactly 4 t2 labels from episodes0..3; test episodes4..15 across t2..31",
+  "comparators": [
+    "fixed a1,b2",
+    "rote 16x4 counts with 4 calibration labels",
+    "8-hypothesis search over four labels; require unique fit",
+    "chronology-shuffled selected hypothesis"
+  ],
+  "thresholds": "TRANSFER if hypothesis accuracy>=95% and all controls <=65%; PARTIAL if hypothesis > all controls; NEGATIVE otherwise; AMBIGUITY if no unique fit",
+  "constraint": "Frozen before first run, fresh seeds, no scientific outcome replay, compile/syntax preflight before first use, archive valid negative and full regression, no model calls/live activation/accepted ref mutation."
+}
