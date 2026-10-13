@@ -1,0 +1,37 @@
+name: Wingless W-R19 frozen original qualification
+on:
+  push:
+    branches: [research/w-r19-multichannel-local-order-r1]
+permissions:
+  contents: read
+jobs:
+  first-use:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify frozen provenance and execution bytes
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor a1c11d76e670a4838a7b05d2b6905d2318183394 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-adjacent-order/execute.py)" = 621f8e0e89f40658e8402f9f074823e1f12907f4
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r19-multichannel/prereg.json)" = e5d60160dee0ed1e4ea96b74749e7c92fe9a5b4e
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r19-multichannel/execute.py)" = d0ace9183dc72927bfa76bec2747027c1a711249
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r19-multichannel/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r19-multichannel/execute.py
+      - name: Run original scientific evaluation once
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r19-multichannel/execute.py > /tmp/W-R19-original.json
+          python3 -m json.tool /tmp/W-R19-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R19-first-use-frozen
+          path: /tmp/W-R19-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full regression at original frozen source
+        run: go test ./... && go build ./...
