@@ -1,0 +1,84 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "experiment": "W-R23-MISSINGNESS-SENTINEL-DEPENDENCE",
+  "parent_head": "c551d41a7b8d4f77b9349033fa788d621a800519",
+  "hypothesis": "W-R22 mask-aware features completely recovered discrimination when absent rows were explicitly encoded as all-zero sentinel observations. Test whether that apparent robustness transfers to missingness hidden by deterministic nonzero forward-fill or interpolation without any additional missingness channel.",
+  "freeze": "Fix three observed-value substitution modes, missing tick masks, all generating families, seeds, model budget, and preregistered classification thresholds before original first use. No reuse of W-R22 heldout.",
+  "training": "Exactly W-R22 development seeds240..255, four frozen clean/augmented models with 1728 paired examples, 32 fixed epochs, 16 weights+bias. No retraining for new missingness encoding.",
+  "sealed_heldout": {
+    "seeds": [
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "noise_amplitude": 3,
+    "missing_ticks": [
+      3,
+      5
+    ],
+    "missing_mask_order": [
+      2,
+      5,
+      8,
+      10,
+      3,
+      6
+    ],
+    "missingness_encoding": [
+      "explicit_all_zero",
+      "forward_fill_previous_observed_row",
+      "linear_interpolate_nearest_nonmissing_rows"
+    ],
+    "negative_swap_families": [
+      "swap10_11",
+      "swap12_13"
+    ],
+    "cells_per_arm": 18,
+    "total_cells": 72
+  },
+  "source": "All observations remain 16x4 channel values. Missing positions remain outside anchor0 and four possible swapped true-tick rows11..14. Both positive and negative pair candidates undergo exactly the same missingness replacement before negative-only reordering.",
+  "interpolation_rule": "Each missing tick and channel replaced by integer floor of mean of nearest previous and next unmasked candidate rows, with offsets bounded within 16-tick observed candidate. No future label, oracle, or additional sensor. Forward fill uses last unmasked preceding row; anchor never masked.",
+  "arms": [
+    "naive_clean",
+    "naive_augmented",
+    "maskaware_clean",
+    "maskaware_augmented"
+  ],
+  "classification": "SENTINEL_DEPENDENCE if maskaware_augmented averages>=0.85 across explicit_all_zero cells but <=0.55 across nonzero encoding cells. ENCODING_ROBUST if maskaware_augmented scores>=0.80 in every nonzero encoding cell. MIXED otherwise. Publish all 18 cells per arm and per-seed confusion.",
+  "controls": [
+    "Exact W-R22 source/prereg SHA and parent identity",
+    "No model training on W-R22 original heldout or new heldout",
+    "All original negative local swaps remain observable and labels distinct",
+    "One first-use artifact and final full Go test/build; no retries or acceptance authority changes"
+  ],
+  "bounds": {
+    "model_arms": 4,
+    "width": 16,
+    "train_examples_each": 1728,
+    "epochs": 32,
+    "heldout_seeds": 16,
+    "heldout_cells_each": 18,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic replacement encoding robustness only; zero-sentinel need not generalize to unmarked loss."
+}
