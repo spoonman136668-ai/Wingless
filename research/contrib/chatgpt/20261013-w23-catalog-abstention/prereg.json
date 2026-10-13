@@ -1,0 +1,20 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R23-OUTSIDE_HYPOTHESIS_CATALOG_ABSTENTION",
+  "parent_commit": "3838bedecfb3cb2133f36846960fddf878498928",
+  "qualified_parent": "W-R22 first-use attempt1 run38358622018 succeeded at pinned commit; moving original PR head excluded by isolation.",
+  "question": "Does an eight-candidate compositional model abstain rather than fabricate certainty when calibration evidence comes from a recurrence outside its frozen hypothesis class?",
+  "hypothesis": "A no-perfect-fit acceptance gate will identify all in-catalogue trajectories and reject out-of-catalogue a=3 dynamics, while a forced best-fit mechanism has no comparable rejection ability.",
+  "freeze": "All generator families, splits, metric windows, abstention rule and controls frozen before first-use; do not expand candidate library in response to out-of-catalogue evidence.",
+  "catalog": "Exactly frozen W-R22 candidates a in {1,2} and b in {0,1,2,3}; 8 hypotheses. Synthetic recurrence x_t=(x[t-1]+a*x[t-2]+b)%4.",
+  "population": "Fresh independent seeds84..91. Seeds84..87 in-catalogue: a=2 if even else1, b=(seed-84)%4. Seeds88..91 out-of-catalogue: a=3 always, b=(seed-88)%4. Episode initial x0=(e+seed)%4, x1=(e//4+3seed)%4 for e0..15, 32 steps.",
+  "allowed_calibration": "Four labeled first transitions t2 from episodes0..3 per seed. Candidate matching uses only four labels and predicts new episodes4..15 if exactly one candidate has zero errors. When no unique candidate, abstain and issue no test predictions.",
+  "controls": [
+    "forced_best_fit: always choose candidate with fewest calibration errors, lexicographic tie-break, even when none fits",
+    "strict_abstention: choose unique exact-fit candidate otherwise explicit reject"
+  ],
+  "metrics": "For 4 in-catalogue and 4 out-of-catalogue seeds report matching hypothesis count, selected/rejected status, forced best model and post-calibration accuracy where predictions made, false accepts, false rejects and coverage. Evaluator may score forced model on out-of-family outcomes only after gate decisions are frozen; predictor cannot read test labels.",
+  "primary": "CORRECT_CATALOG_ABSTENTION if all four in-catalogue seeds have unique accepted correct model with>=.95 subsequent predictive accuracy and all four out-of-catalogue seeds are rejected; PARTIAL if at least one correctly rejected and no forced hidden candidate modifications; FAILURE otherwise.",
+  "controls_integrity": "Exact W-R22 source Git blob identity, four labels per seed, model calls0, finite fixed 8-candidate capacity, no hidden extra hypotheses, future labels or scientific first-use retries.",
+  "claim_limit": "Synthetic catalogue rejection with known excluded dynamics; not calibrated probabilistic uncertainty, general safety assurance or natural language cognition."
+}

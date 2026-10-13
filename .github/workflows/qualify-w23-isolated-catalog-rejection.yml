@@ -1,0 +1,37 @@
+name: Wingless W-R23 pinned eight-candidate catalog rejection
+on:
+  push:
+    branches: [research/chatgpt-isolated-w23-catalog-rejection-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify pinned isolated parent and frozen original
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 3838bedecfb3cb2133f36846960fddf878498928 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-hypothesis-prereg/execute.py)" = ad20dbfb02c06e799fc16834caa87a478a8b9294
+          test "$(git hash-object research/contrib/chatgpt/20261013-w23-catalog-abstention/prereg.json)" = f8161b223fa514aa009c6c919e3ea1a11e013cbc
+          test "$(git hash-object research/contrib/chatgpt/20261013-w23-catalog-abstention/execute.py)" = 39a89607b25001e78b68e8cafd622218081e2093
+          python3 -m json.tool research/contrib/chatgpt/20261013-w23-catalog-abstention/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w23-catalog-abstention/execute.py
+      - name: First-use frozen catalog-abstention experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w23-catalog-abstention/execute.py > /tmp/W-R23-original.json
+          python3 -m json.tool /tmp/W-R23-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R23-original-frozen-abstention
+          path: /tmp/W-R23-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Complete Wingless regression and build
+        run: go test ./... && go build ./...
