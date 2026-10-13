@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R12-SHIFT-NONINVARIANT-POSITION-FALSIFICATION",
+  "parent_commit": "4f7da44d03544559bbb7753052811b93f7d6d823",
+  "predecessor": "W-R11",
+  "hypothesis": "W-R11's positional model may exploit identical-pair positives. Test whether 16-feature trainable temporal discrimination generalizes after global input-channel offset nuisance on positive and reordered negative pairs. Anchor-relative circular features should retain temporal order while removing nuisance.",
+  "preregistration_before_first_use": true,
+  "source": "Exact W-R11 deterministic 16-tick four-channel generator; nine entities per seed; no data-tuned generator.",
+  "split": {
+    "development": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "heldout": [
+      4,
+      5,
+      6,
+      7
+    ]
+  },
+  "arms": [
+    "raw_position_difference: 16 absolute first-channel point differences /255",
+    "unordered_relative_histogram: 16-bin first-channel modulo-16 histogram of relative-to-first circular offsets",
+    "anchor_relative_circular_position: 16 circular first-channel differences after subtracting each sequence's own first channel modulo 256"
+  ],
+  "pair_generation": "Take original W-R11 16x4 tuple. Apply +17 modulo 256 to all channels/ticks for training second sequence and +31 for heldout second sequence. Positive preserves shifted sequence order. Negative changes only the shifted tail: reverse 15 tail ticks in development and rotate tail left by 5 in heldout. Positive/negative candidates have exactly same first observation and multiset for matched seed and entity.",
+  "learning": "Same 16 weights+bias perceptron initialized to zero, 32 ordered epochs, learning rate 0.1, label +1/-1, update iff signed margin <=0; no heldout updates.",
+  "primary": "Per-arm heldout balanced accuracy over 4 seeds x 9 entities x positive/negative. NUISANCE_INVARIANT_TRANSFER only if anchor-relative >=0.85 and unordered <=0.55; otherwise PARTIAL if anchor-relative exceeds both comparators, else NEGATIVE. Retain per-seed confusion and all negative findings.",
+  "independent_checks": [
+    "16-feature width and equal training examples/epochs across arms",
+    "same first row and multiset for both labels per example",
+    "positive shifted pair is not byte-identical to original",
+    "anchor-relative invariant to global shift on identical order",
+    "determinism twice; first-use archive; exact Git blob identities; one full regression"
+  ],
+  "bounds": {
+    "seeds": 8,
+    "heldout_seeds": 4,
+    "entities": 9,
+    "sequence_ticks": 16,
+    "feature_width": 16,
+    "model_candidates": 3,
+    "epochs": 32,
+    "learning_rate": 0.1,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "hidden_capacity_increase": 0
+  },
+  "claim_limit": "Small supervised synthetic invariant representation evaluation; not natural language, language prediction or autonomous intelligence; no accepted-ref mutation."
+}
