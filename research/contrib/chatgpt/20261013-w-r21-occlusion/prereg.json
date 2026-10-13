@@ -1,0 +1,77 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "experiment": "W-R21-MISSING-OBSERVATION-ROBUSTNESS",
+  "parent_head": "52461b46db11ad7677ba058d20ffb52ccd8aa68c",
+  "hypothesis": "W-R20 correctly identified every paired local swap on new generator families, but both its top-two and single-channel models may exploit full observation support. Erase a preregistered subset of non-swapped candidate timepoints before forming matched positive/negative pairs and measure whether the existing frozen learned features survive.",
+  "freeze": "The exact occlusion positions, counts 0/2/4/6, all generator families and thresholds are frozen before first use. Do not change swap sites or masks when results arrive.",
+  "training": "Reuse only W-R19 frozen development seeds160..175, exactly original 1728 paired examples per fixed 16-weight+bias model, 32 epochs, LR0.1, four W-R19 feature arms. No adaptation/retraining to occlusions, new generator families or W-R20 heldout.",
+  "heldout": {
+    "seeds": [
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "amplitudes": [
+      3
+    ],
+    "occluded_tick_counts": [
+      0,
+      2,
+      4,
+      6
+    ],
+    "mask_order": [
+      2,
+      5,
+      8,
+      10,
+      3,
+      6
+    ],
+    "swap_families": [
+      "tail_index10_11",
+      "tail_index12_13"
+    ],
+    "cells_per_arm": 24,
+    "total_cells": 96
+  },
+  "mask_rule": "After generating the candidate, replace entire four-channel row with exact (0,0,0,0) for the first N tick indices in the fixed mask order; keep index 0 and both swapped row positions t=11,12 and t=13,14 untouched. Apply negative swap after mask, ensuring matched positive/negative candidate anchors and multisets.",
+  "outcome": "ROBUST_OCCLUSION if mean_top_two_64 >=0.80 accuracy in EVERY 12 heldout cells at occlusion counts4/6 and exceeds first_channel_max pooled accuracy on those cells by >=0.05. PARTIAL if mean_top_two_64 improves over first_channel_max by >=0.03 pooled for occlusion4/6 without meeting strict threshold. NEGATIVE otherwise. Full confusion for each seed/cell/model, including perfect zero-occlusion controls.",
+  "controls": [
+    "Distinct heldout seeds from W-R19/W-R20 and all previous experiments",
+    "All negative pairs swap untouched observable rows, so no identical positive/negative labels",
+    "All model widths, weights, epochs identical to frozen W-R19 original development",
+    "No new sensors, time budget outside explicit factorial evaluation, post-result tuning, or replay",
+    "Immutable source/prereg Git blobs, original artifact prior to final full Go regression"
+  ],
+  "bounds": {
+    "models": 4,
+    "feature_width": 16,
+    "training_pairs_per_model": 1728,
+    "epochs": 32,
+    "heldout_seeds": 16,
+    "heldout_cells_per_model": 24,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic observation-erasure robustness of fixed-width paired temporal classifiers; no natural-language understanding."
+}
