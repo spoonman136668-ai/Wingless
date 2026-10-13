@@ -1,0 +1,37 @@
+{
+  "id": "W-R57-SUPPORTED-SWAP-AMPLITUDE-SOURCE-TRANSFER",
+  "parent_head": "a4b1f5f0538dae9164e5890802f03b7c8f4af2a6",
+  "predecessor_status": "W-R56 invalid source-contract failure, sealed seeds5824..5871 consumed and NEVER reused",
+  "hypothesis": "Within strictly supported original generator amplitudes (1,2,3), assess whether xorshift withheld-source generalization remains stable across all original supported perturbation levels, with new models and completely fresh sealed data.",
+  "dev_blocks": [
+    [
+      6016,
+      6032
+    ],
+    [
+      6048,
+      6064
+    ],
+    [
+      6080,
+      6096
+    ]
+  ],
+  "sealed_seeds": [
+    6128,
+    6176
+  ],
+  "amplitudes": [
+    1,
+    2,
+    3
+  ],
+  "training": "Exact W-R54 3 cohort 9-model ridge, two other generators864 each, no training on withheld source, 16 weights, ridge lambda1",
+  "classification": "SUPPORTED_AMPLITUDE_GENERALIZATION iff xorshift withheld source>=.65 across all 9 amplitude/cohort pairs AND broad source >=2/3 families>=.55 for all pairs; PARTIAL_SUPPORTED_TRANSFER iff xorshift>=.55 across all nine but no broad proof; NO_TRANSFER otherwise. All source cells recorded.",
+  "controls": [
+    "Source-valid amplitudes1/2/3 in underlying w16 observed contract; prefirst-use assertion validates amplitudes are in source-supported set.",
+    "Never re-open predecessor consumed sealed data. New development6016..6031/6048..6063/6080..6095 and sealed6128..6175, disjoint from previous and FORGE reserved.",
+    "One original artifact and complete Go regression; no edits after seeing outcomes, no accepted refs, controller or FSA authority."
+  ],
+  "claim_limit": "Synthetic two-candidate transfer across supported source distortion levels, not physical source generalization."
+}
