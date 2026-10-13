@@ -1,0 +1,73 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R28B-NEW-COHORT-CAUSAL-BYTE-FORECAST",
+  "parent_head": "859d4af60957941fa3c28dd0c41841c42296d5df",
+  "invalid_prior": {
+    "run": 38407883519,
+    "head": "b2e48d0e03d0e493b9da986029d722cc944ad878",
+    "classification": "INVALID_NO_SCIENCE_RESULT",
+    "exposed_seeds": "456..471",
+    "no_replay": true
+  },
+  "hypothesis": "Exactly W-R28's frozen structural forecast: persistence, first-order velocity and second-order acceleration have differing next-byte errors under affine/quadratic and pseudo-random streams.",
+  "split": {
+    "development_seeds": [
+      472,
+      473,
+      474,
+      475,
+      476,
+      477,
+      478,
+      479
+    ],
+    "sealed_heldout_seeds": [
+      480,
+      481,
+      482,
+      483,
+      484,
+      485,
+      486,
+      487,
+      488,
+      489,
+      490,
+      491,
+      492,
+      493,
+      494,
+      495
+    ]
+  },
+  "scientific_identity": "Same four-channel raw W-R20 affine/quadratic/xorshift input generator, global offset 79 and per-tick jitter noise amplitude1/3/5. Predictor observes only t,t-1,t-2 for t in 2..14, scores hidden observed future value at t+1.",
+  "bounded_repair": "Local observed() generator implements exactly the predeclared modular jitter ((11*t+7*channel+3*entity+seed) mod (2*amp+1))-amp for amplitude5 as well as 1 and3. No inherited range assertion; for amp1/3 validate byte identity against frozen W-R26 observer.",
+  "predictors": [
+    "persistence: next = observed[t]",
+    "velocity: next=(2*observed[t]-observed[t-1])mod256",
+    "acceleration: next=(3*observed[t]-3*observed[t-1]+observed[t-2])mod256",
+    "dev_selected: one global rule chosen by minimum dev affine/quadratic circular absolute loss amp1/3, tie persistence>velocity>acceleration"
+  ],
+  "metrics": "Per synthetic generator, noise amplitude and predictor: heldout circular MAE, exact-byte and within8 accuracy, per-seed scores. Every negative retained.",
+  "classification": "STRUCTURED_FORECAST if affine velocity MAE improves persistence by at least8 and quadratic acceleration improves velocity by at least8 under heldout amp3; PARTIAL if either gain at least8; NEGATIVE otherwise. No post-result adjustments.",
+  "controls": [
+    "New heldout480..495, zero first-use retries",
+    "One exact frozen source/sha and original archived result before full Go regression",
+    "No lookahead/extra sensors/accepted-ref mutation",
+    "No additional simultaneous capacity; no oracle future in predictor"
+  ],
+  "bounds": {
+    "models": 4,
+    "heldout_seeds": 16,
+    "development_seeds": 8,
+    "amplitudes": [
+      1,
+      3,
+      5
+    ],
+    "input_channels": 4,
+    "model_calls": 0,
+    "first_use_retries": 0
+  },
+  "claim_limit": "Deterministic toy raw byte prediction diagnostic only"
+}
