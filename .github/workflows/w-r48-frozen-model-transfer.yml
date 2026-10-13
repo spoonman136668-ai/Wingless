@@ -1,0 +1,54 @@
+name: Wingless W-R48 frozen historical models on new unseen cohort
+on:
+  push:
+    branches: [research/w-r48-frozen-model-cross-cohort-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Fail-closed exact scientific source identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 1dc0a393aee9b23bc879cfe7d87f7cb78864d066 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r46-cluster-replication/execute.py)" = ba17dedfd0cbbb296e774ba055c4d78ce021ab13
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r47-diverse-training/execute.py)" = 092e20b4e5a35cd9ed01cbb653706f943cb36299
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r48-frozen-transfer/prereg.json)" = b0f6f33f276d2815aa80b90915dc57463b1b1d93
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r48-frozen-transfer/execute.py)" = 3b960f91d693e12593d15c76284264806a128f9c
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r48-frozen-transfer/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r48-frozen-transfer/execute.py
+      - name: Original single first-use frozen-weight transfer test
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r48-frozen-transfer/execute.py > /tmp/W-R48-original.json
+          python3 -m json.tool /tmp/W-R48-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R48-original.json'))
+          assert x['sealed_heldout_seeds']==list(range(2720,2768))
+          assert x['new_training_updates']==0
+          assert len(x['results']['identity'])==3
+          assert all(len(x['results']['identity'][arm]['by_seed'])==48
+                     for arm in x['results']['identity'])
+          print('CLASSIFICATION',x['classification'])
+          print('PRIMARY_FAMILIES_PASS',x['primary_generators_above_52_percent'])
+          for arm,row in x['results']['identity'].items():
+              print('ARM',arm,row['balanced_accuracy'],
+                    row['seed_cluster_bootstrap_interval'],
+                    {k:v['accuracy'] for k,v in row['families'].items()},
+                    row['frozen_weights_sha256'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R48-original-frozen-model-new-cohort
+          path: /tmp/W-R48-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: One required full Wingless regression and build
+        run: go test ./... && go build ./...
