@@ -1,0 +1,65 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R41-EXACT-FEATURE-LABEL-COLLISION-AUDIT",
+  "parent_head": "7f538f0fbe0e67418a6a52544d086557fd7e85b7",
+  "hypothesis": "W-R38–W-R40 found XOR55 invariant features with approximately chance-level classification. Determine whether exact feature aliasing of balanced original/swapped sequences explains this: a representation discarding distinguishing information imposes an upper bound regardless of classifier; if few collisions occur, optimization, train distribution and model capacity remain open explanations.",
+  "freeze": "Prior to untouched first use freeze audit seeds1920..1935, 3 generator families, two fixed swap sites, identity/XOR55 recoding after four-bit quantization, five exact representations (full raw reference+observation input, W-R40 scalar, W-R40 lag1/lag2, W-R39 top16), precise collision/empirical lookup math and classification gates. No model training, refit, selection or post-result classifier search.",
+  "cohort": {
+    "sealed_heldout": [
+      1920,
+      1921,
+      1922,
+      1923,
+      1924,
+      1925,
+      1926,
+      1927,
+      1928,
+      1929,
+      1930,
+      1931,
+      1932,
+      1933,
+      1934,
+      1935
+    ],
+    "generator_families": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "swap_sites": [
+      10,
+      12
+    ],
+    "observation_bits": 4,
+    "conditions": [
+      "identity",
+      "xor55"
+    ]
+  },
+  "arms": [
+    "raw_pair: full raw reference and observed candidate bytes, providing the no-compression finite empirical ceiling; no model is trained",
+    "scalar_repeated: W-R40 scalar repeated invariant feature",
+    "ordered_lag1: W-R40 temporal lag1",
+    "ordered_lag2: W-R40 temporal lag2",
+    "top16_sorted: W-R39 top16 ordered bitpopcount feature"
+  ],
+  "measures": "For 16*3*2*9=864 matched positive/negative counterfactual pairs per coding: count exact within-pair identical observed sequences and identical feature encodings for each arm; optimistic matched-pair upper bound=1-(identical_pairs/(2*864)); also count empirical exact-feature positive/negative keys across full 1728 examples to compute an in-sample unrestricted memorization ceiling= sum(max(pos,neg) for each feature key)/1728. Oracle empirical ceiling is NOT candidate performance nor sealed generalization. Save by-seed and by-generator/site counts.",
+  "decision": "OBSERVATION_LIMIT iff raw_pair exact identity fraction >=0.20; FEATURE_COLLAPSE iff raw_pair identity fraction <0.02 but any invariant arm feature identity fraction >=0.20; UNEXPLAINED_BY_EXACT_PAIR_COLLISION otherwise. Include global collision and upper bound in all classifications, never infer that a linearly limited model reached its theoretical ceiling.",
+  "controls": [
+    "No labels or future source values enter any deployed classifier; evaluator uses labels only for exact collision counting, not training or selection",
+    "Same source generator as predecessor, fresh prospective seed cohort, no heldout rerun or broadened budget",
+    "XOR55 equivalence of candidate invariant features checked on every balanced pair; raw observations are not claimed invariant",
+    "Original immutable first-use evidence and complete Go regression/build; synthetic feature diagnostics not independent source-birth or semantic cognition"
+  ],
+  "bounds": {
+    "matched_pairs_per_condition": 864,
+    "arms": 5,
+    "conditions": 2,
+    "seeds": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  }
+}
