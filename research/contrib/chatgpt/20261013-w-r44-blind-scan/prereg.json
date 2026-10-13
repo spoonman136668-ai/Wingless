@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R44-BLIND-LOCAL-COUNTERFACTUAL-SCREEN",
+  "parent_head": "4721050ee908cb8461f26ec2ea1ac30588a59228",
+  "hypothesis": "W-R43's 89.35% paired-ranking gain depended on observing both original/altered candidates. When only one observed sequence is presented, self-generating all 14 adjacent tail-swap alternatives may yield useful anomaly evidence without the evaluator disclosing which site was actually swapped. Performance must be distinguished from a privileged known-site contrastive baseline.",
+  "freeze": "Freeze dev seeds2224..2239, heldout2240..2255, same W-R43 paired-difference weights/32 epochs/1728 balanced pair-order development examples, 16-dimension lag2 features, 4-bit quantizer, identical synthetic generators/site10/12 and two codebooks. Holdout inference under blind arms sees only raw base and candidate, no true site, no alternate original, and fixed all 14 tail-adjacent swaps. Predetermined min-margin and majority-negative rules with score>0 per generated alternate, no threshold tuning.",
+  "development": [
+    2224,
+    2225,
+    2226,
+    2227,
+    2228,
+    2229,
+    2230,
+    2231,
+    2232,
+    2233,
+    2234,
+    2235,
+    2236,
+    2237,
+    2238,
+    2239
+  ],
+  "sealed_heldout": [
+    2240,
+    2241,
+    2242,
+    2243,
+    2244,
+    2245,
+    2246,
+    2247,
+    2248,
+    2249,
+    2250,
+    2251,
+    2252,
+    2253,
+    2254,
+    2255
+  ],
+  "arms": [
+    "known_site_oracle: evaluator supplies true swap site to generate the exact counterpart; privileged benchmark only, not deployable",
+    "blind_any_better: scan all 14 adjacent tail swaps; predict candidate genuine iff NO generated variant has a strictly greater paired-difference score (margin<-1e-10)",
+    "blind_majority: scan all 14 swaps; candidate genuine iff fewer than seven generated variants have strictly greater relative score"
+  ],
+  "metrics": "For each candidate (balanced 864 originals and864 swapped counterfactuals per encoding) record TP/TN/FP/FN by seed/generator/site; 14 fixed counterfactual comparisons for each blind arm, one for oracle baseline; preserve identical alternatives and tie behavior, XOR feature equivalence assertions, runtime comparison counts.",
+  "classification": "BLIND_CONTRASTIVE_GAIN iff either blind arm achieves >=0.65 balanced accuracy and within 0.10 of known-site privileged baseline under both encodings; PARTIAL_GAIN iff either achieves >=0.55 but strict criterion fails; NO_GAIN otherwise. Do not claim parity of compute or information across arms.",
+  "controls": [
+    "Training source original W-R43 paired-difference scheme with NEW development seeds only, 1728 examples, 16 weights+bias, 32 fixed epochs; no sealed training or post-result site selection",
+    "Blind inference never receives true swap site, ground-truth original, or a second independently observed candidate. Only fixed local transforms of the same current candidate are allowed; known-site comparator explicitly leaks evaluator side information",
+    "Fixed 14 local transformations are a bounded additional inference-compute cost; not a learned recurrent state or generalized anomaly detection",
+    "Original immutable first-use evidence, one full Go regression/build and no accepted-ref/authority mutation"
+  ],
+  "bounds": {
+    "arms": 3,
+    "counterfactual_blind_alternatives": 14,
+    "heldout_seeds": 16,
+    "development_seeds": 16,
+    "train_examples": 1728,
+    "epochs": 32,
+    "weights": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Deterministic synthetic alternate-generation diagnostic; any success is conditional on a known local-swap mechanism, not unsupervised open-world anomaly detection."
+}
