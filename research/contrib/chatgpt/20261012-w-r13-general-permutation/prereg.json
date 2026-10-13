@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R13-UNSEEN-PERMUTATION-GENERALIZATION",
+  "parent_commit": "5e27cf50f70bfb8fb28364461e2cac0f0695a055",
+  "predecessor": "W-R12",
+  "scientific_question": "Can a capacity-matched learned temporal mismatch statistic trained on two tail perturbations recognize a disjoint, never-trained family without relying on identical positives?",
+  "hypothesis": "Circular anchor-relative pooled mismatch should transfer to an unseen even-odd interleave, while raw per-position weights may overfit training perturbations and unordered histogram cannot detect order.",
+  "freeze": "This preregistration must be committed before scientific code's first experiment invocation and CI. No parameters, splits, feature maps, thresholds, scores, labels or training budget changed afterward.",
+  "population": "Same original 16-step W-R11/W-R12 four-channel synthetic generator, but fresh seeds 8 through 15. Every second sequence has a shared nuisance channel offset; negative order changes preserve the candidate multiset and anchor.",
+  "split": {
+    "development_seeds": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "sealed_heldout_seeds": [
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  "training_perturbation": "For each development seed/entity, negative uses tail reverse for even entity and tail rotate left by 3 for odd entity. Positive preserves order. Nuisance +17 on all four channels for both negative and positive candidate.",
+  "heldout_perturbation": "Nuisance +47 and new even-index-first/odd-index-last weave of 15-element tail (indices [0,2,...14,1,3,...13]) on negative candidate. Never included in training. Positive candidate retains order.",
+  "arms": [
+    "anchor-relative unordered modulo16 histogram difference, 16 features",
+    "16 per-position anchor-relative circular mismatch values",
+    "same mean absolute anchor-relative circular mismatch repeated across 16 feature dimensions; no extra model parameters"
+  ],
+  "learning": "Exactly 16 weights plus bias per arm, zero initialization, learning-rate .1, 32 full ordered epochs, 72 examples; perceptron updates only at signed margin<=0. No validation examples included in training.",
+  "primary": "Report per-seed TP/TN/FP/FN and heldout accuracy on sealed seeds. TRANSFER if pooled >=0.85 and histogram <=0.55; PARTIAL if pooled > histogram but <0.85; NEGATIVE otherwise. Zero positives or negatives rejected as invalid.",
+  "critical_controls": "All candidates' positive and negative pairs have the same anchor/multiset; channel offset differs from training to heldout; verify invariant features; independent deterministic replay; full repo regression; source identities.",
+  "budget": {
+    "seeds": 8,
+    "development": 4,
+    "heldout": 4,
+    "entities": 9,
+    "ticks": 16,
+    "width": 16,
+    "models": 3,
+    "epochs": 32,
+    "learning_rate": 0.1,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Narrow synthetic supervised perturbation recognition, not natural language understanding, raw reasoning, semantic transfer, or accepted-ref promotion."
+}
