@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R18-LOCAL-ORDER-COUNTEREXAMPLE",
+  "parent_commit": "21b3c3fee08e5af3ed6c22218d67f59ed40d60a9",
+  "predecessor": "W-R17",
+  "scientific_question": "W-R17 detects large permutations under real jitter; does a train-only learned order threshold recognize an unseen single adjacent-tail swap, or does it exploit large permutation magnitude?",
+  "preregistration": "Freeze all source generation, threshold rules, controls, cohort and success thresholds before first-use scientific execution. Never tune based on heldout scores.",
+  "population": "Same exact frozen W-R11 16x4 original sequence; nine entities/seed, 16 ticks; candidate global channel offsets +17 development and +61 heldout, then deterministic per-tick nuisance.",
+  "split": {
+    "development_seeds": [
+      48,
+      49,
+      50,
+      51
+    ],
+    "heldout_seeds": [
+      52,
+      53,
+      54,
+      55
+    ]
+  },
+  "noise": "Development per-tick signed jitter ((5*t+seed+entity)%3)-1; heldout ((7*t+seed+entity)%5)-2. Assert exactly three/five distinct levels in 16 ticks.",
+  "positives": "Candidate preserves shifted+jittered sequence order. Negative preserves candidate first row and exact unordered multiset. For development negative: reverse tail if entity even, rotate tail left 3 if odd. For heldout negative only: swap adjacent tail positions index7 and 8 (zero-based sequence indices, avoiding fixed anchor).",
+  "equal_capacity_arms": [
+    "unordered histogram L1 difference after anchor correction, one train-only threshold",
+    "mean circular anchor-relative position mismatch, one train-only threshold",
+    "maximum circular anchor-relative per-position mismatch, one train-only threshold",
+    "maximum adjacent transition discrepancy between reference and candidate first-channel circular differences, one train-only threshold"
+  ],
+  "learning": "For each scalar feature, calculate max score across 36 development positives and min score across 36 development negatives, freeze threshold midpoint. Predict positive if feature <= threshold. No heldout class data, training iteration, post-hoc model selection or extra capacity.",
+  "metrics": "For all 4 arms, record exact train ranges, thresholds, per-seed heldout TP/TN/FP/FN, accuracy and false-positive counts.",
+  "classification": "LOCAL_ORDER_TRANSFER if transition arm >=0.85 accuracy and unordered <=0.55; PARTIAL if transition beats both pooled and unordered but below 0.85; otherwise NEGATIVE. Invalid if invariants or source identity fail.",
+  "validity": "Candidate set matching per positive/negative pair; genuine nondegenerate noise; distinct heldout generator; source blobs pin exact W-R17 and W-R11; deterministic first-use archive; one full Wingless regression.",
+  "budget": {
+    "dev": 4,
+    "heldout": 4,
+    "entities": 9,
+    "ticks": 16,
+    "arms": 4,
+    "learned_parameters_per_arm": 1,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "A bounded toy test of local sequence order; not generic language or perception intelligence; no accepted-ref mutation."
+}
