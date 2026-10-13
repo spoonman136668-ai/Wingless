@@ -1,0 +1,48 @@
+name: Wingless W-R34 frozen symmetric quantizer training
+on:
+  push:
+    branches: [research/w-r34-symmetric-quantizer-feature-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Immutable first-use source and preregistration gate
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor f7113cf52145cd5f6cb2be43a88fedd38fbd8d94 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r33-quantized-retraining/execute.py)" = 6d9c4b8cdaa2f366ab2b22d4a1ff464016caa01b
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r34-codec-alignment/prereg.json)" = 69611b392b533cc9e3bf510dd4dff7cec612663d
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r34-codec-alignment/execute.py)" = f9eb54cbe2356b31823a4c9694288520cb84ebd2
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r34-codec-alignment/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r34-codec-alignment/execute.py
+      - name: Original frozen first-use codec alignment experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r34-codec-alignment/execute.py > /tmp/W-R34-original.json
+          python3 -m json.tool /tmp/W-R34-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R34-original.json'))
+          assert x["development_seeds"]==list(range(1184,1200))
+          assert x["sealed_heldout_seeds"]==list(range(1200,1216))
+          assert len(x["arms"])==8 and all(len(row["cells"])==6 for row in x["arms"])
+          print('CLASSIFICATION',x['classification'])
+          print('CODEC_GAINS',x['accuracy_gain_symmetric_minus_asymmetric'])
+          for row in x['arms']:
+              print('ARM',row['bits'],row['arm'],row['aggregate_accuracy'],row['identical_training_pairs'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R34-original-symmetric-codec
+          path: /tmp/W-R34-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Complete Wingless regression and build
+        run: go test ./... && go build ./...
