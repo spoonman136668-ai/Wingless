@@ -1,0 +1,89 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R42-BOUNDED-NONLINEAR-READOUT-CAPACITY",
+  "parent_head": "260dc136709f553e8369518605d5010fcfc4f34c",
+  "hypothesis": "W-R41 showed lag2 XOR-invariant temporal features preserve most matched-pair distinguishing information (only 8.449% exact pair collisions) despite poor W-R40 linear readout accuracy. Test whether a small nonlinear depth-2 axis-aligned decision-tree head trained on new development data outperforms a linear perceptron on exact same lag2 features under the same observation/training-example budget, while disclosing differing hypothesis classes and search cost.",
+  "freeze": "Freeze new dev2032..2047, sealed heldout2048..2063, three generator families, two swap sites, 4-bit quantizer, identity-only dev and identity/XOR55 heldout, 16 lag2 invariant inputs. Train 16-weight+bias linear perceptron 32 epochs LR0.1, and depth-2 greedy CART-style tree with fixed 0..32 integer split thresholds, index0..15, deterministic tie-breaking; no post-evaluation search, threshold changes or tuning.",
+  "training": {
+    "dev": [
+      2032,
+      2033,
+      2034,
+      2035,
+      2036,
+      2037,
+      2038,
+      2039,
+      2040,
+      2041,
+      2042,
+      2043,
+      2044,
+      2045,
+      2046,
+      2047
+    ],
+    "examples_per_arm": 1728,
+    "linear_epochs": 32,
+    "linear_lr": 0.1,
+    "tree_max_depth": 2,
+    "tree_nodes": 3,
+    "tree_threshold_candidates": "integers0..32 inclusive",
+    "tree_leaf_prediction": "majority label, ties negative",
+    "tree_greedy_fit": "optimize root in-sample accuracy then separate child splits using same development examples only, deterministic ties first smallest index/threshold"
+  },
+  "test": {
+    "sealed_heldout": [
+      2048,
+      2049,
+      2050,
+      2051,
+      2052,
+      2053,
+      2054,
+      2055,
+      2056,
+      2057,
+      2058,
+      2059,
+      2060,
+      2061,
+      2062,
+      2063
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "sites": [
+      10,
+      12
+    ],
+    "conditions": [
+      "identity",
+      "xor55"
+    ]
+  },
+  "measure": "For each arm/encoding/generator/site/seed report balanced TP/TN/FP/FN, distinct raw observational positives and negatives, exact feature collision count, training objective/updates, model size and threshold search candidate/evaluated examples. Tree requires greater data-dependent combinatorial search; identical training examples and input width do NOT establish equivalent compute or function class.",
+  "classification": "NONLINEAR_READOUT_GAIN iff tree heldout accuracy >=0.65 on identity and XOR55 and improves linear heldout by >=0.10; PARTIAL_GAIN iff tree improves >=0.05; NO_GAIN otherwise. Preserve failures/overfitting and expose nondeployable exact-label upper bound from previous W-R41 only as historical context (no fresh holdout label usage to fit).",
+  "controls": [
+    "No changes to raw candidate encoding, label allocation, future observations, model inputs, training-data volume or sensors",
+    "Training order identical for both arms, labels only for development training, no sealed sample used for branch selection",
+    "Numerical parameter count tree <=10 split/leaf constants vs linear17 weights+bias, but training compute and hypothesis class differ; do not claim equal compute or equal assurance",
+    "One original immutable first-use archive before one required full Go regression/build; no accepted-ref mutation, runtime or production authority"
+  ],
+  "bounds": {
+    "arms": 2,
+    "development_seeds": 16,
+    "heldout_seeds": 16,
+    "training_examples": 1728,
+    "feature_width": 16,
+    "linear_epochs": 32,
+    "tree_depth": 2,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic 4-bit lag2 temporal bit-XOR features and bounded nonlinear readout, not learned general language representation or equal-training-compute result."
+}
