@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R26-LATENT_SYMBOL_PERMUTATION_RECOVERY",
+  "parent_commit": "ebead7f1a2d194553d28db3e352f6e9bb039cedb",
+  "question": "Can a known finite latent second-order recurrence be recovered under an initially unknown four-symbol relabeling, using bounded supervised observations and refusing to guess while multiple candidate predictive rules remain?",
+  "hypothesis": "Searching all 24 symbol permutations by transition consistency recovers a unique observable next-symbol rule from a sufficient set of labels, while early incomplete calibration can leave genuinely ambiguous predictive mappings and cause justified abstention.",
+  "generator": "Latent recurrence x[t]=(x[t-1]+x[t-2]) modulo4 for 32 ticks; x0=(episode+seed)%4, x1=((episode//4)+3*seed)%4 across episodes0..15. For fresh seeds112..119 observed symbol is pi_seed[x], where pi_seed is an index into lexicographically sorted 24 permutations chosen by first SHA256('W26/'+decimal seed) byte mod24; no rule labels or pi_seed provided to predictor.",
+  "cohort": {
+    "heldout_seed_ids": [
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119
+    ]
+  },
+  "calibration_levels": [
+    4,
+    8,
+    16
+  ],
+  "calibration": "For each budget k, show only observed tick0,tick1,tick2 triples of episodes 0..k-1, k fixed from {4,8,16}; test only t3..31 of all sixteen episodes, 16x29=464 predictions per seed. The predictor never receives any tested t>=3 label. All calibration episodes are identified; use the same test set for all budgets.",
+  "arms": [
+    "no_adaptation: directly assume observed labels follow additive mod4 recurrence (identity encoding)",
+    "enumeration_k4: all24 candidate inverses, retain those consistent with 4 triples; accept only if all surviving hypotheses predict identically on ALL 16 possible ordered raw context pairs, otherwise abstain",
+    "enumeration_k8: same with 8 triples",
+    "enumeration_k16: same with 16 triples"
+  ],
+  "metrics": "For each seed and budget: count consistent permutations, count distinct induced 16-context prediction tables, accepted/abstained status, test 4x4 confusion and accuracy if accepted, and test-label-independent table SHA. Report coverage and accepted accuracy, and baseline raw-additive accuracy.",
+  "primary": "REPRESENTATION_RECOVERY if k16 accepts all eight seeds, makes zero incorrect predictions and k16 coverage>=k4, while no_adaptation aggregate accuracy<0.9; PARTIAL if at least one seed accepted correctly; NEGATIVE otherwise. Reject any inconsistent/ambiguous symbolic rules rather than choosing a favorable hypothesis post-result.",
+  "bounds": "24 fixed permutations, 16 possible input contexts, four raw symbols, at most sixteen labeled t2 transitions per seed; labels explicitly budgeted per level, no hidden model calls/capacity increase or extra heldout feedback. Preflight synthetic permutation fixture only, exact Git blob, original first-use archival and full Go regression.",
+  "claim_limit": "Predeclared finite alphabet-isomorphism search with supervised anchors and known latent dynamics, not unconstrained representation learning or natural-language cognition."
+}
