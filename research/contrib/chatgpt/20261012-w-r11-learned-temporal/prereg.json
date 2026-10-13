@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R11-FIXED-WIDTH-LEARNED-TEMPORAL",
+  "parent_commit": "6c106dff38e90e95aebd23d3ea592f26937b2f37",
+  "motivation": "W-R10 falsified temporal-order identifiability of an unordered anchor scorer. Test fixed-width trainable temporal representations rather than continuing static scoring.",
+  "hypothesis": "With identical 16-feature capacity and supervised budget, position-sensitive or transition-sensitive representations can learn order changes from development tail reversal and generalize to an unseen tail-rotation transformation; a histogram cannot.",
+  "freeze": "Commit this preregistration before script installation or first experimental execution. No tuning after heldout observations, including thresholds, width, epochs, update rule, feature maps, or learning rate.",
+  "data": "Exact inherited W-R9 16-step four-channel synthetic generator, nine entities per seed. Positive pairs are identical temporal sequences; negative pairs preserve the anchor and multiset while changing their tail.",
+  "split": {
+    "training_seeds": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "heldout_seeds": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "training_negative": "reverse ticks 1..15",
+    "heldout_negative": "rotate ticks 1..15 left by 5"
+  },
+  "candidate_feature_maps": [
+    "bag-of-rows: 16-bin histogram of first channel modulo 16",
+    "position: 16 ordered normalized first-channel values",
+    "transition: 16 circular first-channel transition increments modulo 256"
+  ],
+  "learner": "Same deterministic 16-dimensional perceptron with bias, zero-initialized weights, 32 ordered epochs, learning rate 0.1, update if signed margin <=0. Includes exactly one positive and one negative per entity/seed during training.",
+  "heldout_metric": "Balanced positive and negative accuracy and confusion counts on disjoint heldout seeds, including full per-seed/per-model outcomes. No training or adjustment on heldout records.",
+  "classification": "ORDER_MODEL_TRANSFER if position and transition both achieve >=0.85 heldout balanced accuracy and histogram <=0.55; PARTIAL_TRANSFER if any temporal model exceeds histogram; otherwise NEGATIVE_TRANSFER. INVALID for data identity or label split failures.",
+  "budget": {
+    "model_candidates": 3,
+    "feature_width": 16,
+    "bias_terms": 1,
+    "epochs": 32,
+    "lr": 0.1,
+    "train_seeds": 4,
+    "heldout_seeds": 4,
+    "entities": 9,
+    "ticks": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "validation": "Exact parent/predecessor/source Git blobs, deterministic double invocation, input invariants, frozen original artifact, and one full project regression.",
+  "claim_limit": "Tiny supervised synthetic representation pilot only; not raw natural language understanding, general reasoning, or accepted-reference promotion."
+}
