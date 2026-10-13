@@ -1,0 +1,46 @@
+name: Wingless W-R25 component dropout first-use
+on:
+  push:
+    branches: [research/w-r25-component-missingness-r1]
+permissions:
+  contents: read
+jobs:
+  original-science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Source and prereg identity freeze
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 800b2fc679e584d50c51a6f0bf5a28a9118dcd2d HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r24-channel-dropout/execute.py)" = c84e6052eb147e5c10b06d83018618d75bfc256a
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r25-component-missingness/prereg.json)" = 35a128b1cd666ee095ce6305894e5021445aca94
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r25-component-missingness/execute.py)" = d7423208ddcec3acd440ce21a001874187b39fd3
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r25-component-missingness/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r25-component-missingness/execute.py
+      - name: Original first-use component dropout transfer
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r25-component-missingness/execute.py > /tmp/W-R25-original.json
+          python3 -m json.tool /tmp/W-R25-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R25-original.json'))
+          assert len(x['models'])==4 and all(len(m['cells'])==24 for m in x['models'])
+          assert x['sealed_heldout_seeds']==list(range(320,336))
+          print('CLASSIFICATION',x['classification'],'PARTIAL_GAIN',x['partial_gain_component_vs_row'])
+          for m in x['models']:
+              print('ARM',m['arm'],'OVERALL',m['overall_accuracy'],'PARTIAL',m['partial_accuracy'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R25-original-component-missingness
+          path: /tmp/W-R25-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Final one full Wingless regression
+        run: go test ./... && go build ./...
