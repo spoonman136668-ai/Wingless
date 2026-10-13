@@ -1,0 +1,37 @@
+name: W-R36 immutable first-use scientific qualification
+on:
+  push:
+    branches: [research/chatgpt-w36-open-family-evidence-budget-20261013]
+permissions:
+  contents: read
+jobs:
+  original-science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Validate immutable parent, preregister and source (nonexecuting)
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor ec08b32ef7617a51fad46e2bbf1b098f9bf85d6b HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-latent-alphabet/execute.py)" = 7632546ca681c3c8fec66991ffc9468ab34e0d07
+          test "$(git hash-object research/contrib/chatgpt/20261013-w36-open-family/prereg.json)" = 5739e85291c2c63c9a6ca2dc875c11e11117aae4
+          test "$(git hash-object research/contrib/chatgpt/20261013-w36-open-family/execute.py)" = 04ff8e92891f39d9e73b1c9943550fa129f782ce
+          python3 -m json.tool research/contrib/chatgpt/20261013-w36-open-family/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w36-open-family/execute.py
+      - name: Original W-R36 scientific first-use
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w36-open-family/execute.py > /tmp/W-R36-original.json
+          python3 -m json.tool /tmp/W-R36-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R36-frozen-original
+          path: /tmp/W-R36-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full independent repository regression
+        run: go test ./... && go build ./...

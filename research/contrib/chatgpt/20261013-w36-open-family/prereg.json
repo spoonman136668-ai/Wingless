@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R36-BUDGETED_OPERATION_FAMILY_INFERENCE",
+  "parent_commit": "ec08b32ef7617a51fad46e2bbf1b098f9bf85d6b",
+  "date": "2026-10-13",
+  "question": "Can the learner choose the relevant operation from four competing, relabeled dynamics families using only selectively acquired feedback, while rejecting a fifth unseen family?",
+  "generator": "Fresh source seeds232..241, 5 development232..236, 5 heldout237..241; two-step recurrent four-symbol dynamic, 16 initial contexts, encoded by SHA256('W36-perm/'+seed) byte0 %24 four-symbol permutation, presented in SHA256('W36-order/'+seed+'/'+episode) order; x0=(original_context+seed)%4, x1=((original_context//4)+3*seed)%4. Source operation by seed mod5: 0 ADD=(a+b)%4; 1 XOR=a^b; 2 MUL=(a*b)%4; 3 SUB=(a-b)%4; 4 AFFINE=(2*a+b+1)%4. Tick2..31 applies same operation. Heldout has exactly one source from each family. Source class label is evaluator only, never available to model.",
+  "hypotheses": "Frozen learner candidate predictive tables obtained from each of four permitted operations ADD/XOR/MUL/SUB relabeled under each of the 24 W26 permutations. Deduplicate exact 16-context tables; do not add an AFFINE candidate or adapt hypotheses after initial acquisition. Exactly four arms use the same candidate class and fresh unseen sources.",
+  "arms": [
+    "PASSIVE_4: query first four presentation-order distinct initial-context t2 labels; do not use other t2 or later labels; accept only if one complete candidate predictive table remains, reject if none, else ABSTAIN.",
+    "ACTIVE_4: at each of at most four t2 queries, select still-unlabeled initial context whose predicted label bins for surviving tables minimize max survivor bin, then squared-bin counts, then original episode index; only then reveal selected label. Same accept/reject/abstain.",
+    "ACTIVE_8: same active selection, maximum eight t2 labels.",
+    "ACTIVE_16: same active selection, maximum16, exhaustive candidate-consistency reference, not an open-world safety certificate."
+  ],
+  "split": {
+    "development": [
+      232,
+      233,
+      234,
+      235,
+      236
+    ],
+    "heldout": [
+      237,
+      238,
+      239,
+      240,
+      241
+    ]
+  },
+  "metrics": "All 10 source fingerprint SHA256 from 16x32 RAW observed sequences unique excluding seed ID, exact training labels per arm, query order, posterior distinct full predictive tables and hypothesis count, classification ACCEPT/REJECT/ABSTAIN, operation-wise false acceptance and abstention, on every ACCEPT 16x29=464 prospective t3..31 forecasts with correct/wrong/confusion and SHA trace. Entire outcome including nonacceptance preserved.",
+  "classification": "FALSE_NOVEL_ACCEPT if ANY heldout AFFINE seed is accepted by any arm; else BOUNDED_OPENSET if exhaustive ACTIVE_16 accepts all four known families with 464/464 accuracy and rejects AFFINE, and ACTIVE_8 accepts at least 3/4 known families with 464/464 accuracy and rejects AFFINE; ACTIVE_EFFICIENCY only if BOUNDED_OPENSET and ACTIVE_4 accepts strictly more known families than PASSIVE_4. MIXED otherwise; INVALID_IDENTITIES on duplicate raw fingerprints.",
+  "constraints": "No model calls, no test t>=3 truth to training, no operation labels visible to learner, exactly frozen finite candidate class and split/limits/metrics. Source-only prereg first; Git blob and W26 identity pinned in one first-use GitHub workflow, archival original ZIP SHA independently verified, full Go tests/build. No first-use replay, thresholds/capacity increase, accepted-ref mutation, or live activation.",
+  "claim_limit": "Finite model selection and explicit labeled queries across four predesigned candidate families and one predesigned open-set operation; not an unbounded method for generating new concepts."
+}
