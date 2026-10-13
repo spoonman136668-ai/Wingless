@@ -1,0 +1,37 @@
+name: Wingless W-R17 genuinely varying jitter scientific qualification
+on:
+  push:
+    branches: [research/w-r17-nondegenerate-jitter-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin parent and frozen original new source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 8e8d402ae3e1134adcfd3fcf948eb94a46dfe135 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r13-general-permutation/execute.py)" = 97640b4637b0c441eb409f8fa175df4996ef8aa8
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r17-true-tick-jitter/prereg.json)" = dc10d985b4de9911cc599a418442b8108847e30f
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r17-true-tick-jitter/execute.py)" = bc84814a2680907a99e2e3dd7980ebaab15a681c
+          python3 -m json.tool research/contrib/chatgpt/20261012-w-r17-true-tick-jitter/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261012-w-r17-true-tick-jitter/execute.py
+      - name: Original nondegenerate jitter scientific evaluation
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261012-w-r17-true-tick-jitter/execute.py > /tmp/W-R17-original.json
+          python3 -m json.tool /tmp/W-R17-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R17-original-variable-jitter
+          path: /tmp/W-R17-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full Wingless regression
+        run: go test ./... && go build ./...
