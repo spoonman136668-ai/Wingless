@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R35-CORRELATED_NOISE_CONFIRMATION_BOUNDARY",
+  "date": "2026-10-13",
+  "parent_commit": "4eb34e2ea945c1df98eb4ca79c2c9db6b4cb2930",
+  "question": "Does two-observation corroboration fail under correlated bursts of incorrect feedback, and what additional adaptation delay follows from requiring three mismatches?",
+  "cohorts": {
+    "development": [
+      216,
+      217,
+      218,
+      219
+    ],
+    "heldout": [
+      220,
+      221,
+      222,
+      223
+    ]
+  },
+  "generator": "Fresh seeds216..223, sixteen initial contexts in seed-keyed SHA256 W35-order presentation order and seed-keyed W35-perm four-symbol permutation. Even seeds hidden ADD4→XOR4 from t16 onward, odd seeds STABLE ADD4. All arms receive uncorrupted two-value contextual state observations but a DISTINCT potentially corrupted supervisory-label report after each forecast. Supervision condition ISOLATED has reports +1 mod4 at t7 and t24 of every 32-tick episode (2 corrupted labels/episode). BURST_2 has +1 at t7,t8,t24,t25 (4 corrupted labels/episode). Source/target truths do not depend on which supervision condition is used.",
+  "arms": [
+    "FROZEN_ADD: fixed calibrated ADD table and no toggling",
+    "K1: toggle ADD/XOR next tick after ONE mismatching feedback report",
+    "K2: toggle only after TWO CONSECUTIVE mismatching feedback reports, reset streak on agreement and after toggle",
+    "K3: toggle only after THREE CONSECUTIVE mismatching feedback reports, reset streak on agreement and after toggle"
+  ],
+  "calibration": "Frozen W26 24-permutation candidate class and sixteen separate t2 labels spanning all initial observed contexts per seed. Require both ADD4 and implied XOR4 complete predictive tables unique, otherwise AMBIGUOUS_HYPOTHESIS. No model calls or prospective label leakage.",
+  "metrics": "Input raw 16x32 source fingerprints distinct across eight new seeds; both supervision conditions per seed share exact raw truth sequences; heldout per STABLE/SHIFT and ISOLATED/BURST_2 K1/K2/K3/FROZEN pre t3..15 and post t16..31 true correct/wrong, toggle counts, feedback-corruption counts, deterministic trace digest. Denominators 416 pre and 512 post per condition/regime with two heldout seeds. No re-run on invalid outcomes.",
+  "classification": "BURST_CORROBORATION_CEILING if all identity/calibration guards pass and in heldout BURST_2+STABLE K3 has strictly fewer wrong forecasts and fewer toggles than K2, while in ISOLATED+SHIFT K2 has >= K3 correct post-t16 forecasts; MIXED otherwise, INVALID_IDENTITIES or AMBIGUOUS_HYPOTHESIS for invalid source.",
+  "safeguards": "Preregister frozen before first use, exact W26 and W34 parents pinned, source SHA and full Go test/build in first-use Actions, original artifact archived, no post-result tuning/replay/capacity expansion/production or accepted-ref mutation.",
+  "claim_limit": "Artificial ADD/XOR finite two-model toggle under isolated versus burst-corrupted supervision and separate clean context observations; not general stochastic noise theory."
+}
