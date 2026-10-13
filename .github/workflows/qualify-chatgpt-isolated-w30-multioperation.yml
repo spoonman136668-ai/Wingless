@@ -1,0 +1,37 @@
+name: W-R30 original first use multi-family full qualification
+on:
+  push:
+    branches: [research/chatgpt-isolated-w30-operation-shift-20261013]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Validate identity without consuming science
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4cb666ccbdccc18f7b0f6cc91da3a572c1c827fe HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w29-independent-witness/execute.py)" = 764ea913abe31decd2dd8b4b5318b240d49525a5
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w30-multioperation/prereg.json)" = b2137c05bbea208745c5c6e5ddb78f382b8d4753
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w30-multioperation/execute.py)" = 5b114499e4d6a2f82b3dc7f91de8e65d4e028f10
+          python3 -m json.tool research/contrib/chatgpt/20261013-isolated-w30-multioperation/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-isolated-w30-multioperation/execute.py
+      - name: Original frozen W-R30 science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-isolated-w30-multioperation/execute.py > /tmp/W-R30-original.json
+          python3 -m json.tool /tmp/W-R30-original.json > /dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R30-frozen-original-first-use
+          path: /tmp/W-R30-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full repository regression
+        run: go test ./... && go build ./...

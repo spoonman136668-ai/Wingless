@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R30-MULTIFAMILY_OPEN_SET_FALSIFICATION",
+  "date": "2026-10-13",
+  "parent_commit": "4cb666ccbdccc18f7b0f6cc91da3a572c1c827fe",
+  "prior": "W-R29 four unused-context witness labels rejected both XOR heldout; this experiment pretests other, non-conjugate operations in a disjoint cohort without asserting universal four-label validity.",
+  "question": "Does an early 24-conjugate modular-addition hypothesis, augmented by exactly up to four independent unused-context witnesses, resist three unfamiliar finite operation families rather than only XOR?",
+  "world": "Sixteen latent 4-symbol episode contexts (all x0,x1 initial pair combinations), same second-order generation. seed mod4 =0 ADD4 (a+b)%4, =1 XOR4 a^b, =2 MUL4 (a*b)%4, =3 SUB4 (a-b)%4; hidden four-symbol relabeling from SHA256('W30/'+seed) byte0 modulo24. Training observations are ONLY explicitly queried t2 labels; test ticks3..31 are never revealed to model and are scored as 464 forecasts per accepted seed.",
+  "cohorts": {
+    "development": [
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151
+    ],
+    "heldout": [
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159
+    ]
+  },
+  "arms": [
+    "ACTIVE_0: frozen W-R29 information-partition acquisition among fixed24 modular-addition conjugacy tables, stop on unique full predictive table or rejection, no unused-context witnesses",
+    "WITNESS_4: same frozen selected table, challenge at most four independent unqueried initial contexts sorted by deterministic SHA256 of observed pair, no refitting, reject on first mismatch",
+    "WITNESS_8: same with up to eight",
+    "WITNESS_ALL: full16-context complete independent consistency scan of every unqueried initial context (potential early rejection), reference only"
+  ],
+  "metrics": "For heldout seeds two per ADD4/XOR4/MUL4/SUB4: acceptance, false acceptance by out-of-family operation, genuine ADD 464/464 accepted accuracy, exact query labels, candidate fits, witness order/digests, operation confusion matrices, outcome fingerprints. Invalid if source fingerprints collide.",
+  "predeclared_classification": "MULTIFAMILY_BOUNDED if WITNESS_4 accepts both ADD at464/464 and rejects all six out-of-family heldout and WITNESS_ALL confirms same. FALSE_FOUR_WITNESS if any out-of-family accepted under WITNESS_4. FALSE_EXHAUSTIVE if any out-of-family accepted under WITNESS_ALL. MIXED otherwise.",
+  "constraints": "Prereg frozen before first-use, source and parent Git blob identity in CI, no candidate expansion beyond original24, no unqueried labels to selection/challenge ordering, first-use zip retained plus full Go test/build. No retries after result, no first-use reclassification, no accepted-ref changes or live activation.",
+  "claim_limit": "Only four enumerated synthetic operations and finite seeded samples, not all possible alien rules or general intelligent inference."
+}
