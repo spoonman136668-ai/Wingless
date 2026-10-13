@@ -155,7 +155,7 @@ def run():
                 "family":family_map[seed%4],"extra_budget":budget,
                 **entry,"test":accepted_score(seed,selected) if selected is not None else None,
             })
-    held=[r for r in records if r["seed"]>=152]
+    held=[r for r in records if r["seed"]>=184]
     stats={}
     for budget in CHALLENGE_BUDGETS:
         entries=[r for r in held if r["extra_budget"]==budget]
