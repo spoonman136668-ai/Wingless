@@ -1,0 +1,40 @@
+name: W-R59 immutable prospective sealed scientific validation
+on:
+  push:
+    branches: [research/w-r59-cross-amplitude-fresh-validation-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Frozen preregistered source gate
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r59-replication/prereg.json)" = 282244456d3ff1730c70d8ab2bd480549bdcbfeb
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r59-replication/execute.py)" = 52b05051f24f99ee8d964e52f33093863c143109
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r59-replication/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r59-replication/execute.py
+      - name: Single original sealed experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r59-replication/execute.py > /tmp/W-R59-original.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R59-original.json'))
+          assert x['sealed_heldout_seeds']==list(range(6720,6768)); assert x['test_amplitudes']==[1,2,3]
+          print('CLASSIFICATION',x['classification'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R59-original-sealed
+          path: /tmp/W-R59-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: One complete repository regression
+        run: go test ./... && go build ./...
