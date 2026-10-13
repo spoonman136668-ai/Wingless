@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R24-FIXED-GAIN-CAUSAL-ERROR-FEEDBACK",
+  "parent_sha": "4646dbe94ae96eec5a3b30def36285f65fd3376d",
+  "prior_source_blob": "0acd33538be4705e8ce5ff5854d5d9c1f20743bb",
+  "question": "Can a small fixed-gain correction from past observed forecast residuals adapt a train-only curvature predictor to an unseen dynamic regime without overreacting to sensor noise, improving on W-R22/W-R23 naive online strategies?",
+  "hypothesis": "Causal correction by 1/4 of the previous one-step frozen-model residual, or median of three recent residuals, may improve heldout late-period MAE while preserving early-period error; could still worsen noise.",
+  "generator": "Exact W-R22 synthetic first-channel quadratic dynamics with nondegenerate development three-level jitter, heldout five-level jitter and heldout-only added second-curvature term 2*max(0,t-8)^2. Fresh seeds development96..99 and heldout100..103, nine entities and 16 ticks per seed. No future target observation consulted by any predictor.",
+  "arms": [
+    "static train-only one-scalar frozen-curvature predictor",
+    "naive local last-second-difference online curvature (W-R22 control)",
+    "frozen curvature + 1/4 of immediately previous causal one-step frozen-model forecast residual",
+    "frozen curvature + 1/4 of median of up to three most recent causal frozen-model forecast residuals"
+  ],
+  "training": "Learn exactly one scalar curvature estimate from development by median signed circular second differences. For residual at time j, calculate how the frozen predictor *would have predicted* already observed x(j) using x(j-1),x(j-2). For forecasting x(t), consult only residuals for j<t (no evaluation target x(t)). First residual available at j=2; for earliest t use zero correction.",
+  "capacity": "All arms receive identical five-previous-observation window, one frozen development scalar, no additional persisted trainable weights or hidden state; correction gain fixed at 0.25 before first-use; median window length3 fixed; bounded O(1) arithmetic per prediction.",
+  "primary": "Heldout circular absolute error per predictor, per seed, full t2..15, early t2..8 and late t9..15. FEEDBACK_TRANSFER if median-error-feedback late MAE <=.90*frozen late MAE and early <=1.10*frozen early MAE and median improves late on >=3/4 heldout seeds. PARTIAL if median improves late aggregate but misses other criteria. NEGATIVE otherwise. Preserve all negative controls.",
+  "validity": "Exact Git source prereg pin; truly varying sensor jitter 3/5 levels; no future/label leakage or heldout-derived gain tuning; first-use original artifact, deterministic output and one complete regression; no accepted-ref mutation.",
+  "bounds": {
+    "seeds": 8,
+    "heldout": 4,
+    "entities": 9,
+    "ticks": 16,
+    "arms": 4,
+    "learned_scalars": 1,
+    "feedback_gain": 0.25,
+    "feedback_window": 3,
+    "context_window": 5,
+    "model_calls": 0,
+    "first_use_retries": 0
+  },
+  "claim_limit": "Synthetic autoregressive forecasting with causal residual feedback, not general intelligence or natural-language prediction."
+}
