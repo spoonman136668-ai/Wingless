@@ -1,0 +1,36 @@
+name: Wingless W-R25 frozen poisoned-calibration falsification
+on:
+  push:
+    branches: [research/chatgpt-w-r25-adversarial-calibration-20261013]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check frozen original identity and source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor a235914611ff2a6c5280ad44d7f902f89b67f43a HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r25-spoofed-labels/prereg.json)" = 068e889a688c5213238be9666925c672f3a3a2a2
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r25-spoofed-labels/execute.py)" = 31559a561236c446d6d01d52a78566ba8d666ae1
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r25-spoofed-labels/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r25-spoofed-labels/execute.py
+      - name: Original frozen W-R25 science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r25-spoofed-labels/execute.py > /tmp/W-R25-original.json
+          python3 -m json.tool /tmp/W-R25-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R25-original-poisoned-calibration
+          path: /tmp/W-R25-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless regression and build
+        run: go test ./... && go build ./...
