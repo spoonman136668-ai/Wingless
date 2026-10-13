@@ -1,0 +1,148 @@
+{
+  "schema": "wingless.science.preregistered.v1",
+  "id": "W-R24-MONOTONE-RETIME-TRANSFER",
+  "parent_sha": "0e208895e192febd8873975dd2ed86eb771afc54",
+  "hypothesis": "W-R23's perfect score may rely on same-time-index positive alignment. Test frozen W-R22 mask-aware learner without retraining when the candidate is generated from monotone (order-preserving) local duplicate/skip warps, and compare against local reordering negatives.",
+  "freeze": "All warp index maps, generators, masks, swaps, fresh seed cohorts and thresholds preregistered before first-use. No positive/negative mutation or post-result fitting.",
+  "split": {
+    "development_seeds": [
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      251,
+      252,
+      253,
+      254,
+      255
+    ],
+    "sealed_heldout_seeds": [
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299,
+      300,
+      301,
+      302,
+      303
+    ]
+  },
+  "learning": "Frozen W-R22 original naive_augmented and maskaware_augmented trained models only on original development seeds240..255, exactly 16 features and 16 weights+bias, 1728 examples/model, 32 epochs. No new training on warps, generators or sealed cohort.",
+  "input": "Same 16 tick, four-channel synthetic input as original, candidate offset79 and deterministic per-tick jitter amplitude3, all-zero row erasure at frozen positions 2,5,8,10,3 from first 3/5. Legitimate mono retiming applied before candidate observation.",
+  "warps": {
+    "identity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "one_local_duplicate": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      5,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "two_local_duplicates": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      4,
+      4,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  "heldout": {
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "mask_counts": [
+      3,
+      5
+    ],
+    "warps": [
+      "identity",
+      "one_local_duplicate",
+      "two_local_duplicates"
+    ],
+    "negative_swap_indices": [
+      "10_11",
+      "12_13"
+    ],
+    "cells_per_arm": 18
+  },
+  "arms": [
+    "naive_augmented: exact W-R22 learned weights and naive four-channel top-two transition feature",
+    "maskaware_augmented: exact W-R22 learned weights and all-zero-row-aware transition feature"
+  ],
+  "success": "ORDER_PRESERVING_WARP_TRANSFER iff maskaware model accuracy>=0.80 in every one of 12 nonidentity generator×mask×warp cells and naive aggregate on nonidentity<=0.60. PARTIAL iff maskaware aggregate on nonidentity>.60 and exceeds naive aggregate by>=.05 without strict success. NEGATIVE otherwise.",
+  "controls": [
+    "Warp maps monotonic, endpoints same, no changes at tail swapped tick positions11-14",
+    "For each positive/negative candidate pair identical anchor and multiset, only negative swaps two valid unmasked rows",
+    "Holdout seeds not exposed in prior research",
+    "Same trained model width/epochs, no additional sensors, budget or model calls",
+    "Record all outcomes, first-use archive, single full Go regression and exact Git source/provenance"
+  ],
+  "bounds": {
+    "evaluation_arms": 2,
+    "training_pairs_each": 1728,
+    "width": 16,
+    "epochs": 32,
+    "heldout_seeds": 16,
+    "cells_per_arm": 18,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Order-preserving monotone resampling of deterministic toy sequences, no broad cognitive inference."
+}
