@@ -1,0 +1,73 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R45-ORDER-BALANCED-PAIR-RANKING-REQUALIFICATION",
+  "parent_head": "2f762cbc51f02cfe5cee94adc6d15cdfc7fc0721",
+  "scientific_custody_notice": "W-R43 reported high accuracy only with true original always first on heldout, creating a constant-first/orientation confound. Its prior numerical classification is retained historically but NOT accepted scientific evidence until a new order-balanced blinded trial. W-R44 single-candidate failure also motivates this control.",
+  "hypothesis": "If W-R43's matched-pair advantage reflects real learned relative sequence information rather than a first-option bias, a pairwise comparator trained on new development pairs should classify both true-first and true-second heldout presentations above chance. Removing the intercept ensures mathematical reversal consistency; the original biased model can be evaluated alongside to measure orientation effects.",
+  "freeze": "Before first use freeze fresh disjoint development seeds2336..2351 and sealed heldout2352..2367, exact W-R43 lag2 feature and paired sign-augmented training, fixed 32 perceptron epochs, LR0.1, 16 weights, identity-only development and identity/XOR55 heldout. Two orientation-balanced presentations per heldout original/swapped pair are ALWAYS evaluated, with tie half credit. Do not select best orientation, readout, threshold or eligible seed after observing outcomes.",
+  "split": {
+    "development": [
+      2336,
+      2337,
+      2338,
+      2339,
+      2340,
+      2341,
+      2342,
+      2343,
+      2344,
+      2345,
+      2346,
+      2347,
+      2348,
+      2349,
+      2350,
+      2351
+    ],
+    "sealed_heldout": [
+      2352,
+      2353,
+      2354,
+      2355,
+      2356,
+      2357,
+      2358,
+      2359,
+      2360,
+      2361,
+      2362,
+      2363,
+      2364,
+      2365,
+      2366,
+      2367
+    ]
+  },
+  "arms": [
+    "always_first_null: predicts first position is genuine regardless of sequence (must score exactly 50% across both orientations)",
+    "biased_original: paired-difference 16 weights plus trained bias exactly W-R43 fitting rule, both heldout candidate orderings evaluated",
+    "antisymmetric_no_bias: same 16-difference inputs and 1728 balanced signed development examples/32 epochs, but intercept frozen exactly zero, yielding exact sign reversal under candidate swap"
+  ],
+  "outcomes": "For each of 16 seeds/three generator families/two swap sites/9 entities per encoding, score both (true,altered) and (altered,true) presentations, count orientation-specific correct, incorrect and tied scores with 0.5 credit; explicitly report always-first null, biased and antisymmetric learning accuracy. For biased model separately record forward/reverse performance to expose one-sided bias.",
+  "classification": "ORDER_BALANCED_RANK_SIGNAL iff antisymmetric no-bias heldout accuracy >=0.65 for both identity and XOR55 and at least +0.10 versus always_first baseline; PARTIAL_SIGNAL iff antisymmetric >=0.55 without strict criteria; NO_CONFIRMED_SIGNAL otherwise. Historical W-R43 forward-only result cannot satisfy this gate.",
+  "controls": [
+    "No new training labels from sealed samples; true class used only by independent scorer and both orderings of each pair are always counted",
+    "16 model weights with no bias versus 16 weights+bias disclosed; both get 1728 balanced training examples and equal fixed 32 epochs; always-first null is a deterministic sanity baseline",
+    "No standalone sample-recognition claim, no new features, no privileged test-site identity to learner, no paired alternative fabrication",
+    "New first-use artifact followed by one complete Go regression/build, no replay of W-R43/W-R44 heldout, no accepted reference promotion"
+  ],
+  "bounds": {
+    "models": 3,
+    "development_seeds": 16,
+    "heldout_seeds": 16,
+    "matched_pairs_per_encoding": 864,
+    "presentations_per_pair": 2,
+    "training_examples_per_trained_model": 1728,
+    "epochs": 32,
+    "weights": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Fresh order-balanced synthetic two-alternative rank discrimination under known data construction, not single-candidate cognition, autonomous recurrent learning or broad general intelligence."
+}
