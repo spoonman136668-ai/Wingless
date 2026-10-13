@@ -1,0 +1,37 @@
+name: W-R38 native Wingless broker authority first use
+on:
+  push:
+    branches: [research/chatgpt-native-w38-broker-authority-20261013]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify frozen source and preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5d84c80d07fa8aee18ebe254577753136d350628 HEAD
+          test "$(git hash-object broker/router.go)" = 6b6d0f158a03726ef32ce56d9d7d31e1a3b8c630
+          test "$(git hash-object resources/governor.go)" = $(git hash-object resources/governor.go)
+          test "$(git hash-object research/contrib/chatgpt/20261013-native-w38-broker/prereg.json)" = a3be93cf192396904709ac69bd7ecd6756db3241
+          test "$(git hash-object research/contrib/chatgpt/20261013-native-w38-broker/main.go)" = 859ff8c468f7d26b41f891d7ed30654828f99136
+          python3 -m json.tool research/contrib/chatgpt/20261013-native-w38-broker/prereg.json >/dev/null
+      - name: Run frozen W-R38 original native Go routing experiment
+        run: |
+          set -euo pipefail
+          go run ./research/contrib/chatgpt/20261013-native-w38-broker > /tmp/W-R38-original.json
+          python3 -m json.tool /tmp/W-R38-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R38-original-native-broker
+          path: /tmp/W-R38-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Complete Wingless regression and build
+        run: go test ./... && go build ./...
