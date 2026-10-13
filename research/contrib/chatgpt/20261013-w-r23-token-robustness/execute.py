@@ -49,42 +49,35 @@ def paired(seed,entity,generator,mask_count,style,swap):
     assert positive!=negative
     return source,positive,negative
 
-def evaluate(arm,model,generator,count,style):
+def evaluate(arm,model,generator,count,style,swap):
     weights,bias,updates=model
     by_seed=[]
     for seed in SEEDS:
         tp=tn=fp=fn=0
         for entity in range(9):
-            for swap in SWAPS:
-                base,p,n=paired(seed,entity,generator,count,style,swap)
-                for positive,candidate in ((True,p),(False,n)):
-                    vec=w22.featurize(base,candidate,arm)
-                    pred=bias+sum(w*x for w,x in zip(weights,vec))>=0
-                    if positive and pred:tp+=1
-                    elif not positive and not pred:tn+=1
-                    elif not positive:fp+=1
-                    else:fn+=1
-        assert tp+tn+fp+fn==36
+            base,p,n=paired(seed,entity,generator,count,style,swap)
+            for positive,candidate in ((True,p),(False,n)):
+                vec=w22.featurize(base,candidate,arm)
+                pred=bias+sum(w*x for w,x in zip(weights,vec))>=0
+                if positive and pred:tp+=1
+                elif not positive and not pred:tn+=1
+                elif not positive:fp+=1
+                else:fn+=1
+        assert tp+tn+fp+fn==18
         by_seed.append({"seed":seed,"tp":tp,"tn":tn,"fp":fp,"fn":fn})
     good=sum(r["tp"]+r["tn"] for r in by_seed)
-    return {"generator":generator,"mask_count":count,"fill_style":style,
-            "accuracy":good/(16*36),"correct":good,"total":16*36,
+    return {"generator":generator,"mask_count":count,"fill_style":style,"swap":swap,
+            "accuracy":good/(16*18),"correct":good,"total":16*18,
             "heldout_by_seed":by_seed}
 
 def run():
     arms=[]
     for arm in ARMS:
         model=w22.train(arm)
-        cells=[evaluate(arm,model,g,c,s)
-               for g in GENERATORS for c in MASK_COUNTS for s in STYLES]
-        assert len(cells)==27
-        summaries=[]
-        for g in GENERATORS:
-            for count in MASK_COUNTS:
-                for style in STYLES:
-                    cell=next(x for x in cells if x["generator"]==g and
-                              x["mask_count"]==count and x["fill_style"]==style)
-                    summaries.append(cell)
+        cells=[evaluate(arm,model,g,c,s,swap)
+               for g in GENERATORS for c in MASK_COUNTS for s in STYLES for swap in SWAPS]
+        assert len(cells)==54
+        summaries=cells
         novel=[c for c in cells if c["fill_style"]!="all_zero_seen"]
         arms.append({"arm":arm,"width":len(model[0]),"training_examples":1728,
                      "epochs":32,"training_updates":model[2],
