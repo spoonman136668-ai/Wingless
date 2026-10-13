@@ -1,0 +1,37 @@
+name: Wingless W-R26 frozen causal error trigger
+on:
+  push:
+    branches: [research/w-r26-error-triggered-gain-r1]
+permissions:
+  contents: read
+jobs:
+  frozen_science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify frozen ancestry and source identities before first use
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 3eae59154cdc2dd88b3e8e82f54a052098c35358 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r25-gain-selection/execute.py)" = 7028e56ebb9626895166a192a6fa5ebd487bc531
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-triggered-gain/prereg.json)" = 2c5b2a8910c10f5342e3c24692a25338c47f3667
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-triggered-gain/execute.py)" = dc88af50ec180d3cc5f2af9c0d59cf07b29a55a7
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r26-triggered-gain/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r26-triggered-gain/execute.py
+      - name: Original frozen scientific evaluation
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r26-triggered-gain/execute.py > /tmp/wr26-original.json
+          python3 -m json.tool /tmp/wr26-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R26-original
+          path: /tmp/wr26-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Single complete repository regression
+        run: go test ./... && go build ./...
