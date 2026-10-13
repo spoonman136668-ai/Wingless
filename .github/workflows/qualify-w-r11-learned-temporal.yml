@@ -1,0 +1,37 @@
+name: Wingless W-R11 frozen learned temporal pilot
+on:
+  push:
+    branches: [research/w-r11-fixed-width-learned-temporal-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify frozen identity and preregistration before first use
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 6c106dff38e90e95aebd23d3ea592f26937b2f37 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r10-order-identifiability/execute.py)" = ef6fc815084cf3adf30d5df967e5960a7fd3c0ca
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r11-learned-temporal/prereg.json)" = 4b5a89380d949164dc30224e166995807cd66e69
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r11-learned-temporal/execute.py)" = 7a4090770da7aade66f2ce68afe0fe530cd2e32a
+          python3 -m json.tool research/contrib/chatgpt/20261012-w-r11-learned-temporal/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261012-w-r11-learned-temporal/execute.py
+      - name: Original frozen supervised synthetic science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261012-w-r11-learned-temporal/execute.py > /tmp/W-R11-original.json
+          python3 -m json.tool /tmp/W-R11-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R11-original-learned-temporal
+          path: /tmp/W-R11-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Full repository regression and build
+        run: go test ./... && go build ./...
