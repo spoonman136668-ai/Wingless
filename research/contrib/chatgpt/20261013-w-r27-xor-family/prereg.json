@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R27-NONISOMORPHIC_LATENT_OPERATION_REJECTION",
+  "parent_commit": "1dfad834724594354aa622d23fd0405f76e79a07",
+  "question": "Can the W-R26 fixed 24-permutation latent addition predictor recognize when unfamiliar encoded dynamics belong to a non-isomorphic operation family, and abstain instead of inventing an unsupported symbol mapping?",
+  "hypothesis": "No permutation of four symbols can transform bitwise two-bit XOR into addition modulo4 over every ordered input pair. A fully observed 16-context calibration should therefore reject XOR while permitting a bijective relabeling of addition.",
+  "family": "Four-symbol latent second-order dynamics x[t]=operator(x[t-2],x[t-1]), with ADD4: (a+b)%4 on even seeds, XOR4: a XOR b on odd seeds. Four fresh ADD seeds120,122,124,126 and four XOR seeds121,123,125,127. Each unknown observation encoding pi_seed uses SHA256('W27/'+seed) byte0 modulo24 to choose from lex 24 permutations, hidden from predictor.",
+  "split": {
+    "in_family_add_seeds": [
+      120,
+      122,
+      124,
+      126
+    ],
+    "out_family_xor_seeds": [
+      121,
+      123,
+      125,
+      127
+    ]
+  },
+  "calibration": "Exactly k observed t0,t1,t2 triples from episodes0..k-1, k∈{4,8,16} with unique pairs. Test only t3..31 for all16 episodes (464 observations per seed), never provide tested labels to learner. All arms have SAME 24 candidate permutations of modular addition and require complete predictive-table consensus among consistent candidates.",
+  "comparators": [
+    "no_adaptation raw ADD4 assumes identity encoding and no labels",
+    "k4 hypothesis consistency / table consensus",
+    "k8 hypothesis consistency / table consensus",
+    "k16 hypothesis consistency / table consensus"
+  ],
+  "metrics": "Per-seed candidate matches, unique full predictive tables, accept/reject status, accepted accuracy and false accepts for XOR, coverage. OPERATION_FAMILY_BOUNDARY iff all ADD accepted with 100% predictive accuracy at k16 and all XOR rejected at k16; FALSE_ACCEPT iff any XOR accepted at k16; otherwise MIXED_OR_NEGATIVE.",
+  "controls": "Fixed 24 candidate count unchanged from W-R26, unique source fingerprint per seed reported; XOR truth generator is never passed to predictor. No source expansion, post-hoc threshold choice, hidden model call, accepted-ref write or first-use retry. Original artifact and one full go test/build.",
+  "claim_limit": "Exact nonisomorphism within two known four-symbol synthetic algebraic families, not general open-world reasoning."
+}
