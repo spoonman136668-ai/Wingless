@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R19-SPARSE-EDGE-TEMPORAL-DETECTION",
+  "parent_sha": "cc98b0829b1f238fe6f950985b8f3420bd9ef8f5",
+  "prior_source_blob": "1e58666f047c2c84cb4de1c50fd223821d8daa18",
+  "hypothesis": "W-R18's 79.2% mean-transition accuracy suggests sparse local changes can be hidden by averaging 15 edges. A maximum local-edge mismatch or top-three local-edge pooled statistic, calibrated only on fresh development inputs, may detect unseen two-swap negatives better. This is a new frozen test; W-R18 heldout never enters calibration.",
+  "generator": "EXACT frozen W-R18 nonlinear four-channel 16-tick synthetic generator and genuine per-tick offset/jitter; development seeds 56-59 with train reversals and rotate-three negatives; heldout seeds60-63 with a novel TWO adjacent-tail-pair swaps (at positions 5/6 and 10/11). Preserve candidate anchor and unordered observation multiset for both labels.",
+  "split": {
+    "development": [
+      56,
+      57,
+      58,
+      59
+    ],
+    "heldout": [
+      60,
+      61,
+      62,
+      63
+    ]
+  },
+  "arms": [
+    "unordered anchor-relative modulo16 histogram difference, scalar train-only threshold (negative control)",
+    "mean 15 adjacent circular transition mismatches, scalar train-only threshold",
+    "maximum of 15 adjacent transition mismatches, scalar train-only threshold",
+    "mean of three largest local transition mismatches, scalar train-only threshold"
+  ],
+  "training": "One scalar threshold per arm, equal 72 training labeled pairs, threshold midpoint of train-only max positive and min negative score, no heldout labels, no post-result tuning or additional model parameters.",
+  "primary": "Compute per-arm 72 heldout pair accuracy and per-seed confusion. SPARSE_EDGE_TRANSFER if max-edge OR top3 >=0.85, histogram<=0.55, and the winning local statistic strictly beats mean edges; PARTIAL if any max/top3 beats mean edges but below criterion; NEGATIVE otherwise. Preserve other arms and false-positive rates.",
+  "validity": "Distinct fresh seeds, all pairs have same candidate multiset/first row, jitter cardinalities asserted, no training on previous heldout, prereg/source pinned before first-use, one full regression, first-use archive; no accepted-ref mutation.",
+  "bounds": {
+    "seeds": 8,
+    "development": 4,
+    "heldout": 4,
+    "entities": 9,
+    "ticks": 16,
+    "arms": 4,
+    "trained_scalars_per_arm": 1,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Frozen synthetic local-temporal discrimination; not language generalization or reasoning."
+}

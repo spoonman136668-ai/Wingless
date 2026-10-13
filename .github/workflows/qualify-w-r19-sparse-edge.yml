@@ -1,0 +1,37 @@
+name: Wingless W-R19 preregistered sparse-edge discrimination
+on:
+  push:
+    branches: [research/w-r19-sparse-transition-r1]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify immutable lineage and original scientific identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor cc98b0829b1f238fe6f950985b8f3420bd9ef8f5 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-local-order/execute.py)" = 1e58666f047c2c84cb4de1c50fd223821d8daa18
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r19-sparse-transition/prereg.json)" = 38b1d4a2df5452b55499e3c47c6bfe3c3866f9b7
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r19-sparse-transition/execute.py)" = 7b4c77d4aa56795cafa6ed0a428c2e5984600616
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r19-sparse-transition/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r19-sparse-transition/execute.py
+      - name: First and only original scientific execution
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r19-sparse-transition/execute.py > /tmp/wr19-first-use.json
+          python3 -m json.tool /tmp/wr19-first-use.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R19-first-use
+          path: /tmp/wr19-first-use.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full repository regression
+        run: go test ./... && go build ./...
