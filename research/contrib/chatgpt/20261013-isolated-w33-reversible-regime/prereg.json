@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R33-REVERSIBLE_REGIME_FEEDBACK",
+  "parent_commit": "9a83922dc60d32c194477982aa38445dabdb77df",
+  "date": "2026-10-13",
+  "question": "Can a bounded two-mode error-driven learner recover after a hidden change and hidden reversion, rather than becoming trapped by a one-way adaptation rule?",
+  "world": "New SHA256 keyed source seeds200..207, sixteen pseudorandom ordered initial-context episodes per seed. Latent initial pairs from original e and seed: x0=(e+seed)%4, x1=((e//4)+3*seed)%4; hidden symbol permutation from SHA256('W33/'+seed) byte0 modulo24. For even seeds DOUBLE_SWITCH: ADD4 until t11 inclusive, XOR4 at t12..21, ADD4 again at t22..31. For odd STABLE: ADD4 for all ticks. No regime signal available to predictor.",
+  "cohorts": {
+    "development": [
+      200,
+      201,
+      202,
+      203
+    ],
+    "heldout": [
+      204,
+      205,
+      206,
+      207
+    ]
+  },
+  "calibration": "Exactly sixteen separate t2 labels from 16 unique initial contexts used to infer ADD and corresponding XOR predictive tables among fixed24 W26 permutations, with exact uniqueness checks; no t>=3 labels available before first prediction.",
+  "arms": [
+    "FROZEN_ADD: always use inferred ADD table, never switch",
+    "ONE_WAY_SWITCH: start ADD each episode, on first prediction error switch to XOR AFTER observing true tick; never switch back in episode",
+    "TWO_WAY_SWITCH: start ADD each episode, after every prediction error toggle ADD<->XOR AFTER true tick feedback (the erroneous tick remains wrong); never peek at next result."
+  ],
+  "metrics": "Heldout by STABLE/DOUBLE_SWITCH, for each arm pre t3..11, middle t12..21, late t22..31 correct/wrong, tick-level causal trace SHA256, switch counts, unique input fingerprints from raw observed 16x32 sequences, training table hypothesis count, test denominator and full confusion.",
+  "classification": "REVERSAL_RECOVERY if valid unique source/table guards, heldout DOUBLE_SWITCH late TWO_WAY_SWITCH correct strictly exceeds ONE_WAY_SWITCH late, STABLE TWO_WAY_SWITCH has zero wrong and zero switches, and pre t12 all policies correct; otherwise MIXED. INVALID_IDENTITIES if raw cohort fingerprint collision; AMBIGUOUS_HYPOTHESIS if frozen calibration cannot uniquely determine both predictive tables.",
+  "controls": "All three arms receive identical previous-tick true feedback after forecast; XOR operator is predeclared candidate, NOT discovered dynamically. No post-result threshold/candidate changes, no first-use retry, original SHA-pinned workflow archive and full Go test/build. No accepted ref mutation or live activation.",
+  "claim_limit": "Synthetic two-mode recurrent dynamics with delayed supervision; not open-world model creation."
+}
