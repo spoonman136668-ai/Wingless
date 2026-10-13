@@ -1,0 +1,103 @@
+{
+  "schema": "wingless.science.frozen-prereg.v1",
+  "experiment": "W-R16-MASS-NOISE-TRANSFER-MATRIX",
+  "parent_head": "cd9ed8c98e655e9ebf77204750f9ca733ced83e5",
+  "objective": "Preregistered factorial falsification of fixed-width temporal recognition across genuine per-tick observation noise, unseen order perturbations and disjoint seeds.",
+  "defect_control": "W-R15's development jitter used coefficient 3*t modulo 3, yielding no tick variation; retain W-R15 as observed first-use result but do not infer that its development noise was time-varying. R16 uses multiplier 11 coprime to moduli 3/5/7.",
+  "frozen_generator": "Base W-R11 16x4 synthetic sequence. Candidate copies the original with global channel shift and independent deterministic bounded per-tick/channel noise ((11*t+7*channel+3*entity+seed) mod (2*amp+1))-amp. Compare original with candidate; negatives reorder only the candidate's last 15 observations and retain identical candidate first observation and multiset as matched positives.",
+  "split": {
+    "development_seeds": [
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47
+    ],
+    "sealed_heldout_seeds": [
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63
+    ]
+  },
+  "train_condition": {
+    "offset": 17,
+    "amplitudes": [
+      1,
+      2
+    ],
+    "negative_families": [
+      "reverse_tail",
+      "rotate3",
+      "weave_tail"
+    ]
+  },
+  "heldout_matrix": {
+    "offset": 61,
+    "amplitudes": [
+      1,
+      2,
+      3
+    ],
+    "negative_families": [
+      "rotate7",
+      "swap_tail_blocks",
+      "pairwise_swap_tail"
+    ],
+    "cells": 9
+  },
+  "fixed_width_models": [
+    "unordered_anchor_relative_mod16_histogram",
+    "16_element_anchor_relative_circular_position",
+    "16_repeated_mean_anchor_relative_mismatch",
+    "16_element_circular_first_difference_transition"
+  ],
+  "learning": "Fixed 16 real weights plus bias per arm, zero init, 32 full ordered passes and learning rate 0.1. Four candidate representations each see the exact same 16 seeds x 9 entities x 3 train families x 2 train noise x 2 labels =1728 examples. No heldout model selection, no recalibration.",
+  "analysis": "Report 9 heldout cells x four arms with per-seed confusion and all counts, plus aggregate. STRONG_FAMILY_TRANSFER iff one order-sensitive arm attains >=0.85 accuracy in EVERY heldout cell, unordered histogram has <=0.60 aggregate accuracy; PARTIAL if some order-sensitive arm exceeds unordered aggregate but does not meet strict condition; NEGATIVE otherwise. Always report strata including any worse-than-random results. Evaluate control truth labels.",
+  "controls": [
+    "Train noise varies by timestep for all amplitudes and is different from previous bug",
+    "match positive and negative first row/multiset per seed entity amplitude",
+    "at least one nonzero feature for order-sensitive negative",
+    "disjoint development and heldout seeds",
+    "no access to heldout calibration or updates",
+    "first-use artifact uploaded before final integration full regression",
+    "exact parent/prereg/executor identity"
+  ],
+  "bounds": {
+    "models": 4,
+    "feature_width": 16,
+    "epochs": 32,
+    "training_pairs_per_model": 1728,
+    "heldout_cells": 9,
+    "heldout_seeds": 16,
+    "entities_per_seed": 9,
+    "sequence_length": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "production_authority": false
+  },
+  "claim_limit": "Finite supervised toy sequence recognition; no claim of general learning, real language reasoning, or deployment; no accepted ref mutation."
+}
