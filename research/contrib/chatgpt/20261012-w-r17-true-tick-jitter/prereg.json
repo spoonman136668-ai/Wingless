@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R17-NONDEGENERATE-TICK-JITTER",
+  "parent_commit": "8e8d402ae3e1134adcfd3fcf948eb94a46dfe135",
+  "predecessor": "W-R16",
+  "reason": "Post-result audit found that W-R15/W-R16 training jitter ((3*t+e+seed)%3)-1 was constant across ticks. This is a fresh distinct experiment, NOT replay or repair of the consumed evaluations.",
+  "hypothesis": "When development positives contain genuine varying per-tick nuisance, a development-only scalar separation threshold may recognize genuine temporal order on unseen stronger jitter where a fixed perceptron is brittle.",
+  "freeze": "Commit exact nondegenerate jitter formula, fresh seeds, arms, threshold method and all classifications before first original execution. No adjustment, relabeling, or replay after outcome.",
+  "generator": "Frozen W-R11 16-tick 4-channel synthetic sequence, 9 entities/seed; apply candidate global +17 in development and +61 heldout. Jitter all four channels at each tick with train ((5*t+e+seed)%3)-1, heldout ((7*t+e+seed)%5)-2; assert each tick series has respectively 3 and 5 distinct jitter levels.",
+  "split": {
+    "development": [
+      40,
+      41,
+      42,
+      43
+    ],
+    "heldout": [
+      44,
+      45,
+      46,
+      47
+    ]
+  },
+  "labels": "Positive preserves temporal order after shift+jitter. Negative permutes only candidate tail (reverse for even entity and rotate left 3 for odd entity in development; even/odd weave in heldout). Both labels share identical candidate first row and unordered row multiset.",
+  "arms": [
+    "16-feature unordered relative histogram trained with fixed perceptron",
+    "16 copies of pooled anchor-relative circular mismatch trained with same perceptron",
+    "one scalar threshold trained only from development maximum positive and minimum negative pooled score (midpoint), even if distributions overlap"
+  ],
+  "learning": "16 weights+bias 32 epochs learning rate0.1 for each perceptron; scalar threshold one train-only parameter. No heldout score/calibration access.",
+  "metrics": "Per heldout seed TP,TN,FP,FN, balanced accuracy and precise development positive/negative score range. ROBUST_TRANSFER if threshold>=0.85 and unordered<=0.55, PARTIAL if threshold beats comparators, NEGATIVE otherwise; also flag invalid generator if noise cardinality asserts fail.",
+  "validity": "Frozen original source identity and prior W-R11 generator, per-tick jitter nondegeneracy, independent cohort, determinism, first-use artifact, one full Wingless regression.",
+  "budget": {
+    "seeds": 8,
+    "heldout": 4,
+    "entities": 9,
+    "ticks": 16,
+    "model_max_width": 16,
+    "epochs": 32,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Synthetic controlled temporal feature learning only, not natural language cognition; no accepted-ref mutation."
+}
