@@ -1,0 +1,37 @@
+name: Wingless W-R21 frozen channel role transfer
+on:
+  push:
+    branches: [research/w-r21-channel-role-transfer-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Exact immutable lineage and science identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 9fdd600c66b3dce4fefe31d3e64076cb436e823b HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r20-temporal-warp/execute.py)" = 161363043fe56cc7b03dd1679439331b62cbe256
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r21-channel-transfer/prereg.json)" = b21a9bd7f117ca64ea8ae9f38a34b4ba53d197d7
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r21-channel-transfer/execute.py)" = f16835f9f8ebd14258f98db965e936bdf941b8b8
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r21-channel-transfer/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r21-channel-transfer/execute.py
+      - name: Original frozen first-use science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r21-channel-transfer/execute.py > /tmp/wr21-original.json
+          python3 -m json.tool /tmp/wr21-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R21-original
+          path: /tmp/wr21-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: One final complete repository regression
+        run: go test ./... && go build ./...
