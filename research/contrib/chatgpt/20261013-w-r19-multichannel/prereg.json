@@ -1,0 +1,82 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "experiment": "W-R19-FOUR-CHANNEL-SWAP-SENSITIVITY",
+  "parent_head": "bf4aa817f6ea00e06e3327549811b5c7e7255133",
+  "hypothesis": "W-R18 single-swap max-transition representation learned unseen positions but deteriorated under amplitude3 jitter. Test whether combining all four already-generated observation channels improves robustness without adding observations or widening model parameters.",
+  "freeze": "Fix all 4 feature approaches, train swap positions, heldout positions, independent seed populations, noise controls and success thresholds before original execution; no result-based retuning.",
+  "input": "Exact W-R11 16x4 original signal, with same four channels already generated and bounded deterministic true per-timestep noise. Reuse existing 4-channel observations, not any new information source.",
+  "split": {
+    "development_seeds": [
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175
+    ],
+    "heldout_seeds": [
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191
+    ]
+  },
+  "generator": "Development candidate offset+17 and per-channel amplitude1/2 jitter, unseen heldout offset+79 and amplitude1/2/3. Positives keep the noisy candidate order; negatives swap only adjacent tail indices, preserve anchor and same candidate multiset.",
+  "training_negatives": [
+    "tail swap indices 2/3",
+    "tail swap indices 5/6",
+    "tail swap indices 8/9"
+  ],
+  "heldout_negatives": [
+    "tail swap indices 10/11",
+    "tail swap indices 12/13"
+  ],
+  "arms": [
+    "first_channel_max_consecutive_transition_mismatch repeated 16",
+    "mean_of_four_channel_max_transition_mismatches repeated16",
+    "median_of_four_channel_max_transition_mismatches repeated16",
+    "mean_top_two_of_64_channel_time_transition_mismatches repeated16"
+  ],
+  "learning": "Four equal-capacity perceptrons with sixteen trained weights plus bias, 1728 paired development examples/model, LR=.1, 32 fixed passes, no heldout training.",
+  "primary": "Four arms x six heldout cells, 16 heldout seeds ×9 entities×positive/negative, per-seed confusion. MULTICHANNEL_ROBUSTNESS iff any 4-channel model scores >=0.80 in both amplitude3 heldout cells AND >=0.05 above first-channel aggregate. PARTIAL if multi4 > firstchannel aggregate by>=0.03 but strict rule unmet; NO_GAIN otherwise. Preserve all outcomes.",
+  "controls": [
+    "No external or hidden sensors, exact same four channels and raw observations for every arm",
+    "Positive/negative candidate same anchor and multiset",
+    "No new model weights, budget, hidden oracle, threshold changes or replay",
+    "First-use artifact and final full Go regression"
+  ],
+  "budget": {
+    "arms": 4,
+    "feature_width": 16,
+    "train_pairs_per_arm": 1728,
+    "epochs": 32,
+    "heldout_cells": 6,
+    "heldout_seeds": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Supervised synthetic multi-channel temporal difference classification only."
+}
