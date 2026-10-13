@@ -1,0 +1,48 @@
+name: Wingless W-R19 four-channel local-order robustness
+on:
+  push:
+    branches: [research/w-r19-multichannel-local-robustness-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Frozen parent and source identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor bf4aa817f6ea00e06e3327549811b5c7e7255133 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-single-swap/execute.py)" = e1b20533c75ea8875aae2e352993db83f78d540e
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r19-multichannel/prereg.json)" = e925e9a7c8c59ea964b81e7da6104209b1fbb45b
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r19-multichannel/execute.py)" = 7b9833ce9744d8520f4255279709ff25f41feffe
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r19-multichannel/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r19-multichannel/execute.py
+      - name: Original frozen multichannel scientific evaluation
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r19-multichannel/execute.py > /tmp/W-R19-original.json
+          python3 -m json.tool /tmp/W-R19-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R19-original.json'))
+          assert len(a['arms'])==4 and all(len(r['matrix'])==6 for r in a['arms'])
+          assert a['development_seeds']==list(range(160,176))
+          assert a['heldout_seeds']==list(range(176,192))
+          print('CLASSIFICATION',a['classification'])
+          for x in a['arms']:
+              print(x['representation'],x['accuracy'],
+                    [(v['amp'],v['transform'],v['accuracy']) for v in x['matrix']])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R19-original-four-channel
+          path: /tmp/W-R19-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless regression and build
+        run: go test ./... && go build ./...
