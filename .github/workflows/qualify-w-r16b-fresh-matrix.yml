@@ -1,0 +1,49 @@
+name: Wingless W-R16B first-use corrected-fresh-noise matrix
+on:
+  push:
+    branches: [research/w-r16b-fresh-noise-matrix-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Exact identity freeze and no-replay boundary
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor cd9ed8c98e655e9ebf77204750f9ca733ced83e5 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r15-noisy-positive/execute.py)" = 0a5a6f6c2993a04ca46c3ec918dd8fbdaac8bda5
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r16b-noise-matrix/prereg.json)" = 216fc74c4493e180ea95a5f9bae904e6ec8b2d0a
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r16b-noise-matrix/execute.py)" = 949971431e0b296c5a797ee6ec336947db207a83
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r16b-noise-matrix/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r16b-noise-matrix/execute.py
+      - name: New first-use sealed cohorts 80-95 original
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r16b-noise-matrix/execute.py > /tmp/W-R16B-original.json
+          python3 -m json.tool /tmp/W-R16B-original.json > /dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R16B-original.json'))
+          assert a['development_seeds']==list(range(64,80))
+          assert a['sealed_heldout_seeds']==list(range(80,96))
+          assert len(a['models'])==4
+          assert all(len(m['matrix'])==9 for m in a['models'])
+          print('W_R16B_CLASSIFICATION',a['classification'])
+          for m in a['models']:
+              print('MODEL',m['model'],'AGGREGATE',m['aggregate_accuracy'],
+                    'MATRIX',[(c['amplitude'],c['negative_family'],c['accuracy']) for c in m['matrix']])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R16B-first-use-fresh-36-cell-matrix
+          path: /tmp/W-R16B-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One complete Wingless final regression
+        run: go test ./... && go build ./...
