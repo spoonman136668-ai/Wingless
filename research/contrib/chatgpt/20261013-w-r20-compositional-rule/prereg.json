@@ -1,0 +1,31 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R20-PARTIAL-CONTEXT-COMPOSITIONAL_RULE",
+  "parent_commit": "fc6056a230156401db4e4cd48f7ca918f43019f8",
+  "predecessor": "W-R19",
+  "question": "Can a fixed compositional rule hypothesis predict novel contexts from four labeled demonstrations, outperforming context-table memorization under equal calibration-label access?",
+  "hypothesis": "Under a modular additive family, a one-parameter residual-bias learner will generalize from four initial-pair examples to all other context pairs, whereas a 64-count rote learner using the same four labels cannot cover the unseen contexts.",
+  "freeze": "All generator, splits, context-limited calibration budget, solver algorithm and rejection controls frozen before scientific first-use; do not tune on heldout test results.",
+  "source": "Base W-R18 x0=(e+seed)%4, x1=(e//4+3*seed)%4, known dynamic hypothesis x[t]=(x[t-1]+x[t-2]+b)%4. Previously studied b0 and b1; NEW heldout tasks set b2 on fresh seeds64..67.",
+  "split": {
+    "development_model_source": "Published W-R18 b0 source identity as known structural hypothesis only, no additional labels",
+    "heldout_seeds": [
+      64,
+      65,
+      66,
+      67
+    ]
+  },
+  "calibration": "Per heldout seed exactly four allowed labels at t2 from episodes e0,1,2,3. Their initial x1 is fixed, leaving 12 of 16 initial context pairs without direct first-step calibration. Exclude the four calibration episodes entirely from test.",
+  "arms": [
+    "old_fixed_b0: use known b=0 formula with no new calibration",
+    "rote_16_context: 16x4 counting table updated with only four calibration labels; unseen contexts default class0 and all rows have fixed deterministic tie rules",
+    "compositional_bias: infer residual offset b=(observed y-xprev1-xprev2)%4 from four calibration labels, accept only if all agree, then use b to predict all test contexts",
+    "shuffled_history_compositional: same inferred b and calibration labels, but at test permute only already observed history prefix, destroying chronological relation while preserving symbol multiset"
+  ],
+  "test": "Per heldout seed 12 uncalibrated episodes e4..15, t2..31 (30 test predictions each, 360 per seed), compute full 4x4 confusion and track SHA256. Test labels inaccessible to learner.",
+  "primary": "COMPOSITIONAL_GENERALIZATION if compositional_bias>=.95 and all three controls<=.65; PARTIAL if compositional outperforms every control but misses threshold; NEGATIVE otherwise; invalid if calibration examples fail agreed rule.",
+  "capacity": "Rote 64 integer counters; compositional one integer parameter b plus formula fixed before run. Not equal parameter capacity; same four new-rule calibration labels and same heldout evaluation observations. Model calls0, no hidden capacity growth.",
+  "safeguards": "No future observations in shuffled control, no heldout-label access during calibration, no tuning, no original first-use reruns, exact SHA identities, deterministic replay and full test/build.",
+  "claim_limit": "Finite predetermined modular-additive hypothesis transfer with four supervised examples, not discovering arbitrary dynamics or generic reasoning."
+}
