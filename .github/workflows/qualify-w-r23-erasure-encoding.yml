@@ -1,0 +1,46 @@
+name: Wingless W-R23 frozen erasure-encoding science
+on:
+  push:
+    branches: [research/w-r23-erasure-encoding-falsification-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Fail-closed immutable parent/prereg/source identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor c551d41a7b8d4f77b9349033fa788d621a800519 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-maskaware/execute.py)" = e43abe25ef7b876d9138576d5184d02cde2819d8
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-erasure-encoding/prereg.json)" = b06306df59a26a4269f09865e942b6295c1f19d3
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-erasure-encoding/execute.py)" = 5198fd4ad32895428bb010751024e7d7e71b1436
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r23-erasure-encoding/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r23-erasure-encoding/execute.py
+      - name: Original first-use sentinel transfer scientific evaluation
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r23-erasure-encoding/execute.py > /tmp/W-R23-original.json
+          python3 -m json.tool /tmp/W-R23-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R23-original.json'))
+          assert x['sealed_heldout_seeds']==list(range(272,288))
+          assert len(x['arms'])==3 and all(len(a['cells'])==18 for a in x['arms'])
+          print('CLASSIFICATION',x['classification'],'NONZERO_GAIN',x['delta_vocabulary_vs_zero_only_nonzero'])
+          for a in x['arms']:
+              print('ARM',a['arm'],'ALL',a['total_accuracy'],'NONZERO',a['nonzero_accuracy'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R23-original-erasure-encoding
+          path: /tmp/W-R23-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless qualification regression
+        run: go test ./... && go build ./...
