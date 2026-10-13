@@ -1,0 +1,37 @@
+name: Wingless W-R15 frozen noisy-positive science
+on:
+  push:
+    branches: [research/w-r15-noisy-positive-temporal-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify frozen parent prereg and source before first use
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 690b08efaffb921835525029c3b5504c30272279 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r14-train-calibration/execute.py)" = a9cb66175840b8b2eef47cea3adcd90aafc74959
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r15-noisy-positive/prereg.json)" = dda30db75849e886ed7690dadda1b1cd68bd529c
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r15-noisy-positive/execute.py)" = 0a5a6f6c2993a04ca46c3ec918dd8fbdaac8bda5
+          python3 -m json.tool research/contrib/chatgpt/20261012-w-r15-noisy-positive/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261012-w-r15-noisy-positive/execute.py
+      - name: Original frozen noisy-positive science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261012-w-r15-noisy-positive/execute.py > /tmp/W-R15-original.json
+          python3 -m json.tool /tmp/W-R15-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R15-original-noisy-positive
+          path: /tmp/W-R15-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Final Wingless full regression
+        run: go test ./... && go build ./...
