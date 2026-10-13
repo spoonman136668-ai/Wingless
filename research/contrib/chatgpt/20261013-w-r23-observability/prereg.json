@@ -1,0 +1,75 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "experiment": "W-R23-HIDDEN-SWAP-IDENTIFIABILITY-BOUNDARY",
+  "parent_head": "c551d41a7b8d4f77b9349033fa788d621a800519",
+  "hypothesis": "W-R22 achieved 100% only where swapped observations remained visible. Deliberately hide the actual swapped rows, keeping the label construction unchanged, to measure observability rather than celebrate impossible recognition.",
+  "freeze": "Frozen before first-use: three visibility classes, masks, swap positions, generators, seed split, existing trained models, thresholds, all controls. No tuning after sealed observation.",
+  "training": "Use exact W-R22 frozen train(arm) on development seeds240..255 with 1728 examples, LR0.1,32 epochs and 16 trained feature weights+bias. No training on W-R22 heldout or W-R23 data.",
+  "heldout": {
+    "sealed_seeds": [
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "amplitude": 3,
+    "swaps": [
+      "swap10_11",
+      "swap12_13"
+    ],
+    "visibility": [
+      "visible",
+      "one_hidden",
+      "both_hidden"
+    ],
+    "background_mask_ticks": [
+      2,
+      5,
+      8
+    ],
+    "global_offset": 79
+  },
+  "mask": "For each swap of adjacent tail indices i,i+1 (actual sequence rows i+1,i+2), visible hides neither target; one_hidden adds actual row i+1; both_hidden adds both actual target rows, in addition to background [2,5,8]. The candidate's full four-channel masked rows are exactly (0,0,0,0). Negative sequence swaps those candidate rows afterward, preserving first row and multiset.",
+  "arms": [
+    "naive_clean",
+    "naive_augmented",
+    "maskaware_clean",
+    "maskaware_augmented"
+  ],
+  "primary": "Preserve per-family/visibility confusion matrices and per-seed accuracy. OBSERVABILITY_BOUNDARY iff both_hidden examples become literally identical for every label pair, every arm scores exactly 0.5 for all both_hidden conditions, and both maskaware arms achieve >=0.85 in all visible cells; PARTIAL if impossibility checks pass but the visible criterion fails; INVALID if any equivalence or identity guard fails. Never claim classification of unobservable distinctions.",
+  "controls": [
+    "Matched positive/negative labels with equivalent observations in both-hidden condition by explicit equality assertion",
+    "No privileged mask map or test labels passed to scoring; trained model uses only observed rows",
+    "No extra features, update epochs or retraining; exactly frozen model identities",
+    "No data leakage; full original outcome artifact then one full Go regression"
+  ],
+  "bounds": {
+    "heldout_seeds": 16,
+    "models": 4,
+    "cells_per_arm": 18,
+    "feature_width": 16,
+    "training_examples_per_arm": 1728,
+    "epochs": 32,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic observability and identifiability of local temporal swaps, not language cognition."
+}

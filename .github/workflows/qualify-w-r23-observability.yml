@@ -1,0 +1,49 @@
+name: Wingless W-R23 sealed hidden swap observability
+on:
+  push:
+    branches: [research/w-r23-observability-boundary-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify exact frozen identities prior to first use
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor c551d41a7b8d4f77b9349033fa788d621a800519 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-maskaware/execute.py)" = e43abe25ef7b876d9138576d5184d02cde2819d8
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-observability/prereg.json)" = 35595a4cd6ee6b7c4c8f7e3a3e3f267c48d1317e
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-observability/execute.py)" = 0fcf7265f845dafefd6a693724480c207f08ae85
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r23-observability/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r23-observability/execute.py
+      - name: Original frozen observational equivalence experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r23-observability/execute.py > /tmp/W-R23-original.json
+          python3 -m json.tool /tmp/W-R23-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          j=json.load(open('/tmp/W-R23-original.json'))
+          assert len(j['arms'])==4 and all(len(a['cells'])==18 for a in j['arms'])
+          assert j['sealed_heldout_seeds']==list(range(272,288))
+          print("CLASSIFICATION",j["classification"],
+                "INVISIBLE_EQUIVALENCE",j["equivalence_control_pass"])
+          for a in j["arms"]:
+              print("ARM",a["arm"],"SUMMARY",
+                    [(v,round(sum(x["accuracy"] for x in a["cells"] if x["visibility"]==v)/6,4))
+                     for v in ("visible","one_hidden","both_hidden")])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R23-original-observability
+          path: /tmp/W-R23-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full Wingless regression and build
+        run: go test ./... && go build ./...
