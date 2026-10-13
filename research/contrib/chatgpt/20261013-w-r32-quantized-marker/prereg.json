@@ -1,0 +1,72 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R32-NATURAL-QUANTIZED-MARKER-ALIAS",
+  "parent_head": "0c8679500be0322dcaeb17637eb56867744e73b6",
+  "hypothesis": "W-R31 showed no downstream penalty after an adversarial legitimate marker intervention at full 8-bit precision. Under otherwise-unchanged CLEAN observed raw streams, lowering sensor precision to 4,2,1 bits can increase naturally occurring zero/all255/repeated-row aliases; this may cause the frozen W-R25 observed marker detector to suppress genuine transitions and harm the unchanged trained pair classifier.",
+  "freeze": "Before first use freeze four high-bit quantizers expanded back to byte range; three existing generator families; two fixed swap positions; fresh heldout seeds; same fixed W-R22 trained model, metric definitions and classifications. No post-run repair of thresholds, cohort changes or repeat first use.",
+  "cohort": {
+    "training_seeds": "original W-R22 development 240..255, identical 1728 balanced examples",
+    "sealed_heldout_seeds": [
+      1080,
+      1081,
+      1082,
+      1083,
+      1084,
+      1085,
+      1086,
+      1087,
+      1088,
+      1089,
+      1090,
+      1091,
+      1092,
+      1093,
+      1094,
+      1095
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "bits": [
+      8,
+      4,
+      2,
+      1
+    ],
+    "swaps": [
+      10,
+      12
+    ],
+    "entities": 9,
+    "noise_amplitude": 3,
+    "noise_offset": 79
+  },
+  "quantizer": "For each untouched clean byte v, retain the top b bits via v>>(8-b), then remap the integer to floor(255*q/(2**b-1)); b in {8,4,2,1}. No missing samples are inserted. Quantization is applied symmetrically to positive and swapped negative candidates; base sequence is unchanged.",
+  "arms": [
+    "old_zero (frozen W-R22 zero-only exclusion)",
+    "multi_marker (frozen W-R25 observed zero/255/repeat exclusion)",
+    "all_observed (W-R19 all-channel top-two transition feature using the exact same trained weights)"
+  ],
+  "outcome": "At every heldout seed/generator/precision/site, count genuinely observed rows whose byte pattern triggers the multi-marker predicate; preserve individual TP/TN/FP/FN and 24 per-arm accuracy cells. QUANTIZED_MARKER_COST iff one-bit natural marker incidence exceeds 8-bit incidence by >=0.05 and multi_marker one-bit accuracy is at least 0.05 lower than all_observed on matched cells; ALIAS_WITHOUT_CONFIRMED_COST iff incidence condition holds but downstream cost does not; NO_ALIAS_GROWTH otherwise.",
+  "controls": [
+    "No erased rows or synthetic marker insertion; all quantized values are genuinely observed",
+    "No change to learned weights, fit examples, model width, classification threshold or relative evaluation budget",
+    "Do not generalize these synthetic source generators to real-world sensor statistics or to semantic reasoning",
+    "Observe all negative and null per-seed outcomes; exact predecessor/prereg/code blob identities, original result artifact and one full Go regression/build"
+  ],
+  "bounds": {
+    "arms": 3,
+    "generators": 3,
+    "precisions": 4,
+    "sites": 2,
+    "heldout_seeds": 16,
+    "model_width": 16,
+    "training_examples": 1728,
+    "epochs": 32,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  }
+}
