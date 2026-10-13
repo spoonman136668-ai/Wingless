@@ -1,0 +1,37 @@
+name: W-R29 original prospective science full regression
+on:
+  push:
+    branches: [research/chatgpt-isolated-w29-adaptive-witness-20261013]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Identity and non-executing preflight
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 141e25c2a19f3ccfca5e11ae066bd8015b168a84 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-latent-alphabet/execute.py)" = 7632546ca681c3c8fec66991ffc9468ab34e0d07
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w29-independent-witness/prereg.json)" = 8b5c605690c4496b6abf05b6a1e000d3214c0dff
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w29-independent-witness/execute.py)" = 764ea913abe31decd2dd8b4b5318b240d49525a5
+          python3 -m json.tool research/contrib/chatgpt/20261013-isolated-w29-independent-witness/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-isolated-w29-independent-witness/execute.py
+      - name: Original one-shot prospective W-R29 research
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-isolated-w29-independent-witness/execute.py > /tmp/W-R29-original.json
+          python3 -m json.tool /tmp/W-R29-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R29-frozen-first-use
+          path: /tmp/W-R29-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full repository regression
+        run: go test ./... && go build ./...
