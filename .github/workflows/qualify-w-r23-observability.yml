@@ -1,0 +1,51 @@
+name: Wingless W-R23 mask-observability first-use
+on:
+  push:
+    branches: [research/w-r23-overlap-mask-identifiability-r1]
+permissions:
+  contents: read
+jobs:
+  scientific-first-use:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Freeze source and prereg exact identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor c551d41a7b8d4f77b9349033fa788d621a800519 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-maskaware/execute.py)" = e43abe25ef7b876d9138576d5184d02cde2819d8
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-overlap-mask/prereg.json)" = dc475d6e7b97b0ca2f60ee871e2fef159a48ad10
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-overlap-mask/execute.py)" = 8a6f4062c343c24331f2c86b42286971a7675350
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r23-overlap-mask/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r23-overlap-mask/execute.py
+      - name: Original frozen missing-signal observability experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r23-overlap-mask/execute.py > /tmp/W-R23-original.json
+          python3 -m json.tool /tmp/W-R23-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R23-original.json'))
+          assert len(x['models'])==4 and all(len(m['cells'])==24 for m in x['models'])
+          assert x['sealed_heldout_seeds']==list(range(272,288))
+          print('CLASSIFICATION',x['classification'])
+          for m in x['models']:
+              print('ARM',m['arm'],m['accuracy'])
+              by={c['case'] for c in m['cells']}
+              for name in sorted(by):
+                  cells=[c for c in m['cells'] if c['case']==name]
+                  print('CASE',name,'AVG',sum(c['accuracy'] for c in cells)/len(cells),
+                        'EQUIVALENT',sum(c['equivalent_pairs'] for c in cells))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R23-original-identifiability
+          path: /tmp/W-R23-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One complete Wingless integration
+        run: go test ./... && go build ./...
