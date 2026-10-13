@@ -1,0 +1,78 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R34-SYMMETRIC-CODEC-COMPARISON",
+  "parent_head": "f7113cf52145cd5f6cb2be43a88fedd38fbd8d94",
+  "hypothesis": "W-R33 showed only 4-bit partial recovery using a refit multi-marker feature comparing an unquantized base reference to quantized observations. Applying the *same deterministic quantizer* to the reference before computing the unchanged W-R25 top-two residual feature may remove representation-domain mismatch, improving heldout temporal swap discrimination at fixed training capacity.",
+  "freeze": "Freeze high-bit 8/4/2/1 quantizers, equal 1728-example cohorts and 32 epochs per arm, three generators, two heldout swap sites and all metrics before original first use. Compare asymmetric previous feature versus symmetric-base quantization; do not inspect or tune on new sealed heldout.",
+  "cohorts": {
+    "development_seeds": [
+      1184,
+      1185,
+      1186,
+      1187,
+      1188,
+      1189,
+      1190,
+      1191,
+      1192,
+      1193,
+      1194,
+      1195,
+      1196,
+      1197,
+      1198,
+      1199
+    ],
+    "sealed_heldout_seeds": [
+      1200,
+      1201,
+      1202,
+      1203,
+      1204,
+      1205,
+      1206,
+      1207,
+      1208,
+      1209,
+      1210,
+      1211,
+      1212,
+      1213,
+      1214,
+      1215
+    ],
+    "source": "Pinned W-R33 deterministic clean paired generator, W-R22 source and W-R25 observed-only marker rule",
+    "original_W_R33_heldout": "1152..1167 is historical context only, not reused"
+  },
+  "arms": [
+    "asymmetric_refit: W-R33 observed-only 16-repeat multi-marker feature comparing clean raw base to clean quantized candidate; newly train from dev with 16 weights+bias",
+    "symmetric_refit: IDENTICAL candidate and marker rule but compare base quantized to same bit depth as observed candidate; independently train from exactly the same dev examples and budget"
+  ],
+  "training": "Per arm/precision: 16 dev seeds, 9 entities, 3 train-only sites, 2 amplitudes, balanced positive/negative =1728 examples. LR 0.1, 32 ordered perceptron epochs, 16 weights+bias. Include every observationally identical negative in training and evaluation.",
+  "heldout": "16 fresh sealed seeds, 3 generator families, 2 fixed sites, paired positives/negatives, equal observable bit depth. Report per-seed TP/TN/FP/FN, near-chance, and identical observational pairs.",
+  "classification": "CODEC_ALIGNMENT_RECOVERY iff (a) symmetric 4-bit accuracy exceeds asymmetric 4-bit by >=0.10 and (b) symmetric 4-bit heldout accuracy >=0.70, without decrease >0.05 at 8-bit; PARTIAL_GAIN iff symmetric 4-bit or 2-bit accuracy exceeds asymmetric by >=0.05; NO_GAIN otherwise. Preserve all family-specific harms/negative outcomes.",
+  "controls": [
+    "Reference quantization is deterministic and declared; it is NOT a hidden-information oracle or added sensor",
+    "No additional feature width, training examples, epochs, labels, early stopping, budget, future source information, or retuning",
+    "One original first-use artifact on pinned immutable source followed by complete Go regression/build",
+    "Do not claim general language cognition from synthetic temporal pairs"
+  ],
+  "bounds": {
+    "arms": 2,
+    "quantizer_bits": [
+      8,
+      4,
+      2,
+      1
+    ],
+    "train_examples_per_arm": 1728,
+    "epochs": 32,
+    "model_width": 16,
+    "heldout_seeds": 16,
+    "generator_families": 3,
+    "sites": 2,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  }
+}
