@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R10-TEMPORAL-ORDER-IDENTIFIABILITY",
+  "parent_commit": "964149b9ac729ae567ce2ff7603d6ca634c8d6ca",
+  "predecessor": "W-R9-HELDOUT-TEMPORAL-TRANSFER",
+  "hypothesis": "W-R9's sorted-row plus first-anchor grouping may be insensitive to permutations of temporal order that preserve those statistics; this would invalidate interpreting W-R9 alone as a temporal-order mechanism.",
+  "freeze": "Preregistration committed before the first experiment workflow is installed/triggered. No parameter selection after any heldout observations. No experimental rerun without new explicit preregistration.",
+  "population": "Nine independent entities, three families per entity, 16 ordered four-channel observations from the exact W-R9 deterministic formula; 8 seeds total.",
+  "split": {
+    "development_seeds": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "heldout_seeds": [
+      4,
+      5,
+      6,
+      7
+    ]
+  },
+  "arms": [
+    "control: identical ordered rows for all three families",
+    "intervention: family0 unchanged, family1 reverses observations 1..15, family2 rotates observations 1..15 left by five; preserve anchor row0 and the complete multiset"
+  ],
+  "metrics": [
+    "original W-R9 sorted-multiset-plus-anchor grouping cardinality",
+    "independent full chronological-sequence exact grouping cardinality",
+    "per-family anchor equality, multiset equality, and nonidentical time sequences"
+  ],
+  "primary_falsification": "For every heldout seed, control sorted-anchor score=9 and scrambled sorted-anchor score=9 while scrambled chronological score=0; if observed, classify TEMPORAL_ORDER_BLIND rather than claiming temporal-order competence.",
+  "alternative": "FALSIFICATION_NOT_CONFIRMED on any heldout disagreement; INVALID if preservation, split, or source identity invariants fail.",
+  "budget": {
+    "seeds": 8,
+    "heldout": 4,
+    "entities": 9,
+    "families": 3,
+    "ticks": 16,
+    "model_calls": 0,
+    "capacity_increase": 0,
+    "first_use_retries": 0
+  },
+  "validation": "Deterministic repeated output, independent chronological comparator, exact W-R9 source Git blob identity, full repository regression once. Preserve all scientific outcomes.",
+  "claim_limit": "Synthetic causal identifiability of this scorer only; no real-language learning, downstream promotion, or accepted-ref modification."
+}

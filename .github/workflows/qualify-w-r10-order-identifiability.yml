@@ -1,0 +1,36 @@
+name: Wingless W-R10 frozen order-identifiability science
+on:
+  push:
+    branches: [research/w-r10-temporal-order-falsification-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Freeze exact parent, preregistration and science source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 964149b9ac729ae567ce2ff7603d6ca634c8d6ca HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r9-heldout-transfer/execute.py)" = ef8e6695f816d2cf30a4560417a7cf50748f5d26
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r10-order-identifiability/prereg.json)" = a1ac97da51d7d741dc8cdbbbad6f79daae8e4fad
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r10-order-identifiability/execute.py)" = ef6fc815084cf3adf30d5df967e5960a7fd3c0ca
+          python3 -m json.tool research/contrib/chatgpt/20261012-w-r10-order-identifiability/prereg.json > /dev/null
+      - name: Original frozen scientific execution with independent order comparator
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261012-w-r10-order-identifiability/execute.py > /tmp/W-R10-original.json
+          python3 -m json.tool /tmp/W-R10-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R10-original-frozen-order-ablation
+          path: /tmp/W-R10-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Full repository regression and build
+        run: go test ./... && go build ./...
