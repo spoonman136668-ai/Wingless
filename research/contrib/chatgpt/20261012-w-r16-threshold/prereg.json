@@ -1,0 +1,44 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R16-TRAIN-ONLY-MARGIN-SEPARATION",
+  "parent_commit": "cd9ed8c98e655e9ebf77204750f9ca733ced83e5",
+  "predecessor": "W-R15",
+  "hypothesis": "W-R15's frozen perceptron failed to distinguish mild jittered positives from reorders even though pooled circular mismatch may contain a separable training margin. Compare a single train-only learned threshold with a capacity-matched 16-weight perceptron under unseen jitter and unseen permutation.",
+  "freeze": "Freeze fresh split, jitter/offset schedules, learning algorithm, labels and thresholds before original run; only development labels can calibrate the threshold. No evaluation-derived adjustment.",
+  "split": {
+    "development": [
+      32,
+      33,
+      34,
+      35
+    ],
+    "heldout": [
+      36,
+      37,
+      38,
+      39
+    ]
+  },
+  "population": "Same 16x4 W-R11 synthetic sequence, nine entities/seed. Train candidate global offset+17, jitter +/-1, negative alternates reversal/rotate3; heldout offset+61, jitter +/-2, negative even-odd weave. Positive and negative candidates per source have equal multisets and anchors.",
+  "arms": [
+    "16-feature unordered relative histogram, fixed 32-epoch perceptron",
+    "16 copies pooled circular relative mismatch, fixed 32-epoch perceptron",
+    "single threshold from development pooled mismatch: theta=(maximum positive training score + minimum negative training score)/2; classify positive if score<=theta even if train distributions overlap"
+  ],
+  "metrics": "Per heldout seed full TP/TN/FP/FN, balanced accuracy, dev max positive/min negative gap, exact trained threshold, and every failure.",
+  "classification": "THRESHOLD_TRANSFER if train-only threshold>=0.85 heldout accuracy and unordered<=0.55; PARTIAL if threshold beats both comparison arms; NEGATIVE otherwise. Preserve class asymmetry.",
+  "validation": "Pinned W-R15 source, all priors, no future/heldout oracle use, deterministic replay, first-use archive and one full project regression.",
+  "budget": {
+    "seeds": 8,
+    "heldout": 4,
+    "entities": 9,
+    "ticks": 16,
+    "max_trainable_weights": 16,
+    "epochs": 32,
+    "lr": 0.1,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Synthetic supervised jitter discrimination, no natural language generalization or accepted-ref change."
+}
