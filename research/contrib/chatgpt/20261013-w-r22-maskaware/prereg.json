@@ -1,0 +1,117 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "experiment": "W-R22-MASK-AWARE-VS-NAIVE-MISSING-TICK-LEARNING",
+  "parent_head": "fd54ad48b14aa493ee922b057f23c3b75c81fe76",
+  "hypothesis": "W-R21 found an immediate 50% collapse after two missing ticks. Compare masked-transition feature selection with/without fixed-budget missing-tick augmentation, versus naive top-two transition scoring with the exact same training examples and model width.",
+  "freeze": "Mask locations, all training assignments, heldout conditions and thresholds locked before any original first-use. No reruns against W-R21 heldout data.",
+  "input": "Four observed channels from the original W-R11 16x4 generator or the exact W-R20 quadratic/xorshift generators, with deterministic time-varying jitter and candidate offset; no additional sensors.",
+  "cohorts": {
+    "development_seeds": [
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      251,
+      252,
+      253,
+      254,
+      255
+    ],
+    "sealed_heldout_seeds": [
+      256,
+      257,
+      258,
+      259,
+      260,
+      261,
+      262,
+      263,
+      264,
+      265,
+      266,
+      267,
+      268,
+      269,
+      270,
+      271
+    ]
+  },
+  "training": {
+    "generator": "affine_prior",
+    "seed_count": 16,
+    "entities": 9,
+    "negative_swap_tail_indices": [
+      2,
+      5,
+      8
+    ],
+    "amplitudes": [
+      1,
+      2
+    ],
+    "samples_per_arm": 1728,
+    "epochs": 32,
+    "learning_rate": 0.1,
+    "fixed_clean_mask": 0,
+    "augmented_mask": "Use first 0,2,4 ticks from index order [2,5,8,10,3,6], assigned by (seed+entity+negative_swap_index+amp)%3, before swapping; the same deterministic mask for positive and negative example within each pair."
+  },
+  "heldout": {
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "amplitude": 3,
+    "masked_ticks": [
+      3,
+      5
+    ],
+    "mask_order": [
+      2,
+      5,
+      8,
+      10,
+      3,
+      6
+    ],
+    "negative_swap_tail_indices": [
+      10,
+      12
+    ],
+    "cells_per_arm": 6
+  },
+  "arms": [
+    "naive_clean: 16 repeated mean top-two transition deltas across all four channels, trained on clean examples",
+    "naive_augmented: same 16-width naive feature trained on development-masked examples",
+    "maskaware_clean: same top-two transition deltas but exclude candidate adjacent edges incident to all-zero missing rows, trained clean",
+    "maskaware_augmented: same mask-aware feature, trained on development-masked examples"
+  ],
+  "learning": "Four 16-feature 16-weight+bias perceptrons, 1728 paired examples each, same 32 passes, LR .1. Feature map uses only observed candidate rows as missingness indicators, not any separate mask oracle. Return zero feature only if no valid edges (should not arise).",
+  "primary": "Per arm, 6 heldout cells × 16 seeds ×9 entities ×binary labels, TP/TN/FP/FN and accuracy. MASK_AWARE_GENERALIZATION iff maskaware_augmented >=0.80 in every cell and > naive_augmented pooled accuracy by>=0.10. PARTIAL iff maskaware_augmented improves naive_augmented pooled by>=0.05 without strict threshold. NEGATIVE otherwise.",
+  "controls": [
+    "Exact parent and W-R21 source blob pinned",
+    "Missing ticks never overlap swapped actual observation rows t11,t12,t13,t14 or anchor t0",
+    "Matched positive/negative candidate first row and multiset preserved",
+    "Same training examples, epochs/weights/budget; no future labels or extra capacity",
+    "Original evidence archived once before a single full regression"
+  ],
+  "bounds": {
+    "arms": 4,
+    "model_width": 16,
+    "training_examples_per_arm": 1728,
+    "epochs": 32,
+    "heldout_cells_per_arm": 6,
+    "heldout_seeds": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Controlled synthetic missing-observation temporal recognition only; not language or general intelligence."
+}
