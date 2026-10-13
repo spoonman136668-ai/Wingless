@@ -1,0 +1,37 @@
+{
+  "id": "W-R56-UNSEEN-SOURCE-SWAP-AMPLITUDE-TRANSFER",
+  "parent_head": "7656df2467df5013cdc48148804d47ab6f9cbaa3",
+  "hypothesis": "W-R55 showed ~70.95% unseen xorshift source in three cohorts, but only one swap amplitude was evaluated. Challenge frozen leave-one-generator-out ridge learners with THREE new predeclared swap amplitudes on one unseen cohort, without retraining or source exposure.",
+  "dev_blocks": [
+    [
+      5700,
+      5716
+    ],
+    [
+      5732,
+      5748
+    ],
+    [
+      5764,
+      5780
+    ]
+  ],
+  "sealed_seeds": [
+    5824,
+    5872
+  ],
+  "amplitudes": [
+    1,
+    2,
+    4
+  ],
+  "arms": [
+    "withhold_affine_prior",
+    "withhold_quadratic_irregular",
+    "withhold_xorshift_independent"
+  ],
+  "training": "Exactly W-R54 1728 signed paired training examples from other two generators per arm, 16 weights, normalized ridge lambda1, three dev cohorts. Test exactly 48 sealed seeds, three generators, two test sites, nine entities, both true-first and true-second presentations, identity and XOR55. Frozen models before all three amplitudes.",
+  "classification": "AMPLITUDE_ROBUST_XORSHIFT if each of 3 cohorts has xorshift unseen-source balanced accuracy >=.65 at EACH amplitude and at least 2 of the 3 withheld families >=.55 at EACH amplitude for BROAD gain; PARTIAL_AMPLITUDE_TRANSFER if xorshift >=.55 in all nine cells regardless of other sources; OTHERWISE_NEGATIVE. Preserve negative families and per-seed results.",
+  "safety": "No FORGE R26/R27 seed range overlap; no post-result model selection; original first-use archive and full Go tests/build; no accepted refs or science authority changes.",
+  "claim_limit": "Synthetic unseen-generator paired discrimination across controlled swap amplitudes, not real cognitive source-birth."
+}
