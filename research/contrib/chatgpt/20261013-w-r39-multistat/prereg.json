@@ -1,0 +1,71 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R39-COMPOSITIONAL-XOR-INVARIANT-STATISTICS",
+  "parent_head": "d9d51080086a39fcbf0f2fae0c08e7a78d6412de",
+  "hypothesis": "W-R38 proved exact XOR55 invariance but lost all heldout temporal utility with a single scalar repeated 16 times. Expose 16 distinct pre-specified XOR-invariant statistics of the same adjacent transition mismatches, preserving the same 16-weight-plus-bias readout and identical learning budget. Test whether ordered statistics or popcount histograms recover discriminative temporal information without XOR-coded training.",
+  "freeze": "Freeze three representation arms, training seeds1824..1839, sealed heldout1840..1855, four-bit clean sensor data, XOR55 recoding only AFTER quantization, same generators, 32 perceptron epochs and all metrics before first use. Do not use W-R38 heldout for new training or select a variant after first-use.",
+  "split": {
+    "dev": [
+      1824,
+      1825,
+      1826,
+      1827,
+      1828,
+      1829,
+      1830,
+      1831,
+      1832,
+      1833,
+      1834,
+      1835,
+      1836,
+      1837,
+      1838,
+      1839
+    ],
+    "sealed_heldout": [
+      1840,
+      1841,
+      1842,
+      1843,
+      1844,
+      1845,
+      1846,
+      1847,
+      1848,
+      1849,
+      1850,
+      1851,
+      1852,
+      1853,
+      1854,
+      1855
+    ]
+  },
+  "arms": [
+    "scalar_repeated: exact W-R38 16-copy top-two popcount residual scalar",
+    "top16_sorted: descending largest sixteen of 64 per-edge/channel popcount residuals",
+    "histogram: first nine components count popcount residuals equal to values0..8, remaining seven components fixed zero (width16)"
+  ],
+  "training": "Each arm receives SAME 1728 identity-only clean 4-bit observed reference/candidate balanced pairs, dev affine_prior family, 16 seed x9 entity x3 train swap x2 amplitudes x2 labels, 32 epochs, LR0.1, 16 trained weights+bias, no early stopping or label filtering.",
+  "evaluation": "Identity and XOR55 encoding, 3 fixed generator families, 2 heldout swap positions, unseen sealed seeds1840..1855; include indistinguishable positive/negative pairs and per-seed TP/TN/FP/FN. Each feature MUST be exactly invariant to XOR55 transformation applied to both base/candidate; preserve any violations as invalid, not scientific negative.",
+  "primary": "XOR_ROBUST_UTILITY iff a new 16-feature arm has >=0.65 heldout accuracy under both identity and XOR55 and exceeds scalar_repeated by >=0.10 on paired heldout; PARTIAL_GAIN iff at least one new arm beats baseline by >=0.05 without meeting strict threshold; NO_GAIN otherwise. Report all three representations and both encodings, even null/negative.",
+  "controls": [
+    "No privileged decoder/XOR key supplied to model, no extra model calls, class labels in features, future states or sample screening",
+    "Same 16 numerical weights for each arm, but 16 distinct inputs have greater effective expressivity than duplicated scalar; disclose this, do not claim identical effective hypothesis class",
+    "Frozen original W-R38 source as exact immutable foundation and bounded new feature/statistics only",
+    "One first-use original artifact followed by one full Go repository test and build; no acceptance/promotion/production authority"
+  ],
+  "bounds": {
+    "arms": 3,
+    "feature_width": 16,
+    "train_examples_per_arm": 1728,
+    "epochs": 32,
+    "heldout_seeds": 16,
+    "codings": 2,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic XOR55-invariant fixed-width transition statistic learning, not general byte-permutation invariance or natural-language reasoning."
+}
