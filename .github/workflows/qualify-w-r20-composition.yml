@@ -1,0 +1,36 @@
+name: Wingless W-R20 frozen four-example compositional rule inference
+on:
+  push:
+    branches: [research/w-r20-partial-rule-inference-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify scientific identity and frozen preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor fc6056a230156401db4e4cd48f7ca918f43019f8 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r20-compositional-rule/prereg.json)" = 7097712f6c2f2f8f7a01931cf9c5386bc5a2e9c4
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r20-compositional-rule/execute.py)" = a879712bb1f06e1a1fae975f05aa8596efc7f66c
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r20-compositional-rule/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r20-compositional-rule/execute.py
+      - name: First-use original compositional inference
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r20-compositional-rule/execute.py > /tmp/W-R20-original.json
+          python3 -m json.tool /tmp/W-R20-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R20-original-four-example
+          path: /tmp/W-R20-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless regression and build
+        run: go test ./... && go build ./...
