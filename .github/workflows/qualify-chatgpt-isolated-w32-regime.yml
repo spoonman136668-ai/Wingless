@@ -1,0 +1,37 @@
+name: W-R32 original frozen scientific first use
+on:
+  push:
+    branches: [research/chatgpt-isolated-w32-hidden-regime-change-20261013]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Freeze and verify immutable source identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor d44de8f85364b6a4b336ffddb1fbc9e1c125089e HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-latent-alphabet/execute.py)" = 7632546ca681c3c8fec66991ffc9468ab34e0d07
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w32-causal-regime/prereg.json)" = e9e03c6c0cfa768053d2d6956cf23fe0e916c9a6
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w32-causal-regime/execute.py)" = 593f1c76563a5540d1756e42f2893c5c26854f5a
+          python3 -m json.tool research/contrib/chatgpt/20261013-isolated-w32-causal-regime/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-isolated-w32-causal-regime/execute.py
+      - name: Original W-R32 frozen experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-isolated-w32-causal-regime/execute.py > /tmp/W-R32-original.json
+          python3 -m json.tool /tmp/W-R32-original.json > /dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R32-original-first-use
+          path: /tmp/W-R32-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full repository regression
+        run: go test ./... && go build ./...
