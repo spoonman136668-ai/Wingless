@@ -1,0 +1,37 @@
+name: Wingless W-R14 train-only temporal calibration qualification
+on:
+  push:
+    branches: [research/w-r14-train-calibrated-temporal-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify frozen source, parent and preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor e9fa91c490316fcc486677e8c272d3cfeb9011a8 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r13-general-permutation/execute.py)" = 97640b4637b0c441eb409f8fa175df4996ef8aa8
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r14-train-calibration/prereg.json)" = eb8d39769f8545150cde1d4ac2922d7cb27c797f
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r14-train-calibration/execute.py)" = a9cb66175840b8b2eef47cea3adcd90aafc74959
+          python3 -m json.tool research/contrib/chatgpt/20261012-w-r14-train-calibration/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261012-w-r14-train-calibration/execute.py
+      - name: First frozen train-only calibrated scientific run
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261012-w-r14-train-calibration/execute.py > /tmp/W-R14-original.json
+          python3 -m json.tool /tmp/W-R14-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R14-original-train-only-calibration
+          path: /tmp/W-R14-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full Wingless regression
+        run: go test ./... && go build ./...

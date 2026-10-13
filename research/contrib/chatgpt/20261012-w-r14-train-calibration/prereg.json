@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R14-TRAIN-ONLY-FEATURE-CALIBRATION",
+  "parent_commit": "e9fa91c490316fcc486677e8c272d3cfeb9011a8",
+  "predecessor": "W-R13",
+  "hypothesis": "W-R13 pooled mismatch features carried information but the fixed perceptron likely underutilized small-magnitude signals. Scale the pooled mismatch by a factor learned strictly from development negatives, then test an entirely fresh, unseen heldout cohort and perturbation.",
+  "freeze": "Freeze source, candidates, model width, epochs, scale rule, train/heldout splits, thresholds and negative outcomes before any first-use execution. No heldout-derived calibration or retraining.",
+  "generator": "Same original Wingless 16-tick four-channel W-R11 synthetic formula; paired candidate applies a global +17 offset in training and +61 offset in heldout. Every negative preserves candidate's first row and multiset but reorders its 15-tick tail.",
+  "split": {
+    "development_seeds": [
+      16,
+      17,
+      18,
+      19
+    ],
+    "heldout_seeds": [
+      20,
+      21,
+      22,
+      23
+    ]
+  },
+  "training_perturbation": "Reversal of 15-tick tail on even-indexed entity, rotation left three on odd-indexed entity.",
+  "heldout_perturbation": "Unseen rotation left seven on 15-tick tail; zero training examples use this rotation.",
+  "candidates": [
+    "unordered_relative_histogram: 16 bins, no order information",
+    "unscaled_pooled_mismatch: 16 repeated mean circular anchor-relative mismatch values",
+    "development_calibrated_pooled_mismatch: 16 repeated mismatch values normalized by strictly positive minimum mismatch across development negatives only, frozen before inference"
+  ],
+  "learning": "Identical 16-weight+bias perceptron, 32 epochs, learning rate 0.1 and zero init. Train-only scaling computed once per development cohort from negative inputs, never read heldout labels or scores.",
+  "primary": "Per-seed confusion and balanced accuracy. TRAIN_CALIBRATED_TRANSFER if calibrated>=0.85 and histogram<=0.55; PARTIAL if calibrated>both baselines without achieving threshold; NEGATIVE otherwise. Preserve all failures.",
+  "validation": "Data generation invariant asserts, exact 16 parameter-width for each candidate, no change in training examples or budgets, deterministic run() twice, one full repo regression, immutable SHA checks.",
+  "budget": {
+    "seeds": 8,
+    "heldout": 4,
+    "entities": 9,
+    "ticks": 16,
+    "features": 16,
+    "models": 3,
+    "epochs": 32,
+    "learning_rate": 0.1,
+    "first_use_retries": 0,
+    "model_calls": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Frozen synthetic supervised feature calibration, no general language, real transfer, or accepted-ref change."
+}
