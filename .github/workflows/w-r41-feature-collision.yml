@@ -1,0 +1,51 @@
+name: Wingless W-R41 exact observed and feature collision audit
+on:
+  push:
+    branches: [research/w-r41-feature-identifiability-audit-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify exact immutable prereg, executor and parent
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 7f538f0fbe0e67418a6a52544d086557fd7e85b7 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r40-positional/execute.py)" = 1598d32e79dc386739987a93001d92a8052f96f1
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r41-feature-audit/prereg.json)" = db3f9597d291bd0a8a9dbd83a95ec792ae569eb2
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r41-feature-audit/execute.py)" = 1887bb8ad74f0e3aafffd567f7af620ef6ae31c2
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r41-feature-audit/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r41-feature-audit/execute.py
+      - name: Original first-use sealed exact feature collision study
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r41-feature-audit/execute.py > /tmp/W-R41-original.json
+          python3 -m json.tool /tmp/W-R41-original.json > /dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R41-original.json'))
+          assert a['sealed_heldout_seeds']==list(range(1920,1936))
+          assert len(a['arms'])==10 and all(r['pairs']==864 for r in a['arms'])
+          print('CLASSIFICATION',a['classification'])
+          print('RAW_IDENTICAL',a['raw_observation_identical_fraction'])
+          print('MAX_FEATURE_IDENTICAL',a['worst_feature_identical_fraction'])
+          print('FIXTURE_SHA256',a['original_fixture_sha256'])
+          for r in a['arms']:
+              print('ARM',r['arm'],r['condition'],'IDENTICAL',r['identity_fraction'],
+                    'PAIR_BOUND',r['matched_pair_optimistic_accuracy_upper_bound'],
+                    'LOOKUP_CEILING_NONDEPLOYABLE',r['exact_feature_memorization_upper_bound_on_this_sample'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R41-original-feature-collision-audit
+          path: /tmp/W-R41-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full required Wingless regression and build
+        run: go test ./... && go build ./...
