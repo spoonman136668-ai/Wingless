@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R18-LEARNED-ORDER-TWO-PREDICTIVE-STATE",
+  "parent_commit": "21b3c3fee08e5af3ed6c22218d67f59ed40d60a9",
+  "predecessor": "W-R17",
+  "novelty": "First prospective tiny next-symbol temporal prediction study instead of paired-order judgment; preserve 16-state/64-count capacity across all comparators.",
+  "question": "Can a 16-context online counting learner infer a compositional second-order predictive rule and transfer its learned transition table to new episodes, outperforming one-step and order-destroyed representations?",
+  "hypothesis": "Order-two state memory will predict unseen episodes significantly better than last observation plus episode group and order-scrambled context, under identical train examples and context capacities.",
+  "freeze": "All splits, exact Fibonacci-style modular recurrence, perturbation controls, capacity, metrics and thresholds fixed before first scientific run; no post-result tuning or replay.",
+  "generator": "For seed S each of 16 episodes e=0..15 has initial x0=(e+S)%4,x1=((e//4)+3*S)%4. For t>=2, xt=(x[t-1]+x[t-2])%4 through 32 observations. 16 episodes traverse all 16 initial-state combinations per seed; finite deterministic and synthetic, not a claim of OOD dynamics.",
+  "split": {
+    "development": [
+      48,
+      49,
+      50,
+      51
+    ],
+    "heldout": [
+      52,
+      53,
+      54,
+      55
+    ]
+  },
+  "arms": [
+    "order_two: exact 16 contexts=(x[t-2],x[t-1]), each 4-class count row",
+    "last_plus_episode: exact 16 contexts=(x[t-1],e%4), each 4-class count row",
+    "shuffled_order_two: exact 16 contexts from a fixed even-index-before-odd-index temporal permutation of the sequence, labels remain unshuffled xt"
+  ],
+  "training": "Identical 4 seeds x 16 episodes x 30 transitions per arm; counters start zero, one-pass add 1 to observed target count. Predict class argmax over 4 with tie fixed lowest class. No heldout updates.",
+  "evaluation": "Exactly 4 sealed heldout seeds x16 episodes x30 predictions per arm. All 16 contexts must be seen in training (report unobserved count). Report per-seed exact next-symbol accuracy, confusion and trace hash; count training examples and table footprint 16x4 each.",
+  "primary": "ORDER_TWO_PREDICTIVE_TRANSFER if order_two heldout accuracy>=.95 and both controls<=.65; PARTIAL_TRANSFER if order_two exceeds both controls without meeting full criterion; NEGATIVE_TRANSFER otherwise.",
+  "controls": "All symbols in {0,1,2,3}, shuffled input preserves complete symbol histogram and only destroys order, same counts and evaluation examples; no labels or future outcomes into predictor at inference; exact hash provenance and one full regression.",
+  "budget": {
+    "models": 3,
+    "context_states": 16,
+    "counts_per_context": 4,
+    "observations_per_episode": 32,
+    "episodes_per_seed": 16,
+    "seeds": 8,
+    "development_seeds": 4,
+    "heldout_seeds": 4,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Memorized finite synthetic second-order recurrence on disjoint episodes, not language intelligence or unseen rule adaptation."
+}

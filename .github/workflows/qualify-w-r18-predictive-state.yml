@@ -1,0 +1,36 @@
+name: Wingless W-R18 frozen learned second-order state prediction
+on:
+  push:
+    branches: [research/w-r18-order-two-predictive-state-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check parent, preregistration and first-use exact code
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 21b3c3fee08e5af3ed6c22218d67f59ed40d60a9 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-predictive-state/prereg.json)" = b7d16b4ddaa8bbe0a72e8b707bbc1f3e595ca61f
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-predictive-state/execute.py)" = f09a072c3c00e1694036dc8e7fcadbc8f0009762
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r18-predictive-state/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r18-predictive-state/execute.py
+      - name: Original fixed-budget temporal prediction experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r18-predictive-state/execute.py > /tmp/W-R18-original.json
+          python3 -m json.tool /tmp/W-R18-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R18-original-second-order-prediction
+          path: /tmp/W-R18-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless test and build
+        run: go test ./... && go build ./...
