@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R21-CHANNEL-ROLE-TRANSFER",
+  "parent_sha": "9fdd600c66b3dce4fefe31d3e64076cb436e823b",
+  "prior_source_blob": "161363043fe56cc7b03dd1679439331b62cbe256",
+  "question": "Does sensor-channel permutation-invariant temporal recognition transfer when the same observed four-channel sequence arrives in unseen channel order, rather than exploiting a privileged channel zero?",
+  "hypothesis": "A symmetric four-channel transition score may outperform a first-channel scorer under an unseen global permutation of the four channels without adding learned parameters.",
+  "source": "Reuse frozen nonlinear 16x4 W-R18 sequence, 9 entities/seed. Original 4 channel readings receive +17 candidate offset and genuine modulo3 per-tick jitter in development, +61 and modulo5 jitter in heldout; negatives rearrange candidate rows preserving the first anchor and multiset. Both a and b sequences have channels permuted by the heldout-only permutation indices [1,2,3,0], so ground-truth order is unchanged by reindexing.",
+  "split": {
+    "development": [
+      72,
+      73,
+      74,
+      75
+    ],
+    "heldout": [
+      76,
+      77,
+      78,
+      79
+    ]
+  },
+  "development_negative": "Reverse 15 tail ticks for even entity; rotate tail left3 for odd entity.",
+  "heldout_negative": "Unseen double adjacent row swaps at ticks5/6 and 10/11.",
+  "arms": [
+    "unordered first-channel anchor-relative histogram score, one train-only scalar threshold",
+    "first-channel mean 15 circular transition mismatch, scalar threshold",
+    "channel-symmetric MAX of four per-channel mean transition mismatch scores, scalar threshold",
+    "channel-symmetric MEAN of four per-channel mean transition mismatch scores, scalar threshold"
+  ],
+  "learning": "For each arm threshold=midpoint(max development-positive score,min development-negative score); 72 same development examples, one scalar learned, no heldout tuning. Four-channel arms evaluate 4x sensor edges but no extra persistent learned parameters; compute cost explicitly increased.",
+  "primary": "Four heldout seeds with TP,TN,FP,FN each; ROLE_TRANSFER if either symmetric arm accuracy>=0.85 and exceeds first-channel baseline strictly, with unordered<=0.55; PARTIAL if it beats baseline without meeting criterion; NEGATIVE otherwise. Keep all failures.",
+  "controls": "Different development and heldout seed cohorts, identical candidate multiset in positive vs negative, genuine varying jitter, exact channel permutation both inputs, all 16-tick input lengths, no post-result threshold tuning, no first-use replay, original artifact and one full regression.",
+  "bounds": {
+    "seeds": 8,
+    "heldout": 4,
+    "models": 4,
+    "learned_scalar_per_arm": 1,
+    "features_per_input": 4,
+    "entities": 9,
+    "ticks": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Synthetic sensor-channel symmetry, not semantic role binding in natural language or real-world general intelligence."
+}
