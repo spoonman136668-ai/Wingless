@@ -1,0 +1,37 @@
+name: W-R28 isolated frozen first-use experiment
+on:
+  push:
+    branches: [research/chatgpt-isolated-w28-adaptive-witness-20261013]
+permissions:
+  contents: read
+jobs:
+  original-science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin origin and prereg/source blob identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 02a379212a8b28e434ad87131539abcfa89ef509 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w28-active-witness/prereg.json)" = 148839534aadc7895c4e89f3288fe3ca476dd135
+          test "$(git hash-object research/contrib/chatgpt/20261013-isolated-w28-active-witness/execute.py)" = 019008fc023ec7d909d1059b4d504c7bbafdf886
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-latent-alphabet/execute.py)" = 7632546ca681c3c8fec66991ffc9468ab34e0d07
+          python3 -m json.tool research/contrib/chatgpt/20261013-isolated-w28-active-witness/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-isolated-w28-active-witness/execute.py
+      - name: Original frozen W-R28 science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-isolated-w28-active-witness/execute.py > /tmp/W-R28-original.json
+          python3 -m json.tool /tmp/W-R28-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R28-isolated-original-first-use
+          path: /tmp/W-R28-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Complete repository regression
+        run: go test ./... && go build ./...
