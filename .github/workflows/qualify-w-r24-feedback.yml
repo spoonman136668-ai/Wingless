@@ -1,0 +1,37 @@
+name: Wingless W-R24 fixed gain causal feedback
+on:
+  push:
+    branches: [research/w-r24-error-feedback-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify frozen predecessor and exact experiment identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4646dbe94ae96eec5a3b30def36285f65fd3376d HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-robust-curvature/execute.py)" = 0acd33538be4705e8ce5ff5854d5d9c1f20743bb
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r24-feedback/prereg.json)" = d7d3077a6bff1c30c0868d8c40c8df02ff312621
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r24-feedback/execute.py)" = e9feea4817627431c036b4ce7079abbf2be24c80
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r24-feedback/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r24-feedback/execute.py
+      - name: Frozen first-use original scientific evaluation
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r24-feedback/execute.py > /tmp/wr24-original.json
+          python3 -m json.tool /tmp/wr24-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R24-original
+          path: /tmp/wr24-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: One complete project regression
+        run: go test ./... && go build ./...
