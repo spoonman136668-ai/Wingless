@@ -1,0 +1,98 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "experiment": "W-R17-CAPACITY-MATCHED-LOCAL-ORDER-TRANSFER",
+  "parent_head": "a8e9d82a8abbb4a423dfa0ffac2d99af026a1005",
+  "hypothesis": "W-R16B pooled temporal mismatch failed on subtle adjacent swaps although it detected coarse reorderings. Test whether replacing two coarse training-negative families with local variants improves recognition of unseen local changes without widening models, epochs or training examples.",
+  "freeze": "This specific factor design, data generation, seed split, budgets, outcomes and thresholds is frozen before any original evaluation. W-R16B heldout is not reused; no retuning on its scores.",
+  "generator": "Reuse W-R16B original 16x4 input formula and genuine per-tick four-channel jitter `(11*t+7*channel+3*entity+seed) % (2*amp+1)-amp`; anchor fixed, candidate shift+17 development and +79 heldout.",
+  "split": {
+    "development_seeds": [
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111
+    ],
+    "heldout_seeds": [
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127
+    ]
+  },
+  "curricula": {
+    "global_only": [
+      "reverse_tail",
+      "rotate3",
+      "weave_tail"
+    ],
+    "local_mixed": [
+      "reverse_tail",
+      "pairwise_swap_tail",
+      "swap_tail_blocks"
+    ]
+  },
+  "test_families": [
+    "offset_pair_swaps: swap tail indices (1,2),(3,4)...(13,14), leaving tail index 0",
+    "single_middle_adjacent_swap: swap tail indices 6 and 7 only"
+  ],
+  "noise_amplitudes": {
+    "train": [
+      1,
+      2
+    ],
+    "heldout": [
+      1,
+      2,
+      3
+    ]
+  },
+  "representations": [
+    "16-element anchor-relative circular position difference",
+    "16 identical mean mismatch features",
+    "16-element circular first-difference transition mismatch"
+  ],
+  "learning": "Each of 6 model/curriculum arms trains on exactly 1728 development pairs (16 seeds,9 entities,3 transform families,2 train noise amps,2 labels), 16 weights+bias, zero init, learning rate0.1, 32 ordered epochs. Same model budget; do not peek at heldout for selection.",
+  "primary": "Evaluate both unseen local heldout families at amplitudes 1,2,3, 16 sealed seeds x9 entities x2 labels. Report six independent cells, per-seed confusion, aggregates for all 6 arms. MIXED_CURRICULUM_GAIN iff local_mixed improves >=0.05 aggregate over global_only for BOTH mean_mismatch and transition; TRADEOFF iff any local_mixed model improves >=0.05 but gain condition fails; otherwise NO_CROSS_FEATURE_GAIN. Preserve negative/mixed outcomes.",
+  "controls": [
+    "Frozen W-R16B source blob sha and parent identity",
+    "Identical paired multiset and first row for positive vs negative candidate",
+    "No direct heldout calibration, labels or updates",
+    "Single first-use artifact and one full regression, fail-closed on identity/provenance/scope drift"
+  ],
+  "bounds": {
+    "arms": 6,
+    "feature_width": 16,
+    "training_pairs_per_arm": 1728,
+    "epochs": 32,
+    "heldout_cells_per_arm": 6,
+    "heldout_seeds": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "production_authority": false
+  },
+  "claim_limit": "Finite supervised synthetic local order discrimination, not general language cognition or accepted ref promotion."
+}
