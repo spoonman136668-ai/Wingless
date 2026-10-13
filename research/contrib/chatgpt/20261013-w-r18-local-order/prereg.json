@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R18-HARD-LOCAL-ORDER-TRANSFER",
+  "parent_sha": "21b3c3fee08e5af3ed6c22218d67f59ed40d60a9",
+  "prior_source_blob": "bc84814a2680907a99e2e3dd7980ebaab15a681c",
+  "scientific_question": "Can a train-only calibrated temporal statistic distinguish an unseen adjacent-swap negative from a correctly ordered noisy positive, not merely distinguish large global permutations?",
+  "hypothesis": "Local transition mismatch has better discriminability than mean positional mismatch when the heldout perturbation is an adjacent tail swap; no guarantee under fresh dynamics and stronger jitter.",
+  "generator": "NEW nonlinear 16-tick four-channel dynamics, first channel (192+seed+7*q+3*t+t*t)%256, other three inherited W-R17 formulas with nonlinear increments (t*t,2*t*t,3*t*t); q=(5*entity+seed)%9. First channel receives full-mod256 channel offset and genuine varying tick jitter, development ((5*t+entity+seed)%3)-1, heldout ((7*t+entity+seed)%5)-2, with asserted cardinality 3 and 5. Positives have jitter+offset but retained order. Negative development reverse 15-tick tail on even entities, rotate3 on odd; negative heldout swaps adjacent tail positions at original ticks 7 and 8. Both labels share first candidate row and sorted candidate multiset.",
+  "split": {
+    "development": [
+      48,
+      49,
+      50,
+      51
+    ],
+    "heldout": [
+      52,
+      53,
+      54,
+      55
+    ]
+  },
+  "arms": [
+    "unordered 16-bin relative histogram difference (negative control)",
+    "mean of 16 first-channel anchor-relative circular positional mismatch",
+    "maximum of 16 first-channel anchor-relative circular positional mismatch",
+    "mean of 15 local transition circular mismatches between consecutive observations"
+  ],
+  "learning": "For each arm derive ONE scalar threshold (max development-positive score + min development-negative score)/2 with no heldout influence. Positive iff score<=threshold. All arms same development 72 pairs and exactly one learned scalar, no budget tuning.",
+  "primary": "Each arm 4 heldout seed confusion matrices and total accuracy. LOCAL_ORDER_TRANSFER if transition>=0.85 and histogram<=0.55, PARTIAL if transition strictly exceeds mean position and unordered without reaching threshold, else NEGATIVE; archive all arm results including if maxima/positives overlap. Distinguish algorithmic failure from generator invalidity.",
+  "independent_controls": "No exact duplicate train-vs-heldout base seeds; disjoint 48..51 and 52..55; equality of candidate multisets for positive and negative, genuine nonconstant per-tick noise in both, no future labels, exact Git objects, first-use once, deterministic replay, final full go regression.",
+  "capacity": {
+    "synthetic_seeds": 8,
+    "heldout": 4,
+    "entities": 9,
+    "ticks": 16,
+    "learned_scalar_per_arm": 1,
+    "arms": 4,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "no_post_result_retuning": true,
+    "no_accepted_ref_mutation": true
+  },
+  "claim_limit": "Frozen toy synthetic temporal pair discrimination, NOT general-purpose semantic intelligence; new generator is not a natural dataset."
+}
