@@ -1,0 +1,33 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R23-MEDIAN-ONLINE-CURVATURE",
+  "parent_sha": "25d608c3e3f4b18e3922e82741048ad53d57190c",
+  "prior_source_blob": "5a3ae9a2fd4f3fff88200f34e52c66a4370cb51b",
+  "question": "W-R22 found naive single past-second-difference online prediction worse under sensor noise. Can a preregistered median-of-three recent curvature estimator suppress noise while adapting to the new post-tick8 curvature regime, without external model calls or heldout tuning?",
+  "hypothesis": "The median of the last three *already observed* signed circular second differences may improve late-regime one-step circular MAE over both naive online curvature and the development-trained frozen curvature, but may adapt too slowly under a sharp regime shift.",
+  "generator": "EXACT W-R22 synthetic 16-tick raw first-channel generator. Development seeds88..91 have quadratic dynamics and actual 3-level jitter, heldout92..95 introduce 2*max(0,t-8)^2 after tick8 and five-level time-varying jitter; 9 entities/seed. No future heldout observations used for prediction or training.",
+  "split": {
+    "development": [
+      88,
+      89,
+      90,
+      91
+    ],
+    "heldout": [
+      92,
+      93,
+      94,
+      95
+    ]
+  },
+  "arms": [
+    "momentum second-order zero-curvature baseline",
+    "development-trained one-scalar frozen curvature (median over development second differences)",
+    "naive online one-step curvature from the immediately preceding observed three ticks",
+    "ROBUST online median of three most recent *available* signed curvature observations; at early ticks use median of available 1-2 or development scalar when none, frozen before first-use"
+  ],
+  "budget": "All predictors receive identical same five-tick causal context, at most one frozen learned scalar d2, no extra model inference or future data; robust predictor evaluates up to three scalar historical signed differences with O(1) computation and no persistent learned weights. Track operations separately, no capacity increase hidden.",
+  "primary": "Per-seed full, prechange t2..8 and postchange t9..15 circular MAE over all 9x14 targets; ROBUST_ONLINE_TRANSFER if median postchange <=0.9*frozen postchange, <=naive postchange, and improvement in >=3/4 heldout seeds. PARTIAL if median postchange <frozen but fails other criteria. NEGATIVE otherwise; preserve all outcomes.",
+  "safeguards": "Pinned exact source identities, new disjoint seeds, jitter cardinality asserts, prerecorded thresholds/splits before first-use, no first-use retries, one full Go repo regression, no accepted-ref mutation or capacity inflation.",
+  "claim_limit": "Synthetic time-series autoregression with causal observation-only online updates, not semantic reasoning or real-world transfer."
+}

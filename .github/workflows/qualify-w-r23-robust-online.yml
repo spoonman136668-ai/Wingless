@@ -1,0 +1,37 @@
+name: Wingless W-R23 frozen robust online curvature
+on:
+  push:
+    branches: [research/w-r23-robust-online-prediction-r1]
+permissions:
+  contents: read
+jobs:
+  original_science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify pinned source and frozen preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 25d608c3e3f4b18e3922e82741048ad53d57190c HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-online-prediction/execute.py)" = 5a3ae9a2fd4f3fff88200f34e52c66a4370cb51b
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-robust-curvature/prereg.json)" = c2d1692e1bba8d40242b793d04483c539f0efb85
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-robust-curvature/execute.py)" = 0acd33538be4705e8ce5ff5854d5d9c1f20743bb
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r23-robust-curvature/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r23-robust-curvature/execute.py
+      - name: First-use frozen scientific experiment
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r23-robust-curvature/execute.py > /tmp/wr23-original.json
+          python3 -m json.tool /tmp/wr23-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R23-original
+          path: /tmp/wr23-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Single full repository regression
+        run: go test ./... && go build ./...
