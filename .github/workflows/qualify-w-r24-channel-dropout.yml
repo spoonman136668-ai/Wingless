@@ -1,0 +1,46 @@
+name: Wingless W-R24 partial-channel dropout first use
+on:
+  push:
+    branches: [research/w-r24-channel-dropout-r1]
+permissions:
+  contents: read
+jobs:
+  scientific-first-use:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Exact source/prereg/parent identity freeze
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 8b4afcc73937bd7f3b1f5621e1aaa00ba6d7094e HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-maskaware/execute.py)" = e43abe25ef7b876d9138576d5184d02cde2819d8
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r24-channel-dropout/prereg.json)" = e9727f0f660b36153d88a515826baf90f27a979c
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r24-channel-dropout/execute.py)" = c84e6052eb147e5c10b06d83018618d75bfc256a
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r24-channel-dropout/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r24-channel-dropout/execute.py
+      - name: First and only sealed partial-channel dropout science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r24-channel-dropout/execute.py > /tmp/W-R24-original.json
+          python3 -m json.tool /tmp/W-R24-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R24-original.json'))
+          assert len(x['models'])==4 and all(len(m['cells'])==30 for m in x['models'])
+          assert x['sealed_heldout_seeds']==list(range(288,304))
+          print('CLASSIFICATION',x['classification'])
+          for m in x['models']:
+              print(m['arm'],'OVERALL',m['overall_accuracy'],'PARTIAL',m['partial_dropout_accuracy'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R24-original-channel-dropout
+          path: /tmp/W-R24-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Complete Wingless full regression
+        run: go test ./... && go build ./...
