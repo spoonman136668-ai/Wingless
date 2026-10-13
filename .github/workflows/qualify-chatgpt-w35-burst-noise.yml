@@ -1,0 +1,37 @@
+name: W-R35 original frozen science
+on:
+  push:
+    branches: [research/chatgpt-w35-bursty-noise-threshold-20261013]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify parent and exact frozen original identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4eb34e2ea945c1df98eb4ca79c2c9db6b4cb2930 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-latent-alphabet/execute.py)" = 7632546ca681c3c8fec66991ffc9468ab34e0d07
+          test "$(git hash-object research/contrib/chatgpt/20261013-w35-bursty-feedback/prereg.json)" = 4a61a61c1d2266af79ffdf1aacacc8169b0ab81d
+          test "$(git hash-object research/contrib/chatgpt/20261013-w35-bursty-feedback/execute.py)" = 098f5233d2a1f75e0b7bee220a8a602dfdc3dcb8
+          python3 -m json.tool research/contrib/chatgpt/20261013-w35-bursty-feedback/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w35-bursty-feedback/execute.py
+      - name: Single original W-R35 first use
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w35-bursty-feedback/execute.py > /tmp/W-R35-original.json
+          python3 -m json.tool /tmp/W-R35-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R35-original-first-use
+          path: /tmp/W-R35-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full repository regression
+        run: go test ./... && go build ./...
