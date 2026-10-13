@@ -46,7 +46,8 @@ def permute(sequence, family):
     elif family == "rotate7":
         transformed = tail[7:] + tail[:7]
     elif family == "swap_tail_blocks":
-        transformed = tail[7:] + tail[:7]
+        # Exchange the first seven with the following four; preserve the final four.
+        transformed = tail[7:11] + tail[:7] + tail[11:]
     else:
         assert family == "pairwise_swap_tail"
         transformed = tuple(tail[i+1] if i%2==0 and i+1<len(tail)
