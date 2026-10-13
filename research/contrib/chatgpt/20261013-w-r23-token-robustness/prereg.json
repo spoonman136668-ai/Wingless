@@ -1,0 +1,72 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "experiment": "W-R23-UNSEEN-MISSINGNESS-ENCODING-TRANSFER",
+  "parent_head": "c551d41a7b8d4f77b9349033fa788d621a800519",
+  "hypothesis": "The 100% W-R22 mask-aware score may depend on the all-zero missing-tick indicator rather than general robustness. Without retraining, replace missing observations by frozen nonzero-fill and last-value-carried-forward representations and quantify accuracy degradation.",
+  "freeze": "Preregister exactly three fill styles, three mask counts, all three input-generating families, two unseen swap positions, and classification prior to scientific first use. Do not change model after heldout.",
+  "training": "Reuse unchanged W-R22 learned weights from development seeds240..255, 1728 paired samples/model, 16 weights+bias, 32 passes, no new training or model selection.",
+  "heldout": {
+    "seeds": [
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "jitter_amplitude": 3,
+    "mask_counts": [
+      2,
+      4,
+      6
+    ],
+    "fill_styles": [
+      "all_zero_seen",
+      "all_255_unseen",
+      "previous_row_fill_unseen"
+    ],
+    "swap_families": [
+      "swap10_11",
+      "swap12_13"
+    ],
+    "cells_per_arm": 54
+  },
+  "data_gen": "Same W-R20 raw-generator and W-R21 candidate offset+79 with amplitude3 time-varying four-channel jitter. Mask candidate ticks in order [2,5,8,10,3,6] before swapping untouched tail rows. All-zero condition matches W-R22, all-255 inserts (255,255,255,255), previous-row copies the most recent unmasked candidate row (not source target). No external metadata supplied to models.",
+  "arms": [
+    "naive_augmented",
+    "maskaware_clean",
+    "maskaware_augmented"
+  ],
+  "metrics": "Report each 54-cell model's per-seed TP/TN/FP/FN, accuracy by fill style and mask count, plus aggregate. Preserve predictions for informative counterexamples.",
+  "classification": "ENCODING_INVARIANT if both maskaware models score >=0.80 in EVERY nonzero-fill cell; PARTIAL if maskaware_augmented accuracy >=0.70 aggregated over nonzero fill cells without strict success; ENCODING_DEPENDENT otherwise. Do not reclassify strict negative if other arm succeeds.",
+  "safeguards": [
+    "All swapped rows and anchor remain unmasked, guaranteeing distinct positive/negative candidates, identical candidate anchor/multiset within pair",
+    "Exact W-R22 source/prereg and parent Git blob, no model retraining, no new sensors or capacity",
+    "Frozen artifact before one full Go regression; no first-use replay or heldout migration"
+  ],
+  "bounds": {
+    "arms": 3,
+    "heldout_cells_per_arm": 54,
+    "heldout_seeds": 16,
+    "trained_width": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Finite synthetic paired temporal dropout-fill encoding; not general cognition."
+}
