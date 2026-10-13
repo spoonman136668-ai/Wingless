@@ -1,0 +1,115 @@
+{
+  "schema": "wingless.science.frozen_prereg.v1",
+  "id": "W-R25-COMPONENT-OBSERVABILITY-TRANSFER",
+  "parent_head": "800b2fc679e584d50c51a6f0bf5a28a9118dcd2d",
+  "hypothesis": "W-R24 found complete-row missingness handling insufficient when only one channel is zeroed. A component-level transition-skipping representation may transfer under the same 16-width model, but could confuse legitimately zero readings with missingness. Include unmasked control.",
+  "freeze": "Prespecify channel-only detection (any candidate channel value 0 is considered unobserved), fixed train/heldout populations, classes and learning budget before first use. No post-result mask thresholds or oracle labels.",
+  "source": "Original four-channel synthetic observations from affine, quadratic and seeded xorshift generators. No additional validity bit or fifth channel.",
+  "splits": {
+    "development_seeds": [
+      304,
+      305,
+      306,
+      307,
+      308,
+      309,
+      310,
+      311,
+      312,
+      313,
+      314,
+      315,
+      316,
+      317,
+      318,
+      319
+    ],
+    "heldout_seeds": [
+      320,
+      321,
+      322,
+      323,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      331,
+      332,
+      333,
+      334,
+      335
+    ]
+  },
+  "training": {
+    "generator": "affine_prior",
+    "amps": [
+      1,
+      2
+    ],
+    "negative_tail_swap_indices": [
+      2,
+      5,
+      8
+    ],
+    "cases": [
+      "none",
+      "single_channel_zero_2_5",
+      "four_channels_separate_ticks_2_5_8_10"
+    ],
+    "assignment_rule": "For each development seed/entity/swap-index/amplitude choose case at (seed+entity+swap_index+amp)%3 for augmented arms; clean arms always none. Apply case after positive/negative candidate is independently generated.",
+    "examples_per_model": 1728,
+    "epochs": 32,
+    "learning_rate": 0.1,
+    "feature_width": 16
+  },
+  "heldout": {
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "amps": [
+      3
+    ],
+    "swap_positions": [
+      "swap10_11",
+      "swap12_13"
+    ],
+    "cases": [
+      "none",
+      "irrelevant_full_rows_2_5",
+      "single_channel_zero_2_5",
+      "four_channels_separate_ticks_2_5_8_10"
+    ],
+    "cells_per_model": 24
+  },
+  "models": [
+    "rowaware_clean",
+    "rowaware_augmented",
+    "componentzero_clean",
+    "componentzero_augmented"
+  ],
+  "features": "rowaware uses W-R22 original four-zero-row masking; componentzero retains W-R22 16 repeated top-two circular transition mismatch values but excludes a channel's edge if either observed endpoint in that channel is zero (not a privileged mask oracle). Same 16 trainable weights+bias.",
+  "classification": "CHANNEL_ZERO_TRANSFER iff componentzero_augmented >=0.80 in EACH 12 partial-channel heldout cells and its aggregate partial-channel accuracy exceeds rowaware_augmented by >=0.10; PARTIAL iff latter gain >=0.05 without full strict criteria; NEGATIVE otherwise. Explicitly report unmasked-control quality to expose confusion of legitimate zero with missing observations.",
+  "controls": [
+    "Exact PR parent and frozen source SHA identities",
+    "Identical negative and positive example first observation, true clean candidate multiset (only dropout after order), no hidden extra sensors",
+    "No recalibration on previously exposed W-R24 heldout seed range288..303",
+    "Single archive then final full Go regression; no accepted refs, budget raises or retries"
+  ],
+  "bounds": {
+    "arms": 4,
+    "model_width": 16,
+    "train_pairs_per_arm": 1728,
+    "epochs": 32,
+    "heldout_seeds": 16,
+    "cells_per_arm": 24,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic component-level missingness inference, not real-world sensor calibration or general intelligence."
+}
