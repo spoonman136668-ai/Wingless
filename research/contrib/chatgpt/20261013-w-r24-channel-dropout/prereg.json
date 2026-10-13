@@ -1,0 +1,72 @@
+{
+  "schema": "wingless.science.frozen_prereg.v1",
+  "id": "W-R24-PARTIAL-CHANNEL-DROPOUT-FALSIFICATION",
+  "parent_head": "8b4afcc73937bd7f3b1f5621e1aaa00ba6d7094e",
+  "hypothesis": "W-R22 and W-R23 mask-aware classifiers detect all-four-channel zero rows. Test whether the same fixed models survive incomplete, channel-specific observation loss that is not recognized by an all-zero-row detector. Under changed observation semantics no new training or model width is permitted.",
+  "freeze": "Source-birth preregistration before first-use; all dropout positions/types fixed and no access to W-R23 heldout seeds.",
+  "training": "Reuse unchanged W-R22 original four models with 16 trained weights+bias and 1728 paired development examples each (seeds240..255); no retraining, new features, or capacity.",
+  "heldout": {
+    "seeds": [
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299,
+      300,
+      301,
+      302,
+      303
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "swap_positions": [
+      "swap10_11",
+      "swap12_13"
+    ],
+    "jitter_amplitude": 3,
+    "mask_application": "Mask absolute tick/channel positions AFTER positive or negative order transformation so physical dropout is independent of label.",
+    "cases": [
+      "none",
+      "irrelevant_full_rows_2_5",
+      "single_channel_zero_2_5",
+      "four_channels_separate_ticks_2_5_8_10",
+      "both_swapped_full_rows"
+    ],
+    "cells_per_model": 30
+  },
+  "training_comparators": [
+    "naive_clean",
+    "naive_augmented",
+    "maskaware_clean",
+    "maskaware_augmented"
+  ],
+  "primary": "Per cell and seed paired classification accuracy and observationally equivalent positive/negative pair count. PARTIAL_CHANNEL_TRANSFER if maskaware_augmented reaches >=0.80 in EVERY non-full-row masked-cell condition, >naive_augmented pooled across those conditions by >=0.05 and all both-swapped-full-row cases have exact 0.5 paired accuracy. MIXED if maskaware_augmented exceeds naive_augmented pooled by >=0.05 on partial dropout but strict criterion fails; NEGATIVE otherwise. Report bound of 50% for equivalent labeled pairs.",
+  "controls": [
+    "No erasure of swap rows except the explicitly fully-unidentifiable both-swap case",
+    "No filtering of indistinguishable example pairs; both positive/negative outcomes retained",
+    "Source and prereg blobs verified, full Go regression after first original archive",
+    "No heldout adaptation, threshold retuning, extra sensor or model budget"
+  ],
+  "bounds": {
+    "models": 4,
+    "width": 16,
+    "train_pairs_per_model": 1728,
+    "epochs": 32,
+    "heldout_seeds": 16,
+    "cells_per_model": 30,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic incomplete-sensor robustness only; no natural language or autonomous intelligence."
+}
