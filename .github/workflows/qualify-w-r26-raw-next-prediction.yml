@@ -1,0 +1,48 @@
+name: Wingless W-R26 direct raw next-observation prediction
+on:
+  push:
+    branches: [research/w-r26-raw-next-step-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Freeze predecessor, prereg, and next-step predictor identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 15cb5de904ebeac196c5411ebdc6a29048662b3f HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r20-generator-shift/execute.py)" = 40face8f9e51aa922da372d6dfc5f4d82bf61441
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-next-prediction/prereg.json)" = 708e05de6725d9a0fe6ab3f69eced46b9de5790b
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-next-prediction/execute.py)" = 63478c803be8a9312dbeeee8d8532ba019375fb7
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r26-next-prediction/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r26-next-prediction/execute.py
+      - name: First-use raw-to-future experiment with sealed cohort
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r26-next-prediction/execute.py > /tmp/W-R26-original.json
+          python3 -m json.tool /tmp/W-R26-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/W-R26-original.json'))
+          assert r['heldout_seeds']==list(range(400,416))
+          assert len(r['models'])==3
+          assert all(len(m['tests'])==3 and m['training_examples']==6336 for m in r['models'])
+          print('CLASSIFICATION',r['classification'])
+          print('MAJORITY_BASELINE',r['xorshift_majority_baseline_accuracy'])
+          for m in r['models']:
+              print('MODEL',m['arm'],[(x['generator'],x['accuracy']) for x in m['tests']])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R26-original-causal-next-step
+          path: /tmp/W-R26-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Complete Wingless regression
+        run: go test ./... && go build ./...
