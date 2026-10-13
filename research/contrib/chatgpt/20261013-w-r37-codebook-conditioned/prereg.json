@@ -1,0 +1,103 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R37-EQUAL-BUDGET-CODEBOOK-CONDITIONED-LEARNING",
+  "parent_head": "595a78cf0759e205c4e86510e3fc7a10cfdd53e3",
+  "hypothesis": "W-R36 showed that XOR-0x55 byte relabeling reduced accuracy of frozen four-bit sequence classifiers to chance. With 16 weights plus bias and the SAME frozen 1728-example/32-epoch budget, supervised exposure to XOR-coded development data may restore heldout performance at the XOR coding while sacrificing zero-shot transfer to identity. Compare matched fresh-cohort training conditions rather than interpreting frozen W-R34's older training cohort as a matched control.",
+  "freeze": "Before first first-use freeze development seeds1664..1679, untouched heldout1680..1695, original W-R34 temporal sequence generator, quantizer at four bits, label-preserving identity or XOR0x55 applied to reference AND candidate, two freshly fit equal-budget arms, full per-seed classification and the thresholds below. No post-result edits or hidden cohort screening.",
+  "training": {
+    "development": [
+      1664,
+      1665,
+      1666,
+      1667,
+      1668,
+      1669,
+      1670,
+      1671,
+      1672,
+      1673,
+      1674,
+      1675,
+      1676,
+      1677,
+      1678,
+      1679
+    ],
+    "heldout": [
+      1680,
+      1681,
+      1682,
+      1683,
+      1684,
+      1685,
+      1686,
+      1687,
+      1688,
+      1689,
+      1690,
+      1691,
+      1692,
+      1693,
+      1694,
+      1695
+    ],
+    "examples_per_arm": 1728,
+    "epochs": 32,
+    "learning_rate": 0.1,
+    "feature_width": 16,
+    "refit_condition": [
+      "identity",
+      "xor55"
+    ],
+    "train_generator": "affine_prior",
+    "training_sites": [
+      2,
+      5,
+      8
+    ],
+    "noise_amplitudes": [
+      1,
+      2
+    ],
+    "noise_offset": 17
+  },
+  "evaluation": {
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "swap_sites": [
+      10,
+      12
+    ],
+    "observation_bits": 4,
+    "conditions": [
+      "identity",
+      "xor55"
+    ],
+    "noise_amplitude": 3,
+    "noise_offset": 79
+  },
+  "arms": [
+    "fit_identity trained on fresh-development identity coded raw-base/4-bit candidate, tested under identity and xor55",
+    "fit_xor55 trained on identical fresh-development paired labels but both inputs XOR0x55, tested under identity and xor55"
+  ],
+  "primary": "CODEBOOK_CONDITIONED_RECOVERY iff fit_xor55 heldout accuracy on XOR inputs exceeds fit_identity heldout XOR accuracy by >=0.10, fit_xor55 XOR accuracy >=0.65 and fit_identity identity accuracy >=0.65. PARTIAL_GAIN iff the gain >=0.05 but strict criterion fails. NO_GAIN otherwise. Report all four accuracies, per-generator/site and per-seed TP/TN/FP/FN, observationally identical pairs, training updates and accuracy on the alternate coding.",
+  "controls": [
+    "No extra model width, sensors, privileged transform inverse, output labels in features, post hoc fit or extra examples",
+    "The two arms see matched train labels and seed identity, but different observed byte coding; no heldout fit",
+    "Transform XOR occurs AFTER four-bit quantization, as in W-R36, and is applied equally to candidate and base; negative pair preserves anchor and multiset",
+    "Independent first-use artifact and required full Go regression/build; no replay, accepted ref mutation, activation or broad cognition claim"
+  ],
+  "bounds": {
+    "heldout_seeds": 16,
+    "training_seeds": 16,
+    "arms": 2,
+    "conditions": 2,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic codebook-conditioned supervised fixed-width temporal classification; restoring transfer by supervised exposure is not zero-shot representation invariance or general intelligence."
+}
