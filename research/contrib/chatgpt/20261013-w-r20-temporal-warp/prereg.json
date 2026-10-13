@@ -1,0 +1,48 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R20-MONOTONE-WARP-COMPOSITION",
+  "parent_sha": "3e96d6f45819abf75ed3d99dbf68b85f8792f098",
+  "prior_source_blob": "7b4c77d4aa56795cafa6ed0a428c2e5984600616",
+  "question": "Can a fixed, one-scalar learned temporal recognizer tolerate a strictly monotone one-repeat/one-skip timing perturbation in otherwise correctly ordered sequences, while rejecting an unseen adjacent swap?",
+  "hypothesis": "An alignment-aware, monotone single-repeat/skip candidate search may outperform raw position and raw transition mismatches under unseen positive warps, at higher but frozen analysis compute cost. All arms learn only a single scalar threshold.",
+  "source": "Use same frozen W-R18 nonlinear 16-tick toy sequence, 9 entities/seed, development true jitter ((5*t+entity+seed)%3)-1 with +17 global candidate shift; heldout true jitter ((7*t+entity+seed)%5)-2 with +61 shift. Apply timing warp to entire shifted noisy candidate by repeating previous row at a single index and omitting that index's original row, keeping 16 ticks, anchor and monotonic source-index order.",
+  "split": {
+    "development": [
+      64,
+      65,
+      66,
+      67
+    ],
+    "heldout": [
+      68,
+      69,
+      70,
+      71
+    ]
+  },
+  "development_pairs": "All positives use warp at tick6 (copy tick5 to tick6). Negatives are same warped candidate followed by 15-row tail reversal on even entity, or rotation left3 on odd entity. First candidate row, candidate multiset and length are identical between matched positive/negative.",
+  "heldout_pairs": "Positives use a new warp at tick9 (copy tick8 to tick9). Negatives swap tick11 and tick12 in the warped candidate (unseen training corruption).",
+  "arms": [
+    "unordered histogram of anchor-relative modulo16 first-channel values, scalar train-only threshold",
+    "raw mean of 16 circular anchor-relative positional discrepancies, scalar threshold",
+    "raw mean of 15 transition discrepancies, scalar threshold",
+    "minimum mean circular anchor-relative difference over 15 preregistered monotone single-repeat/skip alignments (indices 1..15), scalar threshold; 16x15 bounded score computations, no trained new state"
+  ],
+  "learning": "For each arm one scalar trained from development-only max positive score and min negative score midpoint; same development sample count 72, no heldout labels/scores in calibration, no parameter tuning afterward.",
+  "classification": "WARP_TRANSFER if monotone alignment >=0.85 heldout accuracy and unordered <=0.55 and monotone alignment strictly beats raw position; PARTIAL if monotone alignment beats both unordered and raw position but below threshold; NEGATIVE otherwise.",
+  "controls": "Distinct new seed cohort, positive/negative multisets equal, per-tick jitters proven nonconstant, no heldout-derived warp search parameters, immutable Git blob identity, original artifact then one complete regression.",
+  "bounds": {
+    "seeds": 8,
+    "development": 4,
+    "heldout": 4,
+    "entities": 9,
+    "ticks": 16,
+    "trained_scalar_per_arm": 1,
+    "arms": 4,
+    "alignment_candidates": 15,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Synthetic monotone temporal alignment, not general language, semantics or accepted science promotion."
+}
