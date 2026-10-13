@@ -1,0 +1,37 @@
+name: Wingless W-R18 first-use frozen experiment
+on:
+  push:
+    branches: [research/w-r18-subtle-order-r1]
+permissions:
+  contents: read
+jobs:
+  first-use-science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify preregistration, predecessor and immutable evaluator identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 21b3c3fee08e5af3ed6c22218d67f59ed40d60a9 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261012-w-r17-true-tick-jitter/execute.py)" = bc84814a2680907a99e2e3dd7980ebaab15a681c
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-adjacent-order/prereg.json)" = 3096255a9d6afbee97a61e8fd307d339903354ab
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-adjacent-order/execute.py)" = 621f8e0e89f40658e8402f9f074823e1f12907f4
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r18-adjacent-order/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r18-adjacent-order/execute.py
+      - name: Run original scientific evaluation exactly once
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r18-adjacent-order/execute.py > /tmp/W-R18-original.json
+          python3 -m json.tool /tmp/W-R18-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R18-original-frozen
+          path: /tmp/W-R18-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One complete repository regression and build
+        run: go test ./... && go build ./...
