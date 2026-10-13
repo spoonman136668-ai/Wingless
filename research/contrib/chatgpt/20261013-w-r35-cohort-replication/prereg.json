@@ -1,0 +1,120 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R35-CROSS-COHORT-CODEC-ROBUSTNESS",
+  "parent_head": "99cfa8607008a2616660d05d45e5022e757f02c2",
+  "hypothesis": "W-R34 found a 4-bit synthetic accuracy disadvantage for symmetric reference quantization. Test its repeatability across four prospectively specified, mutually disjoint seed cohorts using exact frozen W-R34 development-only models and unchanged evaluation features, with no retraining on new cohorts.",
+  "freeze": "Before first-use freeze 4 nonoverlapping 16-seed cohorts 1440..1503, fixed 4/2-bit precision, 3 generator families, 2 swap sites, paired labels, exact W-R34 model/training implementation and criteria. No reused historical heldout, no seed screening.",
+  "training": "Train each asymmetric_refit and symmetric_refit once per bit depth using EXACT original W-R34 development-only 1184..1199; 1728 examples, 32 epochs, 16 weights+bias, no adjustments or new fitting. Training reconstructed deterministically from exact pinned W-R34 code, not a new qualification of a changed foundation.",
+  "heldout": {
+    "cohorts": [
+      [
+        1440,
+        1441,
+        1442,
+        1443,
+        1444,
+        1445,
+        1446,
+        1447,
+        1448,
+        1449,
+        1450,
+        1451,
+        1452,
+        1453,
+        1454,
+        1455
+      ],
+      [
+        1456,
+        1457,
+        1458,
+        1459,
+        1460,
+        1461,
+        1462,
+        1463,
+        1464,
+        1465,
+        1466,
+        1467,
+        1468,
+        1469,
+        1470,
+        1471
+      ],
+      [
+        1472,
+        1473,
+        1474,
+        1475,
+        1476,
+        1477,
+        1478,
+        1479,
+        1480,
+        1481,
+        1482,
+        1483,
+        1484,
+        1485,
+        1486,
+        1487
+      ],
+      [
+        1488,
+        1489,
+        1490,
+        1491,
+        1492,
+        1493,
+        1494,
+        1495,
+        1496,
+        1497,
+        1498,
+        1499,
+        1500,
+        1501,
+        1502,
+        1503
+      ]
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "swap_tail_sites": [
+      10,
+      12
+    ],
+    "precision_bits": [
+      4,
+      2
+    ]
+  },
+  "primary": "Report per-seed TP/TN/FP/FN, per-cell correct/total, identical-positive-negative counts and each of four cohort accuracy deltas (symmetric minus asymmetric), separately 4-bit and 2-bit. ROBUST_ASYMMETRIC_ADVANTAGE iff >=3 of 4 cohorts show <=-0.05 at 4-bit and pooled 4-bit delta <=-0.05. MIXED_TRANSFER iff 4-bit cohort deltas include both >0 and <0. NO_REPLICATION otherwise. Never tune thresholds after results.",
+  "controls": [
+    "Independently specified heldout seeds; no overlap with W-R34 original dev1184..1199 or heldout1200..1215",
+    "Train/feature/prediction identity with pinned W-R34, no new sensors, classes, loss function, capacity, labels, or tuning",
+    "Include indistinguishable positive/negative pairs; do not discard scientific negatives or frame within-cohort data as independent source-birth evidence",
+    "One original frozen first-use result archived before one Go full regression and build; no accepted-ref mutation"
+  ],
+  "bounds": {
+    "new_seeds": 64,
+    "cohorts": 4,
+    "models": 4,
+    "bits": [
+      4,
+      2
+    ],
+    "feature_width": 16,
+    "training_pairs_per_arm": 1728,
+    "epochs": 32,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Reproducibility of a synthetic 4-bit coding effect across new deterministic seeds; not independent real-world domain generalization."
+}
