@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R25-DEV_ONLY-ADAPTIVE-GAIN-SELECTION",
+  "parent_sha": "3c02f2afc1868c97659e17a667c8e8d88277c9fa",
+  "prior_source_blob": "e9feea4817627431c036b4ce7079abbf2be24c80",
+  "question": "Can a tiny gain parameter selected solely from preregistered development time-series improve the causal median-error feedback learned from W-R24 across heldout regime-shift amplitudes, without post-result threshold tuning?",
+  "hypothesis": "Fixed feedback0.25 delivered weak late accuracy gain with early harm in W-R24. A development-only gain chosen among four frozen candidates may improve out-of-family late-regime generalization and reduce early degradation.",
+  "source": "Raw first-channel 16-tick quadratic base+three-level dev jitter/five-level heldout jitter exactly per W-R22. Development-training seeds104..105 are stationary to learn one frozen curvature scalar. Development-validation seeds106..107 contain a known +2*max(0,t-8)^2 regime shift; their true next ticks may be used ONLY for supervised development gain selection. Heldout seeds108..111 have new +3*max(0,t-8)^2 regime shift with five-level varying jitter; no heldout labels used for learning.",
+  "split": {
+    "curvature_train": [
+      104,
+      105
+    ],
+    "gain_validation": [
+      106,
+      107
+    ],
+    "sealed_heldout": [
+      108,
+      109,
+      110,
+      111
+    ]
+  },
+  "frozen_gain_candidates": [
+    0,
+    0.125,
+    0.25,
+    0.5
+  ],
+  "gain_selection": "Evaluate postchange MAE of causal median of last up to three *past frozen-predictor residuals* on exactly the 2 gain-validation seeds, select minimum MAE; break numerical ties by smaller gain. Freeze chosen gain before observing heldout outputs. All arms retain identical five-observation context and one development curvature scalar+one gain scalar.",
+  "arms": [
+    "frozen curvature gain0 baseline",
+    "fixed gain0.25 median of last3 causal residuals",
+    "single selected development-only gain median of last3 causal residuals"
+  ],
+  "primary": "Report actual selected gain, dev validation MAE for all four candidates, sealed-heldout by-seed pre/post/full circular MAE. DEV_GAIN_TRANSFER only if selected-gain postchange MAE <=0.9*frozen postchange MAE and prechange <=1.1*frozen prechange MAE and selected-gain postchange improves on fixed gain0.25. PARTIAL if selected-gain improves postchange frozen but fails any strict criterion. NEGATIVE otherwise. Preserve negative including gain0.",
+  "controls": "No heldout leakage, no post-result parameter sweep, immutable identities, all simulations deterministic twice, zero external model calls, original first-use archive, one full regression and accepted-ref isolation.",
+  "budget": {
+    "development_train_seeds": 2,
+    "development_validation_seeds": 2,
+    "heldout_seeds": 4,
+    "entities": 9,
+    "ticks": 16,
+    "finite_candidate_gains": 4,
+    "learned_scalars": 2,
+    "context_window": 5,
+    "model_calls": 0,
+    "first_use_retries": 0
+  },
+  "claim_limit": "Synthetic autoregressive gain selection, not general-purpose reasoning."
+}
