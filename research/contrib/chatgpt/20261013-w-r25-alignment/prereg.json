@@ -1,0 +1,68 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "experiment": "W-R25-OBSERVED-ONLY-REFERENCE-ALIGNMENT-UNDER-MISSINGNESS",
+  "parent_head": "bf81aafa6a43b040b00ab5f5b22ceda489c217c2",
+  "hypothesis": "W-R24 structural missing-row heuristics fail with interpolation. Instead identify true observed source rows by nearest four-channel circular alignment to the paired reference stream, retaining only high-confidence time-index mismatches. This could detect swapped observations despite interpolation without privileged missing-data flags.",
+  "freeze": "Freeze row-alignment distance, circular time-index feature, confidence threshold=12, feature/model count, training/heldout fills, all seeds and outcome criteria before original first-use. No post-result threshold adjustment.",
+  "cohorts": {
+    "development_seeds": [
+      320,
+      321,
+      322,
+      323,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      331,
+      332,
+      333,
+      334,
+      335
+    ],
+    "sealed_heldout_seeds": [
+      336,
+      337,
+      338,
+      339,
+      340,
+      341,
+      342,
+      343,
+      344,
+      345,
+      346,
+      347,
+      348,
+      349,
+      350,
+      351
+    ]
+  },
+  "training": "Exactly W-R24 generators on affine dev with all-four channel offset+17, jitter amp1/2, negative swaps tail2/3,5/6,8/9 and deterministic zero/carryforward/127 fill assignment, 2/4 missing ticks mask [1,5,8,11] (untouched swaps). 1728 paired samples/model, learning rate .1, 32 epochs and 16 trainable weights+bias, identical baseline and proposed budget.",
+  "heldout": "Three existing affine/quadratic/xorshift generator families, unseen seeds336..351, global offset+79, amp3, two unseen local swaps tail10/11 and12/13, non-oracle fill policies constant73 and linear nearest-neighbor interpolation, mask counts2/4/6 at [1,4,7,9,15,6]. Exactly 36 heldout conditions per model.",
+  "arms": [
+    "zero_sentinel from W-R24",
+    "structural_fill from W-R24",
+    "reference_signature_alignment new observed-only feature"
+  ],
+  "alignment_feature": "Estimate each channel's modulo256 offset from candidate first row (unmasked anchor) minus reference first row; for each candidate row t compute the mean circular absolute byte difference to each reference row u shifted by anchor offset, choose lowest error with deterministic first-u tie break; if minimum<=12, feature[t]=minimum circular time-index distance between t and u divided by 8, else feature[t]=0. Always exactly 16 features and 16 learned weights, no hidden labels/extra observations.",
+  "classification": "ALIGNMENT_GENERALIZES if alignment holds accuracy>=.85 in EVERY heldout interpolation cell and constant73 cell and beats structural_fill aggregate by >=0.10; PARTIAL if alignment improves structural_fill pooled heldout by >=0.05 but strict result fails; NEGATIVE otherwise. Report per-condition confusion for each arm and every failure.",
+  "safety": "Only existing paired 16x4 observations; deterministic 16x16x4 matching work explicitly budgeted, no external oracle. Exact prereg/source/parent identity, first-use evidence archive then full regression. No accepted-ref mutation, additional inference calls, hidden capacity or retries.",
+  "bounds": {
+    "models": 3,
+    "feature_width": 16,
+    "train_examples_each": 1728,
+    "epochs": 32,
+    "heldout_conditions_per_arm": 36,
+    "development": 16,
+    "heldout": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic four-channel temporal alignment; no general language reasoning."
+}
