@@ -1,0 +1,37 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R29-INDEPENDENT_CHALLENGE_OPEN_SET",
+  "date": "2026-10-13",
+  "parent_commit": "141e25c2a19f3ccfca5e11ae066bd8015b168a84",
+  "prior": "W-R28 produced FALSE_ACCEPT on XOR after premature fixed-hypothesis unique-table selection. Do not reuse W-R28 cohort.",
+  "question": "Can independent unused-context witness labels falsify a model selected from the fixed 24 permutation-induced modular-addition hypotheses, before falsely accepting nonisomorphic XOR dynamics?",
+  "hypothesis": "Independent challenge labels reduce out-of-class XOR false acceptance as the fixed witness budget increases, while encoded ADD4 remains accepted at exact accuracy. The 16-context exhaustive witness is a correctness reference, not evidence that smaller budgets are safe.",
+  "world": "Four-symbol latent second-order recurrence x[t]=f(x[t-2],x[t-1]); even seeds ADD4 modulo4, odd seeds XOR4. 16 initial episode contexts enumerated once, each latent history uses starting x0=(episode+seed)%4, x1=((episode//4)+3*seed)%4. Hidden bijective output permutation SHA256('W29/'+seed) byte0 modulo24. Only queried t2 labels visible during acquisition. Forecast evaluated exclusively at ticks3..31 on 16 full episodes.",
+  "cohorts": {
+    "development": [
+      136,
+      137,
+      138,
+      139
+    ],
+    "heldout": [
+      140,
+      141,
+      142,
+      143
+    ],
+    "family_even": "ADD4",
+    "family_odd": "XOR4"
+  },
+  "arms": [
+    "active_first: select unlabeled episode minimizing maximum survivor hypothesis bin then squared-bin sum then index, stop when one predictive 16-context table or no compatible hypothesis; accept immediately if unique, reject if none; at most16 labels",
+    "active_plus_2: same frozen candidate selected once; then independent challenge on up to 2 previously unqueried t2 contexts sorted by SHA256 observed initial pair. If any new label contradicts frozen table, REJECT; else ACCEPT; no refitting",
+    "active_plus_4: same, with up to 4 independent witness contexts",
+    "active_plus_8: same, with up to 8 independent witness contexts",
+    "active_plus_16: consume ALL remaining contexts as out-of-sample challenge after selection, never refit. ACCEPT only if all contexts consistent."
+  ],
+  "threshold": "SAFE_BOUNDED_CHALLENGE only if an arm with max <=4 witness labels accepts both heldout ADD4 with exactly 464/464 predictions each and rejects both XOR4 AND exhaustive16 reference accepts ADD4/rejects XOR4; FALSE_ACCEPT if exhaustive16 falsely accepts any XOR4; CHALLENGE_INSUFFICIENT if small witness arms fail and exhaustive16 valid; MIXED otherwise. Preserve all false acceptance and coverage, no post-hoc threshold changes.",
+  "metrics": "For each arm/seed: selection labels, extra witness labels, total labels, selected candidate table SHA256, frozen selection trace, holdout challenge trace, ACCEPT/REJECT/ABSTAIN, false acceptance, accepted predictive confusion and exact 464 outcomes, source SHA256 input identity, total match hypothesis count. Report budget coverage and label cost; do not condition away rejected cases.",
+  "constraints": "Unique source fingerprints for all8 fresh seeds, pairwise different source inputs; fixed24 candidate tables reused from SHA pinned W26, exact W28 predecessor; no oracle or test-label access to fitting or witness selection, no labels after true outcome for refitting, prereg first, Git blob SHA pins, original one-shot Actions artifact and full Go test/build; no retries, live operation, accepted-ref mutation or additional models.",
+  "claim_limit": "Predefined finite 24 algebraic hypotheses with explicit extra labels; not natural-language reasoning, open-world discovery or validated unsupervised generalization."
+}
