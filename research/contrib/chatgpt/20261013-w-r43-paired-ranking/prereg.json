@@ -1,0 +1,67 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R43-PAIRED-COMPARATOR-DIAGNOSTIC",
+  "parent_head": "d75b6bb35a037abc9613282f6375d66b0c0eff1b",
+  "hypothesis": "W-R41 exposed usable pair-distinguishing information in XOR-invariant lag2 features while W-R42 single-candidate prediction stayed near chance. Training a fixed-width paired relative-order readout may exploit the difference between alternatives even though a single candidate classifier fails. This is an explicit change of task/interface, not independent single-stream cognition.",
+  "freeze": "Before first use freeze new disjoint development seeds2112..2127, sealed heldout2128..2143, exact pinned W-R42 lag2 16-feature, 4-bit quantization, identity-only training, identity/XOR55 heldout, 3 generators/2 swap sites, balanced pair-order augmentation, 32 epochs, LR0.1, identical 16 coefficients + bias models. No post-result selection or label tuning.",
+  "development": [
+    2112,
+    2113,
+    2114,
+    2115,
+    2116,
+    2117,
+    2118,
+    2119,
+    2120,
+    2121,
+    2122,
+    2123,
+    2124,
+    2125,
+    2126,
+    2127
+  ],
+  "sealed_heldout": [
+    2128,
+    2129,
+    2130,
+    2131,
+    2132,
+    2133,
+    2134,
+    2135,
+    2136,
+    2137,
+    2138,
+    2139,
+    2140,
+    2141,
+    2142,
+    2143
+  ],
+  "arms": [
+    "independent_perceptron: classify each positive/negative candidate separately with the exact original 1728 balanced examples, then compare its continuous scores on a test pair",
+    "paired_difference_perceptron: train relative ordering on 864 true first/second development pairs and corresponding 864 sign-reversed examples, 16 lag2 differences and 32 perceptron epochs, then select the higher-score candidate"
+  ],
+  "metrics": "Record matched pair preference accuracy (ties count 0.5), exact within-pair feature ties, per-seed/site/generator success-tie-failure for both arms. Preserve original true/false labelling and require XOR feature/difference equivalence. Do not report pairwise decision as standalone binary classification accuracy.",
+  "classification": "PAIRED_RANK_GAIN iff paired relative model >=0.65 preference accuracy and exceeds independent score-ranking by >=0.10 with XOR55 equality; PARTIAL_GAIN iff paired advantage >=0.05; NO_GAIN otherwise. Include all failing generators.",
+  "controls": [
+    "Both models observe identical development candidate sequences and exactly 1728 balanced labelled training items, 16 weights+bias, 32 epochs, LR0.1; pairwise model receives both alternatives as an additional information interface, explicitly not same inference task",
+    "All feature transforms constructed exclusively from public raw base and observed alternatives. No future ground truth in input, privileged label sent to heldout learner or sealed-fitness tuning",
+    "Identical positive/negative observed candidates necessarily force tied features; preserve these as half-correct rather than selecting by label",
+    "One original first-use evidence artifact then one full Go test/build, no accepted-ref or production authority mutation"
+  ],
+  "bounds": {
+    "development_seeds": 16,
+    "heldout_seeds": 16,
+    "training_examples_per_arm": 1728,
+    "epochs": 32,
+    "weights": 16,
+    "bias": 1,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic pairwise comparator with two alternatives available simultaneously, NOT improvement to single-candidate recurrent cognition or general language understanding."
+}
