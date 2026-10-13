@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R15-POSITIVE-NOISE-ROBUSTNESS",
+  "parent_commit": "690b08efaffb921835525029c3b5504c30272279",
+  "predecessor": "W-R14",
+  "hypothesis": "W-R14's perfect order recognition may rely on positives with exactly equal anchor-relative sequences. Add bounded per-tick observational jitter that keeps positive order intact, and test whether the same capacity-matched representations distinguish from order-changing negatives under stronger unseen jitter.",
+  "freeze": "All data generation rules, distortion amplitudes, labels, feature maps, training algorithm and thresholds are preregistered before first scientific execution; never adapt to heldout outcomes.",
+  "source": "Exactly the original 16-tick 4-channel synthetic generator frozen in W-R11/W-R12, with observed candidate's all-channel global offset and per-tick signed integer jitter.",
+  "split": {
+    "development_seeds": [
+      24,
+      25,
+      26,
+      27
+    ],
+    "heldout_seeds": [
+      28,
+      29,
+      30,
+      31
+    ]
+  },
+  "development_nuisance": "Apply +17 modulo256 to all channels of candidate; then per-tick jitter=((3*t+entity+seed)%3)-1 to all four channel values. Positives retain resulting candidate temporal order; negatives reverse its 15-tick tail for even entities and rotate left three for odd entities.",
+  "heldout_nuisance": "Apply +61 modulo256, then per-tick jitter=((3*t+entity+seed)%5)-2, and a heldout-only even-index-then-odd-index tail weave for negatives.",
+  "arms": [
+    "unordered 16-bin relative-to-anchor first-channel modulo16 histogram difference",
+    "16 copies of unscaled mean circular anchor-relative positional mismatch",
+    "16 copies of mean mismatch calibrated by minimum negative mean seen only in development; both trained models same budget"
+  ],
+  "learning": "16 weights + one bias, zero init, 32 fixed epochs, learning rate 0.1, 72 examples per candidate, no heldout calibration.",
+  "primary": "Report full heldout confusion matrix per seed and balanced accuracy. ROBUST_TEMPORAL_TRANSFER if at least one pooled arm>=0.85 and unordered control<=0.55; PARTIAL if max pooled>unordered but misses .85; NEGATIVE otherwise. Preserve failures and control confounds.",
+  "validation": "Exact parent/source Git blob identity, equal-width/updates budget, positive/negative candidate first-row and multiset equality within seed+entity, correct labels, train-only calibration and deterministic output, one full repo regression.",
+  "budget": {
+    "seeds": 8,
+    "heldout": 4,
+    "ticks": 16,
+    "entities": 9,
+    "width": 16,
+    "models": 3,
+    "epochs": 32,
+    "lr": 0.1,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Supervised toy temporal perturbation discrimination; no real language learning, reasoning, or accepted-ref mutation."
+}
