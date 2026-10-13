@@ -1,0 +1,45 @@
+name: Wingless W-R57 source-supported amplitudes independent successor
+on:
+  push:
+    branches: [research/w-r57-supported-amplitude-fresh-source-r1]
+permissions:
+  contents: read
+jobs:
+  scientific:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Immutable frozen source and successor pre-first-use gate
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor a4b1f5f0538dae9164e5890802f03b7c8f4af2a6 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r57-valid-amplitude/prereg.json)" = ed6b2fbcdbb0f47ff8720709aee07061428fa043
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r57-valid-amplitude/execute.py)" = 8514f986f33a2d957cf371ab3b6a73cf3b025901
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r54-loso/execute.py)" = f30f8ebfb13b7df49187e7ae95dd0f00d3a0d8d6
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r57-valid-amplitude/execute.py
+      - name: One first-use supported-amplitude sealed study
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r57-valid-amplitude/execute.py > /tmp/W-R57-original.json
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R57-original.json'))
+          assert a['development_blocks']==[list(range(6016,6032)),list(range(6048,6064)),list(range(6080,6096))]
+          assert a['sealed_heldout_seeds']==list(range(6128,6176))
+          assert a['test_amplitudes']==[1,2,3]
+          assert len(a['all_original_sealed_records'])==3
+          print('CLASSIFICATION',a['classification'])
+          print('AMPLITUDE_MATRIX',a['comparison'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R57-original-source-supported-amplitudes
+          path: /tmp/W-R57-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One complete Wingless regression and build
+        run: go test ./... && go build ./...
