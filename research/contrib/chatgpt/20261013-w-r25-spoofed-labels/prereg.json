@@ -1,0 +1,28 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R25-FALSE_CERTAINTY_FROM_ADVERSARIAL_LABELS",
+  "parent_commit": "a235914611ff2a6c5280ad44d7f902f89b67f43a",
+  "question": "Can the exact-match eight-hypothesis selector be made confidently wrong by a calibration feed consistent with another hypothesis, and can later contradictory trusted evidence force safe abstention?",
+  "hypothesis": "Four poisoned labels can uniquely identify a wrong in-family model with zero mismatches; four subsequent genuine observations from distinct contexts should expose the contradiction even though the learner cannot identify which source was poisoned.",
+  "family": "Eight frozen candidates a∈{1,2}, b∈{0,1,2,3}, x[t]=(x[t-1]+a*x[t-2]+b)%4. Fresh seeds104..111, true a2 even/a1 odd, true b=(seed-104)%4, evaluator-only.",
+  "conditions": [
+    "HONEST_FOUR: true tick2 labels from episodes0..3; exact zero-error gate chooses uniquely",
+    "SPOOF_FOUR: replace each tick2 label episodes0..3 with the label generated from a counterfeit candidate a' equal the other a coefficient and b'=(true b+1)%4, not disclosed to policy; exact zero-error gate still attempts inference",
+    "SPOOF_FOUR_PLUS_TRUSTED_FOUR: same four spoofed labels plus four genuine tick2 labels episodes4..7, subject to the same exact zero-error gate. No post-result evidence cherry-picking"
+  ],
+  "sealed_evaluation": "Always test only episodes8..15, all t2..31, 240 predictions per seed when accepted. Report attack mismatch, chosen candidate, false accept, abstention, accepted accuracy and full confusion matrix; no test label available to policy.",
+  "primary": "Record honest/poisoned four-label acceptance, correctness and later rejection. SPOOF_ACCEPTANCE_FAILURE_AND_LATE_REJECTION if HONEST_FOUR accepted 8/8 with perfect accuracy, SPOOF_FOUR falsely accepts 8/8 with <100% accuracy, and SPOOF_FOUR_PLUS_TRUSTED_FOUR rejects all8. FALSE_REASSURANCE if spoofed eight labels still accepted; OTHER otherwise. Note that revealing extra four genuine labels increases the label budget from four to eight, and abstention costs coverage.",
+  "safeguards": "Fixed counterfeit (a',b') rule specified before science; its labels are evaluator-controlled adversarial measurement corruption, not a new authorized adaptation oracle. No ref/tuning/rerun, one original archive and full Go test/build, exact Git SHA source/prereg.",
+  "budget": {
+    "seeds": 8,
+    "calibration_four": 4,
+    "calibration_extended": 8,
+    "candidates": 8,
+    "heldout_per_seed": 240,
+    "conditions": 3,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "capacity_increase": 0
+  },
+  "claim_limit": "Finite identifiable counterfeit teacher flaw in synthetic modular selection, not a claim about adversarial resilience of real-world AI."
+}
