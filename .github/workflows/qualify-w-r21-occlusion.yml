@@ -1,0 +1,47 @@
+name: Wingless W-R21 frozen missing observation transfer
+on:
+  push:
+    branches: [research/w-r21-occluded-temporal-transfer-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Fail-closed identity and preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 52461b46db11ad7677ba058d20ffb52ccd8aa68c HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r20-generator-shift/execute.py)" = 40face8f9e51aa922da372d6dfc5f4d82bf61441
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r21-occlusion/prereg.json)" = b4ce62c7bdef57f8d07f21803f5897d033973e6e
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r21-occlusion/execute.py)" = a24f58099fd65fe47304c560ee15d7467f0f289f
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r21-occlusion/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r21-occlusion/execute.py
+      - name: Frozen first-use missing-tick robustness science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r21-occlusion/execute.py > /tmp/W-R21-original.json
+          python3 -m json.tool /tmp/W-R21-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R21-original.json'))
+          assert len(x['arms'])==4 and all(len(a['cells'])==24 for a in x['arms'])
+          assert x['heldout_seeds']==list(range(208,224))
+          print('CLASSIFICATION',x['classification'],'HARD_GAIN',x['hard_gain_top_vs_first'])
+          for a in x['arms']:
+              print('ARM',a['model'],'ALL',a['aggregate_accuracy'],'HARD',a['hard_occlusion_accuracy'])
+              print('CELLS',[(c['generator'],c['occluded_ticks'],c['swap'],c['accuracy']) for c in a['cells']])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R21-original-missing-observations
+          path: /tmp/W-R21-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: One full Wingless regression
+        run: go test ./... && go build ./...
