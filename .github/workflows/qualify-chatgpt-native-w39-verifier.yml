@@ -1,0 +1,37 @@
+name: W-R39 native verified repair authority first use
+on:
+  push:
+    branches: [research/chatgpt-native-w39-verifier-repair-20261013]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check immutable native runner and original prereg
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 8ac505090055ff2eefa4c177362e94d823cdd0eb HEAD
+          test "$(git hash-object broker/runner.go)" = 06cf2ce2413a8f3d6ba6e012c174f3b370652891
+          test "$(git hash-object broker/router.go)" = 6b6d0f158a03726ef32ce56d9d7d31e1a3b8c630
+          test "$(git hash-object research/contrib/chatgpt/20261013-native-w39-verifier/prereg.json)" = 5c86a1e38669197c18a34eec6314ba1d69acebd1
+          test "$(git hash-object research/contrib/chatgpt/20261013-native-w39-verifier/main.go)" = b0742a0bb4eaaf458d8eee49248a72ef48856616
+          python3 -m json.tool research/contrib/chatgpt/20261013-native-w39-verifier/prereg.json >/dev/null
+      - name: Run original W-R39 native Go 128-case experiment
+        run: |
+          set -euo pipefail
+          go run ./research/contrib/chatgpt/20261013-native-w39-verifier > /tmp/W-R39-original.json
+          python3 -m json.tool /tmp/W-R39-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R39-original-native-verifier
+          path: /tmp/W-R39-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless regression
+        run: go test ./... && go build ./...
