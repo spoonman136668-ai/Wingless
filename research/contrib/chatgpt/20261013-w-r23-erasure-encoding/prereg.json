@@ -1,0 +1,136 @@
+{
+  "schema": "wingless.science.preregistered.v1",
+  "id": "W-R23-ERASURE-ENCODING-INVARIANCE",
+  "parent_sha": "c551d41a7b8d4f77b9349033fa788d621a800519",
+  "hypothesis": "W-R22's perfect mask-aware classification might rely on exact (0,0,0,0) missing-row encoding. Test fixed learned model across alternate erasure sentinels. Explicit multi-sentinel row recognition may generalize, but the original zero-only feature should not be assumed to.",
+  "science": "Same fully observed four-channel input and positive/negative paired temporal task, no new semantic or sensor information.",
+  "freeze": "Freeze three erasure values, two missing-tick counts, three source generators, two unseen swap types, feature arms, fresh heldout seeds, and all success criteria before original scientific execution.",
+  "split": {
+    "development": [
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      251,
+      252,
+      253,
+      254,
+      255
+    ],
+    "heldout": [
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287
+    ]
+  },
+  "dev": "Train original W-R22 development model on original affine seeds240..255, 1728 examples, fixed original zero-erasure augmentation, 16 weights+bias, 32 epochs, LR 0.1. No heldout updates and no W-R22 heldout reuse.",
+  "heldout": {
+    "seeds": [
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "noise_amplitude": 3,
+    "missing_ticks": [
+      3,
+      5
+    ],
+    "mask_order": [
+      2,
+      5,
+      8,
+      10,
+      3,
+      6
+    ],
+    "missing_value_rows": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        255,
+        255,
+        255,
+        255
+      ],
+      [
+        127,
+        127,
+        127,
+        127
+      ]
+    ],
+    "local_swaps": [
+      "swap10_11",
+      "swap12_13"
+    ],
+    "cells_per_arm": 18
+  },
+  "arms": [
+    "naive_augmented: frozen W-R22 trained naive model and existing naive top-two feature",
+    "maskaware_zero_only: frozen W-R22 trained mask-aware model, zero-only feature",
+    "maskaware_declared_sentinel_vocabulary: same frozen maskaware_zero_only weights but skip transition edges incident to rows equal any of three preregistered full-row missing values; no retraining and no per-example oracle missing-mask input"
+  ],
+  "success": "SENTINEL_VOCABULARY_TRANSFER if declared-vocabulary arm accuracy >=0.85 in ALL six nonzero-sentinel generator×erasure-value pooled conditions AND exceeds zero-only accuracy by at least 0.10 aggregate on nonzero sentinels. PARTIAL if declared vocabulary > zero-only by 0.05 but fails strong threshold. NEGATIVE otherwise.",
+  "controls": [
+    "All positive and negative pairs share candidate first row and multiset",
+    "Swap occurs only at unmasked rows 11/12 or 13/14",
+    "Do not treat legitimate observed all-four-channel sentinel-equivalent rows as oracle-marked; document potential aliasing",
+    "No extra learned weights, train examples, epochs or model calls",
+    "No first-use retry or reuse of exposed heldout cohorts, exact SHA freeze, one full repo regression"
+  ],
+  "bounds": {
+    "heldout_seeds": 16,
+    "models_trained": 2,
+    "evaluation_arms": 3,
+    "model_width": 16,
+    "train_pairs_per_model": 1728,
+    "epochs": 32,
+    "per_arm_cells": 18,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Finite synthetic observation-missingness encoding; not a general perceptual or cognitive system."
+}
