@@ -1,0 +1,37 @@
+name: Wingless W-R22 online raw prediction qualification
+on:
+  push:
+    branches: [research/w-r22-online-curvature-r1]
+permissions:
+  contents: read
+jobs:
+  scientific_first_use:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify immutable parent preregistration and source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor cf92ea14e2806b3a7162383da819107286fa2515 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r21-channel-transfer/execute.py)" = f16835f9f8ebd14258f98db965e936bdf941b8b8
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-online-prediction/prereg.json)" = 83446999237a978c1ba0e3a27dc9024fb2c6f687
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-online-prediction/execute.py)" = 5a3ae9a2fd4f3fff88200f34e52c66a4370cb51b
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r22-online-prediction/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r22-online-prediction/execute.py
+      - name: Original preregistered scientific execution
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r22-online-prediction/execute.py > /tmp/wr22-original.json
+          python3 -m json.tool /tmp/wr22-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R22-original
+          path: /tmp/wr22-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: One complete repository regression
+        run: go test ./... && go build ./...

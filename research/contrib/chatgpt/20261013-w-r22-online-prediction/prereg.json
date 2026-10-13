@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R22-ONLINE-SECOND-ORDER-PREDICTION",
+  "parent_sha": "cf92ea14e2806b3a7162383da819107286fa2515",
+  "prior_source_blob": "f16835f9f8ebd14258f98db965e936bdf941b8b8",
+  "question": "Can a bounded online second-order predictor adapt to a newly shifted dynamical regime and predict future raw ticks better than a fixed second-order model trained exclusively on development streams, with zero model inference calls?",
+  "hypothesis": "On an unseen late-regime curvature change, online second-difference adaptation using *only already observed ticks* may lower post-change one-step prediction error relative to frozen curvature and momentum baselines. Noise may render the naive adaptation worse.",
+  "generator": "New synthetic raw 16-tick first-channel data, 9 entities per seed with q=(5*entity+seed)%9. Base=192+seed+7*q+3*t+t*t, all modulo256. In development no regime change; heldout adds 2*max(0,t-8)^2 modulo256 for t>=9. Development jitter=((5*t+entity+seed)%3)-1, heldout jitter=((7*t+entity+seed)%5)-2; assert actual 3/5-level varying jitter. Raw sensor values only; no hidden labels beyond next observed tick as ordinary supervised training targets.",
+  "split": {
+    "development": [
+      80,
+      81,
+      82,
+      83
+    ],
+    "heldout": [
+      84,
+      85,
+      86,
+      87
+    ]
+  },
+  "predictors": [
+    "PERSISTENCE: predict previous observation x(t-1)",
+    "MOMENTUM: predict 2*x(t-1)-x(t-2)",
+    "FROZEN_CURVATURE: predict 2*x(t-1)-x(t-2)+d2, with single scalar d2 learned as median signed circular second difference over 4*9 development trajectories",
+    "ONLINE_CURVATURE: same frozen initial scalar, then estimate next-step curvature from last three already observed readings: x(t-1)-2*x(t-2)+x(t-3); at t=2 use development d2. No future target access."
+  ],
+  "metric": "Circular absolute error min(abs(delta),256-abs(delta)) on each heldout time t=2..15; report full, prechange t2..8, postchange t9..15 MAE, per seed, all four arms, no stochastic retries.",
+  "classification": "ADAPTIVE_PREDICTION_TRANSFER if online postchange MAE <= 0.90*frozen postchange MAE and <= momentum postchange MAE and online improves frozen on >=3/4 heldout seeds. PARTIAL if online improves aggregate postchange frozen but misses other criteria. NEGATIVE otherwise. INVALID if jitter cardinality fails, missing samples or heldout leakage.",
+  "capacity": "One frozen learned scalar d2 shared by curvature arms; online estimator uses a bounded three-observation window (already available to every predictor) and no additional persistent learned model weights. All four arms have exactly same sequence observations and no future samples; online incurs constant per-tick arithmetic. Development corpus 4x9x16, heldout 4x9x16.",
+  "safeguards": "Immutable prerequisite source and prereg identities, first-use only original run, all negative outcomes, no capacity/compute budget inflation beyond explicitly frozen O(1) updates, complete repo regression, no accepted-ref mutation.",
+  "claim_limit": "Finite synthetic next-step time-series prediction and regime shift, NOT general language understanding or reasoning."
+}
