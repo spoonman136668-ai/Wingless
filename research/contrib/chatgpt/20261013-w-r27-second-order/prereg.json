@@ -1,0 +1,73 @@
+{
+  "schema": "wingless.science.preregistered.v1",
+  "id": "W-R27-SECOND-DIFFERENCE-FUTURE-DELTA",
+  "parent_commit": "7b36200f66fc9ea766a6451190637a5a57c47ccb",
+  "hypothesis": "Do causal second differences predict heldout quadratic next-step delta signs better than causal first differences?",
+  "development_seeds": [
+    416,
+    417,
+    418,
+    419,
+    420,
+    421,
+    422,
+    423,
+    424,
+    425,
+    426,
+    427,
+    428,
+    429,
+    430,
+    431
+  ],
+  "heldout_seeds": [
+    432,
+    433,
+    434,
+    435,
+    436,
+    437,
+    438,
+    439,
+    440,
+    441,
+    442,
+    443,
+    444,
+    445,
+    446,
+    447
+  ],
+  "train_generators": [
+    "affine_prior",
+    "quadratic_irregular"
+  ],
+  "test_generators": [
+    "affine_prior",
+    "quadratic_irregular",
+    "xorshift_independent"
+  ],
+  "feature_arms": [
+    "first_lag_16",
+    "first_plus_second_order_16",
+    "unordered_hist_16"
+  ],
+  "data": "At t in 4..14, only observations t-4..t for predictors. Label uses raw future delta at t+1, evaluator only. Development jitter amplitudes 1 and 2 and offset17; heldout amplitude3 offset79.",
+  "frozen_training": {
+    "examples_per_arm": 6336,
+    "width": 16,
+    "epochs": 32,
+    "lr": 0.1,
+    "model_calls": 0
+  },
+  "classification": "SECOND_ORDER_GAIN iff second_order quadratic accuracy>=0.68 and advantage vs first_lag >=0.05 and xorshift accuracy<=0.60; PARTIAL iff quadratic advantage>=0.03 otherwise NEGATIVE",
+  "controls": [
+    "No heldout training or future feature access",
+    "One immutable first-use experiment",
+    "Full final Go tests/build",
+    "No additional capacity",
+    "No accepted-ref changes"
+  ],
+  "claim_limit": "Synthetic binary next-step prediction; no generalization claim beyond tested generators."
+}
