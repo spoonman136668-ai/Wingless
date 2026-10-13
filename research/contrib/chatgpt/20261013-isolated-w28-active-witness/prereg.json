@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R28-ADAPTIVE_LABEL_QUERY_BOUNDARY",
+  "parent_commit": "02a379212a8b28e434ad87131539abcfa89ef509",
+  "source_predecessor": "W-R27",
+  "date": "2026-10-13",
+  "question": "Can active choice of t2 calibration labels reduce the observation budget for accepting an encoded modular-addition mechanism and rejecting nonisomorphic encoded XOR dynamics?",
+  "hypothesis": "An acquisition rule that queries the yet-unlabeled initial pair maximizing disagreement among the surviving 24 exact predictive tables will reach the correct accept/reject boundary with no more labels on average than the fixed episode order.",
+  "world": "For each seed 128..135, base latent episodes e0..15 have initial a=(e+seed)%4,b=((e//4)+3*seed)%4; t>=2 x[t]=((x[t-2]+x[t-1])%4) for even seeds ADD4, xor for odd seeds XOR4; observed alphabet is hidden seed-specific SHA256('W28/'+seed) byte0%24 permutation of 0..3. The 16 initial observed pairs are available without target labels. No other knowledge of true dynamics is visible to the learner.",
+  "split": {
+    "development": [
+      128,
+      129,
+      130,
+      131
+    ],
+    "heldout": [
+      132,
+      133,
+      134,
+      135
+    ],
+    "even": "ADD4",
+    "odd": "XOR4"
+  },
+  "arms": [
+    "passive: query t2 label of episode0..15 in fixed ascending order; update consistency of original 24 ADD-conjugate models; stop if no surviving model (REJECT) or all surviving models imply one complete 16-context predictive table (ACCEPT).",
+    "active: same candidates, at each step select unqueried episode minimizing maximum possible surviving hypothesis count over its four possible outcomes, then sum of squared group sizes, then episode index; update only observed t2 label; same stop criteria.",
+    "budget16: exhaustive t2 labels of all 16 episodes, same 24-table candidate class; verification/oracle-free reference, not another learned candidate."
+  ],
+  "metrics": "heldout per-seed stop decision ACCEPT/REJECT/ABSTAIN, 0..16 queries, candidate count and unique tables at stop, query order and trace SHA, accepted-seed exact t3..31 (464 samples) accuracy; 24 fixed permutations without enlargement, active and passive share identical unseen test data.",
+  "primary": "EFFICIENT_VALID_BOUNDARY if heldout both ADD accepted at 100% test accuracy and both XOR rejected for both query arms, and mean active ADD queries < mean passive ADD queries; VALID_BOUNDARY_NO_EFFICIENCY if correct decisions and active <= passive; MIXED_VALID otherwise; FALSE_ACCEPT if any XOR accepted; INVALID if any test-data exposure or rule mismatch.",
+  "constraints": "Preregister thresholds, immutable candidate class, split, labels and query policy before first scientific use; Python AST compile & synthetic structural fixture only before first use; first original CI execution with archived JSON and one full Go regression; no retry/tuning/accepted-ref mutation, no future test labels to selector, no model calls.",
+  "claim_limit": "Synthetic active sampling across a fixed 24-conjugacy group, not open-world unsupervised intelligence."
+}
