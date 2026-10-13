@@ -1,0 +1,39 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R23-OPEN_SET_CANDIDATE_REJECTION",
+  "parent_commit": "2ebe681a4ffa159251ef9e96a233ccc261f37e70",
+  "question": "Can a frozen eight-hypothesis predictor fail closed when none of its eight candidates can explain four calibration transitions, rather than force an inaccurate model?",
+  "hypothesis": "An exact zero-error hypothesis acceptance gate will accept in-class a=2 but reject out-of-class a=3, while the forced-nearest in-class model will make inaccurate predictions on out-of-class cases.",
+  "family": "Candidate hypotheses x[t]=(x[t-1]+a*x[t-2]+b)%4, a∈{1,2}, b∈{0,1,2,3}, fixed to eight. In-class new seeds 88,90,92,94 have true a=2; out-of-class new seeds 89,91,93,95 true a=3. All have b=(seed-88)%4. The seed value and true coefficients are generator-only, not predictor inputs.",
+  "split": {
+    "in_class_seeds": [
+      88,
+      90,
+      92,
+      94
+    ],
+    "out_of_class_seeds": [
+      89,
+      91,
+      93,
+      95
+    ]
+  },
+  "generator": "Each of 16 episodes initializes x0=(e+seed)%4,x1=(floor(e/4)+3*seed)%4; generate 32 positions. Calibration observes t2 labels only for episodes0..3 (four distinct x0 contexts); test holds episodes4..15 at positions2..31 (360 per seed).",
+  "arms": [
+    "gate: accept only if exactly one of eight candidates has four zero calibration mismatches; otherwise abstain on all 360 test predictions, with no test label used to make the decision",
+    "forced_best: choose one candidate from eight minimizing four calibration mismatches with fixed lexicographic tie break, always predict even on out-of-class input"
+  ],
+  "primary": "Record candidate mismatch count, accepted/rejected per seed, true in-/out-class detection, coverage across 2880 total test slots, accepted-only prediction accuracy, and forced control accuracy separately for in-/out-class. OPEN_SET_REJECTION if all four in-class accepted with 100% correct, all four out-of-class rejected, and no wrong actionable predictions; FALSE_ACCEPT if any out-class accepted; FALSE_REJECT if any in-class rejected; NEGATIVE otherwise.",
+  "safeguards": "The evaluator may report generator true a only after decision; policy sees calibration triples only. No candidate expansion, dynamic thresholds, heldout feedback, adaptive retry or accepted-ref write. Fixture-only synthetic triples preflight (not any real experimental seed), source Git blobs frozen before first original, archive and full repository regression.",
+  "budget": {
+    "seeds": 8,
+    "calibration_examples_per_seed": 4,
+    "heldout_examples_per_seed": 360,
+    "candidate_count": 8,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "hidden_capacity_increase": 0
+  },
+  "claim_limit": "Finite calibrated open-set rejection for deliberately excluded modular dynamics, not general OOD or real-world scientific validity."
+}
