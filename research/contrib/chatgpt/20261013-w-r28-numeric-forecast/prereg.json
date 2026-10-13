@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.science.frozen.v1",
+  "id": "W-R28-RAW-NUMERIC-CAUSAL-FORECAST",
+  "parent_head": "859d4af60957941fa3c28dd0c41841c42296d5df",
+  "hypothesis": "The W-R27 near-chance binary future-delta task may reflect poor learned features rather than a total absence of next-step causal structure. Compare exact fixed causal first/second finite-difference numerical predictors and frozen development-selected recurrence on unseen raw observations.",
+  "split": {
+    "development_seeds": [
+      448,
+      449,
+      450,
+      451,
+      452,
+      453,
+      454,
+      455
+    ],
+    "sealed_heldout_seeds": [
+      456,
+      457,
+      458,
+      459,
+      460,
+      461,
+      462,
+      463,
+      464,
+      465,
+      466,
+      467,
+      468,
+      469,
+      470,
+      471
+    ]
+  },
+  "generators": [
+    "affine_prior",
+    "quadratic_irregular",
+    "xorshift_independent"
+  ],
+  "data": "W-R20 original four-channel byte sequence, offset79 and independent deterministic per-tick amplitudes 1,3,5. At time t in 2..14 only observed bytes at t,t-1,t-2 available for predictors. Evaluate against observed next byte at t+1 (never a feature).",
+  "predictors": [
+    "persistence: observed[t]",
+    "velocity: 2*observed[t]-observed[t-1] modulo256",
+    "acceleration: 3*observed[t]-3*observed[t-1]+observed[t-2] modulo256",
+    "development_selected: choose among first three using lowest aggregate circular absolute error on development affine/quadratic amp1/3; fixed for all heldout generators and amplitudes"
+  ],
+  "selection": "Tie-break persistence then velocity then acceleration; one global model choice, not per hidden generator or heldout condition.",
+  "metrics": "Per generator/noise amplitude and all 4 channels, heldout circular absolute error (min modular byte distance) plus exact-byte and within8 accuracy; independently report each deterministic predictor.",
+  "classification": "STRUCTURED_FORECAST if velocity affine MAE is at least8 bytes better than persistence and acceleration quadratic MAE is at least8 bytes better than velocity on heldout amp3; PARTIAL if either improves by at least8 but strict not met; NEGATIVE otherwise. Preserve negative xorshift behavior.",
+  "controls": [
+    "Same input stream and future-label separation across arms, no target access during prediction",
+    "Frozen development-selection only; no hidden capacity or post-hoc choice",
+    "Exact source/prereg SHA, first-use archive and full Go test/build",
+    "No accepted-ref mutation, no model calls or retries"
+  ],
+  "bounds": {
+    "seeds_development": 8,
+    "seeds_heldout": 16,
+    "generators": 3,
+    "noise_amplitudes": 3,
+    "channels": 4,
+    "timepoints": 13,
+    "predictors": 4,
+    "model_calls": 0,
+    "first_use_retries": 0
+  },
+  "claim_limit": "Deterministic raw byte forecasting diagnostic, not learned general intelligence."
+}
