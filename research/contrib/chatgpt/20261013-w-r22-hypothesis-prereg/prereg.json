@@ -1,0 +1,38 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R22_FRESH_BOUNDED_HYPOTHESIS_TRANSFER",
+  "parent_commit": "baa8e1eadde3fd10bba761735a50ff4d6944a82b",
+  "lineage": "W-R21 branch PR#53 original first-use run 38358152995 invalid due unbound offset name; preserve original branch and no replay. W-R22 is a new frozen source and new cohort, based on last qualified W-R20 head rather than invalid branch.",
+  "question": "Can exactly four observed transition labels identify an unknown member of eight predeclared small causal recurrence hypotheses with unseen-context transfer?",
+  "frozen_family": "Second-order x[t]=(x[t-1]+a*x[t-2]+b)%4, a in [1,2], b in [0,1,2,3], precisely eight candidates. True source seed S 80..83 uses a=2 for even S else1 and b=(S-80)%4; model only receives four training labels, NOT seed or true parameters.",
+  "split": {
+    "calibration_labels": "t2 first transition for episodes e0,e1,e2,e3 per heldout seed",
+    "heldout_seeds": [
+      80,
+      81,
+      82,
+      83
+    ],
+    "test": "episodes e4..e15, each predicted t2..t31, 360 new-context test labels per seed"
+  },
+  "generator": "Each episode starts x0=(e+seed)%4 and x1=(e//4+3*seed)%4, 32 ticks, no noise. During e0..3, x1 constant and x0 spans four possible values; candidate feasibility identifiable.",
+  "arms": [
+    "fixed_predecessor a1 b2 no calibration",
+    "16x4 count memorizer trained only on four labels, unknown contexts deterministic tie label0",
+    "selected one of eight fixed (a,b) by zero prediction errors over four labels; ambiguous set invalid and archived",
+    "same selected hypothesis evaluated on history prefix reordered even positions then odd positions, no future symbol access"
+  ],
+  "fixed_preflight": "Before original first-use, ONLY use four independent manually authored sentinel tuples [(0,0,1),(1,0,2),(2,0,3),(3,0,0)] to assert selector returns uniquely (a1,b1). This checks source binding and semantics, NOT any real research cohort results.",
+  "criterion": "BOUNDED_HYPOTHESIS_TRANSFER iff selected accuracy>=.95 and all three controls<=.65 on four heldout seeds; PARTIAL if selected > all controls but criterion unmet; NEGATIVE otherwise; ambiguity/failure recorded.",
+  "budgets": {
+    "candidates": 8,
+    "calibration_labels_per_seed": 4,
+    "heldout_seeds": 4,
+    "heldout_predictions_per_seed": 360,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": 0
+  },
+  "limits": "Predetermined eight-template syntax and synthetic supervised observations, no broad autonomous discovery or natural-language learning.",
+  "safeguards": "Prereg frozen before source, separate branch/source/artifact, no retrospective R21 replay, first-use only one run, exact parent/prereg/source blob checks and final full regression."
+}
