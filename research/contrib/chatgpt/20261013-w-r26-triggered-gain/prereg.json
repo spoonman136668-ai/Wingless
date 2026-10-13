@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R26-DEV-TRAINED-CHANGEPOINT-GATE",
+  "parent_sha": "3eae59154cdc2dd88b3e8e82f54a052098c35358",
+  "prior_source_blob": "7028e56ebb9626895166a192a6fa5ebd487bc531",
+  "question": "W-R25 supervised gain selection improved post-change forecasts but damaged pre-change error. Can a precommitted causal residual-magnitude threshold learned only from stationary development streams gate feedback so learning is activated mainly after a regime shift?",
+  "hypothesis": "A high-quantile stationary-residual threshold may spare early stationary predictions while still activating development-trained gain under unseen heldout shift; false triggers under noisy observations may defeat it.",
+  "generator": "Frozen W-R25 raw first-channel quadratic+jitter world. Development training seeds112..113 stationary, 3-level genuine jitter; development validation seeds114..115 introduce shift2 after t8 with 3-level jitter; heldout116..119 introduce shift3 after t8 with 5-level jitter, exactly nine entities and sixteen ticks each.",
+  "split": {
+    "stationary_curvature_train": [
+      112,
+      113
+    ],
+    "shifted_dev_gain_validation": [
+      114,
+      115
+    ],
+    "sealed_heldout": [
+      116,
+      117,
+      118,
+      119
+    ]
+  },
+  "learning": "Calculate the frozen curvature median from stationary train samples. Build absolute causal one-step frozen-model residual values from training ticks2..15 (252 samples); freeze trigger as empirical 95th percentile using sorted values index ceil(.95*n)-1, no heldout quantile access. For each gain in [0,1/8,1/4,1/2], on shifted validation forecasts t>=2, compute median of up to three already-observed residuals, then add gain*median ONLY when abs(median) exceeds the frozen trigger. Select gain with smallest validation postchange MAE, tie to smaller gain. Freeze both before heldout.",
+  "arms": [
+    "frozen model no feedback",
+    "always-on fixed gain1/4 median residual feedback",
+    "always-on development-selected gain",
+    "TRIGGERED development-selected gain, with stationary learned residual magnitude gate"
+  ],
+  "primary": "Heldout postchange MAE improvement at least 10% vs static with prechange MAE <=1.10*static early and trigger-model postchange MAE strictly lower than always-on development-selected gain; else PARTIAL if gated postchange MAE lower than static, NEGATIVE otherwise. Record per-seed false-trigger rates and activation by early/late period.",
+  "capacity": "All arms have same 5-observation causal context, development curvature scalar, gain scalar, residual gate scalar; no future target access, no inference model calls. Gain candidate sweep4 and empirical 95th threshold fixed before original run. No capacity budget increased beyond these predeclared three scalars and fixed O1 operations.",
+  "safeguards": "Never rerun consumed W-R25; new disjoint seed split; source SHA and prereg pinned before first-use; no post-result threshold selection, full regression and all negatives preserved, no accepted-ref mutation.",
+  "claim_limit": "Tiny learned change-triggered autoregression on synthetic ticks, not semantic intelligence."
+}
