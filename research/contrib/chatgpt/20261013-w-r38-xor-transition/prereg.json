@@ -1,0 +1,87 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R38-XOR-INVARIANT-TEMPORAL-TRANSITION-REPRESENTATION",
+  "parent_head": "74fa95538c7df1092243d0637cee2bdd1b02a3d2",
+  "hypothesis": "W-R37 XOR-conditioned supervised retraining failed. A zero-shot representation whose adjacent-transition discrepancy is the popcount of (base_i XOR base_next XOR observed_i XOR observed_next), aggregated over all 4 channels and 16 cyclic edges, is invariant to a fixed per-byte XOR key applied equally to base and candidate. Compare its discriminative utility and zero-shot XOR transfer against W-R34 arithmetic residual representation at the SAME 16-weight and example budget.",
+  "freeze": "Before any first-use evaluation freeze fresh dev1760..1775, sealed heldout1776..1791, original W-R37 4-bit sensor quantizer, source families and sites, identity-only development training for both representations, 32 epochs, LR0.1, 1728 balanced examples, and every eligibility gate. No XOR training, inverse key metadata, future source knowledge or post-result tuning.",
+  "split": {
+    "development": [
+      1760,
+      1761,
+      1762,
+      1763,
+      1764,
+      1765,
+      1766,
+      1767,
+      1768,
+      1769,
+      1770,
+      1771,
+      1772,
+      1773,
+      1774,
+      1775
+    ],
+    "sealed_heldout": [
+      1776,
+      1777,
+      1778,
+      1779,
+      1780,
+      1781,
+      1782,
+      1783,
+      1784,
+      1785,
+      1786,
+      1787,
+      1788,
+      1789,
+      1790,
+      1791
+    ]
+  },
+  "arms": [
+    "arithmetic: original W-R34 asymmetric multi-marker 16-wide repeated residual representation, fit on identity development only",
+    "xor-invariant: new 16-wide repeated scalar top-two popcount over XOR adjacent transition signatures, fit on identical identity development only"
+  ],
+  "heldout": {
+    "encodings": [
+      "identity",
+      "xor55"
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "swap_sites": [
+      10,
+      12
+    ],
+    "noise_amplitude": 3,
+    "observation_bits": 4
+  },
+  "representation": "For each of 4 channels and 16 cyclic edges, compute popcount(base[i][c] XOR base[next][c] XOR candidate[i][c] XOR candidate[next][c]); aggregate mean of two largest distances and repeat scalar 16 times. Excludes no genuinely observed rows. Applying the identical fixed XOR55 to each byte of base and candidate must leave every resulting feature component exactly unchanged.",
+  "decision": "ZERO_SHOT_XOR_TRANSFER iff XOR-invariant arm feature equivalence holds for all heldout pairs, heldout identity and XOR accuracies both >=0.65, and arithmetic arm loss identity-to-XOR >=0.10. INVARIANT_BUT_NOT_USEFUL iff equality holds but either invariant arm accuracy <0.65. OTHERWISE_NEGATIVE otherwise. Report all positive, negative and observation-identical cases without selection.",
+  "controls": [
+    "Each arm trains on identical 1728 identity-coded balanced examples, 32 fixed epochs, 16 weights+bias. Only representation differs, no added sensors or oracle.",
+    "XOR55 applied AFTER 4-bit quantization to both raw reference and observed candidate. No new train format or unseen heldout training.",
+    "Report equality at per-seed, per-generator/site features and per-arm per-seed TP/TN/FP/FN, no discarded indistinguishable pairs.",
+    "Single original first-use artifact before required one full Go test/build. No accepted-ref/production/authority mutation."
+  ],
+  "bounds": {
+    "arms": 2,
+    "heldout_conditions": 2,
+    "development": 16,
+    "heldout": 16,
+    "training_pairs_per_arm": 1728,
+    "model_width": 16,
+    "epochs": 32,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic exact XOR-byte-relabel invariance for a local fixed-width temporal feature; no claim of general byte permutation, language understanding, or learned cognitive representation."
+}
