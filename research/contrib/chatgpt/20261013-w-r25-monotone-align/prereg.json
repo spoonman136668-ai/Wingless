@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R25-LEARNED-MONOTONE-ALIGNMENT-PILOT",
+  "parent_head": "de6234a46160970e4c23f74d11e9580683047319",
+  "hypothesis": "W-R24 exposed failure of same-index temporal matching under order-preserving retiming. A bounded monotone dynamic-programming alignment between only observed four-channel sequences may allow a fixed-width learner to distinguish positive monotone warps from true negative local swaps.",
+  "freeze": "Predefine both model feature arms, DP recurrence/tie and gap penalty, training budget, input generator, warp maps, erasure coding, split and success classifications before original first-use. No post-result selection.",
+  "source": "Original Wingless four-channel 16-tick affine synthetic sequence with genuine time-varying jitter. Heldout also tests frozen quadratic and xorshift generators; positive label iff candidate has not undergone the local swap.",
+  "split": {
+    "development_seeds": [
+      304,
+      305,
+      306,
+      307,
+      308,
+      309,
+      310,
+      311,
+      312,
+      313,
+      314,
+      315,
+      316,
+      317,
+      318,
+      319
+    ],
+    "sealed_heldout_seeds": [
+      320,
+      321,
+      322,
+      323,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      331,
+      332,
+      333,
+      334,
+      335
+    ]
+  },
+  "training": "Both arms train with identical development seeds, 9 entities, 3 local swap positions2/3,5/6,8/9, amplitude1/2, positive/negative labels, deterministic erasure mask counts0/2/4, original identity time index mapping; exactly 1728 paired cases/arm, 16 weights+bias, zero init, 32 perceptron passes and LR .1.",
+  "heldout": "Unseen heldout seeds320-335, 3 generators, monotone warp maps identity,one duplicate at6,two duplicates at5/6, candidate noise amplitude3 and erasure mask counts3/5, 2 unseen local swaps10/11 and12/13, 18 cells per arm.",
+  "arm1": "Same original W-R22 maskaware four-channel top-two consecutive transition feature; 16 repeated scalar features",
+  "arm2": "16 repeated scalar of bounded monotone dynamic-programming alignment cost. Align original and non-erased candidate rows by anchor-relative per-channel circular distance; path transitions diagonal/up/left, fixed 0.10 skip penalty on up/left, strict |reference index - original candidate tick index|<=2 corridor, normalize final cost by 16. 16x16 bounded DP; no separate missingness oracle, detect only observed all-zero candidate rows.",
+  "primary": "MONOTONE_ALIGNMENT_TRANSFER if aligned arm >=0.80 accuracy in each 12 warped heldout cells and exceeds baseline mean warped accuracy by >=0.10; PARTIAL if aligned warped average exceeds baseline by >=0.05 without strict success; NEGATIVE otherwise. Include confusion by seed and all failures.",
+  "controls": [
+    "Exact 16 learned weights+bias and 1728 examples/32 epochs per arm, but alignment DP adds explicit bounded feature-computation cost, not claimed compute parity",
+    "No labels, attention or future-state oracle; row erasure explicitly encoded",
+    "Every negative swaps only two observable unmasked candidate rows, positive and negative candidate multiset/anchor identical",
+    "No exposed W-R24 holdout use, no rerun, original artifact before one full Go integration regression",
+    "No authority or accepted-ref mutation"
+  ],
+  "bounds": {
+    "learner_width": 16,
+    "arms": 2,
+    "epochs": 32,
+    "train_pairs_per_arm": 1728,
+    "feature_alignment_states_at_most": 256,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic short-sequence alignment pilot; neither language reasoning nor autonomous cognitive transfer."
+}
