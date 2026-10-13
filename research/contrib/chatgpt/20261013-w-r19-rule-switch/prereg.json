@@ -1,0 +1,22 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R19-FEW_SHOT_RULE_SWITCH",
+  "parent_commit": "452f0e37a449a9e68a1f10371582cbe7013ccb61",
+  "predecessor": "W-R18",
+  "question": "Does a bounded learned 16-context predictor adapt to a changed recurrence using exactly one labeled calibration transition per context, and how does it compare with a non-adapted predictor and order-destroyed context?",
+  "hypothesis": "A frozen old-rule table should fail under the unseen +1 transition shift, while an equal-size replacement table populated with 16 observed new-rule exemplars should successfully predict subsequent steps.",
+  "freeze": "All dynamics, splits, calibration access, widths, controls and outcome thresholds fixed before scientific first use. No tuning after any calibration/test result. All test labels sealed.",
+  "old_rule": "Original W-R18 x[t]=(x[t-1]+x[t-2])%4, seeds48..51; 4 seeds x16 episodes x30 training examples for frozen prior.",
+  "new_rule": "x[t]=(x[t-1]+x[t-2]+1)%4 on unseen heldout seeds56..59. Each episode e0..15 starts x0=(e+seed)%4, x1=((e//4)+3*seed)%4. Each episode 32 ticks.",
+  "calibration": "Within each heldout seed, the observer is explicitly allowed just one new-rule labeled calibration transition at tick2 from each of 16 episodes. Because each initial pair is unique, exactly one exemplar for each of 16 second-order contexts. No test labels from t>=3 may be used to train or recalibrate.",
+  "arms": [
+    "frozen_old_rule: 16x4 training counts learned only from old rule, no heldout update",
+    "fewshot_order_two: new 16x4 counts populated with exactly 16 t2 calibration exemplars per heldout seed; no further update",
+    "fewshot_temporal_shuffle: same 16 labeled t2 exemplars and 16x4 capacity; evaluate using a prefix-only even-index-first/odd-index-last permutation of past observations (no future access), retaining histogram but disturbing chronological order"
+  ],
+  "evaluation": "Per new-rule heldout seed exactly 16 episodes x29 test transitions (t3..31), 4 heldout seeds. Full 4x4 confusion and test trace SHA256 per arm.",
+  "primary": "ADAPTIVE_RULE_RECOVERY if fewshot_order_two>=.95, frozen_old_rule<=.40, shuffled<=.65; PARTIAL if adaptive outperforms both without meeting all thresholds; NEGATIVE otherwise.",
+  "budget": "All arms have 16 four-class counter rows, 64 integer count entries. Old arm deliberately has 1920 historical old-rule labels versus exactly 16 allowed new-rule calibration labels in each adaptive arm; unequal evidence budgets are explicit and NOT an equal-compute comparison. No model calls, hidden extra memory, accepted-ref mutations or reruns.",
+  "safeguards": "Never include test-time future symbols in shuffled representation; only history prefix. Calibration labels are user-authorized synthetic online adaptation labels, not an unsealed negative or post-hoc label look-up. Exact blob pins, archived first-use outcome, deterministic repeat and full regression.",
+  "claim_limit": "Learned finite transition-table adaptation when each context is explicitly demonstrated; not adaptation to arbitrary previously unseen rules or human-like cognitive learning."
+}
