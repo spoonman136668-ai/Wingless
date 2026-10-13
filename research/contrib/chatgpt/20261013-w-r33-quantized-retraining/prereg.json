@@ -1,0 +1,73 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R33-EQUAL-BUDGET-QUANTIZED-REPRESENTATION-RETRAINING",
+  "parent_head": "78613735739aa99fa30b5093b9ff55389e177922",
+  "hypothesis": "W-R32's 8-bit to 1/2/4-bit accuracy drop affects the all-observed as well as marker-aware fixed model. At 4-bit and potentially 2-bit, the weakness may be out-of-distribution feature/weight calibration rather than irreversible lack of temporal information. A newly trained equal-budget 16-weight learner exposed only to quantized DEVELOPMENT data may recover heldout accuracy without hidden labels or extra channels.",
+  "freeze": "Independent new dev1136..1151 and new heldout1152..1167; quantize high bits 8/4/2/1 using unchanged W-R32 encoder, fixed three generator families, fixed sites and noise offsets, frozen perceptron epochs/learning rate/evaluation thresholds. Every training pair retained, even if quantization causes positive and negative to be observationally identical. No postresult budget or feature tuning.",
+  "source_split": {
+    "development_seeds": [
+      1136,
+      1137,
+      1138,
+      1139,
+      1140,
+      1141,
+      1142,
+      1143,
+      1144,
+      1145,
+      1146,
+      1147,
+      1148,
+      1149,
+      1150,
+      1151
+    ],
+    "heldout_seeds": [
+      1152,
+      1153,
+      1154,
+      1155,
+      1156,
+      1157,
+      1158,
+      1159,
+      1160,
+      1161,
+      1162,
+      1163,
+      1164,
+      1165,
+      1166,
+      1167
+    ],
+    "previous_w32_heldout": "1080..1095 is historical evidence only, not used for tuning"
+  },
+  "training": "Affine-prior 16 development seeds * 9 entities *3 predefined tail swap sites 2/5/8 * two noise amplitudes 1/2 * balanced original/swapped labels=1728 examples PER precision/arm. Noise offset 17; all quantized candidate states legitimate clean observations. 32 fixed perceptron epochs, LR0.1, 16 weights plus bias. No sample dropping or extra budget. A fixed frozen W-R22 model is a reference-only benchmark (its original training is not rerun on new development).",
+  "arms": [
+    "frozen_maskaware: original W-R22 trained maskaware_augmented 16-weight/bias model",
+    "refit_multimarker: equal-budget 16-weight perceptron trained on observed-only W-R25 multi marker feature at each precision",
+    "refit_allobserved: equal-budget perceptron trained on W-R19 raw top-two temporal feature at each precision"
+  ],
+  "primary": "For all 3 heldout generator families x 2 tail swaps x 4 precisions, report per-seed paired TP/TN/FP/FN, quantization identity collisions, training updates, and heldout accuracy for all arms. RECOVERY iff 4-bit or 2-bit refit accuracy exceeds frozen model by >=0.10 on aggregate matched cells while equal parameters/training examples/epochs; PARTIAL_RECOVERY iff gain >=0.05 but <0.10; NO_RECOVERY otherwise. Keep all harms and negative outcomes.",
+  "controls": [
+    "Never query or fit on heldout seeds1152..1167; fix training data and code before first use",
+    "Keep entire positive/negative pair even when quantization makes observation byte-identical; report inseparability explicitly",
+    "No label oracle in features, no extra train examples or changing training epochs, split, model width, learning rate, stopping rule or precision mapping",
+    "One immutable original first-use artifact, full Go test/build, no retry or accepted-reference mutation"
+  ],
+  "bounds": {
+    "precision": 4,
+    "heldout_generators": 3,
+    "sites": 2,
+    "models_per_precision": 3,
+    "training_examples_per_refit_arm": 1728,
+    "model_width": 16,
+    "epochs": 32,
+    "learning_rate": 0.1,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Bounded synthetic quantized temporal prediction and equal-budget retraining, not language understanding or real-world deployment."
+}
