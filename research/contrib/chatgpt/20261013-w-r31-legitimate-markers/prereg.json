@@ -1,0 +1,71 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R31-LEGITIMATE-MARKER-DOWNSTREAM-COST",
+  "parent_head": "8e648949b708666d153320ef5fc3f8b77cae0b37",
+  "hypothesis": "W-R30 proved latent missingness is ambiguous from observed marker bytes. Evaluate how treating legitimate all-zero, all-255 or repeated rows as missing affects W-R25's actual ordered-pair classifier, using its unchanged learned weights and a balanced local-swap task.",
+  "freeze": "All observation generator families, marker types, fixed marker-at-swap-row interventions, swap-site pairs, heldout seeds and decision criteria committed prior to first original execution. No changes after evaluation, no use of W-R30 first-use heldout.",
+  "training": "Recompute W-R22 fixed maskaware_augmented perceptron once from its frozen original dev seeds240..255 (1728 examples, 16 weights+bias, LR0.1, 32 epochs). No new training, calibration, threshold or model capacity for any arm.",
+  "heldout_seeds": [
+    1024,
+    1025,
+    1026,
+    1027,
+    1028,
+    1029,
+    1030,
+    1031,
+    1032,
+    1033,
+    1034,
+    1035,
+    1036,
+    1037,
+    1038,
+    1039
+  ],
+  "generators": [
+    "affine_prior",
+    "quadratic_irregular",
+    "xorshift_independent"
+  ],
+  "legitimate_row_formats": [
+    "ordinary_control",
+    "valid_all_zero",
+    "valid_all_255",
+    "valid_copy_previous"
+  ],
+  "swap_sites": [
+    "tail10_11 maps global11_12",
+    "tail12_13 maps global13_14"
+  ],
+  "amplitude": 3,
+  "global_candidate_offset": 79,
+  "world_generation": "Start with the exact W-R20 16x4 generator. Produce candidate with genuine time-varying four-channel noise. In marker cases, substitute a LEGITIMATELY OBSERVED marker at the first observation involved in the subsequent adjacent tail swap (global tick11 or13); nothing is erased. Positive candidate keeps its order; negative swaps that observed marker row and adjacent genuine sample. Both positive and negative share candidate anchor and multiset.",
+  "arms": [
+    "old_zero: W-R22 frozen zero-row exclusion feature",
+    "multi_marker: W-R25 observed zero/255/repeated-row exclusion feature",
+    "all_observed: no rows excluded, original W-R19 top-two all-channel transition feature applied to unchanged W-R22 frozen weights"
+  ],
+  "primary": "24 heldout cells per arm (3 generators×4 marker conditions×2 swap positions). Report per-seed TP/TN/FP/FN, downstream balanced accuracy and marker detector false exclusion of each genuinely observed row. LEGITIMATE_MARKER_COST iff multi_marker loses >=0.10 aggregate accuracy relative all_observed on noncontrol marker cells; TRADEOFF iff there exist >=0.10 per-cell losses and >=0.10 per-cell gains; NO_CONFIRMED_COST otherwise. Retain all adverse and null outcomes.",
+  "controls": [
+    "Legitimate marker rows are *adversarially constructed*, not a natural frequency estimate",
+    "Exactly identical W-R22 weights and training examples across three feature arms",
+    "No privileged validity flag passed to any feature model",
+    "Same 16 actual observations, no hidden oracle, model-call or width change",
+    "Preregistered original archive then one full Go integration regression; no first-use replay or accepted-ref mutation"
+  ],
+  "bounds": {
+    "model_arms": 3,
+    "heldout_cells_per_arm": 24,
+    "heldout_seeds": 16,
+    "entities": 9,
+    "paired_positive_negative": true,
+    "trained_width": 16,
+    "training_pairs": 1728,
+    "epochs": 32,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic adversarial legitimate-value encoding effect on paired sequence classification; not general learning or natural incidence."
+}
