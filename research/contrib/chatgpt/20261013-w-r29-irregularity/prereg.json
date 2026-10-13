@@ -1,0 +1,67 @@
+{
+  "schema": "wingless.science.frozen.v1",
+  "experiment": "W-R29-CAUSAL-GENERATOR-IRREGULARITY-ABLATION",
+  "parent_head": "785ec7782e955225c3c140d181b261e9310eb042",
+  "hypothesis": "W-R28B acceleration reduced error on quadratic-irregular raw data but remained far from perfect. Freeze a direct generator-factor ablation: remove only a bounded modular 19 irregularity term and test whether second-order finite-difference prediction recovers the underlying quadratic law.",
+  "frozen_cohorts": {
+    "development": [
+      496,
+      497,
+      498,
+      499,
+      500,
+      501,
+      502,
+      503
+    ],
+    "sealed_heldout": [
+      504,
+      505,
+      506,
+      507,
+      508,
+      509,
+      510,
+      511,
+      512,
+      513,
+      514,
+      515,
+      516,
+      517,
+      518,
+      519
+    ]
+  },
+  "family_definitions": [
+    "affine_prior identical W-R20 original",
+    "pure_quadratic: (43*s+29*entity+17*c+(5+2*c)*t+(11+3*c)*t*t) mod256",
+    "quadratic_irregular: pure_quadratic+7*((s+c)*t mod19) mod256, exact W-R20",
+    "xorshift_independent exact W-R20"
+  ],
+  "inputs": "Four raw byte channels per tick, candidate global offset+79, real per-tick/each-channel jitter amplitudes1,3,5 with exact bounded W-R28B formula. Predictor at t in2..14 sees only candidate t,t-1,t-2; hidden observed t+1 enters scoring only.",
+  "predictors": [
+    "persistence:x_t",
+    "velocity:2*x_t-x_(t-1) mod256",
+    "acceleration:3*x_t-3*x_(t-1)+x_(t-2) mod256"
+  ],
+  "metrics": "Each of 4 generator families x3 amplitudes x3 predictors: heldout circular MAE and within8/exact-byte rate over all four channels, per-seed results and checks that irregular sequence equals pure plus only specified term.",
+  "classification": "IRREGULARITY_BOUNDARY iff at amp3 pure_quadratic acceleration MAE<=20 and irregular acceleration MAE exceeds pure by>=15 and affine velocity MAE<=10; PARTIAL iff irregular exceeds pure by>=10 but strict boundary fails; NEGATIVE otherwise. Retain all negative controls and never select favorable amp post-result.",
+  "controls": [
+    "No learned parameter fitting on exposed heldout, no future target in input, same noise for paired pure/irregular",
+    "Exact W-R28B source identity/prereg prior to original experiment",
+    "One first-use archive and final full Go regression",
+    "No new model weights or accepted-ref mutation, no first-use retries"
+  ],
+  "limits": {
+    "models": 3,
+    "families": 4,
+    "noise_levels": 3,
+    "sealed_heldout_seeds": 16,
+    "development_seeds": 8,
+    "channels": 4,
+    "model_calls": 0,
+    "first_use_retries": 0
+  },
+  "claim_limit": "Synthetic structural recurrence ablation, not learned general reasoning."
+}
