@@ -1,0 +1,45 @@
+name: Wingless W-R18 sealed single-adjacent transfer
+on:
+  push:
+    branches: [research/w-r18-local-singlet-sensitivity-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Fail-closed first-use identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 6b5024543afe21509b6e7f1acdd6992064963c8b HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r16b-noise-matrix/execute.py)" = 949971431e0b296c5a797ee6ec336947db207a83
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-single-swap/prereg.json)" = 23181d4f35f7f56925ad3a135b6f17212dbd9edd
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r18-single-swap/execute.py)" = e1b20533c75ea8875aae2e352993db83f78d540e
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r18-single-swap/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r18-single-swap/execute.py
+      - name: First original sealed scientific evaluation
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r18-single-swap/execute.py > /tmp/W-R18-original.json
+          python3 -m json.tool /tmp/W-R18-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R18-original.json'))
+          assert len(a['arms'])==6 and all(len(r['matrix'])==6 for r in a['arms'])
+          print('CLASSIFICATION',a['classification'])
+          for r in a['arms']:
+              print(r['curriculum'],r['representation'],r['accuracy'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R18-original-single-swap
+          path: /tmp/W-R18-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless integration regression
+        run: go test ./... && go build ./...
