@@ -1,0 +1,75 @@
+{
+  "schema": "wingless.science.frozen_prereg.v1",
+  "id": "W-R23-OBSERVABILITY-BOUNDARY-MASK-OVERLAP",
+  "parent_head": "c551d41a7b8d4f77b9349033fa788d621a800519",
+  "hypothesis": "W-R22's perfect mask-aware performance relied on missing data never obscuring the reordered observations and on applying occlusion before ordering. Mask AFTER the order perturbation; isolate untouched, irrelevant, one-sided, and fully erased swap observations to quantify identifiability limits.",
+  "freeze": "Original first use only, exact unchanged previously trained W-R22 models and original source. No retraining on withheld mask geometries, no post-result case exclusion or threshold changes.",
+  "training": "Import W-R22 train(arm) exactly, 16 development seeds 240..255, 1728 pairs/model, 32 epochs, width 16. No rerun of W-R22 heldout seeds.",
+  "heldout": {
+    "seeds": [
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287
+    ],
+    "generators": [
+      "affine_prior",
+      "quadratic_irregular",
+      "xorshift_independent"
+    ],
+    "noise_amplitude": 3,
+    "swaps": [
+      "swap10_11",
+      "swap12_13"
+    ],
+    "mask_cases": [
+      "none",
+      "irrelevant_2_5",
+      "one_swap_row",
+      "both_swap_rows"
+    ],
+    "mask_application": "Generate original and observation; generate clean positive and clean negatively reordered candidates first; apply identical absolute-tick row mask afterward to BOTH. A complete two-row swap erasure produces observationally identical pos/neg, which is not a label-predictable outcome.",
+    "per_arm_cells": 24
+  },
+  "arms": [
+    "naive_clean",
+    "naive_augmented",
+    "maskaware_clean",
+    "maskaware_augmented"
+  ],
+  "primary": "Report per-generator/swap/mask case observed-identical pair fraction, TP/TN/FP/FN and accuracy for all models. Fully-erased pairs have a theoretical paired balanced-accuracy upper bound 0.5, not 1.0. IDENTIFIABILITY_BOUNDARY if all fully-erased pairs are observationally identical, no other cases are identical, and maskaware_clean reaches at least 0.8 accuracy in every identifiable cell. PARTIAL_BOUNDARY if observational-equivalence controls hold but identifiable-cell threshold fails; INVALID otherwise.",
+  "controls": [
+    "Verify heldout examples use seeds 272..287 only",
+    "No changed training weights or additional model parameters",
+    "Do not count identical paired positive/negative examples as correct/incorrect after selecting one label: retain BOTH and report irreducible maximum accuracy",
+    "Missing sentinel (0,0,0,0) used only from observed four channels; no hidden mask identity supplied to the classifier",
+    "Exact blob identities, first-use archived evidence, one full Go test/build regression"
+  ],
+  "bounds": {
+    "models": 4,
+    "width": 16,
+    "epochs": 32,
+    "training_examples": 1728,
+    "heldout_seeds": 16,
+    "generator_families": 3,
+    "swap_families": 2,
+    "mask_cases": 4,
+    "cells_per_model": 24,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic observation identifiability only; no generalized temporal understanding or natural language claim."
+}
