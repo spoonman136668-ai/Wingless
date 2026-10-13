@@ -1,0 +1,36 @@
+name: Wingless W-R22 frozen new-cohort hypothesis experiment
+on:
+  push:
+    branches: [research/w-r22-validated-hypothesis-search-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin immutable preregistration, parent and source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor baa8e1eadde3fd10bba761735a50ff4d6944a82b HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-new-hypothesis/prereg.json)" = 868c4cd8fc21bf30f4fa0eb37727f52ee5c38a72
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-new-hypothesis/execute.py)" = 4db2916f5741b0096765d963b3edfa961d6076c3
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r22-new-hypothesis/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r22-new-hypothesis/execute.py
+      - name: Frozen original science — fixture assertions and separate cohort
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r22-new-hypothesis/execute.py > /tmp/W-R22-original.json
+          python3 -m json.tool /tmp/W-R22-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R22-original-eight-candidate
+          path: /tmp/W-R22-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless regression and build
+        run: go test ./... && go build ./...

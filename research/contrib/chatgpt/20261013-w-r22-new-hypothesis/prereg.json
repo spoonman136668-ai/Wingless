@@ -1,0 +1,28 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R22-NEW_COHORT_VERIFIED_HYPOTHESIS_SELECTION",
+  "parent_commit": "baa8e1eadde3fd10bba761735a50ff4d6944a82b",
+  "predecessor": "W-R20; W-R21 failed as INVALID before producing science",
+  "status_reason": "W-R21's first-use attempt failed with undefined Python variable 'offset'. W-R21 remains immutable and invalid. This is a new experiment with separate cohort and full source preflight.",
+  "question": "Can the frozen eight-element modular rule hypothesis family be inferred from exactly four observations and transfer to 12 never-calibrated episodes?",
+  "fixed_family": "x[t]=(x[t-1]+a*x[t-2]+b)%4; a in {1,2}, b in {0,1,2,3}; exactly eight candidates and deterministic zero-error unique selection, not unconstrained search.",
+  "generator": "For seeds 80..83, true a=2 when seed even else1, true b=(seed-80)%4, hidden from predictor. Episode0..15 starts x0=(episode+seed)%4, x1=((episode//4)+3*seed)%4; 32 total ticks.",
+  "development": "Four labels only, transition at tick2 in episodes e=0,1,2,3 for EACH heldout seed. These examples must be excluded from the 12 episode test. No additional source of labels or heldout-score retuning.",
+  "heldout_seeds": [
+    80,
+    81,
+    82,
+    83
+  ],
+  "controls": [
+    "fixed_previous: a=1 b=2, no calibration",
+    "four_demo_rote: 16x4 counts from the same four observed labels, unseen contexts predict class0",
+    "eight_hypothesis: unique zero-error candidate from four labels",
+    "prefix_shuffled: same selected coefficients but reorder only observed history prefix by even then odd positions before computing recurrence"
+  ],
+  "primary": "Per arm heldout accuracy on 4 seeds x12 episodes x30 test positions =1440 predictions, full per-seed confusion, selected a,b and trace SHA256. BOUNDED_HYPOTHESIS_TRANSFER if candidate accuracy>=.95 and all three controls<=.65; PARTIAL if candidate beats every control; NEGATIVE otherwise, HYPOTHESIS_AMBIGUITY for non-unique matches.",
+  "invariants": "Hard-coded explicit algebra correct: previous + a*before + b modulo4. Fixture-only preflight on independently hand-constructed triples checks identification of a,b and rejects wrong candidates; no generator seeds/test labels consumed in fixture. Assert unique calibration pairs, exact counts and full deterministic original repeat.",
+  "capacities": "Eight candidates, four calibration labels per cohort seed, 16x4 rote table, no extra model inference, no post-result threshold/candidate edits, no accepted-ref writes.",
+  "scientific_controls": "Exact Git blobs and immutable prereg before first use, one original Actions attempt, artifact hash and full go test/build regression; failure is INVALID, do not retry consumed experiment.",
+  "claim_limit": "Small prior hypothesis family fitted from four synthetic examples; no unconstrained discovery or natural language reasoning."
+}
