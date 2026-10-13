@@ -1,0 +1,46 @@
+name: Wingless W-R24 frozen monotone retiming
+on:
+  push:
+    branches: [research/w-r24-monotone-time-warp-falsification-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify immutable prereg, source and predecessor
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 0e208895e192febd8873975dd2ed86eb771afc54 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r22-maskaware/execute.py)" = e43abe25ef7b876d9138576d5184d02cde2819d8
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r24-monotone-warp/prereg.json)" = dda76a9f80d4c5c31c44b7ae51611048dd0f8f4b
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r24-monotone-warp/execute.py)" = 916949b8f244be0275dd4a75bec332dc8e64c841
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r24-monotone-warp/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r24-monotone-warp/execute.py
+      - name: One original frozen monotone retiming evaluation
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r24-monotone-warp/execute.py >/tmp/W-R24-original.json
+          python3 -m json.tool /tmp/W-R24-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/W-R24-original.json'))
+          assert x['sealed_heldout_seeds']==list(range(288,304))
+          assert len(x['arms'])==2 and all(len(a['cells'])==18 for a in x['arms'])
+          print('CLASSIFICATION',x['classification'])
+          for arm in x['arms']:
+              print('ARM',arm['arm'],arm['overall_accuracy'],arm['warped_accuracy'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R24-original-monotone-warp
+          path: /tmp/W-R24-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless regression
+        run: go test ./... && go build ./...
