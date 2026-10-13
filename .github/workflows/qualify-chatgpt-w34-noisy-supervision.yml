@@ -1,0 +1,37 @@
+name: W-R34 frozen original research and full qualification
+on:
+  push:
+    branches: [research/chatgpt-w34-feedback-noise-hysteresis-20261013]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify immutable original source and preflight only
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 18742dba3d6a2266d592bb740b1df17a0ca5482f HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r26-latent-alphabet/execute.py)" = 7632546ca681c3c8fec66991ffc9468ab34e0d07
+          test "$(git hash-object research/contrib/chatgpt/20261013-w34-noisy-feedback/prereg.json)" = 21b2efe30497961441b1053402ba7ea1d345e4c0
+          test "$(git hash-object research/contrib/chatgpt/20261013-w34-noisy-feedback/execute.py)" = b407364c983c9102e962be452eaa00cbbf79e984
+          python3 -m json.tool research/contrib/chatgpt/20261013-w34-noisy-feedback/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w34-noisy-feedback/execute.py
+      - name: Run single prospective W-R34 original
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w34-noisy-feedback/execute.py > /tmp/W-R34-original.json
+          python3 -m json.tool /tmp/W-R34-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R34-original-frozen-first-use
+          path: /tmp/W-R34-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full repository regression
+        run: go test ./... && go build ./...
