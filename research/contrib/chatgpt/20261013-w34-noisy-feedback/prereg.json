@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.frozen-prereg.v1",
+  "id": "W-R34-FEEDBACK_NOISE_HYSTERESIS_R1",
+  "date": "2026-10-13",
+  "parent_commit": "18742dba3d6a2266d592bb740b1df17a0ca5482f",
+  "question": "Does requiring corroborating consecutive feedback errors prevent gratuitous model switches under isolated corrupted feedback, and what adaptation delay does it impose during a true hidden operation change?",
+  "world": "Fresh seeds208..215 (development208..211, heldout212..215),16 contexts/episodes, second-order ADD4 and XOR4 with hidden four-symbol observation permutation SHA256('W34-perm/'+seed) byte0 mod24 and unique SHA256('W34-order/'+seed+'/'+episode) context presentation order. Odd seeds remain ADD4. Even seeds switch from ADD4 to XOR4 for t>=16; no regime flag reaches learners. 16 t2 labeled calibration contexts permit unique ADD and XOR predictive tables within fixed W26 24 permutations or experiment is AMBIGUOUS. Evaluation always uses exact latent-generated true target, but the learner's distinct supervisory feedback report is corrupted by +1 modulo4 at ticks7 and24 of every episode, selected in advance; t+1 context is provided via a distinct uncorrupted state-observation channel. These two channels and the evaluator-only truth are explicit.",
+  "arms": [
+    "FROZEN_ADD uses calibrated ADD table forever, ignores supervisor feedback",
+    "ONE_ERROR_TOGGLE starts in ADD and toggles ADD/XOR after every observed prediction-vs-reported-feedback disagreement, taking effect on next tick",
+    "TWO_CONSECUTIVE_ERRORS starts ADD and toggles only after two consecutive disagreements with reported feedback, takes effect next tick and clears mismatch count; any agreement resets count."
+  ],
+  "split": {
+    "development": [
+      208,
+      209,
+      210,
+      211
+    ],
+    "heldout": [
+      212,
+      213,
+      214,
+      215
+    ]
+  },
+  "budget": "16 supervised calibration labels for each seed, 16 episodes x29 forecasts at t3..31 per seed; all arms same 2 precommitted corrupt postforecast reports per episode. No further labeled calibration beyond supervised reports observed AFTER each forecast; no actual evaluation truth visible to learner except separate clean two-value context at next tick. Both candidate tables fixed before evaluation.",
+  "metrics": "All8 raw observed full trajectory fingerprint SHA256 distinct excluding seed name; calibration uniqueness for both ADD and XOR predictive tables; heldout STABLE/SHIFT accuracy vs ground truth (not corrupted feedback), number of toggles in each phase, pre t3..15 and post t16..31 correct/wrong, first switch delay, trace SHA256, corrupt supervision count exactly 2/episode.",
+  "frozen_classification": "NOISE_HYSTERESIS_TRADEOFF if calibration/source valid, heldout STABLE TWO_CONSECUTIVE_ERRORS makes fewer wrong forecasts and fewer toggles than ONE_ERROR_TOGGLE, but heldout SHIFT TWO_CONSECUTIVE_ERRORS does not exceed ONE_ERROR_TOGGLE in correct post-t16 forecasts. MIXED otherwise. INVALID_IDENTITIES or AMBIGUOUS_HYPOTHESIS for guard failures.",
+  "safeguards": "Frozen before source and first use, original Git SHA pins for W26/prereg/evaluator, no candidate expansion, no post-result threshold tuning, no first-use retry, original science JSON and full Go test/build. Keep all negatives, mixed, invalid. No model calls, live activation, accepted-reference mutation.",
+  "claim_limit": "Fixed synthetic two-operation and precommitted noisy supervisor with a separate perfect context channel; not unconstrained error recovery or safe learning under general noise."
+}
