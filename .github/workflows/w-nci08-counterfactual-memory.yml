@@ -1,7 +1,7 @@
 name: W-NCI08 frozen paired counterfactual memory-capacity falsification
 on:
   push:
-    branches: [research/w-nci08-counterfactual-memory-cap-20261014-r1]
+    branches: [research/w-nci08-source-qa-r2-20261014]
 permissions:
   contents: read
 jobs:
@@ -34,7 +34,7 @@ jobs:
           a=json.load(open("/tmp/W-NCI08-development.json"))
           assert a["phase"]=="development" and a["sealed_seed_range"]==[28000,28024]
           assert a["frozen_graph_parameters"]==4 and a["frozen_previous_parameters"]==3
-          assert a["edge_memory_limit"]==7 and a["paired_accuracy_theoretical_ceiling"]==0.5
+          assert a["edge_memory_limit"]==7 and a["theoretical_paired_accuracy_ceiling"]==0.5
           assert a["new_model_training"] is False and a["external_llm_calls"]==0
           print("PINNED_MODEL_VALIDATION",a["graph_dev_accuracy"],a["prior_dev_accuracy"])
           PY
