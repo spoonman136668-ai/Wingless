@@ -1,0 +1,58 @@
+name: W-F2 task-supervised coded gate learning diagnostic
+on:
+  push:
+    branches: [research/w-f2-task-supervised-sharpness-dev-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Pinned parent and frozen training plan
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4a8da70dc242940b42b69dd9d71b0e4f9fc7212c HEAD
+          test "$(git hash-object unitary/f1c_gate_sharpness.go)" = "$(git rev-parse 4a8da70dc242940b42b69dd9d71b0e4f9fc7212c:unitary/f1c_gate_sharpness.go)"
+          python3 -m json.tool research/foundational/20261014-w-f2/prereg.json >/dev/null
+      - name: One new development-only end-to-end scalar learning pilot
+        run: |
+          set -euo pipefail
+          go run ./cmd/f2-wingless > /tmp/w-f2-original-development.json
+          python3 -m json.tool /tmp/w-f2-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F2-original-task-gate-learning-development
+          path: /tmp/w-f2-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: After archival custody independently verify all predictions
+        run: |
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/w-f2-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY" and r["train_graphs"]==288
+          assert r["validation_graphs"]==192 and r["validation_question_count"]==384
+          assert r["validation_negative_count"]==192 and r["validation_positive_count"]==192
+          assert r["native_state_bytes"]==576 and r["trainable_parameter_bytes"]==24
+          assert r["coded_entity_equality"] and not r["learned_entity_binding"]
+          assert r["no_sealed_first_use"] and not r["accepted_ref_mutation"]
+          for name,s in r["candidate_scores"].items():
+            rows=r["original_validation_rows"]
+            acc=sum(int(p==t) for z in rows for p,t in zip(z["models"][name],z["truth"]))/384
+            fp=sum(int(p) for z in rows for p,t in zip(z["models"][name],z["truth"]) if not t)/192
+            assert abs(acc-s["accuracy"])<1e-12 and abs(fp-s["false_positive_rate"])<1e-12
+          assert r["registered_verdict"] in ("DEVELOPMENT_TASK_TRAINED_SHARPNESS_OBSERVED","DEVELOPMENT_NO_TASK_LEARNED_SHARPNESS_GAIN")
+          print("W_F2_VERDICT",r["registered_verdict"])
+          print("W_F2_SCORES",r["candidate_scores"])
+          PY
+      - name: One complete native Go regression and build
+        run: go test ./... && go build ./...
