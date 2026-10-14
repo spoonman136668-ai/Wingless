@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.f4.prereg.v1",
+  "id": "W-F4-LEARNED-QUERY-ENDPOINT-MATCHING-BOTH-ANCHORS_AND_RELATION",
+  "frozen_F3_parent_sha": "d3f6fb15dd8610833c1712d030acbba5bfe942b8",
+  "design": "Train 17 scalar matching parameters to bind source and destination query anchors and graph edge-to-edge transitions from task loss, without direct identity equality. Four-step product-OR traversal remains PROGRAMMED; public 16-bit ID bits are engineered. Distinct from Yggdrasil recurrent learned traversal.",
+  "development": {
+    "train_seeds": [
+      42900,
+      42924
+    ],
+    "validation_seeds": [
+      43100,
+      43112
+    ],
+    "train_families": [
+      0,
+      1,
+      2
+    ],
+    "validation_families": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "train_graph_states": 288,
+    "validation_graph_states": 192,
+    "validation_questions": 384,
+    "negative_validation_questions": 192,
+    "adversarial_aliases": "frozen F1B near-similarity replacement",
+    "training": "Adam-style finite-difference task-BCE gradient, 90 epochs of 24 graph states, learning rate .35, perturbation .045, deterministic sample order",
+    "resident_state_bytes": 576,
+    "trainable_params": 17,
+    "matched_controls": [
+      "same 17-parameter architecture initialized",
+      "pre-existing fixed 13/-6.5 coded equality controller"
+    ],
+    "pre_registered_pass": {
+      "min_accuracy": 0.85,
+      "max_negative_fp": 0.15,
+      "min_gain_vs_initialized": 0.15,
+      "max_deficit_vs_coded_control": 0.15
+    }
+  },
+  "classification": {
+    "positive": "DEVELOPMENT_LEARNED_ENDPOINT_BINDING_OBSERVED",
+    "negative": "DEVELOPMENT_NO_LEARNED_QUERY_BINDING_GAIN"
+  },
+  "authority": {
+    "sealed_first_use": false,
+    "scientific_acceptance": false,
+    "F3_unchanged": true,
+    "no_new_controller": true,
+    "no_work_queue": true,
+    "no_live_systems": true
+  }
+}

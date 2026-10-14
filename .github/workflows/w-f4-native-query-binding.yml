@@ -1,0 +1,59 @@
+name: W-F4 native learned query and relation endpoint binding
+on:
+  push:
+    branches: [research/w-f4-learned-anchors-development-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify frozen F3 lineage and F4 pre-registration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor d3f6fb15dd8610833c1712d030acbba5bfe942b8 HEAD
+          test "$(git hash-object unitary/f2_task_gate_learning.go)" = b068dbc1c92443319138a59787bca7a46e4fbe5d
+          python3 -m json.tool research/foundational/20261014-w-f4/prereg.json >/dev/null
+      - name: Execute bounded F4 development only (NOT sealed F3)
+        run: |
+          set -euo pipefail
+          go run ./cmd/f4-wingless > /tmp/w-f4-original-development.json
+          python3 -m json.tool /tmp/w-f4-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F4-original-learned-endpoint-development
+          path: /tmp/w-f4-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: After archive independently reaggregate raw rows
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f4-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY" and r["train_graph_states"]==288
+          assert r["validation_graph_states"]==192 and r["validation_questions"]==384
+          assert r["negative_questions"]==192 and r["native_state_bytes"]==576
+          assert r["trainable_parameter_count"]==17
+          assert not r["coded_entity_equality_in_candidate"] and not r["coded_query_anchor_equality_in_candidate"]
+          assert r["coded_four_hop_or_traversal_in_candidate"]
+          assert not r["sealed_first_use"] and not r["accepted_ref_mutation"]
+          assert collections.Counter(z["family"] for z in r["original_validation_rows"])=={4:48,5:48,6:48,7:48}
+          for name,s in r["candidate_scores"].items():
+            correct=sum(int(t==p) for row in r["original_validation_rows"] for t,p in zip(row["truth"],row["models"][name]))
+            fp=sum(int(p) for row in r["original_validation_rows"] for t,p in zip(row["truth"],row["models"][name]) if not t)
+            assert correct==s["correct"] and fp==s["false_positives"]
+          assert r["registered_verdict"] in ("DEVELOPMENT_LEARNED_ENDPOINT_BINDING_OBSERVED","DEVELOPMENT_NO_LEARNED_QUERY_BINDING_GAIN")
+          print("W_F4_VERDICT",r["registered_verdict"])
+          print("W_F4_SCORES",r["candidate_scores"])
+          PY
+      - name: One full native regression and build
+        run: go test ./... && go build ./...
