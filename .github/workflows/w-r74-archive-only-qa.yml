@@ -1,0 +1,48 @@
+name: W-R74 archive-only original custody and full Go regression
+on:
+  push:
+    branches: [qa/w-r74-original-archive-regression-20261014-r1]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Frozen original source identity only
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 33ad17eeafed3a7941f0b1258bc67913be247aea HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r74-learned-phase-origin/execute.py)" = ad07a2c5c014f3c4eb680f2f0b86445288b08f55
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r74-learned-phase-origin/prereg.json)" = 156ab3ddc9a73480a5aaaf7973fcf9e109f02f4d
+          echo "NO_SEALED_EXPERIMENT_REEXECUTED=PASS"
+      - uses: actions/download-artifact@v4
+        with:
+          name: W74-frozen-first-use-evidence
+          run-id: 38547057097
+          github-token: ${{ github.token }}
+          path: /tmp/w74-origin
+      - name: Independently check original archived numerical record and original mislabeled row count
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib,pathlib,collections
+          files=list(pathlib.Path("/tmp/w74-origin").glob("*.json"))
+          assert len(files)==1,files
+          raw=files[0].read_bytes()
+          assert hashlib.sha256(raw).hexdigest()=="dcbba7a6c56103a029250c18fb5b0aa1733f7fff9db393f0a46a9542f1b8162e"
+          a=json.loads(raw)
+          assert a["classification"]=="NO_PHASE_ORIGIN_IDENTIFIABILITY"
+          assert len(a["heldout_records"])==16*9*2*3*3==2592
+          counts=collections.Counter((r["phase"],r["predicted"]) for r in a["heldout_records"])
+          assert all(a["confusion"][p][q]==counts[p,q] for p in a["confusion"] for q in a["confusion"][p])
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          print("ORIGINAL_ARCHIVE_ONLY_WITNESS=PASS; ORIGINAL_RESULT_RECORDS=2592")
+          PY
+      - name: Final full Go project regression and build on frozen original source
+        run: go test ./... && go build ./...
