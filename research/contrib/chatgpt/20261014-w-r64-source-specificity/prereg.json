@@ -1,0 +1,87 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R64-SOURCE-CHANNEL-DOMINANCE-PROSPECTIVE",
+  "parent_head": "635d8409a175c483dde48b624149ba1f6505d1a7",
+  "prior": "W-R63 original SOURCE_CHANNEL_ROLE; independently archive-verified, source0 mean -0.0964506173 vs displayed slot0 -0.0041152263",
+  "hypothesis": "Does channel0 genuinely dominate unseen-entity, source-withheld synthetic sequence discrimination, or do losses spread across all four signals when each original channel is independently erased under identical wiring permutations?",
+  "freeze": "Training source and three 16-dimensional ridge fits are unchanged from W-R61/W-R63. No post-result tuning. Evaluate four identity wiring permutations, each original channel 0..3 erasure plus intact control, same balanced labels and frozen weights.",
+  "development_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    9664,
+    9688
+  ],
+  "source_family": "xorshift_independent (withheld from all three source-trained fits)",
+  "entity_group": "unseen_identity_transfer, entities9..17",
+  "amplitudes": [
+    1,
+    2,
+    3
+  ],
+  "permutations": {
+    "identity": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "rotate": [
+      1,
+      2,
+      3,
+      0
+    ],
+    "swap01": [
+      1,
+      0,
+      2,
+      3
+    ],
+    "reverse": [
+      3,
+      2,
+      1,
+      0
+    ]
+  },
+  "conditions": [
+    "intact",
+    "erase_source0",
+    "erase_source1",
+    "erase_source2",
+    "erase_source3"
+  ],
+  "primary": "Report per-seed paired credit/denominator for 3 fixed models x 3 amplitudes x 4 permutations x 5 interventions on fresh seeds 9664..9687, and each channel's average change versus permutation-matched intact control across 36 cells. SOURCE0_DOMINANT_REPLICATED iff channel0 mean loss <= -0.07 and at least 0.035 more adverse than every other channel; MULTICHANNEL_SENSITIVITY iff two or more source channel mean losses <= -0.05; otherwise NO_CLEAR_SOURCE_RANK. Preserve all adverse and null outcomes.",
+  "controls": [
+    "Exact same source sequence, swap labels, model, features and seed per condition",
+    "Erasure fills all 16 ticks on exactly one original source channel; no missingness oracle; an intervention, not natural prevalence",
+    "Only unseen xorshift source and unseen entity group for this prospectively chosen mechanistic test",
+    "One original first-use archive; full Go regression; independent archive verification, no execution retry or ref promotion",
+    "No FORGE, KTRADE, CKB-plane or production mutation"
+  ],
+  "bounds": {
+    "models": 3,
+    "amplitudes": 3,
+    "permutations": 4,
+    "conditions": 5,
+    "heldout_seeds": 24,
+    "entity_count": 9,
+    "feature_width": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Bounded synthetic erasure sensitivity. Does not demonstrate generalized temporal cognition, deployable sensor-repair behavior, or RSI."
+}
