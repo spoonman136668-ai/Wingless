@@ -1,0 +1,66 @@
+name: W76 prospective frozen scientific first-use
+on:
+  push:
+    branches: [research/w-r76-learned-orbit-gate-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify pinned origin and immutable scientific source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor dd8ef01f85d422bf95fe267f5b73e1f076026961 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r75-orbit-pooled/execute.py)" = a8725622f79351356d550ce8ed36cbd6326f0182
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r76-native-orbit-gate/execute.py)" = 1be9ec41bbef37aa723870d85535b5cf10ff3d00
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r76-native-orbit-gate/prereg.json)" = 20b69b77fad950ce848e336e055c257dda519eb8
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r76-native-orbit-gate/execute.py
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-r76-native-orbit-gate/prereg.json >/dev/null
+      - name: Development-only fitting and frozen selection
+        run: |
+          set -euo pipefail
+          python3 -B - <<'PY'
+          import importlib.util
+          sp=importlib.util.spec_from_file_location("w76_dev","research/contrib/chatgpt/20261014-w-r76-native-orbit-gate/execute.py")
+          assert sp and sp.loader
+          m=importlib.util.module_from_spec(sp);sp.loader.exec_module(m)
+          models,alpha,scores=m.fit_and_select()
+          assert len(models)==5 and alpha in (.25,.5,.75,1.0)
+          assert all(v["examples"]==1728 and len(v["weights"])==16 for v in models.values())
+          print("FROZEN_DEV_MIX_ALPHA",alpha,scores)
+          PY
+      - name: Exactly one original first-use evaluation
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r76-native-orbit-gate/execute.py > /tmp/W76-original.json
+          python3 -m json.tool /tmp/W76-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W76-original-first-use
+          path: /tmp/W76-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verify original evidence after durable artifact custody
+        run: |
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W76-original.json"))
+          assert a["sealed_heldout_seeds"]==list(range(19040,19056))
+          assert len(a["complete_heldout_records"])==1152
+          assert a["selected_alpha"] in (.25,.5,.75,1.0)
+          assert a["classification"] in ("LEARNED_NATIVE_ORBIT_MIX_TRANSFER",
+              "PARTIAL_NATIVE_ORBIT_COMPROMISE","NO_NATIVE_ORBIT_MIX_GAIN")
+          print("CLASSIFICATION",a["classification"])
+          print("ACCURACY",a["accuracy"])
+          print("DELTA",a["chosen_minus_baseline"])
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          PY
+      - name: Final full repository regression
+        run: go test ./... && go build ./...

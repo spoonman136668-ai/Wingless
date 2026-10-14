@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R76-BOUNDED-LEARNED-NATIVE-ORBIT-STATE-GATE",
+  "parent_head": "dd8ef01f85d422bf95fe267f5b73e1f076026961",
+  "prior": "W-R75 first-use and complete regression demonstrated true circular phase-invariant orbit16 scores (57.4% each phase) but substantial -14.58 point intact and minus1 regression versus 71.99% baseline, while +1 improved +5.84 points. Development-selected orbit pooling overfit included generator. Bounded mixture may recover useful native signal and some invariance.",
+  "hypothesis": "Can development training choose a 16-state mixing gate α between original temporal features and complete orbit16 averages that yields at least 62% across intact,+1,-1 on withheld-source sealed inputs, with ≤8-point intact and minus1 loss and ≥8-point +1 gain over the original?",
+  "freeze": "Five scalar α candidates 0,.25,.5,.75,1; one separate 16-weight ridge trained on identical 1728 signed examples for each, pretrained fixed native/orbit feature encoders. Choose a NONZERO α via worst-phase/then-intact development accuracy over included generators and dev-validation seeds. No extra model capacity beyond learned α and 16 weights, but 17x feature extract cost for mixed modes. Freeze α+ridge before first-use on excluded xorshift source, unseen entities, seeds19040..19055, three amplitudes, four permutations, intact/+1/-1.",
+  "development_seeds": [
+    9008,
+    9024
+  ],
+  "validation_seeds": [
+    [
+      9040,
+      9048
+    ],
+    [
+      9072,
+      9080
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    19040,
+    19056
+  ],
+  "alpha_candidates": [
+    0,
+    0.25,
+    0.5,
+    0.75,
+    1
+  ],
+  "test_phases": [
+    "intact",
+    "plus1",
+    "minus1"
+  ],
+  "primary": "LEARNED_NATIVE_ORBIT_MIX_TRANSFER iff selected α>0 and min accuracy over 3 phases >=.62, intact/minus1 deltas >=-.08 and plus1 delta >=.08 vs α0. PARTIAL_NATIVE_ORBIT_COMPROMISE if minimum >=.57, intact/minus1 deltas >=-.12 and plus1 gain >=.04. Otherwise NO_NATIVE_ORBIT_MIX_GAIN. Archive 1152 original trial scores and all dev choices.",
+  "controls": [
+    "Source phase always hidden at inference, model reads only raw synchronized channel sequence",
+    "Frozen 16 ridge weights and 1728 examples per model but 17x feature extraction compute for mixtures, not an equal-runtime comparison",
+    "New sealed19040..19055 not in prior original W74/W75 cohorts",
+    "Only development selects α; no sealed data tuning, retries or replay",
+    "Original artifact uploaded before interpretation, complete Go regression and independent archive-only reaggregation",
+    "No paid APIs, FORGE R32/R33, accepted refs, CKB queue/controller, production or merges"
+  ],
+  "bounds": {
+    "alpha_choices": 5,
+    "learned_readout_width": 16,
+    "train_examples": 1728,
+    "heldout_seeds": 16,
+    "permutations": 4,
+    "phases": 3,
+    "heldout_rows": 1152,
+    "max_feature_compute_multiplier": 17,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic learned scalar gate over handcrafted orbit/native temporal features, not recurrent state learning or RSI."
+}
