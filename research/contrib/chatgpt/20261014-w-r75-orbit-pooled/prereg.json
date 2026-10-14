@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R75-CIRCULAR-ORBIT-POOLED-STATE-TRANSFER",
+  "parent_head": "33ad17eeafed3a7941f0b1258bc67913be247aea",
+  "prior": "W-R70–W-R73 demonstrated brittle +1/-1 shifts with original 16-weight readouts and zero improvement from anchor-based normalizers. W-R74 first-use (original post-custody assertion failed, read-only QA passed) showed absolute phase-origin prediction on excluded source ≈0.345 against chance 0.333, making absolute phase estimation unreliable.",
+  "hypothesis": "Can a fixed circular-orbit pooled sixteen-feature state representation eliminate dependence on unidentifiable global temporal origin and improve +1/-1 paired matching scores on completely withheld source without degrading intact performance?",
+  "freeze": "Three fixed candidates: original features (1× compute), average features over offsets0,4,8,12 (4×), or over all sixteen circular offsets (16×), preserving cross-channel relative alignment. Fit separate 16-weight ridge for each on exactly 1728 signed samples of identical included-source development data seeds9008..9023. Select orbit4/orbit16 via minimum intact/+1/-1 score on separate included-source validation 9040..9047+9072..9079 (not heldout). Freeze before first-use on unseen xorshift source, unseen entities, seeds18240..18255, three amps, four permutations and three phase conditions. Full16 all-shift invariance is testable algebraically but not a prediction of preserved task signal.",
+  "development_seeds": [
+    9008,
+    9024
+  ],
+  "validation_ranges": [
+    [
+      9040,
+      9048
+    ],
+    [
+      9072,
+      9080
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    18240,
+    18256
+  ],
+  "candidate_modes": [
+    "baseline",
+    "orbit4",
+    "orbit16"
+  ],
+  "model_width": 16,
+  "training_examples_per_candidate": 1728,
+  "primary": "ORBIT_POOLED_READOUT_TRANSFER iff dev-selected orbit representation achieves >=0.60 accuracy for intact/+1/-1 on heldout, improves +1 >=0.07 vs frozen original, loses at most .05 intact and .05 minus1. PARTIAL_ORBIT_POOLED_READOUT_GAIN if minimum >=.55, plus1 improves >=.04 and intact/minus1 loss <=.08. Else NO_ORBIT_POOLED_GAIN. Record all 1152 original per-seed condition results, source counts and dev selection.",
+  "controls": [
+    "Fixed readout 16 weights and equal 1728 signed examples, but orbit candidate 4x/16x feature-extraction compute (not equal compute)",
+    "No absolute phase label at inference, no future oracle, same relative channel alignment",
+    "Distinct first-use cohort18240..18255 not in prior documented Wingless runs",
+    "Original science artifact uploaded before postrun rubric checks, full Go regression, independent archive-only reaggregation",
+    "No paid model APIs or FORGE R32/R33, accepted refs, CKB queue/controller or production"
+  ],
+  "bounds": {
+    "heldout_seeds": 16,
+    "development_models": 3,
+    "width": 16,
+    "train_examples": 1728,
+    "orbit_evaluations_max": 16,
+    "heldout_records": 1152,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic fixed orbit averaging with supervised readout and up to 16x inference feature computation; not learned raw state formation or RSI."
+}
