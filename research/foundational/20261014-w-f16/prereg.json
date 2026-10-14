@@ -1,0 +1,77 @@
+{
+  "schema": "wingless.f16.prereg.v1",
+  "parent_F15": "b0f0e049b72df11de47c767f32f36ca887a37472",
+  "hypothesis": "Independent calibration, asymmetric false-negative penalty and prefix-local role-availability signals can replace W-F15's harmful early negative stops while obtaining at least 15% recurrent-step savings on unseen 7-8-hop ordered typed graphs, outperforming a separately risk-calibrated confidence heuristic.",
+  "protocol": {
+    "train_families": [
+      80,
+      81,
+      82,
+      83
+    ],
+    "validation_families": [
+      84,
+      85,
+      86,
+      87
+    ],
+    "training_seeds": [
+      61300,
+      61312
+    ],
+    "calibration_seeds": [
+      61800,
+      61806
+    ],
+    "validation_seeds": [
+      62300,
+      62312
+    ],
+    "training_depths": [
+      4,
+      5,
+      6
+    ],
+    "validation_depths": [
+      7,
+      8
+    ],
+    "per_graph_variants": [
+      "valid exact ordered typed path",
+      "negative after necessary edge role mutation",
+      "negative same-role-multiset wrong sequence"
+    ],
+    "train_questions": 864,
+    "calibration_questions": 432,
+    "validation_questions": 576,
+    "training": "8-parameter prefix logistic risk head, 220 Adam epochs lr .06, false safe cost 22x positive safe gain; labels from TRAIN-only final correctness and trajectory stability",
+    "features": "F15 6 current-prefix activation/score/budget features plus O(12) next public role compatibility max and mean; no future model rollout or oracle at inference",
+    "calibration": "entirely distinct calibration seeds, one-sided Wilson z=1.645 upper FNR bound <=.05 and calibration accuracy >=.995; threshold selected to maximize recurrent-step savings; no-stop threshold in grid",
+    "comparators": [
+      "calibration-safe confidence rule using SAME calibration requirements",
+      "full fixed computation",
+      "W-F15 early-negative policy",
+      "hindsight oracle upper"
+    ],
+    "acceptance": {
+      "accuracy_at_least": 0.95,
+      "FNR_at_most": 0.05,
+      "FPR_at_most": 0.05,
+      "saving_at_least": 0.15,
+      "accuracy_deficit_vs_full_at_most": 0.03,
+      "utility_proxy_advantage_vs_calibrated_rule_at_least": 0.01
+    },
+    "positive": "DEVELOPMENT_CALIBRATED_RISK_AWARE_STOPPING_TRANSFER",
+    "negative": "DEVELOPMENT_NO_CALIBRATED_SAFE_STOPPING_TRANSFER"
+  },
+  "limitations": {
+    "metrics_measure": "recurrent steps saved, not latency or total compute",
+    "feature_cost_excluded": true,
+    "native_state_bytes": 576,
+    "query_depth_hard_bound_programmed": true,
+    "not_independent_source_birth": true,
+    "F3_original_frozen": true,
+    "no_controller_or_promotion": true,
+    "no_paid_API": true
+  }
+}
