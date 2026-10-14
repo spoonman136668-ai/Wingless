@@ -225,7 +225,6 @@ func RunWFoundationF17()(map[string]any,error){
   if !robust{verdict="DEVELOPMENT_NO_FROZEN_POLICY_ROBUSTNESS"}else if !efficient{
    verdict="DEVELOPMENT_ROBUST_BUT_NO_PROVEN_ONLINE_WALL_EFFICIENCY"}
   }
- }
  return map[string]any{"schema":"wingless.f17.frozen-online-new-grammars.v1",
   "stage":"DEVELOPMENT_ONLY","frozen_F16_sha":"0fc2d87f9160cbb1a8f7678992642eef461cf104",
   "F16_original_json_sha256":"5f9607a8bdefee8f27ef39ea1b6ab00ef018a2a1e6ec719b1fa944ff840f6bba",
