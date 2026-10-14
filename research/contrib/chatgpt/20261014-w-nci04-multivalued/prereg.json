@@ -1,0 +1,23 @@
+{
+  "schema": "wingless.nci04.prereg.v1",
+  "id": "W-NCI04-MULTIVALUED-RELATION-MEMORY-FALSIFICATION",
+  "parent_head": "4ec09c56e6964b9bb65d2c4c85388f026d0755f3",
+  "hypothesis": "Does the trained native admission/join system preserve simultaneous true relations with a shared subject, retaining old two- and three-hop answers after a new fact and interruption, or does exact functional-map memory overwrite an old branch despite available slots?",
+  "prior": "W-NCI03 achieved bounded positive on four five/six-edge graph motifs, but stored all relationships as one outgoing value per subject. General-purpose relationships often require multivalued subjects; this remained untested.",
+  "frozen_method": "Exactly the previously frozen 6-parameter learned join and 65-parameter native admission, 16-slot exact native recall with experimental 7-entry cap. Three motifs with same five pre-update edges and one later edge: root fork, internal fork, no-fork control; all queried by the same learned predicate and exact symbolic two-hop oracle. Seeds 23744..23767, 24 per motif. Frozen original edge ordering creates branch facts before querying. No model tuning.",
+  "outcome_criteria": "FUNCTIONAL_MAP_FORK_RETENTION_FAILURE when no-fork original two-hop >=85% but BOTH root and internal forks each <50%; MULTIVALUED_TRANSFER_DEMONSTRATED when control and both forks >=85%; else MULTIVALUED_MEMORY_LIMITATION_NOT_ISOLATED. Always report oracle, retention, interruption, new fourhop, direct-only and resource counters. Do not declare native learned relational storage or full NCI01 on any result.",
+  "controls": [
+    "No need to rerun NCI03 original",
+    "Store exactly <=7 active relation sources in candidate; exact multiset oracle max six edges, not learned and not compute comparable",
+    "New 24 seeds disjoint NCI03 22976..22999",
+    "Only dev training qualification before first sealed use, original artifact then rubric",
+    "Full Go regression and independent archive-only verification",
+    "No FORGE, CKB/KTRADE, accepted refs or production"
+  ],
+  "portfolio": {
+    "integration_target_pct": 45,
+    "foundational_target_pct": 45,
+    "optimization_target_pct": 10,
+    "measured_compute_allocation": false
+  }
+}

@@ -1,0 +1,74 @@
+name: W-NCI04 frozen native multivalued relationship memory falsification
+on:
+  push:
+    branches: [research/w-nci04-multivalued-memory-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Source and frozen native ancestry check
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4ec09c56e6964b9bb65d2c4c85388f026d0755f3 HEAD
+          test "$(git hash-object unitary/nci02_learned_relation_join.go)" = 6086ceb3d252dd82a6b5bbd36d70432de19b59fb
+          test "$(git hash-object unitary/nci04_multivalued_memory.go)" = b7f8ba8f2866946319d9ae128867be98bbdcd898
+          test "$(git hash-object cmd/nci-04-wingless/main.go)" = c5a12a61428b5fff4fce7c01c85578515fbf13f2
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci04-multivalued/prereg.json)" = 0153cfd5250f69665749898639e5d8407f3861e1
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci04-multivalued/prereg.json >/dev/null
+      - name: Development-only original native join training and compilation
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-04-wingless -phase=development > /tmp/W-NCI04-development.json
+          python3 - <<'PY'
+          import json
+          j=json.load(open("/tmp/W-NCI04-development.json"))
+          assert j["phase"]=="development" and j["join_params"]==6
+          assert j["sealed_seed_range"]==[23744,23768]
+          assert j["nci01_full_acceptance"] is False
+          assert j["external_llm_calls"]==0 and not j["accepted_ref_mutation"]
+          print("DEV_NATIVE_MODEL_QUALIFIED",j["development_join_accuracy"])
+          PY
+      - name: Execute one original prospective sealed multivalued source
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-04-wingless -phase=sealed > /tmp/W-NCI04-original.json
+          end=$(date +%s%N)
+          printf '{"elapsed_wall_ms":%s,"runner":"ubuntu-latest","cost_usd":"unverified"}\n' "$(((end-start)/1000000))" > /tmp/W-NCI04-resources.json
+          python3 -m json.tool /tmp/W-NCI04-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI04-original-evidence
+          path: |
+            /tmp/W-NCI04-original.json
+            /tmp/W-NCI04-resources.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verify original science after archive custody
+        run: |
+          python3 - <<'PY'
+          import json
+          j=json.load(open("/tmp/W-NCI04-original.json"))
+          assert j["phase"]=="sealed" and j["sealed_seed_range"]==[23744,23768]
+          assert len(j["records"])==72 and j["checkpoint_restores"]==72
+          assert j["peak_entries"]<=7
+          assert j["verdict"] in ("FUNCTIONAL_MAP_FORK_RETENTION_FAILURE",
+            "MULTIVALUED_TRANSFER_DEMONSTRATED","MULTIVALUED_MEMORY_LIMITATION_NOT_ISOLATED")
+          assert j["nci01_full_acceptance"] is False
+          assert j["external_llm_calls"]==0 and not j["accepted_ref_mutation"]
+          print("SCIENTIFIC_CLASSIFICATION",j["verdict"])
+          print("MOTIF_ACCURACIES",j["accuracy_by_motif"])
+          PY
+      - name: Final complete native Go test and build regression
+        run: go test ./... && go build ./...
