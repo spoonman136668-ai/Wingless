@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.nci03.prereg.v1",
+  "id": "W-NCI03-FOUNDATIONAL-NATIVE-JOIN-MOTIF-FALSIFICATION",
+  "parent": "bb3f873924ffebc5180c3ebe2c563dbe8eaf2f77",
+  "prior": "W-NCI02-R2 original sealed first-use and full Go regression PASS with 24/24 results for learned predicate on one graph topology family and 24 distinct name arrangements. The learned sigmoid decision sees manually supplied equality features; true graph-state representation remains symbolic. Next scientific question is transfer across actually distinct branch/merge motifs.",
+  "hypothesis": "Without any changes to 65-parameter learned text admission, six-parameter native SGD edge-join predicate, exact recall, or query algorithm, does the earlier bounded compositional accuracy persist for all four prospectively frozen distractor-graph motifs?",
+  "freeze": "Copy exact frozen W-NCI02 R2 training, candidate join/readout thresholds and queries. Only replace five-edge task graph with four deterministic equal-size motifs: disconnected merge to node1, detached two-cycle, merge to node2, merge to node3/start. Three-hop backbone edges remain, two distracting edges per case, new fourth edge only after checkpoint, total six stored edges. New heldout seeds22976..22999 and disjoint token offsets; 6 trials per motif, 24 distinct names. All threshold and learning choices frozen; no sealed feedback.",
+  "sealed_seeds": [
+    22976,
+    23000
+  ],
+  "graph_motifs": [
+    "merge_at_node1",
+    "detached_2_cycle",
+    "merge_at_node2",
+    "merge_at_node3_plus_start"
+  ],
+  "trials_per_motif": 6,
+  "primary": "NATIVE_JOIN_MOTIF_TRANSFER_BOUNDED iff each of 4 motifs scores >=5/6 on each positive two-hop, positive three-hop, false two-hop, false three-hop, post-interrupt two-hop, and new post-learning four-hop task. Otherwise NATIVE_JOIN_MOTIF_TRANSFER_FALSIFIED. Full native cognitive acceptance stays false because query path enumeration and symbol storage are coded.",
+  "controls": [
+    "Exactly 5 source edges plus1 new, under 16 memory slots",
+    "Same 6 learned join parameters, same 65 learned text-admission parameters and same 768 development pairs as NCI02",
+    "No retraining or source identity reuse of W-NCI02 R2 22144..22167; distinct 22976..22999 first-use",
+    "Direct-only baseline and exact oracle report with higher learned candidate operation counts",
+    "Full Go regression, original archive before interpretive checks, separate original-artifact reaggregation",
+    "No FORGE/CKB/KTRADE/accepted refs/production changes"
+  ],
+  "portfolio_target": {
+    "integration": 45,
+    "foundational": 45,
+    "optimization": 10
+  },
+  "claim_limit": "Four hand-designed graph distractor structures and equality-feature join predicate; bounded falsification, not general language reasoning or RSI."
+}
