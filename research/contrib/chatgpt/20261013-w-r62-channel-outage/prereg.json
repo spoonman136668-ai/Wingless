@@ -1,0 +1,74 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R62-HELDOUT-SINGLE-CHANNEL-OUTAGE-SOURCE-TRANSFER",
+  "parent_head": "4fd74701a7a4cb61a7e4156dd9651390c7d981d5",
+  "source": "W-R61 pinned learned source-withheld 16-weight ridge and recoded_example synthetic candidate generator",
+  "hypothesis": "Entity-heldout source-withheld ranking observed in W-R61 may fail when an entire sensor channel is erased at acquisition. An unchanged trained feature readout should not be assumed robust. Test permanently zeroing exactly one of four acquired channels over the entire 16-tick base and both candidates; no dropout bit, retraining or imputation.",
+  "frozen_training": "Identical W-R61 three source-withheld-xorshift models trained on original dev blocks 9008..9023,9040..9055,9072..9087; no new tuning",
+  "development_seed_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    9312,
+    9336
+  ],
+  "generators": [
+    "affine_prior",
+    "quadratic_irregular",
+    "xorshift_independent"
+  ],
+  "amplitudes": [
+    1,
+    2,
+    3
+  ],
+  "entity_groups": {
+    "seen": [
+      0,
+      9
+    ],
+    "unseen": [
+      9,
+      18
+    ]
+  },
+  "outage_arms": [
+    "intact_reference",
+    "channel0_zeroed",
+    "channel1_zeroed",
+    "channel2_zeroed",
+    "channel3_zeroed"
+  ],
+  "outage_protocol": "Transform all 16 time steps of the base sequence and each candidate identically by overwriting the selected acquired four-channel component with literal 0. The model receives no validity bit and must use identical original 16-feature extraction and weights.",
+  "primary": "Every source, amplitude, training block, entity group and channel arm reports per-seed fractional balanced signed credit across original two-candidate comparisons. Compare unseen-source xorshift amplitude/channel results to paired intact control. CHANNEL_OUTAGE_ROBUST iff all 36 unseen-xorshift channel perturbation cells stay >=0.55 accurate with max intact-relative loss <=0.05. PARTIAL_CHANNEL_OUTAGE iff >=18 of 36 >=0.55 and mean loss <=0.10. Otherwise OUTAGE_TRANSFER_FAILURE. Preserve all results and adverse conditions.",
+  "controls": [
+    "Model width and training weights unchanged, drop exactly one of four acquired channels in all base/positive/negative observations, no dropout oracle given to model",
+    "Time ordering and two-candidate labels fixed; apply same transform to both candidates",
+    "Fresh 9312..9335 heldout seeds never used in W-R61; no first-use retries",
+    "Archive original complete per-seed evidence, independent archived-evidence witness, full Go regression, no accepted-ref changes"
+  ],
+  "bounds": {
+    "heldout_seeds": 24,
+    "training_blocks": 3,
+    "source_generators": 3,
+    "amplitudes": 3,
+    "entities_per_group": 9,
+    "channel_arms": 5,
+    "feature_width": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic source-heldout fixed-feature paired rank stability under single-channel acquisition loss; not genuine robust cognition or production-ready missing-data semantics."
+}
