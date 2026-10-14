@@ -1,0 +1,32 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R72-THREE-PHASE-CURRICULUM",
+  "parent_head": "2a5d5605fb5bd638723c93950ea2379d9ed804b3",
+  "hypothesis": "Can deterministic intact/+1/-1 development phase mixing preserve >=60% unseen accuracy in all three conditions at the same fixed model/sample budget?",
+  "freeze": "Keep W-R71 16-weight 1728-example model, three development blocks, original and +1 controls, four fixed heldout test phases, three amplitudes, four permutations and excluded generator. Only third development phase assignment becomes intact/+1/-1 cyclic and fresh sealed seeds 15360..15375. No tuning after first-use.",
+  "sealed_heldout_seeds": [
+    15360,
+    15376
+  ],
+  "arms": [
+    "original_ridge",
+    "plus1_curriculum",
+    "three_phase_curriculum"
+  ],
+  "primary": "Unchanged W-R71 rubric: robust iff all intact/+1/-1 >=.65 and cohort gain, partial iff each >=.60, otherwise negative. Preserve all 6912 rows.",
+  "controls": [
+    "Source 15360..15375 unused in recorded W-R70/W-R71 studies",
+    "Original archive upload before interpretive assertions",
+    "One full Go regression and independent archive witness",
+    "No accepted ref, FORGE or production action"
+  ],
+  "bounds": {
+    "models": 9,
+    "width": 16,
+    "examples_per_fit": 1728,
+    "sealed_seeds": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  }
+}

@@ -1,0 +1,50 @@
+name: W-R72 prospectively frozen source experiment
+on:
+  push:
+    branches: [research/w-r72-three-phase-curriculum-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify exact parent and frozen source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 2a5d5605fb5bd638723c93950ea2379d9ed804b3 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r71-dual-phase/execute.py)" = 3ef8e97850043b126da1118eda17c773d9a68c32
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r72-three-phase/execute.py)" = db25bd5f2fd877f0cc7d046615e8523b55ec75cf
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r72-three-phase/prereg.json)" = 965a834f796496005cf420f9c18c4a082ddc1011
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r72-three-phase/execute.py
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-r72-three-phase/prereg.json >/dev/null
+      - name: Execute frozen original experiment once
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r72-three-phase/execute.py > /tmp/W-R72-original.json
+          python3 -m json.tool /tmp/W-R72-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-R72-original-evidence
+          path: /tmp/W-R72-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verify source result after artifact custody
+        run: |
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-R72-original.json"))
+          assert a["sealed_heldout_seeds"]==list(range(15360,15376))
+          assert len(a["all_heldout_records"])==6912
+          assert a["classification"] in ("DUAL_PHASE_ROBUST_LEARNED_READOUT","PARTIAL_DUAL_PHASE_READOUT","NO_DUAL_PHASE_ROBUSTNESS")
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          print("CLASSIFICATION",a["classification"])
+          print("RESULT",a["aggregate_accuracy"])
+          PY
+      - name: Final full repository regression
+        run: go test ./... && go build ./...
