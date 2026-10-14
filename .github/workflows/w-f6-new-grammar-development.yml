@@ -1,0 +1,57 @@
+name: W-F6 frozen learned composition on novel graph motifs development
+on:
+  push:
+    branches: [research/w-f6-grammar-shift-transfer-dev-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify exact frozen W-F5 original source and F6 prereg
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 3ee67c1e7323b84dfbf52b671796ff4382e080f3 HEAD
+          test "$(git hash-object unitary/f5_frozen_matcher_learned_recurrence.go)" = "$(git rev-parse 3ee67c1e7323b84dfbf52b671796ff4382e080f3:unitary/f5_frozen_matcher_learned_recurrence.go)"
+          python3 -m json.tool research/foundational/20261014-w-f6/prereg.json >/dev/null
+      - name: One frozen candidate on new DEV-only motifs (NOT F3)
+        run: |
+          set -euo pipefail
+          go run ./cmd/f6-wingless > /tmp/w-f6-original-development.json
+          python3 -m json.tool /tmp/w-f6-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F6-original-new-graph-motif-transfer-development
+          path: /tmp/w-f6-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independent row-level evidence and thresholds after archive
+        run: |
+          python3 - <<'PY'
+          import collections,json
+          d=json.load(open("/tmp/w-f6-original-development.json"))
+          assert d["stage"]=="DEVELOPMENT_ONLY" and d["graph_states"]==192
+          assert d["question_count"]==384 and d["negative_questions"]==192
+          assert d["resident_state_bytes"]==576 and not d["model_retrained"]
+          assert not d["independently_authenticated_source_birth"] and not d["scientific_sealed_transfer"]
+          assert not d["accepted_ref_mutation"]
+          assert collections.Counter(r["family"] for r in d["rows"])=={8:48,9:48,10:48,11:48}
+          for name,s in d["scores"].items():
+            correct=sum(int(t==p) for row in d["rows"] for t,p in zip(row["truth"],row["predictions"][name]))
+            fp=sum(int(p) for row in d["rows"] for t,p in zip(row["truth"],row["predictions"][name]) if not t)
+            assert correct==s["correct"] and fp==s["false_positives"]
+          assert d["registered_verdict"] in ("DEVELOPMENT_FROZEN_NATIVE_COMPOSITION_GRAMMAR_SHIFT_SUPPORTED","DEVELOPMENT_FROZEN_NATIVE_COMPOSITION_GRAMMAR_SHIFT_FAILURE")
+          print("W_F6_VERDICT",d["registered_verdict"])
+          print("W_F6_SCORES",d["scores"])
+          PY
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
