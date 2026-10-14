@@ -1,0 +1,47 @@
+name: Wingless W-R67 frozen phase ladder
+on:
+  push:
+    branches: [research/w-r67-frozen-phase-ladder-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify exact parent and immutable scientific source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 1181a9d408cb4ca1ba5388105be45a26d74b0705 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r66-cross-channel-alignment/execute.py)" = 89467ef60463dacffa750a29e5cd080e34be9dfd
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r67-phase-ladder/prereg.json)" = 290da5851542567100f087e7b5fe2dddbf576960
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r67-phase-ladder/execute.py)" = f41f916bf7c8d5cc47ecd717577718d705d31d32
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-r67-phase-ladder/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r67-phase-ladder/execute.py
+      - name: Single sealed scientific first-use
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r67-phase-ladder/execute.py > /tmp/W-R67-original.json
+          python3 -m json.tool /tmp/W-R67-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-R67-original.json"))
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          assert a["sealed_heldout_seeds"]==list(range(10112,10136))
+          assert len(a["all_sealed_records"])==288 and len(a["comparisons"])==36
+          assert all(len(x["by_seed"])==24 for x in a["all_sealed_records"])
+          assert a["classification"] in ("BROAD_GLOBAL_PHASE_FRAGILITY","DIRECTIONAL_PHASE_ASYMMETRY","MIXED_PHASE_DEPENDENCE")
+          print("CLASSIFICATION",a["classification"]);print("PHASE_MEANS",a["mean_accuracy_change"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R67-original-phase-ladder
+          path: /tmp/W-R67-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Full repository regression
+        run: go test ./... && go build ./...

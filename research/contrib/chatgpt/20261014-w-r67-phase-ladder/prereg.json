@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R67-PROSPECTIVE-GLOBAL-PHASE-LADDER",
+  "parent_head": "1181a9d408cb4ca1ba5388105be45a26d74b0705",
+  "prior": "W-R66 NO_GLOBAL_ALIGNMENT_RESCUE: all-channel circular +1 shift −0.19470 mean paired accuracy versus intact on independent heldout; alignment rescue not supported.",
+  "hypothesis": "Is all-channel circular temporal phase sensitivity robust across displacement magnitude/direction, or peculiar to the single +1 shift used in W-R66?",
+  "freeze": "Unchanged three source-withheld W-R61 ridge fits, 16 feature width, xorshift-independent withheld generator, entities 9..17, same 3 amplitudes and four wiring permutations. Input perturbation is common circular phase shift applied to all 4 source channels in baseline, positive and negative; no fitting, adaptation or threshold change.",
+  "heldout_seeds": [
+    10112,
+    10136
+  ],
+  "development_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "phases": {
+    "intact": 0,
+    "plus1": 1,
+    "minus1": -1,
+    "plus2": 2,
+    "minus2": -2,
+    "plus4": 4,
+    "minus4": -4,
+    "plus8": 8
+  },
+  "primary": "Across 288 cells, 24 fresh seeds each, classify BROAD_GLOBAL_PHASE_FRAGILITY if at least six of seven nonzero phase displacements have 36-cell mean paired accuracy change <=−0.06; otherwise DIRECTIONAL_PHASE_ASYMMETRY if any forward/backward magnitude1/2/4 difference >=0.04; otherwise MIXED_PHASE_DEPENDENCE. Preserve all paired model/amplitude/permutation/seed evidence.",
+  "controls": [
+    "Same frozen training/fit and heldout generator",
+    "Preserve each channel's circular sequence values and synchronous interchannel alignment",
+    "Test magnitude and direction without tuning",
+    "Use previously unused sealed seeds 10112..10135",
+    "One original first-use and final full Go regression; separate read-only audit"
+  ],
+  "bounds": {
+    "models": 3,
+    "amplitudes": 3,
+    "permutations": 4,
+    "conditions": 8,
+    "heldout": 24,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Phase sensitivity in a synthetic fixed readout, not general temporal cognition or RSI."
+}
