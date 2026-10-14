@@ -14,7 +14,7 @@ AMPS = (1, 2, 3)
 GENERATORS = w61.GENERATORS
 GROUPS = w61.GROUPS
 ARMS = ("intact_reference", "channel0_zeroed", "channel1_zeroed", "channel2_zeroed", "channel3_zeroed")
-SITES = w61.m.TEST_SITES
+SITES = w61.m.m.TEST_SITES
 
 def acquire(rows, arm):
     if arm == "intact_reference":
@@ -26,17 +26,17 @@ def acquire(rows, arm):
                  for row in rows)
 
 def case(seed, entity, generator, site, amplitude, model, arm):
-    base, positive, negative = w61.m.w37.recoded_example(
+    base, positive, negative = w61.m.m.w37.recoded_example(
         seed, entity, generator, "identity", site, amplitude, False)
     base = acquire(base, arm)
     positive = acquire(positive, arm)
     negative = acquire(negative, arm)
-    a = w61.m.w42.feature(base, positive)
-    b = w61.m.w42.feature(base, negative)
+    a = w61.m.m.w42.feature(base, positive)
+    b = w61.m.m.w42.feature(base, negative)
     weights = model["weights"]
     assert len(a) == len(b) == len(weights) == 16
     margin = sum(w * (p - n) for w, p, n in zip(weights, a, b))
-    return w61.m.w45.credit(margin, True) + w61.m.w45.credit(-margin, False)
+    return w61.m.m.w45.credit(margin, True) + w61.m.m.w45.credit(-margin, False)
 
 def run():
     trained = w61.fit()
