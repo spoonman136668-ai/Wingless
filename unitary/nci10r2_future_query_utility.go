@@ -1,6 +1,6 @@
 package unitary
 
-import ("fmt";"sort";"math")
+import ("fmt";"sort";"math";"unsafe")
 
 // NCI10-R2 freezes an outcome-trained linear merge controller.
 // Its five numeric parameters and threshold are selected solely with
