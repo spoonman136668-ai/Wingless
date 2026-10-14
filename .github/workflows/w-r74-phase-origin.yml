@@ -1,0 +1,67 @@
+name: W74 frozen bounded developmental state-learning first-use
+on:
+  push:
+    branches: [research/w-r74-learned-phase-origin-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify pinned source and preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 3237efbcd46c25e28f797e1588fc6d73233b59d7 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r73-canonical-temporal-state/execute.py)" = 703c269049fef36c4af6feb71fad69dd1be31514
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r74-learned-phase-origin/execute.py)" = ad07a2c5c014f3c4eb680f2f0b86445288b08f55
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r74-learned-phase-origin/prereg.json)" = 156ab3ddc9a73480a5aaaf7973fcf9e109f02f4d
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r74-learned-phase-origin/execute.py
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-r74-learned-phase-origin/prereg.json >/dev/null
+      - name: Development-only training qualification before sealed first-use
+        run: |
+          set -euo pipefail
+          python3 -B - <<'PY'
+          import importlib.util
+          p="research/contrib/chatgpt/20261014-w-r74-learned-phase-origin/execute.py"
+          s=importlib.util.spec_from_file_location("w74_dev",p)
+          assert s and s.loader
+          m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+          training=m.build_train()
+          assert len(training)==2592
+          trained=m.fit(training)
+          assert len(trained)==3
+          assert all(len(v)==3 and all(len(q)==16 for q in v.values()) for v in trained.values())
+          print("DEVELOPMENT_FITTING_AND_NO_HELDOUT_EXECUTION=PASS")
+          PY
+      - name: Execute one original sealed science and write original evidence
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r74-learned-phase-origin/execute.py > /tmp/W74-original.json
+          python3 -m json.tool /tmp/W74-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W74-frozen-first-use-evidence
+          path: /tmp/W74-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Check frozen science after archive custody
+        run: |
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W74-original.json"))
+          assert len(a["heldout_records"])==3888
+          assert a["sealed_heldout_seeds"]==list(range(16896,16912))
+          assert a["classification"] in ("UNSEEN_PHASE_ORIGIN_IDENTIFIABLE","PARTIAL_PHASE_IDENTIFICATION","NO_PHASE_ORIGIN_IDENTIFIABILITY")
+          assert a["inference_weight_count"]==48 and a["inference_state_width"]==16
+          print("CLASSIFICATION",a["classification"])
+          print("PHASE_ACCURACY",a["accuracy"],a["per_class_recalls"])
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          PY
+      - name: Final full repository regression and build
+        run: go test ./... && go build ./...
