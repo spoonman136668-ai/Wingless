@@ -1,0 +1,107 @@
+name: W-R62 independent archived first-use evidence witness
+on:
+  push:
+    branches: [audit/w-r62-r2-archived-firstuse-validation-20261013]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify fixed source prereg repair ledger and original head
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 6825ce8eab1e3ee4ca3434853466da82dd082237 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r62-channel-outage/prereg.json)" = ce1917d16a189e2c4dbd784134f18b5db4454f32
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r62-channel-outage/execute.py)" = a5b182874758af692a180f7bf788c627b6da6f9a
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r62-channel-outage/pre-firstuse-repair.json)" = 907bce6cee1711ae0d3dc286a17f335d9e2f0fcb
+      - name: Fetch archived original only; do not reexecute consumed seeds
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38497822526
+          name: W-R62-original-channel-outage-transfer-r2
+          github-token: ${{ github.token }}
+          path: archive
+      - name: Independently reaggregate original sealed measurements and classification
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,math,hashlib,pathlib
+          p=pathlib.Path("archive/W-R62-original-r2.json")
+          raw=p.read_bytes(); z=json.loads(raw)
+          assert z["schema"]=="wingless.w-r62-channel-outage-firstuse.v1"
+          assert z["parent_head"]=="4fd74701a7a4cb61a7e4156dd9651390c7d981d5"
+          assert z["sealed_heldout_seeds"]==list(range(9312,9336))
+          assert z["amplitudes"]==[1,2,3]
+          assert len(z["all_sealed_trial_records"])==270
+          assert len(z["primary_xorshift_unseen_differences"])==36
+          assert len(z["training_provenance"])==3
+          groups={"seen_identity_control","unseen_identity_transfer"}
+          generators={"affine_prior","quadratic_irregular","xorshift_independent"}
+          arms={"intact_reference","channel0_zeroed","channel1_zeroed",
+                "channel2_zeroed","channel3_zeroed"}
+          lookup={}
+          witness_rows=[]
+          for entry in z["all_sealed_trial_records"]:
+              assert entry["entity_group"] in groups and entry["generator"] in generators
+              assert entry["arm"] in arms and entry["amplitude"] in (1,2,3)
+              assert entry["model"] in (f"{i}:withhold_xorshift_independent" for i in (1,2,3))
+              by_seed=entry["by_seed"]
+              assert [x["seed"] for x in by_seed]==list(range(9312,9336))
+              credit=sum(x["credit"] for x in by_seed)
+              presentations=sum(x["presentations"] for x in by_seed)
+              assert presentations>0 and all(x["presentations"]==by_seed[0]["presentations"] for x in by_seed)
+              assert math.isclose(credit,entry["credit"],abs_tol=1e-8)
+              assert presentations==entry["presentations"]
+              assert math.isclose(credit/presentations,entry["accuracy"],abs_tol=1e-12)
+              key=(entry["model"],entry["amplitude"],entry["generator"],entry["entity_group"],entry["arm"])
+              assert key not in lookup
+              lookup[key]=entry["accuracy"]
+              witness_rows.append((key,credit,presentations))
+          assert len(lookup)==270 and len(z["compact_results"])==270
+          for row in z["compact_results"]:
+              key=(row["model"],row["amplitude"],row["generator"],row["entity_group"],row["arm"])
+              assert math.isclose(row["accuracy"],lookup[key],abs_tol=1e-12)
+          diffs=[]
+          for i in (1,2,3):
+              model=f"{i}:withhold_xorshift_independent"
+              for amp in (1,2,3):
+                  base=lookup[model,amp,"xorshift_independent","unseen_identity_transfer","intact_reference"]
+                  for arm in ("channel0_zeroed","channel1_zeroed","channel2_zeroed","channel3_zeroed"):
+                      v=lookup[model,amp,"xorshift_independent","unseen_identity_transfer",arm]
+                      diffs.append((model,amp,arm,base,v,v-base))
+          assert len(diffs)==36
+          for row,item in zip(z["primary_xorshift_unseen_differences"],diffs):
+              name,amp,arm,base,v,change=item
+              assert (row["model"],row["amplitude"],row["arm"])==(name,amp,arm)
+              assert math.isclose(row["intact_accuracy"],base,abs_tol=1e-12)
+              assert math.isclose(row["outage_accuracy"],v,abs_tol=1e-12)
+              assert math.isclose(row["outage_minus_intact"],change,abs_tol=1e-12)
+          robust=all(v>=.55 and delta>=-.05 for _,_,_,b,v,delta in diffs)
+          partial=sum(v>=.55 for _,_,_,b,v,delta in diffs)>=18 and sum(x[5] for x in diffs)/36>=-.10
+          label="CHANNEL_OUTAGE_ROBUST" if robust else ("PARTIAL_CHANNEL_OUTAGE" if partial else "OUTAGE_TRANSFER_FAILURE")
+          assert label==z["classification"]
+          witness={"schema":"research.archived-evidence-witness.v1",
+                   "experiment":"W-R62-R2","source_run":38497822526,
+                   "source_artifact_id":11863789229,
+                   "classification":label,
+                   "original_json_sha256":hashlib.sha256(raw).hexdigest(),
+                   "independent_recomputed_case_rows":len(witness_rows),
+                   "independent_recomputed_sealed_seed_rows":len(witness_rows)*24,
+                   "sealed_execution_replayed":False,
+                   "scope":"Read-only independent aggregate verification; not external FSA authority"}
+          pathlib.Path("W-R62-witness.json").write_text(json.dumps(witness,sort_keys=True,indent=2)+"\n")
+          print("WITNESS_PASS",json.dumps(witness,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R62-independent-archived-witness
+          path: W-R62-witness.json
+          if-no-files-found: error
+          retention-days: 90
