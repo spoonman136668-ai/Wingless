@@ -1,0 +1,35 @@
+{
+  "schema": "wingless.nci08.prereg.v1",
+  "id": "W-NCI08-DUAL-ISOMORPHIC-CHAIN-CAPACITY-FALSIFICATION",
+  "parent": "3dd82ec6fcd10e134b788ca0f6058284c4f668f1",
+  "hypothesis": "Frozen four-param Wingless NCI07 graph-local learned memory scored 96/96 across simple target-chain+disconnected noise. If two isomorphic length-four chains are equally represented in the observed 12-edge stream and query identity withheld until after retention, a seven-edge exact memory store cannot preserve both chains. Measure generalization and compare matched native join and eviction baselines.",
+  "frozen_original_model": "Exactly the NCI07 trained four-weight graph-local scorer (same developmental fit) plus NCI06 frozen three-weight scorer, native lexical admission and trained six-weight join; no new training and no postresult model selection.",
+  "fresh_sealed_seeds": [
+    28000,
+    28024
+  ],
+  "families": [
+    "interleaved_chains",
+    "first_chain_early",
+    "second_chain_early",
+    "noise_interleaved"
+  ],
+  "states": 96,
+  "paired_queries": 192,
+  "evaluation": "Two disjoint, four-edge chains, four additional facts, 12 unique relationships and seven active edges. After eviction, issue both four-hop counterfactual queries against the SAME frozen stored state (neither query announced beforehand). Full 12-edge exact symbolic oracle scores both. Each model stores at most seven exact edges, so cannot answer both chain questions correctly without relational compression absent from implementation. Frozen reference theoretical paired max accuracy 0.5.",
+  "outcome": "CAPACITY_SYMMETRY_LIMIT_CONFIRMED iff full oracle both queries correct in all 96 states and learned store violates no paired ≤0.5 physical information bound. This is a falsification/capacity assessment, NOT proof of robust learned memory. DUAL_CHAIN_MEMORY_BOUND_NOT_QUALIFIED for oracle/task failures; any bound violation indicates evaluator/source flaw, fail closed. Report per query arm, four family results, work and missing admissions.",
+  "controls": [
+    "Sealed cohort unused, distinct NCI07 27136..27159",
+    "No task query/target identity available during original native retention; scoring only public facts",
+    "Same 12 facts, native admission and trained join for graph-aware, previous learned, FIFO and LRU",
+    "Capacity 7 exact edges each, oracle 12 and not equal-resource",
+    "Freeze all sources and prereg before first sealed use, upload artifact before interpretation, full Go regression and independent no-replay audit",
+    "No FORGE R32/R33, accepted refs, CKB/KTRADE, controllers, live production or merges"
+  ],
+  "portfolio": {
+    "integration": 45,
+    "foundational": 45,
+    "optimization": 10,
+    "measured_compute": false
+  }
+}
