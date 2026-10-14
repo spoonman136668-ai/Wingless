@@ -1,0 +1,76 @@
+name: W-NCI08 frozen paired counterfactual memory-capacity falsification
+on:
+  push:
+    branches: [research/w-nci08-counterfactual-memory-cap-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify frozen source identity and unused original cohort
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 3dd82ec6fcd10e134b788ca0f6058284c4f668f1 HEAD
+          test "$(git hash-object unitary/nci07_graph_local_retention.go)" = 79ad036ffd97bd4f04847aea726adf2d7400f920
+          test "$(git hash-object unitary/nci08_memory_capacity_falsification.go)" = f22038eff8d1c6e408a3d688922e36c80e27f299
+          test "$(git hash-object cmd/nci-08-wingless/main.go)" = e9d6caf27eeea1b29b6d8ef26c0cb4e811082d7b
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci08/prereg.json)" = e18315415169afa91caad88ec5b0f752d5aea326
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci08/prereg.json >/dev/null
+      - name: Development-only qualification of pinned NCI07/NCI06 native learners
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-08-wingless -phase=development > /tmp/W-NCI08-development.json
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI08-development.json"))
+          assert a["phase"]=="development" and a["sealed_seed_range"]==[28000,28024]
+          assert a["frozen_graph_parameters"]==4 and a["frozen_previous_parameters"]==3
+          assert a["edge_memory_limit"]==7 and a["paired_accuracy_theoretical_ceiling"]==0.5
+          assert a["new_model_training"] is False and a["external_llm_calls"]==0
+          print("PINNED_MODEL_VALIDATION",a["graph_dev_accuracy"],a["prior_dev_accuracy"])
+          PY
+      - name: One new prospective sealed twin-query original experiment
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-08-wingless -phase=sealed > /tmp/W-NCI08-original.json
+          end=$(date +%s%N)
+          printf '{"elapsed_wall_ms":%s,"runner":"ubuntu-latest","cost_usd":"unverified"}\n' "$(((end-start)/1000000))" > /tmp/W-NCI08-resource.json
+          python3 -m json.tool /tmp/W-NCI08-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI08-original-sealed-paired-memory
+          path: |
+            /tmp/W-NCI08-original.json
+            /tmp/W-NCI08-resource.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verify after original first-use archive only
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          a=json.load(open("/tmp/W-NCI08-original.json"))
+          assert a["phase"]=="sealed" and a["sealed_seed_range"]==[28000,28024]
+          assert len(a["records"])==96
+          assert collections.Counter(r["order_family"] for r in a["records"])=={i:24 for i in range(4)}
+          assert a["verdict"] in ("CAPACITY_SYMMETRY_LIMIT_CONFIRMED","DUAL_CHAIN_MEMORY_BOUND_NOT_QUALIFIED")
+          assert all(r["graph_edges"]==7 for r in a["records"])
+          assert all(a["paired_query_accuracy"][m]<=0.5 for m in ("graph","previous","fifo","lru"))
+          assert a["external_llm_calls"]==0 and a["accepted_ref_mutation"] is False
+          print("FROZEN_SCIENCE",a["verdict"])
+          print("PAIRED_PER_POLICY",a["paired_query_accuracy"])
+          print("PER_FAMILY",a["paired_by_family"])
+          print("JOIN_COSTS",a["join_candidate_evaluations"])
+          PY
+      - name: Final full Wingless regression and build
+        run: go test ./... && go build ./...
