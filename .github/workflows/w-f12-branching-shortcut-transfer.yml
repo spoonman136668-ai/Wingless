@@ -1,0 +1,61 @@
+name: W-F12 frozen variable-depth branching shortcut transfer DEV
+on:
+  push:
+    branches: [research/w-f12-frozen-branching-exact-depth-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Source-lock frozen W-F11 and prospective F12 settings
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor b82091fc9247502f10b3c3ecbe9f76ae689b5784 HEAD
+          test "$(git hash-object unitary/f11_query_conditioned_depth.go)" = "$(git rev-parse b82091fc9247502f10b3c3ecbe9f76ae689b5784:unitary/f11_query_conditioned_depth.go)"
+          python3 -m json.tool research/foundational/20261014-w-f12/prereg.json >/dev/null
+      - name: Original new W-F12 structural transfer DEVELOPMENT only
+        run: |
+          set -euo pipefail
+          go run ./cmd/f12-wingless > /tmp/w-f12-original-development.json
+          python3 -m json.tool /tmp/w-f12-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F12-original-branching-exact-depth-development
+          path: /tmp/w-f12-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently reaggregate and enforce shortcut-negative control
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f12-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY" and r["graph_states"]==192
+          assert r["questions"]==384 and r["negative_questions"]==192
+          assert r["native_state_bytes"]==576 and r["query_depth_side_input_bytes"]==1
+          assert not r["frozen_F11_model_retrained"] and not r["sealed_first_use"]
+          assert not r["source_birth_independent"] and not r["accepted_ref_mutation"]
+          assert collections.Counter(z["family"] for z in r["rows"])=={60:48,61:48,62:48,63:48}
+          for name,s in r["scores"].items():
+            correct=sum(int(p==truth) for row in r["rows"] for p,truth in zip(row["predictions"][name],row["truth"]))
+            pairs=sum(int(row["predictions"][name]==row["truth"]) for row in r["rows"])
+            fp=sum(int(row["predictions"][name][0]) for row in r["rows"])
+            assert correct==s["correct"] and pairs==s["paired_correct"]
+            assert fp==s["false_positives"]
+          assert r["scores"]["coded_exact_depth"]["paired_correct"]==192, "INVALID_CODED_ORACLE"
+          assert r["scores"]["coded_reachable_within_depth"]["paired_correct"]<=48, "INVALID_SHORTCUT_NEGATIVE"
+          assert r["registered_verdict"] in ("DEVELOPMENT_FROZEN_VARIABLE_DEPTH_BRANCHING_TRANSFER","DEVELOPMENT_NO_FROZEN_VARIABLE_DEPTH_BRANCHING_TRANSFER")
+          print("W_F12_VERDICT",r["registered_verdict"])
+          print("W_F12_SCORES",r["scores"])
+          PY
+      - name: Full native Go regression and build
+        run: go test ./... && go build ./...
