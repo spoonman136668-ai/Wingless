@@ -1,0 +1,65 @@
+name: W-NCI11 R3 native analytic-gradient memory development-only
+on:
+  push:
+    branches: [research/w-nci11r3-analytic-association-development-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Frozen source identity, old negative and preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 2261747ae1925d6aae2e200b09b8b589bb034a30 HEAD
+          test "$(git hash-object unitary/nci11r2_predictive_recurrent_state.go)" = 154ec03ba15e2f86bd78d0f8e8cccaf7954a9281
+          test "$(git hash-object unitary/nci11r3_analytic_associative.go)" = 20ff3d2c4ee357f6c7315075bf1c5052bcde8233
+          test "$(git hash-object cmd/nci-11r3-wingless/main.go)" = 43654d87e7eec17e4e4c444a4ef968ec49cae52e
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci11r3/prereg.json)" = 8d5ac1a820dddb762dd0202603c41ba0e52f3892
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci11r3/prereg.json >/dev/null
+      - name: One original native analytic task-gradient development evaluation
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-11r3-wingless > /tmp/w-nci11r3-original-development.json
+          finish=$(date +%s%N)
+          printf '{"runner":"ubuntu-latest","development_wall_ms":%s,"billing_usd":"unverified"}\n' "$(((finish-start)/1000000))" > /tmp/w-nci11r3-cost.json
+          python3 -m json.tool /tmp/w-nci11r3-original-development.json >/dev/null
+      - name: Original development evidence custody
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI11R3-original-development-only
+          path: |
+            /tmp/w-nci11r3-original-development.json
+            /tmp/w-nci11r3-cost.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Frozen development result gate with sealed first-use disabled
+        run: |
+          python3 - <<'PY'
+          import json
+          o=json.load(open("/tmp/w-nci11r3-original-development.json"))
+          assert o["stage"]=="DEVELOPMENT_ONLY"
+          assert o["train_seed_bounds"]==[37344,37368]
+          assert o["validation_seed_bounds"]==[37424,37436]
+          assert o["new_native_state_bytes"]==576
+          assert len(o["models"])==2 and all(m["resident_state_bytes"]==576 for m in o["models"])
+          assert all(m["native_checkpoint_pass"] for m in o["models"])
+          assert o["verdict"] in ("NCI11R3_DEVELOPMENT_NO_GENERALIZABLE_STATE_GAIN",
+                                   "NCI11R3_DEVELOPMENT_NATIVE_LEARNING_QUALIFIED")
+          assert o["sealed_cohort_reserved"] is False and o["sealed_first_use"] is False
+          assert o["external_llm_calls"]==0 and o["accepted_ref_mutation"] is False
+          print("NCI11R3_NATIVE_VERDICT",o["verdict"])
+          print("NCI11R3_CANDIDATES",o["models"])
+          PY
+      - name: One full native Wingless Go regression and build
+        run: go test ./... && go build ./...
