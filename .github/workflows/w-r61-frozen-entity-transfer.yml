@@ -1,0 +1,49 @@
+name: Wingless W-R61 frozen unseen-entity first-use
+on:
+  push:
+    branches: [research/w-r61-new-entity-source-transfer-20261013-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify pinned lineage and frozen prereg/executor
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 867ca5dea0d316b4d89d8787585369a0bad508cb HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r59-replication/execute.py)" = 52b05051f24f99ee8d964e52f33093863c143109
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r61-entity-transfer/prereg.json)" = 4d624edd34d48404766a8b41659ab5fbaa173ca0
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r61-entity-transfer/execute.py)" = ea86237d19c5bd75086f0dab699158d2aa8fc353
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r61-entity-transfer/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r61-entity-transfer/execute.py
+      - name: Frozen original sealed heldout scientific evaluation
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r61-entity-transfer/execute.py > /tmp/W-R61-original.json
+          python3 -m json.tool /tmp/W-R61-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R61-original.json'))
+          assert a['sealed_heldout_seeds']==list(range(9120,9168))
+          assert a['unseen_entities']==list(range(9,18))
+          assert len(a['xorshift_comparisons'])==9
+          assert len(a['compact_audit_rows'])==81
+          assert all(len(a['full_cross_family'][key])==3 for key in a['full_cross_family'])
+          print('CLASSIFICATION',a['classification'])
+          print('ENTITY_TRANSFER_COMPARISONS',a['xorshift_comparisons'])
+          print('SOURCE_MODELS',len(a['full_cross_family']))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R61-original-entity-source-transfer
+          path: /tmp/W-R61-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Full Wingless regression and build
+        run: go test ./... && go build ./...

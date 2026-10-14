@@ -1,0 +1,64 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R61-UNSEEN-ENTITY-SOURCE-TRANSFER",
+  "parent_head": "867ca5dea0d316b4d89d8787585369a0bad508cb",
+  "hypothesis": "Ridge readout fitted on identities 0..8 will preserve source-family paired-order ranking on independently unseen identities 9..17; if evidence is memorized entity identity instead of temporal relational structure, entity-out transfer loses >=0.05 accuracy.",
+  "lineage": "Pinned W-R59 source and W-R54 family-balanced ridge; new dev and heldout populations, no amplitude outside native support.",
+  "training_seed_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    9120,
+    9168
+  ],
+  "training_entities": [
+    0,
+    9
+  ],
+  "unseen_evaluation_entities": [
+    9,
+    18
+  ],
+  "seen_control_entities": [
+    0,
+    9
+  ],
+  "amplitudes": [
+    1,
+    2,
+    3
+  ],
+  "generators": [
+    "affine_prior",
+    "quadratic_irregular",
+    "xorshift_independent"
+  ],
+  "score": "Use original W-R59 two-candidate ridge margin and balanced signed-credit score. For every independent training block, source, amplitude and heldout seed, evaluate seen and unseen identities on identical generator and site, retaining complete per-seed/group aggregate outcomes.",
+  "primary": "ENTITY_GENERALIZATION if every xorshift unseen cohort score >=0.55 and any model's unseen xorshift score falls no more than 0.05 versus seen, over all 3 blocks x 3 amplitudes. PARTIAL_ENTITY_TRANSFER if at least 5 of 9 xorshift cases >=0.55 and average new-entity minus seen score >=-0.10; NO_ENTITY_TRANSFER otherwise. These are distinct from cross-family generalization.",
+  "controls": [
+    "No extra train or hyperparameter tuning from heldout; original W-R59 training corpus and feature protocol unchanged except preregistered new development seed identities",
+    "Evaluate all three source families and three supported amplitude settings with paired equivalent observation encoding check",
+    "Identities 9..17 never provided to ridge_fit development",
+    "One original first-use only, capture all null/negative evidence, independent qualification; accepted refs and FORGE untouched"
+  ],
+  "bounds": {
+    "dev_blocks": 3,
+    "dev_seeds_per_block": 16,
+    "heldout_seeds": 48,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic equal-width paired-choice entity-identity transfer, not broad cognition, temporal semantics or deployable RSI."
+}
