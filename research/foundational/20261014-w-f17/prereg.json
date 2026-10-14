@@ -1,0 +1,83 @@
+{
+  "schema": "wingless.f17.prereg.v1",
+  "source_F16": "0fc2d87f9160cbb1a8f7678992642eef461cf104",
+  "source_original_artifact": 11935598224,
+  "source_result_sha256": "5f9607a8bdefee8f27ef39ea1b6ab00ef018a2a1e6ec719b1fa944ff840f6bba",
+  "science": "Frozen risk policy true online execution and total wall time on new graph structures",
+  "method": {
+    "stage": "DEVELOPMENT_ONLY",
+    "data": "Author-created, not independent F3 source",
+    "families": [
+      92,
+      93,
+      94,
+      95
+    ],
+    "seed_bounds": [
+      63200,
+      63212
+    ],
+    "depths": [
+      7,
+      8
+    ],
+    "role_shifts": [
+      0,
+      1
+    ],
+    "graphs": 192,
+    "cases_per_graph": 6,
+    "questions": 1152,
+    "positives": 384,
+    "negatives": 768,
+    "hard_variants": [
+      "valid ordered path",
+      "late necessary role edit",
+      "early necessary role edit",
+      "wrong order",
+      "wrong exact depth",
+      "benign distractor edit"
+    ],
+    "frozen_policy_weights": [
+      0.5233848397033497,
+      0.111980090092255,
+      -4.3433500918591745,
+      -4.043757386252545,
+      0.5349164073718833,
+      1.7913415291476846,
+      0.5233848395808397,
+      0.38694717564180703
+    ],
+    "frozen_threshold": 0.5,
+    "model": "W-F14 serialized 576B identity+role state, frozen W-F11 recurrence",
+    "controls": [
+      "true online full reasoning same core",
+      "static exact one-hop necessary-edge role rule (cheap coded rule)",
+      "oracle typed reachability labels for each individual case"
+    ],
+    "measuring": "time.Now wrapper online state decode + entire iterative reasoning + policy feature collection + decision, with warmup and alternating execution order. New graph construction and fixed model loading excluded equally in both arms. One paired timing pass, host-local noisy; do not equate with energy or stable production speedup.",
+    "success": {
+      "min_accuracy": 0.95,
+      "max_FNR": 0.05,
+      "max_FPR": 0.05,
+      "max_worst_family_FNR": 0.05,
+      "max_worst_family_FPR": 0.05,
+      "max_accuracy_gap_vs_full": 0.03,
+      "min_recurrent_steps_saved": 0.15,
+      "min_observed_wall_fraction_saved": 0.05
+    },
+    "outcomes": [
+      "DEVELOPMENT_FROZEN_ROBUST_AND_WALL_EFFICIENT",
+      "DEVELOPMENT_NO_FROZEN_POLICY_ROBUSTNESS",
+      "DEVELOPMENT_ROBUST_BUT_NO_PROVEN_ONLINE_WALL_EFFICIENCY",
+      "INVALID_FULL_REASONING_REFERENCE"
+    ]
+  },
+  "constraints": {
+    "no_retraining": true,
+    "no_F3_source": true,
+    "no_authority_mutation": true,
+    "no_FORGE_R32R33": true,
+    "no_KTRADE": true
+  }
+}

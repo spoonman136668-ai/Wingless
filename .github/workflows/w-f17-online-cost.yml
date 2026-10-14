@@ -1,0 +1,62 @@
+name: W-F17 frozen online policy robustness and measured wall costs DEV
+on:
+  push:
+    branches: [research/w-f17-frozen-online-halt-latency-new-grammar-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: go.mod}
+      - name: Validate pinned F16 scientific code and F17 hypothesis
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 0fc2d87f9160cbb1a8f7678992642eef461cf104 HEAD
+          test "$(git hash-object unitary/f16_calibrated_risk_stop.go)" = "$(git rev-parse 0fc2d87f9160cbb1a8f7678992642eef461cf104:unitary/f16_calibrated_risk_stop.go)"
+          python3 -m json.tool research/foundational/20261014-w-f17/prereg.json >/dev/null
+      - name: One genuine online frozen policy and benchmark
+        run: |
+          set -euo pipefail
+          go run ./cmd/f17-wingless > /tmp/w-f17-original-development.json
+          python3 -m json.tool /tmp/w-f17-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F17-original-frozen-online-cost-development
+          path: /tmp/w-f17-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independent source audit, raw row aggregation, and true timing
+        run: |
+          python3 - <<'PY'
+          import collections,json
+          d=json.load(open("/tmp/w-f17-original-development.json"))
+          assert d["stage"]=="DEVELOPMENT_ONLY" and d["graph_count"]==192
+          assert d["question_count"]==1152 and d["positive_count"]==384 and d["negative_count"]==768
+          assert d["native_state_bytes"]==576 and not d["model_retrained"]
+          assert d["online_halt_skips_unneeded_core_operations"] and d["no_future_prefix_oracle_for_policy"]
+          assert not d["source_birth_witnessed"] and not d["sealed_first_use"] and not d["accepted_ref_mutation"]
+          assert collections.Counter(x["Family"] for x in d["rows"])=={92:288,93:288,94:288,95:288}
+          assert collections.Counter(x["Variant"] for x in d["rows"])=={0:192,1:192,2:192,3:192,4:192,5:192}
+          for name,col,ns in (("frozen_online","Frozen","FrozenNs"),("fixed_full_online","Full","FullNs"),("coded_first_hop_rule_control","Static","StaticNs")):
+            s=d["scores"][name]
+            correct=sum(int(x[col]["answer"]==x["Truth"]) for x in d["rows"])
+            steps=sum(x[col]["steps"] for x in d["rows"])
+            nanos=sum(x[ns] for x in d["rows"])
+            assert correct==s["correct"] and steps==s["actual_recurrent_steps"] and nanos==s["online_total_wall_ns"]
+            assert all(0<=x[col]["steps"]<=x["Depth"] and x[ns]>=0 for x in d["rows"])
+          assert d["scores"]["fixed_full_online"]["actual_recurrent_steps"]==sum(x["Depth"] for x in d["rows"])
+          assert d["registered_verdict"] in ("DEVELOPMENT_FROZEN_ROBUST_AND_WALL_EFFICIENT",
+             "DEVELOPMENT_NO_FROZEN_POLICY_ROBUSTNESS",
+             "DEVELOPMENT_ROBUST_BUT_NO_PROVEN_ONLINE_WALL_EFFICIENCY",
+             "INVALID_FULL_REASONING_REFERENCE")
+          print("W_F17_SCIENCE_VERDICT",d["registered_verdict"])
+          print("W_F17_SCORES",d["scores"])
+          PY
+      - name: One complete Go regression and build
+        run: go test ./... && go build ./...
