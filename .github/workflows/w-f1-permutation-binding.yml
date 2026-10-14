@@ -1,0 +1,67 @@
+name: W-F1 foundational permutation and relationship binding development
+on:
+  push:
+    branches: [research/w-f1-permutation-binding-development-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  foundational:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Frozen foundational science source and allocation identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor b88f33834c7dd2e3f003ee6dc61c4ccf0968a2d7 HEAD
+          test "$(git hash-object research/portfolio/2026-10-14-foundation-60-integration-30-optimization-10.md)" = fd3bd5776d6c2bbf11709f77792de8c9651c2f75
+          test "$(git hash-object unitary/nci11_trainable_associative_state.go)" = f248fd6dec93d04571f7cb4c3ccd721017812bfd
+          test "$(git hash-object unitary/f1_permutation_binding.go)" = 94252fe7238ec6942d91829eba4a68732f3f76ee
+          test "$(git hash-object cmd/f1-wingless/main.go)" = 439b0090a80c93a26f529a77d6ac04c08384a0cf
+          test "$(git hash-object research/foundational/20261014-w-f1-binding/prereg.json)" = 505e7529f2d2d4a00046e9188a41ce4cd03ee332
+          python3 -m json.tool research/foundational/20261014-w-f1-binding/prereg.json >/dev/null
+      - name: Run F1 three-native-model DEVEL-only first evaluation
+        run: |
+          set -euo pipefail
+          START=$(date +%s%N)
+          go run ./cmd/f1-wingless > /tmp/w-f1-original-development.json
+          END=$(date +%s%N)
+          printf '{"development_wall_ms":%s,"runner":"ubuntu-latest","billing_usd":"unverified"}\n' "$(((END-START)/1000000))" > /tmp/w-f1-resources.json
+          python3 -m json.tool /tmp/w-f1-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F1-original-development-only
+          path: |
+            /tmp/w-f1-original-development.json
+            /tmp/w-f1-resources.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Check frozen F1 outcome AFTER original artifact custody
+        run: |
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/w-f1-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY"
+          assert r["train_bounds"]==[38304,38328] and r["validation_bounds"]==[38416,38428]
+          assert len(r["candidate_results"])==3 and r["native_state_bytes"]==576
+          assert all(x["resident_state_bytes"]==576 and x["checkpoint_pass"] for x in r["candidate_results"])
+          assert all(x["model_parameter_count"]==3 for x in r["candidate_results"])
+          assert r["verdict"] in ("CODED_EQUALITY_SCAFFOLD_EXPLAINS_TRANSFER",
+                                 "EQUALITY_SCAFFOLD_TRANSFER_NOT_CONFIRMED")
+          assert r["coded_equality_binding"] and r["coded_four_hop_search"]
+          assert r["no_learned_identity_matching"] and r["programmed_memory_encoder"]
+          assert r["sealed_first_use"] is False and r["sealed_cohort_reserved"] is False
+          assert r["external_llm_calls"]==0 and not r["accepted_ref_mutation"]
+          print("W_F1_VERDICT",r["verdict"])
+          print("W_F1_CANDIDATES",r["candidate_results"])
+          print("W_F1_PROGRAMMED",r["fixed_exact_binding_control_accuracy"])
+          PY
+      - name: One complete Wingless Go test/build regression
+        run: go test ./... && go build ./...
