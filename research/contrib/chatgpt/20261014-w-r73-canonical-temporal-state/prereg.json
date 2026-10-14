@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R73-BOUNDED-CANONICAL-TEMPORAL-STATE",
+  "parent_head": "e127dde54ce1d4a9f992d0f201c88ab7ee263909",
+  "prior": "W-R70 through W-R72 fixed-width ridge phase augmentation failed joint intact/+1/-1 robustness; input phase canonicalization might fix timing before readout instead of reweighting phase-biased examples.",
+  "hypothesis": "Can one of three development-selected deterministic raw temporal state canonicalizers, each still returning 16 original features, recover shift robust decision quality on heldout unseen-source inputs better than unchanged original ridge?",
+  "freeze": "Fit one 16-weight ridge each to original baseline and three predefined canonicalizers (channel0 magnitude peak, channel0 gradient peak, four-channel summed energy peak), 1728 examples from original dev block 9008..9023. Choose one candidate using worst of intact/+1/-1 on disjoint development-validation cohorts 9040..9047 and 9072..9079 from INCLUDED sources only (not xorshift). Evaluate frozen chosen and original baseline on fresh heldout 16000..16015 xorshift source, 9 unseen identities, 3 amplitudes, 4 permutations, three phases. Do not tune thresholds after heldout.",
+  "training_seeds": [
+    9008,
+    9024
+  ],
+  "validation_cohorts": [
+    [
+      9040,
+      9048
+    ],
+    [
+      9072,
+      9080
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    16000,
+    16016
+  ],
+  "candidate_modes": [
+    "baseline",
+    "channel0_peak",
+    "channel0_gradient",
+    "four_channel_energy"
+  ],
+  "model_width": 16,
+  "training_examples_per_candidate": 1728,
+  "primary": "BOUNDED_CANONICAL_STATE_TRANSFER iff selected min intact/+1/-1 accuracy >=.60, intact loss <=.05, +1 gain >=.07, -1 loss <=.05 vs fixed original baseline; PARTIAL_CANONICAL_STATE_TRANSFER iff worst >=.55, intact loss <=.08 and +1 gain >=.04; otherwise NO_CANONICAL_STATE_GAIN. All 1152 heldout cell rows archived.",
+  "controls": [
+    "Candidate selected exclusively on independent development inputs and *included* generators",
+    "Frozen original learned readout and exactly 16 readout weights, no new model calls, no hidden heldout tuning",
+    "Preprocessor extra scanning cost explicitly reported; no claim of equal compute time",
+    "No additional state retention, no unbounded memory, no real RSI claims",
+    "One original first use, artifact uploaded before classification assertions, full Go regression",
+    "Independently reaggregate original archive, preserve negatives and failure provenance",
+    "No accepted refs, FORGE R32/R33, controller/queue, production, or merges"
+  ],
+  "bounds": {
+    "candidate_count": 3,
+    "readout_width": 16,
+    "training_examples": 1728,
+    "heldout_seeds": 16,
+    "permutation_count": 4,
+    "amplitudes": 3,
+    "phases": 3,
+    "expected_rows": 1152,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  }
+}
