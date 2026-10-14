@@ -1,0 +1,19 @@
+name: W68 development-only time-phase feature audit
+on:
+  push:
+    branches: [qa/w-r68-phase-feature-causality-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Frozen source and development-only feature identity
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r67-phase-ladder/execute.py)" = f41f916bf7c8d5cc47ecd717577718d705d31d32
+          python3 -B research/contrib/chatgpt/20261014-w-r67-phase-ladder/dev_only_feature_identity.py
