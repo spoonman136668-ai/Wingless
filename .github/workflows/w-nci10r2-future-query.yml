@@ -1,7 +1,7 @@
 name: W-NCI10-R2 frozen future-question utility learned memory control
 on:
   push:
-    branches: [research/w-nci10r2-utility-selected-memory-20261014-r1]
+    branches: [research/w-nci10r2-utility-selected-memory-20261014-r2]
 permissions:
   contents: read
 jobs:
@@ -21,7 +21,7 @@ jobs:
           set -euo pipefail
           git merge-base --is-ancestor db2e93d7f7e38d0d0e9cc50462033313fd1b7d1c HEAD
           test "$(git hash-object unitary/nci10_learned_merge_gate.go)" = 6f291de6bef2f567245776df463031ba66625b93
-          test "$(git hash-object unitary/nci10r2_future_query_utility.go)" = 5a0fd68f768eaffcfc805f18b63281a4cb5fd3a9
+          test "$(git hash-object unitary/nci10r2_future_query_utility.go)" = 6900a8c2e99ddf824eae327ed3be0e48a7c2a290
           test "$(git hash-object cmd/nci-10r2-wingless/main.go)" = cd28c761df439718cf1b69adeb6e8ac698c201b0
           test "$(git hash-object research/contrib/chatgpt/20261014-w-nci10r2/prereg.json)" = ec3aa816e520763e9d5842892fc2a89000b36436
           python3 -m json.tool research/contrib/chatgpt/20261014-w-nci10r2/prereg.json >/dev/null
