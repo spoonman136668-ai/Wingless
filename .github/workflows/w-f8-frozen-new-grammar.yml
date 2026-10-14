@@ -1,0 +1,59 @@
+name: W-F8 frozen contrastive identity corrected-control new-grammar development
+on:
+  push:
+    branches: [research/w-f8-corrected-control-frozen-identity-transfer-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Pin F7 source and frozen weight bytes
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 33b45a16c3cbfd470d8ffe8b3e601f5218966985 HEAD
+          test "$(git hash-object unitary/f7_contrastive_identity.go)" = "$(git rev-parse 33b45a16c3cbfd470d8ffe8b3e601f5218966985:unitary/f7_contrastive_identity.go)"
+          python3 -m json.tool research/foundational/20261014-w-f8/prereg.json >/dev/null
+      - name: Run one NEW development only frozen identity study
+        run: |
+          set -euo pipefail
+          go run ./cmd/f8-wingless > /tmp/w-f8-original-development.json
+          python3 -m json.tool /tmp/w-f8-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F8-original-frozen-identity-corrected-control-development
+          path: /tmp/w-f8-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently reaggregate and FAIL CLOSED on broken coded reference
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f8-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY" and r["graph_states"]==192
+          assert r["question_count"]==384 and r["negative_questions"]==192
+          assert r["resident_state_bytes"]==576 and not r["retraining"]
+          assert r["source_F7_trained_weights_sha256"]=="c7df241ca99627ea816091a84d321819828328a02a56a507cd7862d8afe67fe4"
+          assert r["original_F7_reference_invalid"] and r["f8_exact_control_fixed"]
+          assert not r["sealed_first_use"] and not r["source_independently_witnessed"]
+          assert collections.Counter(x["family"] for x in r["rows"])=={28:48,29:48,30:48,31:48}
+          for name,s in r["scores"].items():
+            correct=sum(int(t==p) for row in r["rows"] for t,p in zip(row["truth"],row["predictions"][name]))
+            fp=sum(int(p) for row in r["rows"] for t,p in zip(row["truth"],row["predictions"][name]) if not t)
+            assert correct==s["correct"] and fp==s["false_positives"]
+          assert r["scores"]["corrected_fixed_exact_equality_upper"]["correct"]==384, "INVALID_REFERENCE_ORACLE_CONTROL"
+          assert r["registered_verdict"] in ("DEVELOPMENT_FROZEN_CONTRASTIVE_NEW_GRAMMAR_TRANSFER","DEVELOPMENT_NO_FROZEN_CONTRASTIVE_NEW_GRAMMAR_TRANSFER")
+          print("W_F8_VERDICT",r["registered_verdict"])
+          print("W_F8_SCORES",r["scores"])
+          PY
+      - name: One final full Go regression and build
+        run: go test ./... && go build ./...
