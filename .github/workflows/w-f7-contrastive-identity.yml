@@ -1,0 +1,57 @@
+name: W-F7 contrastive latent identity structural transfer DEV
+on:
+  push:
+    branches: [research/w-f7-contrastive-identity-structural-transfer-dev-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Freeze F6 lineage and F7 test specification
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 70f7ccd375a4b2d1bcbca4ae5af191e6de5ea437 HEAD
+          test "$(git hash-object unitary/f6_frozen_new_motifs.go)" = "$(git rev-parse 70f7ccd375a4b2d1bcbca4ae5af191e6de5ea437:unitary/f6_frozen_new_motifs.go)"
+          python3 -m json.tool research/foundational/20261014-w-f7/prereg.json >/dev/null
+      - name: One DEVELOPMENT identity representation and unseen motif experiment
+        run: |
+          set -euo pipefail
+          go run ./cmd/f7-wingless > /tmp/w-f7-original-development.json
+          python3 -m json.tool /tmp/w-f7-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F7-original-contrastive-identity-development
+          path: /tmp/w-f7-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independent reaggregation after archived original
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f7-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY" and r["graph_states"]==48
+          assert r["question_count"]==96 and r["negative_questions"]==48
+          assert r["learned_projection_parameter_count"]==257 and r["resident_state_bytes"]==576
+          assert not r["direct_coded_identity_in_candidate"] and not r["coded_or_traversal_in_candidate"]
+          assert not r["sealed_first_use"] and not r["independently_witnessed_source_birth"]
+          assert collections.Counter(x["family"] for x in r["rows"])=={16:12,17:12,18:12,19:12}
+          for name,s in r["scores"].items():
+            correct=sum(int(t==p) for row in r["rows"] for t,p in zip(row["truth"],row["predictions"][name]))
+            fp=sum(int(p) for row in r["rows"] for t,p in zip(row["truth"],row["predictions"][name]) if not t)
+            assert correct==s["correct"] and fp==s["false_positives"]
+          assert r["registered_verdict"] in ("DEVELOPMENT_CONTRASTIVE_IDENTITY_STRUCTURAL_TRANSFER_OBSERVED","DEVELOPMENT_NO_CONTRASTIVE_IDENTITY_STRUCTURAL_TRANSFER")
+          print("W_F7_VERDICT",r["registered_verdict"])
+          print("W_F7_SCORES",r["scores"])
+          PY
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
