@@ -1,0 +1,65 @@
+{
+  "schema": "wingless.f13.prereg.v1",
+  "id": "W-F13-CONTRASTIVE-ROLE-EMBEDDING-DEPTH-COMPOSITION",
+  "source_F12": "6b8c3e45840d8606b35fa32af9b49c87382aa6b3",
+  "question": "Can a 4D learned relation-symbol embedding composed with frozen query-depth-conditioned recurrence generalize to seven/eight-hop typed graphs with hard negatives for role mutation, same-bag role-order permutation, and exact-depth contrast?",
+  "method": {
+    "development_only": true,
+    "learning": "17 parameters, 4x4 Euclidean role vectors + bias trained on 4-symbol same/different role pairs; task recurrence frozen from Wingless F11; no Yggdrasil model reuse or graph question learning",
+    "training_iterations": 210,
+    "new_test_seeds": [
+      56300,
+      56312
+    ],
+    "test_families": [
+      64,
+      65,
+      66,
+      67
+    ],
+    "depths": [
+      7,
+      8
+    ],
+    "renamings": [
+      0,
+      1
+    ],
+    "cases": 192,
+    "questions": 768,
+    "negatives": 576,
+    "quadruple": "correct typed path; identical typed query but changed necessary edge role; same role multiset but permuted order query; one fewer step query",
+    "controls": [
+      "untrained same architecture role vectors",
+      "role-blind frozen recurrence",
+      "fully coded typed exact-length oracle (must 192/192)",
+      "always-yes no-graph"
+    ],
+    "thresholds": {
+      "quadruple_accuracy_at_least": 0.8,
+      "total_accuracy_at_least": 0.9,
+      "negative_fpr_at_most": 0.1,
+      "gain_over_initialized_quadruples_at_least": 0.15
+    },
+    "positive": "DEVELOPMENT_CONTRASTIVE_ROLE_DEPTH_COMPOSITION_TRANSFER",
+    "negative": "DEVELOPMENT_NO_CONTRASTIVE_ROLE_DEPTH_TRANSFER",
+    "invalid": "INVALID_TYPED_DEPTH_REFERENCE"
+  },
+  "budget": {
+    "native_state_bytes": 576,
+    "entity_edge_words_bytes": 48,
+    "role_words_bytes": 48,
+    "reserved_bytes": 480,
+    "query_role_bytes": 8,
+    "query_depth_bytes": 1
+  },
+  "limitations": {
+    "role_training_on_identity_pairs_not_graph_qa": true,
+    "programmed_depth_iterations": true,
+    "learned_halting": false,
+    "F3_source_unchanged": true,
+    "independent_source_birth": false,
+    "accepted_ref_mutation": false,
+    "production": false
+  }
+}

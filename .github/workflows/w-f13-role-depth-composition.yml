@@ -1,0 +1,61 @@
+name: Wingless F13 contrastive typed relation and variable depth development
+on:
+  push:
+    branches: [research/w-f13-contrastive-role-depth-recurrence-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Freeze W-F12 predecessor and independent W-F13 prereg
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 6b8c3e45840d8606b35fa32af9b49c87382aa6b3 HEAD
+          test "$(git hash-object unitary/f12_frozen_branching_depth.go)" = "$(git rev-parse 6b8c3e45840d8606b35fa32af9b49c87382aa6b3:unitary/f12_frozen_branching_depth.go)"
+          python3 -m json.tool research/foundational/20261014-w-f13/prereg.json >/dev/null
+      - name: One original F13 new author-generated DEVELOPMENT-only experiment
+        run: |
+          set -euo pipefail
+          go run ./cmd/f13-wingless > /tmp/w-f13-original-development.json
+          python3 -m json.tool /tmp/w-f13-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F13-original-contrastive-roles-depth-dev
+          path: /tmp/w-f13-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independent classification from archived raw validation rows
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          d=json.load(open("/tmp/w-f13-original-development.json"))
+          assert d["stage"]=="DEVELOPMENT_ONLY" and d["quadruple_graphs"]==192
+          assert d["questions"]==768 and d["negative_questions"]==576
+          assert d["native_state_bytes"]==576 and d["resident_role_bytes"]==48
+          assert d["role_parameter_count"]==17 and d["frozen_recurrence_parameters"]==5
+          assert d["recurrence_iteration_programmed"] and not d["learned_halting"]
+          assert not d["independent_source_birth"] and not d["sealed_first_use"]
+          assert not d["accepted_ref_mutation"]
+          assert collections.Counter(z["family"] for z in d["rows"])=={64:48,65:48,66:48,67:48}
+          for name,s in d["scores"].items():
+            correct=sum(int(p==y) for z in d["rows"] for p,y in zip(z["predictions"][name],z["truth"]))
+            total=sum(int(z["predictions"][name]==z["truth"]) for z in d["rows"])
+            fp=sum(int(z["predictions"][name][j]) for z in d["rows"] for j in (1,2,3))
+            assert s["correct"]==correct and s["all_four_correct"]==total and s["false_positives"]==fp
+          assert d["scores"]["coded_exact_typed_role_depth"]["all_four_correct"]==192,"INVALID_TYPED_REFERENCE"
+          assert d["registered_verdict"] in ("DEVELOPMENT_CONTRASTIVE_ROLE_DEPTH_COMPOSITION_TRANSFER","DEVELOPMENT_NO_CONTRASTIVE_ROLE_DEPTH_TRANSFER")
+          print("W_F13_VERDICT",d["registered_verdict"])
+          print("W_F13_SCORES",d["scores"])
+          PY
+      - name: One full native Go regression and build
+        run: go test ./... && go build ./...
