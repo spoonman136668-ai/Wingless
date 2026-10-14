@@ -1,6 +1,6 @@
 package unitary
 
-import("fmt";"math";"time";"unsafe")
+import("math";"time";"unsafe")
 
 // NCI11-R3: analytic task-gradient training of 576-byte native association
 // state, with two alternative fixed-time decay dynamics. State encoder and
