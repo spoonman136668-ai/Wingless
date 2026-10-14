@@ -1,0 +1,79 @@
+name: W-NCI10 frozen learned merge gate shifted graph falsification
+on:
+  push:
+    branches: [research/w-nci10-learned-merge-shift-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify unchanged native source and preregistered first-use
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5e6bd3416d275c731c2a14060fcef09c99e7bb22 HEAD
+          test "$(git hash-object unitary/nci09_native_two_link_chunks.go)" = f792b1682fc8b57b613926f7b8f3c3c78e060336
+          test "$(git hash-object unitary/nci10_learned_merge_gate.go)" = 6f291de6bef2f567245776df463031ba66625b93
+          test "$(git hash-object cmd/nci-10-wingless/main.go)" = b55cf03b01ae5036f9d28f3f715f1dd69f17b8d9
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci10/prereg.json)" = 9cd1d21b13d142df288a5c22692553ac6661818f
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci10/prereg.json >/dev/null
+      - name: Development-only native merge learner and packed byte-budget qualification
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-10-wingless -phase=development > /tmp/W-NCI10-development.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open("/tmp/W-NCI10-development.json"))
+          assert x["phase"]=="development" and x["sealed_seed_range"]==[31424,31448]
+          assert x["merge_gate_parameters"]==5
+          assert x["chunk_record_bytes"]<=x["baseline_edge_record_bytes"]
+          assert x["experimental_slot_cap"]==x["baseline_slot_cap"]==7
+          assert x["training_examples"]>0 and x["validation_examples"]>0
+          assert x["external_llm_calls"]==0 and not x["accepted_ref_mutation"]
+          print("W_NCI10_DEV_QUALIFIED",x["development_accuracy"],x["threshold"])
+          PY
+      - name: Exactly one prospective original sealed learned gate study
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-10-wingless -phase=sealed > /tmp/W-NCI10-original.json
+          finish=$(date +%s%N)
+          printf '{"science_wall_ms":%s,"runner":"ubuntu-latest","billing_usd":"unverified"}\n' "$(((finish-start)/1000000))" > /tmp/W-NCI10-resources.json
+          python3 -m json.tool /tmp/W-NCI10-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI10-original-native-merge-gate
+          path: |
+            /tmp/W-NCI10-original.json
+            /tmp/W-NCI10-resources.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Original scientific rubric AFTER immutable evidence upload
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          x=json.load(open("/tmp/W-NCI10-original.json"))
+          assert x["phase"]=="sealed" and x["sealed_seed_range"]==[31424,31448]
+          assert len(x["records"])==96
+          assert collections.Counter(r["family"] for r in x["records"])=={i:24 for i in range(4)}
+          assert all(r["learned_chunks"]<=7 and r["coded_chunks"]<=7 for r in x["records"])
+          assert x["chunk_record_bytes"]<=x["baseline_edge_record_bytes"]
+          assert x["verdict"] in ("LEARNED_MERGE_GATE_TRANSFER",
+              "PARTIAL_LEARNED_MERGE_GAIN","NO_LEARNED_MERGE_TRANSFER","NOVEL_GRAPH_ORACLE_INVALID")
+          assert not x["nci01_full_acceptance"] and x["external_llm_calls"]==0 and not x["accepted_ref_mutation"]
+          print("ORIGINAL_VERDICT",x["verdict"])
+          print("PAIRED_ACCURACY",x["paired_accuracy"])
+          print("FAMILY_ACCURACY",x["family_accuracy"])
+          print("GATE_WORK",x["gate_inference_evaluations"])
+          PY
+      - name: Final full Go regression and build
+        run: go test ./... && go build ./...
