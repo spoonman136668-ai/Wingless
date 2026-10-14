@@ -1,0 +1,64 @@
+{
+  "schema": "wingless.f12.prereg.v1",
+  "frozen_F11_source": "b82091fc9247502f10b3c3ecbe9f76ae689b5784",
+  "frozen_original_json_sha256": "59859a3ec8211b3e80e160260acea06c9c954d5268338845965b6a96d4f43933",
+  "hypothesis": "A depth-conditioned learned recurrence trained only on linear 3–6-hop paths must still distinguish exact-depth queries when fresh 7–8-hop graphs contain shortcuts, branching dead-ends, and directed cycles.",
+  "data": {
+    "stage": "DEVELOPMENT_ONLY",
+    "new_families": [
+      60,
+      61,
+      62,
+      63
+    ],
+    "seed_bounds": [
+      53800,
+      53824
+    ],
+    "chain_lengths": [
+      7,
+      8
+    ],
+    "graphs": 192,
+    "paired_questions": 384,
+    "negative_questions": 192,
+    "controls": [
+      "fully coded exact-depth oracle must score 192/192 pairs",
+      "coded reachable-WITHIN-depth shortcut must score ≤48/192 pairs",
+      "frozen F10 depth blind",
+      "always yes"
+    ],
+    "counterfactual": "same edges and endpoints, requested exact depth k−1 versus k; 3 of 4 families have k−2 shortcut which fools monotone within-depth matching",
+    "source_independently_witnessed": false
+  },
+  "candidate": {
+    "no_retraining": true,
+    "identity_projection_frozen": true,
+    "recurrent_weights": [
+      6.470679800286544,
+      -1.3847365385924115,
+      -3.0464843010034035,
+      7.51083733991036,
+      -3.4005406394991717
+    ],
+    "resident_bytes": 576,
+    "query_depth_input_bytes": 1,
+    "programmed_depth_iteration": true
+  },
+  "criteria": {
+    "min_pair_accuracy": 0.85,
+    "min_accuracy": 0.9,
+    "max_false_positives": 19,
+    "positive": "DEVELOPMENT_FROZEN_VARIABLE_DEPTH_BRANCHING_TRANSFER",
+    "negative": "DEVELOPMENT_NO_FROZEN_VARIABLE_DEPTH_BRANCHING_TRANSFER",
+    "invalid": "INVALID_DEPTH_REFERENCE_OR_SHORTCUT_CONTROL"
+  },
+  "authority": {
+    "F3_unchanged": true,
+    "first_use": false,
+    "accepted_refs": false,
+    "controllers": false,
+    "FORGE": false,
+    "KTRADE": false
+  }
+}
