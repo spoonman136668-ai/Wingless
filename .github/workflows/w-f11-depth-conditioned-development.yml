@@ -1,0 +1,63 @@
+name: Wingless W-F11 query-conditioned variable-depth recurrence development
+on:
+  push:
+    branches: [research/w-f11-query-conditioned-depth-composition-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Freeze predecessor scientific and source identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor fab5f094a29203a5ef1d63fb40225a3aa9a7e57f HEAD
+          test "$(git hash-object unitary/f8_frozen_projection.b64)" = "$(git rev-parse fab5f094a29203a5ef1d63fb40225a3aa9a7e57f:unitary/f8_frozen_projection.b64)"
+          python3 -m json.tool research/foundational/20261014-w-f11/prereg.json >/dev/null
+      - name: One original W-F11 task-learning DEVELOPMENT study
+        run: |
+          set -euo pipefail
+          go run ./cmd/f11-wingless >/tmp/w-f11-original-development.json
+          python3 -m json.tool /tmp/w-f11-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F11-original-variable-depth-development
+          path: /tmp/w-f11-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently reaggregate original predictions and enforce reference
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f11-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY"
+          assert r["train_graph_states"]==128 and r["validation_graph_states"]==96
+          assert r["validation_questions"]==192 and r["negative_questions"]==96
+          assert r["state_bytes"]==576 and r["query_depth_side_input_bytes"]==1
+          assert r["programmed_depth_loop"] and not r["learned_halting"]
+          assert not r["independent_source_birth"] and not r["sealed_first_use"]
+          assert not r["accepted_ref_mutation"]
+          assert collections.Counter(z["chain_depth"] for z in r["rows"])=={7:48,8:48}
+          for name,s in r["scores"].items():
+            correct=sum(int(a==b) for z in r["rows"] for a,b in zip(z["predictions"][name],z["truth"]))
+            both=sum(int(z["predictions"][name]==z["truth"]) for z in r["rows"])
+            fp=sum(int(z["predictions"][name][0]) for z in r["rows"])
+            assert s["correct"]==correct and s["paired_correct"]==both
+            assert s["negative_false_positives"]==fp
+          assert r["scores"]["coded_exact_depth_oracle"]["paired_correct"]==96, "INVALID_EXACT_DEPTH_REFERENCE"
+          assert r["scores"]["frozen_depth_blind_F10"]["paired_correct"]==0
+          assert r["registered_verdict"] in ("DEVELOPMENT_QUERY_DEPTH_TRANSFER_OBSERVED","DEVELOPMENT_NO_LEARNED_QUERY_DEPTH_TRANSFER")
+          print("W_F11_VERDICT",r["registered_verdict"])
+          print("W_F11_SCORES",r["scores"])
+          PY
+      - name: One full native Go regression and build
+        run: go test ./... && go build ./...
