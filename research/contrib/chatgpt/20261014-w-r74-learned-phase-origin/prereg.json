@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R74-RAW-ORIGIN-IDENTIFIABILITY-PILOT",
+  "parent_head": "3237efbcd46c25e28f797e1588fc6d73233b59d7",
+  "prior": "W-R73 raw-history circular phase canonicalizers failed even to retain intact accuracy. Before designing more complex state-former mechanisms, determine whether shift direction can be statistically identified from raw unlabelled observations, rather than assuming a recoverable phase origin.",
+  "hypothesis": "Can a learned 3-class phase-origin predictor using a fixed 16-element raw-history state detect intact/+1/-1 shifts on sealed unseen generator and entity identities substantially above 1/3 chance?",
+  "freeze": "Three predetermined temporal state encoders (levels, first-differences, magnitude) each output 16 scalars. Learn three one-vs-rest ridge weights per candidate on 2592 phase-labelled training events using dev seeds 9008..9023 and generators other than xorshift. Select one with validation seeds 9040..9047 plus 9072..9079, *included* generators/seen entities only. Freeze before exactly one heldout use on 16896..16911, excluded xorshift generator and unseen entity IDs 9..17, 3 sites, 3 amplitudes and 3 balanced phases.",
+  "training_seeds": [
+    9008,
+    9024
+  ],
+  "validation_groups": [
+    [
+      9040,
+      9048
+    ],
+    [
+      9072,
+      9080
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    16896,
+    16912
+  ],
+  "test_phases": [
+    "intact",
+    "plus1",
+    "minus1"
+  ],
+  "candidate_encoders": [
+    "level16",
+    "delta16",
+    "absolute16"
+  ],
+  "primary": "UNSEEN_PHASE_ORIGIN_IDENTIFIABLE iff first-use balanced accuracy >=.45 and per-class recalls each >=.40; PARTIAL_PHASE_IDENTIFICATION iff accuracy >=.37; else NO_PHASE_ORIGIN_IDENTIFIABILITY. Chance=1/3. Predeclare full three-by-three confusion matrix and 3888 heldout labelled observations, no hidden labels in predictor input.",
+  "controls": [
+    "No original shift/label supplied to predictor after training; only 16x4 raw history",
+    "Holdout source xorshift excluded from all training and development selection",
+    "Validation identity seen, sealed entity IDs 9..17 unseen in training",
+    "Each inference uses fixed 16D handcrafted state, three learned 16-weight class scores; extra weights/compute explicitly reported, not same 16-weight baseline",
+    "One frozen source first-use and custody-first original artifact, full Go regression and read-only archive verification",
+    "Preserve partial and negative outcomes; no paid API, FORGE R32/R33, accepted refs, queue/controller or production"
+  ],
+  "bounds": {
+    "candidates": 3,
+    "feature_width": 16,
+    "learned_inference_weights": 48,
+    "training_phase_labelled_items": 2592,
+    "heldout_seed_count": 16,
+    "heldout_observations": 3888,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic supervised phase-origin identification, not learned recurrent memory, general reasoning or RSI."
+}
