@@ -1,0 +1,41 @@
+name: W-R64 independent archived original evidence witness
+on:
+  push:
+    branches: [audit/w-r64-frozen-archive-witness-20261014]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Pin witness source and original executor
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r64-source-specificity/prereg.json)" = 9c6e39106d7b990d0e2f4849c0c8c47ff8553d0f
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r64-source-specificity/execute.py)" = d029cbbfc0bb3003f7d888f2a6386c1b02ec9338
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r64-source-specificity/archive_witness.py)" = 022fe66b673085037e111331a91debf742ebc608
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r64-source-specificity/archive_witness.py
+      - name: Download archived original first-use without execution
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/spoonman136668-ai/Wingless/actions/artifacts/11878040664 --jq '.digest')" = 'sha256:48d9f0db57f55fdaa16934f47c4b9c6d9e7638a7e5644af8dc278ce055d46fe0'
+          mkdir -p evidence
+          gh run download 38530053003 -R spoonman136668-ai/Wingless --name W-R64-original-source-specificity --dir evidence
+          test -s evidence/W-R64-original.json
+      - name: Independently recompute reported metrics from archived rows
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r64-source-specificity/archive_witness.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R64-independent-archived-witness
+          path: W-R64-witness.json
+          if-no-files-found: error
+          retention-days: 90
