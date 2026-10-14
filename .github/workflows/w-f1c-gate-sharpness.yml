@@ -1,0 +1,57 @@
+name: W-F1C frozen gate-sharpness diagnostic
+on:
+  push:
+    branches: [research/w-f1c-gate-sharpness-dev-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify frozen source lineage and development preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 418f822029e6e1528d2f50ae932fb90db6fe6414 HEAD
+          test "$(git hash-object unitary/f1b_frozen_alias_collision.go)" = bca12ab5585d6a7bf81f54586d3ab7670713c563
+          python3 -m json.tool research/foundational/20261014-w-f1c/prereg.json >/dev/null
+      - name: Run one new bounded development-only causal diagnostic
+        run: |
+          set -euo pipefail
+          go run ./cmd/f1c-wingless > /tmp/w-f1c-original-development.json
+          python3 -m json.tool /tmp/w-f1c-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F1C-original-gate-sharpness-development
+          path: /tmp/w-f1c-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Reaggregate original rows without rerunning experiment
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f1c-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY" and r["new_development_seed_bounds"]==[39600,39624]
+          assert len(r["rows"])==384 and r["question_count"]==768 and r["negative_count"]==384
+          assert collections.Counter(z["family"] for z in r["rows"])=={4:96,5:96,6:96,7:96}
+          assert r["native_state_bytes"]==576 and r["coded_equality"] and not r["learned_identity_binding"]
+          assert not r["sealed_first_use"] and not r["accepted_ref_mutation"]
+          for name,s in r["candidate_scores"].items():
+              rows=r["rows"]
+              acc=sum(int(v==t) for z in rows for v,t in zip(z["models"][name]["stress"],z["truth"]))/768
+              fp=sum(int(v) for z in rows for v,t in zip(z["models"][name]["stress"],z["truth"]) if not t)/384
+              assert abs(acc-s["stress_accuracy"])<1e-12 and abs(fp-s["stress_false_positive_rate"])<1e-12
+          assert r["registered_verdict"] in ("CODED_GATE_SHARPNESS_EXPLAINS_FROZEN_FALSE_POSITIVES","GATE_SHARPNESS_CAUSAL_DIAGNOSTIC_UNRESOLVED")
+          print("W_F1C_VERDICT",r["registered_verdict"])
+          print("W_F1C_SUMMARY",r["candidate_scores"])
+          PY
+      - name: One complete Go regression and build
+        run: go test ./... && go build ./...

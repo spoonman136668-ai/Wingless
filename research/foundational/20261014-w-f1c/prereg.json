@@ -1,0 +1,16 @@
+{
+  "schema": "wingless.f1c.prereg.v1",
+  "id": "W-F1C-FROZEN-GATE-SHARPNESS-CAUSAL-ABLATION",
+  "parent_commit": "418f822029e6e1528d2f50ae932fb90db6fe6414",
+  "prior_artifact": {
+    "run_id": 38631599539,
+    "artifact_id": 11925139848,
+    "content_sha256": "97b7b9bdea0763237cb820eef4fd27c75a995e74bd443276e9bb34bd6a2edcac"
+  },
+  "hypothesis": "Wingless F1B's 144 original/counterfactual false positives are caused by low-separation learned link-gating probabilities, not near-alias substitution; stronger already-existing CODED equality gate improves accuracy and specificity.",
+  "controls": "Evaluate exactly four prefixed arms: original F1B frozen trained gate, preexisting W-F1 fixed sharp control (13,0,-6.5), independently specified near-binary coded gate (20,0,-15), and zero-link negative control (0,0,-30); no training/refit/tuning. Original F1/F1B are NOT rerun. Same 576-byte resident memory and 4-hop coded decoder.",
+  "cohort": "NEW DEV ONLY 24 seeds [39600,39624), graph families 4-7, four cuts, 384 graph states, two questions each, 384 positives and 384 negatives; independent of F1B seeds 39312-39335. New adversarial aliases from frozen F1B procedure. Not sealed first use.",
+  "rubric": "CODED_GATE_SHARPNESS_EXPLAINS_FROZEN_FALSE_POSITIVES iff preexisting fixed sharp gate stress accuracy >=0.95, stress false-positive rate <=0.05, stress accuracy exceeds frozen trained gate by >=0.10, and frozen-gate false positive rate exceeds fixed by >=0.20. Otherwise GATE_SHARPNESS_CAUSAL_DIAGNOSTIC_UNRESOLVED.",
+  "limits": "Even a positive result supports CODED equality gate sharpness, not learned entity identity, transferable cognition, native NCI01, AGI or RSI. Study is developmental only and cannot revise F1/F1B prereg verdicts.",
+  "authority": "No sealed cohort, accepted-ref mutation, queue/dispatch/controller/workflow ownership, FORGE R32/R33, KTRADE, broker or production; GitHub workflow uses one bounded source-pinned development evaluation with final full Go regression."
+}
