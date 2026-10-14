@@ -1,0 +1,88 @@
+{
+  "schema": "wingless.f15.prereg.v1",
+  "study": "W-F15-LEARNED-PREFIX-COMPUTE-CONTROL",
+  "parent_F14": "c37ef4f1213029a0c84cabf1ff099085df01b372",
+  "hypothesis": "A 6-parameter trained logistic policy using only prefix-native-recurrent-trajectory statistics, with the frozen F14 learned model, can save >=15% reasoning steps on novel seven/eight-hop typed relation QA without >3pp accuracy loss versus full compute and beat train-selected confidence threshold by >=0.01 utility.",
+  "design": {
+    "data": "new author-generated DEV ONLY (not independent F3)",
+    "train_families": [
+      72,
+      73,
+      74,
+      75
+    ],
+    "valid_families": [
+      76,
+      77,
+      78,
+      79
+    ],
+    "training_seeds": [
+      59300,
+      59312
+    ],
+    "validation_seeds": [
+      59700,
+      59712
+    ],
+    "training_depths": [
+      4,
+      5,
+      6
+    ],
+    "validation_depths": [
+      7,
+      8
+    ],
+    "variants": 2,
+    "per_graph": [
+      "ordered role positive",
+      "one necessary edge-role changed negative",
+      "role sequence wrong-order negative"
+    ],
+    "training_examples": 864,
+    "validation_examples": 576,
+    "core": "F14 frozen serialized 576B learned entity+role+shared recurrence",
+    "train_head": "6 scalar logistic weights, 220 Adam epochs lr .07 on training-only hindsight safe-stop labels; labels formed from prefix future on TRAIN only",
+    "policy_features": [
+      "constant",
+      "fraction_of_query_budget_used",
+      "max_current_activation",
+      "mean_current_activation",
+      "prefix_final_answer_probability",
+      "delta_probability_from_previous_prefix"
+    ],
+    "policy_inference_forbidden": [
+      "future prefix values",
+      "heldout labels",
+      "graph family ID",
+      "oracle future"
+    ],
+    "controls": [
+      "fixed full k iterations",
+      "fixed one step",
+      "train-selected confidence threshold from prespecified grid",
+      "hindsight oracle upper (never used by candidate)"
+    ],
+    "objective": "utility=accuracy-.15*(actual_steps/available_steps)",
+    "positive_gate": {
+      "min_accuracy": 0.95,
+      "max_negative_FPR": 0.05,
+      "min_compute_savings": 0.15,
+      "max_accuracy_loss_vs_full": 0.03,
+      "min_utility_advantage_vs_heuristic": 0.01
+    },
+    "positive": "DEVELOPMENT_LEARNED_NATIVE_STOPPING_TRANSFER",
+    "negative": "DEVELOPMENT_NO_LEARNED_STOPPING_TRANSFER"
+  },
+  "limits": {
+    "learned_max_budget": false,
+    "query_depth_provides_hard_limit": true,
+    "no_F3_source": true,
+    "first_use": false,
+    "independent_source_birth": false,
+    "accepted_refs": false,
+    "FORGE": false,
+    "KTRADE": false
+  }
+}
