@@ -1,0 +1,49 @@
+name: Wingless W-R64 frozen original-source specificity
+on:
+  push:
+    branches: [research/w-r64-source-channel-specificity-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Freeze verified lineage and exact preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 635d8409a175c483dde48b624149ba1f6505d1a7 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r63-channel-role/execute.py)" = edec64d438fd8f9aa765736b15d741f9a286454c
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r64-source-specificity/prereg.json)" = 9c6e39106d7b990d0e2f4849c0c8c47ff8553d0f
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r64-source-specificity/execute.py)" = d029cbbfc0bb3003f7d888f2a6386c1b02ec9338
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-r64-source-specificity/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r64-source-specificity/execute.py
+      - name: Execute frozen first-use on fresh sealed source-channel cohort
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r64-source-specificity/execute.py > /tmp/W-R64-original.json
+          python3 -m json.tool /tmp/W-R64-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-R64-original.json"))
+          assert a["sealed_heldout_seeds"]==list(range(9664,9688))
+          assert len(a["comparisons"])==36 and len(a["all_sealed_records"])==180
+          assert set(a["source_erase_mean_loss"])=={"0","1","2","3"}
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          assert a["classification"] in ("SOURCE0_DOMINANT_REPLICATED","MULTICHANNEL_SENSITIVITY","NO_CLEAR_SOURCE_RANK")
+          print("CLASSIFICATION",a["classification"])
+          print("SOURCE_ERASURE_MEAN",a["source_erase_mean_loss"])
+          print("HELDOUT_SEEDS",len(a["sealed_heldout_seeds"]))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R64-original-source-specificity
+          path: /tmp/W-R64-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Full Wingless regression and build
+        run: go test ./... && go build ./...
