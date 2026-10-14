@@ -1,0 +1,58 @@
+name: W-F5 frozen learned matcher task-learned recurrence development
+on:
+  push:
+    branches: [research/w-f5-frozen-matcher-learned-recurrence-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Frozen W-F4 source identity and new preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 30577b1e86354e3af3167cd59193819646a3a82e HEAD
+          test "$(git hash-object unitary/f4_learned_endpoint_binding.go)" = "$(git rev-parse 30577b1e86354e3af3167cd59193819646a3a82e:unitary/f4_learned_endpoint_binding.go)"
+          python3 -m json.tool research/foundational/20261014-w-f5/prereg.json >/dev/null
+      - name: New F5 development experiment only (NO F3 first use)
+        run: |
+          set -euo pipefail
+          go run ./cmd/f5-wingless > /tmp/w-f5-original-development.json
+          python3 -m json.tool /tmp/w-f5-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F5-original-frozen-matcher-learned-recurrence
+          path: /tmp/w-f5-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently classify original archived rows
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f5-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY" and r["train_graph_states"]==288
+          assert r["validation_graph_states"]==192 and r["validation_questions"]==384
+          assert r["negative_questions"]==192 and r["native_state_bytes"]==576
+          assert r["learned_composer_parameter_count"]==5
+          assert not r["coded_equality_in_candidate"] and not r["coded_or_traversal_in_candidate"]
+          assert not r["sealed_first_use"] and not r["accepted_ref_mutation"]
+          assert collections.Counter(z["family"] for z in r["rows"])=={4:48,5:48,6:48,7:48}
+          for name,s in r["scores"].items():
+            acc=sum(int(t==p) for row in r["rows"] for t,p in zip(row["truth"],row["models"][name]))
+            fp=sum(int(p) for row in r["rows"] for t,p in zip(row["truth"],row["models"][name]) if not t)
+            assert acc==s["correct"] and fp==s["false_positives"]
+          assert r["registered_verdict"] in ("DEVELOPMENT_NO_LEARNED_COMPOSITION_TRANSFER","DEVELOPMENT_FROZEN_MATCHER_LEARNED_COMPOSITION_OBSERVED")
+          print("W_F5_VERDICT",r["registered_verdict"])
+          print("W_F5_SCORES",r["scores"])
+          PY
+      - name: One complete Go regression and build
+        run: go test ./... && go build ./...

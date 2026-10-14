@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.f5.prereg.v1",
+  "name": "W-F5-frozen_F4_matcher-learned-recurrent-composition",
+  "frozen_F4_sha": "30577b1e86354e3af3167cd59193819646a3a82e",
+  "hypothesis": "With F4 endpoint matching FROZEN, a small native task-learned recurrent message-passing head can compose up to four-edge relationships without the fixed coded OR traversal.",
+  "development": {
+    "train_seed_bounds": [
+      44300,
+      44324
+    ],
+    "validation_seed_bounds": [
+      44600,
+      44612
+    ],
+    "training_states": 288,
+    "validation_states": 192,
+    "validation_questions": 384,
+    "class_balance": "192 positive / 192 negative",
+    "train_families": [
+      0,
+      1,
+      2
+    ],
+    "validation_families": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "frozen_matcher": "17 fixed parameters from W-F4 original result sha256=757f907f089bb2e6a190c0b9558d59271473a0055864417946f71933718192de",
+    "native_state_bytes": 576,
+    "candidate_trainable_params": 5,
+    "steps": 140,
+    "optimizer": "finite difference .035 + Adam lr .12, batches 30, fixed deterministic traversal of 288 training examples",
+    "controls": [
+      "initial same recurrent head",
+      "frozen F4 learned-matching and coded four-hop upper",
+      "coded exact-equality upper"
+    ],
+    "thresholds": {
+      "accuracy_at_least": 0.85,
+      "negative_false_positive_at_most": 0.15,
+      "minimum_gain_vs_initialized": 0.15,
+      "max_accuracy_deficit_vs_frozen_coded_F4": 0.15
+    },
+    "negative_verdict": "DEVELOPMENT_NO_LEARNED_COMPOSITION_TRANSFER",
+    "positive_verdict": "DEVELOPMENT_FROZEN_MATCHER_LEARNED_COMPOSITION_OBSERVED"
+  },
+  "limits": "No exact identity equality or OR traversal in candidate, but engineered 16-bit public ID features, frozen learned matcher and three programmed recurrence rounds. No sealed F3 data, no scientific acceptance, no AGI/RSI claim.",
+  "authority": {
+    "source_birth_admitted": false,
+    "first_use": false,
+    "no_accepted_ref_mutation": true,
+    "no_new_controller": true,
+    "no_ktrade": true,
+    "no_forge_R32_R33": true
+  }
+}
