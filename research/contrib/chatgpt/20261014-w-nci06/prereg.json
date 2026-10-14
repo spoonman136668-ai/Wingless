@@ -1,0 +1,50 @@
+{
+  "schema": "wingless.nci06.prereg.v1",
+  "id": "W-NCI06-TRAINED-FUTURE-RELEVANCE-RETENTION",
+  "parent": "a03f7efb53972ba4c811aa01000dacaf85e1cd3f",
+  "hypothesis": "Can a development-supervised, native three-weight retention scorer predict which graph relations to preserve in a seven-edge store under 12-relation overload, improving unseen compositional queries versus equal-capacity FIFO and LRU?",
+  "learnable_native_component": "Three SGD-fitted real-valued logistic weights on observed public exposure count and time of insertion (plus intercept). Supervision in development uses future query relevance. Sealed inference receives only current/past exposures/timestamps and no future target labels. Preserves unchanged native learned 6-param join.",
+  "development_seeds": [
+    25200,
+    25360
+  ],
+  "validation_seeds": [
+    25360,
+    25392
+  ],
+  "sealed_seeds": [
+    25632,
+    25656
+  ],
+  "structural_families": [
+    "early_chain_high_rehearsal",
+    "interleaved_chain_rehearsal",
+    "inverse_rehearsal_distractors",
+    "mixed_signal_late_chain"
+  ],
+  "task": "12 distinct public graph facts in variable insertion order; capacity fixed at seven; at observation time 6, public rehearsal updates LRU for existing high-exposure edges; answer 2-hop and novel 4-hop graph questions, then restore from checkpoint and retry. 24 sealed seeds×4 graph families.",
+  "controls": [
+    "Same frozen six-weight native relation join and lexical admission without external LLM",
+    "All arms use seven relation edges and same public facts in same order",
+    "Fixed learned scorer training on development only; no leak of future sealed query targets into inference",
+    "FIFO insertion age and LRU publicly observed recency baselines; original exact graph oracle is computationally unbounded and separately disclosed",
+    "Preserve per-family accuracy, learned scorer multiplies, join-work counters, wall time, negative conditions, record all 96 cases",
+    "Only one original sealed first-use, artifact upload before rubric, full Go regression and separate no-replay archive audit",
+    "No FORGE R32/R33, accepted refs, controller, CKB/KTRADE, merges or production"
+  ],
+  "rubric": "LEARNED_BOUNDED_RETENTION_TRANSFER iff learned four-hop >=0.60, delta vs FIFO >=0.15 and vs LRU >=0.10, with no family worse than LRU by >0.20. PARTIAL_RETENTION_GAIN_WITH_GENERALIZATION_COST iff learned FIFO gain >=0.10 but full criteria fail. Otherwise NO_TRANSFERABLE_LEARNED_RETENTION_GAIN. Never claim learned relational storage/search, AGI, RSI or NCI01 full acceptance.",
+  "resources": {
+    "memory_capacity_edges": 7,
+    "retention_weight_count": 3,
+    "join_weight_count": 6,
+    "training_examples": 7680,
+    "heldout_cases": 96,
+    "external_model_calls": 0
+  },
+  "portfolio": {
+    "integration": 45,
+    "foundational": 45,
+    "optimization": 10,
+    "measured_compute": false
+  }
+}
