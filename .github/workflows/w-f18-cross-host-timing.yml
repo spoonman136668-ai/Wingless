@@ -1,0 +1,81 @@
+name: W-F18 frozen online timing repeatability on Linux and Windows
+on:
+  push:
+    branches: [research/w-f18-cross-host-frozen-online-timing-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Freeze upstream F17 and prospectively registered timing protocol
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 3ef00f6db0fda03385730640fe5c0354e10307bf HEAD
+          test "$(git hash-object unitary/f17_frozen_online_cost.go)" = "$(git rev-parse 3ef00f6db0fda03385730640fe5c0354e10307bf:unitary/f17_frozen_online_cost.go)"
+          python -m json.tool research/foundational/20261014-w-f18/prereg.json >/dev/null
+      - name: One prospective development cohort with five measurement repetitions
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/f18-wingless > f18-original-${{ runner.os }}.json
+          python -m json.tool f18-original-${{ runner.os }}.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F18-frozen-cross-host-original-${{ runner.os }}
+          path: f18-original-${{ runner.os }}.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently recompute the raw decisions and timings
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,collections,statistics
+          import glob
+          fs=glob.glob('f18-original-*.json')
+          assert len(fs)==1,fs
+          d=json.load(open(fs[0]))
+          assert d["stage"]=="DEVELOPMENT_ONLY" and d["questions"]==576
+          assert d["graph_states"]==96 and d["positive_count"]==192 and d["negative_count"]==384
+          assert d["state_bytes"]==576 and d["repeats_per_arm"]==5
+          assert d["reused_grammar_disclosed"] and not d["model_retrained"]
+          assert not d["F3_independent_source_birth"] and not d["F3_sealed_first_use"]
+          assert not d["accepted_ref_mutation"]
+          assert collections.Counter(x["family"] for x in d["rows"])=={92:144,93:144,94:144,95:144}
+          assert collections.Counter(x["variant"] for x in d["rows"])==dict.fromkeys(range(6),96)
+          for kind in ("risk","full","static"):
+            s=d["scores"][kind]
+            correct=sum(x[kind]["answer"]==x["truth"] for x in d["rows"])
+            steps=sum(x[kind]["steps"] for x in d["rows"])
+            ns=[sum(x[kind+"_ns"][i] for x in d["rows"]) for i in range(5)]
+            assert s["correct"]==correct and s["recurrent_steps"]==steps
+            assert ns==d[kind+"_wall_ns_by_repeat"]
+          gains=[1-r/f for r,f in zip(d["risk_wall_ns_by_repeat"],d["full_wall_ns_by_repeat"])]
+          assert all(abs(a-b)<1e-12 for a,b in zip(gains,d["risk_fraction_saved_by_repeat"]))
+          assert abs(statistics.median(gains)-d["risk_median_fraction_saved"])<1e-12
+          assert d["registered_verdict"] in (
+            "DEVELOPMENT_REPLICATED_SINGLE_HOST_WALL_GAIN",
+            "DEVELOPMENT_NO_REPLICATED_FROZEN_WALL_GAIN",
+            "DEVELOPMENT_FROZEN_POLICY_ROBUSTNESS_FAILED","INVALID_FROZEN_FULL_ORACLE")
+          print("W_F18_HOST",d["host_os"],d["host_arch"])
+          print("W_F18_VERDICT",d["registered_verdict"])
+          print("W_F18_REPEATED_GAINS",gains)
+          print("W_F18_SCORES",d["scores"])
+          PY
+      - name: One full Go regression and build
+        shell: bash
+        run: go test ./... && go build ./...
