@@ -1,0 +1,51 @@
+{
+  "schema": "wingless.f8.prereg.v1",
+  "source_F7_sha": "33b45a16c3cbfd470d8ffe8b3e601f5218966985",
+  "source_F7_raw_artifact_id": 11931158342,
+  "source_F7_raw_result_sha256": "799364227498074bb3ef45f9017a67d83a721b71e7e92cc5ad6b01fc8506b140",
+  "frozen_trained_parameter_binary_sha256": "c7df241ca99627ea816091a84d321819828328a02a56a507cd7862d8afe67fe4",
+  "reason": "F7 original's coded reference equality signal was uninitialized, yielding an invalid 50% control. Do not repair by replaying F7 original or retuning thresholds. Freeze learned parameters and run disjoint F8 new topology cohorts with corrected coded control.",
+  "cohort": {
+    "new_motif_families": [
+      28,
+      29,
+      30,
+      31
+    ],
+    "seed_bounds": [
+      49800,
+      49848
+    ],
+    "graph_states": 192,
+    "questions": 384,
+    "balanced_positive_negative": [
+      192,
+      192
+    ],
+    "source_birth": "AUTHOR_GENERATED_DEVELOPMENT_ONLY; NOT independent F3 source birth"
+  },
+  "arms": [
+    "frozen F7 16D identity projection + frozen F5 learned recurrence",
+    "same F7 projection + coded OR path control",
+    "frozen F5 learned matcher+recurrence",
+    "corrected fixed coded exact-equality upper, must score 384/384"
+  ],
+  "success": {
+    "minimum_accuracy": 0.85,
+    "maximum_false_positive_rate": 0.15,
+    "minimum_gain_vs_frozen_F5": 0.1
+  },
+  "classification": {
+    "invalid": "INVALID_CODED_REFERENCE_CONTROL",
+    "positive": "DEVELOPMENT_FROZEN_CONTRASTIVE_NEW_GRAMMAR_TRANSFER",
+    "negative": "DEVELOPMENT_NO_FROZEN_CONTRASTIVE_NEW_GRAMMAR_TRANSFER"
+  },
+  "limits": "All weights frozen from archived F7. Both source and sealed F3 unchanged. Novel authored development topology cannot establish independent external source birth or native general intelligence. No oracle equality in candidate inference; engineered ID bits and 3 message rounds remain.",
+  "authority": {
+    "no_controllers": true,
+    "no_queues": true,
+    "no_accepted_refs": true,
+    "no_forge_R32R33": true,
+    "no_ktrade": true
+  }
+}
