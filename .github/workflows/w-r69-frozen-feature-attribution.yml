@@ -1,0 +1,58 @@
+name: Wingless W-R69 prospective minus-one feature attribution
+on:
+  push:
+    branches: [research/w-r69-feature-credit-attribution-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify frozen source, bounded delta and unused cohort
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 9b1eac075006442c7e426ac0cb627d58102958b8 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r68-minus1-replication/execute.py)" = 04222695ef33a1f5a0c9c67baf6cc1d286a304e1
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r69-credit-attribution/execute.py)" = bd41f6d88bbe5ef166578ec43135dc20eb95a208
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r69-credit-attribution/prereg.json)" = 1a1af53e6f7f367be3fc4ec2d1167397a20cd5dd
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-r69-credit-attribution/prereg.json > /dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r69-credit-attribution/execute.py
+          python3 - <<'PY'
+          import json
+          x=json.load(open("research/contrib/chatgpt/20261014-w-r69-credit-attribution/prereg.json"))
+          assert x["sealed_heldout_seeds"]==[12672,12688]
+          assert set(range(12672,12688)).isdisjoint(range(10112,10136))
+          assert set(range(12672,12688)).isdisjoint(range(10432,10456))
+          print("KNOWN_WINGED_SEALED_COHORT_DISJOINT=PASS")
+          PY
+      - name: Exactly one original feature-level sealed probe
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r69-credit-attribution/execute.py > /tmp/W-R69-original.json
+          python3 -m json.tool /tmp/W-R69-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-R69-original.json"))
+          assert a["sealed_heldout_seeds"]==list(range(12672,12688))
+          assert len(a["per_seed_diagnostics"])==3*3*4*16
+          assert set(a["aggregate"])=={"minus1","plus1","minus2"}
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          assert a["classification"] in ("EXACT_FEATURE_LEVEL_MINUS1_INVARIANCE",
+              "MARGIN_LEVEL_MINUS1_INVARIANCE","CREDIT_LEVEL_MINUS1_INVARIANCE",
+              "SEED_AGGREGATE_ONLY_MINUS1_EQUIVALENCE","MINUS1_EXCEPTION_BREAKS_AT_SEED_LEVEL")
+          print("CLASSIFICATION",a["classification"])
+          print("PHASE_AGGREGATES",a["aggregate"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R69-original-feature-attribution
+          path: /tmp/W-R69-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Complete Wingless regression and build
+        run: go test ./... && go build ./...
