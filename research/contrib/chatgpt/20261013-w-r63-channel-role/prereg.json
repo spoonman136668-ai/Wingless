@@ -1,0 +1,99 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R63-CHANNEL-POSITION-VERSUS-PHYSICAL-SIGNAL-ABLATION",
+  "parent_head": "6825ce8eab1e3ee4ca3434853466da82dd082237",
+  "prior": "W-R62-R2 independent archive validation PARTIAL_CHANNEL_OUTAGE, original artifact11863789229",
+  "hypothesis": "The W-R62 channel0 erasure penalty may track the particular original synthetic signal or an arbitrary fixed input slot in the 16-feature projection. Apply 4 legal permutations of the 4 acquired channels to reference and candidates, then compare no erasure, erasure of displayed slot0, or erasure of the original source channel0. Fixed weights and labels throughout.",
+  "training": "Reuse W-R61 three W-R54 ridge source-withheld-xorshift 16-weight model fits and development blocks9008..9023,9040..9055,9072..9087 with zero retraining or post-result tuning",
+  "development_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    9552,
+    9576
+  ],
+  "generators": [
+    "affine_prior",
+    "quadratic_irregular",
+    "xorshift_independent"
+  ],
+  "amplitudes": [
+    1,
+    2,
+    3
+  ],
+  "entity_groups": {
+    "seen_identity_control": [
+      0,
+      9
+    ],
+    "unseen_identity_transfer": [
+      9,
+      18
+    ]
+  },
+  "source_channel_orders": {
+    "identity": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "rotate": [
+      1,
+      2,
+      3,
+      0
+    ],
+    "swap01": [
+      1,
+      0,
+      2,
+      3
+    ],
+    "reverse": [
+      3,
+      2,
+      1,
+      0
+    ]
+  },
+  "conditions": [
+    "intact_permuted",
+    "erase_presented_slot0",
+    "erase_original_source_channel0"
+  ],
+  "primary": "For each of 3 fixed models×3 amplitudes×3 generators×2 groups×4 permutations×3 conditions, record full paired signed-credit accuracy and per-seed evidence. For 27 cells with withheld xorshift/unseen group and nonidentity permutations, recompute mean accuracy loss vs intact baseline for source channel0 and presented slot0. SOURCE_CHANNEL_ROLE if source loss <= -0.07 while displayed-slot loss >= -0.05; FEATURE_SLOT_ROLE if reversed; MIXED_OR_INCONCLUSIVE otherwise.",
+  "controls": [
+    "Permute identical data from base and both candidates; never change temporal order or labels",
+    "Zero one channel over all 16 observations using deterministic original-to-presented map, no mask oracle or additional sensor",
+    "Frozen readout weights, unchanged width16, no retraining or capacity changes",
+    "Fresh sealed 9552..9575 not used in W-R62; one original evidence archive, one full Go regression, independent archival verifier afterwards, no replay"
+  ],
+  "bounds": {
+    "dev_blocks": 3,
+    "heldout_seeds": 24,
+    "permutations": 4,
+    "outage_conditions": 3,
+    "models": 3,
+    "amplitudes": 3,
+    "source_families": 3,
+    "entity_groups": 2,
+    "features": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Controlled synthetic feature-input-channel role ablation; cannot establish natural sensor semantics, high-level temporal understanding or RSI."
+}

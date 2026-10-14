@@ -1,0 +1,50 @@
+name: Wingless W-R63 frozen channel role identity
+on:
+  push:
+    branches: [research/w-r63-channel-role-permutation-20261013-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Freeze prereg, source and predecessor before first use
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 6825ce8eab1e3ee4ca3434853466da82dd082237 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r62-channel-outage/execute.py)" = a5b182874758af692a180f7bf788c627b6da6f9a
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r63-channel-role/prereg.json)" = f6d49e2fbcabaf45066e0b776a1e20baab5eba1b
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r63-channel-role/execute.py)" = edec64d438fd8f9aa765736b15d741f9a286454c
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r63-channel-role/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r63-channel-role/execute.py
+      - name: Original one-time sealed source-versus-feature channel ablation
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r63-channel-role/execute.py > /tmp/W-R63-original.json
+          python3 -m json.tool /tmp/W-R63-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R63-original.json'))
+          assert a['sealed_heldout_seeds']==list(range(9552,9576))
+          assert len(a['all_sealed_records'])==3*3*3*2*4*3
+          assert all(len(x['by_seed'])==24 for x in a['all_sealed_records'])
+          assert len(a['primary_unseen_xorshift_comparisons'])==27
+          print('CLASSIFICATION',a['classification'])
+          print('SOURCE_CHANNEL_MEAN',a['source_channel_mean_effect'])
+          print('PRESENTED_SLOT_MEAN',a['presented_slot_mean_effect'])
+          for x in a['primary_unseen_xorshift_comparisons']:
+              print('CHANNEL_ROLE',x)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R63-original-channel-role
+          path: /tmp/W-R63-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Full Wingless repository regression
+        run: go test ./... && go build ./...
