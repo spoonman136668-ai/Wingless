@@ -1,0 +1,66 @@
+{
+  "schema": "wingless.f18.prereg.v1",
+  "parent_F17": "3ef00f6db0fda03385730640fe5c0354e10307bf",
+  "scientific_goal": "Repeat genuine frozen-policy online cost measurement across Ubuntu and Windows hosted runners, five counterbalanced timing passes each, using a new development seed cohort. Check robustness and within-host repeatability; do NOT present as multi-independent-hardware qualification when CPU/VM models are unknown.",
+  "frozen": {
+    "policy_source": "0fc2d87f9160cbb1a8f7678992642eef461cf104",
+    "f17_model_unchanged": true,
+    "model_training": false,
+    "threshold": 0.5,
+    "serialization_bytes": 576
+  },
+  "cohort": {
+    "development": true,
+    "seed_bounds": [
+      68600,
+      68606
+    ],
+    "grammars_reused": [
+      92,
+      93,
+      94,
+      95
+    ],
+    "explicit_reuse_disclosure": true,
+    "depths": [
+      7,
+      8
+    ],
+    "role_shifts": [
+      0,
+      1
+    ],
+    "graphs": 96,
+    "questions": 576,
+    "positives": 192,
+    "negatives": 384,
+    "variants_per_graph": 6
+  },
+  "controls": [
+    "same full inference identical frozen core",
+    "cheap first-hop coded rule on same inputs",
+    "exact typed oracle source fixtures"
+  ],
+  "timing": {
+    "repeats": 5,
+    "warmup_each_arm": true,
+    "balance_each_arm_per_case": true,
+    "measure_online_inference_include_policy_features": true,
+    "exclude_source_generation": true,
+    "matrix": [
+      "ubuntu-latest",
+      "windows-latest"
+    ],
+    "report_host_information": "GOOS/GOARCH; hosted machines not necessarily distinct physical models",
+    "classification": "Per host pass only if frozen >=95% accuracy, 15% step saving, 5% median timed wall reduction AND each of five wall passes saves at least 5%; record failure on any OS, don't alter weights.",
+    "positive": "DEVELOPMENT_REPLICATED_SINGLE_HOST_WALL_GAIN",
+    "negative": "DEVELOPMENT_NO_REPLICATED_FROZEN_WALL_GAIN"
+  },
+  "safety": {
+    "F3_sealed_original_frozen": true,
+    "not_independent_custody": true,
+    "accepted_refs": false,
+    "FORGE": false,
+    "KTRADE": false
+  }
+}
