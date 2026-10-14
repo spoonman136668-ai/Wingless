@@ -1,0 +1,62 @@
+name: W-F17 preserved-original audit plus full repo qualification
+on:
+  push:
+    branches: [research/w-f17-exact-artifact-audit-only-20261014-r1]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Exact original source and prereg unchanged; do NOT rerun scientific original
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 3ef00f6db0fda03385730640fe5c0354e10307bf HEAD
+          test "$(git hash-object unitary/f17_frozen_online_cost.go)" = "$(git rev-parse 3ef00f6db0fda03385730640fe5c0354e10307bf:unitary/f17_frozen_online_cost.go)"
+          test "$(git hash-object research/foundational/20261014-w-f17/prereg.json)" = "$(git rev-parse 3ef00f6db0fda03385730640fe5c0354e10307bf:research/foundational/20261014-w-f17/prereg.json)"
+      - name: Fetch original run artifact 11936565829 and independently verify exact bytes and rows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fLSs --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/11936565829/zip" -o /tmp/w-f17-original.zip
+          python3 - <<'PY'
+          import zipfile,hashlib,json,collections
+          with zipfile.ZipFile("/tmp/w-f17-original.zip") as z:
+            files=z.namelist()
+            assert files==["w-f17-original-development.json"],files
+            raw=z.read(files[0])
+          sha=hashlib.sha256(raw).hexdigest()
+          assert sha=="a6360bd12e6d8549795d744e8416ea330bdd9b09e67bb8619753fb756a9cd825",sha
+          d=json.loads(raw)
+          assert d["stage"]=="DEVELOPMENT_ONLY" and d["graph_count"]==192
+          assert d["question_count"]==1152 and d["positive_count"]==384 and d["negative_count"]==768
+          assert d["native_state_bytes"]==576 and not d["model_retrained"]
+          assert d["frozen_F16_sha"]=="0fc2d87f9160cbb1a8f7678992642eef461cf104"
+          assert not d["sealed_first_use"] and not d["accepted_ref_mutation"] and not d["source_birth_witnessed"]
+          assert collections.Counter(x["family"] for x in d["rows"])=={92:288,93:288,94:288,95:288}
+          for key,out,timing in (("frozen_online","frozen_online","frozen_ns"),
+            ("fixed_full_online","fixed_full_online","full_ns"),
+            ("coded_first_hop_rule_control","static_one_hop_control","static_ns")):
+            s=d["scores"][key]
+            assert sum(int(x[out]["answer"]==x["truth"]) for x in d["rows"])==s["correct"]
+            assert sum(x[out]["steps"] for x in d["rows"])==s["actual_recurrent_steps"]
+            assert sum(x[timing] for x in d["rows"])==s["online_total_wall_ns"]
+          assert d["scores"]["fixed_full_online"]["actual_recurrent_steps"]==sum(x["depth"] for x in d["rows"])
+          assert d["registered_verdict"]=="DEVELOPMENT_FROZEN_ROBUST_AND_WALL_EFFICIENT"
+          print("W_F17_EXACT_ORIGINAL_AUDIT=PASS")
+          print("W_F17_ORIGINAL_SHA256="+sha)
+          print("W_F17_AUDITED_SCORES",json.dumps(d["scores"],sort_keys=True))
+          PY
+      - name: One full native Go regression and build (without any original replay)
+        run: go test ./... && go build ./...
