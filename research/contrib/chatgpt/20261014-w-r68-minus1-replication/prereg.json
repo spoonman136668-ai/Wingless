@@ -1,0 +1,59 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R68-NEGATIVE-ONE-PHASE-EXCEPTION-REPLICATION",
+  "parent_head": "5a73ddf04a9bad1c2b41c8d5154e472f976ea4aa",
+  "source_predecessor_blob": "f41f916bf7c8d5cc47ecd717577718d705d31d32",
+  "prior": "W-R67 sealed first-use archived BROAD_GLOBAL_PHASE_FRAGILITY: minus1 exactly 0 accuracy loss in all 36 paired model/amplitude/permutation cells, while plus1 -0.203575, minus2 -0.211034 and most other phases negative. No fresh-cohort replication of the exception yet.",
+  "hypothesis": "Does zero loss at synchronous -1 common phase replicate exactly for fresh never-consumed withheld-source sequences, while +1 and -2 remain harmful?",
+  "freeze": "Unchanged W-R67 feature extractor, three previously frozen 16-weight source-withheld ridge readouts, 3 amplitudes, 4 acquisition permutations, 8 phase operations, equal presentation denominators. Freeze new heldout seeds 10432..10455 and original fixed training blocks. Do not retune weights, rubric or source on first-use results.",
+  "heldout_seeds": [
+    10432,
+    10456
+  ],
+  "development_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "phases": {
+    "intact": 0,
+    "plus1": 1,
+    "minus1": -1,
+    "plus2": 2,
+    "minus2": -2,
+    "plus4": 4,
+    "minus4": -4,
+    "plus8": 8
+  },
+  "primary": "Across 36 paired model/amplitude/permutation comparisons, MINUS_ONE_EXCEPTION_REPLICATED iff ALL 36 exact -1 deltas are 0 AND mean +1 and mean -2 each <= -0.06. MINUS_ONE_EXCEPTION_FALSIFIED iff mean -1 <= -0.06; otherwise MINUS_ONE_PARTIAL_OR_INCONCLUSIVE. Preserve per-seed scores for all 288 arms, all negative/null outcomes and full phase means.",
+  "controls": [
+    "24 fresh sealed seed IDs disjoint from W-R67 10112..10135",
+    "Frozen original three source-withheld weights and feature width 16",
+    "No simulator or scoring code adjustment after source freeze",
+    "Same circular shift on base/positive/negative; marginal signal multisets preserved",
+    "All per-cell source, amplitude and acquisition-frame comparisons retained",
+    "One first-use source claim, archive-only independent verification, one full Go regression",
+    "No FORGE R32/R33, CKB queue, accepted refs or production changes"
+  ],
+  "bounds": {
+    "models": 3,
+    "amplitudes": 3,
+    "permutations": 4,
+    "phases": 8,
+    "heldout_seeds": 24,
+    "feature_width": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Bounded synthetic temporal asymmetry in a fixed classifier. No general cognition or RSI."
+}
