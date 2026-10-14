@@ -1,0 +1,78 @@
+name: W-NCI09 prospective native two-hop path chunk compression
+on:
+  push:
+    branches: [research/w-nci09-two-link-compressed-memory-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Exact frozen source and preregistration verification
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor a42e5eecfc8742c38430ca629744d500fa707ba0 HEAD
+          test "$(git hash-object unitary/nci07_graph_local_retention.go)" = 79ad036ffd97bd4f04847aea726adf2d7400f920
+          test "$(git hash-object unitary/nci08_memory_capacity_falsification.go)" = f22038eff8d1c6e408a3d688922e36c80e27f299
+          test "$(git hash-object unitary/nci09_native_two_link_chunks.go)" = f792b1682fc8b57b613926f7b8f3c3c78e060336
+          test "$(git hash-object cmd/nci-09-wingless/main.go)" = 03157ad595aeb4cd8001e253bd37b0a7e57b1bb3
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci09/prereg.json)" = 8bcf43daa25c3074ccd3acaf218e1642c5819d05
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci09/prereg.json >/dev/null
+      - name: Development-only native model and two-link smoke qualification
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-09-wingless -phase=development > /tmp/W-NCI09-development.json
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI09-development.json"))
+          assert a["phase"]=="development" and a["sealed_seed_range"]==[30112,30136]
+          assert a["retention_learned_weights"]==4 and a["learned_join_weights"]==6
+          assert a["memory_slots"]==7 and not a["compression_rule_learned"]
+          assert a["chunk_size_bytes"]>=a["original_edge_size_bytes"]
+          assert a["external_llm_calls"]==0 and a["accepted_ref_mutation"] is False
+          print("DEV_COMPRESSOR_SMOKE_PASS",a["dev_accuracy"])
+          PY
+      - name: One original sealed prospective native chunking experiment
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-09-wingless -phase=sealed > /tmp/W-NCI09-original.json
+          finish=$(date +%s%N)
+          printf '{"science_wall_ms":%s,"runner":"ubuntu-latest","cost_usd":"unverified"}\n' "$(((finish-start)/1000000))" > /tmp/W-NCI09-resources.json
+          python3 -m json.tool /tmp/W-NCI09-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI09-original-native-two-link-evidence
+          path: |
+            /tmp/W-NCI09-original.json
+            /tmp/W-NCI09-resources.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Frozen outcome checks AFTER original archive custody
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          a=json.load(open("/tmp/W-NCI09-original.json"))
+          assert a["phase"]=="sealed" and a["sealed_seed_range"]==[30112,30136]
+          assert len(a["records"])==96
+          assert collections.Counter(x["family"] for x in a["records"])=={i:24 for i in range(4)}
+          assert all(r["chunk_count"]<=7 and r["compressed_coverage"]<=14 for r in a["records"])
+          assert a["verdict"] in ("CODED_TWO_LINK_COMPRESSION_RESTORES_BOUNDED_RECALL",
+              "PARTIAL_TWO_LINK_CHUNK_RECALL_GAIN","NO_TWO_LINK_CHUNK_COMPOSITION_GAIN")
+          assert a["external_llm_calls"]==0 and not a["accepted_ref_mutation"]
+          print("W_NCI09_VERDICT",a["verdict"])
+          print("W_NCI09_PAIRED",a["paired_accuracy"])
+          print("W_NCI09_FAMILY",a["per_family"])
+          print("W_NCI09_EXTRA_COMPUTE",a["join_candidate_evaluations"],a["graph_scorer_feature_multiplies"])
+          PY
+      - name: One complete original Wingless Go regression and build
+        run: go test ./... && go build ./...
