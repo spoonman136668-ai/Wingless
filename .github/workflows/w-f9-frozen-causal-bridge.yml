@@ -1,0 +1,59 @@
+name: W-F9 frozen learned graph causal bridge intervention development
+on:
+  push:
+    branches: [research/w-f9-frozen-causal-edge-cut-development-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify frozen F8 and preregistered F9 source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 14e4f3eadaaf4c29bcfefc16e966c21f9ebb5379 HEAD
+          test "$(git hash-object unitary/f8_frozen_projection.b64)" = "$(git rev-parse 14e4f3eadaaf4c29bcfefc16e966c21f9ebb5379:unitary/f8_frozen_projection.b64)"
+          python3 -m json.tool research/foundational/20261014-w-f9/prereg.json >/dev/null
+      - name: Run one new causal development falsification (no F3 first use)
+        run: |
+          set -euo pipefail
+          go run ./cmd/f9-wingless > /tmp/w-f9-original-development.json
+          python3 -m json.tool /tmp/w-f9-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F9-original-causal-bridge-development
+          path: /tmp/w-f9-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently verify paired counterfactuals after archival
+        run: |
+          python3 - <<'PY'
+          import collections,json
+          r=json.load(open("/tmp/w-f9-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY" and r["paired_graph_states"]==192
+          assert r["question_count"]==384 and r["positive_count"]==192 and r["negative_count"]==192
+          assert not r["sealed_first_use"] and not r["source_birth_independent"]
+          assert not r["accepted_ref_mutation"] and r["freeze_no_training"]
+          assert r["native_state_bytes"]==576
+          assert collections.Counter(x["family"] for x in r["raw_rows"])=={32:48,33:48,34:48,35:48}
+          for name,s in r["scores"].items():
+            truepos=sum(int(z["predictions"][name][0]) for z in r["raw_rows"])
+            trueneg=sum(int(not z["predictions"][name][1]) for z in r["raw_rows"])
+            pairs=sum(int(z["predictions"][name]==[True,False]) for z in r["raw_rows"])
+            assert s["correct"]==truepos+trueneg and s["paired_both_correct_rate"]==pairs/192
+          assert r["scores"]["fixed_exact_coded_control"]["paired_both_correct_rate"]==1,"INVALID_CODED_CAUSAL_CONTROL"
+          assert r["registered_verdict"] in ("DEVELOPMENT_FROZEN_LEARNED_CAUSAL_BRIDGE_SENSITIVITY","DEVELOPMENT_NO_FROZEN_CAUSAL_BRIDGE_SENSITIVITY")
+          print("W_F9_VERDICT",r["registered_verdict"])
+          print("W_F9_SCORES",r["scores"])
+          PY
+      - name: One full native Go regression and build
+        run: go test ./... && go build ./...

@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.f9.prereg.v1",
+  "parent_f8": "14e4f3eadaaf4c29bcfefc16e966c21f9ebb5379",
+  "hypothesis": "A frozen learned identity representation and learned recurrent relation composer must reverse its positive reachability answer when one necessary bridge edge is removed and replaced with a distractor, with the query and all IDs fixed.",
+  "cohort": {
+    "dev_author_created": true,
+    "source_birth_independently_witnessed": false,
+    "new_family_ids": [
+      32,
+      33,
+      34,
+      35
+    ],
+    "seed_bounds": [
+      50300,
+      50348
+    ],
+    "paired_graph_states": 192,
+    "qa_instances": 384,
+    "positive_cut_pair": [
+      true,
+      false
+    ],
+    "mutation": "exactly one necessary edge 2->3 replaced by 2->15 with all other graph facts and query fixed; oracle must change from reachable in 4 to not reachable",
+    "controls": [
+      "frozen F7 embedding + learned recurrence",
+      "same learned embedding + coded OR reachability",
+      "frozen F5 failed matcher + learned recurrence",
+      "fully coded exact equality upper, all 192 paired correct required",
+      "no-graph always-yes negative control"
+    ],
+    "thresholds": {
+      "minimum_pairwise_correct_fraction": 0.95,
+      "minimum_individual_accuracy": 0.95,
+      "max_cut_false_positives": 10,
+      "min_accuracy_gain_over_F5": 0.1
+    },
+    "labels": {
+      "invalid": "INVALID_CODED_CAUSAL_CONTROL",
+      "positive": "DEVELOPMENT_FROZEN_LEARNED_CAUSAL_BRIDGE_SENSITIVITY",
+      "negative": "DEVELOPMENT_NO_FROZEN_CAUSAL_BRIDGE_SENSITIVITY"
+    }
+  },
+  "limits": "No training, no adaptivity to queried results. New author-generated dev-only data; not independent source-birth F3. Engineered binary ID encoding and fixed three recurrent rounds remain.",
+  "authority": {
+    "accepted_ref_mutation": false,
+    "no_queues": true,
+    "no_controller": true,
+    "no_ktrade": true,
+    "no_forge": true
+  }
+}
