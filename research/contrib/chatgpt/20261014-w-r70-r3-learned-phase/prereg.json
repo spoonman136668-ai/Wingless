@@ -1,0 +1,71 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R70-R3-EQUAL-BUDGET-LEARNED-PHASE-READOUT",
+  "parent_head": "9b1eac075006442c7e426ac0cb627d58102958b8",
+  "baseline_executor_blob": "04222695ef33a1f5a0c9c67baf6cc1d286a304e1",
+  "prior": "W-R68 independent repeat demonstrated 36/36 zero credit losses for -1 yet severe +1 shifts; separately W-R68 margin audit found -1 changed margins in 7,356/15,552 cases but no discrete credits changed. Further mechanical attribution alone has diminishing value. Move from diagnosis to a learnable fixed-width predictor. Original W-R70 run 38541195872 failed importing w68.w67 before training/heldout; no original artifact exists. This bounded R2 fixes the single alias and uses unused sealed 13344..13359; failed cohort 13312..13327 remains reserved. R2 development-only import/fit PASS but original sealed 13344–13359 were consumed and artifact was lost after a workflow postrun assertion erroneously expected 1728 rather than 6912 records. R2 source is scientifically unqualified; R3 uses a new source with artifact uploaded before interpretive assertions.",
+  "hypothesis": "Will learning a 16-parameter fixed-width readout from phase-balanced development samples increase +1/+2 temporal-shift accuracy on completely unseen generator/entity/seed inputs over an exactly equal-1728-example, same-regularizer ridge baseline without unacceptable intact/minus1 regression?",
+  "freeze": "Three predetermined models per each of three original development blocks: original ridge (unchanged W61/W54 input data), +1-only curriculum, and balanced intact/+1/-1/+2 curriculum. Same 16 ridge weights, 1728 symmetric signed training items, same excluded xorshift source, 864 per included source, no holdout adjustment or extra sample budget. Evaluate three amplitudes, four presentations, four heldout phases, 16 untouched seed IDs 13424..13439 and entities9..17. No hyperparameter selection after sealed first-use. One dev-only import/fit acceptance before any sealed evaluation. R3 freezes 6912 original per-seed rows and uploads original artifact before numerical rubric assertions.",
+  "dev_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    13424,
+    13440
+  ],
+  "train_arms": [
+    "original_ridge",
+    "plus1_curriculum",
+    "balanced_phase_curriculum"
+  ],
+  "test_phases": [
+    "intact",
+    "plus1",
+    "minus1",
+    "plus2"
+  ],
+  "primary": "EQUAL_BUDGET_LEARNED_PHASE_TRANSFER iff phase-balanced minus baseline +1 >=0.04, +2 >=0.025, intact and -1 each >=-0.03, with at least two of three dev cohorts giving +1 >=0.02. PARTIAL_LEARNED_PHASE_TRANSFER if +1 >=0.02 and intact >=-0.05. Else NO_EQUAL_BUDGET_PHASE_GAIN. Preserve per-seed 1728 records, signed source counts, weight/corpus SHA, all losses and negatives.",
+  "controls": [
+    "Exact baseline examples and SHA matched to original frozen m.build_examples for each unchanged development block",
+    "Only ridge readout changes under the identical 16-weight/1728-item/regularizer budget",
+    "Unseen synthetic generator source and entity9..17 remain withheld from training",
+    "Fresh sealed seeds 13424..13439 disjoint from W-R67 10112..10135, W-R68 10432..10455, and pre-first-use invalid W-R69 12672..12687",
+    "No sealed training, no adaptive threshold or after-the-fact model selection",
+    "One original first-use, one full repository regression/build and independent archive-only witness",
+    "No FORGE R32/R33, accepted refs, CKB-plane queue or production changes",
+    "The W-R70 failed pre-import cohort 13312..13327 is not reused; R2 uses new prospectively frozen sealed identity 13424..13439",
+    "Pre-first-use import and fit of all three original development cohorts mandatory before sealed science",
+    "Failed R1 seeds13312..13327 and consumed R2 seeds13344..13359 are quarantined, never reused",
+    "First-use evidence artifact is uploaded before any post-execution interpretive/prereg assertions"
+  ],
+  "bounds": {
+    "dev_cohorts": 3,
+    "arms": 3,
+    "weights": 16,
+    "items_per_fit": 1728,
+    "heldout_seeds": 16,
+    "amplitudes": 3,
+    "permutations": 4,
+    "phases": 4,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Frozen learned readout only; not general language reasoning, learned state formation or RSI.",
+  "original_failed_source_blob": "5061379ccd3b3c32d561495d5d451b5b37d87f47",
+  "original_failed_run": 38541195872,
+  "failed_r2_executor_blob": "7c6419850010bc8c33bf10a8dcf0e0946ed84778",
+  "failed_r2_run": 38541890236,
+  "expected_heldout_records": 6912
+}
