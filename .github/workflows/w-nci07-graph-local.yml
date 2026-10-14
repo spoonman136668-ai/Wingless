@@ -1,0 +1,77 @@
+name: Wingless NCI07 graph-local native learned memory
+on:
+  push:
+    branches: [research/w-nci07-graph-local-retention-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify original frozen NCI06 ancestry and new scientific source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor c3195345f82ca4e0bd23c6015f27b4f7f7ac2d44 HEAD
+          test "$(git hash-object unitary/nci06_learned_retention.go)" = 17bd70a5e25f8bfb763b021e47d669ee59011129
+          test "$(git hash-object unitary/nci07_graph_local_retention.go)" = 79ad036ffd97bd4f04847aea726adf2d7400f920
+          test "$(git hash-object cmd/nci-07-wingless/main.go)" = 48471d704ca189955d6401b74ba472cd28724e4e
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci07/prereg.json)" = a1347e0fda5f13c932841675ab60ab2f0fdc8758
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci07/prereg.json >/dev/null
+      - name: Development-only graph-local native retention qualification
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-07-wingless -phase=development > /tmp/W-NCI07-dev.json
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI07-dev.json"))
+          assert a["phase"]=="development" and a["development_examples"]==25600
+          assert len(a["trained_retention_weights"])==4
+          assert a["sealed_seeds"]==[27136,27160] and a["memory_cap"]==7
+          assert not a["nci01_full_acceptance"] and not a["accepted_ref_mutation"]
+          print("FROZEN_GRAPH_LOCAL_VALIDATION",a["validation_accuracy"])
+          PY
+      - name: One frozen sealed original native graph-local first use
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-07-wingless -phase=sealed > /tmp/W-NCI07-original.json
+          end=$(date +%s%N)
+          printf '{"elapsed_wall_ms":%s,"runner":"ubuntu-latest","cost_usd":"unverified"}\n' "$(((end-start)/1000000))" > /tmp/W-NCI07-resources.json
+          python3 -m json.tool /tmp/W-NCI07-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI07-original-sealed-evidence
+          path: |
+            /tmp/W-NCI07-original.json
+            /tmp/W-NCI07-resources.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Check original source result after immutable artifact custody
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          a=json.load(open("/tmp/W-NCI07-original.json"))
+          assert a["phase"]=="sealed" and a["sealed_seeds"]==[27136,27160]
+          assert len(a["records"])==96
+          assert collections.Counter(z["family"] for z in a["records"])=={i:24 for i in range(4)}
+          assert a["checkpoint_restores"]==96
+          assert all(x["graph_edges"]==7 for x in a["records"])
+          assert a["verdict"] in ("GRAPH_LOCAL_LEARNED_RETENTION_TRANSFER",
+             "PARTIAL_GRAPH_LOCAL_RETENTION_GAIN","NO_GRAPH_LOCAL_RETENTION_TRANSFER")
+          assert not a["nci01_full_acceptance"] and not a["accepted_ref_mutation"]
+          print("FROZEN_VERDICT",a["verdict"])
+          print("TEST_ACCURACY",a["accuracy"])
+          print("FAMILY_COMPARISONS",a["by_family"])
+          print("RESOURCE_COUNTS",a["join_candidate_evaluations"])
+          PY
+      - name: Final complete original Wingless Go tests and build
+        run: go test ./... && go build ./...

@@ -1,0 +1,42 @@
+{
+  "schema": "wingless.nci07.prereg.v1",
+  "id": "W-NCI07-GRAPH-LOCAL-FUTURE-RELEVANCE",
+  "parent": "c3195345f82ca4e0bd23c6015f27b4f7f7ac2d44",
+  "prior": "W-NCI06 original valid partial: four-hop 24/96, all successes confined to high-rehearsal family, 0/24 in three others; learned relevance scorer prioritized old/high-frequency edges. Avoid threshold variants; introduce genuinely different available-graph relation connectivity at native bounded-memory eviction.",
+  "hypothesis": "Can 4-weight native SGD relevance scoring of local edge connectivity, exposure and relative age, considering incoming candidates as possible eviction victims, generalize withheld four-hop compositional queries better than frozen prior learned recency/exposure policy under same seven-edge budget?",
+  "development": [
+    26800,
+    26960
+  ],
+  "validation": [
+    26960,
+    26992
+  ],
+  "sealed": [
+    27136,
+    27160
+  ],
+  "architecture": "Native W prior NCI06 learned admission (65 params) and learned join (6 params) unchanged; new four-weight logistic relevance policy trained solely on development future labels; at each overflow, feature computation uses at most eight public candidate edges (seven stored plus just observed incoming). Graph degree/adjacency feature is hand-coded but policy weights are learned. Reject incoming if it scores lowest; no external model and no sealed future-query labels.",
+  "fair_controls": "Same seven stored edges, same twelve public admitted facts, same unchanged join. Frozen NCI06 learned three-weight policy, FIFO and LRU arms share same source stream; new policy can reject incoming unlike prior; report costs and control difference explicitly.",
+  "rubric": "GRAPH_LOCAL_LEARNED_RETENTION_TRANSFER iff four-hop >=.60, >=.15 improvement over frozen NCI06 learned and >=.10 over LRU, with no family worse than NCI06 by >.20. PARTIAL_GRAPH_LOCAL_RETENTION_GAIN iff ≥.10 over previous learned without full guards. Otherwise NO_GRAPH_LOCAL_RETENTION_TRANSFER. Archive all 96 rows, family failures, resource multiplications, rejected incoming facts, checkpoint test. No NCI01 full claim even on positive.",
+  "resource": {
+    "capacity": 7,
+    "graph_scan_max_edges": 8,
+    "trained_eviction_params": 4,
+    "retention_dev_examples": 25600,
+    "original_cases": 96,
+    "external_llm_calls": 0
+  },
+  "controls": [
+    "Unused sealed 27136..27159 distinct W06 25632..25655",
+    "Development-only training and selection before one sealed first use",
+    "Original artifact before interpretation, full Go regression, independent read-only original trial audit",
+    "No FORGE R32/R33, CKB/KTRADE, accepted refs, production, merges"
+  ],
+  "allocation": {
+    "integration": 45,
+    "foundational_science": 45,
+    "optimization": 10,
+    "measured_compute": false
+  }
+}
