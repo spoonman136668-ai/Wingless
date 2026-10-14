@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R68-PAIRED-MARGIN-STABILITY",
+  "parent_head": "5a73ddf04a9bad1c2b41c8d5154e472f976ea4aa",
+  "prior": "W-R67 phase minus1 gave zero mean accuracy difference and exactly identical per-seed credits in all 864 rows while six other global phases harmed scores; dev-only [38537515704] confirms feature vectors do change at minus1. Unknown if weighted margins drift without decision changes.",
+  "hypothesis": "Is the surprising minus1 score invariance due to margin insensitivity, or to a stable downstream decision threshold despite shifted 16-dimensional features and weighted margins?",
+  "freeze": "Exactly three W-R61 source-withheld 16-weight ridge fits, generator xorshift-independent, unseen entity group9..17, amplitudes1..3, four channel permutations. Compare intact versus global plus1 and minus1 on unused sealed seeds. Record per pair both positive/negative features, score margin, and credit changes. No retraining or post-result tuning.",
+  "sealed_heldout_seeds": [
+    10208,
+    10232
+  ],
+  "development_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "phases": [
+    "intact",
+    "minus1",
+    "plus1"
+  ],
+  "primary": "Across 864 model-amplitude-permutation-seed rows and 15,552 label pairs, DECISION_STABLE_DESPITE_MARGIN_DRIFT if >=50% minus1 margins change by >1e-9 but <=5% paired credits change. MARGIN_INVARIANCE if <=5% margins change; otherwise MIXED_MARGIN_DECISION_EFFECT. Report positive and negative feature-change counts and plus1 control deltas; preserve null/negative outcomes.",
+  "controls": [
+    "Previous W-R67 sealed seeds untouched; new 10208..10231",
+    "Dev-only feature-level positive verification before freeze, run 38537515704",
+    "Same model weights, data and source identity across three phase arms",
+    "No evaluator-only hidden inputs, no capacity adaptation",
+    "One new firstuse, one full Go regression and build, independent archive-only reaggregate"
+  ],
+  "bounds": {
+    "models": 3,
+    "amplitudes": 3,
+    "permutations": 4,
+    "heldout": 24,
+    "source_pairs_per_seed": 18,
+    "arms": 3,
+    "feature_width": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Causal mechanism of synthetic fixed-readout phase anomaly, not generalized temporal cognition or RSI."
+}

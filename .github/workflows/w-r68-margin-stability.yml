@@ -1,0 +1,47 @@
+name: Wingless W-R68 feature-margin causality
+on:
+  push:
+    branches: [research/w-r68-margin-stability-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Exact parent, frozen executor and preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5a73ddf04a9bad1c2b41c8d5154e472f976ea4aa HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r67-phase-ladder/execute.py)" = f41f916bf7c8d5cc47ecd717577718d705d31d32
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r68-margin-stability/execute.py)" = 21804b9ee8b25870ce3bf87c0a740adfd01c224e
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r68-margin-stability/prereg.json)" = f1bcae8729f5096d0b225c24d476701b7468c479
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r68-margin-stability/execute.py
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-r68-margin-stability/prereg.json >/dev/null
+      - name: One prospective first-use on fresh sealed cohort
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r68-margin-stability/execute.py > /tmp/W-R68-original.json
+          python3 -m json.tool /tmp/W-R68-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-R68-original.json"))
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          assert a["sealed_heldout_seeds"]==list(range(10208,10232))
+          assert len(a["records"])==864 and a["aggregate"]["pairs"]==15552
+          assert a["classification"] in ("DECISION_STABLE_DESPITE_MARGIN_DRIFT","MARGIN_INVARIANCE","MIXED_MARGIN_DECISION_EFFECT")
+          print("CLASSIFICATION",a["classification"])
+          print("AGGREGATE",a["aggregate"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R68-original-margin-stability
+          path: /tmp/W-R68-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Full repository regression
+        run: go test ./... && go build ./...
