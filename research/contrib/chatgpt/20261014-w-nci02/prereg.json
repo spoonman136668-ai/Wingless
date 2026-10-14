@@ -1,13 +1,13 @@
 {
   "schema": "wingless.nci02.prereg.v1",
-  "id": "W-NCI02-LEARNED-EDGE-JOIN-RELATION-COMPOSITION",
-  "parent": "4cac8fa96a9c1aaad854ae62fbf4a22777d6ba09",
-  "prior": "W-NCI01-R2 integrated native learned admission + exact symbolic recall but graph traversal/composition were hardcoded. 24 seed cases represented only eight structural patterns. Full NCI acceptance false.",
+  "id": "W-NCI02-R2-LEARNED-EDGE-JOIN-COMPOSITION",
+  "parent": "fb95e3938b10fff2db1dc195a65ac2f4149ca4bd",
+  "prior": "W-NCI01-R2 integrated native learned admission + exact symbolic recall but graph traversal/composition were hardcoded. 24 seed cases represented only eight structural patterns. Full NCI acceptance false. R1 GitHub run 38560338305 failed Go dev compilation (unused encoding/json import) before first-use. R1 never ran science. R2 fixes only that import plus fresh sealed cohort and provenance.",
   "hypothesis": "Can a native Go SGD-trained logistic relation-join predicate, coupled to existing learned lexical admission and 16-slot exact recall, infer unfamiliar 2-,3-,4-hop graph relationships with negative controls, interrupt/checkpoint restoration, retention and unseen entity names?",
-  "freeze": "Train six learned logistic join parameters from 65 epochs×384 pairs×2 labels on entity IDs0..23, tune threshold only on dev IDs24..31. No use of sealed entity IDs32..63 or seeds22112..22135 before one first-use. Positive and mismatched-edge negatives, bounded up to4 join rounds on existing native exact recall, 5 directed stored edges+1 post-interrupt edge, 1 observational distractor. No external LLM or additional memory; unchanged learned clause admission.",
+  "freeze": "Train six learned logistic join parameters from 65 epochs×384 pairs×2 labels on entity IDs0..23, tune threshold only on dev IDs24..31. No use of sealed entity IDs32..63 or seeds22144..22167 before one first-use. Positive and mismatched-edge negatives, bounded up to4 join rounds on existing native exact recall, 5 directed stored edges+1 post-interrupt edge, 1 observational distractor. No external LLM or additional memory; unchanged learned clause admission. R2 verifies exact prior source and development-only compilation before sealed first-use.",
   "sealed_seeds": [
-    22112,
-    22136
+    22144,
+    22168
   ],
   "cases": 24,
   "primary": "LEARNED_PREDICATE_ONLY_NOT_NATIVE_RELATIONAL_STATE if learned join yields >=.75 accuracy on 2hop,3hop,negative2hop and new4hop under frozen decoder; otherwise LEARNED_JOIN_INTEGRATION_BELOW_GATE. Regardless of numerical result, full NCI01 acceptance FALSE: model sees explicit equality features, learned predicate only, symbolic storage and enumerated join schedule remain designed.",
@@ -17,7 +17,8 @@
     "Existing 65-weight native lexical admission, native 16-slot exact recall and checkpoint bytes",
     "Original source archived before rubric checks; full Go regression; independent artifact-only numerical reaggregation",
     "No architecture replacement, no FORGE R32/R33 or CKB/KTRADE changes",
-    "Preserve accepted refs, source first-use identity and negative/nulls"
+    "Preserve accepted refs, source first-use identity and negative/nulls",
+    "R1 22112..22135 not consumed but remains reserved; R2 22144..22167 unique"
   ],
   "cost_contract": {
     "join_learned_parameters": 6,

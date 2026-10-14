@@ -1,7 +1,6 @@
 package unitary
 
 import (
- "encoding/json"
  "fmt"
  "math"
  "strconv"
@@ -145,10 +144,10 @@ func RunNCI02Wingless(phase string)(NCI02WResult,error){
  join,cut,dev:=nci02WTrain()
  result:=NCI02WResult{
   Schema:"wingless.nci02.learned-composition-predicate.v1",
-  Parent:"4cac8fa96a9c1aaad854ae62fbf4a22777d6ba09",Phase:phase,
+  Parent:"fb95e3938b10fff2db1dc195a65ac2f4149ca4bd",Phase:phase,
   Verdict:"DEVELOPMENT_ONLY",DevelopmentJoinAccuracy:dev,
   JoinThreshold:cut,JoinWeights:join.W,JoinBias:join.B,
-  HeldoutSeedRange:[2]int{22112,22136},TrainingExamples:384*2,TrainingUpdates:65*384*2,
+  HeldoutSeedRange:[2]int{22144,22168},TrainingExamples:384*2,TrainingUpdates:65*384*2,
   LearnableJoinParameters:6,NativeAdmissionParameters:65,NativeRecallCap:16,
   LearnedCompositionPredicate:true,LearnedRelationalStorage:false,
   NCI01FullAcceptance:false,ExternalModelCalls:0,AcceptedRefMutation:false,
@@ -159,7 +158,7 @@ func RunNCI02Wingless(phase string)(NCI02WResult,error){
  keys:=[]string{"two_hop","three_hop","two_hop_negative","three_hop_negative",
   "interrupted","retained","new_four_hop","direct_only_baseline","oracle_two_hop"}
  counts:=map[string]int{};for _,key:=range keys{counts[key]=0}
- for seed:=22112;seed<22136;seed++{
+ for seed:=22144;seed<22168;seed++{
   offset:=(seed*11)%32
   var nodes [5]int
   for k:=range nodes{nodes[k]=32+(offset+k*7)%32}
