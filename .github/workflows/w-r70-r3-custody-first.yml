@@ -1,0 +1,79 @@
+name: Wingless W-R70 R3 custody-first equal-budget learned phase
+on:
+  push:
+    branches: [research/w-r70-r3-custody-first-learned-phase-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify source identity and disjoint sealed cohort before first use
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 9b1eac075006442c7e426ac0cb627d58102958b8 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r68-minus1-replication/execute.py)" = 04222695ef33a1f5a0c9c67baf6cc1d286a304e1
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r70-r3-learned-phase/execute.py)" = 4bbc58c56dcc35ae66e2d47547a2b96868889635
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r70-r3-learned-phase/prereg.json)" = b9b69b76fb3dd9a0cc43512e1caf962ccc536800
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r70-r3-learned-phase/execute.py
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-r70-r3-learned-phase/prereg.json >/dev/null
+          python3 - <<'PY'
+          import json
+          p=json.load(open("research/contrib/chatgpt/20261014-w-r70-r3-learned-phase/prereg.json"))
+          held=set(range(*p["sealed_heldout_seeds"]))
+          assert held==set(range(13424,13440))
+          assert p["expected_heldout_records"]==3*3*3*4*4*16==6912
+          for old in ((10112,10136),(10208,10232),(10432,10456),
+                      (12672,12688),(13312,13328),(13344,13360)):
+              assert held.isdisjoint(range(*old))
+          print("R3_FROZEN_SCOPE_AND_CUSTODY_CONTRACT=PASS")
+          PY
+      - name: Qualification of dev-only unchanged fits before source use
+        run: |
+          set -euo pipefail
+          python3 -B - <<'PY'
+          import importlib.util
+          p="research/contrib/chatgpt/20261014-w-r70-r3-learned-phase/execute.py"
+          spec=importlib.util.spec_from_file_location("w70_r3_dev",p)
+          x=importlib.util.module_from_spec(spec)
+          assert spec and spec.loader
+          spec.loader.exec_module(x)
+          assert x.w67 is x.w68 and len(x.fit())==9
+          print("R3_DEVELOPMENT_FIT=PASS")
+          PY
+      - name: One frozen original first-use (result written before any classification)
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r70-r3-learned-phase/execute.py > /tmp/W-R70-R3-original.json
+          python3 -m json.tool /tmp/W-R70-R3-original.json >/dev/null
+          echo "R3_ORIGINAL_SCIENCE_WRITTEN=PASS"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-R70-R3-first-use-source-record
+          path: /tmp/W-R70-R3-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verify original evidence after artifact custody
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-R70-R3-original.json"))
+          assert a["sealed_heldout_seeds"]==list(range(13424,13440))
+          assert a["training_examples_per_fit"]==1728 and a["model_width"]==16
+          assert len(a["all_heldout_records"])==3*3*3*4*4*16==6912
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          assert a["classification"] in ("EQUAL_BUDGET_LEARNED_PHASE_TRANSFER",
+              "PARTIAL_LEARNED_PHASE_TRANSFER","NO_EQUAL_BUDGET_PHASE_GAIN")
+          print("CLASSIFICATION",a["classification"])
+          print("ARM_ACCURACIES",a["aggregate_accuracy"])
+          print("PAIRED_DELTA",a["balanced_minus_baseline"])
+          PY
+      - name: Final full Wingless regression and build
+        run: go test ./... && go build ./...
