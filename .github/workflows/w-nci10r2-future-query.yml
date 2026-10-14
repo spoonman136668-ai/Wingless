@@ -1,0 +1,80 @@
+name: W-NCI10-R2 frozen future-question utility learned memory control
+on:
+  push:
+    branches: [research/w-nci10r2-utility-selected-memory-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Source and first-use pre-registration identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor db2e93d7f7e38d0d0e9cc50462033313fd1b7d1c HEAD
+          test "$(git hash-object unitary/nci10_learned_merge_gate.go)" = 6f291de6bef2f567245776df463031ba66625b93
+          test "$(git hash-object unitary/nci10r2_future_query_utility.go)" = 5a0fd68f768eaffcfc805f18b63281a4cb5fd3a9
+          test "$(git hash-object cmd/nci-10r2-wingless/main.go)" = cd28c761df439718cf1b69adeb6e8ac698c201b0
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci10r2/prereg.json)" = ec3aa816e520763e9d5842892fc2a89000b36436
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci10r2/prereg.json >/dev/null
+      - name: Development-only native utility policy selection and byte equality
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-10r2-wingless -phase=development > /tmp/w10r2-dev.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open("/tmp/w10r2-dev.json"))
+          assert d["phase"]=="development" and d["sealed_seed_range"]==[32640,32664]
+          assert d["utility_candidate_policies"]==18 and d["utility_validation_finalists"]==4
+          assert d["merge_gate_parameters"]==5 and d["experimental_slot_cap"]==7
+          assert d["chunk_record_bytes"]==8 and d["baseline_edge_record_bytes"]==16
+          assert d["training_examples"]>0 and d["validation_examples"]>0
+          assert not d["nci01_full_acceptance"] and d["external_llm_calls"]==0
+          print("W_DEV_UTILITY_QUALIFIED",d["development_accuracy"],d["threshold"])
+          PY
+      - name: Exactly one original fresh sealed future-query experiment
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-10r2-wingless -phase=sealed > /tmp/w10r2-original.json
+          end=$(date +%s%N)
+          printf '{"science_wall_ms":%s,"runner":"ubuntu-latest","billing_usd":"unverified"}\n' "$(((end-start)/1000000))" > /tmp/w10r2-resource.json
+          python3 -m json.tool /tmp/w10r2-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI10R2-original-future-query-utility
+          path: |
+            /tmp/w10r2-original.json
+            /tmp/w10r2-resource.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Check original sealed evidence after artifact custody
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          d=json.load(open("/tmp/w10r2-original.json"))
+          assert d["phase"]=="sealed" and d["sealed_seed_range"]==[32640,32664]
+          assert len(d["records"])==96
+          assert collections.Counter(x["family"] for x in d["records"])=={i:24 for i in range(4)}
+          assert all(x["learned_chunks"]<=7 and x["coded_chunks"]<=7 for x in d["records"])
+          assert d["chunk_record_bytes"]==8
+          assert d["verdict"] in ("R2_LEARNED_QUERY_UTILITY_TRANSFER",
+            "R2_PARTIAL_QUERY_UTILITY_GAIN","R2_NO_QUERY_UTILITY_TRANSFER",
+            "R2_NOVEL_GRAPH_ORACLE_INVALID")
+          assert not d["nci01_full_acceptance"] and d["external_llm_calls"]==0 and not d["accepted_ref_mutation"]
+          print("FROZEN_CLASSIFICATION",d["verdict"])
+          print("PAIRED_SCORES",d["paired_accuracy"])
+          print("FAMILY_SCORES",d["family_accuracy"])
+          print("INFERENCE_WORK",d["gate_inference_evaluations"],d["join_candidate_evaluations"])
+          PY
+      - name: Final full Go tests and build
+        run: go test ./... && go build ./...
