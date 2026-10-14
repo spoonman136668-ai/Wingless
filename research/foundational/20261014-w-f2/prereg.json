@@ -1,0 +1,16 @@
+{
+  "schema": "wingless.f2.prereg.v1",
+  "id": "W-F2-TASK-SUPERVISED-SHARP-LINK-GATE-LEARNING",
+  "parent_commit": "4a8da70dc242940b42b69dd9d71b0e4f9fc7212c",
+  "prior_F1C": {
+    "run": 38634449022,
+    "artifact": 11927547590,
+    "original_json_sha256": "66b5076b620851333c72387cbf5eb4243b6f46259a9606c9c95c6f36e9fd8d1e"
+  },
+  "hypothesis": "A calibrated three-parameter link-transition gate can be learned from graph-query performance without replacing it with fixed manually selected gate parameters. W-F1C proved a sharp fixed gate works but the original F1 optimizer stalled.",
+  "training": "NEW development training seeds 40500..40523, 3 families 0-2, 288 states. Train source is disjoint from F1/F1B/F1C and validation. Compare F1 original finite-difference optimizer, Adam task BCE, Adam with 2x negative cost, and Adam task BCE with a fixed structural warm start (3,0,-2). Include frozen F1B model and previously existing fixed coded strong control as references. Hyperparameters frozen in source before executing. All adaptive arms use task labels only for training, not as inputs to validation memory.",
+  "validation": "NEW development validation seeds 40700..40711, four families 4..7, 192 states/384 questions with equal positive/negative balance. Record every raw prediction, false positive and exact model weights; retain 576 native resident bytes and 24 trainable parameter bytes. New development only, NO sealed scientific cohort.",
+  "rubric": "DEVELOPMENT_TASK_TRAINED_SHARPNESS_OBSERVED only if one prespecified adaptive arm has >=95% validation accuracy, <=5% negative-question false positives, and >=10pp gain over original F1 optimizer. Otherwise DEVELOPMENT_NO_TASK_LEARNED_SHARPNESS_GAIN. Any observed gain requires separately frozen sealed evaluation before claiming generalization.",
+  "limits": "This model sees CODED identifier equality and uses CODED four-hop traversal. Improving scalar calibration is not learned entity identity, full NCI01, AGI/RSI or native language/reasoning. No future validation questions during training.",
+  "authority": "No accepted-ref mutation, sealed first-use claim, queue/controller changes, FORGE R32/R33, CKB/KTRADE/broker/production. One GitHub development workflow and final Go regression."
+}
