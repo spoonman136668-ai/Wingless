@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.nci02.prereg.v1",
+  "id": "W-NCI02-LEARNED-EDGE-JOIN-RELATION-COMPOSITION",
+  "parent": "4cac8fa96a9c1aaad854ae62fbf4a22777d6ba09",
+  "prior": "W-NCI01-R2 integrated native learned admission + exact symbolic recall but graph traversal/composition were hardcoded. 24 seed cases represented only eight structural patterns. Full NCI acceptance false.",
+  "hypothesis": "Can a native Go SGD-trained logistic relation-join predicate, coupled to existing learned lexical admission and 16-slot exact recall, infer unfamiliar 2-,3-,4-hop graph relationships with negative controls, interrupt/checkpoint restoration, retention and unseen entity names?",
+  "freeze": "Train six learned logistic join parameters from 65 epochs×384 pairs×2 labels on entity IDs0..23, tune threshold only on dev IDs24..31. No use of sealed entity IDs32..63 or seeds22112..22135 before one first-use. Positive and mismatched-edge negatives, bounded up to4 join rounds on existing native exact recall, 5 directed stored edges+1 post-interrupt edge, 1 observational distractor. No external LLM or additional memory; unchanged learned clause admission.",
+  "sealed_seeds": [
+    22112,
+    22136
+  ],
+  "cases": 24,
+  "primary": "LEARNED_PREDICATE_ONLY_NOT_NATIVE_RELATIONAL_STATE if learned join yields >=.75 accuracy on 2hop,3hop,negative2hop and new4hop under frozen decoder; otherwise LEARNED_JOIN_INTEGRATION_BELOW_GATE. Regardless of numerical result, full NCI01 acceptance FALSE: model sees explicit equality features, learned predicate only, symbolic storage and enumerated join schedule remain designed.",
+  "controls": [
+    "Unseen names 32..63, 24 distinct starting offsets, fixed structural family with distractors, not broad task generalization",
+    "Direct-only baseline and exact oracle edge-composition comparator, measured join candidate evaluations; costs are not equal-inference-FLOP",
+    "Existing 65-weight native lexical admission, native 16-slot exact recall and checkpoint bytes",
+    "Original source archived before rubric checks; full Go regression; independent artifact-only numerical reaggregation",
+    "No architecture replacement, no FORGE R32/R33 or CKB/KTRADE changes",
+    "Preserve accepted refs, source first-use identity and negative/nulls"
+  ],
+  "cost_contract": {
+    "join_learned_parameters": 6,
+    "admission_learned_parameters": 65,
+    "memory_slots": 16,
+    "composition_depth_max": 4,
+    "external_llm_calls": 0
+  },
+  "nci01_full_acceptance": false,
+  "portfolio_target": {
+    "native_integration": 45,
+    "foundational_science": 45,
+    "optimization": 10
+  },
+  "claim_limit": "Native learned edge-join decision over manually supplied equality indicators, exact symbolic store, fixed enumeration and answer construction. Not learned language understanding, learned state formation or AGI/RSI."
+}

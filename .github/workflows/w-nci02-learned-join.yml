@@ -1,0 +1,74 @@
+name: Wingless W-NCI02 native learned relation join
+on:
+  push:
+    branches: [research/w-nci02-learned-join-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Frozen native source identity and preregistration
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4cac8fa96a9c1aaad854ae62fbf4a22777d6ba09 HEAD
+          test "$(git hash-object unitary/nci01_native_language_integration.go)" = e2136dfb11d72af18be0bf2fcfab669369ccf090
+          test "$(git hash-object unitary/nci02_learned_relation_join.go)" = afeddfa8be9782da2cd7160302f5c593aee2997d
+          test "$(git hash-object cmd/nci-02-wingless/main.go)" = d870dd6b97c51b05fc2be9757e69fd395412ed68
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci02/prereg.json)" = 0bd3a33842e6a7fc26b395145472e4803344be08
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci02/prereg.json >/dev/null
+      - name: Development-only Go compilation and learned join qualification
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-02-wingless -phase=development > /tmp/W-NCI02-development.json
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI02-development.json"))
+          assert a["phase"]=="development" and a["training_examples"]==768
+          assert a["training_updates"]==49920
+          assert a["learnable_join_parameters"]==6
+          assert a["nci01_full_acceptance"] is False
+          print("DEV_JOIN_SCORE",a["development_join_accuracy"])
+          PY
+      - name: Exactly one novel-combination sealed native experiment
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-02-wingless -phase=sealed > /tmp/W-NCI02-original.json
+          finish=$(date +%s%N)
+          printf '{"elapsed_wall_ms":%s,"runner":"ubuntu-latest","cost_usd":"unverified"}\n' "$(((finish-start)/1000000))" > /tmp/W-NCI02-resources.json
+          python3 -m json.tool /tmp/W-NCI02-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI02-original-source-evidence
+          path: |
+            /tmp/W-NCI02-original.json
+            /tmp/W-NCI02-resources.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verify preregistered result after evidence custody
+        run: |
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI02-original.json"))
+          assert a["phase"]=="sealed" and a["heldout_seed_range"]==[22112,22136]
+          assert len(a["records"])==24 and len(set(z["distinct_structure"] for z in a["records"]))==24
+          assert a["verdict"] in ("LEARNED_PREDICATE_ONLY_NOT_NATIVE_RELATIONAL_STATE",
+                                 "LEARNED_JOIN_INTEGRATION_BELOW_GATE")
+          assert a["nci01_full_acceptance"] is False
+          assert a["external_model_calls"]==0 and a["accepted_ref_mutation"] is False
+          print("FROZEN_CLASSIFICATION",a["verdict"])
+          print("TASK_ACCURACY",a["accuracy"])
+          print("JOIN_CANDIDATE_OPS",a["join_candidate_evaluations"])
+          PY
+      - name: One final complete Wingless regression and build
+        run: go test ./... && go build ./...
