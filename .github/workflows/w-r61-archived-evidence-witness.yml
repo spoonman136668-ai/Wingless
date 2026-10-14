@@ -1,0 +1,92 @@
+name: W-R61 independent archived original evidence witness
+on:
+  push:
+    branches: [audit/w-r61-archived-firstuse-validation-20261013]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify first-use experiment exact immutable head
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4fd74701a7a4cb61a7e4156dd9651390c7d981d5 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r61-entity-transfer/prereg.json)" = 4d624edd34d48404766a8b41659ab5fbaa173ca0
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r61-entity-transfer/execute.py)" = ea86237d19c5bd75086f0dab699158d2aa8fc353
+      - name: Download original artifact only, never rerun first-use
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38494903713
+          name: W-R61-original-entity-source-transfer
+          github-token: ${{ github.token }}
+          path: archive
+      - name: Independent recomputation of frozen scientific decision
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib,math,pathlib
+          p=pathlib.Path("archive/W-R61-original.json")
+          raw=p.read_bytes(); z=json.loads(raw)
+          assert z["schema"]=="wingless.w-r61-entity-heldout.v1"
+          assert z["parent_head"]=="867ca5dea0d316b4d89d8787585369a0bad508cb"
+          assert z["sealed_heldout_seeds"]==list(range(9120,9168))
+          assert z["unseen_entities"]==list(range(9,18))
+          assert z["training_entities"]==list(range(9))
+          assert z["amplitudes"]==[1,2,3]
+          assert len(z["full_cross_family"])==9 and len(z["compact_audit_rows"])==81
+          for key,models in z["full_cross_family"].items():
+              assert key in z["training_provenance"]
+              withheld=key.split("withhold_",1)[1]
+              assert z["training_provenance"][key]["source_counts"][withheld]==0
+              for amplitude in ("1","2","3"):
+                  assert set(models[amplitude])=={"affine_prior","quadratic_irregular","xorshift_independent"}
+                  for generator,groups in models[amplitude].items():
+                      assert set(groups)=={"seen_identity_control","unseen_identity_transfer"}
+                      for group,measured in groups.items():
+                          rows=measured["by_seed"]
+                          assert len(rows)==48 and [r["seed"] for r in rows]==list(range(9120,9168))
+                          correct=sum(r["credit"] for r in rows)
+                          presentations=sum(r["presentations"] for r in rows)
+                          assert presentations>0
+                          assert math.isclose(correct,measured["correct_credit"],abs_tol=1e-8)
+                          assert presentations==measured["presentations"]
+                          assert math.isclose(measured["accuracy"],correct/presentations,abs_tol=1e-12)
+          comparisons=[]
+          for i in range(1,4):
+              model=f"{i}:withhold_xorshift_independent"
+              for amplitude in (1,2,3):
+                  arm=z["full_cross_family"][model][str(amplitude)]["xorshift_independent"]
+                  seen=arm["seen_identity_control"]["accuracy"]
+                  unseen=arm["unseen_identity_transfer"]["accuracy"]
+                  comparisons.append((unseen,unseen-seen))
+          assert len(z["xorshift_comparisons"])==9
+          for row,(unseen,delta) in zip(z["xorshift_comparisons"],comparisons):
+              assert math.isclose(row["unseen_accuracy"],unseen,abs_tol=1e-12)
+              assert math.isclose(row["transfer_minus_seen"],delta,abs_tol=1e-12)
+          strict=all(unseen>=.55 and delta>=-.05 for unseen,delta in comparisons)
+          partial=(sum(unseen>=.55 for unseen,delta in comparisons)>=5 and
+                   sum(delta for unseen,delta in comparisons)/9>=-.10)
+          decision="ENTITY_GENERALIZATION" if strict else ("PARTIAL_ENTITY_TRANSFER" if partial else "NO_ENTITY_TRANSFER")
+          assert decision==z["classification"]
+          witness={"schema":"research.archived-evidence-witness.v1",
+                   "experiment":"W-R61","source_run":38494903713,
+                   "source_artifact_id":11862809977,"original_json_sha256":hashlib.sha256(raw).hexdigest(),
+                   "classification":decision,"independent_recomputed_cases":81,
+                   "sealed_execution_replayed":False,
+                   "scope":"Read-only independent code path; not external FSA authority"}
+          pathlib.Path("W-R61-witness.json").write_text(json.dumps(witness,sort_keys=True,indent=2)+"\n")
+          print("WITNESS_PASS",json.dumps(witness,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R61-independent-archived-witness
+          path: W-R61-witness.json
+          if-no-files-found: error
+          retention-days: 90
