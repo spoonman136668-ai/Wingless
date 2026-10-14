@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.f7.prereg.v1",
+  "id": "W-F7-contrastive-identity-representation-structural-transfer",
+  "source_parent": "70f7ccd375a4b2d1bcbca4ae5af191e6de5ea437",
+  "hypothesis": "Training a learned 16-dimensional latent representation of 16-bit public entity IDs from identity-pair contrastive positives and hard Hamming negatives—not graph-specific QA—improves frozen recurrent composition transfer to novel fork/cycle graph topology families without coded endpoint equality.",
+  "design": {
+    "learning": "256 pair examples per step, 135 deterministic Adam steps; 16x16 projection plus bias (257 parameters), 50/50 positive identical vs one/two-bit-flip negative; no graph-question training labels; no validation-pair access during training",
+    "graph_training_families": [
+      12,
+      13,
+      14,
+      15
+    ],
+    "graph_validation_families": [
+      16,
+      17,
+      18,
+      19
+    ],
+    "note": "Graph training families registered but unused by identity-only learner; validation topologies and source are author-created new development, never independently authenticated F3 heldout",
+    "seed_bounds": [
+      47200,
+      47212
+    ],
+    "validation_graph_states": 48,
+    "validation_questions": 96,
+    "negative_questions": 48,
+    "model_frozen_composition_source": "W-F5 original 38642413429, five trained recurrent parameters",
+    "controls": [
+      "same learned new projection + coded OR traversal",
+      "frozen F5 learned matcher + learned recurrent composition",
+      "fixed exact-coded upper"
+    ],
+    "native_resident_bytes": 576,
+    "thresholds": {
+      "accuracy_at_least": 0.85,
+      "false_positive_rate_at_most": 0.15,
+      "accuracy_gain_vs_frozen_F5_at_least": 0.1,
+      "accuracy_deficit_to_coded_exact_at_most": 0.15
+    },
+    "positive": "DEVELOPMENT_CONTRASTIVE_IDENTITY_STRUCTURAL_TRANSFER_OBSERVED",
+    "negative": "DEVELOPMENT_NO_CONTRASTIVE_IDENTITY_STRUCTURAL_TRANSFER"
+  },
+  "limits": "Engineered raw 16-bit features and fixed composition schedule remain; 257 learned external weights; no coded entity equality in candidate forward inference. No F3 first-use or independent source-birth witness."
+}
