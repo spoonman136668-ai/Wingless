@@ -1,0 +1,72 @@
+name: W-NCI03 learned native join structural falsification
+on:
+  push:
+    branches: [research/w-nci03-graph-motif-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  scientific-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify frozen NCI02 source and new NCI03 prereg
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor bb3f873924ffebc5180c3ebe2c563dbe8eaf2f77 HEAD
+          test "$(git hash-object unitary/nci02_learned_relation_join.go)" = 6086ceb3d252dd82a6b5bbd36d70432de19b59fb
+          test "$(git hash-object unitary/nci03_motif_join.go)" = d5e9f2f86d418cf869fce4143afd79fd8e50df0e
+          test "$(git hash-object cmd/nci-03-wingless/main.go)" = 190f01f563bda72304b93ca9d703682727bbc0dd
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci03/prereg.json)" = ef402b95146749e634a6742249584a4b649b726f
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci03/prereg.json >/dev/null
+      - name: Qualify fixed native join on development only
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-03-wingless -phase=development > /tmp/W-NCI03-dev.json
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI03-dev.json"))
+          assert a["phase"]=="development" and a["heldout_seed_range"]==[22976,23000]
+          assert a["training_examples"]==768 and a["training_updates"]==49920
+          assert not a["nci01_full_acceptance"]
+          print("NATIVE_LEARNED_JOIN_DEV_QUALIFIED",a["development_join_accuracy"])
+          PY
+      - name: Original single frozen four-motif first use
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-03-wingless -phase=sealed > /tmp/W-NCI03-original.json
+          finish=$(date +%s%N)
+          printf '{"elapsed_wall_ms":%s,"runner":"ubuntu-latest","cost_usd":"unverified"}\n' "$(((finish-start)/1000000))" > /tmp/W-NCI03-resource.json
+          python3 -m json.tool /tmp/W-NCI03-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI03-original-frozen-first-use
+          path: |
+            /tmp/W-NCI03-original.json
+            /tmp/W-NCI03-resource.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verify original archive before scientific classification
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          a=json.load(open("/tmp/W-NCI03-original.json"))
+          assert a["heldout_seed_range"]==[22976,23000] and len(a["records"])==24
+          assert collections.Counter(r["topology_class"] for r in a["records"])=={0:6,1:6,2:6,3:6}
+          assert len(a["motif_accuracy"])==4
+          assert a["verdict"] in ("NATIVE_JOIN_MOTIF_TRANSFER_BOUNDED","NATIVE_JOIN_MOTIF_TRANSFER_FALSIFIED")
+          assert not a["nci01_full_acceptance"] and a["external_model_calls"]==0
+          assert not a["accepted_ref_mutation"]
+          print("SCIENTIFIC_VERDICT",a["verdict"])
+          print("FROZEN_MOTIF_ACCURACY",a["motif_accuracy"])
+          PY
+      - name: Full final Go regression and build
+        run: go test ./... && go build ./...
