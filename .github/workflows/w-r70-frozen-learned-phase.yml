@@ -1,0 +1,61 @@
+name: Wingless W-R70 frozen equal-budget learned phase readout
+on:
+  push:
+    branches: [research/w-r70-equal-budget-learned-phase-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify frozen parent, prereg, original training inputs and no known cohort overlap
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 9b1eac075006442c7e426ac0cb627d58102958b8 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r68-minus1-replication/execute.py)" = 04222695ef33a1f5a0c9c67baf6cc1d286a304e1
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r70-learned-phase/execute.py)" = 5061379ccd3b3c32d561495d5d451b5b37d87f47
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r70-learned-phase/prereg.json)" = f8740ea4d903340704fbf78c7a03d576c343523b
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r70-learned-phase/execute.py
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-r70-learned-phase/prereg.json >/dev/null
+          python3 - <<'PY'
+          import json
+          p=json.load(open("research/contrib/chatgpt/20261014-w-r70-learned-phase/prereg.json"))
+          a=set(range(*p["sealed_heldout_seeds"]))
+          assert len(a)==16 and p["bounds"]["weights"]==16
+          assert all(a.isdisjoint(range(*k)) for k in
+             ((10112,10136),(10208,10232),(10432,10456),(12672,12688)))
+          print("W70_KNOWN_SEALED_NONOVERLAP=PASS")
+          PY
+      - name: Exactly one original first-use learned phase comparison
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r70-learned-phase/execute.py > /tmp/W-R70-original.json
+          python3 -m json.tool /tmp/W-R70-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-R70-original.json"))
+          assert a["sealed_heldout_seeds"]==list(range(13312,13328))
+          assert a["training_examples_per_fit"]==1728 and a["model_width"]==16
+          assert len(a["all_heldout_records"])==1728
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          assert a["classification"] in ("EQUAL_BUDGET_LEARNED_PHASE_TRANSFER",
+                 "PARTIAL_LEARNED_PHASE_TRANSFER","NO_EQUAL_BUDGET_PHASE_GAIN")
+          print("CLASSIFICATION",a["classification"])
+          print("TRAINED_PHASE_ACCURACIES",a["aggregate_accuracy"])
+          print("PAIRED_DELTA",a["balanced_minus_baseline"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R70-original-equal-budget-learned-phase
+          path: /tmp/W-R70-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Complete Wingless repository regression and build
+        run: go test ./... && go build ./...
