@@ -1,0 +1,59 @@
+name: Wingless F15 learned prefix-state stopping vs full-budget and heuristic DEV
+on:
+  push:
+    branches: [research/w-f15-learned-native-stop-policy-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Freeze F14 source and F15 prereg
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor c37ef4f1213029a0c84cabf1ff099085df01b372 HEAD
+          test "$(git hash-object unitary/f14_serialized_typed_state.go)" = "$(git rev-parse c37ef4f1213029a0c84cabf1ff099085df01b372:unitary/f14_serialized_typed_state.go)"
+          python3 -m json.tool research/foundational/20261014-w-f15/prereg.json >/dev/null
+      - name: One original native W-F15 learned stopping DEVELOPMENT experiment
+        run: |
+          set -euo pipefail
+          go run ./cmd/f15-wingless > /tmp/w-f15-original-development.json
+          python3 -m json.tool /tmp/w-f15-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F15-original-learned-stop-policy-development
+          path: /tmp/w-f15-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independent row-accurate outcome audit after archive
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f15-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY"
+          assert r["native_state_bytes"]==576 and r["policy_parameter_count"]==6
+          assert r["train_case_count"]==864 and r["valid_case_count"]==576
+          assert not r["candidate_sees_future_oracle"] and r["policy_features_prefix_only"]
+          assert not r["sealed_first_use"] and not r["accepted_ref_mutation"]
+          assert collections.Counter(z["family"] for z in r["rows"])=={76:144,77:144,78:144,79:144}
+          for name,s in r["scores"].items():
+            correct=sum(int(z["decisions"][name]["answer"]==z["label"]) for z in r["rows"])
+            steps=sum(z["decisions"][name]["steps"] for z in r["rows"])
+            assert correct==s["correct"] and steps==s["steps"]
+            assert all(1<=z["decisions"][name]["steps"]<=z["depth"] for z in r["rows"])
+          assert r["scores"]["hindsight_oracle_upper"]["accuracy"]>=r["scores"]["fixed_complete_budget"]["accuracy"]
+          assert r["registered_verdict"] in ("DEVELOPMENT_LEARNED_NATIVE_STOPPING_TRANSFER","DEVELOPMENT_NO_LEARNED_STOPPING_TRANSFER")
+          print("W_F15_VERDICT",r["registered_verdict"])
+          print("W_F15_SCORES",r["scores"])
+          PY
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
