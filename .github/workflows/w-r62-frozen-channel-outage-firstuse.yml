@@ -1,0 +1,48 @@
+name: Wingless W-R62 frozen single-channel outage transfer
+on:
+  push:
+    branches: [research/w-r62-frozen-channel-outage-transfer-20261013-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify immutable parent and prospective scientific identities
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4fd74701a7a4cb61a7e4156dd9651390c7d981d5 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r61-entity-transfer/execute.py)" = ea86237d19c5bd75086f0dab699158d2aa8fc353
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r62-channel-outage/prereg.json)" = ce1917d16a189e2c4dbd784134f18b5db4454f32
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r62-channel-outage/execute.py)" = 4527354e9baed368aa16945e0d042624cc9c92e0
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r62-channel-outage/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r62-channel-outage/execute.py
+      - name: Original one-time sealed heldout acquisition science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r62-channel-outage/execute.py > /tmp/W-R62-original.json
+          python3 -m json.tool /tmp/W-R62-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/W-R62-original.json'))
+          assert a['sealed_heldout_seeds']==list(range(9312,9336))
+          assert len(a['primary_xorshift_unseen_differences'])==36
+          assert len(a['all_sealed_trial_records'])==3*3*3*2*5
+          assert all(len(x['by_seed'])==24 for x in a['all_sealed_trial_records'])
+          print('CLASSIFICATION',a['classification'])
+          for x in a['primary_xorshift_unseen_differences']:
+              print('OUTAGE_COMPARISON',x)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R62-original-channel-outage-transfer
+          path: /tmp/W-R62-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Single full Wingless regression and build
+        run: go test ./... && go build ./...
