@@ -1,0 +1,90 @@
+name: W-NCI11 development-gated learned associative native memory
+on:
+  push:
+    branches: [research/w-nci11-associative-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify source-born original scientific identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 256281ee6873ebeb0890624c605b5b274785087c HEAD
+          test "$(git hash-object unitary/nci10r2_future_query_utility.go)" = 6900a8c2e99ddf824eae327ed3be0e48a7c2a290
+          test "$(git hash-object unitary/nci11_trainable_associative_state.go)" = f248fd6dec93d04571f7cb4c3ccd721017812bfd
+          test "$(git hash-object cmd/nci-11-wingless/main.go)" = 4f82577658d01b68be18e57a2d0433d871c786c2
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci11/prereg.json)" = 148a650bdc07747069be69c51c8b8fcff20f8cec
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci11/prereg.json >/dev/null
+      - name: Train two native 576-byte representations on development only
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-11-wingless -phase=development > /tmp/w-nci11-development.json
+          python3 -m json.tool /tmp/w-nci11-development.json >/dev/null
+      - name: Archive development evidence even for negative result
+        uses: actions/upload-artifact@v4
+        with:
+          name: W-NCI11-development-original
+          path: /tmp/w-nci11-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Fail closed before sealed if native state has no development gain
+        run: |
+          python3 - <<'PY'
+          import json,math
+          a=json.load(open("/tmp/w-nci11-development.json"))
+          assert a["phase"]=="development" and a["sealed_seed_bounds"]==[34112,34136]
+          assert a["native_state_bytes"]==576 and a["learned_parameter_count"]==50
+          assert a["train_families"]==[0,1] and a["validate_families"]==[2,3]
+          assert a["supervised_future_query_training_examples"]==384
+          assert a["external_llm_calls"]==0 and not a["accepted_ref_mutation"]
+          assert a["learned_projection_delta_l2"]>0
+          print("DEV_LEARNED_VALIDATION",a["development_validation_accuracy"])
+          print("DEV_NO_MEMORY_CONTROL",a["zero_memory_validation_accuracy"])
+          assert a["development_validation_accuracy"]>=.65,"NCI11_UNQUALIFIED_DEV_NO_SEALED_USE"
+          assert a["development_validation_accuracy"]-a["zero_memory_validation_accuracy"]>=.10,"NCI11_DEV_MEMORY_ABLATION_FAIL"
+          PY
+      - name: Exactly one prospective original sealed native state evaluation
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-11-wingless -phase=sealed > /tmp/w-nci11-original.json
+          finish=$(date +%s%N)
+          printf '{"sealed_science_wall_ms":%s,"runner":"ubuntu-latest","billing_usd":"unverified"}\n' "$(((finish-start)/1000000))" > /tmp/w-nci11-resource.json
+          python3 -m json.tool /tmp/w-nci11-original.json >/dev/null
+      - name: Original first-use artifact custody BEFORE verdict interpretation
+        uses: actions/upload-artifact@v4
+        with:
+          name: W-NCI11-original-native-latent
+          path: |
+            /tmp/w-nci11-original.json
+            /tmp/w-nci11-resource.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verify original result with preregistered science rubric
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          a=json.load(open("/tmp/w-nci11-original.json"))
+          assert a["phase"]=="sealed" and a["sealed_seed_bounds"]==[34112,34136]
+          assert len(a["records"])==384 and a["sealed_questions"]==768
+          assert collections.Counter(r["family"] for r in a["records"])=={f:96 for f in (4,5,6,7)}
+          assert a["checkpoint_restores"]==384
+          assert all(r["native_state_bytes"]==576 for r in a["records"])
+          assert a["verdict"] in ("NCI11_BOUNDED_LEARNED_LATENT_TRANSFER","NCI11_NO_ROBUST_LATENT_TRANSFER","NCI11_INVALID_ORACLE")
+          assert not a["nci01_full_acceptance"] and a["external_llm_calls"]==0 and not a["accepted_ref_mutation"]
+          print("ORIGINAL_SCIENCE",a["verdict"])
+          print("SEALED_ACCURACY",a["sealed_accuracy"],a["untrained_latent_accuracy"],a["zero_memory_accuracy"],a["coded_compression_accuracy"])
+          print("NEW_MOTIF_ACCURACY",a["by_new_structure"])
+          PY
+      - name: One final complete Wingless Go regression and build
+        run: go test ./... && go build ./...
