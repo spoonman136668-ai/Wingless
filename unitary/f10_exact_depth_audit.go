@@ -111,7 +111,7 @@ func RunWFoundationF10()(map[string]any,error){
   "schema":"wingless.f10.depth_conditioned_capability_audit.v1",
   "stage":"DEVELOPMENT_ONLY","source_F9_sha":"d79f29806be4746dee219dfabf77a5abc2ecd14e",
   "original_F7_weights_sha256":"c7df241ca99627ea816091a84d321819828328a02a56a507cd7862d8afe67fe4",
-  "seeds":[51100,51124],"exact_chain_lengths":[]int{4,5,6,7},
+  "seeds":[]int{51100,51124},"exact_chain_lengths":[]int{4,5,6,7},
   "graph_states":96,"paired_questions":192,"negative_questions":96,
   "state_bytes":576,"model_retrained":false,"weights_adjusted":false,
   "query_depth_is_present_in_frozen_model_interface":false,
