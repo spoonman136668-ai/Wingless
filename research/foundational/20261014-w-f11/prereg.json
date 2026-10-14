@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.f11.prereg.v1",
+  "source_parent": "fab5f094a29203a5ef1d63fb40225a3aa9a7e57f",
+  "question": "Does a shared learned recurrent update conditioned on a public query depth transfer from 3–6 exactly-hop paths to previously unseen lengths 7–8?",
+  "hypothesis": "Variable-depth recurrent readout with a task-trained 5-scalar update has greater exact-depth discriminative power than the same initialized readout or frozen depth-blind model, holding a frozen 257-parameter identity projection fixed.",
+  "science": {
+    "development_only": true,
+    "train_seed_bounds": [
+      51900,
+      51916
+    ],
+    "train_exact_depths": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "train_graph_states": 128,
+    "train_variants": 2,
+    "validation_seed_bounds": [
+      52300,
+      52324
+    ],
+    "validation_exact_depths": [
+      7,
+      8
+    ],
+    "validation_variants": 2,
+    "validation_graph_states": 96,
+    "validation_questions": 192,
+    "negative_questions": 96,
+    "matched_pair": "Identical graph, entity IDs, query endpoints; only requested depth changes k−1 versus k",
+    "graph_edge_capacity": 12,
+    "dev_source_birth": "AUTHOR_GENERATED_NO_INDEPENDENT_WITNESS",
+    "training": {
+      "parameters": 5,
+      "optimizer": "finite-difference paired task BCE Adam 105 steps, batch 24, lr .11, perturbation .035; train-only seeds",
+      "pretrained_frozen_identity_params": 257,
+      "random_seed_policy": "deterministic arithmetic, no candidate validation updates"
+    },
+    "controls": [
+      "initialized model with same variable-depth interface",
+      "frozen W-F10 model with no requested-depth input",
+      "coded exact-depth graph oracle",
+      "always-yes graph-blind control"
+    ],
+    "predeclared_positive": {
+      "paired_accuracy_at_least": 0.85,
+      "overall_accuracy_at_least": 0.9,
+      "negative_false_positives_at_most": 10,
+      "paired_gain_over_initialized_at_least": 0.15
+    },
+    "classification": {
+      "positive": "DEVELOPMENT_QUERY_DEPTH_TRANSFER_OBSERVED",
+      "negative": "DEVELOPMENT_NO_LEARNED_QUERY_DEPTH_TRANSFER",
+      "invalid": "INVALID_EXACT_DEPTH_REFERENCE"
+    }
+  },
+  "constraints": {
+    "resident_native_state_bytes": 576,
+    "explicit_query_depth_metadata_bytes": 1,
+    "programmed_loop_count": true,
+    "learned_halting": false,
+    "no_F3_mutation": true,
+    "no_accepted_refs": true,
+    "no_controller": true,
+    "no_paid_API": true
+  }
+}
