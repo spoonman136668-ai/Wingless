@@ -58,7 +58,7 @@ func wf2Train(train []wf1Datum,method string)(wf1Model,int64){
    m.W[k]=max(-20,min(20,m.W[k]))
   }
  }
- return m,time.Since(start).Milliseconds()
+ return m,time.Since(started).Milliseconds()
 }
 func RunWFoundationF2()(map[string]any,error){
  started:=time.Now()
