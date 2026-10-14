@@ -1,0 +1,79 @@
+name: Wingless NCI06 native learned bounded retention
+on:
+  push:
+    branches: [research/w-nci06-native-learned-retention-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  scientific_first_use:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify exact source provenance and frozen prereg
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor a03f7efb53972ba4c811aa01000dacaf85e1cd3f HEAD
+          test "$(git hash-object unitary/nci05_multiedge_memory.go)" = b6a89e193f3afbe0a8ee6b670f473a9bd5cc5774
+          test "$(git hash-object unitary/nci06_learned_retention.go)" = 17bd70a5e25f8bfb763b021e47d669ee59011129
+          test "$(git hash-object cmd/nci-06-wingless/main.go)" = d080dc1a7a69187222fc594c154179917308bdcd
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci06/prereg.json)" = e95432ebedc2c1faae33fdd9991a4616e59c5409
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci06/prereg.json >/dev/null
+      - name: Native retention learning - development and validation only
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-06-wingless -phase=development > /tmp/W-NCI06-dev.json
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI06-dev.json"))
+          assert a["phase"]=="development" and a["development_examples"]==7680
+          assert len(a["retention_weights"])==3 and a["sealed_seed_range"]==[25632,25656]
+          assert a["memory_cap"]==7 and a["external_llm_calls"]==0
+          assert a["nci01_full_acceptance"] is False and a["accepted_ref_mutation"] is False
+          print("NATIVE_DEV_VALIDATION_ACCURACY",a["development_validation_accuracy"])
+          PY
+      - name: Exactly one frozen prospective sealed science evaluation
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-06-wingless -phase=sealed > /tmp/W-NCI06-original.json
+          finish=$(date +%s%N)
+          printf '{"elapsed_wall_ms":%s,"runner":"ubuntu-latest","cost_usd":"unverified"}\n' "$(((finish-start)/1000000))" > /tmp/W-NCI06-resource.json
+          python3 -m json.tool /tmp/W-NCI06-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI06-original-first-use
+          path: |
+            /tmp/W-NCI06-original.json
+            /tmp/W-NCI06-resource.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verify preserved first-use result against preregistered rubric
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          a=json.load(open("/tmp/W-NCI06-original.json"))
+          assert a["phase"]=="sealed" and a["sealed_seed_range"]==[25632,25656]
+          assert len(a["records"])==96
+          assert collections.Counter(x["family"] for x in a["records"])=={i:24 for i in range(4)}
+          assert a["checkpoint_restores"]==96
+          assert all(x["learned_edges"]<=7 and x["fifo_edges"]<=7 and x["lru_edges"]<=7 for x in a["records"])
+          assert a["verdict"] in ("LEARNED_BOUNDED_RETENTION_TRANSFER",
+            "PARTIAL_RETENTION_GAIN_WITH_GENERALIZATION_COST",
+            "NO_TRANSFERABLE_LEARNED_RETENTION_GAIN")
+          assert not a["nci01_full_acceptance"] and a["external_llm_calls"]==0
+          assert not a["accepted_ref_mutation"]
+          print("W06_FROZEN_VERDICT",a["verdict"])
+          print("W06_SCIENTIFIC_TASK_ACC",a["accuracy"])
+          print("W06_PER_FAMILY",a["by_family"])
+          print("W06_RESOURCE_CALLS",a["learned_join_candidate_evaluations"])
+          PY
+      - name: Final full Wingless Go regression and build
+        run: go test ./... && go build ./...
