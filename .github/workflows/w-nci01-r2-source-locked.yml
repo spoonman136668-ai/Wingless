@@ -1,0 +1,72 @@
+name: W-NCI01-R2 pinned native components and 45-45-10 portfolio
+on:
+  push:
+    branches: [research/w-nci01-r2-native-source-portfolio45-20261014]
+permissions:
+  contents: read
+jobs:
+  native-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify exact native research source, prereg and allocation
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor d5e32af7eff2f3e2a5ebd372f07c6072fec09c1b HEAD
+          test "$(git hash-object unitary/nci01_native_language_integration.go)" = e2136dfb11d72af18be0bf2fcfab669369ccf090
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci01-r2/prereg.json)" = 1b493b73f1ee92f9ca8487b2f0628a35f4544176
+          test "$(git hash-object docs/research/PORTFOLIO_NCI01_20261014.md)" = 0a460b45b39dae3123711a25f83da4dcf30226f3
+          test "$(git hash-object unitary/up_lm0f_learned_admission_language.go)" = d203b2e1eca89cb6ca373fbf48e9f73926c2ef65
+          test "$(git hash-object unitary/up_lm0c_syntax_routed_recall.go)" = dceab4985fb0fb25aeeee736aa761466ee3e4b90
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci01-r2/prereg.json >/dev/null
+      - name: Qualify learned native admission using development only
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-01-wingless -phase=development > /tmp/W-NCI01-R2-development.json
+          python3 -m json.tool /tmp/W-NCI01-R2-development.json > /dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI01-R2-development.json"))
+          assert a["phase"]=="development" and a["verdict"]=="DEV_ONLY"
+          assert a["nci01_full_acceptance"] is False
+          print("DEV_ONLY_QUALIFIED=PASS")
+          PY
+      - name: Execute one original native integration first-use
+        run: |
+          set -euo pipefail
+          start=$(date +%s)
+          go run ./cmd/nci-01-wingless -phase=sealed > /tmp/W-NCI01-R2-original.json
+          end=$(date +%s)
+          printf '{"elapsed_wall_seconds":%s,"runner":"ubuntu-latest","cost_usd":"unverified"}\n' "$((end-start))" > /tmp/W-NCI01-R2-resource.json
+          python3 -m json.tool /tmp/W-NCI01-R2-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI01-R2-original-first-use
+          path: |
+            /tmp/W-NCI01-R2-original.json
+            /tmp/W-NCI01-R2-resource.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Validate original native source after archival
+        run: |
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI01-R2-original.json"))
+          assert a["phase"]=="sealed" and a["seed_range"]==[20700,20724]
+          assert len(a["records"])==24 and a["nci01_full_acceptance"] is False
+          assert a["verdict"] in ("COMPONENT_INTEGRATION_NOT_NATIVE_LEARNED_REASONING","NCI01_COMPONENT_INTEGRATION_BELOW_FEASIBILITY_GATE")
+          print("FIRST_USE_SCIENCE",a["verdict"])
+          print("MEASURED_NATIVE_TRANSFER",a["direct_accuracy"],a["two_hop_accuracy"],a["three_hop_accuracy"],a["interrupted_accuracy"],a["retention_accuracy"],a["new_knowledge_accuracy"])
+          assert a["external_model_calls"]==0
+          assert a["accepted_ref_mutation"] is False
+          PY
+      - name: Final full project regression
+        run: go test ./... && go build ./...

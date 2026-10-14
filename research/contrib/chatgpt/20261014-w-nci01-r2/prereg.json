@@ -1,0 +1,38 @@
+{
+  "schema": "wingless.nci01.prereg.v1",
+  "id": "W-NCI01-R2-LEARNED-ADMISSION-NATIVE-RECALL-STATIC-COMPOSITION",
+  "source_parent": "d5e32af7eff2f3e2a5ebd372f07c6072fec09c1b",
+  "native_paths": [
+    "unitary/up_lm0f_learned_admission_language.go",
+    "unitary/up_lm0c_syntax_routed_recall.go",
+    "unitary/up_lm0d_multibinding_language.go"
+  ],
+  "hypothesis": "Can an existing trained native admission classifier, exact bounded native recall memory and a fixed 2-/3-hop edge-composition rule jointly answer novel unseen-key language binding questions across distractors, checkpoint restoration and new learning without reliance on an external LLM?",
+  "reality_check": "The composition/traversal is an explicit developer-coded procedure and stored edge values are exact symbolic recall, not native learned relational representations. A numerical positive is a component integration result ONLY and explicitly does not meet full NCI-01 acceptance or constitute learned reasoning.",
+  "development": "Native 20-epoch admission classifier trained on 24 keys and 32 values from existing prior; development-only threshold selection over k00–k15. No first-use heldout inspection.",
+  "sealed_seed_range": [
+    20700,
+    20724
+  ],
+  "novel_keys": "k24..k31",
+  "queries_per_case": [
+    "direct",
+    "two_hop",
+    "three_hop",
+    "interrupt_two_hop",
+    "old_retention_after_new",
+    "four_hop_new"
+  ],
+  "frozen_criteria": "COMPONENT_INTEGRATION_NOT_NATIVE_LEARNED_REASONING if sealed 2-hop and new 4-hop >=0.75; else NCI01_COMPONENT_INTEGRATION_BELOW_FEASIBILITY_GATE. NCI01_FULL_ACCEPTANCE is ALWAYS false because composition and relational state are not learned. Preserve every row and admission failure.",
+  "equal_resource_baseline": "Direct-only baseline shares the exact 16-entry store, learned admission calls and source state but is limited to one traversal hop. Report memory entries and retrieval work for composition separately; not equal inference lookup cost.",
+  "resources": {
+    "admission_linear_weights": 65,
+    "latent_recurrent_dim": 64,
+    "recall_cap": 16,
+    "dev_train_examples": 30720,
+    "sealed_cases": 24,
+    "external_llm_calls": 0
+  },
+  "governance": "45% integration,45% foundational science,10% optimization target; no merge or promotion without later independent admission, preserve distinct source identities and full Go tests.",
+  "prior_failure": "R1 source lineaged against default main missing native research modules; failed before scientific first-use; R1 permanently closed, R2 uses actual last qualified research source and a new sealed seed range. No original science was replayed."
+}
