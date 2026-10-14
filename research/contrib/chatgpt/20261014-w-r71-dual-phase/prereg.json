@@ -1,0 +1,60 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R71-EQUAL-BUDGET-DUAL-PHASE-LEARNED-READOUT",
+  "parent_head": "75c69c5a631a3184149823909dcd11ec95f722ea",
+  "frozen_predecessor_executor_blob": "4bbc58c56dcc35ae66e2d47547a2b96868889635",
+  "prior": "W-R70 R3 completed archived original sealed 13424..13439 with full regression. One +1 specialist 71.1% +1, 71.1% intact, 50% -1; balanced 4-way curriculum 50.6% intact, 52.3% +1, 74.0% -1. Registered balanced-science verdict NO_EQUAL_BUDGET_PHASE_GAIN.",
+  "hypothesis": "Does a learnable fixed 16-weight readout trained on a deterministic equal-count mixture of +1 and -1 timing perturbations retain >=65% accuracy on intact and both shift directions, unlike the prior +1 specialist?",
+  "freeze": "Only third development arm replaces four-way balanced with plus1/minus1 alternating pair-index augmentation. Fixed original, +1 specialist, ridge regularization, withheld xorshift source, three original development blocks, 1728 symmetrical signed training items per fit, 864 per source, three amplitudes and four acquisition permutations. New sealed 14336..14351; no post-first-use adjustment.",
+  "development_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    14336,
+    14352
+  ],
+  "train_arms": [
+    "original_ridge",
+    "plus1_curriculum",
+    "plus_minus_curriculum"
+  ],
+  "test_phases": [
+    "intact",
+    "plus1",
+    "minus1",
+    "plus2"
+  ],
+  "primary": "DUAL_PHASE_ROBUST_LEARNED_READOUT iff mixture accuracy intact, plus1, minus1 all >=0.65, and at least two of three cohorts have plus1 gain >=.02 vs original; PARTIAL_DUAL_PHASE_READOUT iff mixture intact/plus1/minus1 all >=.60; else NO_DUAL_PHASE_ROBUSTNESS. Preserve all 6912 per-cell/seed records, baselines and adverse outcomes.",
+  "controls": [
+    "Frozen original W-R70 R3 implementation except new development arm, new heldout identities and prereg rubric",
+    "No model width, training count, capacity, regularizer, source or feature extension",
+    "Fresh 14336..14351 disjoint named 13312–13327,13344–13359,13424–13439 and old W-R69 12672..12687",
+    "One source push/first use; original artifact uploaded BEFORE science assertions, one full Go regression, independent archive reaggregation",
+    "No FORGE R32/R33, accepted refs, controller/queue, production or promotion"
+  ],
+  "bounds": {
+    "development_fits": 9,
+    "train_examples_per_fit": 1728,
+    "weights_per_fit": 16,
+    "heldout_seeds": 16,
+    "amplitudes": 3,
+    "permutations": 4,
+    "conditions": 4,
+    "expected_records": 6912,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Fixed-width supervised ridge timing tradeoff, not trainable raw-state memory, LLM reasoning or RSI."
+}
