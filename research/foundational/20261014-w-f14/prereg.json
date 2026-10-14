@@ -1,0 +1,64 @@
+{
+  "schema": "wingless.f14.prereg.v1",
+  "parent_F13": "0b9e769b00dbaf57fe1357e17592ad41eed47b29",
+  "original_json_sha256": "29af0774cf719b1d103659ac1caaa3d6334718b43ad190888c325af179f1ea1b",
+  "reason": "W-F13 used raw wf13World input and only asserted 576B size of an unused state type; resident-byte-budget claim unproven. Preserve original; do not relabel F13 as budget-qualified. Correct by a separate original on novel seeds with frozen parameters using actual serialized memory as sole candidate input.",
+  "test": {
+    "stage": "DEVELOPMENT_ONLY",
+    "new_seeds": [
+      57900,
+      57912
+    ],
+    "reused_grammar_families": [
+      64,
+      65,
+      66,
+      67
+    ],
+    "depths": [
+      7,
+      8
+    ],
+    "role_shifts": [
+      0,
+      1
+    ],
+    "cases": 192,
+    "questions": 768,
+    "negative_questions": 576,
+    "controls": [
+      "coded exact typed upper 192/192 quadruples required",
+      "same frozen original F13 raw-world implementation as equivalence control",
+      "same serialized untrained role embedding",
+      "serialized roleblind recurrence"
+    ],
+    "quadruple": "valid role sequence, one necessary edge role mutation, order-permuted same role bag, wrong exact depth",
+    "all_weights_frozen": true,
+    "thresholds": {
+      "min_quadruple_accuracy": 0.8,
+      "min_accuracy": 0.9,
+      "max_negative_fp_rate": 0.1,
+      "min_gain_vs_initialized": 0.15
+    },
+    "positive": "DEVELOPMENT_FROZEN_SERIALIZED_ROLE_DEPTH_TRANSFER",
+    "negative": "DEVELOPMENT_NO_FROZEN_SERIALIZED_ROLE_DEPTH_TRANSFER",
+    "invalid": "INVALID_SERIALIZED_REFERENCE"
+  },
+  "budget": {
+    "native_state_bytes": 576,
+    "packed_endpoint_bytes": 48,
+    "packed_role_bytes": 48,
+    "zero_reserve_bytes": 480,
+    "query_role_bytes_max": 8,
+    "query_depth_bytes": 1
+  },
+  "limitations": {
+    "no_new_grammar_family_only_new_seeds": true,
+    "programmed_depth_count": true,
+    "learned_halting": false,
+    "not_witnessed_source_birth": true,
+    "not_F3_first_use": true,
+    "accepted_refs": false,
+    "production": false
+  }
+}

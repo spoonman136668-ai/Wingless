@@ -1,0 +1,62 @@
+name: W-F14 frozen typed model through truly serialized 576-byte state
+on:
+  push:
+    branches: [research/w-f14-serialized-state-source-correction-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify frozen W-F13 source and F14 prereg
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 0b9e769b00dbaf57fe1357e17592ad41eed47b29 HEAD
+          test "$(git hash-object unitary/f13_contrastive_roles_depth.go)" = "$(git rev-parse 0b9e769b00dbaf57fe1357e17592ad41eed47b29:unitary/f13_contrastive_roles_depth.go)"
+          python3 -m json.tool research/foundational/20261014-w-f14/prereg.json >/dev/null
+      - name: Execute F14 original through actual bounded state DEV ONLY
+        run: |
+          set -euo pipefail
+          go run ./cmd/f14-wingless > /tmp/w-f14-original-development.json
+          python3 -m json.tool /tmp/w-f14-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F14-original-serialized-typed-depth
+          path: /tmp/w-f14-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independent row classification and actual byte packing
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f14-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY" and r["quadruple_graphs"]==192
+          assert r["questions"]==768 and r["negative_questions"]==576
+          assert r["resident_state_bytes"]==576 and r["serialized_state_used_by_candidate"]
+          assert r["packed_endpoint_bytes"]+r["packed_role_bytes"]+r["zero_reserved_bytes"]==576
+          assert all(z["state_bytes"]==576 for z in r["rows"])
+          assert not r["model_retrained"] and not r["sealed_first_use"]
+          assert not r["independent_source_birth"] and not r["accepted_ref_mutation"]
+          assert collections.Counter(z["family"] for z in r["rows"])=={64:48,65:48,66:48,67:48}
+          for name,s in r["scores"].items():
+            correct=sum(int(p==y) for z in r["rows"] for p,y in zip(z["predictions"][name],z["truth"]))
+            pairs=sum(int(z["predictions"][name]==z["truth"]) for z in r["rows"])
+            fp=sum(int(z["predictions"][name][j]) for z in r["rows"] for j in (1,2,3))
+            assert correct==s["correct"] and pairs==s["fourway_correct"] and fp==s["false_positives"]
+          assert r["scores"]["coded_exact_typed_upper"]["fourway_correct"]==192
+          assert all(z["predictions"]["frozen_serialized_candidate"]==
+                     z["predictions"]["raw_world_F13_debug"] for z in r["rows"])
+          assert r["registered_verdict"] in ("DEVELOPMENT_FROZEN_SERIALIZED_ROLE_DEPTH_TRANSFER","DEVELOPMENT_NO_FROZEN_SERIALIZED_ROLE_DEPTH_TRANSFER")
+          print("W_F14_VERDICT",r["registered_verdict"],r["scores"])
+          PY
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
