@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R66-CROSS-CHANNEL-ALIGNMENT-FALSIFICATION",
+  "parent_head": "be4517b888d0315e1da392eb066a750e3ea96ab2",
+  "prior": "W-R65 independently classified MIXED_OR_NONREPLICATION; shifting or reversing channel0 and channel1 separately both hurt accuracy, so source0-exclusive temporal causality unsupported.",
+  "hypothesis": "Does shifting all 4 channels together recover accuracy relative to breaking individual channel timing (cross-channel alignment), or is the fixed readout intrinsically sensitive to absolute within-channel temporal ordering?",
+  "freeze": "Use W-R65/W-R61 frozen three ridge fits, feature width 16, withheld xorshift source/entities9..17, amplitudes 1/2/3, four acquisition permutations, and fixed development blocks. Change only input timing interventions, no model training. Apply transformations identically to baseline, positive and negative exemplars; zero time-index wrap; preserve each channel's values.",
+  "development_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "sealed_heldout_seeds": [
+    10016,
+    10040
+  ],
+  "conditions": [
+    "intact",
+    "shift_source0",
+    "shift_source1",
+    "shift_sources01",
+    "shift_sources23",
+    "shift_all",
+    "reverse_source0",
+    "reverse_all"
+  ],
+  "primary": "288 intervention cells = three fixed models x three amplitudes x four permutations x eight conditions, each across 24 fresh sealed seeds. Compare 36 paired mean changes against intact. SYNCHRONOUS_ALIGNMENT_RESCUE iff source0 and source1 individual shifts each <= -0.06, shift_all >= -0.04, and shift_all at least 0.04 less adverse than either individual shift. NO_GLOBAL_ALIGNMENT_RESCUE iff both individual shifts <= -0.06 and shift_all <= -0.06. Else MIXED_OR_INCONCLUSIVE.",
+  "controls": [
+    "Fresh prospectively unused seeds 10016..10039",
+    "No retuning or capacity change",
+    "Circular shifts and reversals preserve marginal channel value multisets",
+    "All-channel and paired-channel perturbations plus original source0 reversal",
+    "W65 identical acquisition permutations and source-withheld models",
+    "One original first use and full regression; independent archive-only readback",
+    "No FORGE R32/R33/accepted-ref changes"
+  ],
+  "bounds": {
+    "models": 3,
+    "amplitudes": 3,
+    "permutations": 4,
+    "conditions": 8,
+    "heldout_seeds": 24,
+    "feature_width": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Frozen synthetic channel order/alignment distinction; not demonstrated cognition, general transfer, or RSI."
+}

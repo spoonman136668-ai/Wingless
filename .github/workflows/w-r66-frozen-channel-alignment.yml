@@ -1,0 +1,48 @@
+name: Wingless W-R66 frozen channel alignment
+on:
+  push:
+    branches: [research/w-r66-cross-channel-alignment-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Exact lineage and immutable source gate
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor be4517b888d0315e1da392eb066a750e3ea96ab2 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r65-temporal-order/execute.py)" = 30c09e011cd3d208fe01f709bd744bf2e8ee32b3
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r66-cross-channel-alignment/prereg.json)" = cfb90f7b1fb3a5608410c2c0d82702044d406b20
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-r66-cross-channel-alignment/execute.py)" = 89467ef60463dacffa750a29e5cd080e34be9dfd
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-r66-cross-channel-alignment/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261014-w-r66-cross-channel-alignment/execute.py
+      - name: One prospective first-use sealed scientific trial
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261014-w-r66-cross-channel-alignment/execute.py > /tmp/W-R66-original.json
+          python3 -m json.tool /tmp/W-R66-original.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-R66-original.json"))
+          assert a["sealed_heldout_seeds"] == list(range(10016,10040))
+          assert len(a["all_sealed_records"]) == 288 and len(a["comparisons"]) == 36
+          assert all(len(row["by_seed"])==24 for row in a["all_sealed_records"])
+          assert a["model_calls"]==0 and a["accepted_ref_mutation"] is False
+          assert a["classification"] in ("SYNCHRONOUS_ALIGNMENT_RESCUE","NO_GLOBAL_ALIGNMENT_RESCUE","MIXED_OR_INCONCLUSIVE")
+          print("CLASSIFICATION",a["classification"])
+          print("PAIRED_MEANS",a["mean_accuracy_change"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R66-original-channel-alignment
+          path: /tmp/W-R66-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Full repository regression
+        run: go test ./... && go build ./...
