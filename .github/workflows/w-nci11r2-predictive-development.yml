@@ -1,0 +1,64 @@
+name: W-NCI11-R2 native predictive memory development only
+on:
+  push:
+    branches: [research/w-nci11r2-predictive-state-development-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify unchanged native prior and frozen development identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor b820ea1ff76f17e350a914177ea823f6984a8e09 HEAD
+          test "$(git hash-object unitary/nci11_trainable_associative_state.go)" = f248fd6dec93d04571f7cb4c3ccd721017812bfd
+          test "$(git hash-object unitary/nci11r2_predictive_recurrent_state.go)" = 154ec03ba15e2f86bd78d0f8e8cccaf7954a9281
+          test "$(git hash-object cmd/nci-11r2-wingless/main.go)" = 5478908dea6756a2116fbd9490d3be32309be443
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci11r2/prereg.json)" = e3262ea16df10218b18749e96ce702c14eeb8b7b
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci11r2/prereg.json >/dev/null
+      - name: Execute frozen DEV-only independent recurrent state qualification
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          go run ./cmd/nci-11r2-wingless > /tmp/w-nci11r2-development.json
+          finish=$(date +%s%N)
+          printf '{"development_wall_ms":%s,"runner":"ubuntu-latest","billing_usd":"unverified"}\n' "$(((finish-start)/1000000))" > /tmp/w-nci11r2-resources.json
+          python3 -m json.tool /tmp/w-nci11r2-development.json >/dev/null
+      - name: Original development evidence custody before classification
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI11R2-original-development-only
+          path: |
+            /tmp/w-nci11r2-development.json
+            /tmp/w-nci11r2-resources.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Inspect frozen development verdict without sealed access
+        run: |
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/w-nci11r2-development.json"))
+          assert r["mode"]=="DEVELOPMENT_ONLY"
+          assert r["training_seeds"]==[35328,35352] and r["validation_seeds"]==[35392,35404]
+          assert r["native_resident_state_bytes"]==576 and r["trained_gate_parameters"]==6
+          assert len(r["models"])==2
+          assert not r["original_first_use_executed"] and not r["sealed_cohort_reserved"]
+          assert r["verdict"] in ("NCI11R2_DEV_NATIVE_LEARNING_QUALIFIED",
+            "NCI11R2_DEV_NO_RELIABLE_LEARNED_MEMORY_GAIN")
+          assert r["external_llm_calls"]==0 and not r["accepted_ref_mutation"]
+          assert not r["nci01_full_acceptance"]
+          print("DEVELOPMENT_VERDICT",r["verdict"])
+          print("NATIVE_CANDIDATES",r["models"])
+          PY
+      - name: Final full native Go regression and build
+        run: go test ./... && go build ./...
