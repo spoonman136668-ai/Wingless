@@ -1,0 +1,66 @@
+name: W-F1B native frozen near-ID collision development study
+on:
+  push:
+    branches: [research/w-f1b-frozen-alias-collision-development-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Freeze original F1 models and pre-registered adversarial source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 079b075a2f939caa7546bbbdd37742169c88620a HEAD
+          test "$(git hash-object unitary/f1_permutation_binding.go)" = 94252fe7238ec6942d91829eba4a68732f3f76ee
+          test "$(git hash-object unitary/f1b_frozen_alias_collision.go)" = bca12ab5585d6a7bf81f54586d3ab7670713c563
+          test "$(git hash-object cmd/f1b-wingless/main.go)" = c8ac4ee282656e97b55da3f25c8a7acc043c23d3
+          test "$(git hash-object research/foundational/20261014-w-f1b/prereg.json)" = b71145aaf43188c127ea5344da51518276525e4f
+          python3 -m json.tool research/foundational/20261014-w-f1b/prereg.json >/dev/null
+      - name: One NEW development-only adversarial study, F1 models FROZEN
+        run: |
+          set -euo pipefail
+          START=$(date +%s%N)
+          go run ./cmd/f1b-wingless > /tmp/w-f1b-original.json
+          END=$(date +%s%N)
+          printf '{"development_wall_ms":%s,"runner":"ubuntu-latest","billing_usd":"unverified"}\n' "$(((END-START)/1000000))" > /tmp/w-f1b-resources.json
+          python3 -m json.tool /tmp/w-f1b-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F1B-original-adversarial-development
+          path: |
+            /tmp/w-f1b-original.json
+            /tmp/w-f1b-resources.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: After original archive check fixed science gates and rows
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f1b-original.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY"
+          assert r["seed_bounds"]==[39312,39336] and len(r["original_rows"])==384
+          assert r["question_count"]==768 and r["negative_question_count"]==384
+          assert collections.Counter(t["family"] for t in r["original_rows"])=={i:96 for i in (4,5,6,7)}
+          assert all(len(x["models"])==3 for x in r["original_rows"])
+          assert r["exact_public_graph_oracle_correct"]==768 and r["native_state_bytes"]==576
+          assert r["registered_verdict"] in ("CODED_EQUALITY_RESISTS_ADVERSARIAL_ID_COLLISIONS",
+            "NEAR_COLLISION_DIAGNOSTIC_INCONCLUSIVE")
+          assert r["coded_entity_equality"] and not r["learned_identity_binding"]
+          assert not r["sealed_first_use"] and not r["sealed_cohort_reserved"]
+          assert not r["accepted_ref_mutation"] and r["external_llm_calls"]==0
+          print("W_F1B_FROZEN_VERDICT",r["registered_verdict"])
+          print("W_F1B_AGGREGATES",r["candidate_scores"])
+          print("NEAR_COLLISION_COSINES",r["mean_alias_feature_similarity"])
+          PY
+      - name: Final complete Wingless native Go regression and build
+        run: go test ./... && go build ./...
