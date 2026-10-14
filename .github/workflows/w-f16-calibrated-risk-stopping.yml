@@ -1,0 +1,64 @@
+name: W-F16 independent-calibrated asymmetric safe stopping development
+on:
+  push:
+    branches: [research/w-f16-calibrated-risk-continuation-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Freeze F15 evidence and new F16 prereg
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor b0f0e049b72df11de47c767f32f36ca887a37472 HEAD
+          test "$(git hash-object unitary/f15_learned_prefix_stop.go)" = "$(git rev-parse b0f0e049b72df11de47c767f32f36ca887a37472:unitary/f15_learned_prefix_stop.go)"
+          python3 -m json.tool research/foundational/20261014-w-f16/prereg.json >/dev/null
+      - name: Execute original F16 learned risk experiment DEVELOPMENT ONLY
+        run: |
+          set -euo pipefail
+          go run ./cmd/f16-wingless > /tmp/w-f16-original-development.json
+          python3 -m json.tool /tmp/w-f16-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F16-original-calibrated-risk-stopping-dev
+          path: /tmp/w-f16-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently check calibration and raw decision evidence
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f16-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY"
+          assert r["train_questions"]==864 and r["calibration_questions"]==432
+          assert r["validation_questions"]==576 and r["resident_state_bytes"]==576
+          assert r["new_trainable_weights"]==8
+          assert r["calibration_seeds_disjoint_from_fitting_and_validation"]
+          assert not r["validation_future_not_visible_to_policy"] is False
+          assert not r["independent_source_birth"] and not r["sealed_first_use"]
+          assert not r["accepted_ref_mutation"]
+          assert r["reported_savings_recurrence_steps_only"] and r["feature_cost_excluded_from_savings"]
+          assert collections.Counter(row["Family"] if "Family" in row else row["family"] for row in r["rows"])=={84:144,85:144,86:144,87:144}
+          for name,score in r["scores"].items():
+            correct=sum(z["decisions"][name]["answer"]==z["label"] for z in r["rows"])
+            steps=sum(z["decisions"][name]["steps"] for z in r["rows"])
+            assert correct==score["correct"] and steps==score["steps"]
+            assert all(1<=z["decisions"][name]["steps"]<=z["depth"] for z in r["rows"])
+          assert r["scores"]["hindsight_oracle_upper"]["accuracy"]>=r["scores"]["full_fixed_budget"]["accuracy"]
+          assert r["registered_verdict"] in ("DEVELOPMENT_CALIBRATED_RISK_AWARE_STOPPING_TRANSFER",
+               "DEVELOPMENT_NO_CALIBRATED_SAFE_STOPPING_TRANSFER")
+          print("W_F16_VERDICT",r["registered_verdict"])
+          print("W_F16_SCORES",r["scores"])
+          PY
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
