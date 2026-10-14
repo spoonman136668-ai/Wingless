@@ -1,0 +1,67 @@
+{
+  "schema": "wingless.frozen-science-prereg.v1",
+  "id": "W-R65-TEMPORAL-ORDER-FALSIFICATION-PROSPECTIVE",
+  "parent_head": "d5fe061ddedab79893b2eb3c5ba5020c9ee2d8a2",
+  "prior": "W-R64 independently archive-verified SOURCE0_DOMINANT_REPLICATED: source0 erase -0.088734567901 vs each of source1..3 within -0.005; this can still be a zero-fill/distribution artifact.",
+  "hypothesis": "Does channel0 importance require temporal order, or does channel0 zero-fill only remove static or non-order information?",
+  "freeze": "Unchanged W-R61 three 16-weight ridge fits, withheld independent-xorshift source and entities 9..17. Same four acquisition permutations, three amplitudes, and seeds 9792..9815. Apply identical source-channel perturbation to base/positive/negative before feature extraction: intact, source0 zero fill, reverse and circular one-tick shift of source0, matched reverse/shift source1 controls. No fitting or rubric change after first use.",
+  "training_lineage": "W-R64 parent identity d5fe061ddedab79893b2eb3c5ba5020c9ee2d8a2; W-R64 executor Git blob d029cbbfc0bb3003f7d888f2a6386c1b02ec9338.",
+  "sealed_heldout_seeds": [
+    9792,
+    9816
+  ],
+  "development_blocks": [
+    [
+      9008,
+      9024
+    ],
+    [
+      9040,
+      9056
+    ],
+    [
+      9072,
+      9088
+    ]
+  ],
+  "conditions": [
+    "intact",
+    "erase_source0",
+    "reverse_source0",
+    "reverse_source1",
+    "shift_source0",
+    "shift_source1"
+  ],
+  "amplitudes": [
+    1,
+    2,
+    3
+  ],
+  "permutations": [
+    "identity",
+    "rotate",
+    "swap01",
+    "reverse"
+  ],
+  "primary": "Paired mean accuracy changes over 36 cells (3 fixed models x 3 amplitudes x 4 permutations). TEMPORAL_ORDER_DEPENDENCE iff source0 erase <= -0.06, reverse0 and shift0 each <= -0.025 and each >= 0.015 more adverse than matched source1 operation. NONORDER_SOURCE0_DEPENDENCE iff erase0 <= -0.06 and both reverse0 and shift0 > -0.025. Otherwise MIXED_OR_NONREPLICATION. Record each of 216 arm records with 24 seed credit/denominator rows, including negatives.",
+  "controls": [
+    "Source marginal distribution preserved by reversal/circular shift",
+    "Matched source1 temporal perturbation controls",
+    "Only unseen source and entity identities; fresh heldout seeds disjoint from W-R64",
+    "No post-first-use retuning/replay",
+    "Full Go regression once; separate read-only archival witness",
+    "No FORGE R32/R33 or accepted source-ref mutation"
+  ],
+  "bounds": {
+    "models": 3,
+    "amplitudes": 3,
+    "permutations": 4,
+    "conditions": 6,
+    "heldout_seeds": 24,
+    "features": 16,
+    "model_calls": 0,
+    "first_use_retries": 0,
+    "accepted_ref_mutation": false
+  },
+  "claim_limit": "Synthetic temporal order sensitivity in fixed ridge readout; no transferable cognition or RSI."
+}
