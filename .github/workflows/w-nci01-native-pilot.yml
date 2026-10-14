@@ -1,0 +1,75 @@
+name: W-NCI01 frozen integration pilot and 45-45-10 portfolio
+on:
+  push:
+    branches: [research/w-nci01-native-integration-portfolio45-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  integration-science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Freeze native source identities and allocation policy
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 97eb9d01d868a629953abd597152e64438577fb9 HEAD
+          test "$(git hash-object unitary/nci01_native_language_integration.go)" = 66dc00b6fff1394c6f0bcc84fcf25453108ff9a9
+          test "$(git hash-object research/contrib/chatgpt/20261014-w-nci01/prereg.json)" = c18c7c53e71c9c5729c589f82e29dfde340131ba
+          test "$(git hash-object docs/research/PORTFOLIO_NCI01_20261014.md)" = 0a460b45b39dae3123711a25f83da4dcf30226f3
+          test "$(git hash-object unitary/up_lm0f_learned_admission_language.go)" = d203b2e1eca89cb6ca373fbf48e9f73926c2ef65
+          test "$(git hash-object unitary/up_lm0c_syntax_routed_recall.go)" = dceab4985fb0fb25aeeee736aa761466ee3e4b90
+          python3 -m json.tool research/contrib/chatgpt/20261014-w-nci01/prereg.json >/dev/null
+      - name: Development only model fitting and source-check before first use
+        run: |
+          set -euo pipefail
+          go run ./cmd/nci-01-wingless -phase=development > /tmp/W-NCI01-development.json
+          python3 -m json.tool /tmp/W-NCI01-development.json >/dev/null
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI01-development.json"))
+          assert a["phase"]=="development"
+          assert a["verdict"]=="DEV_ONLY"
+          assert a["nci01_full_acceptance"] is False
+          print("DEVELOPMENT_ONLY_NATIVE_LEARNING_QUALIFIED=PASS")
+          PY
+      - name: One original native integration first-use on sealed language tasks
+        run: |
+          set -euo pipefail
+          start=$(date +%s)
+          go run ./cmd/nci-01-wingless -phase=sealed > /tmp/W-NCI01-original.json
+          finish=$(date +%s)
+          printf '{"original_wall_seconds":%s,"runner":"ubuntu-latest","mode":"first-use","billable_cost_usd":"not verified"}\n' "$((finish-start))" > /tmp/W-NCI01-resource.json
+          python3 -m json.tool /tmp/W-NCI01-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-NCI01-original-frozen-first-use
+          path: |
+            /tmp/W-NCI01-original.json
+            /tmp/W-NCI01-resource.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verify first-use evidence after durable archival
+        run: |
+          python3 - <<'PY'
+          import json
+          a=json.load(open("/tmp/W-NCI01-original.json"))
+          assert a["phase"]=="sealed"
+          assert len(a["records"])==24 and a["seed_range"]==[20500,20524]
+          assert a["verdict"] in ("COMPONENT_INTEGRATION_NOT_NATIVE_LEARNED_REASONING","NCI01_COMPONENT_INTEGRATION_BELOW_FEASIBILITY_GATE")
+          assert a["nci01_full_acceptance"] is False
+          assert a["native_composition_rule_learned"] is False
+          print("VERDICT",a["verdict"])
+          print("ACCURACIES",a["two_hop_accuracy"],a["three_hop_accuracy"],a["retention_accuracy"],a["new_knowledge_accuracy"])
+          assert a["external_model_calls"]==0
+          assert a["accepted_ref_mutation"] is False
+          PY
+      - name: Complete full native repository regression
+        run: go test ./... && go build ./...
