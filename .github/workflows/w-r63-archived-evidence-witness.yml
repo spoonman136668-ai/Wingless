@@ -1,0 +1,101 @@
+name: W-R63 independent archived firstuse evidence witness
+on:
+  push:
+    branches: [audit/w-r63-archived-firstuse-validation-20261013]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin original source prereg exact identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 635d8409a175c483dde48b624149ba1f6505d1a7 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r63-channel-role/prereg.json)" = f6d49e2fbcabaf45066e0b776a1e20baab5eba1b
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r63-channel-role/execute.py)" = edec64d438fd8f9aa765736b15d741f9a286454c
+      - name: Read original first-use archive only
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38498425768
+          name: W-R63-original-channel-role
+          github-token: ${{ github.token }}
+          path: archive
+      - name: Independently recompute all sealed aggregates and scientific verdict
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib,math,pathlib
+          p=pathlib.Path("archive/W-R63-original.json")
+          raw=p.read_bytes(); a=json.loads(raw)
+          assert a["schema"]=="wingless.w-r63-channel-role.v1"
+          assert a["parent_head"]=="6825ce8eab1e3ee4ca3434853466da82dd082237"
+          assert a["sealed_heldout_seeds"]==list(range(9552,9576))
+          assert a["permutations"]=={"identity":[0,1,2,3],"rotate":[1,2,3,0],
+                                      "swap01":[1,0,2,3],"reverse":[3,2,1,0]}
+          assert len(a["all_sealed_records"])==648
+          perms=set(a["permutations"])
+          conds={"intact_permuted","erase_presented_slot0","erase_original_source_channel0"}
+          lookup={}
+          for r in a["all_sealed_records"]:
+              assert r["permutation"] in perms and r["condition"] in conds
+              assert r["generator"] in ("affine_prior","quadratic_irregular","xorshift_independent")
+              assert r["entity_group"] in ("seen_identity_control","unseen_identity_transfer")
+              assert r["model"] in (f"{i}:withhold_xorshift_independent" for i in (1,2,3))
+              assert r["amplitude"] in (1,2,3)
+              s=r["by_seed"]
+              assert [x["seed"] for x in s]==list(range(9552,9576))
+              credit=sum(x["credit"] for x in s)
+              pres=sum(x["presentations"] for x in s)
+              assert pres>0 and pres==r["presentations"]
+              assert math.isclose(credit,r["credit"],abs_tol=1e-8)
+              assert math.isclose(credit/pres,r["accuracy"],abs_tol=1e-12)
+              key=(r["model"],r["amplitude"],r["generator"],r["entity_group"],r["permutation"],r["condition"])
+              assert key not in lookup
+              lookup[key]=r["accuracy"]
+          assert len(lookup)==648
+          comparisons=[]
+          for i in (1,2,3):
+              model=f"{i}:withhold_xorshift_independent"
+              for amp in (1,2,3):
+                  for perm in ("rotate","swap01","reverse"):
+                      k=(model,amp,"xorshift_independent","unseen_identity_transfer",perm)
+                      intact=lookup[k+("intact_permuted",)]
+                      slot=lookup[k+("erase_presented_slot0",)]
+                      source=lookup[k+("erase_original_source_channel0",)]
+                      comparisons.append((model,amp,perm,intact,slot,source,slot-intact,source-intact))
+          assert len(comparisons)==len(a["primary_unseen_xorshift_comparisons"])==27
+          for r,c in zip(a["primary_unseen_xorshift_comparisons"],comparisons):
+              assert (r["model"],r["amplitude"],r["permutation"])==c[:3]
+              for f,v in zip(("intact_accuracy","slot0_accuracy","source0_accuracy",
+                               "slot_minus_intact","source_minus_intact"),c[3:]):
+                  assert math.isclose(r[f],v,abs_tol=1e-12)
+          slot_avg=sum(x[6] for x in comparisons)/27
+          source_avg=sum(x[7] for x in comparisons)/27
+          assert math.isclose(slot_avg,a["presented_slot_mean_effect"],abs_tol=1e-12)
+          assert math.isclose(source_avg,a["source_channel_mean_effect"],abs_tol=1e-12)
+          label=("SOURCE_CHANNEL_ROLE" if source_avg<=-.07 and slot_avg>=-.05 else
+                 "FEATURE_SLOT_ROLE" if slot_avg<=-.07 and source_avg>=-.05 else
+                 "MIXED_OR_INCONCLUSIVE")
+          assert a["classification"]==label
+          w={"schema":"research.archived-evidence-witness.v1","experiment":"W-R63",
+             "source_run":38498425768,"source_artifact_id":11864363076,
+             "classification":label,"original_json_sha256":hashlib.sha256(raw).hexdigest(),
+             "independent_case_rows":648,"independent_seed_rows":648*24,
+             "sealed_execution_replayed":False,
+             "scope":"Archive-only recomputation, not independent external FSA authority"}
+          pathlib.Path("W-R63-witness.json").write_text(json.dumps(w,sort_keys=True,indent=2)+"\n")
+          print("WITNESS_PASS",json.dumps(w,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R63-independent-archived-witness
+          path: W-R63-witness.json
+          if-no-files-found: error
+          retention-days: 90
