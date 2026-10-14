@@ -1,7 +1,7 @@
 name: W-NCI11 R3 native analytic-gradient memory development-only
 on:
   push:
-    branches: [research/w-nci11r3-analytic-association-development-20261014-r2]
+    branches: [research/w-nci11r3-analytic-association-development-20261014-r3]
 permissions:
   contents: read
 jobs:
@@ -21,7 +21,7 @@ jobs:
           set -euo pipefail
           git merge-base --is-ancestor 2261747ae1925d6aae2e200b09b8b589bb034a30 HEAD
           test "$(git hash-object unitary/nci11r2_predictive_recurrent_state.go)" = 154ec03ba15e2f86bd78d0f8e8cccaf7954a9281
-          test "$(git hash-object unitary/nci11r3_analytic_associative.go)" = e367311868d5091dd6706c214fde28b309289ecb
+          test "$(git hash-object unitary/nci11r3_analytic_associative.go)" = c856f63b0785a7bd48ece51c9a81d5ad292a118f
           test "$(git hash-object cmd/nci-11r3-wingless/main.go)" = 43654d87e7eec17e4e4c444a4ef968ec49cae52e
           test "$(git hash-object research/contrib/chatgpt/20261014-w-nci11r3/prereg.json)" = 8d5ac1a820dddb762dd0202603c41ba0e52f3892
           python3 -m json.tool research/contrib/chatgpt/20261014-w-nci11r3/prereg.json >/dev/null

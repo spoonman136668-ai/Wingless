@@ -150,7 +150,7 @@ func nci11R3Train(data []nci11R3Example,decay float64)nci11R3Model {
     lr:=.04;if k==24{lr=.3};if k==25{lr=.08}
     delta:=lr*adjusted
     if k<12{model.Write[k]=max(.05,min(4,model.Write[k]-delta))}
-    if k>=12&&k<24{model.Query[k]=max(.05,min(4,model.Query[k]-delta))}
+    if k>=12&&k<24{model.Query[k-12]=max(.05,min(4,model.Query[k-12]-delta))}
     if k==24{model.Gain=max(.1,min(300,model.Gain-delta))}
     if k==25{model.Bias=max(-15,min(15,model.Bias-delta))}
   }
