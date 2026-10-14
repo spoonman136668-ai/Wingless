@@ -1,0 +1,59 @@
+name: W-F10 frozen exact-depth chain identifiability DEV
+on:
+  push:
+    branches: [research/w-f10-explicit-depth-identifiability-dev-20261014-r1]
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Freeze parent and prospectively registered scope
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor d79f29806be4746dee219dfabf77a5abc2ecd14e HEAD
+          test "$(git hash-object unitary/f8_frozen_projection.b64)" = "$(git rev-parse d79f29806be4746dee219dfabf77a5abc2ecd14e:unitary/f8_frozen_projection.b64)"
+          python3 -m json.tool research/foundational/20261014-w-f10/prereg.json >/dev/null
+      - name: Execute single dev-only exact-depth query pair study
+        run: |
+          set -euo pipefail
+          go run ./cmd/f10-wingless > /tmp/w-f10-original-development.json
+          python3 -m json.tool /tmp/w-f10-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F10-original-exact-depth-identifiability-development
+          path: /tmp/w-f10-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently verify all 96 paired controls after archival
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          r=json.load(open("/tmp/w-f10-original-development.json"))
+          assert r["stage"]=="DEVELOPMENT_ONLY" and r["graph_states"]==96
+          assert r["paired_questions"]==192 and r["negative_questions"]==96
+          assert r["state_bytes"]==576 and not r["model_retrained"]
+          assert not r["query_depth_is_present_in_frozen_model_interface"]
+          assert not r["sealed_first_use"] and not r["accepted_ref_mutation"]
+          assert collections.Counter(z["path_depth"] for z in r["rows"])=={4:24,5:24,6:24,7:24}
+          for name,s in r["scores"].items():
+            pairs=sum(int(z["models"][name]==z["truth"]) for z in r["rows"])
+            accuracy=sum(int(v==t) for z in r["rows"] for v,t in zip(z["models"][name],z["truth"]))/192
+            assert pairs==s["paired_correct"] and abs(accuracy-s["accuracy"])<1e-12
+          assert r["scores"]["coded_depth_aware_oracle"]["paired_correct"]==96,"INVALID_DEPTH_ORACLE"
+          assert r["scores"]["frozen_learned_composition_depth_blind"]["paired_correct"]==0,"INVALID_DEPTH_INVARIANCE"
+          assert r["registered_verdict"]=="DEPTH_CONDITIONING_MISSING_FROM_FROZEN_INPUT_INTERFACE"
+          print("W_F10_CAPABILITY_BOUNDARY",r["registered_verdict"])
+          print("W_F10_SCORES",r["scores"])
+          PY
+      - name: One final full Go regression and build
+        run: go test ./... && go build ./...

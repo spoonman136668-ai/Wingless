@@ -1,0 +1,54 @@
+{
+  "schema": "wingless.f10.depth-role-audit.prereg.v1",
+  "id": "W-F10-EXACT-LENGTH-VARIABLE-DEPTH-CHAIN-PROBE",
+  "origin_F9": "d79f29806be4746dee219dfabf77a5abc2ecd14e",
+  "scientific_question": "Can the frozen F7 entity-identity representation and F5 learned recurrent composer distinguish queries about exactly k-1 versus k hops when graph, query endpoints and all entity IDs are identical and only requested length differs?",
+  "hypothesis": "Current frozen model lacks an explicit requested-depth input and uses exactly 3 recurrent message passes. It must return the same prediction for both requests, failing paired contrast despite prior four-hop accuracy.",
+  "cohort": {
+    "development_only": true,
+    "new_seed_bounds": [
+      51100,
+      51124
+    ],
+    "new_chain_depths": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "graph_states": 96,
+    "paired_question_count": 192,
+    "labels_each_pair": [
+      false,
+      true
+    ],
+    "negative_questions": 96,
+    "graph_edges": 12,
+    "baseline_and_intervention": "Same graph and endpoint pair, exact requested depth only changes k-1 to k; additional graph edges disconnected distractors",
+    "controls": [
+      "fully coded exact-depth reachability must score 96/96 pairs",
+      "old F5 learned matching+recurrent composition",
+      "always-yes shortcut"
+    ],
+    "invariance": "No requested-depth input exists in frozen candidate; no rerunning F9 or threshold tuning",
+    "limits": {
+      "resident_state_bytes": 576,
+      "weights_frozen": true,
+      "no_F3_sealed_source": true,
+      "third_party_birth_verified": false
+    }
+  },
+  "classification": {
+    "valid_gap": "DEPTH_CONDITIONING_MISSING_FROM_FROZEN_INPUT_INTERFACE",
+    "invalid": "INVALID_DEPTH_ORACLE",
+    "invalid_invariance": "INVALID_DEPTH_INVARIANCE_NOT_PROVEN"
+  },
+  "next_design": "Separate future preregistration should add a genuine conditioning signal and learn variable-depth recursion, with length 8+ capacity/halting/resource controls; NOT a retrofit of frozen F3 or F10.",
+  "authority": {
+    "accepted_ref_mutation": false,
+    "controller": false,
+    "queue": false,
+    "FORGE": false,
+    "KTRADE": false
+  }
+}
