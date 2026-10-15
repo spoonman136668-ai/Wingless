@@ -1,0 +1,33 @@
+name: W-F34 learned transducer engineering only
+on:
+  push:
+    branches:
+      - research/w-f34-learned-operator-preflight-20261015-r1
+permissions:
+  contents: read
+jobs:
+  qualification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Frozen parent/source-prereg and source separation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4fcf4e28ccc8e6461459a4c1f872e4f2dec489c6 HEAD
+          git merge-base --is-ancestor fd239dcb64b953d76b49849d4a17c683409ee84f HEAD
+          python3 -m json.tool research/foundational/20261015-w-f34/learner-prereg-candidate.json > /dev/null
+          python3 -m py_compile research/foundational/20261015-w-f34/learned_train_only.py
+      - name: Focused train-only learner source tests
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f34 -p test_learner_preflight.py -v
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
+      - name: Authority
+        run: echo "Engineering candidate only. Reserved W-F34 original and TRAIN-only cohort not consumed."

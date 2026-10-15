@@ -1,0 +1,71 @@
+{
+  "schema": "wingless.f34.learned-operator-preflight.v1",
+  "status": "BEFORE_TRAIN_ONLY_POLICY_PILOT",
+  "parent_pilot": {
+    "run": 38731171530,
+    "source_commit": "4fcf4e28ccc8e6461459a4c1f872e4f2dec489c6",
+    "source_pilot_sha": "4f4d5cd7ac1330f7f0f53a2ae25ccc6169e2ec81"
+  },
+  "hypothesis": "Training a per-role discrete transition model with gradient descent and role-aware multistep composition can beat equal-evidence empirical controls on novel 6-10 link directed grammar queries.",
+  "allowed_train_only": {
+    "seeds": [
+      203000,
+      203012
+    ],
+    "families": [
+      188,
+      189,
+      190
+    ],
+    "depths": [
+      6,
+      8,
+      10
+    ],
+    "episodes": 108
+  },
+  "reserved_primary_original": {
+    "seeds": [
+      202000,
+      202016
+    ],
+    "families": [
+      184,
+      185,
+      186,
+      187
+    ],
+    "prohibited": true
+  },
+  "learned": {
+    "train_method": "gradient-descent-softmax-transition-rows, postfit assignment to bijective role maps",
+    "role_types": 8,
+    "states": 8,
+    "training_float_coefficients": 512,
+    "inference_mapping_bytes": 64,
+    "native_limit_bytes": 576,
+    "training_working_memory_separately_accounted": true
+  },
+  "controls": [
+    "permutation-constrained empirical MAP",
+    "public affine/masked operator posterior MAP",
+    "nearest observed transition",
+    "no-role",
+    "privileged grammar oracle"
+  ],
+  "advance": {
+    "source_truth_oracle_matches_second_independent_evaluator": true,
+    "role_order_ablation_measured": true,
+    "headroom_fair_baselines_and_per_family_scores": true,
+    "min_advantage_for_future_original": 0.03,
+    "do_not_tune_on_reserved_primary": true
+  },
+  "authority": {
+    "development_only": true,
+    "no_primary_original": true,
+    "independent_F3_custody": false,
+    "no_accepted_ref_mutation": true,
+    "no_paid_api": true,
+    "no_FORGE_CKB_KTRADE_Cloudflare_changes": true
+  }
+}
