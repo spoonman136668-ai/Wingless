@@ -1,0 +1,67 @@
+{
+  "schema": "wingless.f42.posterior-action-rank-source-prereg.v1",
+  "stage": "FRESH_TRAIN_ONLY_SOURCE_HEADROOM_BEFORE_LEARNER",
+  "parent_run": 38777578489,
+  "design_issue": 240,
+  "source_parent_sha": "58f336d67b383ed274dd6d0ea81a258582dbcb19",
+  "hypothesis": "Increasing independently seeded posterior sample banks to 192 reduces instability in predicted final-answer-value acquisition rankings; effective sample rank agreement and actual outcome usefulness must be demonstrated before another learned model.",
+  "train_only": {
+    "seeds": [
+      321000,
+      321012
+    ],
+    "families": [
+      370,
+      371,
+      372
+    ],
+    "lengths": [
+      3,
+      5
+    ],
+    "expected_cases": 72,
+    "public_triples_per_role": 3,
+    "paid_budget_max": 2
+  },
+  "reserved_original": {
+    "seeds": [
+      322000,
+      322016
+    ],
+    "families": [
+      374,
+      375,
+      376,
+      377
+    ]
+  },
+  "budgets": [
+    12,
+    48,
+    192
+  ],
+  "controls": [
+    "query_frontier",
+    "decision_value_48",
+    "decision_value_192",
+    "information_gain_192",
+    "no_purchase",
+    "privileged_hindsight_unfair"
+  ],
+  "gates": {
+    "rank_agreement_48_vs_192_min": 0.55,
+    "gain_192_over_strongest_fair_48_min": 0.03,
+    "per_family_nondegrade": true,
+    "independent_row_recount": true
+  },
+  "limits": {
+    "public_only_action_selection": true,
+    "private_source_through_exact_two_max_port": true,
+    "posterior_external_RAM_not_native": true,
+    "native_576_byte_bound_not_physically_qualified": true,
+    "no_F3_claim": true,
+    "no_primary_original": true,
+    "no_paid_API_or_Codex": true,
+    "no_FORGE_KTRADE_controller_changes": true
+  }
+}
