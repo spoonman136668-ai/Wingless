@@ -1,0 +1,74 @@
+{
+  "schema": "wingless.f19.prereg.v1",
+  "parent_F18": "5ebcc66b63c4de08b1819d82690f6315a3b61a67",
+  "hypothesis": "Frozen learned typed multi-hop recurrence will preserve TRUE when EITHER independently sufficient ordered-role causal path survives, and reject only once both typed witnesses are broken.",
+  "cohort": {
+    "development_only": true,
+    "new_families": [
+      108,
+      109,
+      110,
+      111
+    ],
+    "new_seeds": [
+      73100,
+      73106
+    ],
+    "depths": [
+      7,
+      8
+    ],
+    "shifts": [
+      0,
+      1
+    ],
+    "graph_states": 96,
+    "cases_per_graph": 7,
+    "questions": 672,
+    "positive_count": 384,
+    "negative_count": 288,
+    "variants": [
+      "both valid witnesses",
+      "only alternate witness survives",
+      "only main witness survives",
+      "neither survives",
+      "invalid query symbol order",
+      "invalid exact depth",
+      "benign noise role edit"
+    ],
+    "typed_exact_oracle": "all cases must be verified before the model is run"
+  },
+  "frozen": {
+    "model_pretrained_roles_17_params": true,
+    "learned_entity_projection_257_params": true,
+    "learned_recurrence_5_params": true,
+    "native_state_bytes": 576,
+    "risk_head_8_params": true,
+    "threshold": 0.5,
+    "model_retrained": false
+  },
+  "controls": [
+    "complete frozen learned role-conditioned recurrence",
+    "frozen learned online risk stop",
+    "cheap coded first-hop necessary-edge screen",
+    "coded exact typed reachability only for source labels"
+  ],
+  "registered": {
+    "min_full_accuracy": 0.95,
+    "max_family_error": 0.05,
+    "min_main_damaged_survived": 91,
+    "min_alt_damaged_survived": 91,
+    "positive": "DEVELOPMENT_FROZEN_TWO_WITNESS_TRANSFER",
+    "negative": "DEVELOPMENT_NO_FROZEN_TWO_WITNESS_TRANSFER",
+    "partial": "DEVELOPMENT_TWO_WITNESS_FULL_REASONING_PASS_RISK_STOP_FAILURE"
+  },
+  "guardrails": {
+    "F3_untouched": true,
+    "not_sealed": true,
+    "authentic_source_birth": false,
+    "no_FSA_acceptance": true,
+    "no_CONTROLLER": true,
+    "no_FORGE": true,
+    "no_KTRADE": true
+  }
+}
