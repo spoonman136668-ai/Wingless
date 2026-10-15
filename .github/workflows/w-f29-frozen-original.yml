@@ -6,7 +6,7 @@ permissions:
   contents: read
 jobs:
   original:
-    if: ${{ github.event.head_commit.message == 'science(w-f29): one frozen development original' && github.run_attempt == 1 }}
+    if: "${{ github.event.head_commit.message == 'science(w-f29): one frozen development original' && github.run_attempt == 1 }}"
     runs-on: ubuntu-latest
     timeout-minutes: 75
     steps:
