@@ -1,0 +1,86 @@
+{
+  "schema": "wingless.f54.learned-relation-transition-invariants.prereg.v1",
+  "stage": "PRECODE_FROZEN_NOT_EXECUTED",
+  "parent_F53_source_head": "7669f41cbd2bada209f757530741669c993c0665",
+  "F53_qualified_run": 38816896639,
+  "tracking_issue": 268,
+  "hypothesis": "Shared trained compositional latent-state transition can preserve unseen role-binding and inverse relationship semantics with better task accuracy than strongest equal-work symbolic and fixed Bayesian pruning, without relying on hidden source sign or learned beam selection.",
+  "fit": {
+    "seeds": [
+      581000,
+      581016
+    ],
+    "families": [
+      1040,
+      1041,
+      1042,
+      1043
+    ],
+    "path_lengths": [
+      6,
+      8
+    ],
+    "expected_examples": 128,
+    "supervision": "FIT_only_intermediate_and_final_task_state"
+  },
+  "diagnostic": {
+    "seeds": [
+      581100,
+      581116
+    ],
+    "families": [
+      1044,
+      1045,
+      1046,
+      1047
+    ],
+    "path_lengths": [
+      8,
+      10
+    ],
+    "expected_cases": 128,
+    "source_shift": "novel_relation_algebra_and_inverse_role_reuse"
+  },
+  "future_original_NOT_RESERVED": {
+    "seeds": [
+      582000,
+      582016
+    ],
+    "families": [
+      1048,
+      1049,
+      1050,
+      1051
+    ]
+  },
+  "controls": [
+    "trained_compositional_transition",
+    "F53_frozen_learned_two_beam",
+    "fixed_mass_two_beam",
+    "fixed_entropy_two_beam",
+    "budget_matched_symbolic_transition",
+    "full_public_parity",
+    "public_support_nearest",
+    "exact_full_public_bayes",
+    "private_truth_oracle_unfair"
+  ],
+  "thresholds": {
+    "gain_vs_strongest_equal_work_fair_min": 0.05,
+    "posterior_operation_ratio_vs_exact_max": 0.5,
+    "per_family_nondegradation": true,
+    "transition_and_parameter_receipts_reconstructable": true
+  },
+  "resource_constraints": {
+    "total_model_parameter_and_state_payload_bytes_max": 64,
+    "physical_native_total_576B_qualification": false,
+    "record_all_abstract_transition_operations": true
+  },
+  "authority": {
+    "no_F53_holdout_training": true,
+    "independent_F3": false,
+    "primary_original_first_use": false,
+    "accepted_ref_mutation": false,
+    "paid_API_calls": 0,
+    "live_optimizer_policy_promotion": false
+  }
+}
