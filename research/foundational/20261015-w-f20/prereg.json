@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.f20.prereg.v1",
+  "source_W19": "51d82274d97c076edaba0b45cca45e4a05f093c0",
+  "science": "Falsify whether frozen Wingless core has a causal computation path from explicit alias metadata to its answer, despite metadata being included inside same 576B state.",
+  "cohort": {
+    "author_generated_development": true,
+    "families_reused": [
+      108,
+      109,
+      110,
+      111
+    ],
+    "new_seeds": [
+      78600,
+      78606
+    ],
+    "depths": [
+      7,
+      8
+    ],
+    "shift_count": 2,
+    "graphs": 96,
+    "questions": 576,
+    "variants": [
+      "both path witnesses intact => true",
+      "main path broken but alternate valid => true",
+      "main broken plus alternative bridge renamed, metadata declares alias => true",
+      "IDENTICAL edge inputs but metadata denies alias => false",
+      "both main and alternative role links broken => false",
+      "benign distractor role change => true"
+    ],
+    "critical_control": "variants 2 and 3 contain identical edge/role facts and same query; only state word25 differs (alias declared bit), and coded oracle supplies canonicalization from public input metadata",
+    "encoded_state": "frozen F14 12 packed endpoints + 12 role codes + alias witness reserve words [24,25] remains 576B. Existing frozen wf17Online method does NOT read reserve words; failure is expected and causally diagnostic.",
+    "controls": [
+      "typed exact oracle with alias canonicalization reads state metadata",
+      "raw literal-edge typed exact oracle (not alias aware)",
+      "CODED alias-canonicalize then call unchanged frozen learned model",
+      "frozen full learned model directly on alias witness state",
+      "frozen risk-stop learned model directly on same state"
+    ],
+    "acceptance": {
+      "source_valid_if_exact_oracle_all_pairs": true,
+      "canonicalizer_must_recover_all_576": true,
+      "paired_frozen_predictions_must_be_identical_on_96_ontology_only_swaps": true,
+      "mechanistic_negative_if_frozen_accuracy_below": 0.95
+    },
+    "possible_verdicts": [
+      "DEVELOPMENT_FROZEN_ALIAS_INFORMATION_PATH_NEGATIVE",
+      "DEVELOPMENT_ALIAS_INFORMATION_PATH_NOT_FALSIFIED",
+      "INVALID_ALIAS_CONTROL_OR_IDENTITY_PAIR"
+    ]
+  },
+  "boundaries": {
+    "not_claimed_as_general_unknown_alias_solving": true,
+    "not_a_fair_unassisted_unknown_alias_test": true,
+    "alias_metadata_given_to_model_state_but_ignored_by_current_architecture": true,
+    "semantic_alias_registry_programmed_upper_not_learned": true,
+    "source_f3_not_used": true,
+    "FORGE_engineering_untouched": true,
+    "KTRADE_untouched": true
+  }
+}
