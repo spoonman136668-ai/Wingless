@@ -1,0 +1,105 @@
+name: W-F42 one frozen posterior-rank TRAIN-only diagnostic (NO original)
+on:
+  push:
+    branches:
+      - science/w-f42-frozen-sample-ranks-20261015-r1
+permissions:
+  contents: read
+jobs:
+  train_only:
+    if: "${{ github.event.head_commit.message == 'science(w-f42): one exact-frozen train-only rank diagnostic' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Prove frozen F42 source identity, prereg, and excluded originals
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor c249b6beccab661f48c038443d14da455c51b7f1 HEAD
+          git merge-base --is-ancestor ac32ae3928c8097989b09074dec74a0b768e7926 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f42/source_pilot.py)" = 50f753c9eb66a9711d65d12a926637f601bfebc2
+          test "$(git hash-object research/foundational/20261015-w-f42/prereg-candidate.json)" = 4bfb18442e10d30389c7cea753a5f34a1b6e70cb
+          python3 -m json.tool research/foundational/20261015-w-f42/prereg-candidate.json >/dev/null
+          python3 -m unittest discover -s research/foundational/20261015-w-f42 -p test_preflight.py -v
+      - name: Exactly one source-frozen TRAIN-only F42 diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f42/source_pilot.py > /tmp/w-f42-source.json
+          python3 -m json.tool /tmp/w-f42-source.json >/dev/null
+          sha256sum /tmp/w-f42-source.json > /tmp/w-f42-source.sha256
+          git rev-parse HEAD > /tmp/w-f42-head.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F42-one-frozen-train-only-rank-diagnostic
+          path: |
+            /tmp/w-f42-source.json
+            /tmp/w-f42-source.sha256
+            /tmp/w-f42-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independent all-row, purchase, rank, control and prereg audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/w-f42-source.json'))
+          p=json.load(open('research/foundational/20261015-w-f42/prereg-candidate.json'))
+          assert (d['schema'],d['stage'])==('wingless.f42.action-rank-sample-stability.trainonly.v1','TRAIN_ONLY_SOURCE_DIAGNOSTIC_NOT_LEARNED_ORIGINAL')
+          assert d['source_seeds']==p['train_only']['seeds'] and d['source_families']==p['train_only']['families']
+          assert d['reserved_original_seeds']==p['reserved_original']['seeds']
+          assert d['reserved_original_families']==p['reserved_original']['families']
+          assert d['questions']==p['train_only']['expected_cases']==72 and len(d['rows'])==72
+          assert d['posterior_budgets']==p['budgets']==[12,48,192]
+          assert d['paid_mapping_cap']==p['train_only']['paid_budget_max']==2
+          assert d['high_sample_posterior_external_bytes']==192*8*8
+          assert d['private_maps_only_in_port_and_evaluator'] and d['synthetic_same_repo_not_F3'] and d['primary_original_not_executed']
+          assert not d['accepted_ref_mutation'] and d['paid_api_calls']==0
+          arms=p['controls']
+          rows=d['rows']
+          assert len({(r['seed'],r['family'],r['length']) for r in rows})==72
+          for row in rows:
+              assert 321000<=row['seed']<321012 and row['family'] in (370,371,372) and row['length'] in (3,5)
+              assert len(row['public_sha256'])==64 and row['paid_mapping_max']==2
+              assert set(row['predictions'])==set(arms)
+              assert set(row['receipts'])==set(arms)-{'privileged_hindsight_unfair'}
+              assert set(row['ranking'])=={'b12','b48','b192','b192_independent'}
+              for token,pick in row['ranking'].items():
+                  assert len(pick)==2 and all(isinstance(v,int) and 0<=v<8 for v in pick)
+              for arm,paid in row['receipts'].items():
+                  assert len(paid)<=2 and (arm!='no_purchase' or not paid)
+                  assert len({tuple(t[:2]) for t in paid})==len(paid)
+                  assert all(len(t)==3 and all(isinstance(v,int) and 0<=v<8 for v in t) for t in paid)
+          for arm in arms:
+              expected=sum(r['truth']==r['predictions'][arm] for r in rows)
+              s=d['scores'][arm]
+              assert (s['correct'],s['total'])==(expected,72)
+              assert math.isclose(s['accuracy'],expected/72,abs_tol=1e-12)
+          assert d['scores']['privileged_hindsight_unfair']['correct']==72
+          for family in p['train_only']['families']:
+              subset=[r for r in rows if r['family']==family]
+              assert len(subset)==24
+              for arm in arms:
+                  assert d['by_family'][str(family)][arm]==sum(r['truth']==r['predictions'][arm] for r in subset)
+          rankings={'b12_48':('b12','b48'),'b48_192':('b48','b192'),'b192_192_independent':('b192','b192_independent')}
+          for label,(small,large) in rankings.items():
+              computed=sum(r['ranking'][small]==r['ranking'][large] for r in rows)/72
+              assert math.isclose(d['action_rank_agreements'][label],computed,abs_tol=1e-12)
+          fair=('query_frontier','decision_value_48','information_gain_192')
+          strongest=max(d['scores'][a]['accuracy'] for a in fair)
+          gain=d['scores']['decision_value_192']['accuracy']-strongest
+          nondegrade=all(d['by_family'][str(f)]['decision_value_192']>=max(d['by_family'][str(f)][a] for a in fair) for f in p['train_only']['families'])
+          g=p['gates']
+          passed=(d['action_rank_agreements']['b48_192']>=g['rank_agreement_48_vs_192_min'] and gain>=g['gain_192_over_strongest_fair_48_min'] and nondegrade)
+          expected='TRAIN_ONLY_RANK_STABILITY_QUALIFIED' if passed else 'TRAIN_ONLY_RANK_STABILITY_NOT_QUALIFIED'
+          assert d['verdict']==expected
+          print('W_F42',expected,'accuracy',{a:d['scores'][a]['correct'] for a in arms},'rank_agreements',d['action_rank_agreements'],'gain',gain,'nondegrade',nondegrade)
+          PY
+      - name: Authority boundary
+        run: echo "TRAIN-only synthetic diagnostic. No reserved original, independent F3, scientific acceptance, learner claim or CKB-plane/accepted-ref mutation."
