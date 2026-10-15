@@ -1,0 +1,122 @@
+name: W-F45 once-only selective-lookahead TRAIN diagnostic (NO original)
+on:
+  push:
+    branches:
+      - science/w-f45-one-frozen-budgeted-trainonly-20261015-r1
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    if: "${{ github.event.head_commit.message == 'science(w-f45): one frozen bounded selective-lookahead train diagnostic' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Pin qualified source and precode preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor b9faff4e64d9898b602ac05526738156f17fda6b HEAD
+          git merge-base --is-ancestor 455417099e74f2eb79c17560d00afc45e968e7d5 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f45/source_pilot.py)" = 05b854dcf1a78073ab6ee6aec880468d76da94e5
+          test "$(git hash-object research/foundational/20261015-w-f45/prereg-candidate.json)" = 69bfc9caf17d5768bc33e9e699d6248d3daa5d69
+          python3 -m unittest discover -s research/foundational/20261015-w-f45 -p test_preflight.py -v
+      - name: Execute one fresh TRAIN-only W-F45 diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f45/source_pilot.py > /tmp/w-f45-train.json
+          python3 -m json.tool /tmp/w-f45-train.json >/dev/null
+          sha256sum /tmp/w-f45-train.json > /tmp/w-f45-train.sha256
+          git rev-parse HEAD > /tmp/w-f45-head.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F45-once-only-selective-lookahead-train
+          path: |
+            /tmp/w-f45-train.json
+            /tmp/w-f45-train.sha256
+            /tmp/w-f45-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independent all-row, purchased mapping, computation, and threshold audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/w-f45-train.json'))
+          p=json.load(open('research/foundational/20261015-w-f45/prereg-candidate.json'))
+          t=p['train_only'];h=p['thresholds'];arms=p['controls']
+          assert d['schema']=='wingless.f45.cost-capped-selective-lookahead.trainonly.v1'
+          assert d['stage']=='SYNTHETIC_FRESH_TRAIN_ONLY_NO_ORIGINAL'
+          assert d['seeds']==t['seeds'] and d['families']==t['families']
+          assert d['reserved_seeds']==p['reserved_primary_original']['seeds']
+          assert d['reserved_families']==p['reserved_primary_original']['families']
+          assert d['questions']==t['expected_cases']==72 and len(d['rows'])==72
+          assert d['initial_posterior_worlds']==1296
+          assert d['first_stage_beam']==t['first_stage_counterfactual_beam']==4
+          assert d['max_paid_mappings']==t['max_paid_mappings']==2
+          assert not d['original_executed'] and not d['independent_F3_custody']
+          assert not d['native_576_byte_resident_qualified']
+          assert not d['accepted_ref_mutation'] and d['paid_api_calls']==0
+          rows=d['rows']
+          assert len({(r['seed'],r['family'],r['length']) for r in rows})==72
+          used=sum(bool(r['deep_gate']['used_deep']) for r in rows)
+          assert used==d['deep_gate_count'] and used<=3
+          assert math.isclose(d['deep_gate_fraction'],used/72,abs_tol=1e-12)
+          assert d['deep_gate_fraction']<=t['max_deep_gate_fraction']
+          for r in rows:
+              assert 371000<=r['seed']<371012
+              assert r['family'] in t['families'] and r['length'] in t['lengths']
+              assert 0<=r['truth']<6 and r['initial_posterior_worlds']==1296
+              assert set(r['answers'])==set(arms)
+              assert set(r['receipts'])==set(arms)-{'evaluator_oracle_unfair'}
+              assert set(r['work'])==set(r['receipts'])
+              gate=r['deep_gate']
+              assert isinstance(gate['eligible'],bool) and isinstance(gate['used_deep'],bool)
+              assert gate['used_deep']<=gate['eligible']
+              assert gate['eligible']==(r['length']==5 and gate['one_step_rank_margin']<.05)
+              assert gate['one_step_rank_margin']>=0
+              for arm,receipt in r['receipts'].items():
+                  assert len(receipt)<=2 and (arm!='no_purchase' or not receipt)
+                  assert len({(v[0],v[1]) for v in receipt})==len(receipt)
+                  assert all(len(v)==3 and 0<=v[0]<4 and 0<=v[1]<6 and 0<=v[2]<6 for v in receipt)
+                  assert isinstance(r['work'][arm],int) and r['work'][arm]>=0
+          for arm in arms:
+              score=d['scores'][arm]
+              correct=sum(r['answers'][arm]==r['truth'] for r in rows)
+              assert (score['correct'],score['total'])==(correct,72)
+              assert math.isclose(score['accuracy'],correct/72,abs_tol=1e-12)
+          assert d['scores']['evaluator_oracle_unfair']['correct']==72
+          for fam in t['families']:
+              group=[r for r in rows if r['family']==fam]
+              assert len(group)==24
+              for arm in arms:
+                  assert d['by_family'][str(fam)][arm]==sum(r['answers'][arm]==r['truth'] for r in group)
+          for arm in arms[:-1]:
+              assert d['posterior_world_work'][arm]==sum(r['work'][arm] for r in rows)
+              assert d['elapsed_policy_seconds'][arm]>0
+          fair=('one_step_value','exact_entropy','query_frontier')
+          strongest=max(fair,key=lambda a:d['scores'][a]['accuracy'])
+          gain=d['scores']['selective_budgeted_lookahead']['accuracy']-d['scores'][strongest]['accuracy']
+          nonregress=all(d['by_family'][str(f)]['selective_budgeted_lookahead']>=
+            max(d['by_family'][str(f)][a] for a in fair) for f in t['families'])
+          work=d['posterior_world_work']
+          cost_ok=work['selective_budgeted_lookahead']<=h['posterior_work_ratio_max']*max(work[strongest],1)
+          assert d['strongest_budget_fair_control']==strongest
+          assert math.isclose(d['candidate_gain'],gain,abs_tol=1e-12)
+          assert d['family_nondegradation']==nonregress and d['posterior_work_parity']==cost_ok
+          qualifies=(gain>=h['accuracy_gain_over_strongest_budget_fair_min'] and nonregress and cost_ok
+                     and d['deep_gate_fraction']<=h['deep_fraction_max'])
+          expected='TRAIN_ONLY_COST_GATED_LOOKAHEAD_QUALIFIED' if qualifies else 'TRAIN_ONLY_COST_GATED_LOOKAHEAD_NOT_QUALIFIED'
+          assert d['verdict']==expected
+          print('W_F45',expected,'accuracy',{a:d['scores'][a]['correct'] for a in arms},
+                'gain',gain,'family_no_regress',nonregress,'work_parity',cost_ok,
+                'deep_count',used,'work',work,'policy_seconds',d['elapsed_policy_seconds'])
+          PY
+      - name: Scientific authority limitation
+        run: echo "Synthetic TRAIN-only diagnostic, not source-independent F3, native 576B qualified, primary original, controller or accepted-ref mutation."
