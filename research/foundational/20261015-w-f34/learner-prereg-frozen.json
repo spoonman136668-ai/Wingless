@@ -1,0 +1,71 @@
+{
+  "schema": "wingless.f34.frozen-train-only-learned-operator.v1",
+  "stage": "TRAIN_ONLY_ONE_SHOT_POLICY_FEASIBILITY",
+  "source_parent": "4fcf4e28ccc8e6461459a4c1f872e4f2dec489c6",
+  "precode_prereg_sha": "fd239dcb64b953d76b49849d4a17c683409ee84f",
+  "qualified_source_commit": "8010d4ee6f592f021d44f78a0689b63c1e3eaa82",
+  "qualified_source_tree": "db8c6b3a6050e72a2797f79b06fcae935bd925d5",
+  "original_script_path": "research/foundational/20261015-w-f34/learned_train_only.py",
+  "source_blob_sha": "5f94dec268799b32dd8bfe17b255cd0266454e1e",
+  "engineering_regression": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38740038006",
+  "pilot": {
+    "seeds": [
+      203000,
+      203012
+    ],
+    "families": [
+      188,
+      189,
+      190
+    ],
+    "depths": [
+      6,
+      8,
+      10
+    ],
+    "expected_cases": 108
+  },
+  "reserved_primary_original": {
+    "seeds": [
+      202000,
+      202016
+    ],
+    "families": [
+      184,
+      185,
+      186,
+      187
+    ],
+    "forbidden": true
+  },
+  "learned": {
+    "coefficient_count": 512,
+    "transient_optimizer_scratch_excluded_from_native_core": true,
+    "inference_mapping_bytes": 64,
+    "native_state_ceiling_bytes": 576,
+    "training_epoch_count": 80
+  },
+  "controls": [
+    "learned",
+    "permutation_map",
+    "affine_map",
+    "nearest_demo",
+    "no_role",
+    "privileged_oracle"
+  ],
+  "rule": {
+    "minimum_gain_vs_best_fair": 0.03,
+    "nondegrading_every_pilot_family": true,
+    "source_oracle_all_cases": true,
+    "independent_row_replay": true
+  },
+  "limits": {
+    "one_train_only_execution": true,
+    "no_primary_original": true,
+    "no_independently_controlled_F3_source": true,
+    "no_F3_admission": true,
+    "no_controller_FORGE_cloudflare_KTRADE_changes": true,
+    "no_accepted_ref_mutation": true,
+    "no_paid_api": true
+  }
+}
