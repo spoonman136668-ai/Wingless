@@ -17,7 +17,7 @@ class Preflight(unittest.TestCase):
     self.assertEqual((sign*(y-shift))%m.N,x)
  def test_fit_labels_only(self):
   p,n=m.fit()
-  self.assertEqual(n,16*4*2)
+  self.assertEqual(n,16*4)
   self.assertEqual(len(p),8)
   self.assertTrue(all(0<val<1 for val in p.values()))
  def test_public_only_compose(self):
