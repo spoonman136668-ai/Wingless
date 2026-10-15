@@ -1,0 +1,87 @@
+name: W-F32 one frozen developmental original
+on:
+  push:
+    branches:
+      - science/w-f32-frozen-original-20261015-r1
+permissions:
+  contents: read
+jobs:
+  original:
+    if: "${{ github.event.head_commit.message == 'science(w-f32): one frozen development original' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify qualified immutable source and frozen preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor df46ff2ccdf8b205ced2ce368ac84ec05d4bdf76 HEAD
+          git merge-base --is-ancestor 9691336172d03569cb23e1a5a3230082125eb857 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f32/execute.py)" = f582dd43f631c27989003401f29f05a08f96f964
+          test "$(git hash-object research/foundational/20261015-w-f32/prereg-frozen.json)" = "$(git rev-parse 9691336172d03569cb23e1a5a3230082125eb857:research/foundational/20261015-w-f32/prereg-frozen.json)"
+          python3 -m json.tool research/foundational/20261015-w-f32/prereg-frozen.json > /dev/null
+          python3 -m unittest discover -s research/foundational/20261015-w-f32 -p test_preflight.py -q
+      - name: Execute one new W-F32 development original
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f32/execute.py > /tmp/w-f32-original.json
+          python3 -m json.tool /tmp/w-f32-original.json > /dev/null
+          sha256sum /tmp/w-f32-original.json > /tmp/w-f32-original.sha256
+          git rev-parse HEAD > /tmp/w-f32-source-commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F32-first-frozen-development-original
+          path: |
+            /tmp/w-f32-original.json
+            /tmp/w-f32-original.sha256
+            /tmp/w-f32-source-commit.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independently audit every row and fair coded traversal control
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import collections,json,math
+          d=json.load(open('/tmp/w-f32-original.json'))
+          p=json.load(open('research/foundational/20261015-w-f32/prereg-frozen.json'))
+          assert d['schema']=='wingless.f32.ordered-typed-composition.development.v1'
+          assert d['stage']=='DEVELOPMENT_ONLY'
+          assert d['questions']==p['test']['expected_queries']==1152
+          assert len(d['rows'])==1152 and len(d['weights'])==4
+          assert d['native_state_max_bytes']==576
+          assert d['learned_coefficients_bytes']+d['native_active_state_bytes_max']<=576
+          assert d['source_generated_in_repo'] and d['coded_edge_enumeration']
+          assert not d['independently_born_F3_source'] and not d['sealed_first_use'] and not d['accepted_ref_mutation']
+          assert list(d['test_seeds'])==[172000,172012]
+          assert set(d['test_families'])==set(p['test']['families'])
+          assert list(d['test_depths'])==[3,4,5]
+          assert len(set((r['seed'],r['family'],r['depth'],r['variant']) for r in d['rows']))==1152
+          assert collections.Counter(r['variant'] for r in d['rows'])==dict.fromkeys(range(8),144)
+          assert all(r['truth']==(r['variant'] in (0,1,4,6)) for r in d['rows'])
+          assert all(r['external_graph_bytes']>0 and len(r['source_sha256'])==64 for r in d['rows'])
+          for arm,score in d['scores'].items():
+            right=sum(r['predictions'][arm]==r['truth'] for r in d['rows'])
+            fp=sum(r['predictions'][arm] for r in d['rows'] if not r['truth'])
+            fn=sum(not r['predictions'][arm] for r in d['rows'] if r['truth'])
+            assert (score['correct'],score['fp'],score['fn'])==(right,fp,fn)
+            assert math.isclose(score['accuracy'],right/1152,abs_tol=1e-12)
+          assert d['scores']['coded_exact']['correct']==1152
+          for fam,arms in d['by_family'].items():
+            rows=[r for r in d['rows'] if r['family']==int(fam)]
+            assert len(rows)==288
+            for name,s in arms.items():
+              assert s['correct']==sum(r['predictions'][name]==r['truth'] for r in rows)
+          assert d['verdict'] in ('DEVELOPMENT_ORDERED_COMPOSITION_LEARNED_GAIN','DEVELOPMENT_ORDERED_COMPOSITION_NO_QUALIFIED_GAIN')
+          print('W_F32_REGISTERED',d['verdict'],{k:v['correct'] for k,v in d['scores'].items()})
+          PY
+      - name: No independent F3 custody or scientific promotion
+        run: echo "One W-F32 development original only, no F3 sealed first use or accepted-ref changes"
