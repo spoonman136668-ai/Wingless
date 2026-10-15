@@ -1,0 +1,72 @@
+{
+  "schema": "wingless.f41.action-value-identifiability-source.v1",
+  "stage": "PRE_CODE_TRAIN_ONLY_SOURCE_ENGINEERING",
+  "design_issue": "https://github.com/spoonman136668-ai/Wingless/issues/238",
+  "prior_negative": 38775651862,
+  "hypothesis": "When only three public mapping entries per typed role are known, finite posterior samples may rank entropy-reducing purchases differently from purchases maximizing expected final-answer correctness, explaining learned W-F40 regression. Identify whether the fair best policy has >3 percentage points of prospective room.",
+  "train_only": {
+    "seeds": [
+      311000,
+      311012
+    ],
+    "families": [
+      350,
+      351,
+      352
+    ],
+    "lengths": [
+      3,
+      5
+    ],
+    "expected_questions": 72,
+    "roles": 8,
+    "nodes": 8,
+    "visible_mappings_per_role": 3,
+    "max_purchases": 2,
+    "posterior_sample_budgets": [
+      12,
+      48
+    ]
+  },
+  "reserved_original": {
+    "seeds": [
+      312000,
+      312016
+    ],
+    "families": [
+      354,
+      355,
+      356,
+      357
+    ]
+  },
+  "arms": [
+    "expected_answer_information_gain",
+    "expected_final_answer_correctness",
+    "query_frontier",
+    "fixed_acquisition",
+    "no_purchase",
+    "private_hindsight_oracle_unfair"
+  ],
+  "acceptance": {
+    "independent_dual_truth_oracle": true,
+    "distinct_train_and_original": true,
+    "source_policy_not_given_private_mapping": true,
+    "identifiability_gap_reported": true,
+    "action_rank_stability_reported": true,
+    "purchase_cap": 2,
+    "no_reruns_after_consumption": true
+  },
+  "resource_limits": {
+    "max_native_resident_bytes": 576,
+    "posterior_sample_memory_external": true,
+    "full_python_heap_unqualified": true
+  },
+  "authority": {
+    "source_and_evaluator_project_born_not_independent_F3": true,
+    "accepted_science_no": true,
+    "primary_original_dispatched": false,
+    "no_paid_API_or_codex": true,
+    "no_FORGE_controller_CKB_KTRADE_Cloudflare_mutation": true
+  }
+}
