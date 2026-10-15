@@ -1,0 +1,79 @@
+{
+  "schema": "wingless.f52.encoded-composition-pareto.prereg.v1",
+  "stage": "PRECODE_ONLY_NO_SCIENCE_CONSUMED",
+  "parent_F51_head": "5d5c955524589a82b8b8371f1d7403960d22a7bf",
+  "tracking_issue": 261,
+  "hypothesis": "Train a quantized compositional hidden-state update on variable-binding chains, seeking <=2pp accuracy loss versus a much more expensive exact public posterior while using <=50% its measured posterior operation count and >=5pp accuracy gain over the strongest operation-matched fair approximation on unseen role orders and chain lengths.",
+  "train": {
+    "seeds": [
+      541000,
+      541016
+    ],
+    "families": [
+      940,
+      941,
+      942,
+      943
+    ],
+    "chain_lengths": [
+      4,
+      6
+    ],
+    "expected_train_cases": 128
+  },
+  "diagnostic": {
+    "seeds": [
+      541100,
+      541116
+    ],
+    "families": [
+      944,
+      945,
+      946,
+      947
+    ],
+    "chain_lengths": [
+      6,
+      8
+    ],
+    "expected_cases": 128
+  },
+  "future_original_NOT_RESERVED": {
+    "seeds": [
+      542000,
+      542016
+    ],
+    "families": [
+      948,
+      949,
+      950,
+      951
+    ]
+  },
+  "source": "Seven-value role transformations from sparse PUBLIC calibration pairs; changed role ordering, repeated variable roles, inverse queries and unseen chains. Sign, outcome and oracle posterior stay private at selection.",
+  "controls": [
+    "trained_quantized_state",
+    "budget_matched_symbolic_approx",
+    "full_exact_public_posterior",
+    "public_three_bit_rule",
+    "public_support_hamming",
+    "no_observation",
+    "private_truth_oracle_unfair"
+  ],
+  "thresholds": {
+    "max_absolute_accuracy_loss_vs_exact": 0.02,
+    "max_measured_abstract_work_ratio_vs_exact": 0.5,
+    "gain_vs_budget_matched_min": 0.05,
+    "per_heldout_family_nondegradation": true,
+    "all_row_op_and_memory_audit": true
+  },
+  "limits": {
+    "compressed_state_bytes_target": 64,
+    "physical_native_576B_total_unverified": true,
+    "train_diagnostic_source_disjoint": true,
+    "original_unexecuted": true,
+    "independent_F3": false,
+    "accepted_ref_mutation": false,
+    "paid_API_calls": 0
+  }
+}
