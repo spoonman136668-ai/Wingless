@@ -1,0 +1,71 @@
+name: W-F46 audit existing TRAIN result only (NO new experiment)
+on:
+  push:
+    branches:
+      - audit/w-f46-existing-train-evidence-20261015-r1
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit-existing-f46:
+    if: "${{ github.event.head_commit.message == 'audit(w-f46): independently audit one existing train result' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify code, source, frozen prereg, and existing run identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor bd7f18a31369cd913d353477e60b7be6d0d87876 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f46/prereg-candidate.json)" = a21db2af6f6d57218e0663f7c8305c8df8df1810
+          test "$(git hash-object research/foundational/20261015-w-f46/source_pilot.py)" = 6381cbed708a7223dd97696eb42bf52017ef09ca
+          python3 -m py_compile research/foundational/20261015-w-f46/independent_audit.py
+      - name: Independently check genuine source run and artifact binding (GET only)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          run=$(curl --fail --silent --show-error --retry 2 --max-time 20             -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN"             "https://api.github.com/repos/spoonman136668-ai/Wingless/actions/runs/38803701796")
+          echo "$run" | jq -e --arg sha bd7f18a31369cd913d353477e60b7be6d0d87876             '.head_sha==$sha and .status=="completed" and .conclusion=="success" and .run_attempt==1 and .path==".github/workflows/w-f46-train-once.yml"'
+          arts=$(curl --fail --silent --show-error --retry 2 --max-time 20             -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN"             "https://api.github.com/repos/spoonman136668-ai/Wingless/actions/runs/38803701796/artifacts")
+          echo "$arts" | jq -e --arg sha bd7f18a31369cd913d353477e60b7be6d0d87876             '[.artifacts[] | select(.id==12005147117 and .name=="W-F46-TRAIN-only-new-value-of-computation" and
+              .digest=="sha256:2b365b0c6674ed363a8071d6cf1fdd222684065e068a71a145d9799d5d51f735" and
+              (.expired|not) and .workflow_run.id==38803701796 and .workflow_run.head_sha==$sha)]|length==1'
+      - uses: actions/download-artifact@v4
+        with:
+          name: W-F46-TRAIN-only-new-value-of-computation
+          run-id: 38803701796
+          github-token: ${{ github.token }}
+          repository: spoonman136668-ai/Wingless
+          path: ${{ runner.temp }}/wf46-evidence
+      - name: Read original result and independently audit all rows and receipt integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/wf46-evidence"
+          test "$(cat "$root/SOURCE_SHA")" = "bd7f18a31369cd913d353477e60b7be6d0d87876"
+          (cd "$root" && sha256sum -c result.sha256)
+          python3 -B research/foundational/20261015-w-f46/independent_audit.py             "$root/result.json" > "$RUNNER_TEMP/w-f46-independent-audit.json"
+          cat "$RUNNER_TEMP/w-f46-independent-audit.json"
+          sha256sum "$RUNNER_TEMP/w-f46-independent-audit.json"             > "$RUNNER_TEMP/w-f46-independent-audit.sha256"
+          git rev-parse HEAD > "$RUNNER_TEMP/w-f46-independent-audit-head.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-F46-existing-training-only-independent-audit
+          path: |
+            ${{ runner.temp }}/w-f46-independent-audit.json
+            ${{ runner.temp }}/w-f46-independent-audit.sha256
+            ${{ runner.temp }}/w-f46-independent-audit-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Safeguards
+        run: |
+          echo "SOURCE_EXPERIMENT_RERUN=FALSE"
+          echo "F46_EXISTING_TRAIN_ROWS_AUDITED=96"
+          echo "SCIENTIFIC_ACCEPTED=FALSE"
+          echo "FORGE_ORIGINAL_DISPATCH=FALSE"
