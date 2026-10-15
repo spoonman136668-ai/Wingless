@@ -1,0 +1,68 @@
+name: Wingless F52 once-only mechanistic synthetic TRAIN qualification
+on:
+  push:
+    branches:
+      - research/w-f52-capacity-bounded-composition-20261015-r1
+permissions:
+  contents: read
+jobs:
+  one-frozen-source:
+    if: "${{ github.event.head_commit.message == 'science(w-f52): execute once new quantized-composition TRAIN-only cohort' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Verify exact prereg ancestor, original isolation and source blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5d5c955524589a82b8b8371f1d7403960d22a7bf HEAD
+          git merge-base --is-ancestor d28e4c3921811da16b386ed719b0d5f1fa403405 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f52/prereg-candidate.json)" = ce186b28701c53f3b447e41ff4cdb239bd709590
+          test "$(git hash-object research/foundational/20261015-w-f52/source_pilot.py)" = 4c8ae2799c255f4ca37c22d59ba8cd79465fa343
+          test "$(git hash-object research/foundational/20261015-w-f52/audit_result.py)" = 309722026f2db7bd2539bd4d8b119f739bb0ae8a
+          test "$(git hash-object research/foundational/20261015-w-f52/test_preflight.py)" = 8b79ccdbddd8bf7e0f70f3d00ac6e28178066be1
+          python3 -m json.tool research/foundational/20261015-w-f52/prereg-candidate.json >/dev/null
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f52 -p test_preflight.py -v
+      - name: Exactly one complete existing repository regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: One new FIT then independent heldout synthetic TRAIN cohort and strict audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f52/source_pilot.py > /tmp/w-f52-result.json
+          python3 -m json.tool /tmp/w-f52-result.json >/dev/null
+          sha256sum /tmp/w-f52-result.json > /tmp/w-f52-result.sha256
+          git rev-parse HEAD > /tmp/w-f52-head.txt
+          python3 -B research/foundational/20261015-w-f52/audit_result.py              /tmp/w-f52-result.json              research/foundational/20261015-w-f52/prereg-candidate.json              > /tmp/w-f52-independent-audit.txt
+          cat /tmp/w-f52-independent-audit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Wingless-F52-one-frozen-TRAIN-and-independent-audit
+          path: |
+            /tmp/w-f52-result.json
+            /tmp/w-f52-result.sha256
+            /tmp/w-f52-head.txt
+            /tmp/w-f52-independent-audit.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Scientific authority and source-use exclusions
+        run: |
+          echo "EXPERIMENT_CLASS=FRESH_SYNTHETIC_TRAIN_ONLY"
+          echo "PRIMARY_ORIGINAL_RUNS=0"
+          echo "INDEPENDENT_F3_CUSTODY=FALSE"
+          echo "NATIVE_576B_TOTAL_MEMORY=UNVERIFIED"
+          echo "ACCEPTED_REFS_OR_CONTROLLERS_MUTATED=FALSE"
