@@ -1,0 +1,77 @@
+{
+  "schema": "wingless.f38.source-identifiability-prereg.v1",
+  "stage": "PRE_CODE_TRAIN_ONLY_DIAGNOSTIC",
+  "parent_negative_run": 38752412770,
+  "issue_url": "https://github.com/spoonman136668-ai/Wingless/issues/231",
+  "hypothesis": "With sparse public typed transitions, distinct hidden role-bijection worlds can yield identical evidence but different multi-step answers; dense coverage resolves that underdetermination. Source headroom must be established before another learner.",
+  "diagnostic_cohort": {
+    "seeds": [
+      281000,
+      281012
+    ],
+    "families": [
+      280,
+      281,
+      282
+    ],
+    "mechanisms": [
+      "affine",
+      "arbitrary_permutation",
+      "affine_xor"
+    ],
+    "coverage": [
+      3,
+      7
+    ],
+    "depths": [
+      4,
+      7
+    ],
+    "expected_rows": 144
+  },
+  "source_rules": {
+    "roles": 8,
+    "nodes": 8,
+    "demonstrations_per_role_are_distinct_source_nodes": true,
+    "noisy_examples": false,
+    "public_only_role_source_target_and_ordered_query": true,
+    "private_world_witness_evaluator_only": true,
+    "samples_of_consistent_hidden_completions": 48
+  },
+  "source_baselines": [
+    "affine_xor_group_MAP",
+    "permutation_assignment_MAP",
+    "simple_frequency_walk",
+    "uniform_completions_posterior",
+    "privileged_true_mapping_oracle"
+  ],
+  "source_gate": {
+    "minimum_sparse_ambiguous_fraction": 0.45,
+    "maximum_dense_ambiguous_fraction": 0,
+    "minimum_coverage_reduction": 0.4,
+    "independent_dual_oracle_agreement": true,
+    "all_identity_disjoint": true
+  },
+  "reservation": {
+    "original_seeds": [
+      282000,
+      282016
+    ],
+    "original_families": [
+      284,
+      285,
+      286,
+      287
+    ],
+    "never_generate": true
+  },
+  "authority": {
+    "no_learned_original": true,
+    "train_only_diagnostic": true,
+    "same_repo_synthetic_not_independent_F3": true,
+    "external_public_triples_cost_separate": true,
+    "no_paid_api": true,
+    "no_accepted_ref_mutation": true,
+    "no_FORGE_CKB_KTRADE_Cloudflare_changes": true
+  }
+}
