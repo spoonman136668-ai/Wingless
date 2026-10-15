@@ -1,0 +1,88 @@
+{
+  "schema": "wingless.f53.learned-value-directed-beam.prereg.v1",
+  "stage": "PRECODE_FROZEN_NO_SOURCE_CONSUMED",
+  "source_parent_head": "5561233e1853c301dd2b5763acc6435befd72e38",
+  "F52_audit_run": 38815376692,
+  "tracking_issue": 265,
+  "hypothesis": "Learn which posterior belief states carry future task value, rather than learning hidden source sign, to outperform fixed top-two state retention and strongest equal-work symbolic controls under novel longer variable-binding compositions and source noise.",
+  "fit": {
+    "seeds": [
+      561000,
+      561016
+    ],
+    "families": [
+      980,
+      981,
+      982,
+      983
+    ],
+    "path_lengths": [
+      6,
+      8
+    ],
+    "expected_cases": 128,
+    "training_objective": "terminal_task_success_with_bounded_posterior_work_only"
+  },
+  "diagnostic": {
+    "seeds": [
+      561100,
+      561116
+    ],
+    "families": [
+      984,
+      985,
+      986,
+      987
+    ],
+    "path_lengths": [
+      8,
+      10
+    ],
+    "expected_cases": 128,
+    "source_shift": "new_relation_reuse_and_observation_noise"
+  },
+  "future_original_NOT_RESERVED": {
+    "seeds": [
+      562000,
+      562016
+    ],
+    "families": [
+      988,
+      989,
+      990,
+      991
+    ]
+  },
+  "controls": [
+    "learned_task_value_two_beam",
+    "fixed_mass_two_beam",
+    "fixed_entropy_two_beam",
+    "budget_matched_symbolic",
+    "public_context_parity",
+    "public_support_hamming",
+    "full_exact_public_bayes",
+    "private_truth_oracle_unfair"
+  ],
+  "thresholds": {
+    "gain_vs_strongest_equal_work_fair_min": 0.05,
+    "posterior_operation_ratio_vs_exact_max": 0.5,
+    "per_heldout_family_nondegradation": true,
+    "exact_output_and_transition_work_audit": true
+  },
+  "resource_limits": {
+    "learned_state_payload_max_bytes": 64,
+    "include_weight_and_gate_parameter_bytes": true,
+    "native_total_576B_qualification": false,
+    "source_independent_F3": false,
+    "original_run": false,
+    "paid_api_calls": 0,
+    "accepted_ref_mutation": false
+  },
+  "scientific_integrity": {
+    "fresh_source_identities": true,
+    "no_diagno_truth_in_train_or_action": true,
+    "no_F52_rows_as_test": true,
+    "prereg_controls_before_model_code": true,
+    "all_negative_findings_preserved": true
+  }
+}
