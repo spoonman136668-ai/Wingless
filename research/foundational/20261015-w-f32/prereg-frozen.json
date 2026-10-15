@@ -1,0 +1,80 @@
+{
+  "schema": "wingless.f32.frozen-original-contract.v1",
+  "status": "FROZEN_BEFORE_FIRST_DEVELOPMENT_ORIGINAL",
+  "experiment_id": "W-F32",
+  "parent_science_head": "79fa79fcff14eb8e80becfcb8c3ffa68e03e0289",
+  "prereg_candidate_commit": "a8547f75a359f60a23c9a4d4d9dd8b5f713e5db4",
+  "qualified_source_commit": "df46ff2ccdf8b205ced2ce368ac84ec05d4bdf76",
+  "qualified_tree_sha": "b86957ba993ed210e8c25ccc0a226d78d35b0bdc",
+  "qualified_preflight": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38726796431",
+  "learner_path": "research/foundational/20261015-w-f32/execute.py",
+  "learner_blob_sha": "f582dd43f631c27989003401f29f05a08f96f964",
+  "train": {
+    "seeds": [
+      171000,
+      171080
+    ],
+    "families": [
+      140,
+      141,
+      142,
+      143
+    ],
+    "depths": [
+      3,
+      4,
+      5
+    ],
+    "role_types": 6,
+    "train_local_supervision_only": true
+  },
+  "test": {
+    "seeds": [
+      172000,
+      172012
+    ],
+    "families": [
+      144,
+      145,
+      146,
+      147
+    ],
+    "depths": [
+      3,
+      4,
+      5
+    ],
+    "variants_per_cohort": 8,
+    "expected_queries": 1152,
+    "paired_same_graph_topology_counterfactual": true
+  },
+  "predeclared_baselines": [
+    "fixed_typed_greedy",
+    "topology_only",
+    "unordered_role_bag",
+    "frozen_wf31_proxy",
+    "coded_exact"
+  ],
+  "fairness": "Coded exact typed traversal with identical information is included in strongest fair comparison; it is not excluded as an oracle.",
+  "acceptance": {
+    "min_absolute_gain_vs_best_fair": 0.03,
+    "no_family_regression": true,
+    "role_order_ablation_positive": true,
+    "source_oracle_consistent": true
+  },
+  "state": {
+    "native_learner_bytes": 32,
+    "declared_max_activation_bytes": 144,
+    "state_ceiling": 576,
+    "external_graph_history_metered": true
+  },
+  "disclosures": {
+    "programmed_source_generator": true,
+    "programmed_graph_edge_enumeration": true,
+    "source_independent_from_F3": false,
+    "accepted_ref_mutation": false,
+    "development_only": true,
+    "once_original": true,
+    "no_paid_api": true
+  }
+}
