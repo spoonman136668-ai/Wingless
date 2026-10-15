@@ -1,0 +1,29 @@
+name: W-F29 cross-encounter custody preflight (NO ORIGINAL)
+on:
+  push:
+    branches: [research/w-f29-cross-encounter-preflight-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: go.mod}
+      - name: Enforce exact parent and immutable prereg-candidate identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 331faa14ffe039fffdaac8c4ee6640244d15d149 HEAD
+          test "$(git hash-object unitary/f28_relational_anchor_corroboration.go)" = "$(git rev-parse 331faa14ffe039fffdaac8c4ee6640244d15d149:unitary/f28_relational_anchor_corroboration.go)"
+          test "$(git hash-object research/foundational/20261015-w-f29/prereg-candidate.json)" = "$(git rev-parse 2863105831292d4f11057049c9196a7d88ebe113:research/foundational/20261015-w-f29/prereg-candidate.json)"
+          python3 -m json.tool research/foundational/20261015-w-f29/prereg-candidate.json >/dev/null
+      - name: Focused pre-original custody tests
+        run: go test -count=1 -v ./research/foundational/20261015-w-f29/custody
+      - name: Final complete Go regression and build (once)
+        run: go test ./... && go build ./...
+      - name: Report bounded result
+        run: echo 'W_F29_PREFLIGHT_ENGINEERING_PASS_ONLY — scientific original NOT executed, source custody NOT admitted'

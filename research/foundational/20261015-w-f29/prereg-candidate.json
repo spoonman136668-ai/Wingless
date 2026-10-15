@@ -1,0 +1,110 @@
+{
+  "schema": "wingless.f29.prereg-candidate.v1",
+  "status": "DESIGN_LOCK_CANDIDATE_PRE_ORIGINAL",
+  "experiment_id": "W-F29",
+  "parent_source_sha": "331faa14ffe039fffdaac8c4ee6640244d15d149",
+  "parent_issue": "https://github.com/spoonman136668-ai/Wingless/issues/211",
+  "parent_original_run": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38710499523",
+  "hypothesis": "Learned cross-encounter relational persistence can reject coincident witness impostors under novel graph structures better than strongest equal-evidence consensus.",
+  "candidate_mechanism": {
+    "input": "Per-encounter observed relation witnesses, anonymous encounter identifiers and edge roles, never semantic/canonical identity or evaluation answers",
+    "learning": "Small fixed-capacity train-only scorer of persistence across encounters; readout trained on disjoint entity IDs",
+    "identification": "Search candidate endpoint pairs, not supplied alias tuples",
+    "native_state_bytes": 576,
+    "history_cost_accounting": "All outside-core encounter storage, observations and candidate search comparisons must be measured and reported separately; any unmetered external lookup is INVALID",
+    "independence": "One generated encounter must not reuse a source truth hint or deterministic ID encoding as its join evidence"
+  },
+  "training": {
+    "seeds": [
+      151000,
+      151099
+    ],
+    "entities": "disjoint by construction from validation",
+    "graph_families": [
+      112,
+      113,
+      114,
+      115
+    ],
+    "test_graph_family_identity_must_differ": true
+  },
+  "evaluation": {
+    "seeds": [
+      152300,
+      152312
+    ],
+    "identities_disjoint_from_training": true,
+    "relation_role_permutations": true,
+    "novel_chain_lengths": [
+      9,
+      10,
+      11
+    ],
+    "conditions": [
+      "uncorrelated-impostor",
+      "correlated-impostor",
+      "witness-disagreement",
+      "counterfactual-context"
+    ],
+    "predeclared_graph_families": [
+      116,
+      117,
+      118,
+      119
+    ],
+    "generation_contract": "new generator independent from F28's motif 108-111 and witnesses; exact generator SHA, seeds and hashes must be frozen before original"
+  },
+  "baselines": [
+    "learned-cross-encounter",
+    "2-of-3-consensus",
+    "fixed-multiview",
+    "static-distance",
+    "no-link",
+    "privileged-truth-oracle-excluded-from-fair-comparison"
+  ],
+  "matched_controls": [
+    "same encounter observations",
+    "same candidate search budget",
+    "same native 576B resident budget",
+    "equal measured history bytes and read operations or explicit cost-normalized comparison"
+  ],
+  "audit": [
+    "per-case truth and all arm predictions",
+    "false positive impostors",
+    "genuine false negatives",
+    "encounter/graph role strata",
+    "candidate search counts",
+    "resident/history bytes",
+    "training/inference compute",
+    "oracle consistency"
+  ],
+  "advance_rule": {
+    "absolute_accuracy_gain_vs_strongest_fair_control": 0.03,
+    "impostor_false_positives": "strictly fewer than strongest fair control",
+    "genuine_true_positives": "no drop greater than one percentage point",
+    "each_novel_family": "nondegrading; report family-level confidence intervals",
+    "invalid_if_any": "source identity drift; leaked identity; oracle inconsistency; missed cost accounting; changed threshold after freeze"
+  },
+  "launch": {
+    "status": "BLOCKED_PENDING_IMPLEMENTATION_AND_QUALIFICATION",
+    "once_only_development_original": true,
+    "independent_F3_source_custody": false,
+    "sealed_F3_first_use": false,
+    "accepted_ref_mutation": false,
+    "controller_or_forgeruntime_mutation": false
+  },
+  "provenance": {
+    "prereg_commit_precedes_original": true,
+    "expected_source_artifacts": [
+      "code-commit-SHA",
+      "tree-SHA",
+      "generator-SHA",
+      "dataset-hashes",
+      "test-logs",
+      "one-full-Go-regression",
+      "one-build",
+      "archived-run-and-artifact"
+    ],
+    "no_paid_API": true
+  }
+}

@@ -1,0 +1,83 @@
+name: W-F29 one frozen development original
+on:
+  push:
+    branches: [research/w-f29-cross-encounter-preflight-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  original:
+    if: "${{ github.event.head_commit.message == 'science(w-f29): one frozen development original' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify immutable source, prereg and original limits
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor b7a432f1013d889b4d5dc3426e98d91aaed6586e HEAD
+          git merge-base --is-ancestor 91e74de37cb8d4fb0a41cbb729e154f4f20b2eff HEAD
+          test "$(git hash-object research/foundational/20261015-w-f29/original.go)" = f6e73baf8d158557e1cca11106e899d19d7af20b
+          test "$(git hash-object research/foundational/20261015-w-f29/prereg-frozen.json)" = "$(git rev-parse 91e74de37cb8d4fb0a41cbb729e154f4f20b2eff:research/foundational/20261015-w-f29/prereg-frozen.json)"
+          test "$(git hash-object unitary/f28_relational_anchor_corroboration.go)" = "$(git rev-parse 331faa14ffe039fffdaac8c4ee6640244d15d149:unitary/f28_relational_anchor_corroboration.go)"
+          python3 -m json.tool research/foundational/20261015-w-f29/prereg-frozen.json > /dev/null
+          go test -run '^$' ./research/foundational/20261015-w-f29/...
+      - name: Exactly one W-F29 prospective development cohort
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./research/foundational/20261015-w-f29/original.go > /tmp/w-f29-original.json
+          python3 -m json.tool /tmp/w-f29-original.json > /dev/null
+          sha256sum /tmp/w-f29-original.json > /tmp/w-f29-original.sha256
+          git rev-parse HEAD > /tmp/w-f29-commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F29-frozen-development-original
+          path: |
+            /tmp/w-f29-original.json
+            /tmp/w-f29-original.sha256
+            /tmp/w-f29-commit.txt
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently audit all W-F29 original rows
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,collections,math
+          x=json.load(open('/tmp/w-f29-original.json'))
+          p=json.load(open('research/foundational/20261015-w-f29/prereg-frozen.json'))
+          assert x['stage']=='DEVELOPMENT_ONLY' and x['Questions']==p['test']['expected_pairs']==1152
+          assert x['TrainExamples']==p['train']['cases']==9600
+          assert x['NativeBytes']==576 and len(x['LearnedWeights'])==10
+          assert not x['SealedFirstUse'] and not x['IndependentlyBornSource'] and not x['AcceptedRefMutation']
+          assert x['Scores']['privileged_oracle']['Correct']==1152
+          assert len(x['Rows'])==1152 and x['GraphStates']==144
+          assert set(r['Family'] for r in x['Rows'])==set(p['test']['structural_families'])
+          assert set(r['Depth'] for r in x['Rows'])==set(p['test']['depths'])
+          assert set(r['RoleShift'] for r in x['Rows'])==set(range(4))
+          assert all(152300<=r['Seed']<152312 for r in x['Rows'])
+          assert collections.Counter((r['Seed'],r['Family'],r['Depth'],r['Condition'],r['Truth']) for r in x['Rows']).most_common(1)[0][1]==1
+          assert all(r['HistoryBytes']>0 and len(r['Evidence'])==3 and r['Comparisons']==45 for r in x['Rows'])
+          for arm,entry in x['Scores'].items():
+            n=sum(r['Predictions'][arm]==r['Truth'] for r in x['Rows'])
+            fp=sum(r['Predictions'][arm] for r in x['Rows'] if not r['Truth'])
+            fn=sum(not r['Predictions'][arm] for r in x['Rows'] if r['Truth'])
+            assert (entry['Correct'],entry['FP'],entry['FN'])==(n,fp,fn)
+            assert math.isclose(entry['Accuracy'],n/1152,abs_tol=1e-12)
+          for fam,arms in x['FamilyScores'].items():
+            subset=[r for r in x['Rows'] if r['Family']==int(fam)]
+            assert len(subset)==288
+            for arm,s in arms.items():
+              assert s['Correct']==sum(r['Predictions'][arm]==r['Truth'] for r in subset)
+          assert x['Verdict'] in ('DEVELOPMENT_CROSS_ENCOUNTER_LEARNED_GAIN','DEVELOPMENT_CROSS_ENCOUNTER_NO_QUALIFIED_GAIN')
+          print('W_F29_REGISTERED_VERDICT',x['Verdict'],{k:v['Correct'] for k,v in x['Scores'].items()})
+          PY
+      - name: End state
+        run: echo 'W-F29 development original only; no F3 admission, acceptance, promotion or runtime mutation'
