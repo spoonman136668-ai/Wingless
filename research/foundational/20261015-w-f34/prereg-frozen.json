@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.f34.frozen-train-only-source-pilot.v1",
+  "stage": "PRE_ORIGINAL_SOURCE_HEADROOM_PILOT",
+  "design_issue": "https://github.com/spoonman136668-ai/Wingless/issues/221",
+  "engineered_pr": "https://github.com/spoonman136668-ai/Wingless/pull/223",
+  "source_commit": "4fcf4e28ccc8e6461459a4c1f872e4f2dec489c6",
+  "source_tree": "6f6a2571330082b922a1213a11d94a6dadb15a59",
+  "source_path": "research/foundational/20261015-w-f34/source_pilot.py",
+  "source_blob_sha": "4f4d5cd7ac1330f7f0f53a2ae25ccc6169e2ec81",
+  "precode_prereg_commit": "d678cfb5f8e37f4f1492ce78a64babbb5d28b5be",
+  "qualification_run": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38730798759",
+  "train": {
+    "seeds": [
+      201000,
+      201024
+    ],
+    "families": [
+      180,
+      181,
+      182
+    ],
+    "depths": [
+      6,
+      8,
+      10
+    ],
+    "role_types": 8,
+    "demos_per_role": 4,
+    "expected_rows": 216
+  },
+  "reserved_primary_original": {
+    "seeds": [
+      202000,
+      202016
+    ],
+    "families": [
+      184,
+      185,
+      186,
+      187
+    ],
+    "not_accessed": true
+  },
+  "methods": [
+    "empirical_posterior",
+    "nearest_demo",
+    "no_role",
+    "privileged_oracle"
+  ],
+  "gate": {
+    "minimum_role_order_change_fraction": 0.05,
+    "minimum_headroom_vs_strongest_fair": 0.04,
+    "maximum_strongest_fair_accuracy": 0.96,
+    "oracle_accuracy": 1,
+    "dual_truth_evaluator_required": true
+  },
+  "limits": {
+    "source_and_evaluator_same_repo_not_F3": true,
+    "model_not_yet_trained": true,
+    "source_only_preflight": true,
+    "native_state_576_bytes_not_runtime_measured": true,
+    "external_demo_history_metered": true,
+    "one_train_only_pilot": true,
+    "primary_original_executed": false,
+    "accepted_ref_mutation": false,
+    "paid_api_calls": 0,
+    "no_controller_FORGE_Cloudflare_KTRADE_mutations": true
+  }
+}
