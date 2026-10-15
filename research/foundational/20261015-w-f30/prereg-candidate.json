@@ -1,0 +1,65 @@
+{
+  "schema": "wingless.f30.prereg-candidate.v1",
+  "stage": "DESIGN_LOCK_PRE_ORIGINAL",
+  "parent": "f9f322dfc4760868491be67a5ba050ebcd4a690a",
+  "prior_original": "38716258056",
+  "hypothesis": "Train a role-invariant structural trajectory matcher across anonymized graph encounters and outperform strongest matched programmed comparator in distinct unseen graph families.",
+  "train": {
+    "seeds": [
+      161000,
+      161080
+    ],
+    "families": [
+      120,
+      121,
+      122,
+      123
+    ],
+    "role_count": 4
+  },
+  "test": {
+    "seeds": [
+      162500,
+      162516
+    ],
+    "families": [
+      124,
+      125,
+      126,
+      127
+    ],
+    "role_count": 6,
+    "candidates_per_graph": 8,
+    "conditions": [
+      "role-permutation",
+      "edge-dropout",
+      "bridge-rewiring"
+    ]
+  },
+  "controls": [
+    "motif canonicalization",
+    "Jaccard graph overlap",
+    "two-of-three structural vote",
+    "fixed trajectory",
+    "no-link",
+    "privileged oracle"
+  ],
+  "acceptance": {
+    "minimum_absolute_gain": 0.03,
+    "impostor_false_join_nonincreasing": true,
+    "per_family_not_worse": true,
+    "oracle_correct": true
+  },
+  "custody": {
+    "native_core_limit_bytes": 576,
+    "external_graph_history_metered": true,
+    "test_truth_unavailable_at_inference": true,
+    "train_test_identity_disjoint": true,
+    "independent_F3_source": false,
+    "sealed_first_use": false,
+    "development_only": true,
+    "one_original": true,
+    "accepted_ref_mutation": false,
+    "no_paid_api": true
+  }
+}
