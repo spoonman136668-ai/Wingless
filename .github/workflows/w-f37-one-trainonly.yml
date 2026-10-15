@@ -1,0 +1,87 @@
+name: W-F37 frozen one-shot doubly stochastic TRAIN-only evidence
+on:
+  push:
+    branches:
+      - science/w-f37-frozen-sinkhorn-trainonly-20261015-r1
+permissions:
+  contents: read
+jobs:
+  science:
+    if: "${{ github.event.head_commit.message == 'science(w-f37): one frozen Sinkhorn TRAIN-only cohort' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify frozen source before one-shot developmental evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor bd0ddcb30af56f3fec967c506d48f6d69e920dd2 HEAD
+          git merge-base --is-ancestor b1442da639335c5f37fc4aa9666d1abd38f5a7be HEAD
+          test "$(git hash-object research/foundational/20261015-w-f37/train_only.py)" = 8cfa8945953bb606cd99104f3d30800fa5124108
+          test "$(git hash-object research/foundational/20261015-w-f37/prereg-frozen.json)" = "$(git rev-parse b1442da639335c5f37fc4aa9666d1abd38f5a7be:research/foundational/20261015-w-f37/prereg-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f37 -p test_preflight.py -v
+      - name: Exactly one frozen TRAIN-only learned inverse-binding evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f37/train_only.py > /tmp/w-f37-trainonly.json
+          python3 -m json.tool /tmp/w-f37-trainonly.json >/dev/null
+          sha256sum /tmp/w-f37-trainonly.json > /tmp/w-f37-trainonly.sha256
+          git rev-parse HEAD > /tmp/w-f37-head-identity.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F37-once-frozen-TRAIN-only
+          path: |
+            /tmp/w-f37-trainonly.json
+            /tmp/w-f37-trainonly.sha256
+            /tmp/w-f37-head-identity.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independent per-row metric and preregistration audit
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/w-f37-trainonly.json'))
+          p=json.load(open('research/foundational/20261015-w-f37/prereg-frozen.json'))
+          assert d['schema']=='wingless.f37.doubly-stochastic-trainonly.v1'
+          assert d['stage']=='DEVELOPMENT_TRAIN_ONLY_NO_PRIMARY_ORIGINAL'
+          assert d['seeds']==p['train_only']['seeds']
+          assert d['families']==p['train_only']['families']
+          assert d['reserved_primary_seeds']==p['reserved_primary_original']['seeds']
+          assert d['reserved_primary_families']==p['reserved_primary_original']['families']
+          assert d['questions']==p['train_only']['expected_questions']==108
+          assert len(d['rows'])==108
+          assert len({(r['seed'],r['family'],r['depth']) for r in d['rows']})==108
+          assert d['q8_model_bytes']==512 and d['distribution_scratch_bytes']==16
+          assert d['native_core_limit_bytes']==576 and d['primary_original_not_executed']
+          assert d['source_same_repo_not_independent_F3'] and not d['accepted_ref_mutation']
+          assert all(261000<=r['seed']<261012 and r['family'] in (240,241,242)
+                     and r['public_triples']==40 and len(r['public_sha256'])==64 for r in d['rows'])
+          assert d['order_counterfactual_changes']==sum(r['order_changes_truth'] for r in d['rows'])
+          for a,v in d['scores'].items():
+            count=sum(r['predictions'][a]==r['truth'] for r in d['rows'])
+            assert v['correct']==count and v['total']==108
+            assert math.isclose(v['accuracy'],count/108,abs_tol=1e-12)
+          assert d['scores']['privileged_oracle']['correct']==108
+          fair=('permutation_MAP','affine_MAP','frequency_walk','role_scrambled')
+          for family,arms in d['by_family'].items():
+            group=[r for r in d['rows'] if str(r['family'])==family]
+            assert len(group)==36
+            for a,v in arms.items():
+              assert v['correct']==sum(r['predictions'][a]==r['truth'] for r in group)
+          gain=d['scores']['learned_sinkhorn']['accuracy']-max(d['scores'][a]['accuracy'] for a in fair)
+          robust=all(arms['learned_sinkhorn']['accuracy']>=max(arms[a]['accuracy'] for a in fair) for arms in d['by_family'].values())
+          expected='TRAIN_ONLY_SINKHORN_LEARNED_GAIN' if gain>=.03 and robust else 'TRAIN_ONLY_SINKHORN_NO_QUALIFIED_GAIN'
+          assert d['verdict']==expected
+          print('W_F37_TRAIN_ONLY_RESULT',expected,{a:v['correct'] for a,v in d['scores'].items()},
+                'order_changes',d['order_counterfactual_changes'])
+          PY
+      - name: Preserve developmental authority boundary
+        run: |
+          echo "TRAIN-only evidence; no primary original or F3 promotion"
