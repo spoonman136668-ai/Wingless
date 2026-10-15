@@ -1,0 +1,53 @@
+name: W-F51 algebraic operator against fully informed public controls
+on:
+  push:
+    branches: [research/w-f51-heldout-operator-public-controls-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  once:
+    if: "${{ github.event.head_commit.message == 'science(w-f51): new public-control frozen operator experiment' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Verify original frozen precode and focused source tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 6d28b6e6850aa5120d2f24f023be69326b261a3a HEAD
+          test "$(git hash-object research/foundational/20261015-w-f51/prereg.json)" = 273dd472c8e02f8355679ca4cb772f9c8ba8190d
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f51 -p test_preflight.py -v
+      - name: One full Go regression vet build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: One genuinely new TRAIN-only cohort and independent public-control recount
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/w-f51";mkdir -p "$root"
+          python3 -B research/foundational/20261015-w-f51/source_pilot.py > "$root/result.json"
+          python3 -B research/foundational/20261015-w-f51/audit_result.py \
+            "$root/result.json" research/foundational/20261015-w-f51/prereg.json
+          (cd "$root";sha256sum result.json > result.sha256)
+          printf '%s\n' "$GITHUB_SHA" > "$root/SOURCE_SHA"
+          echo 'W_F51_PREDECLARED_STRONG_PUBLIC_BASELINE_AUDITED=PASS'
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: W-F51-new-fully-informed-public-operator-TRAIN-NO-ORIGINAL
+          path: ${{ runner.temp }}/w-f51/
+          retention-days: 30
+          if-no-files-found: error
