@@ -1,0 +1,83 @@
+name: W-F34 one frozen learned-role TRAIN-only pilot (NO original)
+on:
+  push:
+    branches:
+      - science/w-f34-frozen-learned-train-only-20261015-r1
+permissions:
+  contents: read
+jobs:
+  pilot:
+    if: "${{ github.event.head_commit.message == 'science(w-f34): one frozen learned TRAIN-only pilot' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Enforce frozen source and reserved original exclusions
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 8010d4ee6f592f021d44f78a0689b63c1e3eaa82 HEAD
+          git merge-base --is-ancestor 22ba7b781d7371dc10ee7d918767ea2751a5e5ff HEAD
+          test "$(git hash-object research/foundational/20261015-w-f34/learned_train_only.py)" = 5f94dec268799b32dd8bfe17b255cd0266454e1e
+          test "$(git hash-object research/foundational/20261015-w-f34/learner-prereg-frozen.json)" = "$(git rev-parse 22ba7b781d7371dc10ee7d918767ea2751a5e5ff:research/foundational/20261015-w-f34/learner-prereg-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f34 -p test_learner_preflight.py -v
+      - name: One new TRAIN-only learned transducer feasibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f34/learned_train_only.py > /tmp/w-f34-learned-train-only.json
+          python3 -m json.tool /tmp/w-f34-learned-train-only.json >/dev/null
+          sha256sum /tmp/w-f34-learned-train-only.json > /tmp/w-f34-learned-train-only.sha256
+          git rev-parse HEAD > /tmp/w-f34-learned-train-only-commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F34-once-learned-TRAIN-only-evidence
+          path: |
+            /tmp/w-f34-learned-train-only.json
+            /tmp/w-f34-learned-train-only.sha256
+            /tmp/w-f34-learned-train-only-commit.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independent row and preregistered verdict audit
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/w-f34-learned-train-only.json'))
+          p=json.load(open('research/foundational/20261015-w-f34/learner-prereg-frozen.json'))
+          assert d['stage']=='TRAIN_ONLY_PROSPECTIVE_POLICY_QUALIFICATION'
+          assert d['questions']==p['pilot']['expected_cases']==108
+          assert d['train_seed_range']==p['pilot']['seeds']
+          assert d['train_families']==p['pilot']['families']
+          assert d['primary_original_seed_range']==p['reserved_primary_original']['seeds']
+          assert d['primary_original_families']==p['reserved_primary_original']['families']
+          assert d['output_mapping_bytes']==p['learned']['inference_mapping_bytes']==64
+          assert d['transient_training_parameters']==p['learned']['coefficient_count']==512
+          assert not d['independent_F3_custody'] and d['primary_original_not_executed']
+          assert len(d['rows'])==108
+          assert len({(r['seed'],r['family'],r['depth']) for r in d['rows']})==108
+          assert all(203000<=r['seed']<203012 and r['family'] in (188,189,190)
+                     and r['depth'] in (6,8,10) and len(r['public_evidence_hash'])==64 for r in d['rows'])
+          for arm,score in d['scores'].items():
+            n=sum(r['predictions'][arm]==r['truth_end'] for r in d['rows'])
+            assert score['correct']==n and score['total']==108
+            assert math.isclose(score['accuracy'],n/108,abs_tol=1e-12)
+          assert d['scores']['privileged_oracle']['correct']==108
+          for f,arms in d['per_family'].items():
+            subset=[r for r in d['rows'] if r['family']==int(f)]
+            assert len(subset)==36
+            for a,s in arms.items():
+              assert s['correct']==sum(r['predictions'][a]==r['truth_end'] for r in subset)
+          fair=('permutation_map','affine_map','nearest_demo','no_role')
+          gain=d['scores']['learned']['accuracy']-max(d['scores'][a]['accuracy'] for a in fair)
+          robust=all(d['per_family'][f]['learned']['accuracy']>=max(d['per_family'][f][a]['accuracy'] for a in fair) for f in d['per_family'])
+          verdict='TRAIN_ONLY_LEARNED_COMPOSITION_ELIGIBLE_FOR_SEPARATE_ORIGINAL' if gain>=.03 and robust else 'TRAIN_ONLY_LEARNED_COMPOSITION_NO_QUALIFIED_GAIN'
+          assert d['verdict']==verdict
+          print('W_F34_LEARNED_TRAIN_ONLY',verdict,{a:v['correct'] for a,v in d['scores'].items()})
+          PY
+      - name: Explicit limit
+        run: echo "TRAIN-only adaptation study complete; reserved primary science original not run, F3 custody blocked"
