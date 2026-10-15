@@ -1,0 +1,70 @@
+name: W-F52 audit existing consumed synthetic TRAIN evidence (NO replay)
+on:
+  push:
+    branches:
+      - audit/w-f52-existing-train-20261015-r1
+permissions:
+  contents: read
+  actions: read
+jobs:
+  evidence-only:
+    if: "${{ github.event.head_commit.message == 'audit(w-f52): correct frozen existing TRAIN evidence without rerun' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify precise frozen source and independent prereg identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5561233e1853c301dd2b5763acc6435befd72e38 HEAD
+          git merge-base --is-ancestor d28e4c3921811da16b386ed719b0d5f1fa403405 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f52/prereg-candidate.json)" = ce186b28701c53f3b447e41ff4cdb239bd709590
+          test "$(git hash-object research/foundational/20261015-w-f52/source_pilot.py)" = 4c8ae2799c255f4ca37c22d59ba8cd79465fa343
+          test "$(git hash-object research/foundational/20261015-w-f52/audit_result.py)" = 2e90b5c7f24e3b98588df3f1b96e32d824d3b7b9
+          python3 -m py_compile research/foundational/20261015-w-f52/audit_result.py
+      - name: Bind exact original failed-after-source run and archived ZIP SHA256
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          run=$(curl --fail --silent --show-error --retry 2 --max-time 20             -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN"             "https://api.github.com/repos/spoonman136668-ai/Wingless/actions/runs/38814945549")
+          echo "$run" | jq -e --arg sha 5561233e1853c301dd2b5763acc6435befd72e38             '.head_sha==$sha and .run_attempt==1 and .status=="completed" and .conclusion=="failure"'
+          artifacts=$(curl --fail --silent --show-error --retry 2 --max-time 20             -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN"             "https://api.github.com/repos/spoonman136668-ai/Wingless/actions/runs/38814945549/artifacts")
+          echo "$artifacts" | jq -e --arg sha 5561233e1853c301dd2b5763acc6435befd72e38             '[.artifacts[]|select(.id==12010636187 and
+              .name=="Wingless-F52-one-frozen-TRAIN-and-independent-audit" and
+              .digest=="sha256:1ac05a33ef05be21d210378b533566244262ce280f643f1c50fbc677f6470803" and
+              (.expired|not) and .workflow_run.id==38814945549 and .workflow_run.head_sha==$sha)]|length==1'
+      - uses: actions/download-artifact@v4
+        with:
+          name: Wingless-F52-one-frozen-TRAIN-and-independent-audit
+          run-id: 38814945549
+          github-token: ${{ github.token }}
+          repository: spoonman136668-ai/Wingless
+          path: ${{ runner.temp }}/evidence
+      - name: Independently verify existing scientific rows, costs and criteria
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/evidence"
+          test "$(cat "$root/w-f52-head.txt")" = 5561233e1853c301dd2b5763acc6435befd72e38
+          (cd "$root" && sha256sum -c w-f52-result.sha256)
+          python3 -B research/foundational/20261015-w-f52/audit_result.py             "$root/w-f52-result.json" research/foundational/20261015-w-f52/prereg-candidate.json             > "$RUNNER_TEMP/w-f52-verified.txt"
+          cat "$RUNNER_TEMP/w-f52-verified.txt"
+          sha256sum "$RUNNER_TEMP/w-f52-verified.txt" > "$RUNNER_TEMP/w-f52-verified.sha256"
+          git rev-parse HEAD > "$RUNNER_TEMP/w-f52-audit-head.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-F52-existing-consumed-TRAIN-only-independent-audit
+          path: |
+            ${{ runner.temp }}/w-f52-verified.txt
+            ${{ runner.temp }}/w-f52-verified.sha256
+            ${{ runner.temp }}/w-f52-audit-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Authority limits
+        run: echo "ORIGINAL_SOURCE_RERUNS=0 FIRST_USE_UNCHANGED=TRUE ORIGINALS=0 SCIENTIFIC_ACCEPTED=FALSE"
