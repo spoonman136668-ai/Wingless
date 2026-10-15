@@ -8,7 +8,7 @@ permissions:
   actions: read
 jobs:
   evidence-only:
-    if: "${{ github.event.head_commit.message == 'audit(w-f52): correct frozen existing TRAIN evidence without rerun' && github.run_attempt == 1 }}"
+    if: "${{ github.event.head_commit.message == 'audit(w-f52): reverify archived TRAIN after harmless absolute path normalization' && github.run_attempt == 1 }}"
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -52,7 +52,7 @@ jobs:
           set -euo pipefail
           root="$RUNNER_TEMP/evidence"
           test "$(cat "$root/w-f52-head.txt")" = 5561233e1853c301dd2b5763acc6435befd72e38
-          (cd "$root" && sha256sum -c w-f52-result.sha256)
+          (cd "$root" && sed "s|/tmp/w-f52-result.json|w-f52-result.json|" w-f52-result.sha256 | sha256sum -c -)
           python3 -B research/foundational/20261015-w-f52/audit_result.py             "$root/w-f52-result.json" research/foundational/20261015-w-f52/prereg-candidate.json             > "$RUNNER_TEMP/w-f52-verified.txt"
           cat "$RUNNER_TEMP/w-f52-verified.txt"
           sha256sum "$RUNNER_TEMP/w-f52-verified.txt" > "$RUNNER_TEMP/w-f52-verified.sha256"
