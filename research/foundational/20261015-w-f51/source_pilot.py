@@ -72,9 +72,10 @@ def guess(arm,ctx,p_signminus,seed,family,length):
     if arm=="learned_operator_posterior":return -1 if p_signminus>=.5 else 1
     if arm=="always_shift":return 1
     if arm=="always_reflect":return -1
-    if arm=="cue0_rule":return -1 if ctx[0] else 1
-    if arm=="two_bit_public_parity":return -1 if ctx[0]^ctx[1] else 1
-    if arm=="fixed_public_hash":
+    if arm=="full_five_bit_public_nonlinear_rule":
+        return -1 if ((ctx[0]&ctx[1])^(ctx[2]&ctx[3])^ctx[4]) else 1
+    if arm=="three_bit_public_parity":return -1 if ctx[0]^ctx[1]^ctx[2] else 1
+    if arm=="public_hash":
         return -1 if random.Random(seed*61+family*23+length).randrange(2) else 1
     raise ValueError("non-public policy")
 def run():
