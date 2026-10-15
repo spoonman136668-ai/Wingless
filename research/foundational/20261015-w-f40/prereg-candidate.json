@@ -1,0 +1,86 @@
+{
+  "schema": "wingless.f40.preregistered-train-only-learned-active-value.v1",
+  "parent_source_run": 38771690104,
+  "parent_readonly_audit_run": 38772397638,
+  "design_issue": "https://github.com/spoonman136668-ai/Wingless/issues/235",
+  "phase": "FRESH_TRAIN_ONLY_ENGINEERING_NO_PRIMARY_ORIGINAL",
+  "hypothesis": "Train-only query-conditioned expected end-answer correctness from sampled public-consistent worlds can learn to choose two additional relationship observations that improve downstream answer accuracy beyond strongest equal-budget query-frontier and posterior entropy acquisition.",
+  "meta_train": {
+    "seeds": [
+      301000,
+      301016
+    ],
+    "families": [
+      310,
+      311,
+      312
+    ],
+    "lengths": [
+      3,
+      5
+    ],
+    "coverage": 3,
+    "physical_budget": 2
+  },
+  "heldout_train_only": {
+    "seeds": [
+      302000,
+      302012
+    ],
+    "families": [
+      314,
+      315,
+      316
+    ],
+    "lengths": [
+      3,
+      5
+    ],
+    "expected_queries": 72
+  },
+  "reserved_primary_original": {
+    "seeds": [
+      303000,
+      303016
+    ],
+    "families": [
+      318,
+      319,
+      320,
+      321
+    ]
+  },
+  "model": "Train contextual 7-feature linear action-value scorer from counterfactual downstream probability of true answer on meta-train, only public posterior features used at inference; model trained and fixed before novel validation.",
+  "matched_controls": [
+    "learned_query_value",
+    "query_frontier",
+    "posterior_information_gain",
+    "random_eligible",
+    "fixed_acquisition",
+    "no_purchase",
+    "privileged_complete_map_oracle_unfair"
+  ],
+  "acceptance": {
+    "min_gain_vs_strongest_fair_absolute": 0.03,
+    "each_unseen_family_nondegrading": true,
+    "all_paid_receipts_at_most_2": true,
+    "no_answer_source_leakage": true,
+    "unique_cohort_rows": true,
+    "independent_results_check": true
+  },
+  "resources": {
+    "max_native_core_bytes": 576,
+    "posterior_sampling_external_and_metered": true,
+    "train_heap_external": true,
+    "all_public_paid_mapping_history_metered": true,
+    "physical_runtime_memory_independently_unverified": true
+  },
+  "authority": {
+    "new_science_original": false,
+    "independent_F3_custody": false,
+    "no_promotion": true,
+    "no_accepted_ref_mutations": true,
+    "no_paid_API_or_codex": true,
+    "no_FORGE_CKB_KTRADE_Cloudflare_changes": true
+  }
+}
