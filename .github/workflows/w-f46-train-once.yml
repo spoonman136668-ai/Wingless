@@ -1,0 +1,66 @@
+name: W-F46 prereg protected public query-edge TRAIN experiment
+on:
+  push:
+    branches: [research/w-f46-edge-value-precode-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Check frozen precode identity and focused tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor c55a40c9ba72a5fb13069f3a2f0e46e28721e9c0 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f46/prereg-candidate.json)" = a21db2af6f6d57218e0663f7c8305c8df8df1810
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f46 -p test_preflight.py -v
+      - name: One full Go regression and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go build ./...
+  diagnostic:
+    needs: qualify
+    if: github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Run actual one-shot fresh TRAIN diagnostic; originals forbidden
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/wf46"
+          python3 -B research/foundational/20261015-w-f46/source_pilot.py > "$RUNNER_TEMP/wf46/result.json"
+          python3 - "$RUNNER_TEMP/wf46/result.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          assert d["stage"]=="TRAIN_ONLY_NOT_ORIGINAL" and d["questions"]==96
+          assert d["original_executed"] is False and d["accepted_ref_mutation"] is False
+          assert d["seeds"]==[391100,391112] and d["paid_api_calls"]==0
+          assert len(d["rows"])==96
+          print("W_F46_REAL_TRAIN_DIAGNOSTIC_COMPLETE")
+          PY
+          (cd "$RUNNER_TEMP/wf46" && sha256sum result.json > result.sha256)
+          printf '%s\n' "$GITHUB_SHA" > "$RUNNER_TEMP/wf46/SOURCE_SHA"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: W-F46-TRAIN-only-new-value-of-computation
+          path: ${{ runner.temp }}/wf46/
+          retention-days: 30
+          if-no-files-found: error
