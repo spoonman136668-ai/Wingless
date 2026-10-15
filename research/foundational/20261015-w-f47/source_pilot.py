@@ -44,7 +44,14 @@ def source(seed,family,length):
       ((1,1),(0,-1),(2,1),(1,-1),(3,1)),
       ((0,-1),(2,1),(3,-1),(0,1),(1,-1)),
     )
-    chain=templates[family%4][:length]
+    template=templates[family%4]
+    if family in DIAG_FAM:
+        # Heldout families use genuinely different composition order and
+        # directed role edges, not merely fresh seeds and renamed families.
+        template=(template[0],template[2],template[1],template[3],template[4])
+        template=tuple((role,-direction if i%2 else direction)
+                       for i,(role,direction) in enumerate(template))
+    chain=template[:length]
     return tuple(private),tuple(public),rng.randrange(6),chain
 
 def public_features(observed,start,chain):
