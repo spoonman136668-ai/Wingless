@@ -1,0 +1,66 @@
+name: W-F48 disjoint FIT-trained cost-value TRAIN-only qualification
+on:
+  push:
+    branches: [research/w-f48-trained-cost-value-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Verify precode witness, frozen contract, focused negative tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 27a6b0eaff7ec7b77920a7c84c9699ca8fc3b7c2 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f48/prereg-candidate.json)" = 3a8e4814b9d178b9ad77bd463dbc0e2676e67435
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f48 -p test_preflight.py -v
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+  fresh-train:
+    needs: source
+    if: github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Exactly one fresh FIT/diagnostic TRAIN cohort, never original
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/wf48"
+          mkdir -p "$root"
+          python3 -B research/foundational/20261015-w-f48/source_pilot.py > "$root/result.json"
+          python3 - "$root/result.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          assert d["schema"]=="wingless.f48.disjoint-trained-query-value.trainonly.v1"
+          assert d["questions"]==32 and d["training_questions"]==32
+          assert d["fit_seeds"]==[411000,411004] and d["diagnostic_seeds"]==[411100,411104]
+          assert not d["original_executed"] and not d["independent_F3_custody"]
+          assert not d["accepted_ref_mutation"] and d["paid_api_calls"]==0
+          assert d["verdict"] in ("TRAIN_ONLY_SUPPORTED_NOT_F3","TRAIN_ONLY_NEGATIVE")
+          PY
+          (cd "$root" && sha256sum result.json > result.sha256)
+          printf '%s\n' "$GITHUB_SHA" > "$root/SOURCE_SHA"
+          echo W_F48_NEW_FIT_TRAIN_AND_DIAGNOSTIC_COMPLETE
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: W-F48-disjoint-trained-query-value-train-NO-ORIGINAL
+          path: ${{ runner.temp }}/wf48/
+          retention-days: 30
+          if-no-files-found: error
