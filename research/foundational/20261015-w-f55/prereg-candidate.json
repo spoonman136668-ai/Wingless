@@ -1,0 +1,92 @@
+{
+  "schema": "wingless.f55.public-constructive-binding-efficiency.prereg.v1",
+  "stage": "PRECODE_FROZEN_NO_EXPERIMENT",
+  "parent_F54_source_head": "11eec04d174489c99d037f5990e893390c39d5b8",
+  "F54_verified_run": 38818822125,
+  "tracking_issue": 271,
+  "hypothesis": "With demonstrably sufficient public role observations, shared trainable relation-state transitions generalize to novel variable bindings with equal-work accuracy superior to symbolic approximation while using <=50% of exact posterior operations.",
+  "fit": {
+    "seeds": [
+      601000,
+      601016
+    ],
+    "families": [
+      1100,
+      1101,
+      1102,
+      1103
+    ],
+    "chain_lengths": [
+      6,
+      8
+    ],
+    "expected_fit_cases": 128
+  },
+  "diagnostic": {
+    "seeds": [
+      601100,
+      601116
+    ],
+    "families": [
+      1104,
+      1105,
+      1106,
+      1107
+    ],
+    "chain_lengths": [
+      8,
+      10
+    ],
+    "expected_cases": 128,
+    "source_shift": "new_inverse_binding_and_role_ordering"
+  },
+  "future_original_NOT_RESERVED": {
+    "seeds": [
+      602000,
+      602016
+    ],
+    "families": [
+      1108,
+      1109,
+      1110,
+      1111
+    ]
+  },
+  "evidence_public": {
+    "matched_all_policy_observation_budget": true,
+    "role_mapping_public_samples_per_role": 2,
+    "constructive_full_public_solver_heldout_min_accuracy": 0.85,
+    "no_private_sign_or_hidden_shift_to_action": true
+  },
+  "controls": [
+    "learned_shared_compositional_transition",
+    "F54_frozen_transition_model",
+    "fixed_equal_work_mass_beam",
+    "fixed_equal_work_entropy_beam",
+    "public_full_algebraic_solver",
+    "full_exact_public_posterior",
+    "public_parity_rule",
+    "public_support_nearest",
+    "private_truth_oracle_unfair"
+  ],
+  "thresholds": {
+    "min_public_constructive_witness_accuracy": 0.85,
+    "gain_vs_strongest_equal_work_fair_min": 0.05,
+    "loss_vs_exact_max_absolute": 0.02,
+    "posterior_work_ratio_vs_exact_max": 0.5,
+    "per_heldout_family_nondegradation": true
+  },
+  "resource_limits": {
+    "quantized_params_and_recurrent_state_payload_max_bytes": 64,
+    "whole_native_576B_not_measured": true,
+    "trace_every_transition_and_public_mapping": true
+  },
+  "authority": {
+    "FIT_only_learning": true,
+    "precode_frozen_controls": true,
+    "source_independent_F3": false,
+    "primary_original_first_use": false,
+    "accepted_ref_mutation": false,
+    "Codex_or_paid_API_use": false
+  }
+}
