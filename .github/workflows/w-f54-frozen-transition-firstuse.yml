@@ -55,7 +55,7 @@ jobs:
           go build ./...
           echo W_F54_EXACT_HEAD_COMPLETE_REGRESSION=PASS
   diagnostic:
-    if: ${{ github.event.head_commit.message == 'science(w-f54): first and only frozen disjoint transition TRAIN diagnostic' && github.run_attempt == 1 }}
+    if: "${{ github.event.head_commit.message == 'science(w-f54): first and only frozen disjoint transition TRAIN diagnostic' && github.run_attempt == 1 }}"
     needs: qualification
     runs-on: ubuntu-latest
     timeout-minutes: 90
