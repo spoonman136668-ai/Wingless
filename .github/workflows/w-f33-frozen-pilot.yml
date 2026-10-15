@@ -1,0 +1,77 @@
+name: W-F33 one train-only latent grammar feasibility
+on:
+  push:
+    branches:
+      - science/w-f33-frozen-train-only-pilot-20261015-r1
+permissions:
+  contents: read
+jobs:
+  pilot:
+    if: "${{ github.event.head_commit.message == 'science(w-f33): one frozen train-only feasibility pilot' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify exact frozen identity and source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor ff79cf0d0355330215c4de7ec9a3501b53894ccc HEAD
+          git merge-base --is-ancestor e584f6955147a321f5d2577867e052d48de2a6fd HEAD
+          test "$(git hash-object research/foundational/20261015-w-f33/pilot.py)" = 861c417d380434bcb41f34b159159fa73456a4b1
+          test "$(git hash-object research/foundational/20261015-w-f33/pilot-frozen.json)" = "$(git rev-parse e584f6955147a321f5d2577867e052d48de2a6fd:research/foundational/20261015-w-f33/pilot-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f33 -p test_preflight.py -q
+      - name: Execute ONLY train-source W-F33 role grammar pilot
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f33/pilot.py > /tmp/w-f33-pilot.json
+          python3 -m json.tool /tmp/w-f33-pilot.json > /dev/null
+          sha256sum /tmp/w-f33-pilot.json > /tmp/w-f33-pilot.sha256
+          git rev-parse HEAD > /tmp/w-f33-pilot-source.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F33-once-train-only-feasibility-no-original
+          path: |
+            /tmp/w-f33-pilot.json
+            /tmp/w-f33-pilot.sha256
+            /tmp/w-f33-pilot-source.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independently validate pilot evidence and private-grammar boundary
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math,collections
+          d=json.load(open('/tmp/w-f33-pilot.json'))
+          p=json.load(open('research/foundational/20261015-w-f33/pilot-frozen.json'))
+          assert d['schema']=='wingless.f33.train-only-latent-grammar-pilot.v1'
+          assert d['status']=='PRE_ORIGINAL_TRAIN_ONLY'
+          assert d['questions']==p['pilot']['expected_questions']==480
+          assert len(d['rows'])==480
+          assert d['no_true_role_grammar_to_learner']
+          assert d['primary_original_not_executed'] and not d['F3_source_custody'] and not d['accepted_ref_mutation']
+          assert set(d['families'])==set(p['pilot']['families'])
+          assert set(d['reserved_families'])==set(p['reserved']['families'])
+          assert len(set((r['seed'],r['family'],r['depth']) for r in d['rows']))==480
+          assert all(191000<=r['seed']<191040 and r['learned_core_bytes']<=576 for r in d['rows'])
+          assert all(r['public_demonstration_count']==30 and r['external_demonstration_bytes']==720 for r in d['rows'])
+          for arm,s in d['scores'].items():
+            correct=sum(r['predictions'][arm]==r['truth_end'] for r in d['rows'])
+            assert s['correct']==correct and math.isclose(s['accuracy'],correct/480,abs_tol=1e-12)
+          assert d['scores']['oracle']['correct']==480
+          best=max(d['scores'][arm]['accuracy'] for arm in ('empirical_bayes','nearest_demo','no_role'))
+          qualified=d['scores']['learned']['accuracy']-best>=0 and d['scores']['learned']['accuracy']>d['scores']['no_role']['accuracy']
+          expected='PILOT_ROLE_GRAMMAR_QUALIFIES_FOR_SEPARATE_SOURCE' if qualified else 'PILOT_ROLE_GRAMMAR_NO_QUALIFIED_GAIN'
+          assert d['verdict']==expected
+          print('W_F33_PILOT_VERDICT',d['verdict'],{k:v['correct'] for k,v in d['scores'].items()})
+          PY
+      - name: Preserve primary original and F3 boundary
+        run: echo "W-F33 pilot TRAIN ONLY, reserved test untouched, no original, no controller/F3 changes"
