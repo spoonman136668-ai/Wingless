@@ -1,0 +1,60 @@
+name: Wingless W-F26 causal event-order identity links
+on:
+  push:
+    branches: [research/w-f26-temporal-identity-coherence-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: go.mod}
+      - name: Preflight frozen predecessor and Go syntax BEFORE original
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 341a26b06ad7eaa4b449363608e7212ba76bfaa1 HEAD
+          test "$(git hash-object unitary/f25_identity_hard_negatives.go)" = "$(git rev-parse 341a26b06ad7eaa4b449363608e7212ba76bfaa1:unitary/f25_identity_hard_negatives.go)"
+          python3 -m json.tool research/foundational/20261015-w-f26/prereg.json >/dev/null
+          go test -run '^$' ./unitary ./cmd/f26-wingless
+      - name: Exactly one new independent DEVELOPMENT original
+        run: |
+          set -euo pipefail
+          go run ./cmd/f26-wingless > /tmp/w-f26-original.json
+          python3 -m json.tool /tmp/w-f26-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F26-original-identity-event-order
+          path: /tmp/w-f26-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently verify typed source and controls
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          x=json.load(open('/tmp/w-f26-original.json'))
+          assert x["stage"]=="DEVELOPMENT_ONLY"
+          assert x["graphs"]==96 and x["questions"]==768 and x["native_state_bytes"]==576
+          assert x["training_only_positive_negative_pairs"]==512
+          assert x["trained_temporal_coherence_feature"] and x["impostors_share_static_fingerprint_and_reverse_events"]
+          assert not x["actual_query_candidate_pairs_supplied"]
+          assert not x["independently_born_source"] and not x["sealed_first_use"] and not x["accepted_ref_mutation"]
+          assert collections.Counter(r["Family"] for r in x["rows"])=={108:192,109:192,110:192,111:192}
+          assert collections.Counter(r["Variant"] for r in x["rows"])==dict.fromkeys(range(8),96)
+          assert all(r["Truth"]==[True,True,False,False,True,True,False,True][r["Variant"]] for r in x["rows"])
+          for name,key in [("learned","Learned"),("none","NoLinks"),("fixed_distance","FixedDistance"),
+                ("strict_distance","StrictDistance"),("static_only","StaticOnly"),("coded_oracle","CodedUpper")]:
+            s=x["scores"][name]
+            assert s["correct"]==sum(r[key]["answer"]==r["Truth"] for r in x["rows"])
+            assert s["fp"]==sum(r[key]["answer"] for r in x["rows"] if not r["Truth"])
+            assert s["fn"]==sum(not r[key]["answer"] for r in x["rows"] if r["Truth"])
+          assert x["scores"]["coded_oracle"]["correct"]==768
+          assert x["registered_verdict"] in ["INVALID_F26_SOURCE_ORACLE","DEVELOPMENT_TEMPORAL_IDENTITY_LEARNED_ADVANTAGE","DEVELOPMENT_TEMPORAL_IDENTITY_NO_QUALIFIED_GAIN"]
+          print("W_F26_VERDICT",x["registered_verdict"],x["scores"])
+          PY
+      - name: One full Go repository regression and build
+        run: go test ./... && go build ./...

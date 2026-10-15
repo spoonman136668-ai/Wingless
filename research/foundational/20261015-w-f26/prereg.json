@@ -1,0 +1,67 @@
+{
+  "schema": "wingless.f26.prereg.v1",
+  "parent_source": "341a26b06ad7eaa4b449363608e7212ba76bfaa1",
+  "hypothesis": "Can an independently trained 5-weight temporal trajectory-coherence classifier detect same-entity aliases versus deceptive static-fingerprint-matched impostors, improving typed reasoning over fixed Euclidean and static-only rules?",
+  "cohort": {
+    "stage": "DEVELOPMENT_ONLY",
+    "train_only_pair_count": 512,
+    "training_source_seeds": "5100..5140 disjoint from test",
+    "new_test_seed_bounds": [
+      104200,
+      104206
+    ],
+    "reused_graph_families": [
+      108,
+      109,
+      110,
+      111
+    ],
+    "graph_count": 96,
+    "variants_per_graph": 8,
+    "questions": 768,
+    "full_test_frozen_before_execution": true,
+    "programmed_source_signals": "each node has static identity fingerprint and two ordered event readings; some impostors share static prototype but swap the event sequence",
+    "given_not_learned": [
+      "graph construction",
+      "all-pairs candidate enumeration",
+      "source semantic fingerprints and event observations",
+      "encoded typed recurrence and entity identity prior"
+    ],
+    "candidate_not_given_pair_tuples": true,
+    "native_resident_bytes": 576
+  },
+  "method": {
+    "trainable_parameters": 5,
+    "train_features": "bias + 100*squared differences of static,event1,event2 + 100*squared difference of ordered temporal slope",
+    "epochs": 560,
+    "gradient_step": 0.035,
+    "train_only_graph_truth": false,
+    "frozen_before_new_cohort": true
+  },
+  "controls": [
+    "learned temporal link similarity",
+    "static fingerprint-only threshold < .0004 squared",
+    "fixed 3D Euclidean threshold < .045 squared",
+    "strict 3D Euclidean threshold < .0015 squared",
+    "no-links frozen recurrence",
+    "coded exact oracle"
+  ],
+  "registered_success": {
+    "oracle_correct": 768,
+    "minimum_learned_accuracy": 0.95,
+    "min_gain_no_links": 0.1,
+    "min_gain_vs_best_static_temporal": 0.03
+  },
+  "outcomes": [
+    "INVALID_F26_SOURCE_ORACLE",
+    "DEVELOPMENT_TEMPORAL_IDENTITY_LEARNED_ADVANTAGE",
+    "DEVELOPMENT_TEMPORAL_IDENTITY_NO_QUALIFIED_GAIN"
+  ],
+  "limits": {
+    "real_temporal_provenance_not_authenticated": true,
+    "source_generated_event_sequences": true,
+    "no_external_first_use": true,
+    "F3_NOT_ADMITTED": true,
+    "FORGE_KTRADE_controller_untouched": true
+  }
+}
