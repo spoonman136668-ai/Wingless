@@ -1,0 +1,77 @@
+name: Wingless F53 one frozen synthetic TRAIN-only novel mechanism
+on:
+  push:
+    branches:
+      - research/w-f53-learned-task-value-belief-pruning-20261015-r1
+permissions:
+  contents: read
+  actions: read
+jobs:
+  frozen-source:
+    if: "${{ github.event.head_commit.message == 'science(w-f53): execute frozen prospective task-value TRAIN only' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Exact prereg, original source isolation and model/audit blob identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5561233e1853c301dd2b5763acc6435befd72e38 HEAD
+          git merge-base --is-ancestor 6c39c4bb9465f3df62c0063726eca0e4b263c22b HEAD
+          test "$(git hash-object research/foundational/20261015-w-f53/prereg-candidate.json)" = 59bca9b8e3aed64aaae62d8b41e9a6618e732926
+          test "$(git hash-object research/foundational/20261015-w-f53/source_pilot.py)" = 3a9b6c047fa5a67a6f939465ee2bc149da7feccd
+          test "$(git hash-object research/foundational/20261015-w-f53/audit_result.py)" = db1790e4614a05af8fec2d6a93620fee2d24fd89
+          test "$(git hash-object research/foundational/20261015-w-f53/test_preflight.py)" = 34be6d8f790ad9de023de50d844ef5e4dafbd5c0
+          python3 -m json.tool research/foundational/20261015-w-f53/prereg-candidate.json >/dev/null
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f53 -p test_preflight.py -v
+      - name: Verify first-use FIT-only preflight passed on exact frozen source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          data=$(curl --fail --silent --show-error --retry 2 --max-time 20             -H "Accept: application/vnd.github+json"             -H "Authorization: Bearer $GH_TOKEN"             "https://api.github.com/repos/spoonman136668-ai/Wingless/actions/runs/38816683378")
+          echo "$data" | jq -e '.status=="completed" and .conclusion=="success" and .run_attempt==1'
+      - name: Exactly one repository-wide regression vet and build before scientific source
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: Exactly one fresh FIT plus disjoint synthetic TRAIN diagnostic with independent audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD > /tmp/w-f53-head.txt
+          python3 -B research/foundational/20261015-w-f53/source_pilot.py > /tmp/w-f53-result.json
+          python3 -m json.tool /tmp/w-f53-result.json >/dev/null
+          (cd /tmp && sha256sum w-f53-result.json > w-f53-result.sha256)
+          python3 -B research/foundational/20261015-w-f53/audit_result.py             /tmp/w-f53-result.json             research/foundational/20261015-w-f53/prereg-candidate.json             > /tmp/w-f53-independent-audit.txt
+          cat /tmp/w-f53-independent-audit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Wingless-F53-one-frozen-TRAIN-and-evidence
+          path: |
+            /tmp/w-f53-head.txt
+            /tmp/w-f53-result.json
+            /tmp/w-f53-result.sha256
+            /tmp/w-f53-independent-audit.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Explicit scientific authority limits
+        run: |
+          echo "NEW_SYNTHETIC_TRAIN_EXECUTIONS=ONE"
+          echo "PROTECTED_ORIGINALS_EXECUTED=ZERO"
+          echo "INDEPENDENT_F3_CUSTODY=UNQUALIFIED"
+          echo "TOTAL_NATIVE_576B_RESIDENCY=UNVERIFIED"
+          echo "ACCEPTED_SCIENCE_OR_LIVE_OPTIMIZER_REFS_CHANGED=FALSE"
