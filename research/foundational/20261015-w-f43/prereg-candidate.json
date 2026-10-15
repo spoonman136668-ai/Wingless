@@ -1,0 +1,64 @@
+{
+  "schema": "wingless.f43.exact-posterior-information-prereg.v1",
+  "stage": "PREREG_BEFORE_SOURCE_CODE",
+  "parent_f42_commit": "c249b6beccab661f48c038443d14da455c51b7f1",
+  "negative_f42_run": 38794612570,
+  "design_issue": 243,
+  "hypothesis": "With matched posterior-world evaluation counts, a deterministic fully enumerated answer-entropy reduction policy under sparse bijective typed relations gives stable observation priorities and at least 3pp more unseen end-answer accuracy than the best fair acquisition comparator; sampler instability alone is not an adequate mechanism.",
+  "train_only": {
+    "seed_start": 331000,
+    "seed_stop_exclusive": 331008,
+    "families": [
+      390,
+      391,
+      392
+    ],
+    "lengths": [
+      3,
+      5
+    ],
+    "expected_cases": 48,
+    "roles": 4,
+    "values": 6,
+    "public_pairs_per_role": 3,
+    "private_port_paid_limit": 2,
+    "posterior_worlds_upper_bound": 1296
+  },
+  "reserved_original": {
+    "seed_start": 332000,
+    "seed_stop_exclusive": 332016,
+    "families": [
+      394,
+      395,
+      396,
+      397
+    ]
+  },
+  "comparators": [
+    "exact_answer_entropy",
+    "sampled_information_gain_equal_world_count",
+    "sampled_decision_value_equal_world_count",
+    "query_frontier_equal_world_count",
+    "no_purchase",
+    "private_truth_oracle_unfair"
+  ],
+  "acceptance": {
+    "gain_over_strongest_fair_min": 0.03,
+    "per_family_nondegradation": true,
+    "deterministic_exact_rerun": true,
+    "source_to_selector_private_leakage": false,
+    "independent_full_row_and_receipt_audit": true,
+    "equal_world_evaluation_counts": true
+  },
+  "qualified_limitations": {
+    "train_only_synthetic_source": true,
+    "not_F3_custody": true,
+    "not_a_primary_original": true,
+    "not_a_learned_model": true,
+    "byte_576_native_resident_not_established": true,
+    "external_posterior_memory_and_cpu_must_be_metered": true,
+    "no_paid_API_or_Codex": true,
+    "no_controller_FORGE_KTRADE_CKB_changes": true,
+    "no_accepted_ref_mutation": true
+  }
+}
