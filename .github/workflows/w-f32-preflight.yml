@@ -1,0 +1,33 @@
+name: W-F32 pre-original typed-role engineering
+on:
+  push:
+    branches:
+      - research/w-f32-directed-role-composition-20261015-r1
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Strict prereg parent and no test usage
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 79fa79fcff14eb8e80becfcb8c3ffa68e03e0289 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f32/prereg-candidate.json)" = "$(git rev-parse a8547f75a359f60a23c9a4d4d9dd8b5f713e5db4:research/foundational/20261015-w-f32/prereg-candidate.json)"
+          python3 -m json.tool research/foundational/20261015-w-f32/prereg-candidate.json > /dev/null
+          python3 -m py_compile research/foundational/20261015-w-f32/execute.py
+      - name: Train-source only focused tests
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f32 -p test_preflight.py -v
+      - name: One complete Go regression and build
+        run: go test ./... && go build ./...
+      - name: No original executed in engineering job
+        run: echo "W-F32 preflight only. Heldout test not executed."

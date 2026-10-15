@@ -1,0 +1,87 @@
+{
+  "schema": "wingless.f32.prereg.v1",
+  "status": "FROZEN_CANDIDATE_BEFORE_SOURCE",
+  "experiment_id": "W-F32",
+  "parent_head": "79fa79fcff14eb8e80becfcb8c3ffa68e03e0289",
+  "parent_original": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38723767914",
+  "hypothesis": "A train-only recurrent role-conditioned graph transducer makes more accurate multi-hop relationship decisions than topology-only and fixed budget-matched controls on new counterfactual graph/role families.",
+  "train": {
+    "seed_begin": 171000,
+    "seed_end_exclusive": 171080,
+    "families": [
+      140,
+      141,
+      142,
+      143
+    ],
+    "depths": [
+      3,
+      4,
+      5
+    ],
+    "role_vocab_size": 6
+  },
+  "test": {
+    "seed_begin": 172000,
+    "seed_end_exclusive": 172012,
+    "families": [
+      144,
+      145,
+      146,
+      147
+    ],
+    "depths": [
+      3,
+      4,
+      5
+    ],
+    "variants": [
+      "positive",
+      "last-role-counterfactual",
+      "middle-role-counterfactual",
+      "reversed-one-edge",
+      "same-topology-distractor",
+      "branch-alternative",
+      "role-permutation",
+      "unrelated-impostor"
+    ],
+    "questions": 1152,
+    "role_vocab_size": 6
+  },
+  "model": {
+    "type": "train-only sigmoid role-compatibility model driving ordered directed edge message passing",
+    "native_state_bytes_max": 576,
+    "weights": 4,
+    "programmed_state_expansion_disclosed": true
+  },
+  "controls": [
+    "learned",
+    "fixed-typed-greedy",
+    "topology-only",
+    "unordered-role-bag",
+    "frozen-WF31-feature-baseline",
+    "coded-exact-typed-graph-search"
+  ],
+  "fairness": "If coded exact typed graph search has the same information and budget, include it as fair control; do not label it an unfair oracle merely to pass.",
+  "gate": {
+    "minimum_absolute_gain_vs_strongest_fair": 0.03,
+    "nondegrading_all_families": true,
+    "role_order_ablation_positive": true,
+    "typed_reference_consistent": true,
+    "no_out_of_core_unmetered_search": true
+  },
+  "source": {
+    "same_repo_generated": true,
+    "no_independently_born_F3_source": true,
+    "strict_train_test_seed_family_separation": true,
+    "positive_negative_counterfactuals_same_untyped_topology": true,
+    "one_original_only": true,
+    "no_replay": true
+  },
+  "isolation": {
+    "no_FORGE_or_CKB_controller_changes": true,
+    "no_production_changes": true,
+    "no_accepted_ref_mutation": true,
+    "no_paid_API": true
+  }
+}
