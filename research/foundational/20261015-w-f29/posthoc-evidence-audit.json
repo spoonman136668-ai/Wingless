@@ -1,0 +1,47 @@
+{
+  "schema": "wingless.f29.posthoc-evidence-audit.v1",
+  "original": {
+    "run_id": 38716258056,
+    "url": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38716258056",
+    "artifact_id": 11962703474,
+    "source_sha": "926b5e3dc8ffb10ce1847c5e4107dd36279f8def",
+    "json_sha256": "fc3f3ec416b37c01d9719552120781fdc0df06b746713df02acb3ca7bbf98461"
+  },
+  "execution": "ONE_PROSPECTIVE_DEVELOPMENT_ORIGINAL_COMPLETED_AND_ARCHIVED",
+  "workflow_audit": "FAILED_AFTER_ORIGINAL_DUE_TO_KEYERROR_stage_EXPECTED_Stage",
+  "independent_posthoc_row_audit": "PASS_LOCAL_ORIGINAL_ARCHIVE_NO_RERUN",
+  "metrics": {
+    "rows": 1152,
+    "trained_cases": 9600,
+    "weights": 10,
+    "expected_native_bytes": 576,
+    "learned": {
+      "correct": 792,
+      "fp": 288,
+      "fn": 72,
+      "accuracy": 0.6875
+    },
+    "best_fair_consensus": {
+      "correct": 864,
+      "fp": 288,
+      "fn": 0,
+      "accuracy": 0.75
+    },
+    "gain_absolute": -0.0625,
+    "privileged_source_oracle_correct": 1152
+  },
+  "verdict": "DEVELOPMENT_CROSS_ENCOUNTER_NO_QUALIFIED_GAIN",
+  "audit_scope": "Artifact SHA256 and one-shot source commit match, all 1152 unique rows, per-arm and per-family recomputation, disjoint test-family/seed checks, observation/history/read counts, no source mutation.",
+  "limitations": [
+    "Source-internal oracle not independent F3 oracle",
+    "Programmed synthetic witness generator, coded candidate-pair enumeration",
+    "No fully independent semantic identity source",
+    "No official scientific acceptance or sealed first-use"
+  ],
+  "governance": {
+    "sealed_F3_first_use": false,
+    "accepted_ref_mutation": false,
+    "controller_mutation": false,
+    "original_not_rerun": true
+  }
+}
