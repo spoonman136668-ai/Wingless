@@ -1,0 +1,40 @@
+name: Wingless F57 learned belief-state new FIT-source qualification
+on:
+  push:
+    branches: [research/w-f57-public-belief-method-fitonly-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  fit-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Frozen first use and public policy isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git hash-object research/foundational/20261015-w-f57/prereg.json)" = f088b68ac0cfdcd9ca1a3aa104de1c555fd29c70
+          test "$(git hash-object research/foundational/20261015-w-f57/source_fit.py)" = 1f4fe7af922dc65fd9eca6d1e52affbbff4ef55e
+          test "$(git hash-object research/foundational/20261015-w-f57/test_source_fit.py)" = 90a353321c1a707cb0190f31244afdf140c234ca
+          python3 -B -m py_compile research/foundational/20261015-w-f57/source_fit.py
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f57 -p test_precode.py -v
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f57 -p test_source_fit.py -v
+          echo F57_NEW_FACTORIAL_PUBLIC_BELIEF_SOURCE=PASS
+      - name: One complete Wingless project regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+          echo F57_FULL_WINGLESS_REGRESSION=PASS
+      - name: Scientific authority remains unchanged
+        run: echo "FULL_FIT_NOT_EXECUTED=TRUE DIAGNOSTIC_NOT_EXECUTED=TRUE PRIMARY_ORIGINAL_NOT_EXECUTED=TRUE"
