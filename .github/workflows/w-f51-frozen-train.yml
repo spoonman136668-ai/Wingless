@@ -1,0 +1,62 @@
+name: Wingless F51 frozen new mechanistic TRAIN-only science
+on:
+  push:
+    branches:
+      - research/w-f51-public-support-transfer-20261015-r1
+permissions:
+  contents: read
+jobs:
+  research:
+    if: "${{ github.event.head_commit.message == 'science(w-f51): once-only frozen TRAIN source and independent public-support audit' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Verify original parent, pre-code prereg and unchanged model source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 646b9db1d48eb03150ad79f1c88b7a44354ab96f HEAD
+          git merge-base --is-ancestor 37d23da7c6a64c3d68ab52ddfd6dbdddeeb7f78d HEAD
+          test "$(git hash-object research/foundational/20261015-w-f51/prereg-candidate.json)" = eae440ab4c45a568b7c3e404e6f40a66434ab57e
+          test "$(git hash-object research/foundational/20261015-w-f51/source_pilot.py)" = 5c06c462bfa6cfb29f3aab5afeaf13b58ebf8fc8
+          test "$(git hash-object research/foundational/20261015-w-f51/audit_result.py)" = 1b8a10ffd724ccf14ee8dfbe415c9bf94a4882df
+          python3 -m json.tool research/foundational/20261015-w-f51/prereg-candidate.json >/dev/null
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f51 -p test_preflight.py -v
+      - name: One full existing Go regression vet build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: Exactly one fresh disjoint synthetic TRAIN source and independent audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f51/source_pilot.py > /tmp/w-f51-source.json
+          python3 -m json.tool /tmp/w-f51-source.json >/dev/null
+          sha256sum /tmp/w-f51-source.json > /tmp/w-f51-source.sha256
+          git rev-parse HEAD > /tmp/w-f51-source-head.txt
+          python3 -B research/foundational/20261015-w-f51/audit_result.py              /tmp/w-f51-source.json              research/foundational/20261015-w-f51/prereg-candidate.json              > /tmp/w-f51-independent-audit.txt
+          cat /tmp/w-f51-independent-audit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Wingless-F51-frozen-once-only-TRAIN-and-audit
+          path: |
+            /tmp/w-f51-source.json
+            /tmp/w-f51-source.sha256
+            /tmp/w-f51-source-head.txt
+            /tmp/w-f51-independent-audit.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: No scientific promotion or cross-project mutations
+        run: echo "ORIGINALS_EXECUTED=0 F3_INDEPENDENT=FALSE NATIVE_576B_RESIDENCY=UNQUALIFIED ACCEPTED_REFS_MUTATED=FALSE"

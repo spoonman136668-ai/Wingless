@@ -1,0 +1,97 @@
+{
+  "schema": "wingless.f51.public-calibrated-unseen-operator-rule.prereg.v1",
+  "stage": "PRECODE_FROZEN",
+  "parent_F50_head": "646b9db1d48eb03150ad79f1c88b7a44354ab96f",
+  "prior_strong_public_parity_112_of_128": true,
+  "issue": 257,
+  "hypothesis": "A FIT-trained public-support attention rule can infer the hidden role operator under unseen context-to-operator laws and outperform the strongest fair full parity, majority, hamming-nearest, and empirical-support controls by >=5pp, without heldout family degradation.",
+  "fit": {
+    "seeds": [
+      521000,
+      521008
+    ],
+    "families": [
+      900,
+      901,
+      902,
+      903
+    ],
+    "task_lengths": [
+      3,
+      5
+    ],
+    "fit_cases": 64,
+    "laws": [
+      "parity",
+      "majority",
+      "xnor",
+      "exactly_one"
+    ]
+  },
+  "diagnostic": {
+    "seeds": [
+      521100,
+      521116
+    ],
+    "families": [
+      904,
+      905,
+      906,
+      907
+    ],
+    "task_lengths": [
+      3,
+      5
+    ],
+    "expected_cases": 128,
+    "laws": [
+      "xor_and",
+      "or_not",
+      "threshold_two",
+      "impl"
+    ]
+  },
+  "public_data": {
+    "domain": 7,
+    "cues": 3,
+    "calibration_context_sign_anchors": 4,
+    "calibration_sign_recognized_from_two_mapping_points": true,
+    "target_observations_per_role": 1
+  },
+  "future_original_NOT_RESERVED": {
+    "seeds": [
+      522000,
+      522016
+    ],
+    "families": [
+      908,
+      909,
+      910,
+      911
+    ]
+  },
+  "controls": [
+    "learned_support_attention",
+    "public_hamming_nearest",
+    "public_support_majority",
+    "public_three_bit_parity",
+    "public_three_bit_majority",
+    "always_shift",
+    "always_reflect",
+    "private_sign_oracle_unfair"
+  ],
+  "thresholds": {
+    "gain_vs_strongest_fair_min": 0.05,
+    "per_family_nondegradation": true,
+    "all_public_calibration_and_inverse_comp_audit": true
+  },
+  "limits": {
+    "diagnostic_private_sign_never_action_feature": true,
+    "fit_and_diagnostic_laws_disjoint": true,
+    "source_independent_F3": false,
+    "primary_original_executed": false,
+    "native_576B_total_measured": false,
+    "accepted_ref_mutation": false,
+    "paid_API": 0
+  }
+}
