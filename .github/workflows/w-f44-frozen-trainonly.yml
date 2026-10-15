@@ -1,0 +1,113 @@
+name: W-F44 one frozen two-read TRAIN-only diagnostic (NO original)
+on:
+  push:
+    branches:
+      - science/w-f44-one-frozen-trainonly-20261015-r1
+permissions:
+  contents: read
+jobs:
+  once:
+    if: "${{ github.event.head_commit.message == 'science(w-f44): one exact-frozen two-purchase train-only diagnostic' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Exact precode/source and passed-preflight ancestry before consumption
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 11eb01e7944b19b3409e6e5cc8bbcc158835ea0e HEAD
+          git merge-base --is-ancestor d04fe2c243986b6fba5ff386dce8c8b069ab3db3 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f44/prereg-candidate.json)" = 29e32babd9ea8accbef9f7b3d807e3df25a51811
+          test "$(git hash-object research/foundational/20261015-w-f44/source_pilot.py)" = fc996fada42be1ea59d85732adac34b0b40c03ee
+          python3 -m unittest discover -s research/foundational/20261015-w-f44 -p test_preflight.py -v
+      - name: Consume once one fresh TRAIN-only W-F44 cohort
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f44/source_pilot.py > /tmp/w-f44-train.json
+          python3 -m json.tool /tmp/w-f44-train.json >/dev/null
+          sha256sum /tmp/w-f44-train.json > /tmp/w-f44-train.sha256
+          git rev-parse HEAD > /tmp/w-f44-head.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F44-one-frozen-two-read-train-only
+          path: |
+            /tmp/w-f44-train.json
+            /tmp/w-f44-train.sha256
+            /tmp/w-f44-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independently count all rows receipts computational charges and frozen gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, math
+          d=json.load(open('/tmp/w-f44-train.json'))
+          p=json.load(open('research/foundational/20261015-w-f44/prereg-candidate.json'))
+          assert d['schema']=='wingless.f44.two-read-path-counterfactual.trainonly.v1'
+          assert d['stage']=='FRESH_SYNTHETIC_TRAIN_ONLY_NOT_ORIGINAL'
+          t=p['train_only']
+          assert d['seeds']==t['seeds'] and d['families']==t['families']
+          assert d['reserved_seeds']==p['reserved_original']['seeds']
+          assert d['reserved_families']==p['reserved_original']['families']
+          assert d['questions']==t['cases']==48 and len(d['rows'])==48
+          assert d['first_stage_beam']==t['candidate_first_beam']==4
+          assert d['initial_posterior_worlds']==t['initial_posterior_max']==1296
+          assert d['max_paid_mappings']==t['paid_mapping_cap']==2
+          assert not d['source_independent_F3_custody']
+          assert not d['primary_original_not_executed']==False
+          assert not d['native_576_byte_residency_qualified'] and not d['accepted_ref_mutation']
+          assert d['paid_api_calls']==0
+          rows=d['rows']; arms=p['controls']
+          assert len({(r['seed'],r['family'],r['length']) for r in rows})==48
+          for row in rows:
+              assert 351000<=row['seed']<351008
+              assert row['family'] in t['families'] and row['length'] in t['lengths']
+              assert 0<=row['truth']<6 and row['initial_posterior_worlds']==1296
+              assert set(row['answers'])==set(arms)
+              assert set(row['receipts'])==set(arms)-{'private_oracle_unfair'}
+              assert set(row['work'])==set(row['receipts'])
+              for arm,receipt in row['receipts'].items():
+                  assert len(receipt)<=2 and (arm!='no_purchase' or len(receipt)==0)
+                  assert len({(q[0],q[1]) for q in receipt})==len(receipt)
+                  assert all(len(q)==3 and 0<=q[0]<4 and 0<=q[1]<6 and 0<=q[2]<6 for q in receipt)
+                  assert isinstance(row['work'][arm],int) and row['work'][arm]>=0
+          for arm in arms:
+              correct=sum(r['truth']==r['answers'][arm] for r in rows)
+              score=d['scores'][arm]
+              assert (score['correct'],score['total'])==(correct,48)
+              assert math.isclose(score['accuracy'],correct/48,abs_tol=1e-12)
+          assert d['scores']['private_oracle_unfair']['correct']==48
+          for fam in t['families']:
+              sub=[r for r in rows if r['family']==fam]
+              assert len(sub)==16
+              for a in arms:
+                  assert d['by_family'][str(fam)][a]==sum(r['answers'][a]==r['truth'] for r in sub)
+          for arm in arms[:-1]:
+              assert d['posterior_world_work'][arm]==sum(r['work'][arm] for r in rows)
+              assert d['elapsed_policy_seconds'][arm]>0
+          fair=arms[1:-1]
+          best=max(fair,key=lambda a:d['scores'][a]['accuracy'])
+          gain=d['scores']['two_step_counterfactual']['accuracy']-d['scores'][best]['accuracy']
+          no_reg=all(d['by_family'][str(f)]['two_step_counterfactual']>=max(
+              d['by_family'][str(f)][a] for a in fair) for f in t['families'])
+          work=d['posterior_world_work']
+          parity=work['two_step_counterfactual']<=p['thresholds']['maximum_compute_work_ratio_vs_strongest_baseline']*max(work[best],1)
+          assert d['strongest_fair_control']==best
+          assert math.isclose(d['candidate_gain'],gain,abs_tol=1e-12)
+          assert d['family_nondegradation']==no_reg and d['measured_work_budget_parity']==parity
+          qualifies=gain>=p['thresholds']['accuracy_gain_over_strongest_fair_min'] and no_reg and parity
+          expected='TRAIN_ONLY_TWO_STEP_QUALIFIED' if qualifies else 'TRAIN_ONLY_TWO_STEP_NOT_QUALIFIED'
+          assert d['verdict']==expected
+          print('W_F44',expected,'correct',{a:d['scores'][a]['correct'] for a in arms},
+                'gain',gain,'family_no_regress',no_reg,'compute_parity',parity,
+                'work',d['posterior_world_work'],'policy_seconds',d['elapsed_policy_seconds'])
+          PY
+      - name: Authority boundary
+        run: echo "One synthetic TRAIN-only diagnostic, not primary original, F3, native 576B qualified or controller/accepted ref execution."
