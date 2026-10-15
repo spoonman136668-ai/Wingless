@@ -1,0 +1,62 @@
+name: W-F53 new group-robust public-law TRAIN study
+on:
+  push:
+    branches: [research/w-f53-group-robust-law-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Check frozen precode and full FIT-only source negatives
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 533f6eab22ae4c54292cd8d46af13f4b381ad466 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f53/prereg.json)" = 96fe86b44fbcaa5a10086023640e1a24be440be5
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f53 -p test_preflight.py -v
+          python3 -m py_compile research/foundational/20261015-w-f53/audit_result.py
+      - name: One complete repository Go regression vet build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+  diagnostic:
+    if: "${{ github.event.head_commit.message == 'science(w-f53): first and only fresh disjoint law diagnostic' && github.run_attempt == 1 }}"
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Execute one new TRAIN FIT and DIAG, independently audit once
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/wf53";mkdir -p "$root"
+          python3 -B research/foundational/20261015-w-f53/source_pilot.py > "$root/result.json"
+          python3 -B research/foundational/20261015-w-f53/audit_result.py \
+            "$root/result.json" research/foundational/20261015-w-f53/prereg.json > "$root/audit.txt"
+          (cd "$root";sha256sum result.json audit.txt > manifest.sha256)
+          echo "$GITHUB_SHA" > "$root/SOURCE_SHA"
+          cat "$root/audit.txt"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: W-F53-fresh-minimax-law-TRAIN-NOT-ORIGINAL
+          path: ${{ runner.temp }}/wf53/
+          retention-days: 30
+          if-no-files-found: error
