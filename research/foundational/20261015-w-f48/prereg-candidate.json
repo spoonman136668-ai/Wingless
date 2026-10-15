@@ -1,0 +1,65 @@
+{
+  "schema": "wingless.f48.train-only-prereg.v1",
+  "lane": "Wingless",
+  "status": "PRECODE_PREREG_ONLY_NO_EXECUTION",
+  "parent_f46_exact_sha": "bd7f18a31369cd913d353477e60b7be6d0d87876",
+  "parent_f46_run": 38803701796,
+  "parent_f46_artifact": 12005147117,
+  "forge_f47_pr": 290,
+  "forge_f47_head": "54652b259272a5d2be74838ab77e81fca395fe07",
+  "parent_f46_findings": {
+    "candidate_correct": 75,
+    "control_correct": 73,
+    "n": 96,
+    "threshold_pp": 3,
+    "disposition": "TRAIN_ONLY_NEGATIVE"
+  },
+  "hypothesis": "Disjoint TRAIN-learned query-conditional edge rank and posterior-compute penalty improves exact final-answer accuracy by >=5pp over the strongest same-budget fair policy on fresh unseen TRAIN task structures, without family regression.",
+  "training_seeds_exclusive": [
+    411000,
+    411004
+  ],
+  "diagnostic_seeds_exclusive": [
+    411100,
+    411104
+  ],
+  "training_families": [
+    600,
+    601,
+    602,
+    603
+  ],
+  "reserved_original_seeds_exclusive": [
+    412000,
+    412016
+  ],
+  "reserved_original_families": [
+    604,
+    605,
+    606,
+    607
+  ],
+  "old_original_seeds_exclusive": [
+    392000,
+    392016
+  ],
+  "public_input_only": true,
+  "fit_is_disjoint_from_diagnostic": true,
+  "max_paid_unique_mappings": 2,
+  "max_cost_ratio_vs_fair": 1.2,
+  "threshold_accuracy_gain_pp": 5,
+  "require_no_family_regression": true,
+  "controls": [
+    "one_step_value",
+    "exact_entropy",
+    "query_frontier",
+    "budget_matched_rank",
+    "no_purchase"
+  ],
+  "evaluator_oracle_is_unfair": true,
+  "original_authorized": false,
+  "independent_f3": false,
+  "accepted_ref_mutated": false,
+  "training_executed": false,
+  "paid_api_calls": 0
+}
