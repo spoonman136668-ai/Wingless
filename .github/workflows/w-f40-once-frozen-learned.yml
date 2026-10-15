@@ -1,0 +1,94 @@
+name: W-F40 frozen once-only learned relationship value (NO primary original)
+on:
+  push:
+    branches:
+      - science/w-f40-frozen-learned-active-trainonly-20261015-r1
+permissions:
+  contents: read
+jobs:
+  prospect:
+    if: "${{ github.event.head_commit.message == 'science(w-f40): one frozen learned-active TRAIN-only cohort' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify original learned source/preregistration identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor e968b9cd1ba32d4f4157b4aa9c8ebc1e6c2c22b4 HEAD
+          git merge-base --is-ancestor 38c376876cac05154fc9bb5cc2885b1675e7eeac HEAD
+          test "$(git hash-object research/foundational/20261015-w-f40/train_only.py)" = 46e13f13dc14ebc5a63ba725d4de94214f24a033
+          test "$(git hash-object research/foundational/20261015-w-f40/prereg-frozen.json)" = "$(git rev-parse 38c376876cac05154fc9bb5cc2885b1675e7eeac:research/foundational/20261015-w-f40/prereg-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f40 -p test_preflight.py -v
+      - name: Exactly one new TRAIN-only learned active acquisition cohort
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f40/train_only.py > /tmp/w-f40-train-only.json
+          python3 -m json.tool /tmp/w-f40-train-only.json >/dev/null
+          sha256sum /tmp/w-f40-train-only.json > /tmp/w-f40-train-only.sha256
+          git rev-parse HEAD > /tmp/w-f40-source-identity.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F40-frozen-once-learned-TRAIN-only
+          path: |
+            /tmp/w-f40-train-only.json
+            /tmp/w-f40-train-only.sha256
+            /tmp/w-f40-source-identity.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independently recompute unique row metrics and physical acquisition
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/w-f40-train-only.json'))
+          p=json.load(open('research/foundational/20261015-w-f40/prereg-frozen.json'))
+          assert d['schema']=='wingless.f40.learned-active-evidence.trainonly.v1'
+          assert d['phase']=='FRESH_TRAIN_ONLY_EVALUATION_NOT_PRIMARY_ORIGINAL'
+          assert d['questions']==p['heldout']['expected_queries']==72
+          assert d['train_seeds']==p['train']['seeds'] and d['train_families']==p['train']['families']
+          assert d['eval_seeds']==p['heldout']['seeds'] and d['eval_families']==p['heldout']['families']
+          assert d['reserved_original_seeds']==p['reserved_primary']['seeds']
+          assert d['reserved_original_families']==p['reserved_primary']['families']
+          assert d['model_weight_bytes']==56 and len(d['model_weights'])==7
+          assert d['paid_mapping_read_budget']==2 and d['posterior_worlds_per_update']==24
+          assert d['external_posterior_bytes_per_bank']==1536
+          assert d['source_independently_born_F3'] is False and d['primary_original_not_executed']
+          assert not d['accepted_ref_mutation'] and d['paid_api_calls']==0
+          assert len(d['rows'])==72
+          assert len({(r['seed'],r['family'],r['length']) for r in d['rows']})==72
+          assert all(302000<=r['seed']<302012 and r['family'] in (314,315,316) and
+             r['length'] in (3,5) and len(r['public_sha256'])==64 for r in d['rows'])
+          for row in d['rows']:
+            for arm,receipts in row['receipts'].items():
+              assert 0<=len(receipts)<=2
+              if arm=='no_purchase':assert not receipts
+              assert len({(role,subject) for role,subject,val in receipts})==len(receipts)
+              assert all(0<=role<8 and 0<=subject<8 and 0<=val<8 for role,subject,val in receipts)
+              assert arm in row['entropy_reduction']
+          for arm,s in d['scores'].items():
+            cor=sum(r['answers'][arm]==r['truth'] for r in d['rows'])
+            assert s['correct']==cor and s['total']==72
+            assert math.isclose(s['accuracy'],cor/72,abs_tol=1e-12)
+          assert d['scores']['privileged_complete_map_oracle_unfair']['correct']==72
+          for fam,arms in d['by_family'].items():
+            group=[r for r in d['rows'] if str(r['family'])==fam]
+            assert len(group)==24
+            for arm,s in arms.items():
+              assert s['correct']==sum(r['answers'][arm]==r['truth'] for r in group)
+          fair=('query_frontier','posterior_information_gain','random_eligible','fixed_acquisition','no_purchase')
+          delta=d['scores']['learned_query_value']['accuracy']-max(d['scores'][x]['accuracy'] for x in fair)
+          robust=all(s['learned_query_value']['accuracy']>=max(s[a]['accuracy'] for a in fair) for s in d['by_family'].values())
+          expected='TRAIN_ONLY_LEARNED_ACTIVE_VALUE_GAIN' if delta>=.03 and robust else 'TRAIN_ONLY_LEARNED_ACTIVE_VALUE_NO_QUALIFIED_GAIN'
+          assert d['verdict']==expected
+          print('W_F40_RESULT',expected,{a:v['correct'] for a,v in d['scores'].items()},'training_labels',d['training_action_labels'])
+          PY
+      - name: Explicit scientific authority limit
+        run: |
+          echo "Fresh TRAIN-only development result; no F3 or primary-original execution, no accepted ref"
