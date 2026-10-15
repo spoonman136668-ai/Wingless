@@ -49,6 +49,12 @@ def select(method,observed,start,query,seed):
     else:raise ValueError("unknown arm")
     return max(scores,key=key) if scores else None
 
+def independent_rank_seed(initial_seed, token):
+    # Every ranking budget uses an independent deterministic RNG stream.
+    # A shared seed would make the 48 draws a prefix of the 192 draws.
+    offsets={"b12":11,"b48":29,"b192":47,"b192_independent":997}
+    return initial_seed+offsets[token]
+
 def pick_bayes(observed,start,query,seed):
     return prior.majority_prediction(observed,start,query,seed)
 
@@ -65,7 +71,7 @@ def run():
         initial_seed=seed*101+family+length
         ranks={}
         for n,token in ((12,"b12"),(48,"b48"),(192,"b192"),(192,"b192_independent")):
-            salt=initial_seed+(997 if token.endswith("independent") else 0)
+            salt=independent_rank_seed(initial_seed,token)
             scores,_,_,_,_=prior.score_actions(public,start,query,n,salt)
             ranks[token]=max(scores,key=lambda q:(scores[q][1],scores[q][2],-q[0],-q[1]))
         agreements["b12_48"]+=ranks["b12"]==ranks["b48"]
