@@ -1,0 +1,33 @@
+name: W-F36 typed soft binding engineering (NO first use)
+on:
+  push:
+    branches:
+      - research/w-f36-soft-relational-composition-20261015-r1
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify identity and preregistered rules
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor df0e2c1721b94e0fc958a71721882d6503661719 HEAD
+          git merge-base --is-ancestor e01c2483398441673c7874731e7f3a44db295dcf HEAD
+          python3 -m json.tool research/foundational/20261015-w-f36/prereg-candidate.json >/dev/null
+          python3 -m py_compile research/foundational/20261015-w-f36/train_only.py
+      - name: Focused public-science interfaces only
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f36 -p test_preflight.py -v
+      - name: One full Go regression, then build
+        run: go test ./... && go build ./...
+      - name: Engineering only
+        run: echo "W-F36 preliminary implementation and tests qualified, no cohort or primary original run"

@@ -1,0 +1,82 @@
+{
+  "schema": "wingless.f36.soft-role-binding-prereg.v1",
+  "status": "PRE_CODE_DESIGN_NOT_FIRST_USE",
+  "negative_predecessor_run": 38742585495,
+  "source_parent_commit": "df0e2c1721b94e0fc958a71721882d6503661719",
+  "hypothesis": "A learned row-stochastic role-to-entity transition operator, composed along ordered and inverse typed paths, carries more useful uncertainty about variable bindings than any matched hard inferred grammar, and generalizes to new relational structures.",
+  "source": "New project-authored synthetic development generator: directed affine/cyclic and random bijective role graphs; anonymized entity IDs; public noisy triples (role, subject, object); held-out ordered query with forward/reverse inverse roles. Public demonstrations cannot include a queried answer directly; adversarial same-topology role reordering.",
+  "train_only": {
+    "seeds": [
+      241000,
+      241012
+    ],
+    "families": [
+      210,
+      211,
+      212
+    ],
+    "depths": [
+      4,
+      6,
+      8
+    ],
+    "num_roles": 8,
+    "num_entities": 8,
+    "demos_per_role": 5,
+    "expected_questions": 108
+  },
+  "reserved_development_original": {
+    "seeds": [
+      242000,
+      242016
+    ],
+    "families": [
+      214,
+      215,
+      216,
+      217
+    ],
+    "not_accessed": true
+  },
+  "blocked_past_seeds": {
+    "wf35": [
+      232000,
+      232012
+    ],
+    "wf34_original": [
+      202000,
+      202016
+    ]
+  },
+  "learned": "Per-episode SGD on public transition triple likelihood; soft row-wise transition probabilities, q8 quantized 8x8x8, probability message passing for role-ordered forward/inverse edges. No private grammar inputs.",
+  "fair": [
+    "doubly_stochastic_permutation_MAP",
+    "affine_XOR_posterior_MAP",
+    "public_frequency_walk",
+    "role_order_scrambled",
+    "role_agnostic",
+    "privileged_oracle_unfair"
+  ],
+  "gate": {
+    "improvement_absolute": 0.03,
+    "all_family_nondegradation": true,
+    "oracle_correct_all": true,
+    "role_order_dependency_verified": true,
+    "no_test_label_leak": true
+  },
+  "cost": {
+    "native_core_limit_bytes": 576,
+    "quantized_transition_map_max_bytes": 512,
+    "working_distribution_8_bytes": true,
+    "training_float_optimizer_external": true,
+    "external_public_demonstration_bytes_metered": true
+  },
+  "authority": {
+    "train_only_pilot_first": true,
+    "primary_original_not_authorized": true,
+    "F3_independent_custody": false,
+    "no_controller_FORGE_Cloudflare_KTRADE_edits": true,
+    "no_paid_API": true,
+    "no_accepted_ref_mutation": true
+  }
+}
