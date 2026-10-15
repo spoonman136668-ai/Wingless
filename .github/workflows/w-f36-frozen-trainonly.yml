@@ -1,0 +1,88 @@
+name: W-F36 one frozen learned relational TRAIN-only cohort
+on:
+  push:
+    branches:
+      - science/w-f36-frozen-soft-composition-20261015-r1
+permissions:
+  contents: read
+jobs:
+  one_train_only:
+    if: "${{ github.event.head_commit.message == 'science(w-f36): one frozen TRAIN-only relational cohort' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact frozen source, contract and no source mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor f7f197355fb3211f6f3b5b4086f7656930f862ed HEAD
+          git merge-base --is-ancestor ccd541854d5901ae0df92ec7373715c2b700678e HEAD
+          test "$(git hash-object research/foundational/20261015-w-f36/train_only.py)" = 0fa1d0ed9abd37a3808e7af54832924dfcfb1459
+          test "$(git hash-object research/foundational/20261015-w-f36/prereg-frozen.json)" = "$(git rev-parse ccd541854d5901ae0df92ec7373715c2b700678e:research/foundational/20261015-w-f36/prereg-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f36 -p test_preflight.py -v
+      - name: Exactly one W-F36 prospective TRAIN-only cohort
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f36/train_only.py > /tmp/w-f36-train-only.json
+          python3 -m json.tool /tmp/w-f36-train-only.json >/dev/null
+          sha256sum /tmp/w-f36-train-only.json > /tmp/w-f36-train-only.sha256
+          git rev-parse HEAD > /tmp/w-f36-frozen-head.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F36-frozen-one-TRAIN-only-evidence
+          path: |
+            /tmp/w-f36-train-only.json
+            /tmp/w-f36-train-only.sha256
+            /tmp/w-f36-frozen-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independent original row/cost/threshold audit
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math,collections
+          d=json.load(open('/tmp/w-f36-train-only.json'))
+          p=json.load(open('research/foundational/20261015-w-f36/prereg-frozen.json'))
+          assert d['schema']=='wingless.f36.soft-role-binding.trainonly.v1'
+          assert d['stage']=='NEW_TRAIN_ONLY_NO_PRIMARY_ORIGINAL'
+          assert d['train_seeds']==p['train_only']['seeds']
+          assert d['train_families']==p['train_only']['families']
+          assert d['reserved_original_seeds']==p['reserved_primary']['seeds']
+          assert d['reserved_original_families']==p['reserved_primary']['families']
+          assert d['questions']==p['train_only']['expected_questions']==108
+          assert len(d['rows'])==108
+          assert len({(r['seed'],r['family'],r['depth']) for r in d['rows']})==108
+          assert set(r['depth'] for r in d['rows'])==set(p['train_only']['depths'])
+          assert d['model_q8_bytes']==512 and d['native_model_and_work_bytes']==528
+          assert d['native_model_and_work_bytes']<=p['cost']['native_core_max_bytes']==576
+          assert d['independent_two_oracle_agreement'] and not d['source_independently_born_F3']
+          assert not d['F3_accepted'] and not d['original_executed'] and not d['accepted_ref_mutation']
+          assert all(241000<=r['seed']<241012 and r['family'] in (210,211,212) and
+                     len(r['query'])==r['depth'] and r['public_triples_count']==40 and
+                     len(r['public_evidence_sha256'])==64 for r in d['rows'])
+          for arm,s in d['scores'].items():
+            n=sum(r['predictions'][arm]==r['truth'] for r in d['rows'])
+            assert s['correct']==n and s['total']==108
+            assert math.isclose(s['accuracy'],n/108,abs_tol=1e-12)
+          assert d['scores']['privileged_oracle']['correct']==108
+          assert d['ordered_path_counterfactual_changes']==sum(r['private_order_counterfactual_changes_answer'] for r in d['rows'])
+          for fam,arms in d['per_family'].items():
+            rows=[r for r in d['rows'] if r['family']==int(fam)]
+            assert len(rows)==36
+            for arm,s in arms.items():
+              assert s['correct']==sum(r['predictions'][arm]==r['truth'] for r in rows)
+          fair=('permutation_MAP','affine_MAP','frequency_walk','role_scrambled','role_agnostic')
+          gain=d['scores']['learned_soft']['accuracy']-max(d['scores'][a]['accuracy'] for a in fair)
+          robust=all(d['per_family'][f]['learned_soft']['accuracy']>=max(d['per_family'][f][a]['accuracy'] for a in fair) for f in d['per_family'])
+          eligible=gain>=p['decision']['min_absolute_gain'] and robust
+          assert d['verdict']==('TRAIN_ONLY_ROLE_COMPOSITION_LEARNED_QUALIFIED' if eligible else 'TRAIN_ONLY_ROLE_COMPOSITION_NO_QUALIFIED_GAIN')
+          print('W_F36_TRAIN_ONLY_VERDICT',d['verdict'],{a:s['correct'] for a,s in d['scores'].items()},'order_effect',d['ordered_path_counterfactual_changes'])
+          PY
+      - name: No accepted authority
+        run: echo "W-F36 DEVELOPMENT TRAIN-only, not primary original or independent F3 admission"
