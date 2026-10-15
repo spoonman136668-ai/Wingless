@@ -1,0 +1,34 @@
+name: W-F39 active relationship evidence engineering only
+on:
+  push:
+    branches:
+      - research/w-f39-active-evidence-headroom-20261015-r1
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Precode preregistration and negative ancestor
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor f2803395499a17d9687a515bfecff5241dca4fe7 HEAD
+          git merge-base --is-ancestor a0457e03f7b8c2b81dc8c850e908676d45e9e6b1 HEAD
+          python3 -m json.tool research/foundational/20261015-w-f39/prereg-candidate.json > /dev/null
+          python3 -m py_compile research/foundational/20261015-w-f39/source_pilot.py
+      - name: Focused no-reserved-source purchase tests
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f39 -p test_preflight.py -v
+      - name: One complete Go regression and build
+        run: go test ./... && go build ./...
+      - name: Explicit boundary
+        run: |
+          echo "Engineering only. TRAIN-only source diagnostic and primary original NOT executed."

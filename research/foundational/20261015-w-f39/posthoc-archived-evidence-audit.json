@@ -1,0 +1,66 @@
+{
+  "schema": "wingless.f39.posthoc-archived-evidence-audit.v1",
+  "original_run": 38771690104,
+  "original_head": "9a38ee9a182b79d5de42b779c4dcd0c493b1f551",
+  "artifact_id": 11990524797,
+  "artifact_zip_sha256": "5155c02a02be14d9ab2b85249e4dd0891c95b6bf3ca9f7b586087275f1215436",
+  "original_json_sha256": "bb61011a8cc151e31f9ec26033cd366cc442106600339048d057c84f60788951",
+  "original_source_blob": "24784e27adc3b9c67de63e56dcdd394047d0ee2c",
+  "workflow_conclusion": "failure",
+  "original_executed_once": true,
+  "source_preregistration_verified_before_original": true,
+  "post_run_audit_failure": "Audit incorrectly required exactly 2 paid mappings for each acquisition arm, while source protocol was a maximum of 2; query-aware policies correctly stopped when no remaining relevant unknown edge was proposed.",
+  "local_off_run_audit": {
+    "checksum_match": true,
+    "unique_rows": 72,
+    "aggregate_score_recomputed": true,
+    "per_family_score_recomputed": true,
+    "per_arm_receipt_budget_max_two_verified": true,
+    "duplicate_paid_queries_rejected": true,
+    "source_oracle_truth_not_independently_recomputed_from_archived_source_inputs": true
+  },
+  "receipts_per_arm": {
+    "fixed_acquisition": {
+      "2": 72
+    },
+    "no_purchase": {
+      "0": 72
+    },
+    "posterior_information_gain": {
+      "0": 1,
+      "1": 6,
+      "2": 65
+    },
+    "query_frontier": {
+      "0": 1,
+      "1": 6,
+      "2": 65
+    },
+    "random_eligible": {
+      "2": 72
+    }
+  },
+  "scores_correct": {
+    "posterior_information_gain": 27,
+    "query_frontier": 28,
+    "random_eligible": 9,
+    "fixed_acquisition": 9,
+    "no_purchase": 14,
+    "privileged_complete_map_oracle_unfair": 72
+  },
+  "entropy_reduction_bits": {
+    "posterior_information_gain": 0.43542603231586946,
+    "query_frontier": 0.6497043524697576,
+    "random_eligible": 0.005009108099037445,
+    "fixed_acquisition": 0.011115388773082454,
+    "no_purchase": 0.002378289692169744
+  },
+  "scientific_verdict": "TRAIN_ONLY_ACTIVE_SOURCE_FEASIBLE",
+  "source_gain_vs_no_purchase_pp": 19.444,
+  "fair_learned_policy_tested": false,
+  "development_only": true,
+  "independently_born_F3_source": false,
+  "primary_original_not_executed": true,
+  "rerun_original_forbidden": true,
+  "next": "Design and train a query-conditioned learned value-of-information policy against query-frontier and posterior information gain with equal paid reads on new source families, not this consumed diagnostic."
+}
