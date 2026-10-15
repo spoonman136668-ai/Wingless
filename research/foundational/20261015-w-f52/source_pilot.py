@@ -72,7 +72,7 @@ def source(seed,fam,length):
         x=rng.randrange(N);y=(x+rng.randrange(1,N))%N
         anchors.append((calibration_context,(x,affine(calibration_sign,b,x)),
                         (y,affine(calibration_sign,b,y))))
-    chain=PATHS[fam-900][:length]
+    chain=PATHS[fam-1000][:length]
     start=rng.randrange(N)
     return dict(seed=seed,family=fam,length=length,context=ctx,
        private_sign=hidden_sign,public=public,calibration=anchors,
