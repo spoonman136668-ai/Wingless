@@ -1,0 +1,29 @@
+name: Wingless F54 frozen source FIT-only preflight
+on:
+  push:
+    branches:
+      - research/w-f54-learned-transition-invariants-20261015-r1
+permissions:
+  contents: read
+jobs:
+  registered-fit-only:
+    if: "${{ github.event.head_commit.message == 'test(w-f54): FIT-only registered transition-state preflight' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify frozen source and precode prereg; reject identity drift
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 7669f41cbd2bada209f757530741669c993c0665 HEAD
+          git merge-base --is-ancestor b7dd1df27fdbe7d9a1f6f004a4165e90f5402d6e HEAD
+          test "$(git hash-object research/foundational/20261015-w-f54/prereg-candidate.json)" = e118d7337e98311c033dd3f08559e6fd53a6de0e
+          test "$(git hash-object research/foundational/20261015-w-f54/source_pilot.py)" = 0e2c716830e9ea1f7e7f51e0da18ae8c3bbf5414
+          test "$(git hash-object research/foundational/20261015-w-f54/test_preflight.py)" = 2ad0f93a01aca03e5d01cedde0948e2d2921af68
+          python3 -B -m py_compile research/foundational/20261015-w-f54/source_pilot.py
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f54 -p test_preflight.py -v
+      - name: Source-use authority
+        run: echo "DIAGNOSTIC_SOURCE_RUNS=ZERO; INDEPENDENT_F3=UNQUALIFIED; ORIGINAL_FIRST_USES=UNTOUCHED"
