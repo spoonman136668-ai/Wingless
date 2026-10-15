@@ -20,7 +20,8 @@ def rng_for(seed,family,depth,variant):
     return random.Random(seed*1000003+family*9239+depth*269+variant*1607)
 
 def construct(seed,family,depth,variant):
-    rng=rng_for(seed,family,depth,variant)
+    rng=rng_for(seed,family,depth,0)
+    edit_rng=rng_for(seed,family,depth,variant)
     roles=[rng.randrange(ROLE_COUNT) for _ in range(depth)]
     n=depth+1
     edges=[(j,j+1,roles[j]) for j in range(depth)]
@@ -32,21 +33,21 @@ def construct(seed,family,depth,variant):
     query=list(roles)
     truth=variant in (0,1,4,6)
     if variant==1:
-        perm=list(range(ROLE_COUNT));rng.shuffle(perm)
+        perm=list(range(ROLE_COUNT));edit_rng.shuffle(perm)
         edges=[(a,b,perm[r]) for a,b,r in edges]
         query=[perm[r] for r in query]
     if variant==2:query[depth//2]=(query[depth//2]+1)%ROLE_COUNT
     if variant==3:
         a,b,r=edges[depth//2];edges[depth//2]=(b,a,r)
     if variant==4:
-        p=list(range(n));rng.shuffle(p)
+        p=list(range(n));edit_rng.shuffle(p)
         edges=[(p[a],p[b],r) for a,b,r in edges];src,dst=p[src],p[dst]
     if variant==5:edges.pop(depth//2)
     if variant==6:
         a=n;n+=2
         edges.extend([(src,a,rng.randrange(ROLE_COUNT)),(a,a+1,rng.randrange(ROLE_COUNT))])
     if variant==7:dst=n;n+=1
-    rng.shuffle(edges)
+    edit_rng.shuffle(edges)
     return dict(seed=seed,family=family,depth=depth,variant=variant,source=src,target=dst,
                 nodes=n,edges=tuple(edges),query=tuple(query),truth=truth)
 
@@ -191,7 +192,7 @@ def original():
                 test_depths=DEPTHS,variants=VARIANTS,questions=len(rows),rows=rows,
                 scores=scores,by_family=by_family,
                 native_state_max_bytes=576,learned_coefficients_bytes=32,
-                native_active_state_bytes_max=128,external_graph_max_bytes=max_case_bytes,
+                native_active_state_bytes_max=144,external_graph_max_bytes=max_case_bytes,
                 coded_edge_enumeration=True,source_generated_in_repo=True,
                 role_sequence_given_as_query_not_true_answer=True,
                 independently_born_F3_source=False,sealed_first_use=False,
