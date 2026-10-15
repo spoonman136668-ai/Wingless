@@ -138,7 +138,6 @@ def run():
         private,public,start,chain=(case[k] for k in ("private","public","start","chain"))
         truth=prev.f45.prior.prior.follow(private,start,chain)
         answers={"private_oracle_unfair":truth};receipts={};costs={}
-        baseline_pred,baseline_rec,baseline_cost=run_arm("one_step_value",private,public,start,chain)
         for arm in ARMS[:-1]:
             if arm=="learned_deep_gate":
                 method="full_two_step_costly_reference" if index in chosen else "one_step_value"
@@ -147,9 +146,9 @@ def run():
             else:method=arm
             pred,receipt,price=run_arm(method,private,public,start,chain)
             if arm in ("learned_deep_gate","fixed_public_hash_deep_gate"):
-                # Scoring the public basis is paid on every case for both gates.
-                # The same one-step baseline is computed before deciding to deepen.
-                price+=baseline_cost
+                # Account separately for the public posterior/world features used
+                # to rank this batch before any diagnostic truth is observed.
+                price+=1296
             answers[arm]=pred;receipts[arm]=receipt;costs[arm]=price
             work[arm]+=price
         rows.append(dict(seed=case["seed"],family=case["family"],length=case["length"],
