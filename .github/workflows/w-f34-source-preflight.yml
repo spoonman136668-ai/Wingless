@@ -1,0 +1,34 @@
+name: W-F34 distinct role grammar source engineering (NO original)
+on:
+  push:
+    branches:
+      - research/w-f34-role-grammar-source-qualification-20261015-r1
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Parent science identity and preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor ff79cf0d0355330215c4de7ec9a3501b53894ccc HEAD
+          git merge-base --is-ancestor d678cfb5f8e37f4f1492ce78a64babbb5d28b5be HEAD
+          test "$(git hash-object research/foundational/20261015-w-f33/pilot.py)" = "$(git rev-parse ff79cf0d0355330215c4de7ec9a3501b53894ccc:research/foundational/20261015-w-f33/pilot.py)"
+          python3 -m json.tool research/foundational/20261015-w-f34/source-prereg.json > /dev/null
+          python3 -m py_compile research/foundational/20261015-w-f34/source_pilot.py
+      - name: Train-only source interface preflight
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f34 -p test_preflight.py -v
+      - name: Exactly one full Go regression and build
+        run: go test ./... && go build ./...
+      - name: Scope
+        run: echo "W-F34 source engineering only; no train-only pilot and NO primary original executed"

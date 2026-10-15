@@ -1,0 +1,66 @@
+{
+  "schema": "wingless.f34.source-qualification-prereg.v1",
+  "phase": "TRAIN_ONLY_SOURCE_HEADROOM_PRE_ORIGINAL",
+  "parent_pr": 219,
+  "parent_pilot_run": 38728991647,
+  "design_issue": "https://github.com/spoonman136668-ai/Wingless/issues/221",
+  "question": "Does a distinct long-horizon typed-grammar generator produce nontrivial ordered role dependencies and adequate 3pp headroom against strong equal-budget empirical controls, without generating reserved primary-original test rows?",
+  "train_pilot": {
+    "seeds": [
+      201000,
+      201024
+    ],
+    "families": [
+      180,
+      181,
+      182
+    ],
+    "depths": [
+      6,
+      8,
+      10
+    ],
+    "role_types": 8,
+    "distinct_generator_mechanisms": [
+      "affine-mod8",
+      "random-bijection",
+      "mixed-xor-affine"
+    ],
+    "noisy_public_demos_per_role": 4,
+    "expected_rows": 216
+  },
+  "reserved_original": {
+    "seeds": [
+      202000,
+      202016
+    ],
+    "families": [
+      184,
+      185,
+      186,
+      187
+    ],
+    "never_generate_in_pilot": true,
+    "source_SHA_to_freeze_after_qualified_pilot": true
+  },
+  "controls": [
+    "strong_train_only_empirical_role_posterior",
+    "role-agnostic_demo_guess",
+    "constant_sequence",
+    "privileged_hidden_grammar_oracle_upper_bound"
+  ],
+  "requirements": {
+    "strongest_fair_accuracy_at_most": 0.96,
+    "causal_role_order_answer_changes": true,
+    "decoder_cross_implementation_agreement": true,
+    "all_evidence_and_costs_metered": true,
+    "real_resident_byte_qualification_separate": true
+  },
+  "safety": {
+    "development_only": true,
+    "no_WF34_original_in_this_gate": true,
+    "no_source_promotion": true,
+    "no_independently_born_F3_source": true,
+    "no_controller_FORGE_Cloudflare_KTRADE_changes": true
+  }
+}
