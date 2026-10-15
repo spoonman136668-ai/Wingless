@@ -1,0 +1,35 @@
+name: W-F45 cost-capped selective lookahead source preflight (NO diagnostic)
+on:
+  push:
+    branches:
+      - research/w-f45-cost-gated-lookahead-20261015-r1
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Pin pre-code prereg and proposed source blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 11eb01e7944b19b3409e6e5cc8bbcc158835ea0e HEAD
+          git merge-base --is-ancestor 455417099e74f2eb79c17560d00afc45e968e7d5 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f45/prereg-candidate.json)" = 69bfc9caf17d5768bc33e9e699d6248d3daa5d69
+          test "$(git hash-object research/foundational/20261015-w-f45/source_pilot.py)" = 05b854dcf1a78073ab6ee6aec880468d76da94e5
+          python3 -m json.tool research/foundational/20261015-w-f45/prereg-candidate.json >/dev/null
+          python3 -m py_compile research/foundational/20261015-w-f45/source_pilot.py
+      - name: Focused source-only public selector, resource and port tests
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f45 -p test_preflight.py -v
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
+      - name: Explicit no-experiment authority boundary
+        run: echo "Source engineering only. No F45 cohort or original, F3, controller, accepted-ref or production mutation."
