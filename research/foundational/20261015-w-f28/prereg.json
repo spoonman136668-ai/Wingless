@@ -1,0 +1,66 @@
+{
+  "schema": "wingless.f28.prereg.v1",
+  "parent_f27": "86af22a4e9958826227b11749a6901c9ae84fe8a",
+  "question": "Can learned agreement across three independently generated anchored relationship witnesses infer graph-identity candidate links better than strong 2-of-3 coded consensus and other fixed heuristics, including cases with a corrupted genuine source and one-witness impostor?",
+  "learning": {
+    "train_only_entity_pairs": 768,
+    "balanced_positive_negative": true,
+    "distinct_source_seed_family": "7000..7052; disjoint from test",
+    "learnable_weights": 8,
+    "training_epochs": 650,
+    "training_step": 0.11,
+    "feature_map": "3 witness-wise absolute relation mismatches; 3 min-of-pair disagreements; 1 max disagreement; bias; features programmed",
+    "source_programmed_relational_anchors": 3,
+    "training_positive_one_corrupted_anchor": true,
+    "training_negative_one_deceptive_matching_anchor": true,
+    "not_native_discovery_of_anchor_semantics": true
+  },
+  "cohort": {
+    "new_graph_seeds": [
+      142200,
+      142206
+    ],
+    "motifs_reused": [
+      108,
+      109,
+      110,
+      111
+    ],
+    "graphs": 96,
+    "questions": 768,
+    "variants_per_graph": 8,
+    "state_bytes": 576,
+    "witness_table_per_node": "3 float32 anchor-relation signatures stored with endpoint node ID",
+    "candidate_tuple_pairs_not_supplied": true,
+    "all_endpoint_pair_enumeration_programmed": true,
+    "corrupt_genuine_witness_on_variant4": true,
+    "confusing_impostor_one_anchor_match": true
+  },
+  "controls": [
+    "new learned anchor-relation agreement",
+    "2-of-3 programmed witness consensus |difference|<.075",
+    "full source Euclidean .045",
+    "strict Euclidean .0015",
+    "single anchor fingerprint rule",
+    "single intervention witness rule",
+    "no alias links",
+    "coded typed ground-truth reference"
+  ],
+  "gate": {
+    "oracle_correct": 768,
+    "min_learned_accuracy": 0.95,
+    "min_gain_over_no_links": 0.1,
+    "min_absolute_gain_vs_best_simple_control": 0.03
+  },
+  "outcomes": [
+    "INVALID_F28_SOURCE_ORACLE",
+    "DEVELOPMENT_RELATIONAL_CONSENSUS_LEARNED_GAIN",
+    "DEVELOPMENT_RELATIONAL_CONSENSUS_NO_QUALIFIED_GAIN"
+  ],
+  "limits": {
+    "synthetic_author_generated_anchor_relations": true,
+    "not_evidence_born_independently": true,
+    "no_sealed_F3_first_use": true,
+    "no_FORGE_cloudflare_KTRADE_controller_edits": true
+  }
+}
