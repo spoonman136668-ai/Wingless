@@ -13,7 +13,7 @@ def run(report,prereg):
  assert d["accepted_ref_mutation"] is False and d["paid_api_calls"]==0
  assert set(d["scores"])==set(p["controls"])
  assert len(d["posterior_minus_by_public_context"])==32
- controls=p["frozen_controls"];counts={a:0 for a in controls};seen=set()
+ controls=p["controls"];counts={a:0 for a in controls};seen=set()
  for r in d["rows"]:
   key=r["seed"],r["family"],r["length"]
   assert key not in seen and 541100<=r["seed"]<541116 and r["family"] in p["diagnostic_families"]
