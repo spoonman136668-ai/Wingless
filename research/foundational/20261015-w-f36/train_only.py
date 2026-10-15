@@ -112,16 +112,17 @@ def uncertain_compose(q,start,query):
     state=[0.0]*NODES;state[start]=1.
     for role,direction in query:
         next_state=[0.0]*NODES
-        for src in range(NODES):
-            if direction>0:
-                for dst in range(NODES):next_state[dst]+=state[src]*(q[role][src][dst]/255.)
-            else:
-                # Column-normalized inverse evidence: do NOT assume q is exact
-                # permutation or silently transfer missing source labels.
-                denominators=[sum(q[role][x][dst] for x in range(NODES)) for dst in range(NODES)]
+        if direction>0:
+            for src in range(NODES):
+                for dst in range(NODES):
+                    next_state[dst]+=state[src]*(q[role][src][dst]/255.)
+        else:
+            # Column-normalized inverse evidence: sum all possible current
+            # bindings, never assume the role transition is a hard bijection.
+            denominators=[sum(q[role][x][dst] for x in range(NODES)) for dst in range(NODES)]
+            for dst in range(NODES):
                 for original in range(NODES):
-                    next_state[original]+=state[src]*q[role][original][src]/max(1,denominators[src])
-                break
+                    next_state[original]+=state[dst]*q[role][original][dst]/max(1,denominators[dst])
         total=sum(next_state)
         if total<=0:raise ValueError("collapsed probability mass")
         state=[x/total for x in next_state]
