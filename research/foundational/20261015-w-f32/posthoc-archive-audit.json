@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.f32.posthoc-independent-archive-audit.v1",
+  "original": {
+    "url": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38727251895",
+    "source_sha": "9d9d63501924eb22a945cecb47765a5424229cda",
+    "artifact_id": 11968479146,
+    "artifact_zip_sha256": "aad196f38668bdb6cd71d1eef266518be12d94e74cd0bc58ff6dbf5ee50dc914",
+    "original_json_sha256": "8028b6208d82e19528bd8f533854509264f2849eca57da120bcd0b8b665d14ac"
+  },
+  "independent_archive_audit": "PASS_FROM_DOWNLOADED_ORIGINAL_ZIP_WITHOUT_REEXECUTION",
+  "execution": "ONCE_ONLY_DEVELOPMENT_ORIGINAL_SUCCEEDED_WITH_FULL_WORKFLOW_AUDIT",
+  "rows": 1152,
+  "verdict": "DEVELOPMENT_ORDERED_COMPOSITION_NO_QUALIFIED_GAIN",
+  "scores": {
+    "learned": {
+      "correct": 1008,
+      "fp": 144,
+      "fn": 0
+    },
+    "topology_only": {
+      "correct": 1008,
+      "fp": 144,
+      "fn": 0
+    },
+    "fixed_typed_greedy": {
+      "correct": 1008,
+      "fp": 144,
+      "fn": 0
+    },
+    "unordered_role_bag": {
+      "correct": 1095,
+      "fp": 57,
+      "fn": 0
+    },
+    "coded_exact": {
+      "correct": 1152,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  "failure_localization": {
+    "variant_2_changed_query_role_while_holding_graph_fixed": {
+      "cases": 144,
+      "learned_correct": 0,
+      "unordered_bag_correct": 87,
+      "coded_exact_correct": 144
+    },
+    "other_variants_learned_correct": 1008
+  },
+  "interpretation": "All learned errors are false joins after a changed query role. Learned transducer performs no better than topology-only and fixed heuristic; threshold permits role-mismatched joins; exact typed traversal shares same graph/query evidence and is strongest fair comparator.",
+  "limitations": [
+    "Programmed source and edge enumeration; test source not independent F3 custody",
+    "Resident bytes count logical scalar payload, not actual Python dict allocation; real native resident memory has not been qualified",
+    "Artifact retention 90 days, long-term independent custody not established"
+  ],
+  "governance": {
+    "F3_first_use": false,
+    "accepted_ref_mutation": false,
+    "no_source_rerun": true
+  }
+}
