@@ -1,0 +1,77 @@
+{
+  "schema": "wingless.f50.operator-prior-binding.trainonly-prereg.v1",
+  "status": "PRECODE_FROZEN",
+  "prior_rank_source_sha": "76eb0d3d8d6f38abdbc49a0eaae5cdf519ebf6f0",
+  "issue": 255,
+  "hypothesis": "Learn an operator-family posterior conditional on three observable binary context cues from FIT-only private role mappings; transfer this compact learned representation to unseen role composition paths and fresh hidden mappings under exactly one public role-pair per role; beat strongest fair public rule by >=5pp without family regressions.",
+  "train": {
+    "seeds": [
+      501000,
+      501016
+    ],
+    "families": [
+      800,
+      801,
+      802,
+      803
+    ],
+    "path_lengths": [
+      3,
+      5
+    ],
+    "expected_fit_examples": 64
+  },
+  "diagnostic": {
+    "seeds": [
+      501100,
+      501116
+    ],
+    "families": [
+      804,
+      805,
+      806,
+      807
+    ],
+    "path_lengths": [
+      3,
+      5
+    ],
+    "expected_cases": 128
+  },
+  "prospective_original_NOT_RESERVED": {
+    "seeds": [
+      502000,
+      502016
+    ],
+    "families": [
+      808,
+      809,
+      810,
+      811
+    ]
+  },
+  "public_source": "7-value affine/reflection roles; one observable mapping per role; 3 binary public context bits; latent operator sign shared across roles with source noise",
+  "controls": [
+    "learned_operator_posterior",
+    "always_shift",
+    "always_reflect",
+    "cue0_rule",
+    "two_bit_public_parity",
+    "fixed_public_hash",
+    "private_operator_oracle_unfair"
+  ],
+  "thresholds": {
+    "gain_over_strongest_fair": 0.05,
+    "per_family_nondegradation": true,
+    "independent_all_case_and_public_mapping_audit": true
+  },
+  "safety": {
+    "train_context_labels_separate_from_diag": true,
+    "private_sign_never_selector_input": true,
+    "independent_F3": false,
+    "original_executed": false,
+    "native_576B_measured": false,
+    "accepted_ref_mutation": false,
+    "paid_api_calls": 0
+  }
+}

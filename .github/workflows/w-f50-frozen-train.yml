@@ -1,0 +1,131 @@
+name: W-F50 one frozen learned algebraic role-binding TRAIN-only experiment
+on:
+  push:
+    branches:
+      - research/w-f50-learned-algebraic-role-binding-20261015-r1
+permissions:
+  contents: read
+jobs:
+  scientific-source:
+    if: "${{ github.event.head_commit.message == 'science(w-f50): execute one frozen learned-binding TRAIN-only cohort' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Bind parent, frozen precode prereg and source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 76eb0d3d8d6f38abdbc49a0eaae5cdf519ebf6f0 HEAD
+          git merge-base --is-ancestor c119fc9f7436fc29df05875c5ba4d83338ef9afd HEAD
+          test "$(git hash-object research/foundational/20261015-w-f50/prereg-candidate.json)" = 8835ef36c2fda7135a48ad213d8925c320e22cf0
+          test "$(git hash-object research/foundational/20261015-w-f50/source_pilot.py)" = c542c473556785177dd1877fd0ba6eaddd4fcd0d
+          python3 -m json.tool research/foundational/20261015-w-f50/prereg-candidate.json >/dev/null
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f50 -p test_preflight.py -v
+      - name: Exactly one full existing Go regression vet and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: Once-only 64 FIT + 128 unseen-composition TRAIN diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f50/source_pilot.py > /tmp/w-f50-train.json
+          python3 -m json.tool /tmp/w-f50-train.json >/dev/null
+          sha256sum /tmp/w-f50-train.json > /tmp/w-f50-train.sha256
+          git rev-parse HEAD > /tmp/w-f50-head.txt
+      - name: Independently recount all rows and public-binding composition
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, math
+          from collections import Counter
+          d=json.load(open('/tmp/w-f50-train.json'))
+          p=json.load(open('research/foundational/20261015-w-f50/prereg-candidate.json'))
+          t=p['train'];v=p['diagnostic'];arms=p['controls']
+          assert d['schema']=='wingless.f50.learned-operator-binding.trainonly.v1'
+          assert d['stage']=='DISJOINT_FIT_AND_NOVEL_COMPOSITION_TRAIN_ONLY'
+          assert d['fit_seeds']==t['seeds'] and d['fit_families']==t['families']
+          assert d['diagnostic_seeds']==v['seeds'] and d['diagnostic_families']==v['families']
+          assert set(d['fit_families']).isdisjoint(d['diagnostic_families'])
+          assert d['train_examples']==t['expected_fit_examples']==64
+          assert d['cases']==v['expected_cases']==128 and len(d['rows'])==128
+          assert d['proposed_original_seeds_NOT_RESERVED']==p['prospective_original_NOT_RESERVED']['seeds']
+          assert len(d['posterior_minus_by_public_context'])==8
+          assert all(0<s<1 for s in d['posterior_minus_by_public_context'].values())
+          assert not d['source_independent_F3'] and not d['original_executed']
+          assert not d['native_576_bytes_residency_qualified']
+          assert not d['accepted_ref_mutation'] and d['paid_api_calls']==0
+          counts={arm:0 for arm in arms}
+          seen=set()
+          for row in d['rows']:
+              key=row['seed'],row['family'],row['length']
+              assert key not in seen;seen.add(key)
+              assert 501100<=row['seed']<501116
+              assert row['family'] in v['families'] and row['length'] in v['path_lengths']
+              assert len(row['context'])==3 and all(bit in (0,1) for bit in row['context'])
+              assert len(row['public'])==4
+              assert len({z[0] for z in row['public']})==4
+              assert len(row['chain'])==row['length']
+              assert set(row['answers'])==set(arms)
+              assert set(row['chosen_signs'])==set(arms)-{'private_operator_oracle_unfair'}
+              assert row['answers']['private_operator_oracle_unfair']==row['truth']
+              context=''.join(str(bit) for bit in row['context'])
+              expected_sign=-1 if d['posterior_minus_by_public_context'][context]>=.5 else 1
+              assert row['chosen_signs']['learned_operator_posterior']==expected_sign
+              for arm,sign in row['chosen_signs'].items():
+                  assert sign in (-1,1)
+                  shifts={r:(y-sign*x)%7 for r,x,y in row['public']}
+                  cur=row['start']
+                  for r,direction in row['chain']:
+                      cur=(sign*cur+shifts[r])%7 if direction==1 else (sign*(cur-shifts[r]))%7
+                  assert row['answers'][arm]==cur
+              assert 0<=row['truth']<7
+              for arm in arms:counts[arm]+=int(row['answers'][arm]==row['truth'])
+          assert len(seen)==128
+          for arm in arms:
+              assert d['scores'][arm]['correct']==counts[arm]
+              assert d['scores'][arm]['total']==128
+              assert math.isclose(d['scores'][arm]['accuracy'],counts[arm]/128,abs_tol=1e-12)
+          assert counts['private_operator_oracle_unfair']==128
+          for family in v['families']:
+              sub=[r for r in d['rows'] if r['family']==family]
+              assert len(sub)==32
+              for arm in arms:
+                  assert d['by_family'][str(family)][arm]==sum(r['answers'][arm]==r['truth'] for r in sub)
+          fair=arms[1:-1];best=max(fair,key=lambda a:counts[a])
+          gain=(counts['learned_operator_posterior']-counts[best])/128
+          nonreg=all(d['by_family'][str(f)]['learned_operator_posterior']>=max(
+              d['by_family'][str(f)][a] for a in fair) for f in v['families'])
+          passed=gain>=p['thresholds']['gain_over_strongest_fair'] and nonreg
+          assert d['strongest_fair_control']==best
+          assert math.isclose(d['candidate_gain'],gain,abs_tol=1e-12)
+          assert d['per_family_nondegradation']==nonreg
+          assert d['frozen_criterion_met']==passed
+          assert d['verdict']==('TRAIN_ONLY_OPERATOR_BINDING_SUPPORTED' if passed else
+            'TRAIN_ONLY_OPERATOR_BINDING_NEGATIVE')
+          print('W_F50',d['verdict'],'correct',counts,'gain',gain,'family_guard',nonreg)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F50-one-frozen-algebraic-binding-TRAIN-only
+          path: |
+            /tmp/w-f50-train.json
+            /tmp/w-f50-train.sha256
+            /tmp/w-f50-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Scientific authority limit
+        run: echo "TRAIN_ONLY_SYNTHETIC=TRUE; F3_UNQUALIFIED=TRUE; ORIGINAL_FIRST_USES=0; SCIENTIFIC_ACCEPTED_REFS_CHANGED=FALSE"
