@@ -1,0 +1,60 @@
+name: Wingless W-F27 identity corroboration by independent intervention responses
+on:
+  push:
+    branches: [research/w-f27-intervention-corroboration-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: go.mod}
+      - name: Verify frozen W-F26 and preflight source before original
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor c215e14985e5bb971058096dc48e8f6dd20281c7 HEAD
+          test "$(git hash-object unitary/f26_temporal_relational_identity.go)" = "$(git rev-parse c215e14985e5bb971058096dc48e8f6dd20281c7:unitary/f26_temporal_relational_identity.go)"
+          python3 -m json.tool research/foundational/20261015-w-f27/prereg.json >/dev/null
+          go test -run '^$' ./unitary ./cmd/f27-wingless
+      - name: Execute one original W-F27 new development source
+        run: |
+          set -euo pipefail
+          go run ./cmd/f27-wingless > /tmp/w-f27-original.json
+          python3 -m json.tool /tmp/w-f27-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F27-original-independent-intervention-evidence
+          path: /tmp/w-f27-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently audit every variant, accuracy and control
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          d=json.load(open('/tmp/w-f27-original.json'))
+          assert d['stage']=='DEVELOPMENT_ONLY' and d['graphs']==96 and d['questions']==768
+          assert d['native_state_bytes']==576
+          assert d['impostors_share_initial_context_but_diverge_under_second_intervention']
+          assert not d['actual_query_candidate_pairs_supplied'] and not d['independently_born_source']
+          assert not d['sealed_first_use'] and not d['accepted_ref_mutation']
+          assert collections.Counter(r['Family'] for r in d['rows'])=={108:192,109:192,110:192,111:192}
+          assert collections.Counter(r['Variant'] for r in d['rows'])==dict.fromkeys(range(8),96)
+          assert all(r['Truth']==[True,True,False,False,True,True,False,True][r['Variant']] for r in d['rows'])
+          for arm,col in [('learned','Learned'),('none','NoLinks'),
+                ('fixed_distance','FixedDistance'),('strict_distance','StrictDistance'),
+                ('static_only','StaticOnly'),('causal_fixed','CausalFixed'),('coded_oracle','CodedUpper')]:
+            s=d['scores'][arm]
+            assert s['correct']==sum(r[col]['answer']==r['Truth'] for r in d['rows'])
+            assert s['fp']==sum(r[col]['answer'] for r in d['rows'] if not r['Truth'])
+            assert s['fn']==sum(not r[col]['answer'] for r in d['rows'] if r['Truth'])
+          assert d['scores']['coded_oracle']['correct']==768
+          assert d['registered_verdict'] in ('INVALID_F27_SOURCE_ORACLE','DEVELOPMENT_CAUSAL_CORROBORATION_LEARNED_GAIN','DEVELOPMENT_CAUSAL_CORROBORATION_NO_GAIN')
+          print('W_F27_VERDICT',d['registered_verdict'],d['scores'])
+          PY
+      - name: One full Go repository test and build
+        run: go test ./... && go build ./...

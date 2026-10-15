@@ -1,0 +1,59 @@
+{
+  "schema": "wingless.f27.prereg.v1",
+  "parent_f26": "c215e14985e5bb971058096dc48e8f6dd20281c7",
+  "hypothesis": "An evidence gate trained on separate interventions' response consistency can distinguish genuine aliases from agents with indistinguishable static signatures and first-context responses, improving typed graph reasoning against strong programmed response controls.",
+  "training": {
+    "samples": 512,
+    "model_parameters": 5,
+    "epochs": 560,
+    "train_only_source_seeds": "5100..5140; distinct from new original",
+    "learned_features": "squared discrepancies of static identity context, response to environmental intervention 1, response to intervention 2, response-contrast discrepancy; source defines these attributes, model only weights them"
+  },
+  "original": {
+    "test_seeds": [
+      116200,
+      116206
+    ],
+    "reused_structural_graph_families": [
+      108,
+      109,
+      110,
+      111
+    ],
+    "graphs": 96,
+    "questions": 768,
+    "variant_count": 8,
+    "impostors": "static/first-intervention matched but second intervention response diverges",
+    "new_data_only": true,
+    "frozen_core": true,
+    "native_state_bytes": 576
+  },
+  "controls": [
+    "learned 5-weight link matcher",
+    "same full 3D distance .045",
+    "strict 3D distance .0015",
+    "static fingerprint-only distance .0004",
+    "programmed second-intervention-only distance .009",
+    "never link",
+    "exact coded typed reachability source reference"
+  ],
+  "outcomes": [
+    "INVALID_F27_SOURCE_ORACLE",
+    "DEVELOPMENT_CAUSAL_CORROBORATION_LEARNED_GAIN",
+    "DEVELOPMENT_CAUSAL_CORROBORATION_NO_GAIN"
+  ],
+  "minimum_promotion": {
+    "exact_reference": 768,
+    "learned_accuracy": 0.95,
+    "gain_vs_no_links": 0.1,
+    "gain_vs_best_programmed_control": 0.03
+  },
+  "limitations": {
+    "response_signatures_generated_not_naturally_observed": true,
+    "not_causal_intervention_performed_by_learned_agent": true,
+    "programmed_all_pairs_enumeration": true,
+    "source_graphs_author_generated": true,
+    "no_F3_sealed_source_birth": true,
+    "no_FORGE_KTRADE_controller_change": true
+  }
+}
