@@ -1,0 +1,73 @@
+{
+  "schema": "wingless.f35.frozen-meta-prior-trainonly.v1",
+  "stage": "ONE_FRESH_TRAIN_ONLY_FEASIBILITY_NO_PRIMARY_ORIGINAL",
+  "precode_prereg_commit": "9250a9b18010de7f8bfeefe4902823287d888ac3",
+  "qualified_source_commit": "df0e2c1721b94e0fc958a71721882d6503661719",
+  "qualified_tree": "69f88924089c0f54256f8b1e93b208e93b97ff00",
+  "source_path": "research/foundational/20261015-w-f35/train_only.py",
+  "source_blob": "0ea341e0e300d972a28ae14cdc772344b2c88d0e",
+  "engineering_run": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38742219969",
+  "meta_train": {
+    "seeds": [
+      231000,
+      231024
+    ],
+    "families": [
+      200,
+      201,
+      202
+    ]
+  },
+  "train_only_eval": {
+    "seeds": [
+      232000,
+      232012
+    ],
+    "families": [
+      204,
+      205,
+      206
+    ],
+    "depths": [
+      6,
+      8,
+      10
+    ],
+    "expected_cases": 108
+  },
+  "reserved_primary": {
+    "seeds": [
+      202000,
+      202016
+    ],
+    "families": [
+      184,
+      185,
+      186,
+      187
+    ],
+    "not_accessed": true
+  },
+  "controls": [
+    "learned_meta",
+    "uniform_group_map",
+    "permutation_map",
+    "last_demo",
+    "role_blind",
+    "privileged_oracle"
+  ],
+  "decision": {
+    "min_accuracy_gain_over_strongest_fair": 0.03,
+    "each_unseen_family_nondegrading": true,
+    "oracle_all_correct": true,
+    "validate_predictions_per_row": true
+  },
+  "limits": {
+    "source_generated_in_same_repo": true,
+    "F3_independent_custody": false,
+    "no_primary_original": true,
+    "no_accepted_ref_mutation": true,
+    "native_coefficients_3_external_demo_and_search_costs_separate": true,
+    "no_paid_API": true
+  }
+}
