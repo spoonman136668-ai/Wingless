@@ -1,0 +1,57 @@
+name: Wingless F57 frozen FIT-only science feasibility
+on:
+  push:
+    branches:
+      - research/w-f57-cross-role-public-structure-20261015-r1
+permissions:
+  contents: read
+jobs:
+  frozen-fit:
+    if: "${{ github.event.head_commit.message == 'science(w-f57): once-only FIT coupled-role public feasibility' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Verify frozen source and prereg identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 51ab86ff68e3ab73ff8945a2a7754914fceca26c HEAD
+          test "$(git hash-object research/foundational/20261015-w-f57/prereg-candidate.json)" = 5b759cbf99a9f2a68eaad6d31e78c754321e465d
+          test "$(git hash-object research/foundational/20261015-w-f57/source_feasibility.py)" = c5125ae8c8d3b48f920cc80a91a812114290e4de
+          test "$(git hash-object research/foundational/20261015-w-f57/test_fit_preflight.py)" = dcd6f0853f6032b137758d5cad09af9fad4fdcb2
+          test "$(git hash-object research/foundational/20261015-w-f57/audit_fit.py)" = 36bb011c3d4346ef5c812c9b2dd84e6869b7e22f
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f57 -p test_fit_preflight.py -v
+      - name: One full repository regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: One new FIT-only source and independent threshold audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/w57"
+          git rev-parse HEAD > "$RUNNER_TEMP/w57/SOURCE_SHA"
+          python3 -B research/foundational/20261015-w-f57/source_feasibility.py --fit-only > "$RUNNER_TEMP/w57/result.json"
+          python3 -B research/foundational/20261015-w-f57/audit_fit.py             "$RUNNER_TEMP/w57/result.json"             research/foundational/20261015-w-f57/prereg-candidate.json             > "$RUNNER_TEMP/w57/audit.txt"
+          cat "$RUNNER_TEMP/w57/audit.txt"
+          (cd "$RUNNER_TEMP/w57" && sha256sum result.json audit.txt > manifest.sha256)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Wingless-F57-frozen-FIT-source-evidence
+          path: ${{ runner.temp }}/w57/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Exclude original research authority
+        run: echo "FIT_ONLY=TRUE DIAG_AND_ORIGINAL_UNCONSUMED=TRUE F3=UNQUALIFIED NATIVE_TOTAL_576B=UNVERIFIED"
