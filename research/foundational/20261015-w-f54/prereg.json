@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.f54.public-calibration-identifiability.prereg.v1",
+  "stage": "PRECODE_SOURCE_FREEZE",
+  "parent_f53_source": "7c0d87501ce2c051474fd1b12372fc8298c6eda2",
+  "parent_f53_run": 38816813059,
+  "reason": "FIT-minimax public-law mixture 104/128 lost to Bayes 106/128; test information insufficiency before another selector",
+  "hypothesis": "A single prospectively selected public calibration observation chosen using only the current public posterior will identify hidden operator law better than matched one-purchase alternatives under novel heldout law context/noise.",
+  "fit_seeds": [
+    601000,
+    601008
+  ],
+  "fit_families": [
+    1200,
+    1201,
+    1202,
+    1203
+  ],
+  "diagnostic_seeds": [
+    601100,
+    601116
+  ],
+  "diagnostic_families": [
+    1204,
+    1205,
+    1206,
+    1207
+  ],
+  "proposed_originals_NOT_RESERVED": [
+    602000,
+    602016
+  ],
+  "cases": 128,
+  "public_calibration_initial": 3,
+  "public_calibration_extra_budget": 1,
+  "target_context_bits": 3,
+  "decision_arms": [
+    "public_information_gain_purchase",
+    "public_target_nearest_purchase",
+    "public_fixed_context_purchase",
+    "public_no_purchase",
+    "private_sign_oracle_UNFAIR"
+  ],
+  "fair_controls": [
+    "public_target_nearest_purchase",
+    "public_fixed_context_purchase",
+    "public_no_purchase"
+  ],
+  "threshold_gain_pp": 5,
+  "no_family_regression": true,
+  "private_sign_used_only_for_synthetic_outcome": true,
+  "public_query_selection_must_not_use_family_hidden_law": true,
+  "source_implementation_present": false,
+  "primary_original_executed": false,
+  "F3_accepted": false,
+  "accepted_refs_mutated": false,
+  "paid_API_calls": 0
+}
