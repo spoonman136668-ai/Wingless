@@ -1,0 +1,93 @@
+name: W-F38 one frozen source-identifiability TRAIN-only diagnostic
+on:
+  push:
+    branches:
+      - science/w-f38-frozen-identifiability-trainonly-20261015-r1
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    if: "${{ github.event.head_commit.message == 'science(w-f38): one frozen TRAIN-only identifiability diagnostic' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify immutable source and preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor f2803395499a17d9687a515bfecff5241dca4fe7 HEAD
+          git merge-base --is-ancestor f8d392768db3a104c059e969f75453753f59431d HEAD
+          test "$(git hash-object research/foundational/20261015-w-f38/source_pilot.py)" = 8fa9a66c31ad5bdc53b8c27e86b87de972e31ea8
+          test "$(git hash-object research/foundational/20261015-w-f38/prereg-frozen.json)" = "$(git rev-parse f8d392768db3a104c059e969f75453753f59431d:research/foundational/20261015-w-f38/prereg-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f38 -p test_preflight.py -v
+      - name: Execute exactly one prospective TRAIN-only source diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f38/source_pilot.py > /tmp/w-f38-source-diagnostic.json
+          python3 -m json.tool /tmp/w-f38-source-diagnostic.json >/dev/null
+          sha256sum /tmp/w-f38-source-diagnostic.json > /tmp/w-f38-source-diagnostic.sha256
+          git rev-parse HEAD > /tmp/w-f38-head.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F38-frozen-once-source-evidence
+          path: |
+            /tmp/w-f38-source-diagnostic.json
+            /tmp/w-f38-source-diagnostic.sha256
+            /tmp/w-f38-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Audit distinct source proofs and frozen scientific verdict
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/w-f38-source-diagnostic.json'))
+          p=json.load(open('research/foundational/20261015-w-f38/prereg-frozen.json'))
+          assert d['schema']=='wingless.f38.identifiability-trainonly.v1'
+          assert d['stage']=='SOURCE_DIAGNOSTIC_NOT_LEARNED_ORIGINAL'
+          assert d['questions']==p['training_only']['expected_rows']==144
+          assert d['seeds']==p['training_only']['seeds']
+          assert d['families']==p['training_only']['families']
+          assert d['coverage']==p['training_only']['coverage']
+          assert d['depths']==p['training_only']['depths']
+          assert d['reserved_original_seeds']==p['reserved_original']['seeds']
+          assert d['reserved_original_families']==p['reserved_original']['families']
+          assert d['source_same_repository_not_F3'] and d['no_learned_candidate_executed']
+          assert d['primary_original_not_executed'] and not d['accepted_ref_mutation']
+          assert len(d['rows'])==144
+          assert len({(r['seed'],r['family'],r['coverage'],r['depth']) for r in d['rows']})==144
+          assert all(281000<=r['seed']<281012 and r['family'] in (280,281,282)
+                     and r['coverage'] in (3,7) and r['depth'] in (4,7)
+                     and r['public_triples_count']==8*r['coverage']
+                     and len(r['public_evidence_sha256'])==64 and r['sampled_completion_count']==48
+                     for r in d['rows'])
+          for arm,score in d['scores'].items():
+            correct=sum(r['predictions'][arm]==r['truth'] for r in d['rows'])
+            assert score['correct']==correct and score['total']==144
+            assert math.isclose(score['accuracy'],correct/144,abs_tol=1e-12)
+          assert d['scores']['privileged_oracle']['correct']==144
+          for coverage in (3,7):
+            subset=[r for r in d['rows'] if r['coverage']==coverage]
+            assert len(subset)==72
+            frac=sum(r['nonidentifiability_witness'] is not None for r in subset)/72
+            assert math.isclose(d['witness_fraction'][str(coverage)],frac,abs_tol=1e-12)
+            assert all(r['nonidentifiability_witness'] is None or
+                       (r['nonidentifiability_witness']['alternate_answer']!=r['truth'] and
+                        len(r['nonidentifiability_witness']['maps_sha256'])==64) for r in subset)
+          qualified=(d['witness_fraction']['3']>=.45 and d['witness_fraction']['7']==0
+                     and d['witness_fraction']['3']-d['witness_fraction']['7']>=.40)
+          expected='TRAIN_ONLY_IDENTIFIABILITY_GAP_VERIFIED' if qualified else 'TRAIN_ONLY_IDENTIFIABILITY_SOURCE_GATE_BLOCKED'
+          assert d['verdict']==expected
+          print('W_F38_IDENTIFIABILITY',expected,
+                {a:s['correct'] for a,s in d['scores'].items()},
+                'nonidentifiability',d['witness_fraction'],'entropy_bits',d['posterior_answer_entropy_bits'])
+          PY
+      - name: Source-authority limit
+        run: |
+          echo "Diagnostic only; no learned model first-use, primary original or independent F3 promotion"
