@@ -1,0 +1,73 @@
+name: W-F34 once-only source headroom feasibility (NO primary original)
+on:
+  push:
+    branches:
+      - science/w-f34-frozen-source-headroom-pilot-20261015-r1
+permissions:
+  contents: read
+jobs:
+  train_only_source_pilot:
+    if: "${{ github.event.head_commit.message == 'science(w-f34): one frozen TRAIN-only source pilot' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Frozen source, prereg and reservation guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4fcf4e28ccc8e6461459a4c1f872e4f2dec489c6 HEAD
+          git merge-base --is-ancestor bd5e6840d0578bfb140ac2a93eb7dbcd5579e599 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f34/source_pilot.py)" = 4f4d5cd7ac1330f7f0f53a2ae25ccc6169e2ec81
+          test "$(git hash-object research/foundational/20261015-w-f34/prereg-frozen.json)" = "$(git rev-parse bd5e6840d0578bfb140ac2a93eb7dbcd5579e599:research/foundational/20261015-w-f34/prereg-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f34 -p test_preflight.py -v
+      - name: Exactly one new TRAIN-only source feasibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f34/source_pilot.py > /tmp/w-f34-source-feasibility.json
+          python3 -m json.tool /tmp/w-f34-source-feasibility.json > /dev/null
+          sha256sum /tmp/w-f34-source-feasibility.json > /tmp/w-f34-source-feasibility.sha256
+          git rev-parse HEAD > /tmp/w-f34-source-commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F34-frozen-TRAIN-only-source-evidence
+          path: |
+            /tmp/w-f34-source-feasibility.json
+            /tmp/w-f34-source-feasibility.sha256
+            /tmp/w-f34-source-commit.txt
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently check all TRAIN-only rows
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math,collections
+          d=json.load(open('/tmp/w-f34-source-feasibility.json'))
+          p=json.load(open('research/foundational/20261015-w-f34/prereg-frozen.json'))
+          assert d['status']=='TRAIN_ONLY_SOURCE_QUALIFICATION_NOT_PRIMARY_ORIGINAL'
+          assert d['questions']==p['train']['expected_rows']==216
+          assert d['train_seeds']==p['train']['seeds'] and d['train_families']==p['train']['families']
+          assert d['reserved_original_seeds']==p['reserved_primary_original']['seeds']
+          assert d['reserved_original_families']==p['reserved_primary_original']['families']
+          assert not d['separately_controlled_F3_custody'] and d['primary_original_not_executed']
+          assert d['dual_oracle_implementation_agreement'] and not d['accepted_ref_mutation']
+          assert len(d['rows'])==216 and len({(r['seed'],r['family'],r['depth']) for r in d['rows']})==216
+          assert set(r['depth'] for r in d['rows'])==set(p['train']['depths'])
+          assert all(201000<=r['seed']<201024 and len(r['public_evidence_sha256'])==64
+                     and r['public_demonstration_count']==32 for r in d['rows'])
+          assert d['role_order_changes']==sum(r['reversed_role_order_changes_truth'] for r in d['rows'])
+          for arm,s in d['scores'].items():
+            correct=sum(r['predictions'][arm]==r['truth_end'] for r in d['rows'])
+            assert s['correct']==correct and s['total']==216
+            assert math.isclose(s['accuracy'],correct/216,abs_tol=1.e-12)
+          assert d['scores']['privileged_oracle']['correct']==216
+          assert d['verdict'] in ('TRAIN_ONLY_SOURCE_HEADROOM_ELIGIBLE','TRAIN_ONLY_SOURCE_HEADROOM_BLOCKED')
+          print("W_F34_TRAIN_ONLY_SOURCE_GATE",d['verdict'],d['scores'],"role_order",d['role_order_change_rate'])
+          PY
+      - name: Explicit final authority limit
+        run: echo "Source-only result; W-F34 primary science original NOT dispatched, F3 custody NOT cleared"
