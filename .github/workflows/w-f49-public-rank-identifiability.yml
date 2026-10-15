@@ -1,0 +1,72 @@
+name: W-F49 source-locked public posterior rank experiment
+on:
+  push:
+    branches: [research/w-f49-public-rank-identifiability-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Verify prereg source witness and focused fail-closed tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 1355777d4c0b596e371e4ba4b44255ab9ea7e0f6 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f49/prereg-candidate.json)" = e467c25046229f726e0ffee7c8cb25ea574f4aa8
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f49 -p test_preflight.py -v
+      - name: One full existing repository regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+  fresh-train:
+    needs: source
+    if: github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: One bounded real TRAIN-only experiment; original never eligible
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/f49"
+          mkdir -p "$root"
+          python3 -B research/foundational/20261015-w-f49/source_pilot.py > "$root/result.json"
+          python3 - "$root/result.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          assert d["schema"]=="wingless.f49.public-rank-information.trainonly.v1"
+          assert d["questions"]==64 and d["diagnostic_seeds"]==[431100,431108]
+          assert d["prereg_fit_seeds_held_not_consumed"]==[431000,431004]
+          assert d["proposed_originals_not_consumed"]==[432000,432016]
+          assert not d["primary_original_not_executed"] is False
+          assert d["accepted_ref_mutation"] is False and d["paid_api_calls"]==0
+          assert len(d["rows"])==64
+          assert d["verdict"] in ("TRAIN_ONLY_SUPPORTED_NOT_F3","TRAIN_ONLY_NEGATIVE")
+          print("F49_NEW_TRAIN_MECHANISM_COMPLETED_NO_ORIGINAL=PASS")
+          PY
+          (cd "$root" && sha256sum result.json > result.sha256)
+          printf '%s\n' "$GITHUB_SHA" > "$root/SOURCE_SHA"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: W-F49-public-rank-information-train-NO-ORIGINAL
+          path: ${{ runner.temp }}/f49/
+          retention-days: 30
+          if-no-files-found: error
