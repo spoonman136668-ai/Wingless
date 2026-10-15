@@ -1,0 +1,89 @@
+{
+  "schema": "wingless.f35.train-only-meta-prior-prereg.v1",
+  "phase": "FRESH_TRAIN_ONLY_ENGINEERING_NO_ORIGINAL",
+  "prior_negative_run": 38740481969,
+  "parent_source_commit": "8010d4ee6f592f021d44f78a0689b63c1e3eaa82",
+  "hypothesis": "A train-only learned structural prior over role transition operator families improves long-chain composition from very few demonstrations relative to strong equal-evidence Bayesian MAP, without retuning the consumed W-F34 train pilot.",
+  "method": "Learn the training population frequencies of affine-XOR versus arbitrary permutation source families, fit finite family and Dirichlet operator prior parameters on separate meta-train episodes, freeze them, then estimate each evaluation grammar from only its public demonstrations; inference uses a coded transition compactor and measures every byte. This learns a prior, not a native open-ended grammar discovery system.",
+  "meta_train": {
+    "seeds": [
+      231000,
+      231024
+    ],
+    "families": [
+      200,
+      201,
+      202
+    ],
+    "depths": [
+      6,
+      8,
+      10
+    ],
+    "roles": 8,
+    "demos_per_role": 4
+  },
+  "train_only_evaluation": {
+    "seeds": [
+      232000,
+      232012
+    ],
+    "families": [
+      204,
+      205,
+      206
+    ],
+    "depths": [
+      6,
+      8,
+      10
+    ],
+    "expected_rows": 108
+  },
+  "previous_consumed": {
+    "seeds": [
+      203000,
+      203012
+    ],
+    "families": [
+      188,
+      189,
+      190
+    ]
+  },
+  "reserved_original": {
+    "seeds": [
+      202000,
+      202016
+    ],
+    "families": [
+      184,
+      185,
+      186,
+      187
+    ]
+  },
+  "controls": [
+    "train-fitted-Bayesian-operator-prior",
+    "uniform affine XOR Bayesian MAP",
+    "unrestricted permutation MAP",
+    "last demonstration",
+    "role-blind",
+    "privileged oracle"
+  ],
+  "gate": {
+    "minimum_gain_absolute": 0.03,
+    "nondegrading_every_family": true,
+    "source_oracle_matches_independent_composer": true,
+    "equal_public_demos": true,
+    "base_train_test_disjoint": true
+  },
+  "limitations": {
+    "synthetic_generator_not_F3": true,
+    "trained_prior_native_inference_576_byte_limit": true,
+    "external_demonstrations_and_compute_separately_accounted": true,
+    "primary_original_not_authorized": true,
+    "no_accepted_ref_mutation": true,
+    "no_paid_API": true
+  }
+}
