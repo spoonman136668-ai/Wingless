@@ -1,0 +1,38 @@
+name: Wingless F51 preregistration identity and protected source tests (NO EXPERIMENT)
+on:
+  push:
+    branches: [research/w-f51-operator-shift-controls-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  precode-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Verify prereg preceded all new source and has unchanged control identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 41ac79b6474956bf50e6a41e07ff8259cd9af4dc HEAD
+          test "$(git hash-object research/foundational/20261015-w-f51/prereg-candidate.json)" = b8fca6b83f664655b2c06c5fc11e085da5e12355
+          python3 -B -m json.tool research/foundational/20261015-w-f51/prereg-candidate.json >/dev/null
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f51 -p test_prereg.py -v
+          echo 'F51_PROSPECTIVE_PRECODE_SOURCE_ONLY=PASS'
+      - name: One full existing repository regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: Explicit no experiment or original authority
+        run: echo 'F51_NO_DIAGNOSTIC_DISPATCH=TRUE; F51_NO_PRIMARY_ORIGINAL=TRUE; F50_SCIENCE_RESULT_UNCHANGED=TRUE'

@@ -1,0 +1,110 @@
+{
+  "schema": "wingless.f51.operator-generalization-strong-public-controls.prereg.v1",
+  "stage": "PRECODE_FROZEN_CANDIDATE_NOT_OWNER_ADMITTED",
+  "lane": "Wingless",
+  "parent_f50_source_sha": "646b9db1d48eb03150ad79f1c88b7a44354ab96f",
+  "parent_f50_actions_run": 38809539896,
+  "parent_f50_artifact_id": 12006864741,
+  "independent_f50_review": {
+    "forge_pr": 296,
+    "source_sha": "7a2bb2b564d9238427e1c380c92a1d39bd6fa204",
+    "run_id": 38810692492,
+    "observed_learned_correct": 112,
+    "observed_three_bit_parity_correct": 112,
+    "n": 128,
+    "conclusion": "NO_INCREMENTAL_GAIN_OVER_STRONGER_PUBLIC_CONTROL"
+  },
+  "hypothesis": "A compact trainable conditional operator posterior generalizes to unseen relation-composition families and shifted operator-context mechanisms beyond a complete set of public rules and a FIT-derived context lookup; the hidden operator is never an action input.",
+  "fresh_fit": {
+    "seeds_start_inclusive": 521000,
+    "seeds_end_exclusive": 521016,
+    "families": [
+      840,
+      841,
+      842,
+      843
+    ]
+  },
+  "fresh_diagnostic": {
+    "seeds_start_inclusive": 521100,
+    "seeds_end_exclusive": 521116,
+    "families": [
+      844,
+      845,
+      846,
+      847
+    ]
+  },
+  "proposed_original_NOT_RESERVED": {
+    "seeds_start_inclusive": 522000,
+    "seeds_end_exclusive": 522016,
+    "families": [
+      848,
+      849,
+      850,
+      851
+    ]
+  },
+  "excluded_prior_originals": [
+    [
+      372000,
+      372016
+    ],
+    [
+      392000,
+      392016
+    ],
+    [
+      412000,
+      412016
+    ],
+    [
+      432000,
+      432016
+    ],
+    [
+      502000,
+      502016
+    ]
+  ],
+  "experimental_design": "Two distinct algebraic operator-context source regimes with equal public context evidence; FIT tunes only on authorized training families, diagnostic tests unseen role compositions and different public-context structure. Do not tune after diagnostic.",
+  "public_information": [
+    "observable_context_bits",
+    "observable_role_mapping_pairs",
+    "query_role_chain",
+    "public_task_length"
+  ],
+  "controls": [
+    "learned_context_operator_posterior",
+    "always_shift",
+    "always_reflect",
+    "cue0_rule",
+    "two_bit_public_parity",
+    "three_bit_public_parity",
+    "four_bit_public_parity",
+    "FIT_context_truth_table",
+    "FIT_public_logistic",
+    "public_hash",
+    "private_operator_oracle_unfair"
+  ],
+  "evaluator_only_controls": [
+    "private_operator_oracle_unfair"
+  ],
+  "thresholds": {
+    "minimum_gain_vs_strongest_fair": 0.05,
+    "no_family_regression": true,
+    "no_public_truth_leak": true,
+    "independent_per_row_recomposition": true,
+    "ensure_all_preregistered_controls_present": true
+  },
+  "negative_disposition": "FAIL if any public parity/lookup/logistic control matches candidate or if any predeclared threshold fails",
+  "source_code_implemented": false,
+  "train_or_diagnostic_executed": false,
+  "owner_admitted": false,
+  "primary_original_executed": false,
+  "independent_F3": false,
+  "accepted_ref_mutation": false,
+  "dreamrsi_gain_proven": false,
+  "thetaevolve_training_authorized": false,
+  "paid_api_calls": 0
+}
