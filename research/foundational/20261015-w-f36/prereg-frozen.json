@@ -1,0 +1,73 @@
+{
+  "schema": "wingless.f36.frozen-development-trainonly.v1",
+  "status": "SOURCE_FROZEN_BEFORE_ONE_TRAIN_ONLY_EXECUTION",
+  "precode_prereg_commit": "e01c2483398441673c7874731e7f3a44db295dcf",
+  "qualified_engineering_commit": "f7f197355fb3211f6f3b5b4086f7656930f862ed",
+  "qualified_engineering_tree": "1856d8d753ac159c01a8aa8c7b175aacfde7f3ca",
+  "qualified_source_path": "research/foundational/20261015-w-f36/train_only.py",
+  "qualified_source_blob": "0fa1d0ed9abd37a3808e7af54832924dfcfb1459",
+  "engineering_full_regression": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38747803696",
+  "train_only": {
+    "seeds": [
+      241000,
+      241012
+    ],
+    "families": [
+      210,
+      211,
+      212
+    ],
+    "depths": [
+      4,
+      6,
+      8
+    ],
+    "expected_questions": 108,
+    "num_roles": 8,
+    "num_nodes": 8
+  },
+  "reserved_primary": {
+    "seeds": [
+      242000,
+      242016
+    ],
+    "families": [
+      214,
+      215,
+      216,
+      217
+    ],
+    "never_generate": true
+  },
+  "controls": [
+    "learned_soft",
+    "permutation_MAP",
+    "affine_MAP",
+    "frequency_walk",
+    "role_scrambled",
+    "role_agnostic",
+    "privileged_oracle"
+  ],
+  "decision": {
+    "min_absolute_gain": 0.03,
+    "per_family_nondegrading": true,
+    "privileged_oracle_correct": 108,
+    "dual_oracle_agreement": true,
+    "role_order_effect_reported": true
+  },
+  "cost": {
+    "quantized_model_bytes": 512,
+    "distribution_work_bytes": 16,
+    "native_core_max_bytes": 576,
+    "training_optimizer_external": true,
+    "Python_runtime_resident_memory_not_qualified": true
+  },
+  "authority": {
+    "development_synthetic_only": true,
+    "independently_born_F3": false,
+    "no_primary_original": true,
+    "exactly_one_train_only_run": true,
+    "no_accepted_ref_mutation": true,
+    "no_FORGE_controller_Cloudflare_KTRADE_mutation": true
+  }
+}
