@@ -1,0 +1,85 @@
+{
+  "schema": "wingless.f33.prereg-candidate.v1",
+  "id": "W-F33",
+  "status": "PRE_ORIGINAL_SOURCE_FEASIBILITY",
+  "parent_consumed_original": {
+    "run": 38727251895,
+    "sha": "9d9d63501924eb22a945cecb47765a5424229cda",
+    "verdict": "DEVELOPMENT_ORDERED_COMPOSITION_NO_QUALIFIED_GAIN",
+    "strongest_fair_exact_traversal_accuracy": 1
+  },
+  "hypothesis": "A trainable compact directed role-transition operator can learn ordered multi-hop path semantics without hardcoded equality and generalize to distinct grammars at lower compute/memory than an equal-budget coded approximation.",
+  "change_from_parent": "Replace four-parameter local edge-role similarity scorer with jointly learned six-by-six role operator plus bias trained on full path outcomes; model updates activated nodes sequentially and must outperform no-role/order-scrambled controls, but exact traversal remains explicit 100% privileged or unfair upper reference.",
+  "train": {
+    "seeds": [
+      191000,
+      191064
+    ],
+    "families": [
+      160,
+      161,
+      162,
+      163
+    ],
+    "depths": [
+      3,
+      4,
+      5
+    ],
+    "role_alphabet": 6
+  },
+  "reserved_test": {
+    "seeds": [
+      192000,
+      192012
+    ],
+    "families": [
+      164,
+      165,
+      166,
+      167
+    ],
+    "depths": [
+      6,
+      7,
+      8
+    ],
+    "role_alphabet": 6,
+    "conditions": [
+      "role-permutation",
+      "role-order-swap",
+      "edge-direction-reversal",
+      "isomorphic-typed-counterfactual"
+    ],
+    "no_test_generation_during_preflight": true
+  },
+  "resources": {
+    "native_cap_bytes": 576,
+    "external_edge_storage_metered": true,
+    "source_enumeration_metered": true,
+    "training_budget_fixed": true
+  },
+  "fair_controls": [
+    "equal-capacity coded ordered role transducer",
+    "equal-budget fixed soft edge propagation",
+    "no-role model",
+    "role-order-bag model",
+    "W-F32 frozen model",
+    "exact traversal upper reference"
+  ],
+  "advance": {
+    "learned_improves_over_strongest_fair_nonprivileged_by": 0.03,
+    "per_family_non_degradation": true,
+    "role_order_ablation_clear": true,
+    "no_forgetting_of_true_matches": true,
+    "all_metrics_frozen_before_original": true
+  },
+  "authority": {
+    "independent_F3_source": false,
+    "development_only": true,
+    "no_original_executed": true,
+    "accepted_ref_mutation": false,
+    "no_controller_FORGE_cloudflare_KTRADE_changes": true,
+    "no_paid_api": true
+  }
+}
