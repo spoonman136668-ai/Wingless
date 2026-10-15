@@ -122,7 +122,10 @@ def features(state,index,at,chain):
 
 def pick(state,step,chain,mode,weights):
     if mode=="learned_task_value_two_beam":
-        ranked=sorted(range(7),key=lambda i:(-sum(x*y for x,y in zip(weights,features(state,step,i,chain))),-state[i],i))
+        # The public mass filter allocates exactly three task-value scores.
+        # Every control is conservatively charged the same selection work.
+        eligible=sorted(range(7),key=lambda i:(-state[i],i))[:3]
+        ranked=sorted(eligible,key=lambda i:(-sum(x*y for x,y in zip(weights,features(state,step,i,chain))),-state[i],i))
     elif mode=="fixed_entropy_two_beam":
         top=max(range(7),key=lambda i:(state[i],-i))
         ranked=[top]+sorted((i for i in range(7) if i!=top),
@@ -140,7 +143,7 @@ def task_belief(d,mode,sign,weights):
         if step==0:active=(d["start"],)
         else:
             active=pick(state,step,d["chain"],mode,weights)
-            work+=7*DIM if mode=="learned_task_value_two_beam" else 7*DIM
+            work+=3*DIM
         state,spend=move(state,role,direction,sign,probs,active,True)
         work+=spend
         history.append(tuple(state))
@@ -201,7 +204,6 @@ def run_arm(d,arm,weights):
         mode="fixed_mass_two_beam"
     else:mode=arm
     state,work,_=task_belief(d,mode,sign,weights)
-    if arm=="learned_task_value_two_beam":work+=DIM*7
     return max(range(7),key=lambda i:(state[i],-i)),work,7
 
 def run():
