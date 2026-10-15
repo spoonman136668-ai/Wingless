@@ -1,0 +1,68 @@
+{
+  "schema": "wingless.f33.prereg-candidate.v1",
+  "status": "DESIGN_FROZEN_BEFORE_IMPLEMENTATION",
+  "experiment": "W-F33",
+  "parent_original": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38727251895",
+  "parent_source_sha": "6b46109cfda106696b8d68e23163c32cdc364420",
+  "hypothesis": "Latent role action semantics inferred from publicly observed noisy transitions can be reused for longer ordered compositional queries under novel grammar remappings. Learned posterior must beat strongest same-data Bayesian/symbolic inference, not a no-role strawman.",
+  "pilot_only": true,
+  "train": {
+    "seeds": [
+      191000,
+      191040
+    ],
+    "grammar_families": [
+      160,
+      161,
+      162,
+      163
+    ],
+    "roles": 6,
+    "latent_state_bits": 3,
+    "demonstrations_per_role": 5,
+    "example_noise": 0.16,
+    "query_depths": [
+      3,
+      4,
+      5
+    ]
+  },
+  "reserved_original": {
+    "seeds": [
+      192000,
+      192012
+    ],
+    "grammar_families": [
+      164,
+      165,
+      166,
+      167
+    ],
+    "not_generated_during_pilot": true
+  },
+  "methods": [
+    "learned-role-flip-logits",
+    "empirical-Beta-Bernoulli per-bit",
+    "nearest-demonstration",
+    "no-role",
+    "privileged true-grammar reference"
+  ],
+  "qualification": {
+    "nonzero_role_semantics_transfer_above_no_role": true,
+    "learned_not_worse_than_strongest_equal_data_pilot_control": true,
+    "proven_true_grammar_oracle_correct": true,
+    "immutable_train_only_pilot_first": true
+  },
+  "budget": {
+    "native_coefficients_float64_max": 18,
+    "native_scientific_state_bytes_max": 576,
+    "external_demonstration_storage_counted": true,
+    "compute_counted": true
+  },
+  "sources": {
+    "generated_in_repo": true,
+    "independent_F3_source_custody": false,
+    "no_accepted_refs": true,
+    "no_paid_api": true
+  }
+}

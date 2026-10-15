@@ -1,0 +1,33 @@
+name: W-F33 latent grammar preoriginal engineering
+on:
+  push:
+    branches:
+      - research/w-f33-latent-role-grammar-20261015-r1
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Fail closed on parent and prereg drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 6b46109cfda106696b8d68e23163c32cdc364420 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f33/prereg-candidate.json)" = "$(git rev-parse ae6fc51a889f3d1f6fffab08382948541c4b1844:research/foundational/20261015-w-f33/prereg-candidate.json)"
+          python3 -m json.tool research/foundational/20261015-w-f33/prereg-candidate.json > /dev/null
+          python3 -m py_compile research/foundational/20261015-w-f33/pilot.py
+      - name: Focused TRAIN-only interface tests
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f33 -p test_preflight.py -q
+      - name: Full Go regression and build once
+        run: go test ./... && go build ./...
+      - name: This is engineering only
+        run: echo "W-F33 train-only pilot and reserved original not executed"
