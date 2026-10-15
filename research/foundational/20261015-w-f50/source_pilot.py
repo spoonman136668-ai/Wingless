@@ -59,7 +59,7 @@ def fit():
     n=0
     for seed in FIT:
       for family in FIT_FAM:
-       for length in (3,5):
+       for length in (3,):
         d=source(seed,family,length)
         code="".join(map(str,d["context"]))
         counts[code][int(d["sign"]==-1)]+=1
