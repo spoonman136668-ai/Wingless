@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.f53.group-robust-public-law.prereg.v1",
+  "stage": "PRECODE_FROZEN_BEFORE_SOURCE",
+  "parent_f52_head": "301ef2e5bfe5e1eff701e4cbd49c62965d6cd100",
+  "parent_f52_run": 38815134108,
+  "parent_f52_negative": {
+    "bayes_correct": 106,
+    "fair_correct": 99,
+    "cases": 128,
+    "failed_family": 1006,
+    "reason": "frozen_family_nondegradation_failed"
+  },
+  "hypothesis": "A FIT-only group-minimax calibrated mixture of public Bayesian-law inference and public nearest support can eliminate family-level regression under unseen law noise and novel relation-order structures while increasing average accuracy by at least five percentage points over the strongest preregistered fair control.",
+  "fit_seeds": [
+    581000,
+    581008
+  ],
+  "fit_families": [
+    1100,
+    1101,
+    1102,
+    1103
+  ],
+  "diagnostic_seeds": [
+    581100,
+    581116
+  ],
+  "diagnostic_families": [
+    1104,
+    1105,
+    1106,
+    1107
+  ],
+  "proposed_original_seeds_NOT_RESERVED": [
+    582000,
+    582016
+  ],
+  "fit_calibration_noise": 0.08,
+  "diagnostic_calibration_noise": 0.14,
+  "public_anchors_per_query": 5,
+  "candidate": "fit_minimax_public_mixture",
+  "controls": [
+    "public_bayesian_law_posterior",
+    "learned_support_attention",
+    "public_hamming_nearest",
+    "public_support_majority",
+    "public_three_bit_parity",
+    "public_three_bit_majority",
+    "always_shift",
+    "always_reflect"
+  ],
+  "unfair_control": "private_sign_oracle_unfair",
+  "parameter_selection": "FIT-only maximize worst-family success then overall; no diagnostic labels or hidden signs",
+  "threshold_gain_pp": 5,
+  "require_no_family_regression": true,
+  "source_and_audit_preflight_required": true,
+  "source_implementation_present": false,
+  "original_executed": false,
+  "accepted_ref_mutation": false,
+  "paid_api_calls": 0
+}
