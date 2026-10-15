@@ -1,0 +1,96 @@
+name: W-F41 once-only posterior decision identifiability (NO primary original)
+on:
+  push:
+    branches:
+      - science/w-f41-frozen-action-identifiability-20261015-r1
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    if: "${{ github.event.head_commit.message == 'science(w-f41): one frozen answer-value source diagnostic' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Exact frozen source, prereg and guarded port admission
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 58f336d67b383ed274dd6d0ea81a258582dbcb19 HEAD
+          git merge-base --is-ancestor 0227f5dd2c6005929d9c89e2bd86c5203f698b5d HEAD
+          test "$(git hash-object research/foundational/20261015-w-f41/source_pilot.py)" = 0ad89e71c5752411179318605b5bdfd4e412cb0b
+          test "$(git hash-object research/foundational/20261015-w-f41/prereg-frozen.json)" = "$(git rev-parse 0227f5dd2c6005929d9c89e2bd86c5203f698b5d:research/foundational/20261015-w-f41/prereg-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f41 -p test_preflight.py -v
+      - name: Exactly one new TRAIN-only action identifiability diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f41/source_pilot.py > /tmp/w-f41-source.json
+          python3 -m json.tool /tmp/w-f41-source.json >/dev/null
+          sha256sum /tmp/w-f41-source.json > /tmp/w-f41-source.sha256
+          git rev-parse HEAD > /tmp/w-f41-head.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F41-one-frozen-source-identifiability
+          path: |
+            /tmp/w-f41-source.json
+            /tmp/w-f41-source.sha256
+            /tmp/w-f41-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independently recompute per-case accuracy, receipts, action-regret gate
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/w-f41-source.json'))
+          p=json.load(open('research/foundational/20261015-w-f41/prereg-frozen.json'))
+          assert d['schema']=='wingless.f41.posterior-action-identifiability.trainonly.v1'
+          assert d['stage']=='FRESH_SOURCE_DIAGNOSTIC_NOT_LEARNED_ORIGINAL'
+          assert d['seeds']==p['train_only']['seeds'] and d['families']==p['train_only']['families']
+          assert d['reserved_original_seeds']==p['reserved_primary_original']['seeds']
+          assert d['reserved_original_families']==p['reserved_primary_original']['families']
+          assert d['questions']==p['train_only']['expected_questions']==72
+          assert len(d['rows'])==72
+          assert len({(r['seed'],r['family'],r['length']) for r in d['rows']})==72
+          assert d['physical_purchase_cap']==2 and d['posterior_sample_budgets']==[12,48]
+          assert d['posterior_external_memory_bytes_per_48_sample_bank']==48*8*8
+          assert d['evaluator_private_true_maps_never_given_to_selector']
+          assert not d['source_independent_F3_custody'] and d['primary_original_not_executed']
+          assert not d['accepted_ref_mutation'] and not d['paid_api_calls']
+          for row in d['rows']:
+            assert row['family'] in (350,351,352) and 311000<=row['seed']<311012
+            assert row['length'] in (3,5) and len(row['public_sha256'])==64
+            for arm,receipt in row['receipts'].items():
+              assert len(receipt)<=2
+              if arm=='no_purchase':assert len(receipt)==0
+              assert len({(r,x) for r,x,y in receipt})==len(receipt)
+              assert all(0<=r<8 and 0<=x<8 and 0<=y<8 for r,x,y in receipt)
+          for arm,s in d['scores'].items():
+            n=sum(row['answers'][arm]==row['truth'] for row in d['rows'])
+            assert s['correct']==n and s['total']==72
+            assert math.isclose(s['accuracy'],n/72,abs_tol=1e-12)
+          assert d['scores']['private_hindsight_oracle_unfair']['correct']==72
+          for fam,arms in d['by_family'].items():
+            subset=[row for row in d['rows'] if str(row['family'])==fam]
+            assert len(subset)==24
+            for arm,n in arms.items():
+              assert n==sum(row['answers'][arm]==row['truth'] for row in subset)
+          entropy_stability=sum(row['small_entropy_argmax']==row['large_entropy_argmax'] for row in d['rows'])/72
+          disagreement=sum(row['large_decision_argmax']!=row['large_entropy_argmax'] for row in d['rows'])/72
+          assert math.isclose(d['entropy_action_rank_stability_12_vs_48'],entropy_stability,abs_tol=1e-12)
+          assert math.isclose(d['entropy_vs_decision_action_disagreement_rate_48'],disagreement,abs_tol=1e-12)
+          fair=('expected_answer_information_gain','expected_final_answer_correctness','query_frontier','fixed_acquisition')
+          gain=max(d['scores'][x]['accuracy'] for x in fair)-d['scores']['no_purchase']['accuracy']
+          expected='TRAIN_ONLY_DECISION_IDENTIFIABILITY_HEADROOM' if gain>=.03 else 'TRAIN_ONLY_DECISION_IDENTIFIABILITY_INSUFFICIENT'
+          assert d['verdict']==expected
+          print('W_F41_SOURCE_DIAGNOSTIC',expected,{a:s['correct'] for a,s in d['scores'].items()},
+                'rank_stability',entropy_stability,'information_decision_disagreement',disagreement)
+          PY
+      - name: Explicit scientific authority limit
+        run: |
+          echo "Source diagnostic only. No new learned scientific original, no F3 independent custody"
