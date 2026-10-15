@@ -1,0 +1,63 @@
+name: W-F49 authentic TRAIN-only public action identifiability
+on:
+  push:
+    branches: [research/w-f49-public-identifiability-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Frozen pre-code, focused negatives, one full regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 86370a8b3b214c534741efb3f4b7e753fd607359 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f49/prereg.json)" = 96a4f8d916ed6e08b5c39c4816f95b0239f3f6cc
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f49 -p test_preflight.py -v
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+  diagnostic:
+    needs: source
+    if: github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Exactly one disjoint real TRAIN diagnostic, no primary original
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/f49w";mkdir -p "$root"
+          python3 -B research/foundational/20261015-w-f49/source_pilot.py > "$root/result.json"
+          python3 - "$root/result.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          assert d["schema"]=="wingless.f49.public-identifiability.trainonly.v1"
+          assert d["questions"]==32 and d["counterfactual_world_evaluations"]==64
+          assert d["diagnostic_seeds"]==[461100,461104]
+          assert not d["original_executed"] and not d["independent_F3_custody"]
+          assert not d["accepted_ref_mutation"] and d["paid_api_calls"]==0
+          PY
+          (cd "$root";sha256sum result.json > result.sha256)
+          echo "$GITHUB_SHA" > "$root/SOURCE_SHA"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: W-F49-fresh-identifiability-TRAIN-NO-ORIGINAL
+          path: ${{ runner.temp }}/f49w/
+          retention-days: 30
+          if-no-files-found: error
