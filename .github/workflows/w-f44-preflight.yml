@@ -1,0 +1,35 @@
+name: W-F44 bounded counterfactual source preflight (NO diagnostic or original)
+on:
+  push:
+    branches:
+      - research/w-f44-two-step-causal-lookahead-20261015-r1
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Pin prerequisite accepted source and precode F44 preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4ac3643813104c40b5e91e24e967d63f8734c674 HEAD
+          git merge-base --is-ancestor d04fe2c243986b6fba5ff386dce8c8b069ab3db3 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f44/prereg-candidate.json)" = 29e32babd9ea8accbef9f7b3d807e3df25a51811
+          test "$(git hash-object research/foundational/20261015-w-f44/source_pilot.py)" = fc996fada42be1ea59d85732adac34b0b40c03ee
+          python3 -m json.tool research/foundational/20261015-w-f44/prereg-candidate.json >/dev/null
+          python3 -m py_compile research/foundational/20261015-w-f44/source_pilot.py
+      - name: Focused source identity, public counterfactual and bounded purchase tests
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f44 -p test_preflight.py -v
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
+      - name: Source-only boundary
+        run: echo "F44 engineering PRELIGHT only, no prospective TRAIN cohort or reserved originals; no F3/native/accepted-ref/controller authority."
