@@ -1,0 +1,82 @@
+{
+  "schema": "wingless.f47.learned-value-of-compute-prereg.v1",
+  "stage": "PRECODE_FROZEN",
+  "parent_f46_head": "bd7f18a31369cd913d353477e60b7be6d0d87876",
+  "f46_scientific_audit_run": 38804348750,
+  "design_issue": 250,
+  "hypothesis": "A trained public-feature gate predicting task-accuracy benefit of two-step counterfactual acquisition can outperform equally budgeted fixed gates on novel relation topologies while invoking at most 8 deeper cases and keeping posterior-world work <=1.2x strongest budget-fair control.",
+  "train_only": {
+    "fit_seeds": [
+      421000,
+      421012
+    ],
+    "diagnostic_seeds": [
+      421100,
+      421112
+    ],
+    "fit_families": [
+      560,
+      561,
+      562,
+      563
+    ],
+    "diagnostic_families": [
+      564,
+      565,
+      566,
+      567
+    ],
+    "lengths": [
+      3,
+      5
+    ],
+    "expected_diagnostic_cases": 96,
+    "roles": 4,
+    "domain": 6,
+    "public_pairs_per_role": 3,
+    "paid_mapping_cap": 2,
+    "first_stage_deep_beam": 4,
+    "deep_cases_max": 8
+  },
+  "future_original_proposal_NOT_RESERVED": {
+    "seeds": [
+      422000,
+      422016
+    ],
+    "families": [
+      568,
+      569,
+      570,
+      571
+    ]
+  },
+  "controls": [
+    "learned_deep_gate",
+    "one_step_value",
+    "exact_entropy",
+    "query_frontier",
+    "static_F46_query_edge",
+    "fixed_public_hash_deep_gate",
+    "full_two_step_costly_reference",
+    "no_purchase",
+    "private_oracle_unfair"
+  ],
+  "acceptance": {
+    "min_gain_vs_strongest_fair": 0.03,
+    "per_diagnostic_family_nondegradation": true,
+    "max_posterior_work_ratio": 1.2,
+    "positive_gain_vs_fixed_hash_gate": true,
+    "independent_receipt_reconstruction_and_cost_audit": true
+  },
+  "limits": {
+    "learn_on_training_labels_only": true,
+    "diagnostic_source_truth_never_in_gate": true,
+    "bounded_compute_finite_proposals": true,
+    "training_cost_report_separately": true,
+    "source_independent_F3_custody": false,
+    "original_first_use_executed": false,
+    "native_576_bytes_residency_qualified": false,
+    "controller_or_accepted_ref_mutation": false,
+    "paid_api_calls": 0
+  }
+}
