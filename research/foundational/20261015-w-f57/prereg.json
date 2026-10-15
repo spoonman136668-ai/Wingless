@@ -1,0 +1,91 @@
+{
+  "schema": "wingless.f57.uncertainty-aware-compositional-belief.prereg.v1",
+  "stage": "PRECODE_FROZEN_NO_SOURCE_OR_DIAGNOSTIC",
+  "parent_f56_source_sha": "cd79405ace566a1f3c45442be9d003797d396cb4",
+  "parent_f56_run": 38824302124,
+  "parent_f56_fit_result_sha256": "7d2a2cfc6ec277382e228168370eabc04269cfb1551b44bb1b1a1a305bbde99a",
+  "parent_f56_failed_first_gate": true,
+  "parent_f56_counts": {
+    "exact_public_bayes": 82,
+    "best_fixed_budget": 83,
+    "cases": 128
+  },
+  "hypothesis": "Fit shared public-evidence-conditioned compositional belief-state transitions with explicit role-specific uncertainty, rather than reweighting an exposed fixed public posterior beam. Test new role-order transfer on independent source law families and long inverse variable-binding chains.",
+  "fit": {
+    "seed_range": [
+      661000,
+      661016
+    ],
+    "families": [
+      1240,
+      1241,
+      1242,
+      1243
+    ],
+    "lengths": [
+      8,
+      10
+    ],
+    "cases": 128
+  },
+  "diagnostic_NOT_AUTHORIZED": {
+    "seed_range": [
+      661100,
+      661116
+    ],
+    "families": [
+      1244,
+      1245,
+      1246,
+      1247
+    ],
+    "lengths": [
+      10,
+      12
+    ],
+    "cases": 128
+  },
+  "proposed_original_NOT_RESERVED": {
+    "seed_range": [
+      662000,
+      662016
+    ],
+    "families": [
+      1248,
+      1249,
+      1250,
+      1251
+    ]
+  },
+  "controls": [
+    "learned_public_belief_transition",
+    "frozen_F56_budgeted_posterior_beam",
+    "fixed_public_mass_state",
+    "fixed_public_entropy_state",
+    "fixed_known_operator_bank",
+    "full_exact_public_bayes_extra_work",
+    "private_role_truth_oracle_unfair"
+  ],
+  "FIT_gate_before_diagnostic": {
+    "public_exact_accuracy_min": 0.75,
+    "exact_over_strongest_budgeted_fair_min_pp": 5,
+    "distinct_source_and_frozen_controls": true
+  },
+  "heldout_gates": {
+    "gain_over_strongest_equal_compute_fair_min_pp": 5,
+    "max_loss_vs_full_exact_absolute_pp": 2,
+    "operations_vs_exact_max_ratio": 0.5,
+    "no_regression_any_heldout_family": true,
+    "source_free_row_reconstruction_required": true
+  },
+  "restrictions": {
+    "fit_only_training": true,
+    "diagnostic_unconsumed": true,
+    "first_use_original_unconsumed": true,
+    "native_total_576B_not_measured": true,
+    "independent_F3": false,
+    "accepted_ref_mutation": false,
+    "live_optimizer_policy_promotion": false,
+    "paid_model_API_calls": 0
+  }
+}
