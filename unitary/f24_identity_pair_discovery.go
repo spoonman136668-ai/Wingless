@@ -98,7 +98,7 @@ func wf24Recurrent(state wf1State,q [2]int,pattern [8]int,k int,
     msg:=0.
     for i:=0;i<12;i++{
      if i==j{continue}
-     sim,_,_=wf7Pair(enc,dst[i],src[j])
+     sim,_,_:=wf7Pair(enc,dst[i],src[j])
      if allowed[i][j]{sim=math.Max(sim,1)}
      msg+=active[i]*sim
     }
@@ -109,7 +109,7 @@ func wf24Recurrent(state wf1State,q [2]int,pattern [8]int,k int,
   active=next
  }
  score:=0.
- for i:=0;i<12;i++{sim,_,_=wf7Pair(enc,dst[i],q[1]);score+=active[i]*sim}
+ for i:=0;i<12;i++{sim,_,_:=wf7Pair(enc,dst[i],q[1]);score+=active[i]*sim}
  return wf15Choice{Answer:wf1Prob(core.W[3]*score+core.W[4])>=.5,Steps:k},joins
 }
 func RunWFoundationF24()(map[string]any,error){
