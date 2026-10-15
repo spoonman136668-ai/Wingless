@@ -1,0 +1,115 @@
+name: W-F43 one frozen exact-answer TRAIN-only diagnostic (NO original)
+on:
+  push:
+    branches:
+      - science/w-f43-one-frozen-trainonly-20261015-r1
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    if: "${{ github.event.head_commit.message == 'science(w-f43): one frozen exact-answer train-only evaluation' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Bind to precode prereg, passed preflight identity, original-exclusion
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4ac3643813104c40b5e91e24e967d63f8734c674 HEAD
+          git merge-base --is-ancestor 87848b03b2f6030839b5ecc63490291467ad313a HEAD
+          test "$(git hash-object research/foundational/20261015-w-f43/source_pilot.py)" = 838a9164c392bad689975ba9afc2609a26825bd6
+          test "$(git hash-object research/foundational/20261015-w-f43/prereg-candidate.json)" = 63a9a3de20326402726e6783397e2265169ef0a1
+          python3 -m unittest discover -s research/foundational/20261015-w-f43 -p test_preflight.py -v
+      - name: Consume exactly one new TRAIN-only F43 source cohort
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f43/source_pilot.py > /tmp/w-f43-train.json
+          python3 -m json.tool /tmp/w-f43-train.json >/dev/null
+          sha256sum /tmp/w-f43-train.json > /tmp/w-f43-train.sha256
+          git rev-parse HEAD > /tmp/w-f43-head.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F43-once-only-exact-answer-train
+          path: |
+            /tmp/w-f43-train.json
+            /tmp/w-f43-train.sha256
+            /tmp/w-f43-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independently audit every row, equal posterior-world count, receipts and prereg verdict
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, math
+          d=json.load(open('/tmp/w-f43-train.json'))
+          p=json.load(open('research/foundational/20261015-w-f43/prereg-candidate.json'))
+          assert d['schema']=='wingless.f43.certified-answer-information.trainonly.v1'
+          assert d['stage']=='TRAIN_ONLY_EXACT_POSTERIOR_SOURCE_DIAGNOSTIC_NOT_ORIGINAL'
+          t=p['train_only'];reserve=p['reserved_original']
+          assert d['seeds']==[t['seed_start'],t['seed_stop_exclusive']]
+          assert d['families']==t['families']
+          assert d['reserved_seeds']==[reserve['seed_start'],reserve['seed_stop_exclusive']]
+          assert d['reserved_families']==reserve['families']
+          assert d['questions']==t['expected_cases']==48 and len(d['rows'])==48
+          assert d['exact_source_world_bound']==t['posterior_worlds_upper_bound']==1296
+          assert d['posterior_exact_only_for_reduced_six_value_source']
+          assert d['posterior_external_logical_payload_bytes']==1296*4*6
+          assert d['selector_world_evaluation_matching']
+          assert d['private_truth_only_in_evaluator_and_paid_port']
+          assert not d['source_independent_F3_custody'] and d['primary_original_not_executed']
+          assert not d['native_576_byte_resident_qualified'] and not d['accepted_ref_mutation']
+          assert d['paid_api_calls']==0 and d['wall_clock_seconds']>0
+          rows=d['rows']
+          assert len({(r['seed'],r['family'],r['length']) for r in rows})==48
+          arms=p['comparators']
+          for row in rows:
+              assert 331000<=row['seed']<331008
+              assert row['family'] in t['families'] and row['length'] in t['lengths']
+              assert 0<=row['truth']<6 and row['initial_worlds']==1296
+              assert row['exact_rank_seed_invariant']
+              assert len(row['first_exact'])==2 and all(0<=x<max(4,6) for x in row['first_exact'])
+              assert set(row['answers'])==set(arms)
+              assert set(row['receipts'])==set(arms)-{'private_truth_oracle_unfair'}
+              assert set(row['world_evaluation_counts'])==set(row['receipts'])
+              for arm, receipt in row['receipts'].items():
+                  assert len(receipt)<=2
+                  if arm=='no_purchase': assert not receipt
+                  assert len({(z[0],z[1]) for z in receipt})==len(receipt)
+                  assert all(len(z)==3 and 0<=z[0]<4 and 0<=z[1]<6 and 0<=z[2]<6 for z in receipt)
+                  evaluated=row['world_evaluation_counts'][arm]
+                  if arm=='no_purchase':assert evaluated==[]
+                  else:
+                      assert len(evaluated)==len(receipt)==2
+                      assert evaluated[0]==1296 and evaluated[1]==432
+          for arm in arms:
+              correct=sum(r['answers'][arm]==r['truth'] for r in rows)
+              score=d['scores'][arm]
+              assert (score['correct'],score['total'])==(correct,48)
+              assert math.isclose(score['accuracy'],correct/48,abs_tol=1e-12)
+          assert d['scores']['private_truth_oracle_unfair']['correct']==48
+          for fam in t['families']:
+              cohort=[r for r in rows if r['family']==fam]
+              assert len(cohort)==16
+              for arm in arms:
+                  assert d['by_family'][str(fam)][arm]==sum(r['answers'][arm]==r['truth'] for r in cohort)
+          fair=arms[1:-1]
+          best=max(d['scores'][a]['accuracy'] for a in fair)
+          gain=d['scores']['exact_answer_entropy']['accuracy']-best
+          nondegrade=all(d['by_family'][str(f)]['exact_answer_entropy']>=max(
+              d['by_family'][str(f)][a] for a in fair) for f in t['families'])
+          assert math.isclose(d['candidate_gain'],gain,abs_tol=1e-12)
+          assert d['per_family_nondegrade']==nondegrade
+          passed=gain>=p['acceptance']['gain_over_strongest_fair_min'] and nondegrade
+          expected='TRAIN_ONLY_EXACT_INFORMATION_HEADROOM' if passed else 'TRAIN_ONLY_EXACT_INFORMATION_NOT_QUALIFIED'
+          assert d['verdict']==expected
+          print('W_F43',expected,'correct',{a:d['scores'][a]['correct'] for a in arms},'gain',gain,'no_family_degrade',nondegrade,'runtime_s',d['wall_clock_seconds'])
+          PY
+      - name: Explicit authority limit
+        run: echo "Synthetic TRAIN-only once, no reserved original/F3/native 576B acceptance, controller/accepted ref mutation, or learner claim."
