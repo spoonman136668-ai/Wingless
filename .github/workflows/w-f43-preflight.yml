@@ -1,0 +1,35 @@
+name: W-F43 exact posterior source preflight (NO TRAIN cohort or original)
+on:
+  push:
+    branches:
+      - research/w-f43-certified-posterior-20261015-r1
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify predecessor, pre-code prereg and pinned bounded patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor c249b6beccab661f48c038443d14da455c51b7f1 HEAD
+          git merge-base --is-ancestor 87848b03b2f6030839b5ecc63490291467ad313a HEAD
+          test "$(git hash-object research/foundational/20261015-w-f43/prereg-candidate.json)" = 63a9a3de20326402726e6783397e2265169ef0a1
+          test "$(git hash-object research/foundational/20261015-w-f43/source_pilot.py)" = 838a9164c392bad689975ba9afc2609a26825bd6
+          python3 -m json.tool research/foundational/20261015-w-f43/prereg-candidate.json >/dev/null
+          python3 -m py_compile research/foundational/20261015-w-f43/source_pilot.py
+      - name: Frozen isolated exact inference / paid-port / source-only unit preflight
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f43 -p test_preflight.py -v
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
+      - name: Explicit non-execution boundary
+        run: echo "F43 source engineering ONLY. No F43 TRAIN cohort, original source, F3, native activation, accepted ref or controller mutation."
