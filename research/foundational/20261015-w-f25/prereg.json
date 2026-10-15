@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.f25.prereg.v1",
+  "parent_source": "0927853d9330e7fa6462276b8b9ef120cba554c7",
+  "scientific_question": "Can 4-weight learned contextual identity-link similarity trained on deliberately deceptive near-negative pairs outperform strong pre-registered Euclidean cutoff heuristics while enabling native recurrent multi-path reasoning?",
+  "design": {
+    "training_only_instances": 512,
+    "training_examples": "256 same-identity pairs, 256 distinct-identity near-impostors with +0.045 displacement of first contextual node coordinate",
+    "learnable_parameters": 4,
+    "model": "logistic squared fingerprint distances scaled 1000, frozen after 700 training epochs, fixed .012 gradient step",
+    "no_W24_test_fitting": true,
+    "test_new_seeds": [
+      98300,
+      98306
+    ],
+    "reused_graph_motifs": [
+      108,
+      109,
+      110,
+      111
+    ],
+    "graph_states": 96,
+    "variants": 8,
+    "questions": 768,
+    "source_generator": "hard near-matches created for unrelated decoy IDs, aliases share latent profile; other source graph construction inherited unchanged from F24",
+    "role_entity_and_recurrent_core_frozen": true,
+    "resident_bytes": 576
+  },
+  "controls": [
+    "new trained hard-negative logistic identity similarity",
+    "pre-registered original Euclidean cutoff 0.045",
+    "pre-registered strict Euclidean cutoff 0.0015",
+    "no alias links",
+    "exact typed ground-truth oracle, reference only"
+  ],
+  "acceptance": {
+    "oracle_correct": 768,
+    "min_learned_accuracy": 0.95,
+    "min_gain_vs_no_links": 0.1,
+    "min_gain_vs_best_static": 0.03
+  },
+  "outcomes": [
+    "INVALID_F25_SOURCE_ORACLE",
+    "DEVELOPMENT_HARD_NEGATIVE_IDENTITY_LEARNED_ADVANTAGE",
+    "DEVELOPMENT_HARD_NEGATIVE_IDENTITY_NO_GAIN"
+  ],
+  "limitations": {
+    "new_hard_negatives_author_constructed": true,
+    "real_semantic_attributes_not_discovered": true,
+    "all_candidate_endpoint_pairs_enumerated_in_code": true,
+    "not_independent_F3_sealed": true,
+    "no_controller_F0RGE_KTRADE_cloudflare_changes": true
+  }
+}
