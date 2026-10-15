@@ -1,0 +1,70 @@
+{
+  "schema": "wingless.f45.cost-capped-selective-lookahead-prereg.v1",
+  "stage": "PRECODE_FROZEN",
+  "predecessor_pr": 246,
+  "negative_run": 38798711311,
+  "design_issue": 247,
+  "hypothesis": "A public-only ambiguity gate can spend two-step counterfactual compute on a small predeclared subset of hard typed relation chains, preserving the observed terminal-answer gain while keeping posterior-work <=1.20 times the best equally budgeted one-step alternative and avoiding per-family regressions.",
+  "train_only": {
+    "seeds": [
+      371000,
+      371012
+    ],
+    "families": [
+      460,
+      461,
+      462
+    ],
+    "lengths": [
+      3,
+      5
+    ],
+    "expected_cases": 72,
+    "roles": 4,
+    "values": 6,
+    "public_pairs_per_role": 3,
+    "max_paid_mappings": 2,
+    "first_stage_counterfactual_beam": 4,
+    "hard_case_flags": [
+      "length_5",
+      "one_step_top_two_gain_gap_below_0_05"
+    ],
+    "max_deep_gate_fraction": 0.1
+  },
+  "reserved_primary_original": {
+    "seeds": [
+      372000,
+      372016
+    ],
+    "families": [
+      464,
+      465,
+      466,
+      467
+    ]
+  },
+  "controls": [
+    "selective_budgeted_lookahead",
+    "one_step_value",
+    "exact_entropy",
+    "query_frontier",
+    "full_two_step_costly_reference",
+    "no_purchase",
+    "evaluator_oracle_unfair"
+  ],
+  "thresholds": {
+    "accuracy_gain_over_strongest_budget_fair_min": 0.03,
+    "per_family_nondegradation": true,
+    "posterior_work_ratio_max": 1.2,
+    "deep_fraction_max": 0.1,
+    "independent_row_cost_receipt_audit": true,
+    "physical_native_576B_not_claimed": true
+  },
+  "claims": {
+    "exact_enumeration_restricted_to_reduced_synthetic_source": true,
+    "primary_original_not_executed": true,
+    "independent_F3_custody": false,
+    "no_controller_or_accepted_ref_mutation": true,
+    "no_paid_api_or_codex": true
+  }
+}
