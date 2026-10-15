@@ -1,0 +1,101 @@
+name: W-F39 once-only active relation TRAIN-only feasibility (NO original)
+on:
+  push:
+    branches:
+      - science/w-f39-frozen-active-source-trainonly-20261015-r1
+permissions:
+  contents: read
+jobs:
+  cohort:
+    if: "${{ github.event.head_commit.message == 'science(w-f39): one frozen active-source TRAIN-only cohort' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify immutable source/preregistration and private mapping port
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 9706199c360c50ecc73f50af276ab5ee60170b07 HEAD
+          git merge-base --is-ancestor 5b63e524916ff487a4380ba5caed70544fe76b26 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f39/source_pilot.py)" = 24784e27adc3b9c67de63e56dcdd394047d0ee2c
+          test "$(git hash-object research/foundational/20261015-w-f39/prereg-frozen.json)" = "$(git rev-parse 5b63e524916ff487a4380ba5caed70544fe76b26:research/foundational/20261015-w-f39/prereg-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f39 -p test_preflight.py -v
+      - name: Exactly one TRAIN-only active source information diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f39/source_pilot.py > /tmp/w-f39-source.json
+          python3 -m json.tool /tmp/w-f39-source.json > /dev/null
+          sha256sum /tmp/w-f39-source.json > /tmp/w-f39-source.sha256
+          git rev-parse HEAD > /tmp/w-f39-source-head.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F39-frozen-once-source-headroom
+          path: |
+            /tmp/w-f39-source.json
+            /tmp/w-f39-source.sha256
+            /tmp/w-f39-source-head.txt
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently replay every observation receipt, arm score and gate
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/w-f39-source.json'))
+          p=json.load(open('research/foundational/20261015-w-f39/prereg-frozen.json'))
+          assert d['schema']=='wingless.f39.paid-relationship-source.trainonly.v1'
+          assert d['stage']=='ACTIVE_SOURCE_HEADROOM_NO_LEARNED_ORIGINAL'
+          assert d['questions']==p['cohort']['expected_cases']==72
+          assert d['seeds']==p['cohort']['seeds'] and d['families']==p['cohort']['families']
+          assert d['reserved_seeds']==p['reserved_primary_original']['seeds']
+          assert d['reserved_families']==p['reserved_primary_original']['families']
+          assert len(d['rows'])==72
+          assert len({(r['seed'],r['family'],r['depth']) for r in d['rows']})==72
+          assert d['physical_query_budget']==2 and d['posterior_samples']==24
+          assert d['public_mappings_per_role']==3
+          assert d['source_same_repo_not_F3'] and d['no_learned_policy_deployed'] and d['primary_original_not_executed']
+          assert not d['accepted_ref_mutation'] and d['paid_api_calls']==0
+          assert all(291000<=r['seed']<291012 and r['family'] in (290,291,292)
+                    and r['depth'] in (4,7) and r['public_count']==24 and
+                    r['private_map_not_exposed_to_policies'] and len(r['public_evidence_sha256'])==64
+                    for r in d['rows'])
+          for row in d['rows']:
+            for arm,receipts in row['receipts'].items():
+              assert len(receipts)<=2
+              if arm=='no_purchase':assert len(receipts)==0
+              else:assert len(receipts)==2
+              assert len({(r,x) for r,x,y in receipts})==len(receipts)
+              assert all(0<=r<8 and 0<=x<8 and 0<=y<8 for r,x,y in receipts)
+              assert arm in row['entropy_before'] and arm in row['entropy_after']
+          for arm,s in d['scores'].items():
+            correct=sum(row['answers'][arm]==row['truth'] for row in d['rows'])
+            assert s['correct']==correct and s['total']==72
+            assert math.isclose(s['accuracy'],correct/72,abs_tol=1e-12)
+          assert d['scores']['privileged_complete_map_oracle_unfair']['correct']==72
+          for family,arms in d['per_family_correct'].items():
+            group=[r for r in d['rows'] if r['family']==int(family)]
+            assert len(group)==24
+            for arm,count in arms.items():
+              assert count==sum(row['answers'][arm]==row['truth'] for row in group)
+          for arm,delta in d['mean_answer_entropy_reduction_bits'].items():
+            manual=sum(r['entropy_before'][arm]-r['entropy_after'][arm] for r in d['rows'])/72
+            assert math.isclose(delta,manual,abs_tol=1e-12)
+          fair=('posterior_information_gain','query_frontier','random_eligible','fixed_acquisition')
+          best=max(d['scores'][a]['accuracy'] for a in fair)
+          expected=('TRAIN_ONLY_ACTIVE_SOURCE_FEASIBLE' if
+            best-d['scores']['no_purchase']['accuracy']>=.04 and
+            max(d['mean_answer_entropy_reduction_bits'][a] for a in fair)>0
+            else 'TRAIN_ONLY_ACTIVE_SOURCE_INSUFFICIENT_HEADROOM')
+          assert d['verdict']==expected
+          print('W_F39_SOURCE_GATE',expected,{a:s['correct'] for a,s in d['scores'].items()},
+                'entropy_bits',d['mean_answer_entropy_reduction_bits'])
+          PY
+      - name: Development authority limit
+        run: |
+          echo "TRAIN-only source feasibility, no learned scientific original or independent F3 custody"
