@@ -1,0 +1,53 @@
+name: W-F51B fresh corrected fully-registered public operator science
+on:
+  push:
+    branches: [research/w-f51-heldout-operator-public-controls-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  source-and-science:
+    if: "${{ github.event.head_commit.message == 'science(w-f51b): fresh disjoint preregistered five-bit operator diagnostic' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Reject replay of consumed earlier F51 cohort, verify second frozen precode
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 013741787d4fbad98932b4c3fd6d456e76cf0784 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f51/prereg-distinct-replacement.json)" = e9c099ea9dae06ed749a2cfdd8359a1638131866
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f51 -p test_preflight.py -v
+      - name: One Go regression vet build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: New disjoint F51B TRAIN and independent full public-control recount
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/w-f51b";mkdir -p "$root"
+          python3 -B research/foundational/20261015-w-f51/source_pilot.py > "$root/result.json"
+          python3 -B research/foundational/20261015-w-f51/audit_result.py \
+            "$root/result.json" research/foundational/20261015-w-f51/prereg-distinct-replacement.json
+          (cd "$root";sha256sum result.json > result.sha256)
+          printf '%s\n' "$GITHUB_SHA" > "$root/SOURCE_SHA"
+          echo 'W_F51B_NEW_DISTINCT_COHORT_AUDITED=PASS'
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: W-F51B-fresh-disjoint-operator-public-controls-TRAIN-NO-ORIGINAL
+          path: ${{ runner.temp }}/w-f51b/
+          retention-days: 30
+          if-no-files-found: error
