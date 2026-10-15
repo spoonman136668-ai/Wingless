@@ -1,0 +1,36 @@
+name: Wingless F52 source-only control and budget preflight
+on:
+  push:
+    branches: [research/w-f52-capacity-bounded-composition-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5\n        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Qualify frozen prereg and negative source tests, NO SCIENTIFIC EXECUTION
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git hash-object research/foundational/20261015-w-f52/prereg-candidate.json)" = ce186b28701c53f3b447e41ff4cdb239bd709590
+          python3 -m json.tool research/foundational/20261015-w-f52/prereg-candidate.json >/dev/null
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f52 -p test_prereg.py -v
+          test ! -f research/foundational/20261015-w-f52/source_pilot.py
+          echo F52_PRECODE_ONLY_QUALIFICATION=PASS
+      - name: One existing full repository regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: Record non-execution boundary
+        run: echo 'F52_NO_NEW_TRAIN_OR_PRIMARY_ORIGINAL=TRUE; F51_FAILED_RESULT_PRESERVED=TRUE'
