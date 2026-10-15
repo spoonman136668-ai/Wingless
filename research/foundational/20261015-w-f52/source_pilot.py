@@ -149,7 +149,12 @@ def propagate(d,sign,quantized):
     operations=4*7+4*7  # observation likelihood comparisons and normalizations
     for role,direction in d["chain"]:
         nextstate=[0.]*N
-        for at in range(N):
+        # Compressed policy retains the two highest-weight active answer
+        # hypotheses and explicitly counts each of its 2x7 transitions.
+        # Full exact control propagates all seven positions for both signs.
+        active=(sorted(range(N),key=lambda i:(-state[i],i))[:2]
+                if quantized else range(N))
+        for at in active:
             for shift in range(N):
                 if direction==1:nxt=(sign*at+shift)%N
                 else:nxt=(sign*(at-shift))%N
