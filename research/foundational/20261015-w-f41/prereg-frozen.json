@@ -1,0 +1,62 @@
+{
+  "schema": "wingless.f41.frozen-source-identifiability.v1",
+  "stage": "ONE_PROSPECTIVE_TRAIN_ONLY_INFORMATION_DIAGNOSTIC_NOT_PRIMARY_ORIGINAL",
+  "design_issue": "https://github.com/spoonman136668-ai/Wingless/issues/238",
+  "engineering_pr": "https://github.com/spoonman136668-ai/Wingless/pull/239",
+  "precode_prereg": "726fff3b1976af89246fc680740b6f0195938865",
+  "source_commit": "58f336d67b383ed274dd6d0ea81a258582dbcb19",
+  "source_tree": "8cc1251a9f7b6669042ca1e6e30c02e25d6af8f1",
+  "source_blob": "0ad89e71c5752411179318605b5bdfd4e412cb0b",
+  "engineering_run": 38777132890,
+  "train_only": {
+    "seeds": [
+      311000,
+      311012
+    ],
+    "families": [
+      350,
+      351,
+      352
+    ],
+    "lengths": [
+      3,
+      5
+    ],
+    "expected_questions": 72
+  },
+  "reserved_primary_original": {
+    "seeds": [
+      312000,
+      312016
+    ],
+    "families": [
+      354,
+      355,
+      356,
+      357
+    ]
+  },
+  "actions": [
+    "expected_answer_information_gain",
+    "expected_final_answer_correctness",
+    "query_frontier",
+    "fixed_acquisition",
+    "no_purchase",
+    "private_hindsight_oracle_unfair"
+  ],
+  "predeclared": {
+    "min_headroom_vs_no_purchase": 0.03,
+    "posterior_budget_small": 12,
+    "posterior_budget_large": 48,
+    "all_2_max_purchases": true,
+    "independent_per_row_audit": true
+  },
+  "limits": {
+    "source_same_repo_no_independent_F3": true,
+    "no_learned_policy_advance_claim": true,
+    "no_primary_original": true,
+    "no_accepted_ref_mutation": true,
+    "no_paid_api": true,
+    "no_FORGE_controller_CKB_KTRADE_Cloudflare_edits": true
+  }
+}
