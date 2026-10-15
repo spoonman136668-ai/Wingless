@@ -17,6 +17,7 @@ class Check(unittest.TestCase):
         self.assertTrue(m.exact(a));self.assertFalse(m.exact(b))
         self.assertEqual(a["source"],b["source"])
         self.assertEqual(a["target"],b["target"])
+        self.assertEqual(set(a["edges"]),set(b["edges"]), "paired counterfactual must preserve same edges")
     def test_state_cap_and_pure_inference(self):
         a=m.construct(171001,141,4,0)
         self.assertEqual(m.construct(171001,141,4,0),a)
