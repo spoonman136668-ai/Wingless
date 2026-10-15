@@ -48,7 +48,7 @@ def check(path,prereg):
   for arm in arms[:-1]:
    answer,cost,bytes_count=m.decide(arm,identity,d["trained_quantized_weights"])
    assert (answer,cost,bytes_count)==(row["answers"][arm],row["abstract_operation_counts"][arm],row["belief_state_bytes"][arm])
-   if arm=="trained_quantized_state":assert bytes_count<=g["compressed_state_bytes_target"]
+   if arm=="trained_quantized_state":assert bytes_count<=p["limits"]["compressed_state_bytes_target"]
    correct[arm]+=int(answer==identity["truth"])
    work[arm]+=cost
   correct["private_truth_oracle_unfair"]+=1
