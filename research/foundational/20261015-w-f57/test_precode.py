@@ -20,9 +20,12 @@ def gate(p):
             assert a["seed_range"][1]<=b["seed_range"][0]
     assert len(p["controls"])==len(set(p["controls"]))
     assert p["controls"]==["learned_public_belief_transition","frozen_F56_budgeted_posterior_beam","fixed_public_mass_state","fixed_public_entropy_state","fixed_known_operator_bank","full_exact_public_bayes_extra_work","private_role_truth_oracle_unfair"]
-    assert p["FIT_gate_before_diagnostic"]["public_exact_accuracy_min"]==.75 if True else True
-    assert p["FIT_gate_before_diagnostic"]["full_public_offline_accuracy_min"]==.85 if False else True
-    for name in ("diagnostic_unconsumed","originals_unconsumed") if False else ("diagnostic_unconsumed","first_use_original_unconsumed"):
+    assert p["FIT_gate_before_diagnostic"]["public_exact_accuracy_min"]==.75
+    assert p["FIT_gate_before_diagnostic"]["exact_over_strongest_budgeted_fair_min_pp"]==5
+    assert p["FIT_gate_before_diagnostic"]["distinct_source_and_frozen_controls"] is True
+    assert p["heldout_gates"]["gain_over_strongest_equal_compute_fair_min_pp"]==5
+    assert p["heldout_gates"]["no_regression_any_heldout_family"] is True
+    for name in ("diagnostic_unconsumed","first_use_original_unconsumed"):
         assert p["restrictions"][name] is True
     for name in ("independent_F3","accepted_ref_mutation","live_optimizer_policy_promotion"):
         assert p["restrictions"][name] is False
@@ -40,6 +43,12 @@ class PrecodeFrozen(unittest.TestCase):
         with self.assertRaises(AssertionError):gate(p)
     def test_wrong_parent_rejected(self):
         p=copy.deepcopy(self.p);p["parent_f56_failed_first_gate"]=False
+        with self.assertRaises(AssertionError):gate(p)
+    def test_weakened_fit_gain_rejected(self):
+        p=copy.deepcopy(self.p);p["FIT_gate_before_diagnostic"]["exact_over_strongest_budgeted_fair_min_pp"]=0
+        with self.assertRaises(AssertionError):gate(p)
+    def test_no_family_regression_remains_required(self):
+        p=copy.deepcopy(self.p);p["heldout_gates"]["no_regression_any_heldout_family"]=False
         with self.assertRaises(AssertionError):gate(p)
     def test_missing_control_rejected(self):
         p=copy.deepcopy(self.p);p["controls"].pop()
