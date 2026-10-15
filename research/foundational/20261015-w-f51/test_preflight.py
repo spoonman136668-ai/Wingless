@@ -8,7 +8,7 @@ class Focused(unittest.TestCase):
   self.assertFalse(set(m.FIT)&set(m.DIAG))
   self.assertFalse(set(m.FIT_FAM)&set(m.DIAG_FAM))
   self.assertFalse(set(m.DIAG)&set(m.RESERVED))
-  for seed,fam in ((502000,908),(522000,908),(501100,904),(521100,900)):
+  for seed,fam in ((502000,908),(542000,968),(501100,904),(541100,960)):
    with self.assertRaises(ValueError):m.source(seed,fam,3)
  def test_full_public_control_is_registered(self):
   self.assertEqual(m.ARMS,("learned_operator_posterior","always_shift","always_reflect",
@@ -21,7 +21,7 @@ class Focused(unittest.TestCase):
   posterior,n=m.fit()
   self.assertEqual(n,64)
   self.assertEqual(len(posterior),32)
-  d=m.source(521000,900,5)
+  d=m.source(541000,960,5)
   self.assertEqual(len(d["context"]),5)
   for sign in (-1,1):
    self.assertIn(m.compose(d["context"],d["public"],d["chain"],d["start"],sign),range(7))

@@ -4,19 +4,19 @@ def run(report,prereg):
  d=json.load(open(report));p=json.load(open(prereg))
  assert d["schema"]=="wingless.f51.five-bit-public-operator.trainonly.v1"
  assert d["stage"]=="DISJOINT_FIT_AND_NOVEL_COMPOSITION_TRAIN_ONLY"
- assert d["fit_seeds"]==p["train_seeds"] and d["fit_families"]==p["train_families"]
+ assert d["fit_seeds"]==p["fit_seeds"] and d["fit_families"]==p["fit_families"]
  assert d["diagnostic_seeds"]==p["diagnostic_seeds"]
  assert d["diagnostic_families"]==p["diagnostic_families"]
- assert d["proposed_original_seeds_NOT_RESERVED"]==p["proposed_primary_original_seeds_NOT_RESERVED"]
+ assert d["proposed_original_seeds_NOT_RESERVED"]==p["future_original_seeds_NOT_RESERVED"]
  assert d["train_examples"]==64 and d["cases"]==128 and len(d["rows"])==128
  assert d["source_independent_F3"] is False and d["original_executed"] is False
  assert d["accepted_ref_mutation"] is False and d["paid_api_calls"]==0
- assert set(d["scores"])==set(p["frozen_controls"])
+ assert set(d["scores"])==set(p["controls"])
  assert len(d["posterior_minus_by_public_context"])==32
  controls=p["frozen_controls"];counts={a:0 for a in controls};seen=set()
  for r in d["rows"]:
   key=r["seed"],r["family"],r["length"]
-  assert key not in seen and 521100<=r["seed"]<521116 and r["family"] in p["diagnostic_families"]
+  assert key not in seen and 541100<=r["seed"]<541116 and r["family"] in p["diagnostic_families"]
   seen.add(key)
   assert len(r["context"])==5 and all(x in (0,1) for x in r["context"])
   assert len(r["public"])==4 and len({x[0] for x in r["public"]})==4

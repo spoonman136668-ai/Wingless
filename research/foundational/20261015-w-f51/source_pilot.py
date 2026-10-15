@@ -5,11 +5,11 @@ physically qualified native 576B residency. Diagnostic policy sees one public
 mapping per role and three public context bits; private sign stays evaluator-only.
 """
 import json,random
-FIT=range(521000,521016)
-DIAG=range(521100,521116)
-FIT_FAM=(900,901,902,903)
-DIAG_FAM=(904,905,906,907)
-RESERVED=range(522000,522016)
+FIT=range(541000,541016)
+DIAG=range(541100,541116)
+FIT_FAM=(960,961,962,963)
+DIAG_FAM=(964,965,966,967)
+RESERVED=range(542000,542016)
 N=7
 ARMS=("learned_operator_posterior","always_shift","always_reflect",
       "full_five_bit_public_nonlinear_rule","three_bit_public_parity","public_hash",
@@ -37,7 +37,7 @@ def source(seed,family,length):
     for role in range(4):
         x=rng.randrange(N)
         visible.append((role,x,(sign*x+private_shifts[role])%N))
-    chain=TEMPLATES[family-900][:length]
+    chain=TEMPLATES[family-960][:length]
     start=rng.randrange(N)
     return dict(seed=seed,family=family,length=length,context=ctx,
         sign=sign,shifts=private_shifts,public=tuple(visible),chain=chain,start=start)
