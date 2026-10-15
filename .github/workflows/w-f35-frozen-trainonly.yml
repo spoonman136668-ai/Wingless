@@ -1,0 +1,85 @@
+name: W-F35 one frozen meta-learned TRAIN-only evaluation (NO original)
+on:
+  push:
+    branches:
+      - science/w-f35-frozen-meta-trainonly-20261015-r1
+permissions:
+  contents: read
+jobs:
+  feasibility:
+    if: "${{ github.event.head_commit.message == 'science(w-f35): one frozen meta-prior TRAIN-only cohort' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Freeze identity and pre-original safeguards
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor df0e2c1721b94e0fc958a71721882d6503661719 HEAD
+          git merge-base --is-ancestor fe964e851d1cefd0d5c295532cc7e97f7a45cba5 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f35/train_only.py)" = 0ea341e0e300d972a28ae14cdc772344b2c88d0e
+          test "$(git hash-object research/foundational/20261015-w-f35/prereg-frozen.json)" = "$(git rev-parse fe964e851d1cefd0d5c295532cc7e97f7a45cba5:research/foundational/20261015-w-f35/prereg-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f35 -p test_preflight.py -v
+      - name: One prospectively frozen TRAIN-only meta-learned evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f35/train_only.py > /tmp/w-f35-train-only-original.json
+          python3 -m json.tool /tmp/w-f35-train-only-original.json > /dev/null
+          sha256sum /tmp/w-f35-train-only-original.json > /tmp/w-f35-train-only-original.sha256
+          git rev-parse HEAD > /tmp/w-f35-source-commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F35-one-frozen-TRAIN-only-evidence
+          path: |
+            /tmp/w-f35-train-only-original.json
+            /tmp/w-f35-train-only-original.sha256
+            /tmp/w-f35-source-commit.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independent row-level source and predeclared verdict checks
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/w-f35-train-only-original.json'))
+          p=json.load(open('research/foundational/20261015-w-f35/prereg-frozen.json'))
+          assert d['stage']=='TRAIN_ONLY_NO_PRIMARY_ORIGINAL'
+          assert d['questions']==p['train_only_eval']['expected_cases']==108
+          assert d['meta_train']==p['meta_train']['seeds']
+          assert d['meta_train_families']==p['meta_train']['families']
+          assert d['eval_seeds']==p['train_only_eval']['seeds']
+          assert d['eval_families']==p['train_only_eval']['families']
+          assert d['reserved_original_seeds']==p['reserved_primary']['seeds']
+          assert d['reserved_original_families']==p['reserved_primary']['families']
+          assert d['primary_original_not_executed'] and not d['independent_F3_source_custody']
+          assert d['questions']==len(d['rows'])==108
+          assert len({(r['seed'],r['family'],r['depth']) for r in d['rows']})==108
+          assert len(d['learned_prior_weights'])==3
+          assert all(232000<=r['seed']<232012 and r['family'] in (204,205,206)
+                     and r['depth'] in (6,8,10) and r['public_demo_count']==32
+                     and len(r['roles'])==r['depth'] for r in d['rows'])
+          for arm,s in d['scores'].items():
+            correct=sum(r['answers'][arm]==r['truth'] for r in d['rows'])
+            assert s['correct']==correct and s['total']==108
+            assert math.isclose(s['accuracy'],correct/108,abs_tol=1e-12)
+          assert d['scores']['privileged_oracle']['correct']==108
+          for family,arms in d['family_scores'].items():
+            subset=[r for r in d['rows'] if r['family']==int(family)]
+            assert len(subset)==36
+            for arm,s in arms.items():
+              assert s['correct']==sum(r['answers'][arm]==r['truth'] for r in subset)
+          fair=('uniform_group_map','permutation_map','last_demo','role_blind')
+          gain=d['scores']['learned_meta']['accuracy']-max(d['scores'][a]['accuracy'] for a in fair)
+          nondegrade=all(d['family_scores'][f]['learned_meta']['accuracy']>=max(d['family_scores'][f][a]['accuracy'] for a in fair) for f in d['family_scores'])
+          expected='TRAIN_ONLY_META_LEARNED_ROLE_GAP_QUALIFIED' if gain>=.03 and nondegrade else 'TRAIN_ONLY_META_LEARNED_ROLE_NO_GAIN'
+          assert d['verdict']==expected
+          print('W_F35_TRAIN_ONLY_RESULT',expected,{a:v['correct'] for a,v in d['scores'].items()},'meta_examples',d['training_validation_examples'])
+          PY
+      - name: Authority
+        run: echo "Development TRAIN-only qualification, no F3 source admission or primary-original dispatch"
