@@ -1,0 +1,68 @@
+{
+  "schema": "wingless.f37.prereg-candidate.v1",
+  "stage": "FRESH_TRAIN_ONLY_PREIMPLEMENTATION",
+  "parent_negative_run": 38748282508,
+  "parent_branch_head": "f7f197355fb3211f6f3b5b4086f7656930f862ed",
+  "design_issue": "https://github.com/spoonman136668-ai/Wingless/issues/229",
+  "hypothesis": "Doubly stochastic, inverse-consistent quantized learned role bindings using tied forward/inverse edge evidence improve prospective long-chain accuracy against exact permutation and affine operator controls.",
+  "mechanism": "Per-graph gradient-trained role transition logits from public noisy triples. Sinkhorn row/column projection represents one-to-one entity transitions. Forward and inverse relation composition use same normalized q8 matrix, not a free reverse model. No secret operator or truth at inference.",
+  "train_only": {
+    "seeds": [
+      261000,
+      261012
+    ],
+    "families": [
+      240,
+      241,
+      242
+    ],
+    "depths": [
+      4,
+      6,
+      8
+    ],
+    "expected_questions": 108,
+    "roles": 8,
+    "nodes": 8,
+    "public_demos_per_role": 5
+  },
+  "reserved_original": {
+    "seeds": [
+      262000,
+      262016
+    ],
+    "families": [
+      244,
+      245,
+      246,
+      247
+    ],
+    "forbidden": true
+  },
+  "matched_controls": [
+    "doubly_stochastic_learned",
+    "Hungarian_permutation_MAP",
+    "affine_XOR_MAP",
+    "frequency_walk",
+    "role_scrambled_ablation",
+    "privileged_oracle"
+  ],
+  "pass": {
+    "gain_above_best_fair": 0.03,
+    "per_family_nondegradation": true,
+    "source_dual_oracle_agreement": true,
+    "role_order_changes_observed": true
+  },
+  "resources": {
+    "quantized_model_bytes": 512,
+    "native_scratch_limit_bytes": 64,
+    "total_core_max_bytes": 576,
+    "external_optimizer_demo_cost_separate": true
+  },
+  "authority": {
+    "no_primary_original": true,
+    "independent_F3_custody": false,
+    "no_controller_FORGE_KTRADE_Cloudflare_modifications": true,
+    "no_paid_API": true
+  }
+}
