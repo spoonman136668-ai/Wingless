@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.f44.counterfactual-two-read-prereg.v1",
+  "stage": "PRECODE_PREREG_NO_SCIENCE_EXECUTED",
+  "parent_w_f43_preflight_sha": "4ac3643813104c40b5e91e24e967d63f8734c674",
+  "prior_negative_run": 38796715777,
+  "design_issue": 245,
+  "hypothesis": "A bounded two-step counterfactual policy maximizing expected terminal final-answer correctness after a second possible mapping purchase (using observable posterior worlds and a predeclared 4-action frontier shortlist) improves fresh inverse/reused-role reasoning accuracy over exact-entropy, one-step decision-value, and query-frontier acquisition.",
+  "train_only": {
+    "seeds": [
+      351000,
+      351008
+    ],
+    "families": [
+      430,
+      431,
+      432
+    ],
+    "lengths": [
+      3,
+      5
+    ],
+    "cases": 48,
+    "roles": 4,
+    "domain": 6,
+    "visible_pairs_per_role": 3,
+    "paid_mapping_cap": 2,
+    "candidate_first_beam": 4,
+    "initial_posterior_max": 1296
+  },
+  "reserved_original": {
+    "seeds": [
+      352000,
+      352016
+    ],
+    "families": [
+      434,
+      435,
+      436,
+      437
+    ]
+  },
+  "controls": [
+    "two_step_counterfactual",
+    "one_step_value",
+    "exact_entropy",
+    "query_frontier",
+    "no_purchase",
+    "private_oracle_unfair"
+  ],
+  "thresholds": {
+    "accuracy_gain_over_strongest_fair_min": 0.03,
+    "per_family_nondegradation": true,
+    "independent_all_row_and_purchase_receipt_audit": true,
+    "compute_budget_parity_required_for_efficiency_claim": true,
+    "maximum_compute_work_ratio_vs_strongest_baseline": 1.2
+  },
+  "constraints": {
+    "zero_or_one_purchase_termination_allowed": true,
+    "source_worlds_exact_only_for_reduced_synthetic_source": true,
+    "all_candidates_public_only": true,
+    "source_family_not_selector_feature": true,
+    "posterior_cpu_and_memory_accounted_separately": true,
+    "independent_F3_custody": false,
+    "primary_original_executed": false,
+    "native_576_byte_residency_qualified": false,
+    "no_paid_API_or_Codex": true,
+    "no_CKB_FORGE_KTRADE_controller_or_accepted_ref_mutation": true
+  }
+}
