@@ -19,7 +19,7 @@ CONDITIONS=("role-permutation","edge-dropout","bridge-rewiring")
 ARMS=("learned","canonical","jaccard","two_of_three","fixed_trajectory","no_link","privileged_oracle")
 NUM_CANDIDATES=8
 CORE_BUDGET=576
-FEATURE_COUNT=11
+FEATURE_COUNT=12
 MASK=0xffffffff
 def stream(seed,family,condition,serial):
     return random.Random(seed*1000003+family*10007+condition*431+serial*53)
@@ -39,13 +39,13 @@ def graph(seed,family,serial,test):
     if family%2:
         for b in range(2,n,3):edges.add((0,b))
     # Edge role labels are source-generated (not identities).
-    return n,tuple(sorted((a,b,(a*7+b*5+family+seed+serial)%4) for a,b in edges))
+    return n,tuple(sorted((a,b,(a*7+b*5+family+seed+serial)%(6 if test else 4)) for a,b in edges))
 
 def observed(source,seed,family,condition,encounter,truth,test):
     n,edges=source
     rng=stream(seed,family,condition+7,encounter+int(not truth)*1000)
     perm=list(range(n));rng.shuffle(perm)
-    rolemap=list(range(4));rng.shuffle(rolemap)
+    rolemap=list(range(6 if test else 4));rng.shuffle(rolemap)
     # Source and destination use different anon node IDs in each episode.
     result=[]
     for a,b,r in edges:
@@ -162,7 +162,7 @@ def original():
     return dict(schema="wingless.f30.structural-trajectory-development.v1",stage="DEVELOPMENT_ONLY",
       parent="f9f322dfc4760868491be67a5ba050ebcd4a690a",native_core_budget_bytes=CORE_BUDGET,
       actual_coefficient_bytes=len(weights)*8,external_encounter_storage_metered_separately=True,
-      external_encounter_values_per_query=2*NUM_CANDIDATES*9*9,training_pairs=ntrain,training_epoch_count=140,
+      external_encounter_values_per_query_upper_bound=2*NUM_CANDIDATES*9*9,training_pairs=ntrain,training_epoch_count=140,
       weights=weights,train_seeds=[161000,161080],test_seeds=[162500,162516],
       train_families=TRAIN_FAMILIES,test_families=TEST_FAMILIES,conditions=CONDITIONS,
       all_candidates_enumerated_without_truth=True,truth_not_given_to_scorer=True,
