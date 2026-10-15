@@ -1,0 +1,59 @@
+name: Wingless F19 redundant causal witness original
+on:
+  push:
+    branches: [research/w-f19-redundant-causal-witnesses-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: go.mod}
+      - name: Verify frozen source and F19 prereg
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5ebcc66b63c4de08b1819d82690f6315a3b61a67 HEAD
+          test "$(git hash-object unitary/f17_frozen_online_cost.go)" = "$(git rev-parse 5ebcc66b63c4de08b1819d82690f6315a3b61a67:unitary/f17_frozen_online_cost.go)"
+          python3 -m json.tool research/foundational/20261015-w-f19/prereg.json >/dev/null
+      - name: Original scientific F19 two-witness DEVELOPMENT
+        run: |
+          set -euo pipefail
+          go run ./cmd/f19-wingless > /tmp/w-f19-original-development.json
+          python3 -m json.tool /tmp/w-f19-original-development.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F19-original-redundant-causal-witnesses
+          path: /tmp/w-f19-original-development.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independent exact row and source budget check
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          d=json.load(open("/tmp/w-f19-original-development.json"))
+          assert d["stage"]=="DEVELOPMENT_ONLY" and d["graph_states"]==96
+          assert d["question_count"]==672 and d["positive_count"]==384 and d["negative_count"]==288
+          assert d["native_state_bytes"]==576 and not d["model_retrained"]
+          assert not d["source_birth_independent"] and not d["sealed_first_use"]
+          assert not d["accepted_ref_mutation"]
+          assert collections.Counter(r["Family"] for r in d["rows"])=={108:168,109:168,110:168,111:168}
+          assert collections.Counter(r["Variant"] for r in d["rows"])==dict.fromkeys(range(7),96)
+          assert all(r["Truth"]==[True,True,True,False,False,False,True][r["Variant"]] for r in d["rows"])
+          for name,key in (("full","Full"),("risk","Risk"),("static","Static")):
+            s=d["scores"][name]
+            assert s["correct"]==sum(r[key]["answer"]==r["Truth"] for r in d["rows"])
+            assert s["steps"]==sum(r[key]["steps"] for r in d["rows"])
+            assert s["false_positives"]==sum(r[key]["answer"] for r in d["rows"] if not r["Truth"])
+            assert s["false_negatives"]==sum(not r[key]["answer"] for r in d["rows"] if r["Truth"])
+          assert d["registered_verdict"] in ("DEVELOPMENT_FROZEN_TWO_WITNESS_TRANSFER",
+             "DEVELOPMENT_NO_FROZEN_TWO_WITNESS_TRANSFER",
+             "DEVELOPMENT_TWO_WITNESS_FULL_REASONING_PASS_RISK_STOP_FAILURE")
+          print("W_F19_VERDICT",d["registered_verdict"],d["scores"])
+          PY
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
