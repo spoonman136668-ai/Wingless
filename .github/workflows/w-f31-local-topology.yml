@@ -1,0 +1,56 @@
+name: W-F31 two-round WL relational identity structural transfer
+on:
+  push:
+    branches: [research/w-f31-wl-local-structure-transfer-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: go.mod}
+      - name: Strict prereg and source freeze before new original
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor e2a3ad22f01f0eeee38140e460920ad9076a9d98 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f30/execute.py)" = "$(git rev-parse e2a3ad22f01f0eeee38140e460920ad9076a9d98:research/foundational/20261015-w-f30/execute.py)"
+          python3 -m py_compile research/foundational/20261015-w-f31/execute.py
+          python3 -m json.tool research/foundational/20261015-w-f31/prereg.json >/dev/null
+      - name: One new development original from frozen source
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f31/execute.py > /tmp/w-f31-original.json
+          python3 -m json.tool /tmp/w-f31-original.json > /dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F31-original-local-topological-identity
+          path: /tmp/w-f31-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independently aggregate original and verify frozen verdict
+        run: |
+          python3 - <<'PY'
+          import json,collections
+          d=json.load(open("/tmp/w-f31-original.json"))
+          assert d["stage"]=="DEVELOPMENT_ONLY" and d["questions"]==192
+          assert d["wl_node_refinement_depth"]==2 and d["role_name_permutation_invariant"]
+          assert len(d["weights"])==16 and d["training_pairs"]==7680
+          assert d["train_seeds"]==[168000,168080] and d["test_seeds"]==[169500,169516]
+          assert d["native_core_budget_bytes"]==576 and d["independently_born_F3_source"] is False
+          assert not d["sealed_first_use"] and not d["accepted_ref_mutation"]
+          assert collections.Counter(x["family"] for x in d["rows"])=={132:48,133:48,134:48,135:48}
+          for name in ("learned","wl_fixed","canonical","jaccard","two_of_three","fixed_trajectory","no_link","privileged_oracle"):
+            s=d["scores"][name]
+            assert s["correct"]==sum(r["predictions"][name]==r["truth_index"] for r in d["rows"])
+          assert d["scores"]["privileged_oracle"]["correct"]==192
+          assert d["verdict"] in ("DEVELOPMENT_WL_RELATIONAL_TRANSFER_LEARNED_GAIN",
+            "DEVELOPMENT_WL_RELATIONAL_TRANSFER_NO_QUALIFIED_GAIN")
+          print("W_F31_VERDICT",d["verdict"],d["scores"])
+          PY
+      - name: Full Wingless repository regression and build
+        run: go test ./... && go build ./...
