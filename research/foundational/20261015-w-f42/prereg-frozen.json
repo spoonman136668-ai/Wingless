@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.f42.frozen-train-only-rank-source.v1",
+  "stage": "ONE_FRESH_TRAIN_ONLY_SOURCE_DIAGNOSTIC_NOT_PRIMARY_ORIGINAL",
+  "prereg_before_code_commit": "ac32ae3928c8097989b09074dec74a0b768e7926",
+  "source_qualified_head": "97ec7860a363e8431c9b31a2424bb19a863166a4",
+  "source_tree": "cf52f10d335c96bea107591b9eef681ac627795f",
+  "source_blob": "0e84192fec880b4434be0f5a315357e67143eccf",
+  "engineering_run": 38791044382,
+  "cohort": {
+    "seeds": [
+      321000,
+      321012
+    ],
+    "families": [
+      370,
+      371,
+      372
+    ],
+    "lengths": [
+      3,
+      5
+    ],
+    "expected_cases": 72
+  },
+  "reserved_primary": {
+    "seeds": [
+      322000,
+      322016
+    ],
+    "families": [
+      374,
+      375,
+      376,
+      377
+    ],
+    "never_generate": true
+  },
+  "sample_budgets": [
+    12,
+    48,
+    192
+  ],
+  "arms": [
+    "query_frontier",
+    "decision_value_48",
+    "decision_value_192",
+    "information_gain_192",
+    "no_purchase",
+    "privileged_hindsight_unfair"
+  ],
+  "acceptance": {
+    "minimum_48_192_rank_agreement": 0.55,
+    "minimum_accuracy_gain_over_fair_48": 0.03,
+    "per_family_no_degradation": true,
+    "source_truth_oracle_all_correct": true,
+    "all_case_receipt_replay": true
+  },
+  "limits": {
+    "at_most_two_paid_unique_mappings": true,
+    "external_192_completion_memory_bytes": 12288,
+    "public_only_decisions": true,
+    "source_same_repository_not_F3": true,
+    "actual_native_576_byte_resident_unqualified": true,
+    "no_scientific_original": true,
+    "no_accepted_ref_mutation": true,
+    "no_paid_API": true,
+    "no_FORGE_controller_KTRADE_changes": true
+  }
+}
