@@ -1,0 +1,61 @@
+name: W-F54 public calibration identifiability FIT-only source and TRAIN
+on:
+  push:
+    branches: [research/w-f54-public-calibration-identifiability-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Validate prior first-alone frozen source identity and focused negatives
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 87e0cb48a3d7a8fbf909fea6e68fab3f50c743c7 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f54/prereg.json)" = d5c083b7af56ab09bafa6a07e6ada52480a9084d
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f54 -p test_preflight.py -v
+      - name: One full Go regression vet build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+  diagnostic:
+    if: "${{ github.event.head_commit.message == 'science(w-f54): once-only fresh public identifiability TRAIN' && github.run_attempt == 1 }}"
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Exactly one new TRAIN cohort and complete independent public-audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/wf54";mkdir -p "$root"
+          python3 -B research/foundational/20261015-w-f54/source_pilot.py > "$root/result.json"
+          python3 -B research/foundational/20261015-w-f54/audit_result.py \
+            "$root/result.json" research/foundational/20261015-w-f54/prereg.json > "$root/audit.txt"
+          (cd "$root";sha256sum result.json audit.txt > manifest.sha256)
+          printf '%s\n' "$GITHUB_SHA" > "$root/SOURCE_SHA"
+          cat "$root/audit.txt"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: W-F54-active-calibration-new-TRAIN-not-F3-original
+          path: ${{ runner.temp }}/wf54/
+          retention-days: 30
+          if-no-files-found: error
