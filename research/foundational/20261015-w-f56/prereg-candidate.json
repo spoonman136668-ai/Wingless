@@ -1,0 +1,92 @@
+{
+  "schema": "wingless.f56.partial-observable-compositional-inference.prereg.v1",
+  "stage": "PRECODE_FROZEN",
+  "tracking_issue": 272,
+  "parent_F55_fit_witness_run": 38820556274,
+  "reason_to_shift": "F55 two public calibration pairs made exact role maps fully determined, 128/128 FIT and no meaningful accuracy headroom.",
+  "hypothesis": "Under incomplete/noisy role calibration, train a bounded shared relational state transition approximating the exact high-cost public posterior with better unseen task accuracy than strongest cost-matched fair symbolic/public controls.",
+  "fit": {
+    "seeds": [
+      621000,
+      621016
+    ],
+    "families": [
+      1140,
+      1141,
+      1142,
+      1143
+    ],
+    "chain_lengths": [
+      6,
+      8
+    ],
+    "expected_cases": 128
+  },
+  "diagnostic": {
+    "seeds": [
+      621100,
+      621116
+    ],
+    "families": [
+      1144,
+      1145,
+      1146,
+      1147
+    ],
+    "chain_lengths": [
+      8,
+      10
+    ],
+    "expected_cases": 128,
+    "source_shifts": [
+      "novel_variable_role_ordering",
+      "independent_noise_regimes"
+    ]
+  },
+  "protected_original_NOT_RESERVED": {
+    "seeds": [
+      622000,
+      622016
+    ],
+    "families": [
+      1148,
+      1149,
+      1150,
+      1151
+    ]
+  },
+  "observations": {
+    "public_role_pairs_per_role": 2,
+    "at_least_one_noisy_pair_in_some_cases": true,
+    "hidden_role_map_never_available_to_decision": true,
+    "public_only_exact_posterior_required": true
+  },
+  "controls": [
+    "learned_shared_relation_transition",
+    "budget_matched_fixed_public_posterior_beam",
+    "public_support_nearest",
+    "fixed_known_operator_bank",
+    "full_exact_public_bayes",
+    "private_truth_oracle_unfair"
+  ],
+  "feasibility_first": {
+    "FIT_only_exact_public_solver_min_accuracy": 0.75,
+    "FIT_only_fair_budget_headroom_min_pp": 0.05,
+    "holdout_not_consumed_before_model_and_controls_frozen": true
+  },
+  "thresholds": {
+    "gain_vs_strongest_equal_work_fair_min": 0.05,
+    "loss_vs_exact_max_absolute": 0.02,
+    "posterior_operation_ratio_vs_exact_max": 0.5,
+    "per_family_nondegradation": true
+  },
+  "authority": {
+    "learn_only_on_FIT": true,
+    "source_independent_F3": false,
+    "primary_original_first_use": false,
+    "native_total_576B_unverified": true,
+    "accepted_ref_mutation": false,
+    "paid_API_or_Codex": false,
+    "independent_projects": true
+  }
+}
