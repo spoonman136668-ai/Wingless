@@ -1,0 +1,30 @@
+name: Wingless F53 FIT-only preregulated source preflight
+on:
+  push:
+    branches:
+      - research/w-f53-learned-task-value-belief-pruning-20261015-r1
+permissions:
+  contents: read
+jobs:
+  source-preflight:
+    if: "${{ github.event.head_commit.message == 'test(w-f53): independently qualify FIT-only value pruning preflight' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Freeze precode preregistration and registered FIT model identity
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5561233e1853c301dd2b5763acc6435befd72e38 HEAD
+          git merge-base --is-ancestor 6c39c4bb9465f3df62c0063726eca0e4b263c22b HEAD
+          test "$(git hash-object research/foundational/20261015-w-f53/prereg-candidate.json)" = 59bca9b8e3aed64aaae62d8b41e9a6618e732926
+          test "$(git hash-object research/foundational/20261015-w-f53/source_pilot.py)" = 3a9b6c047fa5a67a6f939465ee2bc149da7feccd
+          test "$(git hash-object research/foundational/20261015-w-f53/test_preflight.py)" = 34be6d8f790ad9de023de50d844ef5e4dafbd5c0
+          python3 -m json.tool research/foundational/20261015-w-f53/prereg-candidate.json >/dev/null
+          python3 -B -m py_compile research/foundational/20261015-w-f53/source_pilot.py
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f53 -p test_preflight.py -v
+      - name: No prospective cohort consumed
+        run: echo "TRAIN_FIT_ONLY_TESTS=TRUE; NEW_DIAGNOSTIC=FALSE; PRIMARY_ORIGINAL=FALSE; ACCEPTED_REFS_UNCHANGED=TRUE"
