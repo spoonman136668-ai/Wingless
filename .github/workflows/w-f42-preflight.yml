@@ -1,0 +1,34 @@
+name: W-F42 posterior ranking source preflight (NO original)
+on:
+  push:
+    branches:
+      - research/w-f42-posterior-rank-calibration-20261015-r1
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Ensure negative predecessor and pre-code science preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 58f336d67b383ed274dd6d0ea81a258582dbcb19 HEAD
+          git merge-base --is-ancestor ac32ae3928c8097989b09074dec74a0b768e7926 HEAD
+          python3 -m json.tool research/foundational/20261015-w-f42/prereg-candidate.json >/dev/null
+          python3 -m py_compile research/foundational/20261015-w-f42/source_pilot.py
+      - name: Source-only identity and evidence boundary tests
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f42 -p test_preflight.py -v
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
+      - name: Non-execution boundary
+        run: |
+          echo "F42 engineering only, no prospective source cohort or original executed"
