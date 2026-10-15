@@ -1,0 +1,32 @@
+name: W-F30 structural transfer engineering preflight
+on:
+  push:
+    branches:
+      - research/w-f30-role-trajectory-transfer-20261015-r1
+permissions:
+  contents: read
+jobs:
+  qualification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify parent source and prereg before original
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor f9f322dfc4760868491be67a5ba050ebcd4a690a HEAD
+          python3 -m json.tool research/foundational/20261015-w-f30/prereg-candidate.json > /dev/null
+          python3 -m py_compile research/foundational/20261015-w-f30/execute.py
+      - name: Focused train-only source interface checks
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f30 -p test_preflight.py -v
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
+      - name: Engineering-only attestation
+        run: echo "W-F30 pre-original engineering checks only; no test cohort or original executed"
