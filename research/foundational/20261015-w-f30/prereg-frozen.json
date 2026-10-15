@@ -1,0 +1,83 @@
+{
+  "schema": "wingless.f30.prereg-frozen.v1",
+  "status": "LOCKED_BEFORE_DEVELOPMENT_ORIGINAL",
+  "experiment_id": "W-F30",
+  "predecessor_negative": {
+    "original_run": 38716258056,
+    "source_commit": "f9f322dfc4760868491be67a5ba050ebcd4a690a"
+  },
+  "proposal_commit": "1760d99819d9d6b74f77022a92f5be2cf0bd46a7",
+  "qualified_implementation_commit": "62c946634f3c4370542fb647ed13ce144d9a4404",
+  "qualified_implementation_tree": "5f044c2a39db145263830425206cfb1d7041ef99",
+  "source_path": "research/foundational/20261015-w-f30/execute.py",
+  "source_blob_sha": "09bfbe9f2e3e0d43388f5727bcd32229ff98fa52",
+  "qualification_run": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38718163857",
+  "train": {
+    "seeds": [
+      161000,
+      161080
+    ],
+    "families": [
+      120,
+      121,
+      122,
+      123
+    ],
+    "candidate_examples": 7680,
+    "weight_count": 12,
+    "epochs": 140,
+    "role_types": 4
+  },
+  "test": {
+    "seeds": [
+      162500,
+      162516
+    ],
+    "families": [
+      124,
+      125,
+      126,
+      127
+    ],
+    "conditions": [
+      "role-permutation",
+      "edge-dropout",
+      "bridge-rewiring"
+    ],
+    "role_types": 6,
+    "candidates": 8,
+    "expected_queries": 192
+  },
+  "measured_methods": [
+    "learned",
+    "canonical",
+    "jaccard",
+    "two_of_three",
+    "fixed_trajectory",
+    "no_link",
+    "privileged_oracle"
+  ],
+  "acceptance": {
+    "test_oracle_correct": 192,
+    "min_absolute_gain_vs_best_fair": 0.03,
+    "per_family_non_degradation": true,
+    "hard_negative_mismatch_accounted_as_error": true,
+    "invalid_if_identity_leak_or_cost_drift": true
+  },
+  "disclosures": {
+    "graph_family_generators_author_programmed": true,
+    "same_repo_data_generation": true,
+    "no_independent_F3_source_custody": true,
+    "core_budget_bytes": 576,
+    "actual_learner_coefficient_bytes": 96,
+    "external_encounter_memory_separate": true,
+    "test_labels_unavailable_to_scorer": true,
+    "stage": "DEVELOPMENT_ONLY"
+  },
+  "execution": {
+    "exactly_one_original": true,
+    "full_regression_passed_before_freeze": true,
+    "no_accepted_ref_mutation": true,
+    "no_controller_or_FORGE_cloudflare_KTRADE_edits": true
+  }
+}

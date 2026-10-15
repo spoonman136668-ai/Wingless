@@ -1,0 +1,87 @@
+name: W-F30 frozen one-shot developmental science
+on:
+  push:
+    branches:
+      - science/w-f30-frozen-original-20261015-r1
+permissions:
+  contents: read
+jobs:
+  original:
+    if: "${{ github.event.head_commit.message == 'science(w-f30): frozen development original' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Frozen preregistration and exact-source preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 62c946634f3c4370542fb647ed13ce144d9a4404 HEAD
+          git merge-base --is-ancestor 7476228c14bcedc2f01ad9fec737ee68a5b890fb HEAD
+          test "$(git hash-object research/foundational/20261015-w-f30/execute.py)" = 09bfbe9f2e3e0d43388f5727bcd32229ff98fa52
+          test "$(git hash-object research/foundational/20261015-w-f30/prereg-frozen.json)" = "$(git rev-parse 7476228c14bcedc2f01ad9fec737ee68a5b890fb:research/foundational/20261015-w-f30/prereg-frozen.json)"
+          python3 -m json.tool research/foundational/20261015-w-f30/prereg-frozen.json > /dev/null
+          python3 -m unittest discover -s research/foundational/20261015-w-f30 -p test_preflight.py -q
+      - name: Single prospective W-F30 developmental original
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f30/execute.py > /tmp/w-f30-original.json
+          python3 -m json.tool /tmp/w-f30-original.json > /dev/null
+          sha256sum /tmp/w-f30-original.json > /tmp/w-f30-original.sha256
+          git rev-parse HEAD > /tmp/w-f30-original-commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F30-once-development-original
+          path: |
+            /tmp/w-f30-original.json
+            /tmp/w-f30-original.sha256
+            /tmp/w-f30-original-commit.txt
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Independent row-by-row evidence audit
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,collections,math
+          d=json.load(open('/tmp/w-f30-original.json'))
+          p=json.load(open('research/foundational/20261015-w-f30/prereg-frozen.json'))
+          assert d['schema']=='wingless.f30.structural-trajectory-development.v1'
+          assert d['stage']=='DEVELOPMENT_ONLY' and not d['sealed_first_use']
+          assert not d['independently_born_F3_source'] and not d['accepted_ref_mutation']
+          assert d['questions']==p['test']['expected_queries']==192
+          assert d['training_pairs']==p['train']['candidate_examples']==7680
+          assert len(d['weights'])==p['train']['weight_count']==12
+          assert d['actual_coefficient_bytes']<=d['native_core_budget_bytes']==576
+          assert d['truth_not_given_to_scorer'] and d['all_candidates_enumerated_without_truth']
+          assert set(d['train_families'])==set(p['train']['families'])
+          assert set(d['test_families'])==set(p['test']['families'])
+          assert set(d['conditions'])==set(p['test']['conditions'])
+          assert len(d['rows'])==192
+          assert len({(r['seed'],r['family'],r['condition']) for r in d['rows']})==192
+          assert collections.Counter(r['family'] for r in d['rows'])==dict.fromkeys(p['test']['families'],48)
+          assert all(162500<=r['seed']<162516 for r in d['rows'])
+          assert all(0<=r['truth_index']<8 and len(r['candidate_motifs'])==8 and r['candidate_count']==8 for r in d['rows'])
+          assert all(len(r['pair_feature_sha256'])==64 for r in d['rows'])
+          for arm,s in d['scores'].items():
+            right=sum(r['predictions'][arm]==r['truth_index'] for r in d['rows'])
+            assert s['correct']==right and s['total']==192
+            assert math.isclose(s['accuracy'],right/192,abs_tol=1e-12)
+          assert d['scores']['privileged_oracle']['correct']==192
+          for family,arms in d['by_family'].items():
+            cohort=[r for r in d['rows'] if r['family']==int(family)]
+            assert len(cohort)==48
+            for arm,s in arms.items():
+              assert s['correct']==sum(r['predictions'][arm]==r['truth_index'] for r in cohort)
+          assert d['verdict'] in ('DEVELOPMENT_STRUCTURAL_TRANSFER_LEARNED_GAIN','DEVELOPMENT_STRUCTURAL_TRANSFER_NO_QUALIFIED_GAIN')
+          print('W_F30_REGISTERED',d['verdict'],{a:d['scores'][a]['correct'] for a in d['scores']})
+          PY
+      - name: Development evidence only
+        run: echo "W-F30 completed developmental original; no F3 claim, acceptance or controller changes"

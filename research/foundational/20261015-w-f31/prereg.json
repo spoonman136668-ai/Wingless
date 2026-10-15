@@ -1,0 +1,74 @@
+{
+  "schema": "wingless.f31.prereg.v1",
+  "parent_original": "e2a3ad22f01f0eeee38140e460920ad9076a9d98",
+  "science": "Can a train-only learnable local topological fingerprint distinguish anonymized encounters from unseen graph-generating families better than fixed structural controls after W-F30 learned motif global statistics failed?",
+  "model": {
+    "local_structure": "Two rounds of Weisfeiler-Lehman refinement from raw graph degrees, neighbor color signatures; node names and shuffled role labels ignored",
+    "trainable_weights": 16,
+    "feature_vector": "12 original motif-based features +3 WL-depth Jaccard similarity levels +1 weighted local-scale composite",
+    "training_seeds": [
+      168000,
+      168080
+    ],
+    "training_families": [
+      128,
+      129,
+      130,
+      131
+    ],
+    "training_pairs": 7680,
+    "train_epochs": 140,
+    "train_regularization": 0.0003,
+    "source_generated_encounter_trajectories": true
+  },
+  "test": {
+    "new_seeds": [
+      169500,
+      169516
+    ],
+    "new_families": [
+      132,
+      133,
+      134,
+      135
+    ],
+    "new_graph_node_count": 9,
+    "train_graph_node_count": 8,
+    "conditions": [
+      "role-permutation",
+      "edge-dropout",
+      "bridge-rewiring"
+    ],
+    "candidates_per_query": 8,
+    "questions": 192,
+    "graph_identifiers_anonymized": true,
+    "test_family_labels_not_given_to_policy": true
+  },
+  "controls": [
+    "16-weight learned local+motif features",
+    "untrained fixed weighted WL overlap",
+    "canonical motif absolute-difference sum",
+    "normalized motif/Jaccard",
+    "2-of-3 motif gate",
+    "fixed edge-triangle-wedge trajectory",
+    "reject all candidates",
+    "privileged true identity index oracle"
+  ],
+  "acceptance": {
+    "source_count": 192,
+    "oracle_accuracy": 1,
+    "minimum_absolute_learned_advantage_over_best_programmed": 0.03,
+    "never_worse_than_best_programmed_in_any_test_family": true
+  },
+  "verdicts": [
+    "DEVELOPMENT_WL_RELATIONAL_TRANSFER_LEARNED_GAIN",
+    "DEVELOPMENT_WL_RELATIONAL_TRANSFER_NO_QUALIFIED_GAIN"
+  ],
+  "limits": {
+    "graph_generator_and_structural_embedding_programmed": true,
+    "external_encounter_storage_separate_from_native_576B_budget": true,
+    "source_independent_birth_F3": false,
+    "source_sealed_first_use": false,
+    "no_FORGE_KTRADE_controllers_cloudflare_mutations": true
+  }
+}
