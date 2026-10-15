@@ -1,0 +1,65 @@
+name: Wingless F55 FIT-only public-feasibility and full-regression gate
+on:
+  push:
+    branches:
+      - research/w-f55-public-feasible-role-binding-20261015-r1
+permissions:
+  contents: read
+jobs:
+  fit-only-evidence:
+    if: "${{ github.event.head_commit.message == 'science(w-f55): one frozen FIT-only public role feasibility gate' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Source and prereg hash exact-head identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 11eec04d174489c99d037f5990e893390c39d5b8 HEAD
+          git merge-base --is-ancestor 4594e6d9dc12f2d0364b8e867716a811e16ae88d HEAD
+          test "$(git hash-object research/foundational/20261015-w-f55/prereg-candidate.json)" = 47515bea8590e3a5c849ce058587fa1852d991a7
+          test "$(git hash-object research/foundational/20261015-w-f55/source_feasibility.py)" = 251367c9b2acc3830c0250611b31cddf7b5dd43d
+          test "$(git hash-object research/foundational/20261015-w-f55/test_fit_preflight.py)" = e72644c9777445fab32339ae79ce45b1d70099bd
+          python3 -B -m py_compile research/foundational/20261015-w-f55/source_feasibility.py
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f55 -p test_fit_preflight.py -v
+      - name: One full existing repository regression and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: Exactly one FIT-only source feasibility witness, with no diagnostic use
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/w-f55"
+          python3 -B research/foundational/20261015-w-f55/source_feasibility.py --fit-only > "$RUNNER_TEMP/w-f55/fit-only-result.json"
+          python3 -B - "$RUNNER_TEMP/w-f55/fit-only-result.json" <<'PY'
+          import json,sys
+          doc=json.load(open(sys.argv[1]))
+          assert doc['public_constructive_accuracy'] >= 0.85
+          assert doc['train_fit_cases']==128
+          assert doc['disjoint_diagnostic_unused'] is True
+          assert doc['originals_unused'] is True
+          print('F55_FIT_ONLY_SOURCE_FEASIBILITY=PASS',doc['public_constructive_accuracy'])
+          PY
+          git rev-parse HEAD > "$RUNNER_TEMP/w-f55/SOURCE_SHA"
+          (cd "$RUNNER_TEMP/w-f55" && sha256sum fit-only-result.json > manifest.sha256)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Wingless-F55-FIT-only-public-source-feasibility
+          path: ${{ runner.temp }}/w-f55/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Scientific original and diagnostic exclusion
+        run: echo "FIT_ONLY=TRUE DIAGNOSTIC=UNCONSUMED PROTECTED_ORIGINAL=UNTOUCHED F3=UNQUALIFIED"
