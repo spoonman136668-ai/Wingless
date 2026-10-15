@@ -1,0 +1,44 @@
+name: W-F33 ordered role operator TRAIN-only qualification
+on:
+  push:
+    branches:
+      - research/w-f33-role-transducer-source-preflight-20261015-r1
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: go.mod}
+      - name: Frozen previous original and train-only prereg verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 6b46109cfda106696b8d68e23163c32cdc364420 HEAD
+          git merge-base --is-ancestor b8070adf65e7291337fb1d1d3409dea51f042365 HEAD
+          python3 -m json.tool research/foundational/20261015-w-f33/prereg-candidate.json > /dev/null
+          python3 -m py_compile research/foundational/20261015-w-f33/execute.py
+      - name: Focused identity and directed-role invariants
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f33 -p test_preflight.py -v
+      - name: One qualified TRAIN-only model preparation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f33/execute.py > /tmp/w-f33-train-only.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/w-f33-train-only.json'))
+          assert d['stage']=='TRAIN_ONLY_NO_RESERVED_ORIGINAL'
+          assert d['train_examples']==6144 and d['weights_count']==36
+          assert d['train_coefficients_bytes']==288 and d['state_limit_bytes']==576
+          assert d['reserved_original_not_executed'] and not d['independent_F3_source']
+          print('W_F33_TRAIN_ONLY_PASS')
+          PY
+      - name: One complete Go regression and build
+        run: go test ./... && go build ./...
+      - name: Preserve boundary
+        run: echo "W-F33 train-source only, no reserved test source generated, no original executed"
