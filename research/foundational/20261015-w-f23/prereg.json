@@ -1,0 +1,106 @@
+{
+  "schema": "wingless.f23.prereg.v1",
+  "parent_F22": "5a785822bf8fe7aa9878ab374dfd799a9d6f3633",
+  "question": "Can a small learned per-node evidence similarity metric infer alias candidate pairs in an unchanged 576-byte typed graph without a supplied (old ID,alias ID) certificate?",
+  "method": {
+    "train_only_descriptions": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        1
+      ],
+      [
+        1,
+        0,
+        1
+      ],
+      [
+        1,
+        1,
+        0
+      ]
+    ],
+    "heldout_description_classes": [
+      [
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        1,
+        1
+      ]
+    ],
+    "train_pairs": 16,
+    "epochs": 450,
+    "learnable_parameters": 4,
+    "train_labels": "identity among known 3-feature description classes, no labeled validation pairs",
+    "inference": "24 independent ID/3-feature record slots in 120 spare float32 state words, learned squared-difference similarity controls message coefficients for any graph endpoint pair; not an explicit pair certificate",
+    "resident_native_bytes": 576,
+    "previous_entity_role_recurrent_weights_frozen": true,
+    "features_supplied_from_source_simulator": true,
+    "feature_distance_formula_programmed": true,
+    "record_ID_lookup_programmed": true,
+    "complete_native_alias_semantic_discovery_claim": false
+  },
+  "cohort": {
+    "new_seeds": [
+      88300,
+      88306
+    ],
+    "reused_graph_motifs": [
+      108,
+      109,
+      110,
+      111
+    ],
+    "graph_count": 96,
+    "conditions_per_graph": 12,
+    "questions": 1152,
+    "truth": "4 positive alias descriptor classes, 4 incompatible alias descriptor classes, 4 controls intact/main-broken/both-broken/unrelated third party",
+    "source_oracle": "exact typed reachability after source-only code canonicalization; never used for candidate decisions"
+  },
+  "controls": [
+    "frozen full recurrence with raw node IDs only",
+    "same metric untrained: no label knowledge",
+    "unrestricted learned-message links between any nonmatching graph IDs",
+    "coded exact descriptor equality message links"
+  ],
+  "success": {
+    "coded_descriptor_upper": 1152,
+    "train_pair_classification": 16,
+    "min_accuracy": 0.95,
+    "max_fp": 29,
+    "max_fn": 29,
+    "min_advantage_vs_raw": 0.05,
+    "min_advantage_vs_untrained": 0.05
+  },
+  "results": [
+    "INVALID_W23_ENTITY_DESCRIPTION_ORACLE",
+    "DEVELOPMENT_LEARNED_NODE_DESCRIPTION_ALIAS_TRANSFER",
+    "DEVELOPMENT_NO_LEARNED_NODE_DESCRIPTION_ALIAS_TRANSFER"
+  ],
+  "boundaries": {
+    "development_not_independent": true,
+    "F3_unchanged": true,
+    "FORGE_cloudflare_not_touched": true,
+    "KTRADE_not_touched": true,
+    "controllers_unchanged": true
+  }
+}
