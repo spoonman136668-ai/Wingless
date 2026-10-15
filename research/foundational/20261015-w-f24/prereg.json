@@ -1,0 +1,79 @@
+{
+  "schema": "wingless.f24.prereg.v1",
+  "parent_F23": "ab55d8aa4dbc1f706e821bc94ae366f455570ecb",
+  "hypothesis": "A small train-only learned similarity metric can infer candidate alias links by comparing contextual node profiles directly inside a fixed-size 576-byte state, without externally supplied candidate node-ID PAIRS, and improve typed multi-path reasoning on new identity/source seeds.",
+  "method": {
+    "learned": "four-weight logistic similarity over three squared feature distances",
+    "train": "320 historical synthetic positive/negative unrelated entity identity pairs, 420 bounded SGD epochs",
+    "freeze_before_test": true,
+    "candidate_generation": "programmed enumeration of ALL possible pairwise recurrent graph edge connections; similarity decides which unmatched endpoints to associate; NO supplied candidate pair tuples",
+    "given_not_learned": "per-node source-generated semantic profile vectors, node IDs, coded graph-edge enumeration, initial typed role and 5-weight recurrence",
+    "true_identity_semantics": "source-generator latent shared vector for truly aliased nodes; candidate never receives whether any two IDs share latent identity",
+    "native_state_bytes": 576
+  },
+  "cohort": {
+    "new_test_seeds": [
+      93200,
+      93206
+    ],
+    "old_motifs_disclosed": [
+      108,
+      109,
+      110,
+      111
+    ],
+    "graph_count": 96,
+    "variants_each": 8,
+    "questions": 768,
+    "role_shift_count": 2,
+    "depths": [
+      7,
+      8
+    ],
+    "controlled_cases": [
+      "both paths intact",
+      "main broken plus true unseen alias bridge",
+      "main broken plus unrelated bridge negative",
+      "main and alternative damaged",
+      "true alias with noisy observed evidence",
+      "benign distant role mutation",
+      "false alternative and necessary role damage",
+      "only main branch role changed; alternate intact"
+    ],
+    "expected": [
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true
+    ]
+  },
+  "controls": [
+    "learned all-pairs contextual candidate links in W22 style graph recurrence",
+    "frozen core no aliases",
+    "fixed Euclidean descriptor distance < 0.045, no training",
+    "coded exact oracle using source-known identity (reference only)"
+  ],
+  "predeclared_gate": {
+    "oracle_correct": 768,
+    "min_learned_accuracy": 0.95,
+    "min_accuracy_advantage_no_links": 0.1,
+    "min_accuracy_advantage_fixed_distance": 0.03
+  },
+  "outcomes": [
+    "INVALID_F24_SOURCE_ORACLE",
+    "DEVELOPMENT_UNGIVEN_IDENTITY_CANDIDATE_TRANSFER",
+    "DEVELOPMENT_NO_UNGIVEN_IDENTITY_CANDIDATE_TRANSFER"
+  ],
+  "limits": {
+    "author_generated_development_only": true,
+    "not_unconstrained_semantic_identity_discovery": true,
+    "generative_features_source_supplied": true,
+    "enumeration_programmed": true,
+    "no_F3_first_use": true,
+    "FORGE_KTRADE_controller_untouched": true
+  }
+}
