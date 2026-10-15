@@ -1,0 +1,63 @@
+name: W-F52 public-law posterior TRAIN-only source and once-only science
+on:
+  push:
+    branches: [research/w-f52-public-law-posterior-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  qualification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Frozen first-alone prereg and public-only negative tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 93f9c7315cf5865a8e8f2164bd44f490e73c6564 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f52/prereg.json)" = d552ca2bb104e3a9d74cd96f62b88a2c180d6382
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f52 -p test_preflight.py -v
+          python3 -m py_compile research/foundational/20261015-w-f52/audit_result.py
+      - name: One full regression vet build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+  diagnostic:
+    if: ${{ github.event.head_commit.message == 'science(w-f52): dispatch first fresh TRAIN-only public-law evaluation' && github.run_attempt == 1 }}
+    needs: qualification
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: One new disjoint FIT and diagnostic; NEVER primary original
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/w-f52";mkdir -p "$root"
+          python3 -B research/foundational/20261015-w-f52/source_pilot.py > "$root/result.json"
+          python3 -B research/foundational/20261015-w-f52/audit_result.py \
+            "$root/result.json" research/foundational/20261015-w-f52/prereg.json \
+            > "$root/independent-audit.txt"
+          (cd "$root";sha256sum result.json independent-audit.txt > sha256-manifest.txt)
+          printf '%s\n' "$GITHUB_SHA" > "$root/SOURCE_SHA"
+          cat "$root/independent-audit.txt"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: W-F52-public-law-posterior-fresh-TRAIN-NO-ORIGINAL
+          path: ${{ runner.temp }}/w-f52/
+          retention-days: 30
+          if-no-files-found: error
