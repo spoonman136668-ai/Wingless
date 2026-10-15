@@ -1,0 +1,34 @@
+name: W-F40 learned value pre-original engineering
+on:
+  push:
+    branches:
+      - research/w-f40-learned-active-value-20261015-r1
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify consumed predecessor and precode registration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 7ea3170f127f1e9be2aad59cf388b6ebec6bed57 HEAD
+          git merge-base --is-ancestor 1f3388e19644652d4b7bccd6f8faf49364d77cb9 HEAD
+          python3 -m json.tool research/foundational/20261015-w-f40/prereg-candidate.json >/dev/null
+          python3 -m py_compile research/foundational/20261015-w-f40/train_only.py
+      - name: Train-only source interface tests without EVAL
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f40 -p test_preflight.py -v
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
+      - name: Authority
+        run: |
+          echo "Engineering only. New train-only evaluation, primary original and F3 first-use NOT executed."
