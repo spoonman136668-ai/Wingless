@@ -1,0 +1,56 @@
+name: Wingless F22 alias-linked recurrent learned evidence science
+on:
+  push:
+    branches: [research/w-f22-learned-alias-graph-link-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: go.mod}
+      - name: Freeze W21 original and W22 prospective prereg
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4ddac012e9cbbb960fdc03a49fe86f4d08607e6b HEAD
+          test "$(git hash-object unitary/f21_learned_alias_authority.go)" = "$(git rev-parse 4ddac012e9cbbb960fdc03a49fe86f4d08607e6b:unitary/f21_learned_alias_authority.go)"
+          python3 -m json.tool research/foundational/20261015-w-f22/prereg.json >/dev/null
+      - name: One original W-F22 learned internal association trial
+        run: |
+          set -euo pipefail
+          go run ./cmd/f22-wingless > /tmp/w-f22-original.json
+          python3 -m json.tool /tmp/w-f22-original.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F22-original-learned-alias-recurrent-links
+          path: /tmp/w-f22-original.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Independent raw source identity/metric/count verification
+        run: |
+          python3 - <<'PY'
+          import collections,json
+          d=json.load(open("/tmp/w-f22-original.json"))
+          assert d["stage"]=="DEVELOPMENT_ONLY" and d["graphs"]==96 and d["questions"]==1152
+          assert d["resident_state_bytes"]==576 and d["new_head_training_performed"] is False
+          assert d["learned_witness_controls_alias_link_during_recurrence"] is True
+          assert d["programmed_edge_endpoint_rewriting_inside_candidate"] is False
+          assert d["coded_alias_endpoint_candidate_detection"] is True
+          assert not d["independent_source_birth"] and not d["sealed_first_use"] and not d["accepted_ref_mutation"]
+          assert collections.Counter(r["Family"] for r in d["rows"])=={108:288,109:288,110:288,111:288}
+          assert collections.Counter(r["Variant"] for r in d["rows"])==dict.fromkeys(range(12),96)
+          for name,field in (("native","Native"),("no_alias","NoAlias"),("always_alias","AlwaysAlias"),("coded_upper","CodedUpper"),("rewrite_upper","RewriteUpper")):
+            s=d["scores"][name]
+            assert s["correct"]==sum(r[field]["answer"]==r["Truth"] for r in d["rows"])
+            assert s["false_positives"]==sum(r[field]["answer"] for r in d["rows"] if not r["Truth"])
+            assert s["false_negatives"]==sum(not r[field]["answer"] for r in d["rows"] if r["Truth"])
+          assert d["registered_verdict"] in ("INVALID_W22_CODED_ORACLE_UPPER","DEVELOPMENT_LEARNED_ALIAS_GRAPH_LINK_TRANSFER","DEVELOPMENT_NO_NATIVE_ALIAS_GRAPH_LINK_TRANSFER")
+          print("W_F22_VERDICT",d["registered_verdict"],d["scores"])
+          PY
+      - name: Full native Go regression and build
+        run: go test ./... && go build ./...
