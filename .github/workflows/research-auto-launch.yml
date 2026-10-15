@@ -93,6 +93,15 @@ jobs:
           "head_sha=$($R.head_sha)" >> $env:GITHUB_OUTPUT
           "reason=$($R.reason)" >> $env:GITHUB_OUTPUT
 
+      - name: Preserve real owner preexecution evidence (source-only)
+        if: ${{ always() && steps.config.outputs.enabled == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: r31-wingless-preexecution-${{ github.run_id }}
+          path: ${{ runner.temp }}/wingless-repo-local-*/preexecution-observation.json
+          retention-days: 30
+          if-no-files-found: ignore
+
       - name: Dispatch next bounded cycle
         if: steps.config.outputs.enabled == 'true' && steps.cycle.outputs.advanced == 'true'
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"

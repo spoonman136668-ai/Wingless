@@ -294,6 +294,15 @@ $MindContext
 
     $QualifiedHead=(& git rev-parse HEAD).Trim()
     $QualDir=Join-Path $RunRoot 'qualification'
+    # Real repository-local owner observation BEFORE the qualification worker.
+    # Source-only evidence, NOT independent first-use or randomized selection.
+    & (Join-Path $PSScriptRoot 'Write-ResearchPreexecutionObservation.ps1') `
+      -Lane 'Wingless' -RepoPath $RepoPath -ParentSha $StartSha `
+      -PreregistrationCommit ([string]$Commits[0]) -QualifiedHead $QualifiedHead `
+      -Experiment ([string]$Request.experiment) -Stage 'PRE_QUALIFICATION' `
+      -RunId ([long]$env:GITHUB_RUN_ID) -RunAttempt ([int]$env:GITHUB_RUN_ATTEMPT) `
+      -OutputPath (Join-Path $RunRoot 'preexecution-observation.json')
+    if(-not $?) {throw 'R31_OWNER_PREEXECUTION_OBSERVATION_FAILED'}
     $SavedSha=$env:GITHUB_SHA
     $SavedRef=$env:GITHUB_REF_NAME
     try{
