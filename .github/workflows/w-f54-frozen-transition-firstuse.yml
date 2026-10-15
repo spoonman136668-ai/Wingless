@@ -1,0 +1,85 @@
+name: Wingless F54 learnable transition exact-head prereg and TRAIN-only first-use
+on:
+  push:
+    branches: [research/w-f54-learned-transition-invariants-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  qualification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Source identity, controls, fit-only preflight and auditor safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor b7dd1df27fdbe7d9a1f6f004a4165e90f5402d6e HEAD
+          test "$(git hash-object research/foundational/20261015-w-f54/prereg-candidate.json)" = e118d7337e98311c033dd3f08559e6fd53a6de0e
+          python3 -B -m json.tool research/foundational/20261015-w-f54/prereg-candidate.json >/dev/null
+          python3 -B -m py_compile research/foundational/20261015-w-f54/source_pilot.py
+          python3 -B -m py_compile research/foundational/20261015-w-f54/audit_result.py
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f54 -p test_preflight.py -v
+          python3 -B - <<'PY'
+          import json,importlib.util,pathlib
+          root=pathlib.Path('research/foundational/20261015-w-f54')
+          p=json.loads((root/'prereg-candidate.json').read_text())
+          spec=importlib.util.spec_from_file_location('f54',(root/'source_pilot.py'))
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          assert list(m.ARMS)==p['controls']
+          assert (m.FIT.start,m.FIT.stop)==tuple(p['fit']['seeds'])
+          assert (m.DIAG.start,m.DIAG.stop)==tuple(p['diagnostic']['seeds'])
+          assert set(m.FIT_FAM)==set(p['fit']['families'])
+          assert set(m.DIAG_FAM)==set(p['diagnostic']['families'])
+          assert (m.ORIGINAL.start,m.ORIGINAL.stop)==tuple(p['future_original_NOT_RESERVED']['seeds'])
+          assert set(m.FIT_FAM).isdisjoint(m.DIAG_FAM)
+          try:m.source(582000,1048,8)
+          except ValueError:pass
+          else:raise AssertionError('protected original could be generated')
+          print('W_F54_PRECODE_CONTROL_EXACT_IDENTITY=PASS')
+          PY
+      - name: One complete Wingless Go regression vet and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+          echo W_F54_EXACT_HEAD_COMPLETE_REGRESSION=PASS
+  diagnostic:
+    if: ${{ github.event.head_commit.message == 'science(w-f54): first and only frozen disjoint transition TRAIN diagnostic' && github.run_attempt == 1 }}
+    needs: qualification
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Once-only new FIT-trained original TRAIN diagnostic; independently audit rows
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/wf54"
+          mkdir -p "$root"
+          python3 -B research/foundational/20261015-w-f54/source_pilot.py > "$root/result.json"
+          python3 -B research/foundational/20261015-w-f54/audit_result.py \
+            "$root/result.json" research/foundational/20261015-w-f54/prereg-candidate.json > "$root/audit.json"
+          (cd "$root" && sha256sum result.json audit.json > manifest.sha256)
+          printf '%s\n' "$GITHUB_SHA" > "$root/SOURCE_SHA"
+          cat "$root/audit.json"
+          echo W_F54_REAL_TRAIN_DIAGNOSTIC_COMPLETE_NO_F3_NO_ORIGINAL=PASS
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: W-F54-new-transition-learning-TRAIN-not-original
+          path: ${{ runner.temp }}/wf54/
+          retention-days: 30
+          if-no-files-found: error
