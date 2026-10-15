@@ -183,14 +183,16 @@ func RunWFoundationF25()(map[string]any,error){
      // Distinct node profiles supplied by source; the learner is NOT told
      // that alias uses the same latent prototype as original.
      embedding:=wf25Observed(seed,id,semantic,variant)
-     if id==unrelated{embedding[0]+=.045}\n    if variant==4&&id==alias{embedding[0]+=.055}
+     if id==unrelated{embedding[0]+=.045}
+    if variant==4&&id==alias{embedding[0]+=.055}
      for c:=0;c<3;c++{state[24+j*4+c+1]=float32(embedding[c])}
      state[24+j*4]=float32(id)
     }
     learned,pairs:=wf25Recurrent(state,q,w.Required,depth,role,entity,core,p,"learned")
     none,_:=wf25Recurrent(state,q,w.Required,depth,role,entity,core,p,"none")
     fixed,_:=wf25Recurrent(state,q,w.Required,depth,role,entity,core,p,"fixed_distance")
-    strict,_:=wf25Recurrent(state,q,w.Required,depth,role,entity,core,p,"strict_distance")\n    // Given *semantic oracle*: labels checked from programmed graph
+    strict,_:=wf25Recurrent(state,q,w.Required,depth,role,entity,core,p,"strict_distance")
+    // Given *semantic oracle*: labels checked from programmed graph
     // canonicalization, not injected into native model features.
     upper:=wf15Choice{Answer:wf13Exact(reference,w.Required,depth,nil),Steps:depth}
     rows=append(rows,wf25Row{Seed:seed,Family:fam,Depth:depth,Shift:shift,
