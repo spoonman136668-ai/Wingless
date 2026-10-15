@@ -1,0 +1,33 @@
+name: W-F35 learned grammar meta-prior engineering (NO original)
+on:
+  push:
+    branches:
+      - research/w-f35-demonstration-prior-preflight-20261015-r1
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Check pristine ancestor and preimplementation preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 8010d4ee6f592f021d44f78a0689b63c1e3eaa82 HEAD
+          git merge-base --is-ancestor 9250a9b18010de7f8bfeefe4902823287d888ac3 HEAD
+          python3 -m json.tool research/foundational/20261015-w-f35/prereg-candidate.json > /dev/null
+          python3 -m py_compile research/foundational/20261015-w-f35/train_only.py
+      - name: Focused no-test-consumption learning interface checks
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f35 -p test_preflight.py -v
+      - name: One complete Go regression and build
+        run: go test ./... && go build ./...
+      - name: Engineering-only
+        run: echo "W-F35 policy source qualified; NO train-only test cohort and NO primary original consumed"
