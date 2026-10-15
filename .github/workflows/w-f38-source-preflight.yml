@@ -1,0 +1,34 @@
+name: W-F38 source identifiability preflight
+on:
+  push:
+    branches:
+      - research/w-f38-identifiability-source-20261015-r1
+permissions:
+  contents: read
+jobs:
+  engineering:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify ancestry, pre-code preregistration and source syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor bd0ddcb30af56f3fec967c506d48f6d69e920dd2 HEAD
+          git merge-base --is-ancestor 8f662e85e737563eb2d97c307486e3736da973d9 HEAD
+          python3 -m json.tool research/foundational/20261015-w-f38/prereg-candidate.json >/dev/null
+          python3 -m py_compile research/foundational/20261015-w-f38/source_pilot.py
+      - name: Source-only identifiability tests
+        run: python3 -m unittest discover -s research/foundational/20261015-w-f38 -p test_preflight.py -v
+      - name: One full Go regression and build
+        run: go test ./... && go build ./...
+      - name: Record no scientific first-use
+        run: |
+          echo "ENGINEERING-ONLY source preflight; no source cohort or primary original"
