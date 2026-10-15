@@ -1,0 +1,97 @@
+name: W-F42 once-only independent posterior-rank feasibility (NO original)
+on:
+  push:
+    branches:
+      - science/w-f42-frozen-rank-source-20261015-r1
+permissions:
+  contents: read
+jobs:
+  source_diagnostic:
+    if: "${{ github.event.head_commit.message == 'science(w-f42): one frozen TRAIN-only posterior rank cohort' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Frozen source/prereg and identities before first use
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 97ec7860a363e8431c9b31a2424bb19a863166a4 HEAD
+          git merge-base --is-ancestor f5ffcb6690c48bf56fb1207da88ac4586867382e HEAD
+          test "$(git hash-object research/foundational/20261015-w-f42/source_pilot.py)" = 0e84192fec880b4434be0f5a315357e67143eccf
+          test "$(git hash-object research/foundational/20261015-w-f42/prereg-frozen.json)" = "$(git rev-parse f5ffcb6690c48bf56fb1207da88ac4586867382e:research/foundational/20261015-w-f42/prereg-frozen.json)"
+          python3 -m unittest discover -s research/foundational/20261015-w-f42 -p test_preflight.py -v
+      - name: Exactly one fresh TRAIN-only rank convergence source diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f42/source_pilot.py > /tmp/w-f42-source.json
+          python3 -m json.tool /tmp/w-f42-source.json >/dev/null
+          sha256sum /tmp/w-f42-source.json > /tmp/w-f42-source.sha256
+          git rev-parse HEAD > /tmp/w-f42-source-head.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F42-frozen-TRAIN-only-rank-source
+          path: |
+            /tmp/w-f42-source.json
+            /tmp/w-f42-source.sha256
+            /tmp/w-f42-source-head.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Independent row, receipt, heldout rank and verdict verification
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/w-f42-source.json'))
+          p=json.load(open('research/foundational/20261015-w-f42/prereg-frozen.json'))
+          assert d['schema']=='wingless.f42.action-rank-sample-stability.trainonly.v1'
+          assert d['stage']=='TRAIN_ONLY_SOURCE_DIAGNOSTIC_NOT_LEARNED_ORIGINAL'
+          assert d['questions']==p['cohort']['expected_cases']==72
+          assert d['source_seeds']==p['cohort']['seeds']
+          assert d['source_families']==p['cohort']['families']
+          assert d['reserved_original_seeds']==p['reserved_primary']['seeds']
+          assert d['reserved_original_families']==p['reserved_primary']['families']
+          assert d['posterior_budgets']==p['sample_budgets']==[12,48,192]
+          assert d['high_sample_posterior_external_bytes']==12288 and d['paid_mapping_cap']==2
+          assert d['private_maps_only_in_port_and_evaluator'] and d['synthetic_same_repo_not_F3']
+          assert d['primary_original_not_executed'] and not d['accepted_ref_mutation']
+          assert len(d['rows'])==72
+          assert len({(r['seed'],r['family'],r['length']) for r in d['rows']})==72
+          assert all(321000<=r['seed']<321012 and r['family'] in (370,371,372) and
+              r['length'] in (3,5) and len(r['public_sha256'])==64 for r in d['rows'])
+          for row in d['rows']:
+            for method,paid in row['receipts'].items():
+              assert len(paid)<=2
+              if method=='no_purchase':assert len(paid)==0
+              assert len({(a,b) for a,b,v in paid})==len(paid)
+              assert all(0<=a<8 and 0<=b<8 and 0<=v<8 for a,b,v in paid)
+          for arm,v in d['scores'].items():
+            cor=sum(r['predictions'][arm]==r['truth'] for r in d['rows'])
+            assert v['correct']==cor and v['total']==72
+            assert math.isclose(v['accuracy'],cor/72,abs_tol=1e-12)
+          assert d['scores']['privileged_hindsight_unfair']['correct']==72
+          for fam,arms in d['by_family'].items():
+            group=[r for r in d['rows'] if str(r['family'])==fam]
+            assert len(group)==24
+            for arm,v in arms.items():
+              assert v==sum(r['predictions'][arm]==r['truth'] for r in group)
+          for k,left,right in (('b12_48','b12','b48'),('b48_192','b48','b192'),('b192_192_independent','b192','b192_independent')):
+            agreement=sum(r['ranking'][left]==r['ranking'][right] for r in d['rows'])/72
+            assert math.isclose(d['action_rank_agreements'][k],agreement,abs_tol=1e-12)
+          fair=('query_frontier','decision_value_48','information_gain_192')
+          best=max(d['scores'][a]['accuracy'] for a in fair)
+          delta=d['scores']['decision_value_192']['accuracy']-best
+          robust=all(s['decision_value_192']>=max(s[a] for a in fair) for s in d['by_family'].values())
+          eligible=d['action_rank_agreements']['b48_192']>=.55 and delta>=.03 and robust
+          expected='TRAIN_ONLY_RANK_STABILITY_QUALIFIED' if eligible else 'TRAIN_ONLY_RANK_STABILITY_NOT_QUALIFIED'
+          assert d['verdict']==expected
+          print('W_F42_RANK_SOURCE_RESULT',expected,{k:v['correct'] for k,v in d['scores'].items()},d['action_rank_agreements'])
+          PY
+      - name: Scientific authority
+        run: |
+          echo "Source-only F42: no learned scientific original, F3 acceptance or production mutation"
