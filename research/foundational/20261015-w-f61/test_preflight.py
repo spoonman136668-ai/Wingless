@@ -27,6 +27,15 @@ class Tests(unittest.TestCase):
     chain=((0,1),(1,-1)),second_chain=((2,1),),
     counterfactual_start=1,counterfactual_chain=((3,-1),(0,1)))
   outcomes,cost,n=m.evaluate(synthetic)
+  # Source-free recomputation on hand-authored public input only.
+  auditpath=p.with_name('audit_fit.py')
+  auditsp=importlib.util.spec_from_file_location('w61b_independent_public_audit',auditpath)
+  auditor=importlib.util.module_from_spec(auditsp);auditsp.loader.exec_module(auditor)
+  public_row={**synthetic,'secondary_chain':synthetic['second_chain']}
+  independent,independent_joint_count=auditor.recompute(public_row)
+  self.assertEqual([tuple(outcomes[x]) for x in m.ARMS[:-1]],list(independent))
+  self.assertEqual(independent_joint_count,n)
+  with self.assertRaises(AssertionError):auditor.recompute({**public_row,'family':1440})
   self.assertEqual(set(outcomes),set(m.ARMS))
   self.assertTrue(all(len(x)==3 for x in outcomes.values()))
   self.assertEqual(outcomes["strong_structured_MAP"],outcomes[m.ARMS[3]])
