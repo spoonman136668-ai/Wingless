@@ -1,0 +1,22 @@
+name: Wingless F61B source-only qualification
+on:
+  push:
+    branches:
+      - research/w-f61b-prereg-first-20261016-r2
+permissions:
+  contents: read
+jobs:
+  frozen-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Exact-commit source qualification, no FIT
+        run: python3 -B research/foundational/20261015-w-f61/qualify_source.py --expect-head "$GITHUB_SHA"
