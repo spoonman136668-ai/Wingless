@@ -1,0 +1,56 @@
+name: W-F60 read-only diagnostic of original archived firstuse
+on:
+  push:
+    branches:
+      - audit/w-f60-archived-firstuse-20261015-r1
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-archive-only:
+    if: "${{ github.event.head_commit.message == 'audit(w-f60): read original ZIP without source replay' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify original science and audit bytes frozen
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 57555a26f95591f81c996d5ea456ad8b00d485aa HEAD
+          test "$(git hash-object research/foundational/20261015-w-f60/source_feasibility.py)" = f6863c7fdf31bd2cd20daaf6434640596b6ba5a4
+          test "$(git hash-object research/foundational/20261015-w-f60/audit_fit.py)" = c57801c7dc2d317ced9c789a68bf560f72162f5a
+      - name: Verify immutable one-time run/archive SHA and no replay
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 2 -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/spoonman136668-ai/Wingless/actions/runs/38830952488" | jq -e '.head_sha=="57555a26f95591f81c996d5ea456ad8b00d485aa" and .run_attempt==1 and .status=="completed" and .conclusion=="failure"'
+          curl --fail --silent --show-error --retry 2 -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/spoonman136668-ai/Wingless/actions/runs/38830952488/artifacts" | jq -e '[.artifacts[]|select(.id==12017177693 and .name=="Wingless-F60-once-only-FIT-evidence-and-audit" and .digest=="sha256:19496ccd797dce059bff909a69c5f1f8a3190bd913db7d348ecce1fb7fe8ccaa" and (.expired|not))]|length==1'
+      - uses: actions/download-artifact@v4
+        with:
+          name: Wingless-F60-once-only-FIT-evidence-and-audit
+          run-id: 38830952488
+          github-token: ${{ github.token }}
+          repository: spoonman136668-ai/Wingless
+          path: ${{ runner.temp }}/original
+      - name: Diagnose stored predictions without running any experiment
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/original"
+          test "$(cat "$root/SOURCE_SHA")" = 57555a26f95591f81c996d5ea456ad8b00d485aa
+          (cd "$root" && sha256sum -c source-manifest.sha256)
+          python3 -B research/foundational/20261015-w-f60/audit_existing_diagnose.py "$root/result.json" | tee "$RUNNER_TEMP/archive-diagnose.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-F60-read-only-posterior-diagnostic
+          path: ${{ runner.temp }}/archive-diagnose.txt
+          retention-days: 90
+          if-no-files-found: error
+      - name: Explicit authority
+        run: echo "NEW_FIT_RUNS=ZERO DIAG=UNTOUCHED ORIGINALS=UNTOUCHED SCIENCE_NOT_CLAIMED"
