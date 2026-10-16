@@ -80,13 +80,18 @@ jobs:
             'QUALIFICATION_BASELINE_MISMATCH',
             'qualified-scientific-result',
             'MIND_PALACE_CONTEXT_UNAVAILABLE_FALLBACK',
-            'RESEARCH_AGENT_ATTEMPT'
+            'RESEARCH_EXECUTOR_UNATTENDED=NOT_CONFIGURED_NO_MODEL_INVOCATION'
           )){
             if(-not$Text.Contains($Needle)){throw "CONTROLLER_INVARIANT_MISSING $Needle"}
           }
-          if(-not$Text.Contains("'--approve-for-me'")){throw 'CODEX_APPROVE_FOR_ME_MISSING'}
-          if($Text.Contains("'--sandbox','workspace-write','--approve-for-me'")){throw 'CODEX_MUTUALLY_EXCLUSIVE_FLAGS_PRESENT'}
-          if($Text.Contains('--full-auto')){throw 'OBSOLETE_CODEX_FULL_AUTO_PRESENT'}
+          foreach($Needle in @('Resolve-Codex','RESEARCH_AGENT_ATTEMPT','Start-Process -FilePath $Codex','--approve-for-me','gpt-5.6-sol','gpt-5.6-luna')){
+            if($Text.Contains($Needle)){throw "UNATTENDED_CODEX_INVOCATION_FORBIDDEN $Needle"}
+          }
+          $RetiredText=Get-Content -Raw 'scripts\Invoke-RepoLocalResearchContinuation.ps1'
+          if(-not$RetiredText.Contains('RESEARCH_CONTINUATION_NOT_DISPATCHED=NO_UNATTENDED_MODEL')){throw 'LEGACY_CODEX_ADAPTER_NOT_DISABLED'}
+          foreach($Needle in @('Start-Process','CODEX_HOME','codex.exe')){
+            if($RetiredText.Contains($Needle)){throw "LEGACY_CODEX_INVOCATION_FORBIDDEN $Needle"}
+          }
           $AgentText=Get-Content -Raw $AgentPath
           foreach($Needle in @(
             'z-ai/glm-5.3',
@@ -109,83 +114,17 @@ jobs:
           if(-not$LauncherText.Contains("cron: '49 * * * *'")){throw 'RESEARCH_QUOTA_REFRESH_WAKE_DRIFT'}
           $WorkflowText=Get-Content -Raw '.github/workflows/research-continuation-controller.yml'
           if($WorkflowText.Contains('NVIDIA_API_KEY:')){throw 'EXTERNAL_API_KEY_BINDING_FORBIDDEN'}
-          if(-not$Text.Contains('RESEARCH_AGENT_POLICY=CODEX_ONLY_NO_EXTERNAL_APIS')){throw 'CODEX_ONLY_POLICY_MISSING'}
+          if(-not$Text.Contains('RESEARCH_AGENT_POLICY=GPT_CHAT_GITHUB_SOURCE_ONLY_NO_CODEX_NO_EXTERNAL_APIS')){throw 'NO_CODEX_EXECUTION_POLICY_MISSING'}
+          if(-not$Text.Contains('gpt-authored-research-required-no-unattended-model')){throw 'NO_MODEL_WAIT_RECORD_MISSING'}
           if($Text.Contains('-Provider nvidia') -or $Text.Contains('-Provider openrouter')){throw 'EXTERNAL_API_EXECUTION_FORBIDDEN'}
-          if(-not$Text.Contains("gpt-5.6-sol") -or -not$Text.Contains("gpt-5.6-luna")){throw 'APPROVED_CODEX_MODELS_MISSING'}
           Write-Host 'WINGLESS_REPO_LOCAL_CONTROLLER_STATIC_PASS'
 
-      - name: Legacy external-provider probe disabled (Codex-only)
-        if: ${{ false }}
-        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
-        env:
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-        run: |
-          $ErrorActionPreference='Stop'
-          if([string]::IsNullOrWhiteSpace($env:NVIDIA_API_KEY)){throw 'NVIDIA_API_KEY_SECRET_MISSING'}
-          $Root=(Resolve-Path '.').Path
-          $Head=(git rev-parse HEAD).Trim()
-          if($Head -notmatch '^[0-9a-f]{40}$'){throw 'PROVIDER_PROBE_HEAD_INVALID'}
-          $Worktree=Join-Path $env:RUNNER_TEMP ('glm-provider-probe-'+$env:GITHUB_RUN_ID+'-'+$env:GITHUB_RUN_ATTEMPT)
-          $ProbeBranch='qual/glm-provider-probe-'+$env:GITHUB_RUN_ID+'-'+$env:GITHUB_RUN_ATTEMPT
-          $Prompt=Join-Path $env:RUNNER_TEMP ('glm-provider-prompt-'+$env:GITHUB_RUN_ID+'.txt')
-          $Last=Join-Path $env:RUNNER_TEMP ('glm-provider-last-'+$env:GITHUB_RUN_ID+'.txt')
-          if(Test-Path -LiteralPath $Worktree){Remove-Item -LiteralPath $Worktree -Recurse -Force}
-          git worktree add -b $ProbeBranch $Worktree $Head
-          if($LASTEXITCODE-ne0){throw 'PROVIDER_PROBE_WORKTREE_CREATE_FAILED'}
-          try{
-            @(
-              'This is a frozen provider protocol probe.'
-              'Do not modify any repository file.'
-              'Call git_status exactly once.'
-              'Then call finish exactly once with status complete and summary exactly GLM_PROVIDER_PROTOCOL_PASS.'
-            ) | Set-Content -LiteralPath $Prompt -Encoding UTF8
-            & '.\scripts\Invoke-NemotronRepoAgent.ps1' `
-              -RepoPath $Worktree `
-              -Program 'Wingless' `
-              -ActiveBranch $ProbeBranch `
-              -StartSha $Head `
-              -PromptPath $Prompt `
-              -LastMessagePath $Last `
-              -Provider nvidia `
-              -Model 'z-ai/glm-5.3' `
-              -MaxRounds 6 `
-              -ProtocolProbe
-            if(-not(Test-Path -LiteralPath $Last -PathType Leaf)){throw 'GLM_PROVIDER_PROTOCOL_RESULT_MISSING'}
-            $Summary=[IO.File]::ReadAllText($Last).Trim()
-            if($Summary -cne 'GLM_PROVIDER_PROTOCOL_PASS'){throw "GLM_PROVIDER_PROTOCOL_RESULT_INVALID summary=$Summary"}
-            if((git -C $Worktree status --porcelain)-join''){throw 'GLM_PROVIDER_PROTOCOL_MUTATED_WORKTREE'}
-            Write-Host 'WINGLESS_GLM_PROVIDER_PROTOCOL_PASS'
-          }
-          finally{
-            if(Test-Path -LiteralPath $Worktree){git worktree remove --force $Worktree | Out-Null}
-            $Existing=@(git branch --list $ProbeBranch | Where-Object{$_ -and $_.Trim()})
-            if($Existing.Count-gt0){git branch -D $ProbeBranch | Out-Null}
-          }
-
-      - name: Verify Codex runtime
+      - name: Verify no subscription-backed research executor
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          $P='C:\ProgramData\CKBR\codex\bin\codex.exe'
-          if(-not(Test-Path -LiteralPath $P -PathType Leaf)){throw 'CODEX_RUNTIME_MISSING'}
-          & $P --version
-          if($LASTEXITCODE-ne0){throw "CODEX_VERSION_FAILED exit=$LASTEXITCODE"}
-          $Help=(& $P exec --help 2>&1)-join "`n"
-          if($LASTEXITCODE-ne0){throw 'CODEX_EXEC_HELP_FAILED'}
-          foreach($Needle in @('--sandbox','workspace-write','--approve-for-me','--output-last-message')){if(-not$Help.Contains($Needle)){throw "CODEX_EXEC_INTERFACE_MISSING $Needle"}}
-          $Controller=Get-Content -Raw 'scripts\Invoke-RepoLocalResearchCycle.ps1'
-          if($Controller.Contains('--full-auto')){throw 'OBSOLETE_CODEX_FULL_AUTO_PRESENT'}
-          Write-Host 'WINGLESS_REPO_LOCAL_CODEX_PASS'
-
-      - name: Verify Codex exec CLI contract
-        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
-        run: |
-          $ErrorActionPreference='Stop'
-          $P='C:\ProgramData\CKBR\codex\bin\codex.exe'
-          $Help=((& $P exec --approve-for-me --help 2>&1)|ForEach-Object{[string]$_}) -join [Environment]::NewLine
-          if($LASTEXITCODE-ne0){throw "CODEX_EXEC_HELP_FAILED exit=$LASTEXITCODE"}
-          Write-Host $Help
-          Write-Host 'WINGLESS_REPO_LOCAL_CODEX_EXEC_HELP_PASS'
+          Write-Host 'WINGLESS_RESEARCH_EXECUTOR=GPT_CHAT_GITHUB_ONLY_NO_CODEX'
+          Write-Host 'WINGLESS_UNATTENDED_MODEL_CALLS=ZERO'
 
       - name: Full Wingless regression
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
