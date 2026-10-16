@@ -63,7 +63,7 @@ def source(seed,family,length=8):
  rng.shuffle(chain)
  start=rng.randrange(P)
  answer=apply_chain(hidden,start,chain)
- second_chain=tuple((r,-d) for r,d in reversed(chain))
+ second_chain=tuple((r,1 if j%2 else -1) for j,r in enumerate((1,3,0,2,3,1)))
  second_answer=apply_chain(hidden,answer,second_chain)
  # Public pair-composition probes are sampled independently of the
  # private queries, and are made available to EVERY registered solver.
@@ -93,59 +93,56 @@ def likelihood(maps,observations,rate,bridges=()):
   w*=1-rate if guess==y else rate/(P-1)
  return w
 def evaluate(case):
- public=case["public"];rate=noise(case["family"]);weights=[]
- for maps in MAPS:weights.append(likelihood(maps,public,rate,case["public_bridges"]))
+ public=case["public"];rate=noise(case["family"])
+ weights=[likelihood(m,public,rate,case["public_bridges"]) for m in MAPS]
  total=sum(weights);assert total>0
  weights=[v/total for v in weights]
- votes=[0.]*P
- for maps,w in zip(MAPS,weights):
-  votes[apply_chain(maps,case["start"],case["chain"])]+=w
- exact=max(range(P),key=lambda z:(votes[z],-z))
- best_map=max(range(len(MAPS)),key=lambda k:(weights[k],-k))
- structured_map=apply_chain(MAPS[best_map],case["start"],case["chain"])
- # Independent public per-role MAP drops the global closure constraint.
- choices=[]
- for role,pairs in enumerate(public):
-  ww=[math.prod((1-rate if p[x]==y else rate/(P-1)) for x,y in pairs)
-       for p in PERMS]
-  choices.append(max(range(8),key=lambda k:(ww[k],-k)))
- local=apply_chain(tuple(PERMS[x] for x in choices),case["start"],case["chain"])
- # Matched-work structurally valid restricted beam: choose 2 locally
- # preferred operators for each of roles 0,1,2, deriving role 3 via
- # PUBLIC closure. This sees the same evidence with 8 joint branches.
- rankings=[]
+ def task_pair(m):
+  first=apply_chain(m,case["start"],case["chain"])
+  return (first,apply_chain(m,first,case["second_chain"]))
+ joint={}
+ for m,w in zip(MAPS,weights):
+  pair=task_pair(m)
+  joint[pair]=joint.get(pair,0.)+w
+ exact=max(sorted(joint),key=lambda pair:joint[pair])
+ best=max(range(len(MAPS)),key=lambda k:(weights[k],-k))
+ structured=task_pair(MAPS[best])
+ # Strong public independent-role MAP; ignores cross-role closure but is
+ # not arbitrarily weakened or denied publicly available calibration.
+ ranks=[]
  for role,pairs in enumerate(public[:3]):
-  ww=[math.prod((1-rate if p[x]==y else rate/(P-1)) for x,y in pairs)
-      for p in PERMS]
-  rankings.append(sorted(range(8),key=lambda k:(-ww[k],k))[:2])
- beam_votes=[0.]*P
- for indices in itertools.product(*rankings):
-  maps=(PERMS[indices[0]],PERMS[indices[1]],PERMS[indices[2]])
-  last=invert(compose(maps[2],compose(maps[1],maps[0])))
-  allmaps=maps+(last,)
-  w=likelihood(allmaps,public,rate,case["public_bridges"])
-  beam_votes[apply_chain(allmaps,case["start"],case["chain"])]+=w
- beam=max(range(P),key=lambda z:(beam_votes[z],-z))
- answers=(exact,structured_map,local,beam,case["truth"])
- # Two dependent tasks share a fixed hidden map. The secondary chain
- # is a novel variable binding, but no inference method receives its
- # true starting value; a separate marginal posterior is evaluated.
- secondary={}
- for maps,w in zip(MAPS,weights):
-  pair=(apply_chain(maps,case["start"],case["chain"]),
-        apply_chain(maps,apply_chain(maps,case["start"],case["chain"]),case["second_chain"]))
-  secondary[pair]=secondary.get(pair,0)+w
- return dict(zip(ARMS,answers)),dict(zip(ARMS,(512*(14+case["length"]),512*14+case["length"],
-     4*8*2+case["length"],3*8*2+8*(14+case["length"]),0))),secondary
- return dict(zip(ARMS,answers)),dict(zip(ARMS,costs))
+  local=[math.prod((1-rate if perm[x]==y else rate/3) for x,y in pairs)
+       for perm in PERMS]
+  ranks.append(sorted(range(8),key=lambda k:(-local[k],k)))
+ rolewise=[]
+ for pairs in public:
+  local=[math.prod((1-rate if perm[x]==y else rate/3) for x,y in pairs) for perm in PERMS]
+  rolewise.append(PERMS[max(range(8),key=lambda k:(local[k],-k))])
+ local=task_pair(tuple(rolewise))
+ beam_votes={}
+ for indices in itertools.product(*[r[:2] for r in ranks]):
+  a,b,c=(PERMS[k] for k in indices)
+  maps=(a,b,c,invert(compose(c,compose(b,a))))
+  pair=task_pair(maps)
+  weight=likelihood(maps,public,rate,case["public_bridges"])
+  beam_votes[pair]=beam_votes.get(pair,0.)+weight
+ beam=max(sorted(beam_votes),key=lambda pair:beam_votes[pair])
+ result=dict(zip(ARMS,(exact,structured,local,beam,
+                       (case["truth"],case["second_truth"]))))
+ length=case["length"]+len(case["second_chain"])
+ costs=dict(zip(ARMS,(512*(10+2*len(case["public_bridges"])+length),
+  512*(10+2*len(case["public_bridges"]))+length,
+  4*8*2+length,
+  3*8*2+8*(10+2*len(case["public_bridges"])+length),0)))
+ return result,costs,len(joint)
 def fit_report():
  rows=[];correct={a:0 for a in ARMS};operations={a:0 for a in ARMS[:-1]}
  ablation=0
  for seed in FIT:
   for family in FIT_FAMILIES:
    for length in (8,10):
-    c=source(seed,family,length);ans,cost,joint=evaluate(c)
-    d={a:int(ans[a]==c["truth"]) for a in ARMS}
+    c=source(seed,family,length);ans,cost,joint_count=evaluate(c)
+    d={a:int(tuple(ans[a])==(c["truth"],c["second_truth"])) for a in ARMS}
     for a in ARMS:correct[a]+=d[a]
     for a in ARMS[:-1]:operations[a]+=cost[a]
     ablation+=int(ans[ARMS[1]]==ans[ARMS[2]])
@@ -154,7 +151,7 @@ def fit_report():
       public_bridges=[list(q) for q in c["public_bridges"]],
       secondary_chain=[list(v) for v in c["second_chain"]],
       secondary_truth=c["second_truth"],
-      exact_joint_candidate_count=len(joint),
+      exact_joint_candidate_count=joint_count,
       chain=[list(x) for x in c["chain"]],start=c["start"],
       truth=c["truth"],public_corruptions=c["corrupted"],
       predictions=ans,correct=d,abstract_operations=cost))
