@@ -1,0 +1,64 @@
+name: Wingless F58 exact-source FIT-only scientific feasibility
+on:
+  push:
+    branches:
+      - research/w-f58-persistent-role-binding-20261015-r1
+permissions:
+  contents: read
+jobs:
+  source-qualification:
+    if: "${{ github.event.head_commit.message == 'science(w-f58): once-only FIT persistent-binding public source qualification' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Frozen precode prereg and exact source/test/audit identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5e1ad40bc243476e2211f21960da9325fdc16712 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f58/prereg.json)" = c364a4b9fefd0d1d7957691900fa511e117a6109
+          test "$(git hash-object research/foundational/20261015-w-f58/source_feasibility.py)" = d1da42dd4129102a9592a6b8953c492a212903b2
+          test "$(git hash-object research/foundational/20261015-w-f58/test_preflight.py)" = 94e0edd90b8fb18c1d9c43ed0c9aa71794a58f3e
+          test "$(git hash-object research/foundational/20261015-w-f58/audit_fit.py)" = d07ac5caa9ea17e306b5d34186da6fc9ed40dcbb
+          python3 -m json.tool research/foundational/20261015-w-f58/prereg.json >/dev/null
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f58 -p test_preflight.py -v
+      - name: One full independent repository regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: Exactly one new FIT-only scientific source and source-free audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/w-f58"
+          git rev-parse HEAD > "$RUNNER_TEMP/w-f58/SOURCE_SHA"
+          python3 -B research/foundational/20261015-w-f58/source_feasibility.py --fit-only             > "$RUNNER_TEMP/w-f58/result.json"
+          python3 -m json.tool "$RUNNER_TEMP/w-f58/result.json" >/dev/null
+          python3 -B research/foundational/20261015-w-f58/audit_fit.py             "$RUNNER_TEMP/w-f58/result.json"             research/foundational/20261015-w-f58/prereg.json             > "$RUNNER_TEMP/w-f58/source-free-audit.txt"
+          cat "$RUNNER_TEMP/w-f58/source-free-audit.txt"
+          (cd "$RUNNER_TEMP/w-f58" && sha256sum result.json source-free-audit.txt > manifest.sha256)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Wingless-F58-once-FIT-feasibility-evidence
+          path: ${{ runner.temp }}/w-f58/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Scientific authority boundary
+        run: |
+          echo "NEW_FIT_ONLY=TRUE"
+          echo "DIAG_AND_ORIGINAL=UNCONSUMED"
+          echo "F3=NOT_INDEPENDENT"
+          echo "WHOLE_NATIVE_576B=UNVERIFIED"
+          echo "FORGE_OPTIMIZER_AND_ACCEPTED_REFS=UNCHANGED"
