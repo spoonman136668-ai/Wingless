@@ -1,0 +1,79 @@
+{
+  "schema": "wingless.research-observation-reconciliation-proposal.v1",
+  "authority": "ADVISORY_SOURCE_ONLY_NOT_ACCEPTANCE",
+  "status": "R35_ORIGINAL_RUN_OBSERVED_NO_RERUN",
+  "project": "Wingless",
+  "experiment": "WLM-SI-RAW-REP-PHASE-ANCHOR-BOUNDARY44-SURFACE25-RECORD-CONTENT-NECESSITY-R35",
+  "provenance": {
+    "original_workflow_url": "https://github.com/spoonman136668-ai/Wingless/actions/runs/38936916822",
+    "original_workflow_run_id": 38936916822,
+    "original_workflow_job_id": 117094661033,
+    "frozen_prereg_path": "docs/experiments/wlm-si-raw-rep-phase-anchor-boundary44-surface25-record-content-necessity-r35.json",
+    "frozen_prereg_git_blob_sha": "f72cf9f3ca1d069ad528038f80e83df4608362a9",
+    "prereg_exact_parent_commit": "88fe84eba3b9691488bb3a4410e45abaf6b0f07a",
+    "qualified_source_commit": "422669f44a38ff4948e6d9c7ef4ff7e79d11f3e0",
+    "original_evidence_record_commit": "55f1862941e1dd7da307ecaba810e86d37a4d8df",
+    "original_state_path": ".research-autonomy/state.json",
+    "original_state_stores_generic_wrapper_classification_only": true
+  },
+  "recovered_from_original_job_log": {
+    "result_schema": "wingless.research-scientific-result.v1",
+    "scientific_classification": "record_content_necessary",
+    "wrapper_classification": "qualified-scientific-result",
+    "full_go_regression_and_harness": "passed_in_original_run",
+    "metrics": {
+      "experimental_arm_count": 44,
+      "completed_arm_count": 44,
+      "base_record_count": 1161,
+      "independent44_record_count": 1188,
+      "prefix_mismatch_count": 0,
+      "authentic_arm_count": 1,
+      "authentic_sufficient_arm_count": 1,
+      "duplicate_control_arm_count": 43,
+      "duplicate_sufficient_arm_count": 0,
+      "duplicate_unchanged_arm_count": 43,
+      "duplicate_other_arm_count": 0,
+      "duplicate_identity_mismatch_count": 0,
+      "arm_record_cardinality_mismatch_count": 0,
+      "pair_preserving_partition_count_per_arm": 127,
+      "partition_panel_arm_count": 22352,
+      "partial_partition_count_total": 0,
+      "evaluation_entity_pair_count_total": 804672,
+      "task_training_record_count": 0,
+      "tokenizer_use_count": 0,
+      "external_model_call_count": 0,
+      "capacity_growth_event_count": 0,
+      "invalid_row_count": 0,
+      "counter_overflow_count": 0
+    },
+    "authentic_sample_43": {
+      "all_four_matching_partitions": 0,
+      "partial_matching_partitions": 0,
+      "zero_matching_partitions": 127
+    },
+    "each_of_43_duplicate_controls": {
+      "all_four_matching_partitions": 120,
+      "partial_matching_partitions": 0,
+      "zero_matching_partitions": 7
+    }
+  },
+  "scientific_interpretation": "At frozen surface 25, the added authentic sample 43 alters the outcome while each duplicate of samples 0..42 does not; evidence supports record-content necessity within this exact deterministic experiment, not broader language-reasoning generalization.",
+  "reconciliation_gates": [
+    "Read ONLY original immutable run 38936916822 job 117094661033; never rerun R35 against an exposed cohort.",
+    "Verify source commit, prereg Git blob and exact original experiment ID before import.",
+    "Parse original result JSON from the original job log without normalization of scientific classification or metrics; require exact expected field values and 44 matching arms.",
+    "Ensure the parsed original result agrees with the frozen R35 preregistration classification rule and wrapper PASS log.",
+    "Carry the evidence with original-run links and immutable source identifiers; never convert a wrapper PASS alone into scientific success.",
+    "No mutation of .research-autonomy/state.json, CKB-plane accepted refs, controller, queue, or active research branch by this advisory proposal.",
+    "Any eventual canonical import or scientific acceptance remains exclusively under the existing authorized CKB-plane qualification path."
+  ],
+  "next_scientific_question": "After canonical evidence reconciliation, distinguish whether the unique authentic record contributes novel support, ordering, or an identity-relationship constraint. Preregister bounded byte-preserving ablations on independently eligible sources; do not explore/tune against consumed R35 outcomes.",
+  "restrictions": {
+    "new_experiment_run": false,
+    "scientific_first_use": false,
+    "controller_dispatch": false,
+    "acceptance_authority": false,
+    "optimizer_promotion": false,
+    "production_authority": false
+  }
+}
