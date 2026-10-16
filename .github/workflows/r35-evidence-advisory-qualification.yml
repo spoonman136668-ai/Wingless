@@ -1,43 +1,59 @@
-name: Wingless R35 advisory qualification
+name: Wingless R35 original evidence custody
 on:
   push:
     branches:
       - contrib/chatgpt-r35-science-evidence-20261016-r1
-  workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
-  r35-audit:
+  r35-original-evidence:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Verify immutable research-base ref
+      - name: Verify cached full regression and exact unchanged science tree
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           git merge-base --is-ancestor 55f1862941e1dd7da307ecaba810e86d37a4d8df HEAD
-          git cat-file -e 422669f44a38ff4948e6d9c7ef4ff7e79d11f3e0^{commit}
-          git status --porcelain
-      - name: Python syntax and original-log mutation tests
+          actual="$(git diff --name-only b17222d16e7b79abdb62a750ee2db9af129c7979 HEAD)"
+          test "$actual" = ".github/workflows/r35-evidence-advisory-qualification.yml"
+          curl --fail --silent --show-error --location \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/spoonman136668-ai/Wingless/actions/runs/38963795776 \
+            -o "$RUNNER_TEMP/r35-prior-qualification.json"
+          python3 -B -c 'import json,os; d=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"r35-prior-qualification.json"))); assert d["head_sha"]=="b17222d16e7b79abdb62a750ee2db9af129c7979"; assert d["conclusion"]=="success" and d["status"]=="completed"; print("EXACT_UNCHANGED_SCIENCE_TREE_PREVIOUS_FULL_REGRESSION_VERIFIED")'
+      - name: Re-run original-log parser mutation tests
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m py_compile docs/evidence-reconciliation/verify_r35_original_log.py docs/evidence-reconciliation/test_verify_r35_original_log.py
-          python3 -m unittest discover -v -s docs/evidence-reconciliation -p 'test_verify_r35_original_log.py'
-      - name: One full Wingless Go regression
+          python3 -B -m unittest discover -v -s docs/evidence-reconciliation -p 'test_verify_r35_original_log.py'
+      - name: Authenticated original R35 job-log retrieval and exact verification
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          go version
-          go test ./...
-      - name: Confirm checkout stayed unchanged
-        shell: bash
+          curl --fail --silent --show-error --location \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/spoonman136668-ai/Wingless/actions/jobs/117094661033/logs \
+            -o "$RUNNER_TEMP/r35-original-job.log"
+          test -s "$RUNNER_TEMP/r35-original-job.log"
+          sha256sum "$RUNNER_TEMP/r35-original-job.log"
+          python3 -B docs/evidence-reconciliation/verify_r35_original_log.py \
+            --job-log "$RUNNER_TEMP/r35-original-job.log" \
+            --prereg docs/experiments/wlm-si-raw-rep-phase-anchor-boundary44-surface25-record-content-necessity-r35.json
+          echo 'R35_ORIGINAL_LOG_GITHUB_AUTHENTICATED_RETRIEVAL_VERIFIED'
+      - name: No source mutation
         run: |
           set -euo pipefail
           git diff --exit-code
           git diff --cached --exit-code
-          git status --porcelain
