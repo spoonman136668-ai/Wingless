@@ -1,0 +1,46 @@
+name: Wingless F59 frozen-source preflight without prospective FIT use
+on:
+  push:
+    branches:
+      - research/w-f59-latent-variable-binding-20261015-r1
+permissions:
+  contents: read
+jobs:
+  frozen-source-preflight:
+    if: "${{ github.event.head_commit.message == 'ci(w-f59): frozen source preflight and one repository regression' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Assert frozen prereg and all source, test and independent audit blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 3a8d1cfcd3a874bf7fdb0d5be368c6aa2839dc5d HEAD
+          test "$(git hash-object research/foundational/20261015-w-f59/prereg.json)" = 82fe15456e83a5818fb6b9ff1d44de905db47afa
+          test "$(git hash-object research/foundational/20261015-w-f59/source_feasibility.py)" = 2422d7e823d5bd6c46b5511602826144940a465a
+          test "$(git hash-object research/foundational/20261015-w-f59/test_preflight.py)" = 9f50c379dc76b3e399bda40d0f336df1e830e42c
+          test "$(git hash-object research/foundational/20261015-w-f59/audit_fit.py)" = 99deb74adf8a4a336fa42c09168fc4f7794a9f29
+          python3 -m json.tool research/foundational/20261015-w-f59/prereg.json >/dev/null
+          python3 -B -m py_compile research/foundational/20261015-w-f59/source_feasibility.py
+          python3 -B -m py_compile research/foundational/20261015-w-f59/audit_fit.py
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f59 -p test_preflight.py -v
+      - name: One complete repository regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: Publish only source identity, never prospective FIT evidence
+        run: |
+          echo "F59_PRECODE_SOURCE_PREFLIGHT=PASS"
+          echo "FIT_SOURCE_EVALUATION_NOT_EXECUTED=TRUE"
+          echo "DIAGNOSTIC_AND_PRIMARY_ORIGINAL_UNCONSUMED=TRUE"

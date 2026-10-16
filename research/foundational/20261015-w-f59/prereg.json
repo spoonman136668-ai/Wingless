@@ -1,0 +1,78 @@
+{
+  "schema": "wingless.f59.compositional-variable-binding.prereg.v1",
+  "stage": "PRECODE_FROZEN_NO_SOURCE_USE",
+  "issue": 280,
+  "parent_F58_source_sha": "5a12929f1794f6a13539afacbef6a2153c3e5fe3",
+  "parent_F58_run": 38828170707,
+  "hypothesis": "New typed relational compositions that require globally consistent variable-binding state create task-value differences compared with cheap per-role MAP and fixed local symbolic rules; a trainable recurrence can exploit that under matched computation.",
+  "fit": {
+    "seeds": [
+      701000,
+      701016
+    ],
+    "families": [
+      1340,
+      1341,
+      1342,
+      1343
+    ],
+    "expected_cases": 128
+  },
+  "diagnostic_NOT_AUTHORIZED": {
+    "seeds": [
+      701100,
+      701116
+    ],
+    "families": [
+      1344,
+      1345,
+      1346,
+      1347
+    ],
+    "expected_cases": 128,
+    "shifts": [
+      "heldout_noncommutative_relation_roles",
+      "inverse_role_ordering"
+    ]
+  },
+  "originals_NOT_RESERVED": {
+    "seeds": [
+      702000,
+      702016
+    ],
+    "families": [
+      1348,
+      1349,
+      1350,
+      1351
+    ]
+  },
+  "FIT_source_requirements": {
+    "public_exact_source_accuracy_min": 0.8,
+    "full_public_minus_strongest_affordable_structural_control_min": 0.05,
+    "role_binding_counterfactual_ablation": true,
+    "no_private_source_latent_maps_to_action": true
+  },
+  "controls": [
+    "public_exact_structured_solver_extra_work",
+    "public_structured_MAP",
+    "fixed_public_rolewise_composition",
+    "matched_work_symbolic_state",
+    "unfair_private_truth_oracle"
+  ],
+  "future_learning": {
+    "train_FIT_only": true,
+    "shared_latent_variable_binding": true,
+    "heldout_accuracy_gain_vs_best_same_work_min": 0.05,
+    "per_family_nondegradation": true,
+    "full_parameters_and_operations_accounted": true
+  },
+  "limits": {
+    "source_independent_F3": false,
+    "primary_original_executed": false,
+    "native_total_576B_unverified": true,
+    "accepted_ref_mutation": false,
+    "live_optimizer_mutation": false,
+    "Codex_or_paid_API": false
+  }
+}
