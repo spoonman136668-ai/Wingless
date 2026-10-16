@@ -1,0 +1,49 @@
+name: Wingless F61B one-time FIT source feasibility
+on:
+  push:
+    branches:
+      - science/w-f61b-once-fit-source-20261016-r1
+permissions:
+  contents: read
+jobs:
+  once-only-fit:
+    if: ${{ github.event.head_commit.message == 'science(w-f61b): execute one frozen disjoint FIT and independent audit' && github.run_attempt == 1 }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact qualified ancestor and frozen scientific identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 3e4af348b35bd792463c40ddafcad9e953309206 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f61/prereg.json)" = d6fd61c0e8062ed27c19da63ff196ad08a5e6ed6
+          test "$(git hash-object research/foundational/20261015-w-f61/prereg-amendment.json)" = 08222165f73f4e9dfd1546b601dacdd719724bf1
+          test "$(git hash-object research/foundational/20261015-w-f61/source_feasibility.py)" = f9372cf2cbba75f6b90add7ca388b607d9ee49bc
+          test "$(git hash-object research/foundational/20261015-w-f61/audit_fit.py)" = f5fc5f0204280160ac8736f9777bc7a32f58c425
+          test "$(git hash-object research/foundational/20261015-w-f60/source_feasibility.py)" = f6863c7fdf31bd2cd20daaf6434640596b6ba5a4
+          mkdir -p evidence
+          printf 'head=%s\nqualified_ancestor=%s\n' "$GITHUB_SHA" 3e4af348b35bd792463c40ddafcad9e953309206 > evidence/source_identity.txt
+      - name: Exactly one frozen FIT source experiment (no DIAG or originals)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f61/source_feasibility.py --fit-only > evidence/f61b-fit.json
+      - name: Source-independent full-result audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/foundational/20261015-w-f61/audit_fit.py evidence/f61b-fit.json research/foundational/20261015-w-f61/prereg.json research/foundational/20261015-w-f61/prereg-amendment.json | tee evidence/independent_audit.txt
+          sha256sum evidence/f61b-fit.json evidence/independent_audit.txt | tee evidence/hashes.txt
+          echo "FIT_SOURCE_ONLY=TRUE F3=FALSE DIAG=UNCONSUMED ORIGINAL=UNCONSUMED"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wingless-f61b-once-fit-receipts
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
