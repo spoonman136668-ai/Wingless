@@ -7,7 +7,7 @@ permissions:
   contents: read
 jobs:
   once-only-fit:
-    if: ${{ github.event.head_commit.message == 'science(w-f61b): execute one frozen disjoint FIT and independent audit' && github.run_attempt == 1 }}
+    if: "${{ github.event.head_commit.message == 'science(w-f61b): retry after pre-job workflow failure' && github.run_attempt == 1 }}"
     runs-on: ubuntu-latest
     timeout-minutes: 110
     steps:
