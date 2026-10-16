@@ -1,0 +1,68 @@
+name: Wingless F55 new learned mechanism source FIT-only qualification
+on:
+  push:
+    branches: [research/w-f55-learned-public-role-operator-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  exact-head-frozen-fit-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify prereg source controls and exact-hash independent audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 90cf716f4dabb04d2d6a7dcf18ac9a97df98f104 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f55/prereg-candidate.json)" = 47515bea8590e3a5c849ce058587fa1852d991a7
+          test "$(git hash-object research/foundational/20261015-w-f55/source_pilot.py)" = d02fc933b52fc44d537ed45b061aef56ccd90a7f
+          test "$(git hash-object research/foundational/20261015-w-f55/audit_result.py)" = 77bf4346d5772d4077a739b445a265a49df936ca
+          test "$(git hash-object research/foundational/20261015-w-f55/test_model_fit.py)" = 490f1730b73ec060d49bd9f80aa23eca6f6e992e
+          python3 -B -m py_compile research/foundational/20261015-w-f55/source_pilot.py
+          python3 -B -m py_compile research/foundational/20261015-w-f55/audit_result.py
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f55 -p test_fit_preflight.py -v
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f55 -p test_model_fit.py -v
+          echo F55_FROZEN_LEARNED_MODEL_AND_AUDITOR_FIT_ONLY=PASS
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: One full original Wingless regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: Capture one learned model FIT-only source witness; NO DIAG execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/wf55"
+          mkdir -p "$root"
+          python3 -B research/foundational/20261015-w-f55/source_pilot.py --fit-only > "$root/fit-only-result.json"
+          python3 -B - "$root/fit-only-result.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          assert d["fit_cases"]==128 and d["fit_labeled_role_examples"]==512
+          assert len(d["learned_quantized_signed_int8_parameters"])==12
+          assert d["diagnostic_cohort_NOT_EVALUATED"]==[601100,601116]
+          assert d["future_original_NOT_RESERVED"]==[602000,602016]
+          assert d["source_independent_F3"] is False
+          print("F55_NEW_LEARNED_MODEL_FIT_ONLY=PASS")
+          PY
+          printf '%s\n' "$GITHUB_SHA" > "$root/SOURCE_SHA"
+          (cd "$root" && sha256sum fit-only-result.json > manifest.sha256)
+          echo "F55_DIAGNOSTIC_UNCONSUMED=TRUE; ORIGINAL_UNEXECUTED=TRUE; F3_FALSE=TRUE"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Wingless-F55-new-learned-model-FIT-only-source-no-diagnostic
+          path: ${{ runner.temp }}/wf55/
+          retention-days: 45
+          if-no-files-found: error
