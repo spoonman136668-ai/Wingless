@@ -41,10 +41,10 @@ ARMS=("public_exact_structured_solver_extra_work",
 def noise(family):
  if family not in FIT_FAMILIES:raise ValueError("not FIT")
  return (.025,.05,.075,.10)[family-1340]
-def source(seed,family):
- if seed not in FIT or family not in FIT_FAMILIES:
+def source(seed,family,length=8):
+ if seed not in FIT or family not in FIT_FAMILIES or length not in (8,10):
   raise ValueError("only fresh preregistered F59 FIT source is authorized")
- rng=random.Random(seed*31337+family*4799+59021)
+ rng=random.Random(seed*31337+family*4799+length*509+59021)
  hidden=MAPS[rng.randrange(len(MAPS))]
  public=[];corrupt=0
  for role in range(4):
@@ -55,7 +55,6 @@ def source(seed,family):
     y=rng.choice([z for z in range(P) if z!=y]);corrupt+=1
    pairs.append((x,y))
   public.append(tuple(pairs))
- length=8 if seed%2==0 else 10
  chain=[(r,1 if j%3 else -1) for j,r in enumerate((0,1,2,3,0,2,1,3))]
  if length==10:chain.extend(((2,-1),(1,1)))
  rng.shuffle(chain)
@@ -119,27 +118,31 @@ def fit_report():
  ablation=0
  for seed in FIT:
   for family in FIT_FAMILIES:
-   c=source(seed,family);ans,cost=evaluate(c)
-   d={a:int(ans[a]==c["truth"]) for a in ARMS}
-   for a in ARMS:correct[a]+=d[a]
-   for a in ARMS[:-1]:operations[a]+=cost[a]
-   ablation+=int(ans[ARMS[1]]==ans[ARMS[2]])
-   rows.append(dict(seed=seed,family=family,length=c["length"],
-     public=[[[x,y] for x,y in pair] for pair in c["public"]],
-     chain=[list(x) for x in c["chain"]],start=c["start"],
-     truth=c["truth"],public_corruptions=c["corrupted"],
-     predictions=ans,correct=d,abstract_operations=cost))
- assert len(rows)==64
- # TWO chain lengths are represented by a source per seed, so this pilot
- # is 64 FIT problems, not the preregistered 128. Refuse to claim the
- # preregistered acceptance gate; this report is a source-shape preflight.
+   for length in (8,10):
+    c=source(seed,family,length);ans,cost=evaluate(c)
+    d={a:int(ans[a]==c["truth"]) for a in ARMS}
+    for a in ARMS:correct[a]+=d[a]
+    for a in ARMS[:-1]:operations[a]+=cost[a]
+    ablation+=int(ans[ARMS[1]]==ans[ARMS[2]])
+    rows.append(dict(seed=seed,family=family,length=c["length"],
+      public=[[[x,y] for x,y in pair] for pair in c["public"]],
+      chain=[list(x) for x in c["chain"]],start=c["start"],
+      truth=c["truth"],public_corruptions=c["corrupted"],
+      predictions=ans,correct=d,abstract_operations=cost))
+ assert len(rows)==128
+ exact=correct[ARMS[0]]/len(rows)
+ strongest=max(ARMS[1:-1],key=lambda a:correct[a])
+ gain=(correct[ARMS[0]]-correct[strongest])/len(rows)
+ eligible=exact>=.8 and gain>=.05
  return dict(schema="wingless.f59.typed-binding-fit-source.v1",
-   stage="FIT_ONLY_SOURCE_SHAPE_PREFLIGHT_NOT_128_CASE_QUALIFICATION",
+   stage="NEW_DISJOINT_FIT_ONLY_SOURCE_FEASIBILITY_NOT_LEARNED",
    fit_seeds=[FIT.start,FIT.stop],FIT_families=list(FIT_FAMILIES),
-   cases=len(rows),required_prereg_cases=128,case_count_matches_prereg=False,
+   cases=len(rows),required_prereg_cases=128,case_count_matches_prereg=True,
    scores=correct,operations=operations,rows=rows,
+   strongest_affordable_structural_control=strongest,
+   exact_gain_vs_strongest=gain,exact_public_accuracy=exact,
    structured_vs_rolewise_prediction_agreement=ablation,
-   source_gate_qualified=False,
+   source_gate_qualified=eligible,
    diagnostic_unconsumed=True,originals_unconsumed=True,
    independent_F3=False,native_total_576B_unverified=True,
    accepted_refs_unchanged=True)
