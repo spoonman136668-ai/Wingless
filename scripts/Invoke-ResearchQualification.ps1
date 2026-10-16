@@ -117,7 +117,18 @@ if ($Match.Success) {
     }
 }
 else {
-    $ProbeParseError = 'No probe JSON block was found before the scientific-diagnosis marker.'
+    # Some research wrappers emit one canonical standalone scientific JSON
+    # line rather than the legacy diagnosis marker. Require exactly ONE
+    # complete identity-bound record: do not accept arbitrary log JSON or
+    # multiple possible results, and preserve the existing failure gate.
+    try {
+        . (Join-Path $PSScriptRoot 'Get-WinglessTranscriptScientificProbe.ps1')
+        $Probe = Get-WinglessTranscriptScientificProbe -Transcript $Transcript -ExpectedExperiment ([string]$Request.experiment)
+        $Probe | ConvertTo-Json -Depth 100 | Set-Content -Encoding UTF8 -Path $ProbePath
+    }
+    catch {
+        $ProbeParseError = $_.Exception.Message
+    }
 }
 
 $StatusLines = @(
