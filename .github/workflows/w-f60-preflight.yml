@@ -1,0 +1,42 @@
+name: Wingless F60 source identity preflight and full regression
+on:
+  push:
+    branches:
+      - research/w-f60-multi-instance-bindings-20261015-r1
+permissions:
+  contents: read
+jobs:
+  exact-head-preflight:
+    if: "${{ github.event.head_commit.message == 'ci(w-f60): frozen noncommutative paired-binding preflight and full regression' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Frozen precode scientific prereg and exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/foundational/20261015-w-f60/prereg.json)" = 47b793c9493cbf434f1baeed4a900212b0dbaf5c
+          test "$(git hash-object research/foundational/20261015-w-f60/source_feasibility.py)" = f6863c7fdf31bd2cd20daaf6434640596b6ba5a4
+          test "$(git hash-object research/foundational/20261015-w-f60/test_preflight.py)" = b3cbc5f6cab88be76c915a830e37a74b386abd11
+          test "$(git hash-object research/foundational/20261015-w-f60/audit_fit.py)" = c57801c7dc2d317ced9c789a68bf560f72162f5a
+          python3 -m json.tool research/foundational/20261015-w-f60/prereg.json > /dev/null
+          python3 -B -m py_compile research/foundational/20261015-w-f60/source_feasibility.py
+          python3 -B -m py_compile research/foundational/20261015-w-f60/audit_fit.py
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f60 -p test_preflight.py -v
+      - name: One complete repository regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: Authority guard
+        run: echo "NO_F60_FIT_SOURCE_USE=TRUE DIAGNOSTIC_ORIGINALS=UNTOUCHED F3=UNQUALIFIED"
