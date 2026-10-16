@@ -1,4 +1,4 @@
-name: W-F60 read-only diagnostic of original archived firstuse
+name: W-F60 independently audit original FIT under normalized posterior
 on:
   push:
     branches:
@@ -8,7 +8,7 @@ permissions:
   actions: read
 jobs:
   original-archive-only:
-    if: "${{ github.event.head_commit.message == 'audit(w-f60): read original ZIP without source replay' && github.run_attempt == 1 }}"
+    if: "${{ github.event.head_commit.message == 'audit(w-f60): verify normalized public posterior from archived firstuse' && github.run_attempt == 1 }}"
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -22,7 +22,7 @@ jobs:
           set -euo pipefail
           git merge-base --is-ancestor 57555a26f95591f81c996d5ea456ad8b00d485aa HEAD
           test "$(git hash-object research/foundational/20261015-w-f60/source_feasibility.py)" = f6863c7fdf31bd2cd20daaf6434640596b6ba5a4
-          test "$(git hash-object research/foundational/20261015-w-f60/audit_fit.py)" = c57801c7dc2d317ced9c789a68bf560f72162f5a
+          test "$(git hash-object research/foundational/20261015-w-f60/audit_fit.py)" = ae84cde8b711dfea351a839e8f41e2e9ca46e0ad
       - name: Verify immutable one-time run/archive SHA and no replay
         shell: bash
         env:
@@ -45,12 +45,12 @@ jobs:
           root="$RUNNER_TEMP/original"
           test "$(cat "$root/SOURCE_SHA")" = 57555a26f95591f81c996d5ea456ad8b00d485aa
           (cd "$root" && sha256sum -c source-manifest.sha256)
-          python3 -B research/foundational/20261015-w-f60/audit_existing_diagnose.py "$root/result.json" | tee "$RUNNER_TEMP/archive-diagnose.txt"
+          python3 -B research/foundational/20261015-w-f60/audit_fit.py "$root/result.json" research/foundational/20261015-w-f60/prereg.json | tee "$RUNNER_TEMP/archived-independent-audit.txt"
       - uses: actions/upload-artifact@v4
         with:
-          name: W-F60-read-only-posterior-diagnostic
+          name: W-F60-read-only-independent-original-audit
           path: ${{ runner.temp }}/archive-diagnose.txt
           retention-days: 90
           if-no-files-found: error
       - name: Explicit authority
-        run: echo "NEW_FIT_RUNS=ZERO DIAG=UNTOUCHED ORIGINALS=UNTOUCHED SCIENCE_NOT_CLAIMED"
+        run: echo "NEW_FIT_RUNS=ZERO DIAG=UNTOUCHED ORIGINALS=UNTOUCHED SCIENCE_GATE_DEPENDS_ON_AUDIT"
