@@ -105,7 +105,7 @@ def audit(result,prereg):
    assert row["correct"][a]==val
    totals[a]+=val
    if a!=ARMS[-1]:work[a]+=row["abstract_operations"][a]
-  same+=int(independent[1]==independent[4])
+  same+=int(independent[1]==independent[2])
  assert len(seen)==128 and totals==d["scores"] and work==d["operations"]
  assert d["structured_vs_rolewise_prediction_agreement"]==same
  strong=max(ARMS[1:-1],key=lambda a:totals[a])
