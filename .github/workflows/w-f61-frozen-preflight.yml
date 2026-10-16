@@ -1,0 +1,42 @@
+name: Wingless F61 frozen counterfactual source preflight
+on:
+  push:
+    branches:
+      - research/w-f61-counterfactual-query-proof-20261015-r1
+permissions:
+  contents: read
+jobs:
+  source-preflight:
+    if: "${{ github.event.head_commit.message == 'ci(w-f61): frozen counterfactual source preflight and full regression' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Verify precode prereg ancestor and immutable source/audit/test
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor ea5d5c24b0f3d32a716529b2eb8c5016e5bed9c6 HEAD
+          test "$(git hash-object research/foundational/20261015-w-f61/prereg.json)" = d6fd61c0e8062ed27c19da63ff196ad08a5e6ed6
+          test "$(git hash-object research/foundational/20261015-w-f61/source_feasibility.py)" = 055bfa3a496eeb20c354b7ed5ab38fbf20a60b9f
+          test "$(git hash-object research/foundational/20261015-w-f61/audit_fit.py)" = a9a51581995a013b3e1bde2eeac8f311f50fa8db
+          test "$(git hash-object research/foundational/20261015-w-f61/test_preflight.py)" = 8735f632dcbcca6d640c54ce29d108804319f12e
+          python3 -B -m py_compile research/foundational/20261015-w-f61/source_feasibility.py
+          python3 -B -m py_compile research/foundational/20261015-w-f61/audit_fit.py
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f61 -p test_preflight.py -v
+      - name: One complete original repository regression and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+      - name: FIT first-use not executed
+        run: echo "REGRESSION_ONLY=TRUE FIT=UNCONSUMED DIAG=UNCONSUMED ORIGINAL=UNCONSUMED"
