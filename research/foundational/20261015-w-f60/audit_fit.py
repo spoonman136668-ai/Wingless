@@ -41,13 +41,18 @@ def recompute(row):
   return value
  def two(m):
   a=run(m,row["start"],chain);return (a,run(m,a,second))
+ # Normalize the same PUBLIC joint likelihood distribution before
+ # summation. With D4 symmetries, nearly tied pair posteriors can flip the
+ # floating-point tie choice if one verifier sums unnormalized weights.
+ # This is a numeric identity correction, not source/data/threshold tuning.
  raw=[likelihood(m) for m in MAPS]
  total=sum(raw);assert total>0
+ weights=[v/total for v in raw]
  joint={}
- for m,v in zip(MAPS,raw):
+ for m,v in zip(MAPS,weights):
   k=two(m);joint[k]=joint.get(k,0.)+v
  exact=max(sorted(joint),key=lambda p:joint[p])
- best=max(range(512),key=lambda k:(raw[k],-k))
+ best=max(range(512),key=lambda k:(weights[k],-k))
  structured=two(MAPS[best])
  ranks=[]
  for r,cal in enumerate(observations):
