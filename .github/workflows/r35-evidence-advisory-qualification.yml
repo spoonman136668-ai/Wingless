@@ -1,0 +1,43 @@
+name: Wingless R35 advisory qualification
+on:
+  push:
+    branches:
+      - contrib/chatgpt-r35-science-evidence-20261016-r1
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  r35-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify immutable research-base ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 55f1862941e1dd7da307ecaba810e86d37a4d8df HEAD
+          git cat-file -e 422669f44a38ff4948e6d9c7ef4ff7e79d11f3e0^{commit}
+          git status --porcelain
+      - name: Python syntax and original-log mutation tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile docs/evidence-reconciliation/verify_r35_original_log.py docs/evidence-reconciliation/test_verify_r35_original_log.py
+          python3 -m unittest discover -v -s docs/evidence-reconciliation -p 'test_verify_r35_original_log.py'
+      - name: One full Wingless Go regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go version
+          go test ./...
+      - name: Confirm checkout stayed unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          git diff --cached --exit-code
+          git status --porcelain
