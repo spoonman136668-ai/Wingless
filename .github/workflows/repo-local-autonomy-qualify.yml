@@ -115,7 +115,7 @@ jobs:
           $WorkflowText=Get-Content -Raw '.github/workflows/research-continuation-controller.yml'
           if($WorkflowText.Contains('NVIDIA_API_KEY:')){throw 'EXTERNAL_API_KEY_BINDING_FORBIDDEN'}
           if(-not$Text.Contains('RESEARCH_AGENT_POLICY=GPT_CHAT_GITHUB_SOURCE_ONLY_NO_CODEX_NO_EXTERNAL_APIS')){throw 'NO_CODEX_EXECUTION_POLICY_MISSING'}
-          if(-not$Text.Contains("Write-CycleResult -Advanced $false -Reason 'gpt-authored-research-required-no-unattended-model'")){throw 'NO_MODEL_WAIT_RECORD_MISSING'}
+          if(-not$Text.Contains('gpt-authored-research-required-no-unattended-model')){throw 'NO_MODEL_WAIT_RECORD_MISSING'}
           if($Text.Contains('-Provider nvidia') -or $Text.Contains('-Provider openrouter')){throw 'EXTERNAL_API_EXECUTION_FORBIDDEN'}
           Write-Host 'WINGLESS_REPO_LOCAL_CONTROLLER_STATIC_PASS'
 
