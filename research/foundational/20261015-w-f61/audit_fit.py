@@ -23,7 +23,8 @@ ARMS=("public_full_exact_joint_posterior_extra_work","strong_structured_MAP",
       "public_top2_role_beam","F60_MAP_algorithm_port_F61_observations",
       "public_local_rolewise","private_oracle_unfair")
 def recompute(row):
- rate=(.045,.085,.12,.16)[row["family"]-1440]
+ assert row["family"] in (1480,1481,1482,1483), "UNREGISTERED_F61B_FAMILY"
+ rate=(.045,.085,.12,.16)[row["family"]-1480]
  observations=row["public"];bridge=row["public_bridges"]
  chain=row["chain"];second=row["secondary_chain"];counter=row["counterfactual_chain"]
  def likelihood(maps):
