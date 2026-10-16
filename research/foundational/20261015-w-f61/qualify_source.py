@@ -38,14 +38,27 @@ def main():
         assert git_blob(ROOT/name)==blob,"BLOB_DRIFT: "+name
     old=json.loads((HERE/"prereg.json").read_text(encoding="utf-8"))
     amendment=json.loads((HERE/"prereg-amendment.json").read_text(encoding="utf-8"))
+    assert old["schema"]=="wingless.f61.counterfactual-multi-instance-binding.prereg.v1"
     assert old["stage"]=="PRECODE_FROZEN_NO_FIT_USE"
     assert old["fit"]["seeds"]==[751000,751016]
+    assert old["diagnostic_NOT_AUTHORIZED"]["seeds"]==[751100,751116]
+    assert old["original_NOT_RESERVED"]["seeds"]==[752000,752016]
+    assert old["authorities"]["independent_F3"] is False
+    assert amendment["schema"]=="wingless.f61b.comparator-integrity-amendment.v1"
+    assert amendment["stage"]=="PRECODE_REPLACEMENT_NO_FIT_DISPATCH"
     assert amendment["original_prereg_blob_sha"]==FROZEN["research/foundational/20261015-w-f61/prereg.json"]
     assert amendment["fit"]["seeds"]==[771000,771016]
+    assert amendment["fit"]["families"]==[1480,1481,1482,1483]
+    assert amendment["fit"]["expected_joint_cases"]==128
     assert amendment["diagnostic_UNAUTHORIZED"]["seeds"]==[771100,771116]
     assert amendment["original_UNRESERVED"]["seeds"]==[772000,772016]
     assert amendment["original_F61_cohort_status"].startswith("not pristine")
+    assert amendment["prior_preflight_generated_one_original_FIT_case"] is True
     assert amendment["source_gates"]["minimum_additional_correct_of_128"]==7
+    assert amendment["source_gates"]["minimum_exact_accuracy"]==0.8
+    assert amendment["source_gates"]["minimum_full_exact_gain_vs_strongest_affordable"]==0.05
+    assert amendment["future_fit_results_generated"] is False
+    assert amendment["diagnostic_and_original_unconsumed"] is True
     assert amendment["independent_F3"] is False
     run("FOCUSED_F61B_SYNTHETIC_ONLY",[
        sys.executable,"-B","-m","unittest","discover","-s",str(HERE),"-p","test_preflight.py","-v"])
