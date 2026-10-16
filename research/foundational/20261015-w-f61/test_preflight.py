@@ -11,10 +11,10 @@ class Tests(unittest.TestCase):
  def test_public_counterfactual_roles(self):
   c=m.source(751000,1440,8)
   self.assertEqual(len(c["public_bridges"]),3)
-  self.assertEqual(len(c["secondary_chain"]),6)
+  self.assertEqual(len(c["second_chain"]),6)
   self.assertEqual(len(c["counterfactual_chain"]),6)
   self.assertTrue(all(len(x)==2 for x in c["public"]))
-  self.assertNotEqual(c["secondary_chain"],c["counterfactual_chain"])
+  self.assertNotEqual(c["second_chain"],c["counterfactual_chain"])
   outcomes,cost,n=m.evaluate(c)
   self.assertEqual(set(outcomes),set(m.ARMS))
   self.assertEqual(len(outcomes[m.ARMS[0]]),3)
