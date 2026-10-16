@@ -3,7 +3,7 @@ function Get-WinglessTranscriptScientificProbe {
         [Parameter(Mandatory=$true)][string]$Transcript,
         [Parameter(Mandatory=$true)][string]$ExpectedExperiment
     )
-    $Matches = @(
+    $Candidates = @(
         foreach ($Line in ($Transcript -split '[\r\n]+')) {
             $Clean = $Line.Trim()
             if ($Clean -notmatch '^\{\s*"schema"\s*:') { continue }
@@ -16,8 +16,8 @@ function Get-WinglessTranscriptScientificProbe {
             $Candidate
         }
     )
-    if ($Matches.Count -ne 1) {
-        throw "WINGLESS_SCIENTIFIC_JSON_LINE_MISSING_OR_AMBIGUOUS count=$($Matches.Count)"
+    if ($Candidates.Count -ne 1) {
+        throw "WINGLESS_SCIENTIFIC_JSON_LINE_MISSING_OR_AMBIGUOUS count=$($Candidates.Count)"
     }
-    return $Matches[0]
+    return $Candidates[0]
 }
