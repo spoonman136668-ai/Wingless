@@ -22,11 +22,14 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test "$(git hash-object research/foundational/20261015-w-f57/prereg.json)" = f088b68ac0cfdcd9ca1a3aa104de1c555fd29c70
-          test "$(git hash-object research/foundational/20261015-w-f57/source_fit.py)" = 1f4fe7af922dc65fd9eca6d1e52affbbff4ef55e
+          test "$(git hash-object research/foundational/20261015-w-f57/source_fit.py)" = 527fa9d89ab9fda7d0ecda0655ff5683377c932e
           test "$(git hash-object research/foundational/20261015-w-f57/test_source_fit.py)" = 90a353321c1a707cb0190f31244afdf140c234ca
           python3 -B -m py_compile research/foundational/20261015-w-f57/source_fit.py
           python3 -B -m unittest discover -s research/foundational/20261015-w-f57 -p test_precode.py -v
           python3 -B -m unittest discover -s research/foundational/20261015-w-f57 -p test_source_fit.py -v
+          test "$(git hash-object research/foundational/20261015-w-f57/audit_fit.py)" = 3a70817c7ac741befcd286ece160241319e62b9f
+          test "$(git hash-object research/foundational/20261015-w-f57/test_audit_fit.py)" = 170418e81c337432894dc866dd34a8dfe6f768b7
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f57 -p test_audit_fit.py -v
           echo F57_NEW_FACTORIAL_PUBLIC_BELIEF_SOURCE=PASS
       - name: One complete Wingless project regression
         shell: bash
