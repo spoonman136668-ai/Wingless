@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Offline mutation tests for the read-only R35 original-job-log parser."""
 from __future__ import annotations
+import copy
 import importlib.util
 import json
 from pathlib import Path
 import unittest
+from unittest import mock
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location("r35_original_log_verifier",
@@ -110,6 +112,36 @@ class FrozenR35LogTests(unittest.TestCase):
         self.assertEqual(verify.git_blob_sha(b"hello"),
                          "b6fc4c620b67d95f953a5c1c1230aaab5db5a1b0")
 
+
+    def test_original_source_identity_verified_without_rerun(self):
+        advisory = copy.deepcopy(ADVISORY)
+        provenance = advisory["provenance"]
+        prereg = json.dumps(dict(
+            experiment=verify.EXPERIMENT,
+            exact_parent_sha=provenance["prereg_exact_parent_commit"],
+            classification_rules={"record_content_necessary": "frozen"}
+        )).encode()
+        provenance["frozen_prereg_git_blob_sha"] = verify.git_blob_sha(prereg)
+        state = dict(experiment=verify.EXPERIMENT, github_run_id="38936916822",
+                     qualified_head_sha=provenance["qualified_source_commit"],
+                     classification="qualified-scientific-result")
+        with mock.patch.object(verify, "git_at", side_effect=[
+            prereg, json.dumps(state).encode()
+        ]) as reader:
+            frozen = verify.verify_original_sources(advisory, prereg)
+            self.assertEqual(frozen["experiment"], verify.EXPERIMENT)
+            self.assertEqual(reader.call_count, 2)
+
+    def test_original_prereg_drift_fails_closed(self):
+        advisory = copy.deepcopy(ADVISORY)
+        with self.assertRaises(verify.EvidenceMismatch):
+            verify.verify_original_sources(advisory, b"not-original-frozen-source")
+
+    def test_wrong_transport_identifier_fails_closed(self):
+        advisory = copy.deepcopy(ADVISORY)
+        advisory["provenance"]["original_workflow_job_id"] += 1
+        with self.assertRaises(verify.EvidenceMismatch):
+            verify.verify_original_sources(advisory, b"irrelevant")
 
 if __name__ == "__main__":
     unittest.main()
