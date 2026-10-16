@@ -1,0 +1,97 @@
+{
+  "schema": "wingless.f58.persistent-role-binding.prereg.v1",
+  "stage": "PRECODE_FROZEN_NOT_EXECUTED",
+  "issue": 278,
+  "parent_source_sha": "4f30c36b53bb6a6a472a50a6545850b286590384",
+  "hypothesis": "Persistent role identity and repeated-variable binding under shifted public calibration noise creates task-value advantage over erroneously resampled factorized belief, permitting truly new learned state representation.",
+  "fit": {
+    "seed_range": [
+      681000,
+      681016
+    ],
+    "families": [
+      1300,
+      1301,
+      1302,
+      1303
+    ],
+    "lengths": [
+      8,
+      10
+    ],
+    "cases": 128
+  },
+  "diagnostic": {
+    "seed_range": [
+      681100,
+      681116
+    ],
+    "families": [
+      1304,
+      1305,
+      1306,
+      1307
+    ],
+    "lengths": [
+      10,
+      12
+    ],
+    "cases": 128,
+    "not_authorized": true
+  },
+  "original": {
+    "seed_range": [
+      682000,
+      682016
+    ],
+    "families": [
+      1308,
+      1309,
+      1310,
+      1311
+    ],
+    "not_reserved": true
+  },
+  "public_evidence": {
+    "roles": 4,
+    "nondegenerate_pairs_each_role": 3,
+    "private_maps_14_each": true,
+    "role_reuse_repeated": true,
+    "noise_families": [
+      0.03,
+      0.07,
+      0.1,
+      0.14
+    ],
+    "binding_field_size": 7,
+    "causal_action_no_hidden_role_maps": true
+  },
+  "FIT_source_methods": [
+    "exact_joint_public_posterior_extra_work",
+    "factorized_public_belief_fixed",
+    "frozen_top_two_role_map_beam",
+    "public_role_MAP",
+    "private_truth_oracle_unfair"
+  ],
+  "FIT_source_gates": {
+    "exact_public_accuracy_min": 0.8,
+    "exact_advantage_vs_factorized_min_absolute": 0.05,
+    "all_rows_and_public_receipts_independent": true
+  },
+  "scientific_future": {
+    "train_only_on_disjoint_FIT": true,
+    "learn_persistent_latent_relation_state": true,
+    "improvement_vs_strongest_equal_work_fair_min_absolute": 0.05,
+    "per_family_nondegradation": true,
+    "compute_and_all_parameter_bytes_audited": true
+  },
+  "authority": {
+    "no_DIAG_firstuse": true,
+    "no_original_firstuse": true,
+    "no_F3_acceptance": true,
+    "native_total_576B_unverified": true,
+    "accepted_ref_mutation": false,
+    "live_optimizer_promotion": false,
+    "paid_Codex_API": false
+  }
+}
