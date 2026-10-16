@@ -1,0 +1,44 @@
+name: Wingless F57 first frozen within-FIT learned belief validation
+on:
+  push:
+    branches: [research/w-f57-public-belief-method-fitonly-20261015-r1]
+permissions:
+  contents: read
+jobs:
+  first-fit-validation:
+    if: "${{ github.event.head_commit.message == 'science(w-f57): one frozen new belief transition FIT-only validation' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Authenticate frozen source and negative controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/foundational/20261015-w-f57/prereg.json)" = f088b68ac0cfdcd9ca1a3aa104de1c555fd29c70
+          test "$(git hash-object research/foundational/20261015-w-f57/source_fit.py)" = 527fa9d89ab9fda7d0ecda0655ff5683377c932e
+          test "$(git hash-object research/foundational/20261015-w-f57/audit_fit.py)" = 3a70817c7ac741befcd286ece160241319e62b9f
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f57 -p test_precode.py -v
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f57 -p test_source_fit.py -v
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f57 -p test_audit_fit.py -v
+      - name: One bounded source FIT split and independent all-public predictor recount
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/w57"; mkdir -p "$root"
+          git rev-parse HEAD > "$root/SOURCE_SHA"
+          python3 -B research/foundational/20261015-w-f57/source_fit.py --fit-only > "$root/result.json"
+          python3 -B research/foundational/20261015-w-f57/audit_fit.py \
+            "$root/result.json" research/foundational/20261015-w-f57/prereg.json > "$root/audit.json"
+          (cd "$root" && sha256sum result.json audit.json > manifest.sha256)
+          cat "$root/audit.json"
+          echo W_F57_FIT_ONLY_LEARNED_STATE_VALIDATION=PASS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: W-F57-first-FIT-belief-state-validation-no-DIAG
+          path: ${{ runner.temp }}/w57/
+          retention-days: 60
+          if-no-files-found: warn
