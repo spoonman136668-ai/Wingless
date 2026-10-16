@@ -1,0 +1,78 @@
+{
+  "schema": "wingless.f60.multi-instance-variable-binding.prereg.v1",
+  "stage": "PRECODE_FROZEN_NO_FIT_OR_DIAG",
+  "tracking_issue": 282,
+  "parent_f59_run": 38829694517,
+  "parent_F59_source_sha": "22e4593bbbba81a6d8afb871dc01191712612767",
+  "scientific_reason": "F59 exact 124/128, cheap structural MAP 122/128; low headroom despite source feasibility. Require shared latent state across multiple query instances, not another single-map classification.",
+  "hypothesis": "Trainable shared variable-binding state can preserve consistent role identity across coupled public relation proof instances, outperforming strong affordable symbolic state machines on novel compositions.",
+  "fit": {
+    "seeds": [
+      721000,
+      721016
+    ],
+    "families": [
+      1380,
+      1381,
+      1382,
+      1383
+    ],
+    "expected_cases": 128,
+    "paired_dependent_query_instances": true
+  },
+  "diagnostic_NOT_AUTHORIZED": {
+    "seeds": [
+      721100,
+      721116
+    ],
+    "families": [
+      1384,
+      1385,
+      1386,
+      1387
+    ],
+    "expected_cases": 128,
+    "novel_role_composition_orders": true
+  },
+  "primary_original_NOT_RESERVED": {
+    "seeds": [
+      722000,
+      722016
+    ],
+    "families": [
+      1388,
+      1389,
+      1390,
+      1391
+    ]
+  },
+  "source_gates": {
+    "public_full_exact_accuracy_min": 0.8,
+    "gain_vs_strongest_affordable_symbolic_control_min": 0.05,
+    "variable_binding_counterfactual_ablation_required": true,
+    "public_observations_only": true
+  },
+  "controls": [
+    "exact_joint_public_structured",
+    "strong_affordable_structured_MAP",
+    "matched_work_public_dynamic_programming",
+    "frozen_F59_coupled_MAP",
+    "fixed_rolewise_public_baseline",
+    "unfair_private_oracle"
+  ],
+  "future_learned_test": {
+    "FIT_training_and_validation_disjoint": true,
+    "shared_latent_binding_state": true,
+    "source_identity_frozen_before_fit": true,
+    "accuracy_gain_min": 0.05,
+    "per_family_nondegradation": true,
+    "compute_and_state_bytes_recorded": true
+  },
+  "authority": {
+    "F3_original_accepted": false,
+    "native_total_576B_unverified": true,
+    "accepted_ref_mutation": false,
+    "controller_changes": false,
+    "paid_API_or_Codex": false
+  }
+}
