@@ -1,4 +1,4 @@
-"""W-F61 independent source-free D4 counterfactual triple-binding audit.
+"""W-F61B independent source-free D4 counterfactual triple-binding audit.
 
 Reconstructs all possible public D4 relations from archived public pairs and
 paired query descriptions; never imports science source or private maps.
@@ -20,10 +20,11 @@ def invert(p):return tuple(p.index(i) for i in range(4))
 MAPS=tuple((a,b,c,invert(compose(c,compose(b,a))))
  for a,b,c in itertools.product(PERMS,repeat=3))
 ARMS=("public_full_exact_joint_posterior_extra_work","strong_structured_MAP",
-      "budget_matched_public_dp","frozen_F60_public_coupled_MAP",
+      "public_top2_role_beam","F60_MAP_algorithm_port_F61_observations",
       "public_local_rolewise","private_oracle_unfair")
 def recompute(row):
- rate=(.045,.085,.12,.16)[row["family"]-1440]
+ assert row["family"] in (1480,1481,1482,1483), "UNREGISTERED_F61B_FAMILY"
+ rate=(.045,.085,.12,.16)[row["family"]-1480]
  observations=row["public"];bridge=row["public_bridges"]
  chain=row["chain"];second=row["secondary_chain"];counter=row["counterfactual_chain"]
  def likelihood(maps):
@@ -68,23 +69,29 @@ def recompute(row):
   pair=triple(maps);beam[pair]=beam.get(pair,0.)+likelihood(maps)
  selected=max(sorted(beam),key=lambda p:beam[p])
  return (exact,structured,selected,structured,independent),len(joint)
-def audit(result,prereg):
- d=json.load(open(result));p=json.load(open(prereg))
- assert d["schema"]=="wingless.f61.counterfactual-binding-FIT-source.v1"
- assert d["stage"]=="F61_DISJOINT_FIT_ONLY_SOURCE_NOT_LEARNED"
- assert d["fit_seeds"]==p["fit"]["seeds"] and d["FIT_families"]==p["fit"]["families"]
- assert d["cases"]==len(d["rows"])==p["fit"]["expected_joint_cases"]==128
+def audit(result,prereg,amendment):
+ d=json.load(open(result));p=json.load(open(prereg));v=json.load(open(amendment))
+ assert v['schema']=='wingless.f61b.comparator-integrity-amendment.v1'
+ assert v['original_prereg_blob_sha']=='d6fd61c0e8062ed27c19da63ff196ad08a5e6ed6'
+ assert p['controls'][2:4]==['budget_matched_public_dp','frozen_F60_public_coupled_MAP']
+ assert v['new_controls']==list(ARMS)
+ assert d["schema"]=="wingless.f61b.counterfactual-binding-FIT-source.v1"
+ assert d["stage"]=="F61B_DISJOINT_FIT_ONLY_SOURCE_NOT_LEARNED"
+ assert d["fit_seeds"]==v["fit"]["seeds"] and d["FIT_families"]==v["fit"]["families"]
+ assert d["cases"]==len(d["rows"])==v["fit"]["expected_joint_cases"]==128
  assert d["dependent_query_instances_per_case"]==3
  assert d["frozen_counterfactual_binding_source"]
  assert d["diagnostic_unconsumed"] and d["originals_unconsumed"]
  assert d["native_total_576B_unverified"] and d["accepted_refs_unchanged"] and not d["independent_F3"]
  assert set(d["scores"])==set(ARMS)
- assert p["controls"]==list(ARMS)
+ assert v["new_controls"]==list(ARMS)
+ assert d["historical_F60_adapter_blob"]==v["historical_F60_likelihood_blob_sha"]
+ assert d["abstract_cost_is_not_proven_matched_work"] is True
  seen=set();totals={a:0 for a in ARMS};work={a:0 for a in ARMS[:-1]};same=0
  for row in d["rows"]:
   seed,fam,n=row["seed"],row["family"],row["length"]
   assert (seed,fam,n) not in seen;seen.add((seed,fam,n))
-  assert p["fit"]["seeds"][0]<=seed<p["fit"]["seeds"][1] and fam in p["fit"]["families"]
+  assert v["fit"]["seeds"][0]<=seed<v["fit"]["seeds"][1] and fam in v["fit"]["families"]
   assert n in (8,10) and len(row["chain"])==n
   assert len(row["secondary_chain"])==6 and len(row["counterfactual_chain"])==6 and len(row["public_bridges"])==3
   assert len(row["public"])==4 and all(len(c)==2 for c in row["public"])
@@ -111,13 +118,13 @@ def audit(result,prereg):
  strong=max(ARMS[1:-1],key=lambda a:totals[a])
  gain=(totals[ARMS[0]]-totals[strong])/128
  accuracy=totals[ARMS[0]]/128
- qualified=(accuracy>=p["FIT_source_gates"]["minimum_exact_accuracy"]
-   and gain>=p["FIT_source_gates"]["minimum_full_exact_gain_vs_strongest_affordable"])
+ qualified=(accuracy>=v["source_gates"]["minimum_exact_accuracy"]
+   and gain>=v["source_gates"]["minimum_full_exact_gain_vs_strongest_affordable"])
  assert d["strongest_affordable_structural_control"]==strong
  assert abs(d["exact_gain_vs_strongest"]-gain)<1e-12
  assert abs(d["exact_public_accuracy"]-accuracy)<1e-12
  assert d["source_gate_qualified"]==qualified
  print("W_F61_SOURCE_AUDIT",json.dumps(dict(correct=totals,exact_accuracy=accuracy,headroom=gain,qualified=qualified),sort_keys=True))
 if __name__=="__main__":
- assert len(sys.argv)==3
- audit(sys.argv[1],sys.argv[2])
+ assert len(sys.argv)==4
+ audit(sys.argv[1],sys.argv[2],sys.argv[3])

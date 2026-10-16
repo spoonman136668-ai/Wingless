@@ -1,4 +1,4 @@
-"""W-F61 FIT-only counterfactual triple-instance typed variable-binding source.
+"""W-F61B FIT-only counterfactual triple-instance typed variable-binding source.
 
 Typed roles act on a public four-element lattice using the eight symmetries
 of a square (the dihedral D4 group). The latent role maps obey the PUBLIC
@@ -11,9 +11,9 @@ This module only permits preregistered FIT identities. The explicit exact
 posterior is an extra-work reference, never an equal-cost comparator.
 """
 from __future__ import annotations
-import itertools,json,math,random,sys
-FIT=range(751000,751016); FIT_FAMILIES=(1440,1441,1442,1443)
-DIAG=range(751100,751116);ORIGINAL=range(752000,752016)
+import functools,hashlib,importlib.util,itertools,json,math,pathlib,random,sys
+FIT=range(771000,771016); FIT_FAMILIES=(1480,1481,1482,1483)
+DIAG=range(771100,771116);ORIGINAL=range(772000,772016)
 P=4
 # Coordinate indices 0..3 represent (x,y) corners of a square.
 COORD=((0,0),(1,0),(1,1),(0,1))
@@ -36,15 +36,15 @@ MAPS=tuple((a,b,c,invert(compose(c,compose(b,a))))
  for a,b,c in itertools.product(PERMS,repeat=3))
 assert len(MAPS)==512
 ARMS=("public_full_exact_joint_posterior_extra_work",
-      "strong_structured_MAP","budget_matched_public_dp",
-      "frozen_F60_public_coupled_MAP","public_local_rolewise",
+      "strong_structured_MAP","public_top2_role_beam",
+      "F60_MAP_algorithm_port_F61_observations","public_local_rolewise",
       "private_oracle_unfair")
 def noise(family):
  if family not in FIT_FAMILIES:raise ValueError("not FIT")
- return (.045,.085,.12,.16)[family-1440]
+ return (.045,.085,.12,.16)[family-1480]
 def source(seed,family,length=8):
  if seed not in FIT or family not in FIT_FAMILIES or length not in (8,10):
-  raise ValueError("only fresh preregistered F59 FIT source is authorized")
+  raise ValueError("only fresh amended F61B FIT source is authorized")
  rng=random.Random(seed*32609+family*5617+length*613+61031)
  hidden=MAPS[rng.randrange(len(MAPS))]
  public=[];corrupt=0
@@ -101,6 +101,26 @@ def likelihood(maps,observations,rate,bridges=()):
   guess=maps[b][maps[a][x]]
   w*=1-rate if guess==y else rate/(P-1)
  return w
+@functools.lru_cache(maxsize=1)
+def historical_F60():
+ path=pathlib.Path(__file__).resolve().parent.parent/'20261015-w-f60'/'source_feasibility.py'
+ data=path.read_bytes()
+ blob=hashlib.sha1(b'blob '+str(len(data)).encode()+bytes([0])+data).hexdigest()
+ assert blob=='f6863c7fdf31bd2cd20daaf6434640596b6ba5a4', 'F60_SOURCE_DRIFT'
+ spec=importlib.util.spec_from_file_location('historical_w_f60_algorithm',path)
+ module=importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(module)
+ assert module.MAPS==MAPS
+ return module
+
+def ported_F60_MAP(case,rate,task_triple):
+ # Original frozen F60 likelihood/MAP algorithm, explicitly ported to
+ # F61B public observations and three query outputs; not old F60 accuracy.
+ f60=historical_F60()
+ weights=[f60.likelihood(m,case['public'],rate,case['public_bridges']) for m in f60.MAPS]
+ best=max(range(len(weights)),key=lambda k:(weights[k],-k))
+ return task_triple(f60.MAPS[best])
+
 def evaluate(case):
  public=case["public"];rate=noise(case["family"])
  weights=[likelihood(m,public,rate,case["public_bridges"]) for m in MAPS]
@@ -138,7 +158,8 @@ def evaluate(case):
   weight=likelihood(maps,public,rate,case["public_bridges"])
   beam_votes[pair]=beam_votes.get(pair,0.)+weight
  beam=max(sorted(beam_votes),key=lambda pair:beam_votes[pair])
- result=dict(zip(ARMS,(exact,structured,beam,structured,local,
+ historical=ported_F60_MAP(case,rate,task_pair)
+ result=dict(zip(ARMS,(exact,structured,beam,historical,local,
                        (case["truth"],case["second_truth"],case["counterfactual_truth"]))))
  length=case["length"]+len(case["second_chain"])+len(case["counterfactual_chain"])
  costs=dict(zip(ARMS,(512*(10+2*len(case["public_bridges"])+length),
@@ -175,8 +196,8 @@ def fit_report():
  strongest=max(ARMS[1:-1],key=lambda a:correct[a])
  gain=(correct[ARMS[0]]-correct[strongest])/len(rows)
  eligible=exact>=.8 and gain>=.05
- return dict(schema="wingless.f61.counterfactual-binding-FIT-source.v1",
-   stage="F61_DISJOINT_FIT_ONLY_SOURCE_NOT_LEARNED",
+ return dict(schema="wingless.f61b.counterfactual-binding-FIT-source.v1",
+   stage="F61B_DISJOINT_FIT_ONLY_SOURCE_NOT_LEARNED",
    fit_seeds=[FIT.start,FIT.stop],FIT_families=list(FIT_FAMILIES),
    cases=len(rows),required_prereg_cases=128,case_count_matches_prereg=True,
    scores=correct,operations=operations,rows=rows,
@@ -186,6 +207,8 @@ def fit_report():
    source_gate_qualified=eligible,
    dependent_query_instances_per_case=3,
    frozen_counterfactual_binding_source=True,
+   historical_F60_adapter_blob='f6863c7fdf31bd2cd20daaf6434640596b6ba5a4',
+   abstract_cost_is_not_proven_matched_work=True,
    diagnostic_unconsumed=True,originals_unconsumed=True,
    independent_F3=False,native_total_576B_unverified=True,
    accepted_refs_unchanged=True)

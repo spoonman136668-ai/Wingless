@@ -1,0 +1,81 @@
+{
+  "schema": "wingless.f61b.comparator-integrity-amendment.v1",
+  "stage": "PRECODE_REPLACEMENT_NO_FIT_DISPATCH",
+  "original_prereg_blob_sha": "d6fd61c0e8062ed27c19da63ff196ad08a5e6ed6",
+  "original_F61_preflight_head": "a2d6ace03fb0650c0fdd958d59278da570a6d430",
+  "original_F61_source_blob_sha": "055bfa3a496eeb20c354b7ed5ab38fbf20a60b9f",
+  "original_F61_audit_blob_sha": "39230ce77a368ea95504048d5306a8fcc0b5d9c4",
+  "historical_F60_likelihood_blob_sha": "f6863c7fdf31bd2cd20daaf6434640596b6ba5a4",
+  "prior_preflight_generated_one_original_FIT_case": true,
+  "prior_generated_case": {
+    "seed": 751000,
+    "family": 1440,
+    "length": 8
+  },
+  "original_F61_cohort_status": "not pristine for first-use; do not relabel the prior validation as unseen; quarantine the entire original FIT cohort from new first-use claims",
+  "fit": {
+    "seeds": [
+      771000,
+      771016
+    ],
+    "families": [
+      1480,
+      1481,
+      1482,
+      1483
+    ],
+    "expected_joint_cases": 128
+  },
+  "diagnostic_UNAUTHORIZED": {
+    "seeds": [
+      771100,
+      771116
+    ],
+    "families": [
+      1484,
+      1485,
+      1486,
+      1487
+    ]
+  },
+  "original_UNRESERVED": {
+    "seeds": [
+      772000,
+      772016
+    ],
+    "families": [
+      1488,
+      1489,
+      1490,
+      1491
+    ]
+  },
+  "new_controls": [
+    "public_full_exact_joint_posterior_extra_work",
+    "strong_structured_MAP",
+    "public_top2_role_beam",
+    "F60_MAP_algorithm_port_F61_observations",
+    "public_local_rolewise",
+    "private_oracle_unfair"
+  ],
+  "control_changes": [
+    "Previously named budget_matched_public_dp is reclassified as an unproven work-matched top-two local role beam, not dynamic programming. It remains in the controls under its honest new name.",
+    "Original frozen F60 likelihood and MAP selection are SHA-verified and ported to F61B public observations and triple-query outputs. This is an adapter, not a direct F60 frozen-output replay or independent algorithm.",
+    "Abstract costs are proxies, not proofs of matched resources. Strongest affordable control is selected from all public structural candidates; do not claim equivalent measured compute."
+  ],
+  "source_gates": {
+    "minimum_exact_accuracy": 0.8,
+    "minimum_full_exact_gain_vs_strongest_affordable": 0.05,
+    "minimum_additional_correct_of_128": 7
+  },
+  "future_fit_results_generated": false,
+  "diagnostic_and_original_unconsumed": true,
+  "independent_F3": false,
+  "accepted_refs_unchanged": true,
+  "prequalification": [
+    "Verify original prereg and F60 method blobs unchanged",
+    "Synthetic preflight without generating any fresh FIT case",
+    "One full original Go regression, vet and build on the exact corrected head",
+    "Independent audit/once-only FIT authorization is a separate later gate"
+  ]
+}
