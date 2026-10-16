@@ -1,0 +1,42 @@
+name: Wingless bounded R34 transcript parser qualification
+on:
+  push:
+    branches: [engineering/wingless-r34-qualification-marker-20261016-r1]
+permissions:
+  contents: read
+jobs:
+  native-parser:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Frozen source and PowerShell marker compatibility negatives
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA) { throw 'HEAD_DRIFT' }
+          & ./scripts/tests/Test-WinglessTranscriptScientificProbe.ps1
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'PARSER_FAILED' }
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Single full Go regression, vet and build
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & go test ./... -count=1
+          if ($LASTEXITCODE -ne 0) { throw 'WINGLESS_GO_FULL_REGRESSION_FAILED' }
+          & go vet ./...
+          if ($LASTEXITCODE -ne 0) { throw 'WINGLESS_GO_VET_FAILED' }
+          & go build ./...
+          if ($LASTEXITCODE -ne 0) { throw 'WINGLESS_GO_BUILD_FAILED' }
+          Write-Host 'WINGLESS_NATIVE_RESEARCH_HARNESS_FULL_REGRESSION=PASS'
+      - name: No experiment, model, or science state mutations
+        shell: powershell
+        run: |
+          if ((git status --porcelain) -join '') { throw 'UNEXPECTED_MUTATION' }
+          Write-Host 'WINGLESS_RESEARCH_ORIGINALS_DISPATCHED=ZERO'
+          Write-Host 'WINGLESS_FIRSTUSE_LEDGER_MUTATIONS=ZERO'
