@@ -1,0 +1,63 @@
+name: Wingless F59 one frozen FIT scientific source with independent audit
+on:
+  push:
+    branches:
+      - research/w-f59-latent-variable-binding-20261015-r1
+permissions:
+  contents: read
+  actions: read
+jobs:
+  once-only:
+    if: "${{ github.event.head_commit.message == 'science(w-f59): one frozen FIT-only typed variable-binding experiment' && github.run_attempt == 1 }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify frozen source, precode prereg and completed authentic regression before use
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 0330f05d4a62ac246d49b78ee4071c5744ccd0fa HEAD
+          test "$(git hash-object research/foundational/20261015-w-f59/prereg.json)" = 82fe15456e83a5818fb6b9ff1d44de905db47afa
+          test "$(git hash-object research/foundational/20261015-w-f59/source_feasibility.py)" = 2422d7e823d5bd6c46b5511602826144940a465a
+          test "$(git hash-object research/foundational/20261015-w-f59/test_preflight.py)" = 9f50c379dc76b3e399bda40d0f336df1e830e42c
+          test "$(git hash-object research/foundational/20261015-w-f59/audit_fit.py)" = 99deb74adf8a4a336fa42c09168fc4f7794a9f29
+          curl --fail --silent --show-error --retry 2 --max-time 20 \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            https://api.github.com/repos/spoonman136668-ai/Wingless/actions/runs/38829479363 \
+            | jq -e --arg sha 0330f05d4a62ac246d49b78ee4071c5744ccd0fa \
+              '.head_sha==$sha and .run_attempt==1 and .status=="completed" and .conclusion=="success"'
+          python3 -B -m unittest discover -s research/foundational/20261015-w-f59 -p test_preflight.py -v
+      - name: Exactly one FIT-only source, independent source-free all-row audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/w-f59"
+          git rev-parse HEAD > "$RUNNER_TEMP/w-f59/SOURCE_SHA"
+          python3 -B research/foundational/20261015-w-f59/source_feasibility.py --fit-only > "$RUNNER_TEMP/w-f59/result.json"
+          python3 -m json.tool "$RUNNER_TEMP/w-f59/result.json" > /dev/null
+          python3 -B research/foundational/20261015-w-f59/audit_fit.py \
+            "$RUNNER_TEMP/w-f59/result.json" \
+            research/foundational/20261015-w-f59/prereg.json > "$RUNNER_TEMP/w-f59/independent-audit.txt"
+          cat "$RUNNER_TEMP/w-f59/independent-audit.txt"
+          (cd "$RUNNER_TEMP/w-f59" && sha256sum result.json independent-audit.txt > manifest.sha256)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Wingless-F59-once-only-FIT-source-and-audit
+          path: ${{ runner.temp }}/w-f59/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Authority isolation
+        run: |
+          echo "SYNTHETIC_FIT_ONLY=TRUE"
+          echo "HELDOUT_DIAGNOSTIC_AND_PRIMARY_ORIGINAL=UNCONSUMED"
+          echo "NATIVE_576B_WHOLE_RUNTIME=UNVERIFIED"
+          echo "INDEPENDENT_F3=NOT_QUALIFIED"
+          echo "ACCEPTED_REFS_AND_FORGE_CONTROLLERS=UNCHANGED"
