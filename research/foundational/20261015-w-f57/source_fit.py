@@ -165,6 +165,14 @@ def fit_preview():
                 b=frozen_F56_budgeted_beam(case)
                 c=fixed_known_operator_bank(case)
                 rows.append({"seed":seed,"family":family,"length":length,
+                    "public":[{"role":role,"pairs":[list(pair) for pair in pairs]}
+                              for role,pairs in case["public"]],
+                    "start":case["start"],
+                    "chain":[list(x) for x in case["chain"]],
+                    "truth":case["evaluator_truth"],
+                    "answers":{"learned_public_belief_state":a[0],
+                               "frozen_F56_posterior_beam":b[0],
+                               "known_operator_MAP":c[0]},
                     "correct":{"learned_public_belief_state":int(a[0]==case["evaluator_truth"]),
                                "frozen_F56_posterior_beam":int(b[0]==case["evaluator_truth"]),
                                "known_operator_MAP":int(c[0]==case["evaluator_truth"])},
