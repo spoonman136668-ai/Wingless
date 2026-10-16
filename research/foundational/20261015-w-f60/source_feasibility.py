@@ -35,9 +35,9 @@ assert all(compose(p,invert(p))==IDENTITY for p in PERMS)
 MAPS=tuple((a,b,c,invert(compose(c,compose(b,a))))
  for a,b,c in itertools.product(PERMS,repeat=3))
 assert len(MAPS)==512
-ARMS=("public_exact_structured_solver_extra_work",
-      "public_structured_MAP","fixed_public_rolewise_composition",
-      "matched_work_symbolic_state","unfair_private_truth_oracle")
+ARMS=("exact_joint_public_structured",
+      "strong_affordable_structured_MAP","fixed_rolewise_public_baseline",
+      "matched_work_public_dynamic_programming","unfair_private_oracle")
 def noise(family):
  if family not in FIT_FAMILIES:raise ValueError("not FIT")
  return (.045,.07,.09,.11)[family-1380]
