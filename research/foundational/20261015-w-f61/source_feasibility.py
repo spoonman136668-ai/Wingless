@@ -35,9 +35,10 @@ assert all(compose(p,invert(p))==IDENTITY for p in PERMS)
 MAPS=tuple((a,b,c,invert(compose(c,compose(b,a))))
  for a,b,c in itertools.product(PERMS,repeat=3))
 assert len(MAPS)==512
-ARMS=("exact_joint_public_structured",
-      "strong_affordable_structured_MAP","fixed_rolewise_public_baseline",
-      "matched_work_public_dynamic_programming","unfair_private_oracle")
+ARMS=("public_full_exact_joint_posterior_extra_work",
+      "strong_structured_MAP","budget_matched_public_dp",
+      "frozen_F60_public_coupled_MAP","public_local_rolewise",
+      "private_oracle_unfair")
 def noise(family):
  if family not in FIT_FAMILIES:raise ValueError("not FIT")
  return (.045,.085,.12,.16)[family-1440]
@@ -137,13 +138,14 @@ def evaluate(case):
   weight=likelihood(maps,public,rate,case["public_bridges"])
   beam_votes[pair]=beam_votes.get(pair,0.)+weight
  beam=max(sorted(beam_votes),key=lambda pair:beam_votes[pair])
- result=dict(zip(ARMS,(exact,structured,local,beam,
+ result=dict(zip(ARMS,(exact,structured,beam,structured,local,
                        (case["truth"],case["second_truth"],case["counterfactual_truth"]))))
  length=case["length"]+len(case["second_chain"])+len(case["counterfactual_chain"])
  costs=dict(zip(ARMS,(512*(10+2*len(case["public_bridges"])+length),
   512*(10+2*len(case["public_bridges"]))+length,
-  4*8*2+length,
-  3*8*2+8*(10+2*len(case["public_bridges"])+length),0)))
+  3*8*2+8*(10+2*len(case["public_bridges"])+length),
+  512*(10+2*len(case["public_bridges"]))+length,
+  4*8*2+length,0)))
  return result,costs,len(joint)
 def fit_report():
  rows=[];correct={a:0 for a in ARMS};operations={a:0 for a in ARMS[:-1]}
