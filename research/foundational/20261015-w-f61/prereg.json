@@ -1,0 +1,74 @@
+{
+  "schema": "wingless.f61.counterfactual-multi-instance-binding.prereg.v1",
+  "stage": "PRECODE_FROZEN_NO_FIT_USE",
+  "issue": 284,
+  "parent_F60_original_run": 38830952488,
+  "parent_F60_independent_archive_audit": 38831336351,
+  "parent_source_sha": "57555a26f95591f81c996d5ea456ad8b00d485aa",
+  "hypothesis": "A persistent shared belief over ambiguous typed relations across counterfactual dependent questions achieves task gains over strong cheap structured single MAP and same-work dynamic programming when role identity is reused across scenarios.",
+  "fit": {
+    "seeds": [
+      751000,
+      751016
+    ],
+    "families": [
+      1440,
+      1441,
+      1442,
+      1443
+    ],
+    "expected_joint_cases": 128
+  },
+  "diagnostic_NOT_AUTHORIZED": {
+    "seeds": [
+      751100,
+      751116
+    ],
+    "families": [
+      1444,
+      1445,
+      1446,
+      1447
+    ],
+    "not_executed": true
+  },
+  "original_NOT_RESERVED": {
+    "seeds": [
+      752000,
+      752016
+    ],
+    "families": [
+      1448,
+      1449,
+      1450,
+      1451
+    ]
+  },
+  "controls": [
+    "public_full_exact_joint_posterior_extra_work",
+    "strong_structured_MAP",
+    "budget_matched_public_dp",
+    "frozen_F60_public_coupled_MAP",
+    "public_local_rolewise",
+    "private_oracle_unfair"
+  ],
+  "FIT_source_gates": {
+    "minimum_exact_accuracy": 0.8,
+    "minimum_full_exact_gain_vs_strongest_affordable": 0.05,
+    "all_public_counterfactual_receipts_independently_recomputable": true
+  },
+  "future_learned_gates": {
+    "train_only_disjoint_FIT": true,
+    "min_advantage_vs_strongest_fair": 0.05,
+    "per_family_nondegradation": true,
+    "role_binding_ablation_positive": true
+  },
+  "authorities": {
+    "independent_F3": false,
+    "primary_original_not_executed": true,
+    "whole_native_total_576B_unverified": true,
+    "accepted_refs_unchanged": true,
+    "controller_unchanged": true,
+    "no_Codex_or_paid_API": true
+  }
+}
