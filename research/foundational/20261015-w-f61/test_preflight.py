@@ -23,7 +23,8 @@ class Tests(unittest.TestCase):
   # Hand-built public observations; no call to source() with an FIT seed.
   synthetic=dict(family=1480,public=tuple((((0,0),(1,1))) for _ in range(4)),
     public_bridges=((0,2,0,0),(1,3,1,1),(2,0,0,0)),
-    start=0,chain=((0,1),(1,-1)),second_chain=((2,1),),
+    start=0,length=8,truth=0,second_truth=0,counterfactual_truth=1,
+    chain=((0,1),(1,-1)),second_chain=((2,1),),
     counterfactual_start=1,counterfactual_chain=((3,-1),(0,1)))
   outcomes,cost,n=m.evaluate(synthetic)
   self.assertEqual(set(outcomes),set(m.ARMS))
