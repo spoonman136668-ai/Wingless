@@ -128,7 +128,8 @@ def validate(root, relationship_file):
 
     require(typed.get("authority", "").startswith("derived; active platform"), "type report authority mismatch")
     resolved = typed.get("relationships", [])
-    diagnostics = typed.get("diagnostics", [])
+    # Go encodes an uninitialized []string as JSON null; null means no diagnostics.
+    diagnostics = typed.get("diagnostics") or []
     require(isinstance(diagnostics, list), "missing typecheck diagnostics")
     confirmed = 0
     for e in reviewed_edges:
