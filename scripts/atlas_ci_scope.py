@@ -18,6 +18,8 @@ ATLAS_SCRIPTS = {
     "scripts/test_code_atlas_tamper.py",
     "scripts/test_atlas_browser.py",
     "scripts/atlas_ci_scope.py",
+    "scripts/maintain_code_atlas.py",
+    "scripts/test_source_aware_atlas.py",
 }
 WORKFLOW = ".github/workflows/wingless-code-atlas.yml"
 STATUS_JOB = "Read-only Windows Atlas Qualification"
@@ -75,6 +77,7 @@ def self_test(root):
         "src/new.yaml", "go.mod", ".gitattributes", ".gitignore",
         "scripts/validate_code_atlas.py", "scripts/test_code_atlas_tamper.py",
         "scripts/test_atlas_browser.py", "scripts/atlas_ci_scope.py",
+        "scripts/maintain_code_atlas.py", "scripts/test_source_aware_atlas.py",
         ".ice/code-intelligence.html", ".ice/code-intelligence.ice",
         "viewer.html", "deep/new_viewer.html", "notes.ice", "deep/new.ice",
         ".github/workflows/wingless-code-atlas.yml",
