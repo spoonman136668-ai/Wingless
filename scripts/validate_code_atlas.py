@@ -152,8 +152,14 @@ def validate(root, relationship_file):
     fragment = source.split("allowed := map[State][]State{", 1)
     require(len(fragment) == 2, "lifecycle transition table missing")
     fragment = fragment[1].split("}", 1)[0]  # Read below from full source instead for nested braces.
-    transitions = {a: [v.strip() for v in b.split(",") if v.strip()]
-                   for a, b in re.findall(r"([A-Za-z]+):\s*\{([^}]+)\}", source)}
+    const_values = dict(re.findall(r'([A-Za-z]+)\s+State\s*=\s*"([A-Z_]+)"', source))
+    require(const_values, "Go lifecycle enum values absent")
+    transitions = {}
+    for state, destinations in re.findall(r"([A-Za-z]+):\s*\{([^}]+)\}", source):
+        require(state in const_values, "unknown lifecycle source state: " + state)
+        options = [v.strip() for v in destinations.split(",") if v.strip()]
+        require(all(v in const_values for v in options), "unknown lifecycle destination state")
+        transitions[const_values[state]] = [const_values[v] for v in options]
     require(transitions == machine[0]["transitions"], "lifecycle graph does not match source")
 
     html = (root / ".ice/code-intelligence.html").read_text(encoding="utf-8")
