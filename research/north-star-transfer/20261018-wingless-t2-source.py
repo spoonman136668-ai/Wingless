@@ -35,8 +35,7 @@ def build_fixture(seed,algebra="C7",length=10):
     # Evaluation-only calculator, never exposed to a learner.
     value=start
     for role,direction in chain:
-        x,y=roles[role][:2]
-        z,t=roles[role][1:]
+        (x,y),(z,t)=roles[role][:2]
         a=((t-y)*pow((z-x)%prime,-1,prime))%prime
         b=(y-a*x)%prime
         if direction==1:value=(a*value+b)%prime
