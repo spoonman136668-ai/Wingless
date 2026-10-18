@@ -5,6 +5,8 @@ Mutations are performed exclusively in a disposable local Git clone.
 The checked-out PR tree, committed Wingless source, and research state remain untouched.
 """
 import argparse
+import fnmatch
+import re
 import json
 import shutil
 import subprocess
@@ -101,6 +103,33 @@ def mutate_typed(raw):
     return jbytes(doc)
 
 
+def verify_indexed_path_triggers(work):
+    """Assert that source-only changes cannot bypass the GitHub PR freshness gate."""
+    workflow = (work / ".github/workflows/wingless-code-atlas.yml").read_text(encoding="utf-8")
+    match = re.search(r"(?m)^  pull_request:\n    paths:\n((?:      - '.+'\n)+)", workflow)
+    require(match is not None, "pull_request indexed-source path gate missing")
+    patterns = re.findall(r"(?m)^      - '([^']+)'$", match.group(1))
+    require(patterns, "no indexed-source patterns")
+    indexed = json.loads((work / ".ice/manifest.json").read_text(encoding="utf-8"))["files"]
+    # Synthetic paths cover newly introduced files not yet in the existing index.
+    sources = [record["path"] for record in indexed] + [
+        "new_source.go", "sub/new_source.go", "README.md", "sub/new.md",
+        "src/new.json", "src/new.ps1", ".github/workflows/fresh.yml",
+        "src/new.yaml", "go.mod", ".gitattributes", ".gitignore",
+        "scripts/validate_code_atlas.py", "scripts/test_code_atlas_tamper.py",
+    ]
+    def match_path(path, pattern):
+        return fnmatch.fnmatchcase(path, pattern) or (
+            pattern.startswith("**/") and fnmatch.fnmatchcase(path, pattern[3:])
+        )
+    uncovered = sorted(set(path for path in sources
+                           if not any(match_path(path, rule) for rule in patterns)))
+    require(not uncovered, "indexed source can bypass PR gate: " + repr(uncovered))
+    print(json.dumps({"result": "ATLAS_PR_SOURCE_PATH_COVERAGE_PASS",
+                      "indexed_files": len(indexed), "globs": len(patterns),
+                      "future_path_probes": len(sources) - len(indexed)}, sort_keys=True))
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--root", type=Path, required=True)
@@ -123,6 +152,7 @@ def main():
         checkout = execute(["git", "checkout", "--quiet", "--detach", current_commit], cwd=work)
         require(checkout.returncode == 0, "failed exact-head scratch checkout: " + checkout.stdout[-1200:])
         require(not execute(["git", "status", "--porcelain"], cwd=work).stdout.strip(), "scratch not clean")
+        verify_indexed_path_triggers(work)
 
         validation = [sys.executable, str(work / "scripts/validate_code_atlas.py"),
                       "--root", str(work), "--relationships", str(report)]

@@ -2,12 +2,19 @@ name: Wingless Code Intelligence Qualification
 on:
   pull_request:
     paths:
-      - '.ice/code-intelligence.*'
-      - '.ice/architecture-map.json'
-      - '.ice/manifest.json'
+      - '**/*.go'
+      - '**/*.md'
+      - '**/*.json'
+      - '**/*.ps1'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - 'go.mod'
+      - '.gitattributes'
+      - '.gitignore'
+      - '**/.gitattributes'
+      - '**/.gitignore'
       - 'scripts/validate_code_atlas.py'
       - 'scripts/test_code_atlas_tamper.py'
-      - '.github/workflows/wingless-code-atlas.yml'
   workflow_dispatch:
 
 permissions:
