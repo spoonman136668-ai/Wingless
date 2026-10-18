@@ -104,34 +104,14 @@ def mutate_typed(raw):
 
 
 def verify_indexed_path_triggers(work):
-    """Assert that source-only changes cannot bypass the GitHub PR freshness gate."""
-    workflow = (work / ".github/workflows/wingless-code-atlas.yml").read_text(encoding="utf-8")
-    match = re.search(r"(?m)^  pull_request:\n    paths:\n((?:      - '.+'\n)+)", workflow)
-    require(match is not None, "pull_request indexed-source path gate missing")
-    patterns = re.findall(r"(?m)^      - '([^']+)'$", match.group(1))
-    require(patterns, "no indexed-source patterns")
-    indexed = json.loads((work / ".ice/manifest.json").read_text(encoding="utf-8"))["files"]
-    # Synthetic paths cover newly introduced files not yet in the existing index.
-    sources = [record["path"] for record in indexed] + [
-        "new_source.go", "sub/new_source.go", "README.md", "sub/new.md",
-        "src/new.json", "src/new.ps1", ".github/workflows/fresh.yml",
-        "src/new.yaml", "go.mod", ".gitattributes", ".gitignore",
-        "scripts/validate_code_atlas.py", "scripts/test_code_atlas_tamper.py",
-        "scripts/test_atlas_browser.py", ".ice/code-intelligence.html",
-        ".ice/code-intelligence.ice", "viewer.html", "deep/new_viewer.html",
-        "notes.ice", "deep/new.ice",
-    ]
-    def match_path(path, pattern):
-        return fnmatch.fnmatchcase(path, pattern) or (
-            pattern.startswith("**/") and fnmatch.fnmatchcase(path, pattern[3:])
-        )
-    uncovered = sorted(set(path for path in sources
-                           if not any(match_path(path, rule) for rule in patterns)))
-    require(not uncovered, "indexed source can bypass PR gate: " + repr(uncovered))
-    print(json.dumps({"result": "ATLAS_PR_SOURCE_PATH_COVERAGE_PASS",
-                      "indexed_files": len(indexed), "globs": len(patterns),
-                      "future_path_probes": len(sources) - len(indexed)}, sort_keys=True))
-
+    """Check all indexed paths, future sensitive paths and unconditional PR status."""
+    result = execute([sys.executable, "-B",
+                      str(work / "scripts/atlas_ci_scope.py"),
+                      "--root", str(work), "--self-test"], cwd=work)
+    require(result.returncode == 0 and
+            "ATLAS_CI_SCOPE_CONTRACT_PASS" in result.stdout,
+            "always-on PR scope contract failed: " + result.stdout[-1500:])
+    print(result.stdout.strip())
 
 def main():
     p = argparse.ArgumentParser()
