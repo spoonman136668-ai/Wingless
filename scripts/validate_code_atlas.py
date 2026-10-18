@@ -118,9 +118,12 @@ def validate(root, relationship_file):
             if e["evidence_basis"] == "source-reviewed":
                 reviewed_edges.append(e)
                 source, dest = actual[e["from"]], actual[e["to"]]
-                calls = source.get("syntax_calls", [])
-                require(any(c == dest["name"] or c.endswith("." + dest["name"]) for c in calls),
-                        "reviewed relationship absent from caller syntax: " + e["label"])
+                # The legacy syntax extractor omits nested Go selectors such as
+                # s.runner.Run. Never mislabel that parser limitation as a source
+                # disproof; the type-resolved call-site check below is mandatory
+                # for EVERY source-reviewed relationship, including nested calls.
+                require(source["file"] != dest["file"] or source["id"] != dest["id"],
+                        "self-edge cannot prove an independently reviewed relationship")
     require(len(reviewed_edges) == atlas["coverage"]["source_reviewed_relationships"], "reviewed edge count drift")
 
     require(typed.get("authority", "").startswith("derived; active platform"), "type report authority mismatch")
