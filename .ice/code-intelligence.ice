@@ -5,7 +5,7 @@ SOURCE_COMMIT: b87899b50d2c1558e26d74a1921623786fde1282
 SCHEMA: wingless.ice.semantic-code-atlas.v1
 EVIDENCE: .ice/code-intelligence.json (complete machine-readable 352-symbol index)
 AUTHORITY: Source code and qualified tests outrank these descriptions; never grant runtime or acceptance authority.
-COVERAGE: 352 symbols in 138 indexed source/configuration files; 182 inspected semantic labels; 170 explicitly provisional lexical labels.
+COVERAGE: 352 symbols in 138 indexed source/configuration files; 236 inspected semantic labels; 116 explicitly provisional lexical labels.
 RELATIONSHIPS: 9 inspected relationships, 51 local package imports, 95 unresolved syntax-only call candidates.
 
 HOW TO USE
@@ -60,3 +60,10 @@ Each of these 78 descriptions is anchored to an immutable source commit, matchin
 Each newly reviewed symbol also records the file's imported local Wingless packages. These are file-level dependency facts, NOT evidence that the particular function calls those packages.
 All preexisting 9 confirmed typed call relationships remain unchanged. Syntax-only relationship candidates remain provisional.
 No execution, experimental authority, data mutation, deployment, production activation, or controller scheduling occurs as part of this documentary expansion.
+
+SOURCE-BODY EVIDENCE EXPANSION — TRANCHE 3 (2026-10-18)
+Added 54 source-reviewed production symbols, retaining exact source commit, SHA-256, definition lines, and validated literal source anchors.
+Cumulative coverage: 236 / 352 source-reviewed; remaining 116 provisional declarations are test functions or test helpers only.
+Source-reviewed coverage now includes all currently indexed non-test declarations across benchmark fixtures/provenance, diagnostic CLIs, platform-specific resource sampling, Windows/non-Windows process containment, and the isolated transport proof executable.
+The 54 new source-bound entries also record source-derived file-level local imports, explicitly not treated as proof of direct runtime calls.
+Existing scientific execution, application source, and protected acceptance/research workflow authority remain unchanged. Existing 9 confirmed typed relationship edges and 95 unverified syntactic candidates remain separately labeled.
