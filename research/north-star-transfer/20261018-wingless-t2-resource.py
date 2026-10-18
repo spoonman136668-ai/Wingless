@@ -38,6 +38,21 @@ def attest():
     new=load("t2_wlearned",KERNEL)
     source=load("t2_w_source",SOURCE)
     pub,priv=source.build_fixture(-900,"C7",10)
+    if old.base.PRIME != pub["prime"] or old.base.PRIME != new.PRIME:
+        # Honest source-backed incompatibility. W-F55 was frozen over F11
+        # while the prototype/new TRAIN source uses F7. Do not repurpose
+        # W-F55's exact symbolic control by secretly replacing its modulus.
+        return {"schema":"wingless.t2.cost-diagnostic.v1",
+           "status":"BLOCKED_INCOMMENSURATE_NATIVE_SOURCE_DOMAIN",
+           "frozen_F55_source_prime":old.base.PRIME,
+           "T1_new_kernel_prime":new.PRIME,
+           "T2_new_fixture_prime":pub["prime"],
+           "public_information_comparison_valid":False,
+           "CPU_or_full_memory_parity_demonstrated":False,
+           "real_native_WF55_integration_qualified":False,
+           "noncommuting_S3_representable":False,
+           "protected_cohorts_born":0,
+           "scientific_transfer_qualified":False}
     role_samples=[list(pub["public_roles"][r]) for r in sorted(pub["public_roles"])]
     (packed,train_meta),training=measured(lambda:new.learn_shared_prior(role_samples))
     def candidate():
