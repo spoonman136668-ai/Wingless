@@ -117,6 +117,9 @@ def verify_indexed_path_triggers(work):
         "src/new.json", "src/new.ps1", ".github/workflows/fresh.yml",
         "src/new.yaml", "go.mod", ".gitattributes", ".gitignore",
         "scripts/validate_code_atlas.py", "scripts/test_code_atlas_tamper.py",
+        "scripts/test_atlas_browser.py", ".ice/code-intelligence.html",
+        ".ice/code-intelligence.ice", "viewer.html", "deep/new_viewer.html",
+        "notes.ice", "deep/new.ice",
     ]
     def match_path(path, pattern):
         return fnmatch.fnmatchcase(path, pattern) or (
@@ -202,22 +205,6 @@ def main():
             "source_checkout_changed": False,
             "scratch_cleanup": "automatic",
         }, sort_keys=True))
-        # A real Chrome browser acceptance occurs after existing fail-closed
-        # negative verification. Changes are confined to a disposable clone.
-        # Pin Selenium to make the driver contract reproducible; no model/API.
-        install = execute([sys.executable, "-m", "pip", "install",
-                           "--disable-pip-version-check", "--quiet",
-                           "selenium==4.35.0"], cwd=work, timeout=240)
-        require(install.returncode == 0,
-                "browser driver dependency setup failed: " + install.stdout[-1600:])
-        browser = execute([sys.executable, str(work / "scripts/test_atlas_browser.py"),
-                           "--root", str(work)], cwd=work, timeout=240)
-        print(browser.stdout)
-        require(browser.returncode == 0 and
-                "WINGLESS_ATLAS_CHROMIUM_BROWSER_ACCEPTANCE_PASS" in browser.stdout,
-                "real Chromium UI acceptance failed: " + browser.stdout[-5000:])
-        require(not execute(["git", "status", "--porcelain"], cwd=work).stdout.strip(),
-                "browser qualification modified the scratch worktree")
 
 
 

@@ -5,6 +5,8 @@ on:
       - '**/*.go'
       - '**/*.md'
       - '**/*.json'
+      - '**/*.html'
+      - '**/*.ice'
       - '**/*.ps1'
       - '**/*.yml'
       - '**/*.yaml'
@@ -15,6 +17,7 @@ on:
       - '**/.gitignore'
       - 'scripts/validate_code_atlas.py'
       - 'scripts/test_code_atlas_tamper.py'
+      - 'scripts/test_atlas_browser.py'
   workflow_dispatch:
 
 permissions:
@@ -65,6 +68,15 @@ jobs:
           $ErrorActionPreference = 'Stop'
           python scripts/test_code_atlas_tamper.py --root . --relationships "$env:RUNNER_TEMP\wingless-type-relationships.json" --scratch-parent "$env:RUNNER_TEMP"
           if ($LASTEXITCODE -ne 0) { throw 'ATLAS_TAMPER_NEGATIVE_ACCEPTANCE_FAILED' }
+
+      - name: Genuine Chromium browser navigation acceptance
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python -m pip install --disable-pip-version-check --quiet "selenium==4.35.0"
+          if ($LASTEXITCODE -ne 0) { throw 'PINNED_SELENIUM_INSTALL_FAILED' }
+          python -B scripts/test_atlas_browser.py --root .
+          if ($LASTEXITCODE -ne 0) { throw 'ATLAS_CHROMIUM_BROWSER_ACCEPTANCE_FAILED' }
 
       - name: Focused ICE regression
         shell: pwsh
