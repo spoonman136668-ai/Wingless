@@ -1,0 +1,44 @@
+name: T3 wingless learned-cognition correction nonconsuming
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t3-wingless.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t3-wingless-frozen-readiness-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  exact-source-focused:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest,windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 35
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify preimplementation T3 freeze and run only source-neutral math/native checks
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T3_EXACT_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t3-mechanism-freeze.json').Trim() -cne 'e659ee5d452d3d943396b842eac066c0857ae03e'){throw 'T3_SOURCE_FROZEN_BLOB_DRIFT'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261018-wingless-t3-mechanism-freeze.json').Trim() -cne '24a519f6c35138c2d59c5a81574ad89f1ccaae5d'){throw 'T3_SOURCE_FREEZE_AFTER_IMPLEMENTATION'}
+          git merge-base --is-ancestor '24a519f6c35138c2d59c5a81574ad89f1ccaae5d' HEAD
+          if($LASTEXITCODE -ne 0){throw 'T3_FREEZE_NOT_ANCESTOR'}
+          if((git hash-object 'research/foundational/20261015-w-f55/source_pilot.py').Trim() -cne 'd02fc933b52fc44d537ed45b061aef56ccd90a7f'){throw 'T3_UNCHANGED_HISTORICAL_BASELINE_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py').Trim() -cne '1c577e34f476a5ce3fe0c788dbe81221ac0ab13b'){throw 'T3_NEW_CORRECTION_DRIFT'}
+          $py=if($IsWindows){'python'}else{'python3'}
+          & $py -B 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py'
+          if($LASTEXITCODE -ne 0){throw 'T3_FROZEN_FOCUSED_NONCONSUMING_FAIL'}
+          Write-Output 'T3_WINGLESS_FOCUSED_SOURCE_QUALIFICATION=PASS'
+          Write-Output 'T3_WINGLESS_ORIGINAL_PROTECTED_COHORTS_CONSUMED=0'
+          Write-Output 'T3_WINGLESS_FULL_RESOURCE_PARITY_NOT_ASSUMED=true'
+          Write-Output 'T3_WINGLESS_SCIENTIFIC_TRANSFER_ACCEPTANCE=false'
