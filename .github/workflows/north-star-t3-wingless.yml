@@ -34,7 +34,7 @@ jobs:
           git merge-base --is-ancestor '24a519f6c35138c2d59c5a81574ad89f1ccaae5d' HEAD
           if($LASTEXITCODE -ne 0){throw 'T3_FREEZE_NOT_ANCESTOR'}
           if((git hash-object 'research/foundational/20261015-w-f55/source_pilot.py').Trim() -cne 'd02fc933b52fc44d537ed45b061aef56ccd90a7f'){throw 'T3_UNCHANGED_HISTORICAL_BASELINE_DRIFT'}
-          if((git hash-object 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py').Trim() -cne '1c577e34f476a5ce3fe0c788dbe81221ac0ab13b'){throw 'T3_NEW_CORRECTION_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py').Trim() -cne '85dbd2673a94a6d72db29e57ee836619405f7f1e'){throw 'T3_NEW_CORRECTION_DRIFT'}
           $py=if($IsWindows){'python'}else{'python3'}
           & $py -B 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py'
           if($LASTEXITCODE -ne 0){throw 'T3_FROZEN_FOCUSED_NONCONSUMING_FAIL'}
