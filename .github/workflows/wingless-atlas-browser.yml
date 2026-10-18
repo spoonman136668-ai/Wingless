@@ -1,0 +1,77 @@
+name: Wingless Atlas Chromium Browser Acceptance
+
+on:
+  pull_request:
+    paths:
+      - '.ice/code-intelligence.html'
+      - '.github/workflows/wingless-atlas-browser.yml'
+      - 'scripts/test_code_atlas_browser.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-atlas-browser-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromium:
+    name: Real offline Chromium navigation on Windows
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact proposed source without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up pinned Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Verify frozen atlas source exists
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git cat-file -e "b87899b50d2c1558e26d74a1921623786fde1282^{commit}"
+          if ($LASTEXITCODE -ne 0) { throw 'FROZEN_ATLAS_SOURCE_UNAVAILABLE' }
+          python -m py_compile scripts/test_code_atlas_browser.py
+          if ($LASTEXITCODE -ne 0) { throw 'BROWSER_TEST_SYNTAX_FAILURE' }
+
+      - name: Install pinned browser automation library (no browser download)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python -m pip install --disable-pip-version-check "playwright==1.56.0"
+          if ($LASTEXITCODE -ne 0) { throw 'PINNED_PLAYWRIGHT_INSTALL_FAILED' }
+
+      - name: Exercise real headless Chromium offline
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python scripts/test_code_atlas_browser.py --atlas .ice/code-intelligence.html --expected-source-commit b87899b50d2c1558e26d74a1921623786fde1282 --receipt "$env:RUNNER_TEMP\wingless-atlas-browser.json"
+          if ($LASTEXITCODE -ne 0) { throw 'CHROMIUM_ATLAS_ACCEPTANCE_FAILED' }
+          $receipt = Get-Content "$env:RUNNER_TEMP\wingless-atlas-browser.json" -Raw | ConvertFrom-Json
+          if ($receipt.status -ne 'PASS') { throw 'CHROMIUM_RECEIPT_NOT_PASS' }
+          $dirty = @(git status --porcelain)
+          if ($dirty.Count -gt 0) { throw "BROWSER_CHECKOUT_DIRTY: $($dirty -join ', ')" }
+          "WINGLESS_BROWSER_QUALIFIED_HEAD=$(git rev-parse HEAD)" >> $env:GITHUB_STEP_SUMMARY
+          "SOURCE_COMMIT=$($receipt.source_commit)" >> $env:GITHUB_STEP_SUMMARY
+          "CHROMIUM_VERSION=$($receipt.browser_version)" >> $env:GITHUB_STEP_SUMMARY
+          "INTERACTION_CHECKS=$($receipt.checks.Count)" >> $env:GITHUB_STEP_SUMMARY
+          'Offline Chromium search, filters, selection, relationship traversal, source popup and no-network policy PASS.' >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Preserve machine-readable acceptance receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: wingless-atlas-chromium-evidence
+          path: |
+            ${{ runner.temp }}/wingless-atlas-browser.json
+            ${{ runner.temp }}/wingless-atlas-browser.png
+          if-no-files-found: warn
+          retention-days: 30
