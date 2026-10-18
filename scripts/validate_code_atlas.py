@@ -131,6 +131,10 @@ def validate(root, relationship_file):
         lineage = node.get("provenance_lineage")
         if lineage is not None:
             require(isinstance(lineage, dict), "G26 invalid provenance lineage")
+            # A self-asserted receipt is never an independent review, even if
+            # all source hashes and literal anchors happen to match.
+            if lineage.get("mode") == "fresh-review-receipt-unverified-identity":
+                require(False, "G26_UNAPPROVED_FRESH_REVIEW: independent review not authenticated")
             prior = lineage.get("prior_source_commit", "")
             require(isinstance(prior, str) and
                     re.fullmatch(r"[0-9a-f]{40}", prior) is not None,
@@ -168,8 +172,6 @@ def validate(root, relationship_file):
                 require(lineage.get("mode") ==
                         "fresh-review-receipt-unverified-identity",
                         "G26 unknown review lineage class")
-                require(False,
-                        "G26_UNAPPROVED_FRESH_REVIEW: source witnesses do not independently authenticate a reviewer")
         dependency_proof = node.get("file_level_local_package_dependencies")
         require(dependency_proof is not None, "missing file-level dependency evidence: " + symbol_id)
         if dependency_proof is not None:
