@@ -1,0 +1,112 @@
+name: G25 Disposable Structural Rebuild and Provenance Guard
+on:
+  pull_request:
+    paths:
+      - 'inference/lifecycle.go'
+      - '.github/workflows/g25-source-delta-rebuild-probe.yml'
+permissions:
+  contents: read
+jobs:
+  isolated:
+    name: G25 Isolated Rebuild and Historical Provenance
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact disposable head
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Set up frozen Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+      - name: Rebuild canonical ICE in throwaway checkout; deny forged semantic review
+        shell: pwsh
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+          EXPECTED_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $head = (git rev-parse HEAD).Trim()
+          if ($head -ne $env:EXPECTED_HEAD) { throw 'G25_HEAD_IDENTITY_MISMATCH' }
+          if ($env:EXPECTED_BASE -ne '506a74a5da4016cef47a79c40b954c91235c61d8') { throw 'G25_BASE_IDENTITY_MISMATCH' }
+          $originalTree = (git status --porcelain)
+          if ($originalTree) { throw 'G25_ORIGINAL_CHECKOUT_DIRTY' }
+          $scratch = Join-Path $env:RUNNER_TEMP 'g25-ice-structural-rebuild'
+          git clone --quiet --no-hardlinks --no-checkout . "$scratch"
+          if ($LASTEXITCODE -ne 0) { throw 'G25_CLONE_FAILED' }
+          git -C "$scratch" checkout --quiet --detach "$head"
+          if ($LASTEXITCODE -ne 0) { throw 'G25_SCRATCH_CHECKOUT_FAILED' }
+          Push-Location "$scratch"
+          try {
+            $changes = @(git diff --name-only $env:EXPECTED_BASE $head)
+            $allowed = @('inference/lifecycle.go', '.github/workflows/g25-source-delta-rebuild-probe.yml')
+            if ($changes.Count -ne 2 -or @($changes | Where-Object { $_ -notin $allowed }).Count -ne 0) {
+              throw "G25_UNEXPECTED_CHANGES: $($changes -join ', ')"
+            }
+            $before = Get-Content '.ice/manifest.json' -Raw | ConvertFrom-Json
+            $sourceEntry = @($before.files | Where-Object { $_.path -eq 'inference/lifecycle.go' })
+            if ($sourceEntry.Count -ne 1) { throw 'G25_MISSING_OLD_SOURCE_ENTRY' }
+            $oldHash = $sourceEntry[0].sha256
+            $newHash = (Get-FileHash 'inference/lifecycle.go' -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($oldHash -eq $newHash) { throw 'G25_SOURCE_NOT_CHANGED' }
+            $oldSemantic = Get-Content '.ice/code-intelligence.json' -Raw | ConvertFrom-Json
+            if ($oldSemantic.source_commit -ne 'b87899b50d2c1558e26d74a1921623786fde1282' -or $oldSemantic.nodes.Count -ne 352) {
+              throw 'G25_UNEXPECTED_FROZEN_SEMANTIC_BASIS'
+            }
+            $affected = @($oldSemantic.nodes | Where-Object { $_.file -eq 'inference/lifecycle.go' })
+            if ($affected.Count -lt 1) { throw 'G25_NO_AFFECTED_SYMBOLS' }
+            foreach ($node in $affected) {
+              if ($node.file_sha256 -ne $oldHash -or $node.review_evidence.file_sha256 -ne $oldHash) {
+                throw 'G25_OLD_REVIEW_PROVENANCE_ALREADY_DRIFTED'
+              }
+            }
+            $stale = (go run ./cmd/ice validate 2>&1 | Out-String)
+            if ($LASTEXITCODE -eq 0 -or $stale -notmatch 'ICE_STALE:') { throw "G25_STALE_NOT_REJECTED: $stale" }
+            Write-Output 'G25_PRE_REBUILD_STALE_REJECTION=PASS'
+            go run ./cmd/ice build
+            if ($LASTEXITCODE -ne 0) { throw 'G25_REBUILD_FAILED' }
+            go run ./cmd/ice validate
+            if ($LASTEXITCODE -ne 0) { throw 'G25_POST_REBUILD_STRUCTURAL_VALIDATE_FAILED' }
+            $after = Get-Content '.ice/manifest.json' -Raw | ConvertFrom-Json
+            $fresh = @($after.files | Where-Object { $_.path -eq 'inference/lifecycle.go' })
+            if ($fresh.Count -ne 1 -or $fresh[0].sha256 -ne $newHash) { throw 'G25_REBUILT_SOURCE_IDENTITY_WRONG' }
+            $semanticAfter = Get-Content '.ice/code-intelligence.json' -Raw | ConvertFrom-Json
+            if ($semanticAfter.source_commit -ne $oldSemantic.source_commit -or $semanticAfter.nodes.Count -ne 352) {
+              throw 'G25_SEMANTIC_BASE_SILENTLY_REWRITTEN'
+            }
+            foreach ($node in @($semanticAfter.nodes | Where-Object { $_.file -eq 'inference/lifecycle.go' })) {
+              if ($node.review_evidence.file_sha256 -ne $oldHash -or $node.file_sha256 -ne $oldHash -or $node.file_sha256 -eq $newHash) {
+                throw 'G25_REVIEW_EVIDENCE_LAUNDERED'
+              }
+            }
+            Write-Output "G25_STRUCTURAL_ICE_REBUILD=PASS; AFFECTED_REVIEWED_SYMBOLS=$($affected.Count)"
+            go run ./cmd/ice relationships > "$env:RUNNER_TEMP\g25-relationships.json"
+            if ($LASTEXITCODE -ne 0) { throw 'G25_RELATIONSHIP_EXTRACTION_FAILED' }
+            $semantic = (python -B scripts/validate_code_atlas.py --root . --relationships "$env:RUNNER_TEMP\g25-relationships.json" 2>&1 | Out-String)
+            if ($LASTEXITCODE -eq 0 -or $semantic -notmatch 'ATLAS_FAIL_CLOSED') {
+              throw "G25_HISTORIC_SEMANTIC_ATLAS_INCORRECTLY_ACCEPTED: $semantic"
+            }
+            Write-Output 'G25_HISTORIC_SEMANTIC_REVIEW_REQUIRES_REQUALIFICATION=PASS'
+            go test ./ice
+            if ($LASTEXITCODE -ne 0) { throw 'G25_FOCUSED_TESTS_FAILED' }
+            go test ./...
+            if ($LASTEXITCODE -ne 0) { throw 'G25_FULL_GO_REGRESSION_FAILED' }
+            go vet ./...
+            if ($LASTEXITCODE -ne 0) { throw 'G25_GO_VET_FAILED' }
+            go build -o "$env:RUNNER_TEMP\g25-ice.exe" ./cmd/ice
+            if ($LASTEXITCODE -ne 0) { throw 'G25_GO_BUILD_FAILED' }
+            Write-Output "G25_ISOLATED_REBUILD_PROVENANCE_GUARD_PASS head=$head"
+          } finally {
+            Pop-Location
+          }
+          $dirty = @(git status --porcelain)
+          if ($dirty.Count -ne 0) { throw "G25_ORIGINAL_SOURCE_DIRTY: $($dirty -join ', ')" }
+          Write-Output 'G25_ORIGINAL_CHECKOUT_UNCHANGED=PASS'
