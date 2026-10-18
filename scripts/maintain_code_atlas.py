@@ -163,6 +163,9 @@ def generate(root, receipts_path=None):
             n["provenance_lineage"] = {
                 "mode": "canonical-LF-declaration-byte-reuse",
                 "prior_source_commit": previous,
+                "prior_start_line": oldnode["start_line"],
+                "prior_end_line": oldnode["end_line"],
+                "prior_file_sha256": sha(old_file),
                 "prior_declaration_sha256": sha(old_canonical),
                 "current_declaration_sha256": sha(new_canonical),
             }
@@ -198,6 +201,9 @@ def generate(root, receipts_path=None):
             n["provenance_lineage"] = {
                 "mode": "fresh-review-receipt-unverified-identity",
                 "prior_source_commit": previous,
+                "prior_start_line": oldnode["start_line"],
+                "prior_end_line": oldnode["end_line"],
+                "prior_file_sha256": sha(old_file),
                 "prior_declaration_sha256": sha(old_decl),
                 "current_declaration_sha256": sha(new_decl),
                 "reviewer_assertion": receipt["reviewer"],

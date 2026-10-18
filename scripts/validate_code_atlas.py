@@ -87,6 +87,7 @@ def validate(root, relationship_file):
     require(len(expected) == len(indexed), "duplicate raw symbol identity")
     actual = {n["id"]: n for n in nodes}
     require(len(actual) == len(nodes) and actual.keys() == expected.keys(), "symbol identity drift")
+    historical_source_cache = {}
     reviewed = 0
     evidenced = 0
     dependency_bound = 0
@@ -125,6 +126,50 @@ def validate(root, relationship_file):
                     require(isinstance(token, str) and len(token) >= 4 and token.strip() == token,
                             "invalid source review token: " + symbol_id)
                     require(token in span, "source evidence token mismatch: " + symbol_id + " " + repr(token))
+        # G26 reuse is checked against immutable source bytes; a new self-asserted
+        # review cannot independently authenticate a human or admit changed code.
+        lineage = node.get("provenance_lineage")
+        if lineage is not None:
+            require(isinstance(lineage, dict), "G26 invalid provenance lineage")
+            prior = lineage.get("prior_source_commit", "")
+            require(isinstance(prior, str) and
+                    re.fullmatch(r"[0-9a-f]{40}", prior) is not None,
+                    "G26 previous source identity invalid")
+            old_start = lineage.get("prior_start_line")
+            old_end = lineage.get("prior_end_line")
+            require(isinstance(old_start, int) and isinstance(old_end, int) and
+                    1 <= old_start <= old_end, "G26 historical declaration lines invalid")
+            cache_id = (prior, s["file"])
+            if cache_id not in historical_source_cache:
+                read = subprocess.run(
+                    ["git", "show", prior + ":" + s["file"]],
+                    cwd=root, capture_output=True)
+                require(read.returncode == 0, "G26 old source unavailable")
+                historical_source_cache[cache_id] = read.stdout
+            old_source = historical_source_cache[cache_id]
+            require(hashlib.sha256(old_source).hexdigest() ==
+                    lineage.get("prior_file_sha256"),
+                    "G26 historical file hash mismatch")
+            old_lines = old_source.splitlines(keepends=True)
+            now_lines = (root / s["file"]).read_bytes().splitlines(keepends=True)
+            require(old_end <= len(old_lines) and s["end"] <= len(now_lines),
+                    "G26 historical or current span exceeds source")
+            old_decl = b"".join(old_lines[old_start-1:old_end]).replace(b"\r\n", b"\n")
+            now_decl = b"".join(now_lines[s["start"]-1:s["end"]]).replace(b"\r\n", b"\n")
+            prev_digest = hashlib.sha256(old_decl).hexdigest()
+            now_digest = hashlib.sha256(now_decl).hexdigest()
+            require(prev_digest == lineage.get("prior_declaration_sha256") and
+                    now_digest == lineage.get("current_declaration_sha256"),
+                    "G26 declaration provenance digest mismatch")
+            if lineage.get("mode") == "canonical-LF-declaration-byte-reuse":
+                require(prev_digest == now_digest,
+                        "G26 claimed reused declaration body changed")
+            else:
+                require(lineage.get("mode") ==
+                        "fresh-review-receipt-unverified-identity",
+                        "G26 unknown review lineage class")
+                require(False,
+                        "G26_UNAPPROVED_FRESH_REVIEW: source witnesses do not independently authenticate a reviewer")
         dependency_proof = node.get("file_level_local_package_dependencies")
         require(dependency_proof is not None, "missing file-level dependency evidence: " + symbol_id)
         if dependency_proof is not None:

@@ -155,9 +155,10 @@ def run(root, scratch_parent):
                                cwd=second, stdout=out, stderr=subprocess.PIPE,
                                text=True, timeout=240)
             require(p.returncode == 0, "typed extraction failed: " + p.stderr)
-        good(second, sys.executable, "-B", "scripts/validate_code_atlas.py",
-             "--root", ".", "--relationships", report)
-        print("G26_CHANGED_DECLARATION_FRESH_RECEIPT=PASS", new_head)
+        reject(second, "G26_UNAPPROVED_FRESH_REVIEW",
+               sys.executable, "-B", "scripts/validate_code_atlas.py",
+               "--root", ".", "--relationships", report)
+        print("G26_CHANGED_DECLARATION_FRESH_RECEIPT_REQUIRES_INDEPENDENT_APPROVAL=PASS", new_head)
 
         require(not good(root, "git", "status", "--porcelain").strip(),
                 "original checkout modified")
