@@ -110,6 +110,20 @@ def run(root, scratch_parent):
         reject(dirty, "G27_DIRTY_NON_ICE_WORKTREE",
                sys.executable, "-B", "scripts/maintain_code_atlas.py",
                "--root", ".")
+        # Even if local Git status is deliberately blinded, independent
+        # HEAD-blob verification must reject a modified worktree file.
+        hidden = Path(t) / "hidden-working-tree-change"
+        clone(root, hidden, baseline)
+        hidden_old = (hidden / SOURCE).read_text("utf-8")
+        good(hidden, "git", "update-index", "--assume-unchanged",
+             SOURCE.as_posix())
+        (hidden / SOURCE).write_text(
+            hidden_old + "\n// G27 hidden source blob divergence.\n",
+            "utf-8")
+        good(hidden, "go", "run", "./cmd/ice", "build")
+        reject(hidden, "G27_TARGET_SOURCE_CONTENT_MISMATCH",
+               sys.executable, "-B", "scripts/maintain_code_atlas.py",
+               "--root", ".")
         # A committed module context change must not inherit 352 behavioral
         # descriptions solely because Go declaration bodies match.
         module = Path(t) / "module-context-change"
@@ -197,6 +211,7 @@ def run(root, scratch_parent):
         "forged_fresh_receipt": "REJECTED",
         "synthetic_fresh_receipt": "ACCEPTED_AS_UNVERIFIED_ASSERTION",
         "dirty_source_identity": "REJECTED",
+        "hidden_source_blob_divergence": "REJECTED",
         "module_context_drift": "REJECTED",
         "original_checkout_changed": False,
     }, sort_keys=True))
