@@ -175,6 +175,14 @@ def main():
         run_negative("canonical-ice-source-staleness", work, SOURCE,
                      lambda b: b + b"\n// negative qualification index staleness only\n",
                      go_validation, "ICE_STALE:")
+        # G26 maintenance must be qualified in separate exact-head clones.
+        g26 = execute([sys.executable, "-B", "scripts/test_source_aware_atlas.py",
+                       "--root", str(root), "--scratch-parent", str(args.scratch_parent or Path(tmp))],
+                      cwd=root, timeout=900)
+        require(g26.returncode == 0 and
+                "G26_ISOLATED_MAINTENANCE_QUALIFICATION_PASS" in g26.stdout,
+                "G26 source-aware regeneration qualification failed: " + g26.stdout[-2400:])
+        print(g26.stdout)
         require(not execute(["git", "status", "--porcelain"], cwd=root).stdout.strip(),
                 "original checkout was modified")
         print(json.dumps({
