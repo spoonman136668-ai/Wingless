@@ -86,7 +86,7 @@ def run(root, scratch_parent):
         node = next(n for n in derived["nodes"]
                     if n["file"] == str(SOURCE).replace("\\", "/"))
         require(node["provenance_lineage"]["mode"] ==
-                "exact-declaration-byte-reuse" and
+                "canonical-LF-declaration-byte-reuse" and
                 node["review_evidence"]["source_commit"] == comment_head,
                 "body-identical proof was not rebound")
         rels = Path(t) / "types-one.json"
