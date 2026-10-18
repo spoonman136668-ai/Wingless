@@ -5,7 +5,7 @@ SOURCE_COMMIT: b87899b50d2c1558e26d74a1921623786fde1282
 SCHEMA: wingless.ice.semantic-code-atlas.v1
 EVIDENCE: .ice/code-intelligence.json (complete machine-readable 352-symbol index)
 AUTHORITY: Source code and qualified tests outrank these descriptions; never grant runtime or acceptance authority.
-COVERAGE: 352 symbols in 138 indexed source/configuration files; 104 inspected semantic labels; 248 explicitly provisional lexical labels.
+COVERAGE: 352 symbols in 138 indexed source/configuration files; 182 inspected semantic labels; 170 explicitly provisional lexical labels.
 RELATIONSHIPS: 9 inspected relationships, 51 local package imports, 95 unresolved syntax-only call candidates.
 
 HOW TO USE
@@ -44,7 +44,7 @@ SOURCE-REVIEWED STATE MACHINE — inference.Lifecycle.Move
 - FAILED -> STOPPED
 These are explicit local transitions only; an external controller has a separate state machine.
 
-NOT MODIFIED: Wingless Go source, existing ICE files, research experiments, workflows, quotas, controller, branch main.
+NOT MODIFIED: Wingless application and scientific Go source, research experiments, existing runtime workflows/quotas, controller, or main branch.
 NEXT QUALIFICATION: Type-resolved call graph and broader function-by-function semantic review, then deterministic snapshot regeneration after future source changes.
 
 SOURCE-BODY EVIDENCE EXPANSION — 2026-10-18
@@ -52,3 +52,11 @@ New source-reviewed symbols: 77
 Source review is anchored to frozen b87899b50d2c1558e26d74a1921623786fde1282; exact line ranges, source SHA-256 and literal body/field evidence are attached to each newly reviewed JSON node.
 Reviewed functions and interfaces cover tool authorization, context limits, local inference transport, resource admission, model process supervision, type-resolved relationship extraction, strict candidate transport and bounded synthetic replay.
 Provisional symbols remain explicitly unverified; no behavioral/source execution authority is implied.
+
+SOURCE-BODY EVIDENCE EXPANSION — TRANCHE 2 (2026-10-18)
+Additional source-reviewed symbols: 78; cumulative source-reviewed: 182 / 352; still provisional: 170.
+New coverage includes: core inference request/result schema; scoped worker/broker records; local lifecycle states; inactive external work translation; transport guard constants; GPU collection/CSV validation; exact microfixture benchmarking; typed ICE index metadata; and CLI fixture modes.
+Each of these 78 descriptions is anchored to an immutable source commit, matching file SHA-256 and exact declaration lines, plus source literal evidence verified during qualification.
+Each newly reviewed symbol also records the file's imported local Wingless packages. These are file-level dependency facts, NOT evidence that the particular function calls those packages.
+All preexisting 9 confirmed typed call relationships remain unchanged. Syntax-only relationship candidates remain provisional.
+No execution, experimental authority, data mutation, deployment, production activation, or controller scheduling occurs as part of this documentary expansion.

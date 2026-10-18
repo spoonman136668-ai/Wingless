@@ -84,6 +84,7 @@ def validate(root, relationship_file):
     require(len(actual) == len(nodes) and actual.keys() == expected.keys(), "symbol identity drift")
     reviewed = 0
     evidenced = 0
+    dependency_bound = 0
     for symbol_id, node in actual.items():
         s = expected[symbol_id]
         for field in ("file", "kind", "name"):
@@ -115,9 +116,23 @@ def validate(root, relationship_file):
                     require(isinstance(token, str) and len(token) >= 4 and token.strip() == token,
                             "invalid source review token: " + symbol_id)
                     require(token in span, "source evidence token mismatch: " + symbol_id + " " + repr(token))
-        else:
+        dependency_proof = node.get("file_level_local_package_dependencies")
+        if dependency_proof is not None:
+            require(basis == "source-reviewed" and proof is not None,
+                    "file-level package dependencies require a reviewed symbol: " + symbol_id)
+            require(isinstance(dependency_proof, list) and all(isinstance(x, str) for x in dependency_proof),
+                    "invalid local package import evidence: " + symbol_id)
+            expected_imports = sorted(path.removeprefix("github.com/spoonman136668-ai/Wingless/")
+                    for path in (dependencies.get(s["file"]) or [])
+                    if path.startswith("github.com/spoonman136668-ai/Wingless/"))
+            require(sorted(dependency_proof) == expected_imports,
+                    "local package dependency identity drift: " + symbol_id)
+            dependency_bound += 1
+        if basis != "source-reviewed":
             require(proof is None, "unreviewed symbol must not carry behavioral proof: " + symbol_id)
             require("not a verified behavioral description" in node["description"], "unsupported behavioral inference")
+    require(atlas["coverage"].get("source_dependency_bound_labels") == dependency_bound,
+            "source dependency evidence count drift")
     require(atlas["coverage"]["source_reviewed_labels"] == reviewed, "reviewed count drift")
     require(atlas["coverage"].get("source_evidenced_new_labels") == evidenced,
             "new source-evidence count drift")
@@ -199,6 +214,7 @@ def validate(root, relationship_file):
         "symbols": len(nodes),
         "source_reviewed_labels": reviewed,
         "new_source_evidenced_labels": evidenced,
+        "dependency_index_bound_labels": dependency_bound,
         "typed_confirmed_reviewed_edges": confirmed,
         "typecheck_diagnostics": len(diagnostics),
     }

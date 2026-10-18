@@ -11,12 +11,13 @@
   "coverage": {
     "source_files": 138,
     "symbols": 352,
-    "source_reviewed_labels": 104,
-    "lexical_provisional_labels": 248,
+    "source_reviewed_labels": 182,
+    "lexical_provisional_labels": 170,
     "source_reviewed_relationships": 9,
     "local_package_imports": 51,
     "syntactic_call_candidates": 95,
-    "source_evidenced_new_labels": 77
+    "source_evidenced_new_labels": 155,
+    "source_dependency_bound_labels": 78
   },
   "methodology": {
     "all_symbols": "Go symbol declarations already indexed by Wingless ICE",
@@ -24,7 +25,7 @@
     "lexical_provisional": "Name-only; not verified behavior",
     "syntactic_call_candidates": "Parser syntax; no dynamic dispatch, type resolution, or runtime control flow guarantees",
     "source_state": "Only source identities from pinned commit; no runtime, broker, research, or acceptance effect",
-    "review_evidence": "New source-reviewed labels each carry exact file SHA-256, pinned commit, definition-line range and body/field tokens checked against the frozen source. Tokens verify factual source basis; they are not runtime execution evidence."
+    "review_evidence": "Source-reviewed labels carry pinned source commit, file SHA-256, exact declaration line spans and source literal anchors checked by Windows qualification; local package dependencies are explicitly file-level and do not prove a function call."
   },
   "nodes": [
     {
@@ -173,11 +174,25 @@
       "name": "LocalRow",
       "start_line": 16,
       "end_line": 30,
-      "label": "Type: Local Row",
-      "description": "Declared type in benchmark/local.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Detailed local synthetic benchmark attempt record",
+      "description": "Contains semantic/protocol/strict correctness flags, process samples, backend result and throughput.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/benchmark/local.go#L16-L30",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "benchmark/local.go",
+        "file_sha256": "ad045020866c5c5d1de788c51b0d748700a1ed3e39e8e89f1f808bf1a0b71cce",
+        "start_line": 16,
+        "end_line": 30,
+        "literal_tokens": [
+          "ProtocolCompliant bool"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:benchmark/local.go::type::LocalReport@31",
@@ -187,11 +202,25 @@
       "name": "LocalReport",
       "start_line": 31,
       "end_line": 44,
-      "label": "Type: Local Report",
-      "description": "Declared type in benchmark/local.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Versioned local benchmark evidence envelope",
+      "description": "Summarizes provenance, variance, platform, CPU count, rows and external acceptance status.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/benchmark/local.go#L31-L44",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "benchmark/local.go",
+        "file_sha256": "ad045020866c5c5d1de788c51b0d748700a1ed3e39e8e89f1f808bf1a0b71cce",
+        "start_line": 31,
+        "end_line": 44,
+        "literal_tokens": [
+          "ResourceScope string"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:benchmark/local.go::function::codeShape@46",
@@ -201,15 +230,29 @@
       "name": "codeShape",
       "start_line": 46,
       "end_line": 86,
-      "label": "Function: code Shape",
-      "description": "Declared function in benchmark/local.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Recognize one exact source-code fixture shape",
+      "description": "Uses the Go parser to accept only a candidate-package Add(a,b int) function returning a+b with no other declarations.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/benchmark/local.go#L46-L86",
       "syntax_calls": [
         "append",
         "len",
         "parser.ParseFile",
         "token.NewFileSet"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "benchmark/local.go",
+        "file_sha256": "ad045020866c5c5d1de788c51b0d748700a1ed3e39e8e89f1f808bf1a0b71cce",
+        "start_line": 46,
+        "end_line": 86,
+        "literal_tokens": [
+          "parser.ParseFile"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
       ]
     },
     {
@@ -220,9 +263,9 @@
       "name": "RunLocal",
       "start_line": 89,
       "end_line": 157,
-      "label": "Function: Run Local",
-      "description": "Declared function in benchmark/local.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Measure fixed microfixtures without executing generated code",
+      "description": "Runs limited repetitions with request/resource bounds, observes optional process metrics, separates semantic/protocol scores and computes variance.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/benchmark/local.go#L89-L157",
       "syntax_calls": [
         "append",
@@ -245,6 +288,20 @@
         "semanticCandidate",
         "summarize",
         "time.Now"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "benchmark/local.go",
+        "file_sha256": "ad045020866c5c5d1de788c51b0d748700a1ed3e39e8e89f1f808bf1a0b71cce",
+        "start_line": 89,
+        "end_line": 157,
+        "literal_tokens": [
+          "codingFixtures()"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
       ]
     },
     {
@@ -403,11 +460,25 @@
       "name": "exact",
       "start_line": 24,
       "end_line": 24,
-      "label": "Type: exact",
-      "description": "Declared type in benchmark/replay.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Exact expected fixture verifier representation",
+      "description": "String-backed verifier used to compare candidate output with a frozen fixture expectation.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/benchmark/replay.go#L24-L24",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "benchmark/replay.go",
+        "file_sha256": "08352ecf0fe83817f3bc6214093428704e530da30b067e9ac7a62dc76acc09d7",
+        "start_line": 24,
+        "end_line": 24,
+        "literal_tokens": [
+          "type exact string"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
+      ]
     },
     {
       "id": "wingless:benchmark/replay.go::method::exact.Verify@26",
@@ -530,11 +601,25 @@
       "name": "Entry",
       "start_line": 12,
       "end_line": 16,
-      "label": "Type: Entry",
-      "description": "Declared type in broker/router.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Registered backend routing entry",
+      "description": "Pairs an inference backend with declared class and fast/deep/external tier.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/broker/router.go#L12-L16",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/router.go",
+        "file_sha256": "281d07081380d56742961591bea1b267c7a45b3010871a675a4ae014b29719b1",
+        "start_line": 12,
+        "end_line": 16,
+        "literal_tokens": [
+          "Backend inference.InferenceBackend"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:broker/router.go::type::Registry@17",
@@ -544,11 +629,25 @@
       "name": "Registry",
       "start_line": 17,
       "end_line": 20,
-      "label": "Type: Registry",
-      "description": "Declared type in broker/router.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Synchronized backend registry",
+      "description": "Holds registered inference entries by backend ID under an RWMutex.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/broker/router.go#L17-L20",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/router.go",
+        "file_sha256": "281d07081380d56742961591bea1b267c7a45b3010871a675a4ae014b29719b1",
+        "start_line": 17,
+        "end_line": 20,
+        "literal_tokens": [
+          "entries map[string]Entry"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:broker/router.go::method::Registry.Register@22",
@@ -593,11 +692,25 @@
       "name": "Policy",
       "start_line": 53,
       "end_line": 61,
-      "label": "Type: Policy",
-      "description": "Declared type in broker/router.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Explicit inference routing and repair policy",
+      "description": "Defines backend allowlist, deep/fallback authorization, escalation reason and bounded repairs.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/broker/router.go#L53-L61",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/router.go",
+        "file_sha256": "281d07081380d56742961591bea1b267c7a45b3010871a675a4ae014b29719b1",
+        "start_line": 53,
+        "end_line": 61,
+        "literal_tokens": [
+          "MaxRepairs      int"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:broker/router.go::type::Decision@62",
@@ -607,11 +720,25 @@
       "name": "Decision",
       "start_line": 62,
       "end_line": 67,
-      "label": "Type: Decision",
-      "description": "Declared type in broker/router.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Observed backend routing decision",
+      "description": "Records selected backend, tier, reason and rejected alternatives.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/broker/router.go#L62-L67",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/router.go",
+        "file_sha256": "281d07081380d56742961591bea1b267c7a45b3010871a675a4ae014b29719b1",
+        "start_line": 62,
+        "end_line": 67,
+        "literal_tokens": [
+          "Rejected []string"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:broker/router.go::function::contains@69",
@@ -621,11 +748,25 @@
       "name": "contains",
       "start_line": 69,
       "end_line": 76,
-      "label": "Function: contains",
-      "description": "Declared function in broker/router.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Check a routing allowlist for exact ID",
+      "description": "Returns whether a specific backend ID appears in the supplied list.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/broker/router.go#L69-L76",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/router.go",
+        "file_sha256": "281d07081380d56742961591bea1b267c7a45b3010871a675a4ae014b29719b1",
+        "start_line": 69,
+        "end_line": 76,
+        "literal_tokens": [
+          "if s == x"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:broker/router.go::function::Select@77",
@@ -814,11 +955,25 @@
       "name": "Event",
       "start_line": 10,
       "end_line": 16,
-      "label": "Type: Event",
-      "description": "Declared type in broker/runner.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Record one bounded inference attempt",
+      "description": "Stores attempt number, routing decision, backend result, verifier outcome and error.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/broker/runner.go#L10-L16",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/runner.go",
+        "file_sha256": "37c1ced58499c0eb3456d2d223ac378bef47014deea42bcf262ecb0d79a963d5",
+        "start_line": 10,
+        "end_line": 16,
+        "literal_tokens": [
+          "Verification string"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:broker/runner.go::type::Outcome@17",
@@ -828,11 +983,25 @@
       "name": "Outcome",
       "start_line": 17,
       "end_line": 21,
-      "label": "Type: Outcome",
-      "description": "Declared type in broker/runner.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Represent a candidate-only multi-attempt outcome",
+      "description": "Carries terminal candidate status, attempt history and external acceptance requirement.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/broker/runner.go#L17-L21",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/runner.go",
+        "file_sha256": "37c1ced58499c0eb3456d2d223ac378bef47014deea42bcf262ecb0d79a963d5",
+        "start_line": 17,
+        "end_line": 21,
+        "literal_tokens": [
+          "Acceptance string"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:broker/runner.go::interface::Verifier@24",
@@ -842,11 +1011,25 @@
       "name": "Verifier",
       "start_line": 24,
       "end_line": 26,
-      "label": "Interface: Verifier",
-      "description": "Declared interface in broker/runner.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Deterministic result verification interface",
+      "description": "Requires a trusted Verify(ctx, inference.Result) method independent of model acceptance claims.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/broker/runner.go#L24-L26",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/runner.go",
+        "file_sha256": "37c1ced58499c0eb3456d2d223ac378bef47014deea42bcf262ecb0d79a963d5",
+        "start_line": 24,
+        "end_line": 26,
+        "literal_tokens": [
+          "Verify(context.Context, inference.Result) error"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:broker/runner.go::type::Runner@27",
@@ -856,11 +1039,25 @@
       "name": "Runner",
       "start_line": 27,
       "end_line": 31,
-      "label": "Type: Runner",
-      "description": "Declared type in broker/runner.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Dependencies for bounded inference execution",
+      "description": "Holds a backend registry, resource metrics provider and optional trusted verifier.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/broker/runner.go#L27-L31",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/runner.go",
+        "file_sha256": "37c1ced58499c0eb3456d2d223ac378bef47014deea42bcf262ecb0d79a963d5",
+        "start_line": 27,
+        "end_line": 31,
+        "literal_tokens": [
+          "Metrics  resources.Provider"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:broker/runner.go::method::Runner.Run@33",
@@ -1046,11 +1243,27 @@
       "name": "unknown",
       "start_line": 16,
       "end_line": 16,
-      "label": "Type: unknown",
-      "description": "Declared type in cmd/wingless/main.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "No-resource-observation fixture provider",
+      "description": "Implements a metrics provider whose Snapshot yields empty metrics for demonstration paths.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/cmd/wingless/main.go#L16-L16",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "cmd/wingless/main.go",
+        "file_sha256": "fec2fbc7059ff366c24e85a8ecd8598cb6f8adc0b95276c0767d08d1f91d8f5f",
+        "start_line": 16,
+        "end_line": 16,
+        "literal_tokens": [
+          "type unknown struct{}"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "benchmark",
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:cmd/wingless/main.go::method::unknown.Snapshot@18",
@@ -1061,11 +1274,27 @@
       "receiver": "unknown",
       "start_line": 18,
       "end_line": 18,
-      "label": "Method: unknown Snapshot",
-      "description": "Declared method in cmd/wingless/main.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Return unavailable metrics in mock mode",
+      "description": "Returns zero-value Metrics with nil error to exercise non-resource-dependent fixtures.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/cmd/wingless/main.go#L18-L18",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "cmd/wingless/main.go",
+        "file_sha256": "fec2fbc7059ff366c24e85a8ecd8598cb6f8adc0b95276c0767d08d1f91d8f5f",
+        "start_line": 18,
+        "end_line": 18,
+        "literal_tokens": [
+          "resources.Metrics{}, nil"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "benchmark",
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:cmd/wingless/main.go::function::main@19",
@@ -1075,9 +1304,9 @@
       "name": "main",
       "start_line": 19,
       "end_line": 81,
-      "label": "Function: main",
-      "description": "Declared function in cmd/wingless/main.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Dispatch Wingless diagnostic and fixture CLI modes",
+      "description": "Routes gpu/local-benchmark/host and fixture demo/benchmark operations, rejecting unsupported arguments.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/cmd/wingless/main.go#L19-L81",
       "syntax_calls": [
         "benchmark.Replay",
@@ -1096,6 +1325,22 @@
         "runner.Run",
         "time.Now",
         "time.Sleep"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "cmd/wingless/main.go",
+        "file_sha256": "fec2fbc7059ff366c24e85a8ecd8598cb6f8adc0b95276c0767d08d1f91d8f5f",
+        "start_line": 19,
+        "end_line": 81,
+        "literal_tokens": [
+          "local-benchmark"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "benchmark",
+        "broker",
+        "inference",
+        "resources"
       ]
     },
     {
@@ -1106,11 +1351,24 @@
       "name": "Snippet",
       "start_line": 12,
       "end_line": 17,
-      "label": "Type: Snippet",
-      "description": "Declared type in contextbroker/broker.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Source excerpt with exact indexed span",
+      "description": "Stores source file, inclusive line range and extracted text for bounded retrieval.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/contextbroker/broker.go#L12-L17",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "contextbroker/broker.go",
+        "file_sha256": "f3ce97d0fe2591adfd966fcc902569d2d766de2c8611872614c303ca49b978a5",
+        "start_line": 12,
+        "end_line": 17,
+        "literal_tokens": [
+          "Start int"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "ice"
+      ]
     },
     {
       "id": "wingless:contextbroker/broker.go::interface::Provider@18",
@@ -1120,11 +1378,24 @@
       "name": "Provider",
       "start_line": 18,
       "end_line": 20,
-      "label": "Interface: Provider",
-      "description": "Declared interface in contextbroker/broker.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Bounded context retrieval contract",
+      "description": "Requires Retrieve(query, maxBytes) returning source excerpts.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/contextbroker/broker.go#L18-L20",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "contextbroker/broker.go",
+        "file_sha256": "f3ce97d0fe2591adfd966fcc902569d2d766de2c8611872614c303ca49b978a5",
+        "start_line": 18,
+        "end_line": 20,
+        "literal_tokens": [
+          "Retrieve(query string, maxBytes int)"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "ice"
+      ]
     },
     {
       "id": "wingless:contextbroker/broker.go::type::ICE@21",
@@ -1134,11 +1405,24 @@
       "name": "ICE",
       "start_line": 21,
       "end_line": 21,
-      "label": "Type: ICE",
-      "description": "Declared type in contextbroker/broker.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Index-backed context provider configuration",
+      "description": "Holds the source root used by ICE.Retrieve for validated source lookups.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/contextbroker/broker.go#L21-L21",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "contextbroker/broker.go",
+        "file_sha256": "f3ce97d0fe2591adfd966fcc902569d2d766de2c8611872614c303ca49b978a5",
+        "start_line": 21,
+        "end_line": 21,
+        "literal_tokens": [
+          "Root string"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "ice"
+      ]
     },
     {
       "id": "wingless:contextbroker/broker.go::method::ICE.Retrieve@23",
@@ -1245,11 +1529,22 @@
       "name": "Symbol",
       "start_line": 21,
       "end_line": 29,
-      "label": "Type: Symbol",
-      "description": "Declared type in ice/index.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Source-location and syntactic-call symbol record",
+      "description": "Holds declaration name/kind/path, start/end lines, optional receiver and call tokens.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/index.go#L21-L29",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/index.go",
+        "file_sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
+        "start_line": 21,
+        "end_line": 29,
+        "literal_tokens": [
+          "Calls    []string"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/index.go::type::File@30",
@@ -1259,11 +1554,22 @@
       "name": "File",
       "start_line": 30,
       "end_line": 35,
-      "label": "Type: File",
-      "description": "Declared type in ice/index.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Source-file identity and import record",
+      "description": "Stores path, SHA-256, package name and imports for advisory inventory.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/index.go#L30-L35",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/index.go",
+        "file_sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
+        "start_line": 30,
+        "end_line": 35,
+        "literal_tokens": [
+          "SHA256  string"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/index.go::type::Implementation@36",
@@ -1273,11 +1579,22 @@
       "name": "Implementation",
       "start_line": 36,
       "end_line": 41,
-      "label": "Type: Implementation",
-      "description": "Declared type in ice/index.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Explicit interface assertion observation",
+      "description": "Stores asserted interface/expression and declaration location; it is not a full inferred implementation graph.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/index.go#L36-L41",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/index.go",
+        "file_sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
+        "start_line": 36,
+        "end_line": 41,
+        "literal_tokens": [
+          "Expression string"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/index.go::type::Index@42",
@@ -1287,11 +1604,22 @@
       "name": "Index",
       "start_line": 42,
       "end_line": 48,
-      "label": "Type: Index",
-      "description": "Declared type in ice/index.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Advisory source inventory root",
+      "description": "Contains version, authority, files, symbols and explicit implementation assertions.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/index.go#L42-L48",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/index.go",
+        "file_sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
+        "start_line": 42,
+        "end_line": 48,
+        "literal_tokens": [
+          "Implementations []Implementation"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/index.go::function::Build@50",
@@ -1346,15 +1674,26 @@
       "name": "derived",
       "start_line": 157,
       "end_line": 171,
-      "label": "Function: derived",
-      "description": "Declared function in ice/index.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Project an ICE index into companion maps",
+      "description": "Builds dependency, test, architecture, symbol, implementation and manifest maps deterministically.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/index.go#L157-L171",
       "syntax_calls": [
         "append",
         "strings.HasPrefix",
         "strings.HasSuffix"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/index.go",
+        "file_sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
+        "start_line": 157,
+        "end_line": 171,
+        "literal_tokens": [
+          "dependency-map.json"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/index.go::function::Save@172",
@@ -1388,15 +1727,26 @@
       "name": "Load",
       "start_line": 203,
       "end_line": 211,
-      "label": "Function: Load",
-      "description": "Declared function in ice/index.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Load saved advisory source index",
+      "description": "Reads .ice/manifest.json from source root and unmarshals JSON into Index.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/index.go#L203-L211",
       "syntax_calls": [
         "filepath.Join",
         "json.Unmarshal",
         "os.ReadFile"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/index.go",
+        "file_sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
+        "start_line": 203,
+        "end_line": 211,
+        "literal_tokens": [
+          "manifest.json"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/index.go::function::Validate@212",
@@ -1728,11 +2078,24 @@
       "name": "Request",
       "start_line": 11,
       "end_line": 23,
-      "label": "Type: Request",
-      "description": "Declared type in inference/backend.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Bounded inference request identity and limits",
+      "description": "Carries parent/request IDs, role, context byte/token budgets, deadline, workspace, capability and resource policy.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/backend.go#L11-L23",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/backend.go",
+        "file_sha256": "fa029b7ad7fb5fa88e4d505fd439943364f3d5f2c6d9d5a83d85645c5bf2d76f",
+        "start_line": 11,
+        "end_line": 23,
+        "literal_tokens": [
+          "MaxContextBytes  int"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "resources"
+      ]
     },
     {
       "id": "wingless:inference/backend.go::method::Request.Validate@25",
@@ -1762,11 +2125,24 @@
       "name": "Usage",
       "start_line": 35,
       "end_line": 38,
-      "label": "Type: Usage",
-      "description": "Declared type in inference/backend.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Optional measured inference token counts",
+      "description": "Records prompt and output token pointers, permitting unavailable values.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/backend.go#L35-L38",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/backend.go",
+        "file_sha256": "fa029b7ad7fb5fa88e4d505fd439943364f3d5f2c6d9d5a83d85645c5bf2d76f",
+        "start_line": 35,
+        "end_line": 38,
+        "literal_tokens": [
+          "OutputTokens *int"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "resources"
+      ]
     },
     {
       "id": "wingless:inference/backend.go::type::Telemetry@39",
@@ -1776,11 +2152,24 @@
       "name": "Telemetry",
       "start_line": 39,
       "end_line": 46,
-      "label": "Type: Telemetry",
-      "description": "Declared type in inference/backend.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Optional model timing and resource observations",
+      "description": "Carries first-token/generation/loading times and before/peak/after resource samples.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/backend.go#L39-L46",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/backend.go",
+        "file_sha256": "fa029b7ad7fb5fa88e4d505fd439943364f3d5f2c6d9d5a83d85645c5bf2d76f",
+        "start_line": 39,
+        "end_line": 46,
+        "literal_tokens": [
+          "TimeToFirstTokenMS"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "resources"
+      ]
     },
     {
       "id": "wingless:inference/backend.go::type::Result@47",
@@ -1790,11 +2179,24 @@
       "name": "Result",
       "start_line": 47,
       "end_line": 58,
-      "label": "Type: Result",
-      "description": "Declared type in inference/backend.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Backend result with candidate status and provenance",
+      "description": "Includes backend/model IDs, text, token usage, latency, termination/error class and resource snapshot.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/backend.go#L47-L58",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/backend.go",
+        "file_sha256": "fa029b7ad7fb5fa88e4d505fd439943364f3d5f2c6d9d5a83d85645c5bf2d76f",
+        "start_line": 47,
+        "end_line": 58,
+        "literal_tokens": [
+          "BackendID   string"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "resources"
+      ]
     },
     {
       "id": "wingless:inference/backend.go::type::Cost@59",
@@ -1804,11 +2206,24 @@
       "name": "Cost",
       "start_line": 59,
       "end_line": 63,
-      "label": "Type: Cost",
-      "description": "Declared type in inference/backend.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Estimated inference resource requirement",
+      "description": "Stores context byte count, maximum output token count and whether estimate is approximate.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/backend.go#L59-L63",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/backend.go",
+        "file_sha256": "fa029b7ad7fb5fa88e4d505fd439943364f3d5f2c6d9d5a83d85645c5bf2d76f",
+        "start_line": 59,
+        "end_line": 63,
+        "literal_tokens": [
+          "Estimated       bool"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "resources"
+      ]
     },
     {
       "id": "wingless:inference/backend.go::interface::InferenceBackend@64",
@@ -1832,12 +2247,25 @@
       "name": "Classify",
       "start_line": 73,
       "end_line": 84,
-      "label": "Function: Classify",
-      "description": "Declared function in inference/backend.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Classify cancellation and backend failures",
+      "description": "Maps deadline exceeded to worker_timeout, cancellation to canceled, other errors to backend_failure and nil to empty class.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/backend.go#L73-L84",
       "syntax_calls": [
         "errors.Is"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/backend.go",
+        "file_sha256": "fa029b7ad7fb5fa88e4d505fd439943364f3d5f2c6d9d5a83d85645c5bf2d76f",
+        "start_line": 73,
+        "end_line": 84,
+        "literal_tokens": [
+          "\"worker_timeout\""
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "resources"
       ]
     },
     {
@@ -2060,11 +2488,22 @@
       "name": "State",
       "start_line": 8,
       "end_line": 8,
-      "label": "Type: State",
-      "description": "Declared type in inference/lifecycle.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Enumerated model lifecycle state type",
+      "description": "Defines the string-backed state vocabulary used by Lifecycle.Move.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L8-L8",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 8,
+        "end_line": 8,
+        "literal_tokens": [
+          "type State string"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::const::Unavailable@11",
@@ -2074,11 +2513,22 @@
       "name": "Unavailable",
       "start_line": 11,
       "end_line": 11,
-      "label": "Declaration: Unavailable",
-      "description": "Declared const in inference/lifecycle.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Unavailable inference lifecycle state",
+      "description": "Constant UNAVAILABLE; the transition table permits return to STOPPED.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L11-L11",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 11,
+        "end_line": 11,
+        "literal_tokens": [
+          "\"UNAVAILABLE\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::const::Stopped@12",
@@ -2088,11 +2538,22 @@
       "name": "Stopped",
       "start_line": 12,
       "end_line": 12,
-      "label": "Declaration: Stopped",
-      "description": "Declared const in inference/lifecycle.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Stopped inference lifecycle state",
+      "description": "Constant STOPPED; allows STARTING or UNAVAILABLE.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L12-L12",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 12,
+        "end_line": 12,
+        "literal_tokens": [
+          "\"STOPPED\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::const::Starting@13",
@@ -2102,11 +2563,22 @@
       "name": "Starting",
       "start_line": 13,
       "end_line": 13,
-      "label": "Declaration: Starting",
-      "description": "Declared const in inference/lifecycle.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Starting inference lifecycle state",
+      "description": "Constant STARTING; allows READY or FAILED.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L13-L13",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 13,
+        "end_line": 13,
+        "literal_tokens": [
+          "\"STARTING\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::const::Ready@14",
@@ -2116,11 +2588,22 @@
       "name": "Ready",
       "start_line": 14,
       "end_line": 14,
-      "label": "Declaration: Ready",
-      "description": "Declared const in inference/lifecycle.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Ready inference lifecycle state",
+      "description": "Constant READY; allows BUSY, DRAINING or FAILED.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L14-L14",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 14,
+        "end_line": 14,
+        "literal_tokens": [
+          "\"READY\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::const::Busy@15",
@@ -2130,11 +2613,22 @@
       "name": "Busy",
       "start_line": 15,
       "end_line": 15,
-      "label": "Declaration: Busy",
-      "description": "Declared const in inference/lifecycle.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Busy inference lifecycle state",
+      "description": "Constant BUSY; allows IDLE or FAILED.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L15-L15",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 15,
+        "end_line": 15,
+        "literal_tokens": [
+          "\"BUSY\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::const::Idle@16",
@@ -2144,11 +2638,22 @@
       "name": "Idle",
       "start_line": 16,
       "end_line": 16,
-      "label": "Declaration: Idle",
-      "description": "Declared const in inference/lifecycle.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Idle inference lifecycle state",
+      "description": "Constant IDLE; allows BUSY, DRAINING or FAILED.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L16-L16",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 16,
+        "end_line": 16,
+        "literal_tokens": [
+          "\"IDLE\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::const::Draining@17",
@@ -2158,11 +2663,22 @@
       "name": "Draining",
       "start_line": 17,
       "end_line": 17,
-      "label": "Declaration: Draining",
-      "description": "Declared const in inference/lifecycle.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Draining inference lifecycle state",
+      "description": "Constant DRAINING; allows STOPPED or FAILED.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L17-L17",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 17,
+        "end_line": 17,
+        "literal_tokens": [
+          "\"DRAINING\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::const::Failed@18",
@@ -2172,11 +2688,22 @@
       "name": "Failed",
       "start_line": 18,
       "end_line": 18,
-      "label": "Declaration: Failed",
-      "description": "Declared const in inference/lifecycle.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Failed inference lifecycle state",
+      "description": "Constant FAILED; only STOPPED is permitted next.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L18-L18",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 18,
+        "end_line": 18,
+        "literal_tokens": [
+          "\"FAILED\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::type::Lifecycle@21",
@@ -2186,11 +2713,22 @@
       "name": "Lifecycle",
       "start_line": 21,
       "end_line": 24,
-      "label": "Type: Lifecycle",
-      "description": "Declared type in inference/lifecycle.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Mutex-guarded local lifecycle tracker",
+      "description": "Stores a state value with synchronization for State and Move operations.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L21-L24",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 21,
+        "end_line": 24,
+        "literal_tokens": [
+          "state State"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::function::NewLifecycle@26",
@@ -3009,11 +3547,26 @@
       "name": "FrozenPlaneSourceCommit",
       "start_line": 21,
       "end_line": 21,
-      "label": "Declaration: Frozen Plane Source Commit",
-      "description": "Declared const in integration/ckbplane/adapter.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Immutable external translation reference",
+      "description": "Pins the frozen external contract revision consumed by this inactive adapter.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/adapter.go#L21-L21",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 21,
+        "end_line": 21,
+        "literal_tokens": [
+          "\"539d56fec273c8851aea131cf4d31425a62f7250\""
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:integration/ckbplane/adapter.go::var::safeID@24",
@@ -3023,11 +3576,26 @@
       "name": "safeID",
       "start_line": 24,
       "end_line": 24,
-      "label": "Declaration: safe ID",
-      "description": "Declared var in integration/ckbplane/adapter.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Work identity lexical restriction",
+      "description": "Defines the compiled regular expression accepted for work-order identifiers.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/adapter.go#L24-L24",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 24,
+        "end_line": 24,
+        "literal_tokens": [
+          "regexp.MustCompile"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:integration/ckbplane/adapter.go::var::sha40@25",
@@ -3037,11 +3605,26 @@
       "name": "sha40",
       "start_line": 25,
       "end_line": 25,
-      "label": "Declaration: sha40",
-      "description": "Declared var in integration/ckbplane/adapter.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "40-character baseline commit SHA restriction",
+      "description": "Defines a lowercase 40-hex regular expression for pinned baseline identity.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/adapter.go#L25-L25",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 25,
+        "end_line": 25,
+        "literal_tokens": [
+          "^[0-9a-f]{40}$"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:integration/ckbplane/adapter.go::type::WorkOrderContract@30",
@@ -3051,11 +3634,26 @@
       "name": "WorkOrderContract",
       "start_line": 30,
       "end_line": 40,
-      "label": "Type: Work Order Contract",
-      "description": "Declared type in integration/ckbplane/adapter.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Restricted external work-order fields",
+      "description": "Contains allowed/forbidden paths, source identity and protection flags, without queue or acceptance state.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/adapter.go#L30-L40",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 30,
+        "end_line": 40,
+        "literal_tokens": [
+          "ProtectAcceptedRefs bool"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:integration/ckbplane/adapter.go::type::WorkspaceBinding@44",
@@ -3065,11 +3663,26 @@
       "name": "WorkspaceBinding",
       "start_line": 44,
       "end_line": 49,
-      "label": "Type: Workspace Binding",
-      "description": "Declared type in integration/ckbplane/adapter.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Externally owned workspace identity snapshot",
+      "description": "Carries work ID, attempt, absolute/workspace path and matching baseline SHA.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/adapter.go#L44-L49",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 44,
+        "end_line": 49,
+        "literal_tokens": [
+          "BaselineSHA string"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:integration/ckbplane/adapter.go::type::RequestPolicy@53",
@@ -3079,11 +3692,26 @@
       "name": "RequestPolicy",
       "start_line": 53,
       "end_line": 65,
-      "label": "Type: Request Policy",
-      "description": "Declared type in integration/ckbplane/adapter.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Trusted inference adapter policy",
+      "description": "Supplies role, deadline, capabilities, resource checks and backend/route allowlists; it is not model output.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/adapter.go#L53-L65",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 53,
+        "end_line": 65,
+        "literal_tokens": [
+          "AllowedBackends  []string"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:integration/ckbplane/adapter.go::type::ReplayEnvelope@69",
@@ -3093,11 +3721,26 @@
       "name": "ReplayEnvelope",
       "start_line": 69,
       "end_line": 74,
-      "label": "Type: Replay Envelope",
-      "description": "Declared type in integration/ckbplane/adapter.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Strict replay-only translation envelope",
+      "description": "Combines work order, workspace binding, context and trusted policy for test decoding.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/adapter.go#L69-L74",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 69,
+        "end_line": 74,
+        "literal_tokens": [
+          "Workspace WorkspaceBinding"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:integration/ckbplane/adapter.go::function::DecodeReplayEnvelope@76",
@@ -3168,11 +3811,26 @@
       "name": "Canceler",
       "start_line": 158,
       "end_line": 160,
-      "label": "Interface: Canceler",
-      "description": "Declared interface in integration/ckbplane/adapter.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Cancellation-only adapter interface",
+      "description": "Requires Cancel(requestID) bool without external status or acceptance rights.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/adapter.go#L158-L160",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 158,
+        "end_line": 160,
+        "literal_tokens": [
+          "Cancel(string) bool"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:integration/ckbplane/adapter.go::function::Cancel@164",
@@ -3182,14 +3840,29 @@
       "name": "Cancel",
       "start_line": 164,
       "end_line": 176,
-      "label": "Function: Cancel",
-      "description": "Declared function in integration/ckbplane/adapter.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Translate external work attempt into cancellation",
+      "description": "Computes deterministic Wingless request ID and forwards cancellation without taking over external work lifecycle.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/adapter.go#L164-L176",
       "syntax_calls": [
         "RequestID",
         "c.Cancel",
         "errors.New"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 164,
+        "end_line": 176,
+        "literal_tokens": [
+          "RequestID(workOrderID, attempt)"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
       ]
     },
     {
@@ -3200,11 +3873,26 @@
       "name": "Candidate",
       "start_line": 180,
       "end_line": 189,
-      "label": "Type: Candidate",
-      "description": "Declared type in integration/ckbplane/adapter.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Non-authoritative external result projection",
+      "description": "Carries request IDs, candidate status, model/backend and error class with no accepted flag.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/adapter.go#L180-L189",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 180,
+        "end_line": 189,
+        "literal_tokens": [
+          "Acceptance  string"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:integration/ckbplane/adapter.go::function::CandidateFromOutcome@191",
@@ -3507,11 +4195,22 @@
       "name": "TransportRequestSchema",
       "start_line": 20,
       "end_line": 20,
-      "label": "Declaration: Transport Request Schema",
-      "description": "Declared const in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Frozen inbound request schema ID",
+      "description": "Exact schema identifier required to decode the bounded external transport.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L20-L20",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 20,
+        "end_line": 20,
+        "literal_tokens": [
+          "\"ckb-plane.wingless-transport-request.v1\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::const::CandidateEnvelopeSchema@21",
@@ -3521,11 +4220,22 @@
       "name": "CandidateEnvelopeSchema",
       "start_line": 21,
       "end_line": 21,
-      "label": "Declaration: Candidate Envelope Schema",
-      "description": "Declared const in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Frozen outbound candidate schema ID",
+      "description": "Exact schema for non-authoritative candidate responses.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L21-L21",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 21,
+        "end_line": 21,
+        "literal_tokens": [
+          "\"ckb-plane.wingless-candidate-envelope.v1\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::const::TransportPath@22",
@@ -3535,11 +4245,22 @@
       "name": "TransportPath",
       "start_line": 22,
       "end_line": 22,
-      "label": "Declaration: Transport Path",
-      "description": "Declared const in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Explicit candidate HTTP route",
+      "description": "Only HTTP route admitted by the candidate listener.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L22-L22",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 22,
+        "end_line": 22,
+        "literal_tokens": [
+          "\"/v1/wingless/candidate\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::const::maxTransportRequestBytes@23",
@@ -3549,11 +4270,22 @@
       "name": "maxTransportRequestBytes",
       "start_line": 23,
       "end_line": 23,
-      "label": "Declaration: max Transport Request Bytes",
-      "description": "Declared const in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Inbound request-body byte ceiling",
+      "description": "Caps transport request bytes to 2 MiB.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L23-L23",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 23,
+        "end_line": 23,
+        "literal_tokens": [
+          "2 << 20"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::const::maxCandidateEnvelopeBytes@24",
@@ -3563,11 +4295,22 @@
       "name": "maxCandidateEnvelopeBytes",
       "start_line": 24,
       "end_line": 24,
-      "label": "Declaration: max Candidate Envelope Bytes",
-      "description": "Declared const in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Candidate JSON payload byte ceiling",
+      "description": "Caps serialized candidate envelope to 7 MiB.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L24-L24",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 24,
+        "end_line": 24,
+        "literal_tokens": [
+          "7 << 20"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::const::maxCandidateTextBytes@25",
@@ -3577,11 +4320,22 @@
       "name": "maxCandidateTextBytes",
       "start_line": 25,
       "end_line": 25,
-      "label": "Declaration: max Candidate Text Bytes",
-      "description": "Declared const in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Candidate text byte ceiling",
+      "description": "Caps candidate text to 1 MiB.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L25-L25",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 25,
+        "end_line": 25,
+        "literal_tokens": [
+          "1 << 20"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::const::maxEditOperations@26",
@@ -3591,11 +4345,22 @@
       "name": "maxEditOperations",
       "start_line": 26,
       "end_line": 26,
-      "label": "Declaration: max Edit Operations",
-      "description": "Declared const in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Proposed edit operation count ceiling",
+      "description": "Caps the number of unexecuted edit proposals to 64.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L26-L26",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 26,
+        "end_line": 26,
+        "literal_tokens": [
+          "maxEditOperations = 64"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::const::maxEditFileBytes@27",
@@ -3605,11 +4370,22 @@
       "name": "maxEditFileBytes",
       "start_line": 27,
       "end_line": 27,
-      "label": "Declaration: max Edit File Bytes",
-      "description": "Declared const in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Per-edit text byte ceiling",
+      "description": "Caps each proposed write_text payload to 1 MiB.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L27-L27",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 27,
+        "end_line": 27,
+        "literal_tokens": [
+          "maxEditFileBytes = 1 << 20"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::const::maxEditAggregateBytes@28",
@@ -3619,11 +4395,22 @@
       "name": "maxEditAggregateBytes",
       "start_line": 28,
       "end_line": 28,
-      "label": "Declaration: max Edit Aggregate Bytes",
-      "description": "Declared const in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Aggregate edit text byte ceiling",
+      "description": "Caps total proposed write_text bytes to 4 MiB.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L28-L28",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 28,
+        "end_line": 28,
+        "literal_tokens": [
+          "maxEditAggregateBytes = 4 << 20"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::var::sha64@31",
@@ -3633,11 +4420,22 @@
       "name": "sha64",
       "start_line": 31,
       "end_line": 31,
-      "label": "Declaration: sha64",
-      "description": "Declared var in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "SHA-256 identity format restriction",
+      "description": "Compiles a 64-character lowercase-hex validation expression.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L31-L31",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 31,
+        "end_line": 31,
+        "literal_tokens": [
+          "^[0-9a-f]{64}$"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::TransportResources@33",
@@ -3978,15 +4776,26 @@
       "name": "writeListenerError",
       "start_line": 218,
       "end_line": 222,
-      "label": "Function: write Listener Error",
-      "description": "Declared function in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Write JSON error without accepting a candidate",
+      "description": "Sets application/json status and encodes a bounded error code response.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L218-L222",
       "syntax_calls": [
         "json.NewEncoder",
         "w.Header",
         "w.WriteHeader"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 218,
+        "end_line": 222,
+        "literal_tokens": [
+          "w.WriteHeader(status)"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::decodeTransportRequest@224",
@@ -4918,11 +5727,22 @@
       "name": "LoopbackServiceReadySchema",
       "start_line": 15,
       "end_line": 15,
-      "label": "Declaration: Loopback Service Ready Schema",
-      "description": "Declared const in integration/ckbplane/service.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Ephemeral service readiness schema",
+      "description": "Defines the schema ID for loopback endpoint/PID readiness notices.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/service.go#L15-L15",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/service.go",
+        "file_sha256": "0f7fd9fa4b73e0275f4e969c51d3b5a5cee5365d56cbd91c965eca12a7052453",
+        "start_line": 15,
+        "end_line": 15,
+        "literal_tokens": [
+          "\"wingless.loopback-service-ready.v1\""
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/service.go::type::LoopbackServiceReady@17",
@@ -6378,11 +7198,22 @@
       "name": "GPU",
       "start_line": 17,
       "end_line": 28,
-      "label": "Type: GPU",
-      "description": "Declared type in resources/nvidia.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Structured GPU resource observation",
+      "description": "Represents vendor/UUID and nullable VRAM, utilization, temperature and power readings.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/nvidia.go#L17-L28",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/nvidia.go",
+        "file_sha256": "40749140b7c6065cdd801895da9ffc16352e5adcf01242e6599d7582d9346d9f",
+        "start_line": 17,
+        "end_line": 28,
+        "literal_tokens": [
+          "FreeBytes"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/nvidia.go::interface::GPUProvider@29",
@@ -6392,11 +7223,22 @@
       "name": "GPUProvider",
       "start_line": 29,
       "end_line": 31,
-      "label": "Interface: GPU Provider",
-      "description": "Declared interface in resources/nvidia.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "GPU snapshot source interface",
+      "description": "Defines GPU(context.Context) producing a GPU observation or error.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/nvidia.go#L29-L31",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/nvidia.go",
+        "file_sha256": "40749140b7c6065cdd801895da9ffc16352e5adcf01242e6599d7582d9346d9f",
+        "start_line": 29,
+        "end_line": 31,
+        "literal_tokens": [
+          "GPU(context.Context) (GPU, error)"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/nvidia.go::type::NVIDIA@32",
@@ -6406,11 +7248,22 @@
       "name": "NVIDIA",
       "start_line": 32,
       "end_line": 35,
-      "label": "Type: NVIDIA",
-      "description": "Declared type in resources/nvidia.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Explicit nvidia-smi query configuration",
+      "description": "Holds absolute nvidia-smi executable path and selected GPU index.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/nvidia.go#L32-L35",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/nvidia.go",
+        "file_sha256": "40749140b7c6065cdd801895da9ffc16352e5adcf01242e6599d7582d9346d9f",
+        "start_line": 32,
+        "end_line": 35,
+        "literal_tokens": [
+          "Executable string"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/nvidia.go::type::limitedOutput@36",
@@ -6420,11 +7273,22 @@
       "name": "limitedOutput",
       "start_line": 36,
       "end_line": 36,
-      "label": "Type: limited Output",
-      "description": "Declared type in resources/nvidia.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Bounded GPU subprocess output collector",
+      "description": "Stores accumulated bytes for NVIDIA GPU subprocess stdout and stderr.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/nvidia.go#L36-L36",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/nvidia.go",
+        "file_sha256": "40749140b7c6065cdd801895da9ffc16352e5adcf01242e6599d7582d9346d9f",
+        "start_line": 36,
+        "end_line": 36,
+        "literal_tokens": [
+          "data []byte"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/nvidia.go::method::limitedOutput.Write@38",
@@ -6435,15 +7299,26 @@
       "receiver": "limitedOutput",
       "start_line": 38,
       "end_line": 44,
-      "label": "Method: limited Output Write",
-      "description": "Declared method in resources/nvidia.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Enforce GPU output-size limit",
+      "description": "Rejects attempts to accumulate more than 16 KiB in the buffer.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/nvidia.go#L38-L44",
       "syntax_calls": [
         "append",
         "fmt.Errorf",
         "len"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/nvidia.go",
+        "file_sha256": "40749140b7c6065cdd801895da9ffc16352e5adcf01242e6599d7582d9346d9f",
+        "start_line": 38,
+        "end_line": 44,
+        "literal_tokens": [
+          "GPU response too large"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/nvidia.go::method::NVIDIA.GPU@45",
@@ -6454,9 +7329,9 @@
       "receiver": "NVIDIA",
       "start_line": 45,
       "end_line": 67,
-      "label": "Method: NVIDIA GPU",
-      "description": "Declared method in resources/nvidia.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Query one explicitly allowed GPU without credentials",
+      "description": "Rejects unexpected binary name/index, runs timeout-bounded nvidia-smi with restricted environment and parses strict CSV.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/nvidia.go#L45-L67",
       "syntax_calls": [
         "append",
@@ -6472,7 +7347,18 @@
         "strconv.Itoa",
         "string",
         "strings.ToLower"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/nvidia.go",
+        "file_sha256": "40749140b7c6065cdd801895da9ffc16352e5adcf01242e6599d7582d9346d9f",
+        "start_line": 45,
+        "end_line": 67,
+        "literal_tokens": [
+          "--query-gpu=uuid,name"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/nvidia.go::function::number@68",
@@ -6482,9 +7368,9 @@
       "name": "number",
       "start_line": 68,
       "end_line": 78,
-      "label": "Function: number",
-      "description": "Declared function in resources/nvidia.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Parse a bounded optional GPU numeric field",
+      "description": "Treats unsupported/N/A readings as absent, rejecting NaN, infinities, negatives and values over a per-field maximum.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/nvidia.go#L68-L78",
       "syntax_calls": [
         "fmt.Errorf",
@@ -6492,7 +7378,18 @@
         "math.IsNaN",
         "strconv.ParseFloat",
         "strings.TrimSpace"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/nvidia.go",
+        "file_sha256": "40749140b7c6065cdd801895da9ffc16352e5adcf01242e6599d7582d9346d9f",
+        "start_line": 68,
+        "end_line": 78,
+        "literal_tokens": [
+          "invalid GPU numeric field"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/nvidia.go::function::parseGPU@79",
@@ -6502,9 +7399,9 @@
       "name": "parseGPU",
       "start_line": 79,
       "end_line": 133,
-      "label": "Function: parse GPU",
-      "description": "Declared function in resources/nvidia.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Decode a single validated NVIDIA CSV row",
+      "description": "Requires exactly nine fields, no extra rows, GPU-prefixed UUID, valid numeric bounds and consistent memory usage.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/nvidia.go#L79-L133",
       "syntax_calls": [
         "bytes",
@@ -6520,7 +7417,18 @@
         "strings.NewReader",
         "strings.TrimSpace",
         "uint64"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/nvidia.go",
+        "file_sha256": "40749140b7c6065cdd801895da9ffc16352e5adcf01242e6599d7582d9346d9f",
+        "start_line": 79,
+        "end_line": 133,
+        "literal_tokens": [
+          "invalid GPU CSV shape"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/nvidia.go::type::WithGPU@136",
@@ -6530,11 +7438,22 @@
       "name": "WithGPU",
       "start_line": 136,
       "end_line": 139,
-      "label": "Type: With GPU",
-      "description": "Declared type in resources/nvidia.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Compose host and optional GPU telemetry providers",
+      "description": "Pairs host metrics with a GPU provider without granting resource admission itself.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/nvidia.go#L136-L139",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/nvidia.go",
+        "file_sha256": "40749140b7c6065cdd801895da9ffc16352e5adcf01242e6599d7582d9346d9f",
+        "start_line": 136,
+        "end_line": 139,
+        "literal_tokens": [
+          "Device GPUProvider"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/nvidia.go::method::WithGPU.Snapshot@141",
@@ -6545,15 +7464,26 @@
       "receiver": "WithGPU",
       "start_line": 141,
       "end_line": 160,
-      "label": "Method: With GPU Snapshot",
-      "description": "Declared method in resources/nvidia.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Return host resource snapshot enriched with optional GPU metrics",
+      "description": "Propagates host failures, preserves optional GPU errors as GPUError and fills VRAM and utilization when available.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/nvidia.go#L141-L160",
       "syntax_calls": [
         "context.Background",
         "e.Error",
         "fmt.Errorf"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/nvidia.go",
+        "file_sha256": "40749140b7c6065cdd801895da9ffc16352e5adcf01242e6599d7582d9346d9f",
+        "start_line": 141,
+        "end_line": 160,
+        "literal_tokens": [
+          "m.GPUError = &message"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/nvidia_test.go::function::TestNVIDIAParsing@9",
@@ -7107,11 +8037,25 @@
       "name": "Boundary",
       "start_line": 13,
       "end_line": 20,
-      "label": "Interface: Boundary",
-      "description": "Declared interface in worker/service.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "In-memory candidate worker interface",
+      "description": "Defines SubmitWork, Status, Cancel, Result, Health and Capabilities, without durable queue ownership.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/worker/service.go#L13-L20",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "worker/service.go",
+        "file_sha256": "30e6af13638a8bd072ed5c7d5b8b9218efbfe5e110ba579ad08264c7db5a90a0",
+        "start_line": 13,
+        "end_line": 20,
+        "literal_tokens": [
+          "SubmitWork(context.Context"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
+      ]
     },
     {
       "id": "wingless:worker/service.go::type::job@21",
@@ -7121,11 +8065,25 @@
       "name": "job",
       "start_line": 21,
       "end_line": 25,
-      "label": "Type: job",
-      "description": "Declared type in worker/service.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Single in-memory request record",
+      "description": "Stores current status, cancel function and broker outcome.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/worker/service.go#L21-L25",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "worker/service.go",
+        "file_sha256": "30e6af13638a8bd072ed5c7d5b8b9218efbfe5e110ba579ad08264c7db5a90a0",
+        "start_line": 21,
+        "end_line": 25,
+        "literal_tokens": [
+          "cancel context.CancelFunc"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
+      ]
     },
     {
       "id": "wingless:worker/service.go::type::Service@26",
@@ -7135,11 +8093,25 @@
       "name": "Service",
       "start_line": 26,
       "end_line": 32,
-      "label": "Type: Service",
-      "description": "Declared type in worker/service.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Single-concurrency worker service state",
+      "description": "Keeps broker runner, policy, active-job flag and guarded map of request results.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/worker/service.go#L26-L32",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "worker/service.go",
+        "file_sha256": "30e6af13638a8bd072ed5c7d5b8b9218efbfe5e110ba579ad08264c7db5a90a0",
+        "start_line": 26,
+        "end_line": 32,
+        "literal_tokens": [
+          "jobs   map[string]*job"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
+      ]
     },
     {
       "id": "wingless:worker/service.go::function::New@36",
@@ -7166,11 +8138,25 @@
       "receiver": "Service",
       "start_line": 40,
       "end_line": 42,
-      "label": "Method: Service Capabilities",
-      "description": "Declared method in worker/service.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Declare bounded worker capabilities",
+      "description": "Advertises bounded inference, in-memory status, cancellation and candidate results only.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/worker/service.go#L40-L42",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "worker/service.go",
+        "file_sha256": "30e6af13638a8bd072ed5c7d5b8b9218efbfe5e110ba579ad08264c7db5a90a0",
+        "start_line": 40,
+        "end_line": 42,
+        "literal_tokens": [
+          "\"candidate_result\""
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
+      ]
     },
     {
       "id": "wingless:worker/service.go::method::Service.Health@43",
