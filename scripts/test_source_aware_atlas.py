@@ -113,9 +113,9 @@ def run(root, scratch_parent):
                 != new_head, "failed generation unexpectedly published atlas")
         manifest = json.loads((second / ".ice/manifest.json").read_text("utf-8"))
         old_atlas = json.loads((second / ATLAS).read_text("utf-8"))
-        entry = next(f for f in manifest["files"] if f["path"] == str(SOURCE))
+        entry = next(f for f in manifest["files"] if f["path"] == SOURCE.as_posix())
         item = next(n for n in old_atlas["nodes"]
-                    if n["file"] == str(SOURCE) and n["name"] == "Move")
+                    if n["file"] == SOURCE.as_posix() and n["name"] == "Move")
         new_source = (second / SOURCE).read_bytes()
         lines = new_source.splitlines(keepends=True)
         text = b"".join(lines[item["start_line"]-1:item["end_line"]])
