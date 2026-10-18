@@ -1,0 +1,25 @@
+{
+  "schema": "research.northstar.t4.train-only-learning-resource-parity.v1",
+  "state": "PRE_EXPERIMENT_SOURCE_AND_EVALUATOR_FROZEN",
+  "frozen_parent_head": "f49246ab6f4858c1f994d806cbbe31264f4ca4a1",
+  "scientific_hypothesis": "Public-only shared learned 12-byte prior measurably changes cross-task operator prediction and improves nonprotected diagnostic composition against zero-weight and F11/S3 full exact public solver.",
+  "source_and_splits": [
+    "negative fixture ids -12000..-12031 TRAIN and -12100..-12115 open diagnostic; never registered original 880000/881000/882000/883000",
+    "two public calibration pairs per role; disjoint roles/operators and 10/12-step chains",
+    "F11 affine and S3 typed public operator descriptors, not private source label"
+  ],
+  "controls": [
+    "frozen F55 exact public solver on its own F11 domain",
+    "same-domain exact enumerative public solver on F11 and S3",
+    "T3 weights all zero; fixed operator prior"
+  ],
+  "resource_budget": "model 12B+state 3B; full training amortized over 16 open tasks, complete runtime CPU and peak including calibration buffers <= strongest exact full public control measured in same process; no privilege from excluding training",
+  "strict_scientific_acceptance": "strict positive per-task answer improvement vs strongest exact control plus zero regression, total CPU/peak nonincrease; if exact control perfect => negative and no OOD first-use",
+  "independent_nonprotected_training_allowed": true,
+  "original_protected_holdouts_allowed": false,
+  "original_consumer_admission": false,
+  "real_unseen_transfer_accepted": false,
+  "merges_or_production_authorized": false,
+  "optimizer_dispatch": false,
+  "date": "2026-10-18"
+}
