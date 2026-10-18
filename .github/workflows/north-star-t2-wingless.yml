@@ -1,0 +1,44 @@
+name: T2 wingless genuine transfer readiness (nonconsuming)
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t2-wingless.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t2-wingless-nonconsuming-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  independent-source-and-native-audit:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 40
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify exact prereg source and run only synthetic readiness fixtures
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T2_EXACT_BRANCH_HEAD_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t2-source-freeze.json').Trim() -cne '3257665900f30be75c0440d457b560c44bf3bdb9'){throw 'T2_FROZEN_BIRTH_DRIFT'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261018-wingless-t2-source-freeze.json').Trim() -cne 'e0a5b7b01e2ab8fc479fddec19d80079e6d6fbf8'){throw 'T2_PROTOCOL_NOT_FROZEN_BEFORE_SOURCE'}
+          git merge-base --is-ancestor 'e0a5b7b01e2ab8fc479fddec19d80079e6d6fbf8' HEAD
+          if($LASTEXITCODE -ne 0){throw 'T2_FROZEN_COMMIT_NOT_ANCESTOR'}
+          if((git hash-object 'research/foundational/20261015-w-f55/source_pilot.py').Trim() -cne 'd02fc933b52fc44d537ed45b061aef56ccd90a7f'){throw 'T2_PREVIOUS_CONTROL_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t2-source.py').Trim() -cne '495378a7bf6c37669529be0ed6282bb950d25d5e'){throw 'T2_WINGLESS_SOURCE_CODE_DRIFT'}
+          $py=if($IsWindows){'python'}else{'python3'}
+          & $py -B 'research/north-star-transfer/20261018-wingless-t2-source.py'
+          if($LASTEXITCODE -ne 0){throw 'T2_WINGLESS_READINESS_FAIL'}
+          Write-Output 'T2_WINGLESS_SOURCE_AND_NATIVE_READINESS=PASS'
+          Write-Output 'T2_WINGLESS_PROTECTED_COHORTS_CONSUMED=0'
+          Write-Output 'T2_WINGLESS_SCIENCE_PROTECTED_ADMISSION=false'
+          Write-Output 'T2_WINGLESS_FULL_RESOURCE_PARITY_NOT_ASSUMED=true'
