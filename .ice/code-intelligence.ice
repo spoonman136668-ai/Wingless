@@ -5,7 +5,7 @@ SOURCE_COMMIT: b87899b50d2c1558e26d74a1921623786fde1282
 SCHEMA: wingless.ice.semantic-code-atlas.v1
 EVIDENCE: .ice/code-intelligence.json (complete machine-readable 352-symbol index)
 AUTHORITY: Source code and qualified tests outrank these descriptions; never grant runtime or acceptance authority.
-COVERAGE: 352 symbols in 130 indexed source/configuration files; 27 inspected semantic labels; 325 explicitly provisional lexical labels.
+COVERAGE: 352 symbols in 131 indexed source/configuration files; 27 inspected semantic labels; 325 explicitly provisional lexical labels.
 RELATIONSHIPS: 9 inspected relationships, 51 local package imports, 95 unresolved syntax-only call candidates.
 
 HOW TO USE
