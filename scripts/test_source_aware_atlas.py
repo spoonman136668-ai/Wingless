@@ -99,6 +99,34 @@ def run(root, scratch_parent):
              "--root", ".", "--relationships", rels)
         print("G26_EXACT_DECLARATION_REUSE=PASS", comment_head)
 
+        # An uncommitted Go change plus a rebuilt canonical ICE index must
+        # never masquerade as the frozen target commit.
+        dirty = Path(t) / "dirty-source-checkout"
+        clone(root, dirty, baseline)
+        unchanged = (dirty / SOURCE).read_text("utf-8")
+        (dirty / SOURCE).write_text(
+            unchanged + "\n// G27 uncommitted source delta.\n", "utf-8")
+        good(dirty, "go", "run", "./cmd/ice", "build")
+        reject(dirty, "G27_DIRTY_NON_ICE_WORKTREE",
+               sys.executable, "-B", "scripts/maintain_code_atlas.py",
+               "--root", ".")
+        # A committed module context change must not inherit 352 behavioral
+        # descriptions solely because Go declaration bodies match.
+        module = Path(t) / "module-context-change"
+        clone(root, module, baseline)
+        modfile = Path("go.mod")
+        mod_before = (module / modfile).read_text("utf-8")
+        (module / modfile).write_text(
+            mod_before + "\n// G27 synthetic module context drift\n", "utf-8")
+        good(module, "git", "add", "go.mod")
+        good(module, "git", "-c", "user.name=Wingless G27 Synthetic",
+             "-c", "user.email=g27-fixture@example.invalid",
+             "commit", "-qm", "G27 synthetic module-context fixture")
+        good(module, "go", "run", "./cmd/ice", "build")
+        reject(module, "G27_DEPENDENCY_CONTEXT_CHANGED",
+               sys.executable, "-B", "scripts/maintain_code_atlas.py",
+               "--root", ".")
+        print("G27_GIT_SOURCE_IDENTITY_AND_MODULE_CONTEXT_NEGATIVES_PASS")
         second = Path(t) / "changed-declaration"
         clone(root, second, baseline)
         old = (second / SOURCE).read_text("utf-8")
@@ -168,6 +196,8 @@ def run(root, scratch_parent):
         "changed_declaration_without_receipt": "REJECTED",
         "forged_fresh_receipt": "REJECTED",
         "synthetic_fresh_receipt": "ACCEPTED_AS_UNVERIFIED_ASSERTION",
+        "dirty_source_identity": "REJECTED",
+        "module_context_drift": "REJECTED",
         "original_checkout_changed": False,
     }, sort_keys=True))
 

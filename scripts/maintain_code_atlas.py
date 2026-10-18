@@ -88,6 +88,31 @@ def generate(root, receipts_path=None):
             previous.encode("ascii"), "prior source is not an ancestor")
     require(idx.get("authority") == "advisory syntax only; source wins",
             "canonical ICE authority changed")
+    # G27 review hardening: a structurally consistent working tree is not
+    # sufficient proof that target HEAD actually contains those source bytes.
+    # Only canonical ICE outputs may be dirty after 'go run ./cmd/ice build'.
+    status = git(root, "status", "--porcelain", "--untracked-files=all")
+    for entry in status.decode("utf-8", errors="replace").splitlines():
+        require(entry[3:].startswith(".ice/"),
+                "G27_DIRTY_NON_ICE_WORKTREE: " + entry[3:])
+    # Context-sensitive descriptions cannot inherit earlier review if module
+    # resolution or text-conversion rules changed even when declarations did not.
+    for context_path in ("go.mod", ".gitattributes"):
+        require(source_bytes(root, previous, context_path) ==
+                source_bytes(root, target, context_path),
+                "G27_DEPENDENCY_CONTEXT_CHANGED: " + context_path)
+    # All source-bearing files must exactly match the advertised target commit.
+    # The canonical LF transform is safe for this repository's explicit
+    # '.gitattributes: * text=auto eol=lf' contract.
+    for item in idx["files"]:
+        path = item["path"]
+        raw = (root / path).read_bytes()
+        committed = source_bytes(root, target, path)
+        require(sha(raw) == item["sha256"],
+                "G27_STRUCTURAL_INDEX_MISMATCH: " + path)
+        require(raw.replace(b"\r\n", b"\n") ==
+                committed.replace(b"\r\n", b"\n"),
+                "G27_TARGET_SOURCE_CONTENT_MISMATCH: " + path)
     files = {f["path"]: f for f in idx["files"]}
     require(len(files) == len(idx["files"]), "duplicate current indexed file")
     old_by_key = {node_key(n): n for n in old["nodes"]}
@@ -219,6 +244,14 @@ def generate(root, receipts_path=None):
                            target + "/" + path + "#L" +
                            str(n["start_line"]) + "-L" + str(n["end_line"]))
         n["syntax_calls"] = sorted(set(current.get("calls") or []))
+        historical_deps = sorted(oldnode.get(
+            "file_level_local_package_dependencies") or [])
+        current_deps = sorted(
+            x.removeprefix("github.com/" + REPO + "/")
+            for x in (deps.get(path) or [])
+            if x.startswith("github.com/" + REPO + "/"))
+        require(historical_deps == current_deps,
+                "G27_IMPORT_CONTEXT_CHANGED: " + path)
         n["file_level_local_package_dependencies"] = sorted(
             x.removeprefix("github.com/" + REPO + "/")
             for x in (deps.get(path) or [])
