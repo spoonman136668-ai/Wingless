@@ -103,6 +103,7 @@ def validate(root, relationship_file):
         proof = node.get("review_evidence")
         if basis == "source-reviewed":
             reviewed += 1
+            require(proof is not None, "source-reviewed symbol has no explicit proof: " + symbol_id)
             if proof is not None:
                 evidenced += 1
                 require(isinstance(proof, dict), "review proof not an object")
@@ -120,6 +121,7 @@ def validate(root, relationship_file):
                             "invalid source review token: " + symbol_id)
                     require(token in span, "source evidence token mismatch: " + symbol_id + " " + repr(token))
         dependency_proof = node.get("file_level_local_package_dependencies")
+        require(dependency_proof is not None, "missing file-level dependency evidence: " + symbol_id)
         if dependency_proof is not None:
             require(basis == "source-reviewed" and proof is not None,
                     "file-level package dependencies require a reviewed symbol: " + symbol_id)
@@ -166,7 +168,7 @@ def validate(root, relationship_file):
     require(atlas["coverage"]["source_reviewed_labels"] == reviewed, "reviewed count drift")
     require(atlas["coverage"].get("source_evidenced_new_labels") == evidenced,
             "new source-evidence count drift")
-    require(reviewed - evidenced == 27, "legacy reviewed cohort unexpectedly changed")
+    require(evidenced == reviewed == len(nodes), "source evidence not uniform across all symbols")
     require(atlas["coverage"]["lexical_provisional_labels"] == len(nodes)-reviewed, "provisional count drift")
 
     ids = set(actual)
@@ -244,6 +246,7 @@ def validate(root, relationship_file):
         "symbols": len(nodes),
         "source_reviewed_labels": reviewed,
         "new_source_evidenced_labels": evidenced,
+        "fully_evidenced_symbol_count": evidenced,
         "dependency_index_bound_labels": dependency_bound,
         "source_verified_test_contracts": test_contracts,
         "test_cases": test_cases,

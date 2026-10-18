@@ -16,11 +16,12 @@
     "source_reviewed_relationships": 9,
     "local_package_imports": 51,
     "syntactic_call_candidates": 95,
-    "source_evidenced_new_labels": 325,
-    "source_dependency_bound_labels": 248,
+    "source_evidenced_new_labels": 352,
+    "source_dependency_bound_labels": 352,
     "source_evidenced_test_contracts": 116,
     "test_cases": 66,
-    "test_fixtures_and_helpers": 50
+    "test_fixtures_and_helpers": 50,
+    "all_reviewed_source_evidenced_labels": 352
   },
   "methodology": {
     "all_symbols": "Go symbol declarations already indexed by Wingless ICE",
@@ -28,7 +29,8 @@
     "lexical_provisional": "Name-only; not verified behavior",
     "syntactic_call_candidates": "Parser syntax; no dynamic dispatch, type resolution, or runtime control flow guarantees",
     "source_state": "Only source identities from pinned commit; no runtime, broker, research, or acceptance effect",
-    "review_evidence": "Source-reviewed labels carry pinned source commit, file SHA-256, exact declaration line spans and source literal anchors checked by Windows qualification; local package dependencies are explicitly file-level and do not prove a function call."
+    "review_evidence": "Source-reviewed labels carry pinned source commit, file SHA-256, exact declaration line spans and source literal anchors checked by Windows qualification; local package dependencies are explicitly file-level and do not prove a function call.",
+    "uniform_source_proof": "Every source-reviewed declaration carries pinned source identity, exact source-line span, verified literal evidence and source-indexed FILE-LEVEL local package imports; file imports are not function calls."
   },
   "nodes": [
     {
@@ -606,7 +608,11 @@
           "Expected string",
           "Prompt   string"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
+      ]
     },
     {
       "id": "wingless:benchmark/replay.go::type::Row@17",
@@ -631,7 +637,11 @@
           "Correct       bool",
           "Outcome       broker.Outcome"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
+      ]
     },
     {
       "id": "wingless:benchmark/replay.go::type::exact@24",
@@ -688,7 +698,11 @@
           "r.Text != string(e)",
           "fixture output mismatch"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
+      ]
     },
     {
       "id": "wingless:benchmark/replay.go::function::Replay@32",
@@ -723,7 +737,11 @@
           "case \"D\"",
           "r.Run(ctx, req, p)"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
+      ]
     },
     {
       "id": "wingless:benchmark/replay_test.go::type::metrics@11",
@@ -908,6 +926,21 @@
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/broker/router.go#L22-L41",
       "syntax_calls": [
         "fmt.Errorf"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/router.go",
+        "file_sha256": "281d07081380d56742961591bea1b267c7a45b3010871a675a4ae014b29719b1",
+        "start_line": 22,
+        "end_line": 41,
+        "literal_tokens": [
+          "invalid registration",
+          "duplicate backend"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
       ]
     },
     {
@@ -926,6 +959,20 @@
       "syntax_calls": [
         "append",
         "sort.Slice"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/router.go",
+        "file_sha256": "281d07081380d56742961591bea1b267c7a45b3010871a675a4ae014b29719b1",
+        "start_line": 42,
+        "end_line": 51,
+        "literal_tokens": [
+          "sort.Slice(out"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
       ]
     },
     {
@@ -1034,6 +1081,21 @@
         "reg.Entries",
         "req.Validate",
         "resources.Check"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/router.go",
+        "file_sha256": "281d07081380d56742961591bea1b267c7a45b3010871a675a4ae014b29719b1",
+        "start_line": 77,
+        "end_line": 146,
+        "literal_tokens": [
+          "resources.Check(req.Resources, m)",
+          "b.Health(ctx)"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
       ]
     },
     {
@@ -1508,6 +1570,21 @@
         "fmt.Errorf",
         "len",
         "req.Validate"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/runner.go",
+        "file_sha256": "37c1ced58499c0eb3456d2d223ac378bef47014deea42bcf262ecb0d79a963d5",
+        "start_line": 33,
+        "end_line": 112,
+        "literal_tokens": [
+          "Acceptance: \"external_required\"",
+          "r.Verifier.Verify(ctx"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
       ]
     },
     {
@@ -1527,6 +1604,21 @@
         "len",
         "planning.Run",
         "r.Run"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "broker/runner.go",
+        "file_sha256": "37c1ced58499c0eb3456d2d223ac378bef47014deea42bcf262ecb0d79a963d5",
+        "start_line": 116,
+        "end_line": 136,
+        "literal_tokens": [
+          "planning.Run(ctx, req, pp)",
+          "r.Run(ctx, req, p)"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
       ]
     },
     {
@@ -1948,6 +2040,20 @@
         "string",
         "strings.Join",
         "strings.Split"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "contextbroker/broker.go",
+        "file_sha256": "f3ce97d0fe2591adfd966fcc902569d2d766de2c8611872614c303ca49b978a5",
+        "start_line": 23,
+        "end_line": 59,
+        "literal_tokens": [
+          "ice.Query(p.Root, q)",
+          "ice.Validate(p.Root)"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "ice"
       ]
     },
     {
@@ -1966,6 +2072,20 @@
         "fmt.Errorf",
         "len",
         "p.Retrieve"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "contextbroker/broker.go",
+        "file_sha256": "f3ce97d0fe2591adfd966fcc902569d2d766de2c8611872614c303ca49b978a5",
+        "start_line": 60,
+        "end_line": 76,
+        "literal_tokens": [
+          "p.Retrieve(q, budget)",
+          "provider exceeded context budget"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "ice"
       ]
     },
     {
@@ -2219,7 +2339,19 @@
         "v.Pos",
         "x.End",
         "x.Pos"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/index.go",
+        "file_sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
+        "start_line": 50,
+        "end_line": 156,
+        "literal_tokens": [
+          "filepath.WalkDir(root",
+          "sha256.Sum256(b)"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/index.go::function::derived@157",
@@ -2272,7 +2404,19 @@
         "os.MkdirAll",
         "os.ReadFile",
         "os.WriteFile"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/index.go",
+        "file_sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
+        "start_line": 172,
+        "end_line": 202,
+        "literal_tokens": [
+          "derived(idx)",
+          "os.WriteFile"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/index.go::function::Load@203",
@@ -2327,7 +2471,19 @@
         "os.IsNotExist",
         "os.ReadFile",
         "string"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/index.go",
+        "file_sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
+        "start_line": 212,
+        "end_line": 247,
+        "literal_tokens": [
+          "ICE_STALE:",
+          "derived(now)"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/index.go::function::Query@248",
@@ -2350,7 +2506,19 @@
         "strings.Join",
         "strings.ToLower",
         "strings.TrimSpace"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/index.go",
+        "file_sha256": "a96eaf6f20f730fa73d9082d4d055f8f609b73efb4d4316d10041990b9f8090d",
+        "start_line": 248,
+        "end_line": 272,
+        "literal_tokens": [
+          "Validate(root)",
+          "strings.Contains(strings.ToLower"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/index_test.go::function::TestSourceWins@9",
@@ -2529,7 +2697,8 @@
           "Kind string",
           "Line int"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/relationships.go::type::TypeReport@24",
@@ -2554,7 +2723,8 @@
           "GOARCH",
           "Diagnostics"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/relationships.go::type::typeLoader@31",
@@ -2580,7 +2750,8 @@
           "packages map[string]*types.Package",
           "report   TypeReport"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/relationships.go::method::typeLoader.Import@41",
@@ -2625,7 +2796,8 @@
           "info.Uses[id]",
           "types.Implements"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/relationships.go::function::Relationships@118",
@@ -2669,7 +2841,8 @@
           "l.report.Diagnostics",
           "sort.Slice"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:ice/relationships_test.go::function::TestTypeResolvedRelationships@9",
@@ -2755,6 +2928,20 @@
         "len",
         "time.Until",
         "utf8.ValidString"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/backend.go",
+        "file_sha256": "fa029b7ad7fb5fa88e4d505fd439943364f3d5f2c6d9d5a83d85645c5bf2d76f",
+        "start_line": 25,
+        "end_line": 33,
+        "literal_tokens": [
+          "r.Deadline.IsZero()",
+          "invalid or unbounded request"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "resources"
       ]
     },
     {
@@ -2877,7 +3064,21 @@
       "description": "Declares identity, capabilities, health, cost estimation, invocation and cancellation; implementation never grants acceptance.",
       "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/backend.go#L64-L71",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/backend.go",
+        "file_sha256": "fa029b7ad7fb5fa88e4d505fd439943364f3d5f2c6d9d5a83d85645c5bf2d76f",
+        "start_line": 64,
+        "end_line": 71,
+        "literal_tokens": [
+          "Invoke(context.Context, Request)",
+          "Cancel(string) bool"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "resources"
+      ]
     },
     {
       "id": "wingless:inference/backend.go::function::Classify@73",
@@ -3163,7 +3364,8 @@
           "Kind   string",
           "Schema json.RawMessage"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/constraint.go::method::OutputConstraint.Validate@15",
@@ -3195,7 +3397,8 @@
           "len(c.Schema) > 16384",
           "json.Unmarshal"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/constraint.go::function::ConstraintCapability@28",
@@ -3220,7 +3423,8 @@
           "if c == nil",
           "return \"output:\" + c.Kind"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::type::State@8",
@@ -3484,7 +3688,18 @@
       "description": "Creates a local lifecycle in STOPPED state without launching any backend.",
       "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L26-L26",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 26,
+        "end_line": 26,
+        "literal_tokens": [
+          "state: Stopped"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::method::Lifecycle.State@27",
@@ -3499,7 +3714,18 @@
       "description": "Returns the current in-memory lifecycle state under the mutex.",
       "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L27-L27",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 27,
+        "end_line": 27,
+        "literal_tokens": [
+          "return l.state"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/lifecycle.go::method::Lifecycle.Move@28",
@@ -3516,7 +3742,19 @@
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/lifecycle.go#L28-L39",
       "syntax_calls": [
         "fmt.Errorf"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/lifecycle.go",
+        "file_sha256": "1d434925aeefce8e852c0cc883d4da8b528a90c4188658fa92f1ab574ab655ac",
+        "start_line": 28,
+        "end_line": 39,
+        "literal_tokens": [
+          "allowed := map[State][]State",
+          "invalid lifecycle transition"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/mock.go::type::Mock@11",
@@ -3541,7 +3779,8 @@
           "Reply     string",
           "active    map[string]context.CancelFunc"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.ID@24",
@@ -3566,7 +3805,8 @@
         "literal_tokens": [
           "return m.Name"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.Capabilities@25",
@@ -3593,7 +3833,8 @@
         "literal_tokens": [
           "append([]string(nil), m.Features...)"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.Health@26",
@@ -3622,7 +3863,8 @@
           "ctx.Err()",
           "m.Unhealthy"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.EstimateCost@35",
@@ -3650,7 +3892,8 @@
           "len(r.Context)",
           "r.MaxOutputTokens"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.Cancel@36",
@@ -3678,7 +3921,8 @@
           "m.active[id]",
           "return ok"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.Invoke@45",
@@ -3720,7 +3964,8 @@
           "duplicate active request",
           "r.MaxOutputTokens*4"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/openai_compatible.go::type::LocalHTTP@19",
@@ -3745,7 +3990,8 @@
           "endpoint string",
           "*http.Client"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/openai_compatible.go::function::NewLocalHTTP@30",
@@ -3779,7 +4025,8 @@
           "!ip.IsLoopback()",
           "CheckRedirect"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.ID@42",
@@ -3804,7 +4051,8 @@
         "literal_tokens": [
           "return b.name"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.Capabilities@43",
@@ -3831,7 +4079,8 @@
         "literal_tokens": [
           "append([]string(nil), b.features...)"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.EstimateCost@44",
@@ -3859,7 +4108,8 @@
           "len(r.Context)",
           "r.MaxOutputTokens"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.Health@47",
@@ -3896,7 +4146,8 @@
           "res.StatusCode != 200",
           "m.ID == b.model"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.Cancel@84",
@@ -3924,7 +4175,8 @@
           "b.active[id]",
           "return ok"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.Invoke@93",
@@ -3974,7 +4226,8 @@
           "b.readStream",
           "wire.Model != b.model"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/robustness_test.go::function::TestSSEFragmentationAndBounds@13",
@@ -4187,7 +4440,8 @@
           "NewLocalHTTP",
           "b.streaming = true"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/stream.go::method::LocalHTTP.Close@22",
@@ -4212,7 +4466,8 @@
         "literal_tokens": [
           "b.client.CloseIdleConnections()"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/stream.go::function::usageValid@23",
@@ -4237,7 +4492,8 @@
           "u.PromptTokens == nil",
           "u.OutputTokens <= max"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/stream.go::method::LocalHTTP.readStream@26",
@@ -4287,7 +4543,8 @@
           "unsupported stream choice/tool call",
           "truncated stream"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:inference/stream_test.go::function::TestStreamingValidation@13",
@@ -4638,6 +4895,22 @@
         "d.DisallowUnknownFields",
         "errors.New",
         "json.NewDecoder"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 76,
+        "end_line": 91,
+        "literal_tokens": [
+          "d.DisallowUnknownFields()",
+          "exactly one replay envelope required"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
       ]
     },
     {
@@ -4656,6 +4929,22 @@
         "errors.New",
         "fmt.Sprintf",
         "safeID.MatchString"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 93,
+        "end_line": 98,
+        "literal_tokens": [
+          "safeID.MatchString(workOrderID)",
+          "%s-wingless-%d"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
       ]
     },
     {
@@ -4679,6 +4968,22 @@
         "safeID.MatchString",
         "sha40.MatchString",
         "strings.TrimSpace"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 103,
+        "end_line": 156,
+        "literal_tokens": [
+          "e.Workspace.BaselineSHA != e.Order.BaselineSHA",
+          "MaxRepairs:      0"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
       ]
     },
     {
@@ -4789,6 +5094,22 @@
         "fmt.Errorf",
         "len",
         "safeID.MatchString"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/adapter.go",
+        "file_sha256": "4a46aee8dd93672ec007019638b90a05a00f020ad67e6575573594b194f2dd40",
+        "start_line": 191,
+        "end_line": 216,
+        "literal_tokens": [
+          "Acceptance: \"external_required\"",
+          "out.Acceptance != \"external_required\""
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference",
+        "resources"
       ]
     },
     {
@@ -5653,7 +5974,8 @@
           "MinRAMBytes",
           "MaxCPUPercent"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::TransportPolicy@40",
@@ -5679,7 +6001,8 @@
           "AllowedBackends",
           "MaxContextBytes"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::TransportRequest@51",
@@ -5705,7 +6028,8 @@
           "ForbiddenActions",
           "Deadline"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::EditOperation@70",
@@ -5730,7 +6054,8 @@
           "ExpectedBeforeSHA256",
           "Content"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::EditEnvelope@77",
@@ -5755,7 +6080,8 @@
           "WorkOrderDigest",
           "Operations"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::CandidateEnvelope@88",
@@ -5780,7 +6106,8 @@
           "Acceptance",
           "Edits"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::interface::Intelligence@106",
@@ -5804,7 +6131,8 @@
         "literal_tokens": [
           "Run(context.Context, TransportRequest)"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::Listener@110",
@@ -5829,7 +6157,8 @@
           "session string",
           "engine  Intelligence"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::NewListener@115",
@@ -5857,7 +6186,8 @@
           "!validSession(session)",
           "engine == nil"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::validSession@125",
@@ -5884,7 +6214,8 @@
           "len(session) != 64",
           "r < 'a' || r > 'f'"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::method::Listener.Handler@137",
@@ -5911,7 +6242,8 @@
         "literal_tokens": [
           "http.HandlerFunc(l.ServeHTTP)"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::method::Listener.ServeHTTP@141",
@@ -5959,7 +6291,8 @@
           "l.engine.Run(ctx, req)",
           "validateCandidateEnvelope"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::writeListenerError@218",
@@ -6021,7 +6354,8 @@
           "d.DisallowUnknownFields()",
           "trailing JSON"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::validateTransportRequest@241",
@@ -6058,7 +6392,8 @@
           "req.SourceCommit != FrozenPlaneSourceCommit",
           "p.AllowedBackends"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::validateCandidateEnvelope@276",
@@ -6089,7 +6424,8 @@
           "validateEditEnvelope(*c.Edits, req)",
           "candidate identity mismatch"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::validateEditEnvelope@313",
@@ -6122,7 +6458,8 @@
           "case \"write_text\"",
           "maxEditAggregateBytes"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::rejectDuplicateJSONKeys@350",
@@ -6156,7 +6493,8 @@
           "d.More()",
           "trailing JSON"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/listener_contract.go::const::AcceptedPlaneTransportCommit@6",
@@ -7735,7 +8073,8 @@
           "Endpoint string",
           "PID      int"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/service.go::function::ServeLoopbackService@27",
@@ -7784,7 +8123,8 @@
           "NewListener(session, engine)",
           "server.Shutdown"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:integration/ckbplane/service_test.go::type::serviceEngineFunc@21",
@@ -8827,7 +9167,11 @@
           "ModelSHA256",
           "RuntimeSeconds"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::type::Evidence@48",
@@ -8853,7 +9197,11 @@
           "ProcessError",
           "StderrTail"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::type::tail@62",
@@ -8878,7 +9226,11 @@
           "mu sync.Mutex",
           "b  []byte"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::tail.Write@67",
@@ -8907,7 +9259,11 @@
           "n >= 8192",
           "t.b[len(t.b)-8192:]"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::tail.text@81",
@@ -8935,7 +9291,11 @@
         "literal_tokens": [
           "strings.ToValidUTF8(string(t.b), \"?\")"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::type::Supervisor@87",
@@ -8960,7 +9320,11 @@
           "probe    *resources.ProcessProbe",
           "evidence Evidence"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::function::New@99",
@@ -8992,7 +9356,11 @@
           "!filepath.IsAbs(c.Executable)",
           "only pinned llama-server supported"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::function::pinned@118",
@@ -9033,7 +9401,11 @@
           "!st.Mode().IsRegular()",
           "file hash mismatch"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::Supervisor.Endpoint@145",
@@ -9061,7 +9433,11 @@
           "\"http://127.0.0.1:\"",
           "strconv.Itoa(s.cfg.Port)"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::Supervisor.Status@146",
@@ -9090,7 +9466,11 @@
           "s.out.text()",
           "s.err.text()"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::Supervisor.Start@176",
@@ -9157,7 +9537,11 @@
           "job.Attach(cmd.Process)",
           "backend.Health(ready)"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::Supervisor.Stop@346",
@@ -9188,7 +9572,11 @@
           "s.cancel()",
           "case <-ctx.Done()"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": [
+        "inference",
+        "resources"
+      ]
     },
     {
       "id": "wingless:modelhost/supervisor_test.go::type::unknown@13",
@@ -9365,7 +9753,8 @@
           "CPUPercent",
           "GPUError"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/governor.go::type::Policy@22",
@@ -9390,7 +9779,8 @@
           "MinRAM",
           "MaxCPU"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/governor.go::interface::Provider@28",
@@ -9414,7 +9804,8 @@
         "literal_tokens": [
           "Snapshot() (Metrics, error)"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/governor.go::function::Check@30",
@@ -9431,7 +9822,19 @@
       "syntax_calls": [
         "fmt.Errorf",
         "math.IsNaN"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/governor.go",
+        "file_sha256": "4f25bd3d71c99ec333b6fbd01a2a74b2ee2236800bc0ee169069a1eff23ccf6e",
+        "start_line": 30,
+        "end_line": 47,
+        "literal_tokens": [
+          "x.min > 0",
+          "math.IsNaN(p.MaxCPU)"
+        ]
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/governor_test.go::function::TestFloors@8",
@@ -9492,7 +9895,8 @@
           "previous *cpuTicks",
           "sync.Mutex"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/host.go::type::cpuTicks@14",
@@ -9516,7 +9920,8 @@
         "literal_tokens": [
           "idle, total uint64"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/host.go::method::Host.Snapshot@16",
@@ -9547,7 +9952,8 @@
           "t.total > h.previous.total",
           "inconsistent CPU counters"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/host_linux.go::function::hostSnapshot@13",
@@ -10326,7 +10732,8 @@
           "PID            int",
           "DiskWriteBytes"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/process.go::type::ProcessProbe@24",
@@ -10351,7 +10758,8 @@
           "identity string",
           "started  time.Time"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/process.go::function::NewProcessProbe@31",
@@ -10381,7 +10789,8 @@
           "sampleProcess(pid)",
           "time.Now()"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/process.go::method::ProcessProbe.Snapshot@41",
@@ -10412,7 +10821,8 @@
           "id != p.identity",
           "m.LifetimeMS = &ms"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:resources/process_linux.go::function::processIdentity@12",
@@ -10684,7 +11094,8 @@
           "Tool string",
           "Path string"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:toolboundary/tools.go::type::Policy@18",
@@ -10709,7 +11120,8 @@
           "AllowedTools",
           "MaxOutputBytes"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:toolboundary/tools.go::type::Observation@25",
@@ -10734,7 +11146,8 @@
           "Stdout",
           "ElapsedMS"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:toolboundary/tools.go::function::has@35",
@@ -10758,7 +11171,8 @@
         "literal_tokens": [
           "if v == x"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:toolboundary/tools.go::function::Execute@43",
@@ -10807,7 +11221,8 @@
           "os.OpenRoot(p.Workspace)",
           "io.LimitReader"
         ]
-      }
+      },
+      "file_level_local_package_dependencies": []
     },
     {
       "id": "wingless:toolboundary/tools_test.go::function::TestBoundary@11",
@@ -10948,6 +11363,21 @@
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/worker/service.go#L36-L39",
       "syntax_calls": [
         "append"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "worker/service.go",
+        "file_sha256": "30e6af13638a8bd072ed5c7d5b8b9218efbfe5e110ba579ad08264c7db5a90a0",
+        "start_line": 36,
+        "end_line": 39,
+        "literal_tokens": [
+          "p.AllowedBackends = append",
+          "jobs: map[string]*job{}"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
       ]
     },
     {
@@ -10995,6 +11425,21 @@
       "syntax_calls": [
         "fmt.Errorf",
         "len"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "worker/service.go",
+        "file_sha256": "30e6af13638a8bd072ed5c7d5b8b9218efbfe5e110ba579ad08264c7db5a90a0",
+        "start_line": 43,
+        "end_line": 56,
+        "literal_tokens": [
+          "if s.active",
+          "len(s.jobs) >= 256"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
       ]
     },
     {
@@ -11018,6 +11463,21 @@
         "len",
         "parent.Err",
         "r.Validate"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "worker/service.go",
+        "file_sha256": "30e6af13638a8bd072ed5c7d5b8b9218efbfe5e110ba579ad08264c7db5a90a0",
+        "start_line": 57,
+        "end_line": 95,
+        "literal_tokens": [
+          "s.runner.Run(ctx, r, s.policy)",
+          "duplicate request id"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
       ]
     },
     {
@@ -11035,6 +11495,20 @@
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/worker/service.go#L96-L104",
       "syntax_calls": [
         "fmt.Errorf"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "worker/service.go",
+        "file_sha256": "30e6af13638a8bd072ed5c7d5b8b9218efbfe5e110ba579ad08264c7db5a90a0",
+        "start_line": 96,
+        "end_line": 104,
+        "literal_tokens": [
+          "j.status, nil"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
       ]
     },
     {
@@ -11052,6 +11526,20 @@
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/worker/service.go#L105-L114",
       "syntax_calls": [
         "j.cancel"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "worker/service.go",
+        "file_sha256": "30e6af13638a8bd072ed5c7d5b8b9218efbfe5e110ba579ad08264c7db5a90a0",
+        "start_line": 105,
+        "end_line": 114,
+        "literal_tokens": [
+          "j.cancel()"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
       ]
     },
     {
@@ -11071,6 +11559,20 @@
         "fmt.Errorf",
         "json.Marshal",
         "json.Unmarshal"
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "worker/service.go",
+        "file_sha256": "30e6af13638a8bd072ed5c7d5b8b9218efbfe5e110ba579ad08264c7db5a90a0",
+        "start_line": 115,
+        "end_line": 129,
+        "literal_tokens": [
+          "json.Marshal(j.result)"
+        ]
+      },
+      "file_level_local_package_dependencies": [
+        "broker",
+        "inference"
       ]
     },
     {

@@ -77,3 +77,9 @@ Test descriptions explain existing assertions and negative cases; they are not e
 Untyped source-syntax call candidates remain separate from 9 confirmed typed reviewed edges; do not infer runtime reachability from syntax alone.
 
 NEXT: preserve source identity and validate exact-head Windows full regression, then independently review and separately authorize PR merge. Any later source change requires rebuilding/requalifying the source-bound index.
+
+UNIFORM SYMBOL-LEVEL PROVENANCE CLOSEOUT — 2026-10-18
+All 352/352 symbols now carry exact pinned source commit, source-file SHA-256, declaration line ranges, and literal within-declaration evidence tokens. The 27 historically source-reviewed descriptions were independently rechecked and brought into the same proof contract as the remaining 325.
+All 352 symbols now record their SOURCE-FILE's local Wingless import dependencies from the frozen ICE dependency index. A file-level import is not evidence of a direct function call or runtime transition.
+Original 9 source-reviewed typed call edges, 51 indexed package imports and 95 provisional syntax-call candidates retain their separate evidence classifications.
+No application behavior, scientific experiment, runtime controller, or other repository is modified by this documentation/provenance update.
