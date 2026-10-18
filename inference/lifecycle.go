@@ -37,3 +37,5 @@ func (l *Lifecycle) Move(next State) error {
 	}
 	return fmt.Errorf("invalid lifecycle transition %s -> %s", l.state, next)
 }
+
+// G25 PROBE: no behavior change; the canonical ICE source hash must reject this edit.
