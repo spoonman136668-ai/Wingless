@@ -6,6 +6,7 @@ on:
       - '.ice/architecture-map.json'
       - '.ice/manifest.json'
       - 'scripts/validate_code_atlas.py'
+      - 'scripts/test_code_atlas_tamper.py'
       - '.github/workflows/wingless-code-atlas.yml'
   workflow_dispatch:
 
@@ -50,6 +51,13 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'TYPE_RELATIONSHIP_EXTRACTION_FAILED' }
           python scripts/validate_code_atlas.py --root . --relationships "$env:RUNNER_TEMP\wingless-type-relationships.json"
           if ($LASTEXITCODE -ne 0) { throw 'SEMANTIC_ATLAS_VALIDATION_FAILED' }
+
+      - name: Tamper-resistance negative acceptance in disposable exact-head clone
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python scripts/test_code_atlas_tamper.py --root . --relationships "$env:RUNNER_TEMP\wingless-type-relationships.json" --scratch-parent "$env:RUNNER_TEMP"
+          if ($LASTEXITCODE -ne 0) { throw 'ATLAS_TAMPER_NEGATIVE_ACCEPTANCE_FAILED' }
 
       - name: Focused ICE regression
         shell: pwsh

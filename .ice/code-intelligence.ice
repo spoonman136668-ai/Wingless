@@ -83,3 +83,6 @@ All 352/352 symbols now carry exact pinned source commit, source-file SHA-256, d
 All 352 symbols now record their SOURCE-FILE's local Wingless import dependencies from the frozen ICE dependency index. A file-level import is not evidence of a direct function call or runtime transition.
 Original 9 source-reviewed typed call edges, 51 indexed package imports and 95 provisional syntax-call candidates retain their separate evidence classifications.
 No application behavior, scientific experiment, runtime controller, or other repository is modified by this documentation/provenance update.
+
+TAMPER-RESISTANCE NEGATIVE QUALIFICATION — 2026-10-18
+The qualified Windows workflow now runs a separate fail-closed negative suite in a disposable clone of the exact PR head. Eight synthetic attacks are required to be rejected: source-hash drift, forged review anchors, forged local dependency, forged test classification, changed symbol line span, changed offline viewer data, erased type-resolved call evidence, and stale canonical ICE source. Original checkout and source remain untouched. A source anchor supports provenance, not a machine proof of human-written behavioral semantics; independent reviewer approval remains a separate gate.
