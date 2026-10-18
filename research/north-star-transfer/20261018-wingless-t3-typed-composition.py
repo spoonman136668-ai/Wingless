@@ -40,7 +40,7 @@ def flatten(cases):
                 feature=(agreements[j%len(agreements)]/len(pairs))
                 score[j]+=0.03125*(feature-best/len(pairs)/2)
                 steps+=1
-    encoded=bytes(max(0,min(255,round(v*32)+128)) for v in score)
+    encoded=bytes(max(-127,min(127,round(v*32)))&255 for v in score)
     need(len(encoded)==12,"EXACT_SHARED_PRIOR_BYTES")
     return encoded,{"public_only_training_feature_updates":steps,
                     "cross_family_training_executed":False,
@@ -106,8 +106,8 @@ def selftest():
     prior,meta=flatten([
         (AFFINE,[(0,3),(1,5),(2,7)]),
         (NONCOMMUTING_PERM,[(0,1),(1,2),(2,0)])])
-    need(len(prior)==12 and meta["public_only_training_feature_updates"]==48,
-         "TRAINED_WEIGHT_SHAPE")
+    need(len(prior)==12 and meta["public_only_training_feature_updates"]==48
+         and any(signed(prior)), "SIGNED_TWO_COMPLEMENT_TRAINED_WEIGHT_SHAPE")
     for domain in (AFFINE,NONCOMMUTING_PERM):
         for op in candidates(domain):
             state=compose_state(start(domain),op,domain)
