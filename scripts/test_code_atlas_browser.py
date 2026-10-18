@@ -167,6 +167,9 @@ def main():
             with page.expect_popup() as popup_event:
                 source_link.click()
             popup = popup_event.value
+            # expect_popup fires before the initial blank page finishes navigating.
+            popup.wait_for_url(lambda url: url.split("#")[0] == href.split("#")[0],
+                               timeout=15000)
             popup.wait_for_load_state("domcontentloaded")
             require(popup.url.split("#")[0] == href.split("#")[0],
                     "SOURCE_POPUP_URL_MISMATCH: observed=" + popup.url)
