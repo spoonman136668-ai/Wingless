@@ -153,15 +153,18 @@ def generate(root, receipts_path=None):
             require(isinstance(token, str) and token.encode("utf-8") in old_decl,
                     "historical token outside declaration: " + repr(key))
         n = copy.deepcopy(oldnode)
-        if old_decl == new_decl:
+        # LF/CRLF checkout normalization is not a source-body edit.
+        old_canonical = old_decl.replace(b"\r\n", b"\n")
+        new_canonical = new_decl.replace(b"\r\n", b"\n")
+        if old_canonical == new_canonical:
             require(key not in receipt_by_key,
                     "review receipt for unchanged declaration is forbidden")
             reused += 1
             n["provenance_lineage"] = {
-                "mode": "exact-declaration-byte-reuse",
+                "mode": "canonical-LF-declaration-byte-reuse",
                 "prior_source_commit": previous,
-                "prior_declaration_sha256": sha(old_decl),
-                "current_declaration_sha256": sha(new_decl),
+                "prior_declaration_sha256": sha(old_canonical),
+                "current_declaration_sha256": sha(new_canonical),
             }
         else:
             receipt = receipt_by_key.get(key)
