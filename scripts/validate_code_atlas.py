@@ -85,6 +85,9 @@ def validate(root, relationship_file):
     reviewed = 0
     evidenced = 0
     dependency_bound = 0
+    test_contracts = 0
+    test_cases = 0
+    test_helpers = 0
     for symbol_id, node in actual.items():
         s = expected[symbol_id]
         for field in ("file", "kind", "name"):
@@ -128,11 +131,38 @@ def validate(root, relationship_file):
             require(sorted(dependency_proof) == expected_imports,
                     "local package dependency identity drift: " + symbol_id)
             dependency_bound += 1
+        contract = node.get("test_contract")
+        if s["file"].endswith("_test.go"):
+            require(basis == "source-reviewed" and proof is not None and isinstance(contract, dict),
+                    "unreviewed test contract or missing source proof: " + symbol_id)
+            classification = ("test_case" if s["kind"] == "function" and s["name"].startswith("Test")
+                              else "test_fixture_or_helper")
+            require(contract.get("classification") == classification,
+                    "incorrect test-case versus helper classification: " + symbol_id)
+            require(contract.get("test_file") == s["file"], "test file contract identity drift: " + symbol_id)
+            require(contract.get("source_anchor") in proof["literal_tokens"],
+                    "test contract witness not in reviewed source tokens: " + symbol_id)
+            require(isinstance(contract.get("interpretation"), str)
+                    and "do not prove untested environments" in contract["interpretation"],
+                    "test contract overstates authority: " + symbol_id)
+            test_contracts += 1
+            if classification == "test_case":
+                test_cases += 1
+            else:
+                test_helpers += 1
+        else:
+            require(contract is None, "non-test symbol has test assertion contract: " + symbol_id)
         if basis != "source-reviewed":
             require(proof is None, "unreviewed symbol must not carry behavioral proof: " + symbol_id)
             require("not a verified behavioral description" in node["description"], "unsupported behavioral inference")
     require(atlas["coverage"].get("source_dependency_bound_labels") == dependency_bound,
             "source dependency evidence count drift")
+    require(atlas["coverage"].get("source_evidenced_test_contracts") == test_contracts,
+            "test contract coverage drift")
+    require(atlas["coverage"].get("test_cases") == test_cases and
+            atlas["coverage"].get("test_fixtures_and_helpers") == test_helpers,
+            "test fixture/test case classification drift")
+    require(test_contracts == 116, "frozen test contract cohort not fully reviewed")
     require(atlas["coverage"]["source_reviewed_labels"] == reviewed, "reviewed count drift")
     require(atlas["coverage"].get("source_evidenced_new_labels") == evidenced,
             "new source-evidence count drift")
@@ -215,6 +245,9 @@ def validate(root, relationship_file):
         "source_reviewed_labels": reviewed,
         "new_source_evidenced_labels": evidenced,
         "dependency_index_bound_labels": dependency_bound,
+        "source_verified_test_contracts": test_contracts,
+        "test_cases": test_cases,
+        "test_fixtures_and_helpers": test_helpers,
         "typed_confirmed_reviewed_edges": confirmed,
         "typecheck_diagnostics": len(diagnostics),
     }

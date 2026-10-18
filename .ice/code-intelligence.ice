@@ -5,7 +5,7 @@ SOURCE_COMMIT: b87899b50d2c1558e26d74a1921623786fde1282
 SCHEMA: wingless.ice.semantic-code-atlas.v1
 EVIDENCE: .ice/code-intelligence.json (complete machine-readable 352-symbol index)
 AUTHORITY: Source code and qualified tests outrank these descriptions; never grant runtime or acceptance authority.
-COVERAGE: 352 symbols in 138 indexed source/configuration files; 236 inspected semantic labels; 116 explicitly provisional lexical labels.
+COVERAGE: 352 symbols in 138 indexed source/configuration files; 352 inspected semantic labels; 0 explicitly provisional lexical labels.
 RELATIONSHIPS: 9 inspected relationships, 51 local package imports, 95 unresolved syntax-only call candidates.
 
 HOW TO USE
@@ -67,3 +67,13 @@ Cumulative coverage: 236 / 352 source-reviewed; remaining 116 provisional declar
 Source-reviewed coverage now includes all currently indexed non-test declarations across benchmark fixtures/provenance, diagnostic CLIs, platform-specific resource sampling, Windows/non-Windows process containment, and the isolated transport proof executable.
 The 54 new source-bound entries also record source-derived file-level local imports, explicitly not treated as proof of direct runtime calls.
 Existing scientific execution, application source, and protected acceptance/research workflow authority remain unchanged. Existing 9 confirmed typed relationship edges and 95 unverified syntactic candidates remain separately labeled.
+
+SOURCE-REVIEWED TEST CONTRACT COMPLETION — 2026-10-18
+Test source declarations and fixtures reviewed: 116 (66 test functions, 50 fixtures/helpers).
+Cumulative descriptions reviewed: 352 of 352 on the frozen index; 0 provisional symbol labels.
+New test contracts cover bounded benchmark scoring, routing, transport and workspace identity checks, cancellation, exact model-boundary input validation, source-index anti-tampering, platform-specific host/process sampling, owned model lifecycle and read-only tool boundary.
+Every test record includes test-case versus fixture/helper classification and an immutable source-line witness; validation reopens the source file and matches exact proof tokens to the indexed declaration range.
+Test descriptions explain existing assertions and negative cases; they are not evidence of behavior outside the test's platforms, mocks or other observed preconditions.
+Untyped source-syntax call candidates remain separate from 9 confirmed typed reviewed edges; do not infer runtime reachability from syntax alone.
+
+NEXT: preserve source identity and validate exact-head Windows full regression, then independently review and separately authorize PR merge. Any later source change requires rebuilding/requalifying the source-bound index.
