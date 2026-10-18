@@ -18,6 +18,7 @@ ALLOWED_DIFF = {
     "scripts/validate_code_atlas.py",
     "scripts/test_code_atlas_tamper.py",
     "scripts/test_atlas_browser.py",
+    "scripts/atlas_ci_scope.py",
     ".github/workflows/wingless-code-atlas.yml",
 }
 
