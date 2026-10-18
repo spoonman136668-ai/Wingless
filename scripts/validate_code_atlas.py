@@ -17,6 +17,7 @@ ALLOWED_DIFF = {
     ".ice/architecture-map.json",
     "scripts/validate_code_atlas.py",
     "scripts/test_code_atlas_tamper.py",
+    "scripts/test_atlas_browser.py",
     ".github/workflows/wingless-code-atlas.yml",
 }
 
