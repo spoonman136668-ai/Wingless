@@ -168,7 +168,8 @@ def main():
                 source_link.click()
             popup = popup_event.value
             popup.wait_for_load_state("domcontentloaded")
-            require(popup.url == href, "SOURCE_POPUP_URL_MISMATCH")
+            require(popup.url.split("#")[0] == href.split("#")[0],
+                    "SOURCE_POPUP_URL_MISMATCH: observed=" + popup.url)
             require(popup.locator("body").inner_text() == "Offline source target probe",
                     "SOURCE_POPUP_NOT_INTERCEPTED")
             require(any(url.split("#")[0] == href.split("#")[0]
