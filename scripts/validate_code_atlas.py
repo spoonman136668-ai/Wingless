@@ -83,6 +83,7 @@ def validate(root, relationship_file):
     actual = {n["id"]: n for n in nodes}
     require(len(actual) == len(nodes) and actual.keys() == expected.keys(), "symbol identity drift")
     reviewed = 0
+    evidenced = 0
     for symbol_id, node in actual.items():
         s = expected[symbol_id]
         for field in ("file", "kind", "name"):
@@ -95,11 +96,32 @@ def validate(root, relationship_file):
         require("/blob/" + source_commit + "/" in node["source_url"], "source hyperlink not immutable")
         basis = node["evidence_basis"]
         require(basis in ("source-reviewed", "lexical-provisional"), "unknown label evidence")
+        proof = node.get("review_evidence")
         if basis == "source-reviewed":
             reviewed += 1
+            if proof is not None:
+                evidenced += 1
+                require(isinstance(proof, dict), "review proof not an object")
+                require(proof.get("source_commit") == source_commit, "review source commit drift: " + symbol_id)
+                require(proof.get("file") == s["file"], "review file identity drift: " + symbol_id)
+                require(proof.get("file_sha256") == indexed_files[s["file"]]["sha256"], "review source hash drift: " + symbol_id)
+                require(proof.get("start_line") == s["start"] and proof.get("end_line") == s["end"], "reviewed span drift: " + symbol_id)
+                tokens = proof.get("literal_tokens")
+                require(isinstance(tokens, list) and 1 <= len(tokens) <= 12, "inadequate review tokens: " + symbol_id)
+                lines = (root / s["file"]).read_text(encoding="utf-8").splitlines()
+                require(s["end"] <= len(lines), "source span outside file: " + symbol_id)
+                span = "\\n".join(lines[s["start"] - 1:s["end"]])
+                for token in tokens:
+                    require(isinstance(token, str) and len(token) >= 4 and token.strip() == token,
+                            "invalid source review token: " + symbol_id)
+                    require(token in span, "source evidence token mismatch: " + symbol_id + " " + repr(token))
         else:
+            require(proof is None, "unreviewed symbol must not carry behavioral proof: " + symbol_id)
             require("not a verified behavioral description" in node["description"], "unsupported behavioral inference")
     require(atlas["coverage"]["source_reviewed_labels"] == reviewed, "reviewed count drift")
+    require(atlas["coverage"].get("source_evidenced_new_labels") == evidenced,
+            "new source-evidence count drift")
+    require(reviewed - evidenced == 27, "legacy reviewed cohort unexpectedly changed")
     require(atlas["coverage"]["lexical_provisional_labels"] == len(nodes)-reviewed, "provisional count drift")
 
     ids = set(actual)
@@ -176,6 +198,7 @@ def validate(root, relationship_file):
         "source_files": len(architecture),
         "symbols": len(nodes),
         "source_reviewed_labels": reviewed,
+        "new_source_evidenced_labels": evidenced,
         "typed_confirmed_reviewed_edges": confirmed,
         "typecheck_diagnostics": len(diagnostics),
     }

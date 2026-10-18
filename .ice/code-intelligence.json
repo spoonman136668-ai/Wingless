@@ -11,18 +11,20 @@
   "coverage": {
     "source_files": 138,
     "symbols": 352,
-    "source_reviewed_labels": 27,
-    "lexical_provisional_labels": 325,
+    "source_reviewed_labels": 104,
+    "lexical_provisional_labels": 248,
     "source_reviewed_relationships": 9,
     "local_package_imports": 51,
-    "syntactic_call_candidates": 95
+    "syntactic_call_candidates": 95,
+    "source_evidenced_new_labels": 77
   },
   "methodology": {
     "all_symbols": "Go symbol declarations already indexed by Wingless ICE",
     "source_reviewed": "Curated against exact source files and recorded SHA256 identities",
     "lexical_provisional": "Name-only; not verified behavior",
     "syntactic_call_candidates": "Parser syntax; no dynamic dispatch, type resolution, or runtime control flow guarantees",
-    "source_state": "Only source identities from pinned commit; no runtime, broker, research, or acceptance effect"
+    "source_state": "Only source identities from pinned commit; no runtime, broker, research, or acceptance effect",
+    "review_evidence": "New source-reviewed labels each carry exact file SHA-256, pinned commit, definition-line range and body/field tokens checked against the frozen source. Tokens verify factual source basis; they are not runtime execution evidence."
   },
   "nodes": [
     {
@@ -351,11 +353,22 @@
       "name": "Fixture",
       "start_line": 12,
       "end_line": 16,
-      "label": "Type: Fixture",
-      "description": "Declared type in benchmark/replay.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Exact-output synthetic benchmark case",
+      "description": "Pairs stable fixture ID and prompt with exact expected output.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/benchmark/replay.go#L12-L16",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "benchmark/replay.go",
+        "file_sha256": "08352ecf0fe83817f3bc6214093428704e530da30b067e9ac7a62dc76acc09d7",
+        "start_line": 12,
+        "end_line": 16,
+        "literal_tokens": [
+          "Expected string",
+          "Prompt   string"
+        ]
+      }
     },
     {
       "id": "wingless:benchmark/replay.go::type::Row@17",
@@ -365,11 +378,22 @@
       "name": "Row",
       "start_line": 17,
       "end_line": 23,
-      "label": "Type: Row",
-      "description": "Declared type in benchmark/replay.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Measured synthetic replay result row",
+      "description": "Records configuration, fixture correctness, wall time and the broker candidate outcome.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/benchmark/replay.go#L17-L23",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "benchmark/replay.go",
+        "file_sha256": "08352ecf0fe83817f3bc6214093428704e530da30b067e9ac7a62dc76acc09d7",
+        "start_line": 17,
+        "end_line": 23,
+        "literal_tokens": [
+          "Correct       bool",
+          "Outcome       broker.Outcome"
+        ]
+      }
     },
     {
       "id": "wingless:benchmark/replay.go::type::exact@24",
@@ -394,14 +418,25 @@
       "receiver": "exact",
       "start_line": 26,
       "end_line": 31,
-      "label": "Method: exact Verify",
-      "description": "Declared method in benchmark/replay.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Check exact match to fixture expected text",
+      "description": "Returns an error if candidate text differs from expected fixture value.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/benchmark/replay.go#L26-L31",
       "syntax_calls": [
         "fmt.Errorf",
         "string"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "benchmark/replay.go",
+        "file_sha256": "08352ecf0fe83817f3bc6214093428704e530da30b067e9ac7a62dc76acc09d7",
+        "start_line": 26,
+        "end_line": 31,
+        "literal_tokens": [
+          "r.Text != string(e)",
+          "fixture output mismatch"
+        ]
+      }
     },
     {
       "id": "wingless:benchmark/replay.go::function::Replay@32",
@@ -411,9 +446,9 @@
       "name": "Replay",
       "start_line": 32,
       "end_line": 59,
-      "label": "Function: Replay",
-      "description": "Declared function in benchmark/replay.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Replay bounded fixture configurations against exact verifier",
+      "description": "Selects supported B/C/D test policies, rejects unsupported configuration/explicit override and records per-fixture results from Runner.Run.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/benchmark/replay.go#L32-L59",
       "syntax_calls": [
         "append",
@@ -423,7 +458,20 @@
         "r.Run",
         "time.Now",
         "time.Since"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "benchmark/replay.go",
+        "file_sha256": "08352ecf0fe83817f3bc6214093428704e530da30b067e9ac7a62dc76acc09d7",
+        "start_line": 32,
+        "end_line": 59,
+        "literal_tokens": [
+          "case \"B\"",
+          "case \"C\"",
+          "case \"D\"",
+          "r.Run(ctx, req, p)"
+        ]
+      }
     },
     {
       "id": "wingless:benchmark/replay_test.go::type::metrics@11",
@@ -1493,11 +1541,22 @@
       "name": "Relationship",
       "start_line": 17,
       "end_line": 23,
-      "label": "Type: Relationship",
-      "description": "Declared type in ice/relationships.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Resolved relationship location record",
+      "description": "Carries edge kind, endpoints, callsite file and line for Go type-derived observations.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/relationships.go#L17-L23",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/relationships.go",
+        "file_sha256": "d8e3c7b86d403b4e14f100108554e458646b66bd9ae014055712250f50c29d99",
+        "start_line": 17,
+        "end_line": 23,
+        "literal_tokens": [
+          "Kind string",
+          "Line int"
+        ]
+      }
     },
     {
       "id": "wingless:ice/relationships.go::type::TypeReport@24",
@@ -1507,11 +1566,22 @@
       "name": "TypeReport",
       "start_line": 24,
       "end_line": 30,
-      "label": "Type: Type Report",
-      "description": "Declared type in ice/relationships.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Platform-specific Go type resolution report",
+      "description": "Records operating system/architecture, resolved edges, diagnostics and advisory provenance.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/relationships.go#L24-L30",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/relationships.go",
+        "file_sha256": "d8e3c7b86d403b4e14f100108554e458646b66bd9ae014055712250f50c29d99",
+        "start_line": 24,
+        "end_line": 30,
+        "literal_tokens": [
+          "GOARCH",
+          "Diagnostics"
+        ]
+      }
     },
     {
       "id": "wingless:ice/relationships.go::type::typeLoader@31",
@@ -1521,11 +1591,23 @@
       "name": "typeLoader",
       "start_line": 31,
       "end_line": 39,
-      "label": "Type: type Loader",
-      "description": "Declared type in ice/relationships.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Recursive typed package import cache",
+      "description": "Holds parsed packages, busy import-cycle tracking, Go type importer and relationship results.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/relationships.go#L31-L39",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/relationships.go",
+        "file_sha256": "d8e3c7b86d403b4e14f100108554e458646b66bd9ae014055712250f50c29d99",
+        "start_line": 31,
+        "end_line": 39,
+        "literal_tokens": [
+          "groups   map[string][]*ast.File",
+          "packages map[string]*types.Package",
+          "report   TypeReport"
+        ]
+      }
     },
     {
       "id": "wingless:ice/relationships.go::method::typeLoader.Import@41",
@@ -1536,9 +1618,9 @@
       "receiver": "typeLoader",
       "start_line": 41,
       "end_line": 114,
-      "label": "Method: type Loader Import",
-      "description": "Declared method in ice/relationships.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Type-check packages and collect direct type-resolved calls",
+      "description": "Caches packages, detects import cycles, records typed function call targets and same-package interface implementations.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/relationships.go#L41-L114",
       "syntax_calls": [
         "append",
@@ -1557,7 +1639,20 @@
         "target.FullName",
         "types.Implements",
         "types.NewPointer"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/relationships.go",
+        "file_sha256": "d8e3c7b86d403b4e14f100108554e458646b66bd9ae014055712250f50c29d99",
+        "start_line": 41,
+        "end_line": 114,
+        "literal_tokens": [
+          "l.busy[path]",
+          "cfg.Check",
+          "info.Uses[id]",
+          "types.Implements"
+        ]
+      }
     },
     {
       "id": "wingless:ice/relationships.go::function::Relationships@118",
@@ -1567,9 +1662,9 @@
       "name": "Relationships",
       "start_line": 118,
       "end_line": 169,
-      "label": "Function: Relationships",
-      "description": "Declared function in ice/relationships.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Produce advisory platform-bound Go relationship analysis",
+      "description": "Validates ICE and filters active non-test Go source, type-checks local packages, records partial coverage diagnostics and never claims runtime call reachability.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/ice/relationships.go#L118-L169",
       "syntax_calls": [
         "Load",
@@ -1588,7 +1683,20 @@
         "sort.Strings",
         "strings.HasSuffix",
         "token.NewFileSet"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "ice/relationships.go",
+        "file_sha256": "d8e3c7b86d403b4e14f100108554e458646b66bd9ae014055712250f50c29d99",
+        "start_line": 118,
+        "end_line": 169,
+        "literal_tokens": [
+          "Validate(root)",
+          "build.Default.MatchFile",
+          "l.report.Diagnostics",
+          "sort.Slice"
+        ]
+      }
     },
     {
       "id": "wingless:ice/relationships_test.go::function::TestTypeResolvedRelationships@9",
@@ -1870,11 +1978,22 @@
       "name": "OutputConstraint",
       "start_line": 10,
       "end_line": 13,
-      "label": "Type: Output Constraint",
-      "description": "Declared type in inference/constraint.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Optional output schema descriptor",
+      "description": "Holds the requested constraint kind and optional JSON schema; adapters do not automatically support it.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/constraint.go#L10-L13",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/constraint.go",
+        "file_sha256": "dc9c8074eeffea4803911b12b1164760ceb6862f57c7ad8f6f75d48eb65ce12a",
+        "start_line": 10,
+        "end_line": 13,
+        "literal_tokens": [
+          "Kind   string",
+          "Schema json.RawMessage"
+        ]
+      }
     },
     {
       "id": "wingless:inference/constraint.go::method::OutputConstraint.Validate@15",
@@ -1885,16 +2004,28 @@
       "receiver": "OutputConstraint",
       "start_line": 15,
       "end_line": 27,
-      "label": "Method: Output Constraint Validate",
-      "description": "Declared method in inference/constraint.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Validate bounded JSON schema configuration",
+      "description": "Nil is allowed; a nonnil constraint must be json_schema with a nonempty, valid JSON-object schema at most 16 KiB.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/constraint.go#L15-L27",
       "syntax_calls": [
         "fmt.Errorf",
         "json.Unmarshal",
         "json.Valid",
         "len"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/constraint.go",
+        "file_sha256": "dc9c8074eeffea4803911b12b1164760ceb6862f57c7ad8f6f75d48eb65ce12a",
+        "start_line": 15,
+        "end_line": 27,
+        "literal_tokens": [
+          "c.Kind != \"json_schema\"",
+          "len(c.Schema) > 16384",
+          "json.Unmarshal"
+        ]
+      }
     },
     {
       "id": "wingless:inference/constraint.go::function::ConstraintCapability@28",
@@ -1904,11 +2035,22 @@
       "name": "ConstraintCapability",
       "start_line": 28,
       "end_line": 33,
-      "label": "Function: Constraint Capability",
-      "description": "Declared function in inference/constraint.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Identify a required output-constraint capability",
+      "description": "Returns an empty capability when absent, or output:kind for a configured constraint.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/constraint.go#L28-L33",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/constraint.go",
+        "file_sha256": "dc9c8074eeffea4803911b12b1164760ceb6862f57c7ad8f6f75d48eb65ce12a",
+        "start_line": 28,
+        "end_line": 33,
+        "literal_tokens": [
+          "if c == nil",
+          "return \"output:\" + c.Kind"
+        ]
+      }
     },
     {
       "id": "wingless:inference/lifecycle.go::type::State@8",
@@ -2104,11 +2246,22 @@
       "name": "Mock",
       "start_line": 11,
       "end_line": 20,
-      "label": "Type: Mock",
-      "description": "Declared type in inference/mock.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Configure deterministic fixture inference",
+      "description": "Holds fixed mock response, health/failure/delay settings, capabilities and a synchronized map of active cancellations.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/mock.go#L11-L20",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/mock.go",
+        "file_sha256": "f25189d8b927bd054c9c4b14552eb4364b8ddca528d495ca8a2f45ff9492acd9",
+        "start_line": 11,
+        "end_line": 20,
+        "literal_tokens": [
+          "Reply     string",
+          "active    map[string]context.CancelFunc"
+        ]
+      }
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.ID@24",
@@ -2119,11 +2272,21 @@
       "receiver": "Mock",
       "start_line": 24,
       "end_line": 24,
-      "label": "Method: Mock ID",
-      "description": "Declared method in inference/mock.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Read mock backend name",
+      "description": "Returns the mock fixture name.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/mock.go#L24-L24",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/mock.go",
+        "file_sha256": "f25189d8b927bd054c9c4b14552eb4364b8ddca528d495ca8a2f45ff9492acd9",
+        "start_line": 24,
+        "end_line": 24,
+        "literal_tokens": [
+          "return m.Name"
+        ]
+      }
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.Capabilities@25",
@@ -2134,13 +2297,23 @@
       "receiver": "Mock",
       "start_line": 25,
       "end_line": 25,
-      "label": "Method: Mock Capabilities",
-      "description": "Declared method in inference/mock.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Copy mock capability names",
+      "description": "Returns a defensive copy of the configured capabilities.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/mock.go#L25-L25",
       "syntax_calls": [
         "append"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/mock.go",
+        "file_sha256": "f25189d8b927bd054c9c4b14552eb4364b8ddca528d495ca8a2f45ff9492acd9",
+        "start_line": 25,
+        "end_line": 25,
+        "literal_tokens": [
+          "append([]string(nil), m.Features...)"
+        ]
+      }
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.Health@26",
@@ -2151,14 +2324,25 @@
       "receiver": "Mock",
       "start_line": 26,
       "end_line": 34,
-      "label": "Method: Mock Health",
-      "description": "Declared method in inference/mock.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Check cancellation and mock availability",
+      "description": "Propagates canceled contexts and rejects explicitly unhealthy mock backends.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/mock.go#L26-L34",
       "syntax_calls": [
         "ctx.Err",
         "fmt.Errorf"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/mock.go",
+        "file_sha256": "f25189d8b927bd054c9c4b14552eb4364b8ddca528d495ca8a2f45ff9492acd9",
+        "start_line": 26,
+        "end_line": 34,
+        "literal_tokens": [
+          "ctx.Err()",
+          "m.Unhealthy"
+        ]
+      }
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.EstimateCost@35",
@@ -2169,13 +2353,24 @@
       "receiver": "Mock",
       "start_line": 35,
       "end_line": 35,
-      "label": "Method: Mock Estimate Cost",
-      "description": "Declared method in inference/mock.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Estimate mock token envelope",
+      "description": "Reports context bytes and requested maximum output tokens as an estimate.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/mock.go#L35-L35",
       "syntax_calls": [
         "len"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/mock.go",
+        "file_sha256": "f25189d8b927bd054c9c4b14552eb4364b8ddca528d495ca8a2f45ff9492acd9",
+        "start_line": 35,
+        "end_line": 35,
+        "literal_tokens": [
+          "len(r.Context)",
+          "r.MaxOutputTokens"
+        ]
+      }
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.Cancel@36",
@@ -2186,13 +2381,24 @@
       "receiver": "Mock",
       "start_line": 36,
       "end_line": 44,
-      "label": "Method: Mock Cancel",
-      "description": "Declared method in inference/mock.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Cancel an active mock inference by ID",
+      "description": "Looks up an active cancellation callback under lock and invokes it when found.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/mock.go#L36-L44",
       "syntax_calls": [
         "c"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/mock.go",
+        "file_sha256": "f25189d8b927bd054c9c4b14552eb4364b8ddca528d495ca8a2f45ff9492acd9",
+        "start_line": 36,
+        "end_line": 44,
+        "literal_tokens": [
+          "m.active[id]",
+          "c()"
+        ]
+      }
     },
     {
       "id": "wingless:inference/mock.go::method::Mock.Invoke@45",
@@ -2203,9 +2409,9 @@
       "receiver": "Mock",
       "start_line": 45,
       "end_line": 103,
-      "label": "Method: Mock Invoke",
-      "description": "Declared method in inference/mock.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Generate a bounded synthetic inference candidate",
+      "description": "Checks request/deadline/health, rejects output constraints and duplicate IDs, honors cancel/delay/failure, and caps fixture output size.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/mock.go#L45-L103",
       "syntax_calls": [
         "Classify",
@@ -2222,7 +2428,19 @@
         "time.Now",
         "time.Since",
         "timer.Stop"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/mock.go",
+        "file_sha256": "f25189d8b927bd054c9c4b14552eb4364b8ddca528d495ca8a2f45ff9492acd9",
+        "start_line": 45,
+        "end_line": 103,
+        "literal_tokens": [
+          "r.Validate()",
+          "duplicate active request",
+          "r.MaxOutputTokens*4"
+        ]
+      }
     },
     {
       "id": "wingless:inference/openai_compatible.go::type::LocalHTTP@19",
@@ -2232,11 +2450,22 @@
       "name": "LocalHTTP",
       "start_line": 19,
       "end_line": 26,
-      "label": "Type: Local HTTP",
-      "description": "Declared type in inference/openai_compatible.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Local numeric-loopback inference client state",
+      "description": "Stores model identity, local endpoint, features, HTTP client, and synchronized per-request cancellation.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/openai_compatible.go#L19-L26",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/openai_compatible.go",
+        "file_sha256": "bc8a7972302d6626187c3ef812f50b7ff01e9c8fc1971fffa36ce0366a4394ee",
+        "start_line": 19,
+        "end_line": 26,
+        "literal_tokens": [
+          "endpoint string",
+          "*http.Client"
+        ]
+      }
     },
     {
       "id": "wingless:inference/openai_compatible.go::function::NewLocalHTTP@30",
@@ -2246,9 +2475,9 @@
       "name": "NewLocalHTTP",
       "start_line": 30,
       "end_line": 41,
-      "label": "Function: New Local HTTP",
-      "description": "Declared function in inference/openai_compatible.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Configure proxy-free numeric-loopback HTTP inference",
+      "description": "Requires numeric loopback HTTP origin, rejects credentialed/query URLs, and configures explicit timeouts with no proxy or redirects.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/openai_compatible.go#L30-L41",
       "syntax_calls": [
         "append",
@@ -2258,7 +2487,19 @@
         "strings.TrimRight",
         "u.Hostname",
         "url.Parse"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/openai_compatible.go",
+        "file_sha256": "bc8a7972302d6626187c3ef812f50b7ff01e9c8fc1971fffa36ce0366a4394ee",
+        "start_line": 30,
+        "end_line": 41,
+        "literal_tokens": [
+          "net.ParseIP(u.Hostname())",
+          "!ip.IsLoopback()",
+          "CheckRedirect"
+        ]
+      }
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.ID@42",
@@ -2269,11 +2510,21 @@
       "receiver": "LocalHTTP",
       "start_line": 42,
       "end_line": 42,
-      "label": "Method: Local HTTP ID",
-      "description": "Declared method in inference/openai_compatible.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Read local backend name",
+      "description": "Returns the configured local HTTP backend ID.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/openai_compatible.go#L42-L42",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/openai_compatible.go",
+        "file_sha256": "bc8a7972302d6626187c3ef812f50b7ff01e9c8fc1971fffa36ce0366a4394ee",
+        "start_line": 42,
+        "end_line": 42,
+        "literal_tokens": [
+          "return b.name"
+        ]
+      }
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.Capabilities@43",
@@ -2284,13 +2535,23 @@
       "receiver": "LocalHTTP",
       "start_line": 43,
       "end_line": 43,
-      "label": "Method: Local HTTP Capabilities",
-      "description": "Declared method in inference/openai_compatible.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Copy declared local model capabilities",
+      "description": "Returns a defensive copy of configured capabilities.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/openai_compatible.go#L43-L43",
       "syntax_calls": [
         "append"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/openai_compatible.go",
+        "file_sha256": "bc8a7972302d6626187c3ef812f50b7ff01e9c8fc1971fffa36ce0366a4394ee",
+        "start_line": 43,
+        "end_line": 43,
+        "literal_tokens": [
+          "append([]string(nil), b.features...)"
+        ]
+      }
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.EstimateCost@44",
@@ -2301,13 +2562,24 @@
       "receiver": "LocalHTTP",
       "start_line": 44,
       "end_line": 46,
-      "label": "Method: Local HTTP Estimate Cost",
-      "description": "Declared method in inference/openai_compatible.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Estimate local inference request envelope",
+      "description": "Uses the context byte count and maximum requested output tokens.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/openai_compatible.go#L44-L46",
       "syntax_calls": [
         "len"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/openai_compatible.go",
+        "file_sha256": "bc8a7972302d6626187c3ef812f50b7ff01e9c8fc1971fffa36ce0366a4394ee",
+        "start_line": 44,
+        "end_line": 46,
+        "literal_tokens": [
+          "len(r.Context)",
+          "r.MaxOutputTokens"
+        ]
+      }
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.Health@47",
@@ -2318,9 +2590,9 @@
       "receiver": "LocalHTTP",
       "start_line": 47,
       "end_line": 83,
-      "label": "Method: Local HTTP Health",
-      "description": "Declared method in inference/openai_compatible.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Verify locally served model identity",
+      "description": "Queries /v1/models with a three-second deadline, bounded UTF-8 JSON and HTTP 200; requires an exact configured model ID.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/openai_compatible.go#L47-L83",
       "syntax_calls": [
         "c",
@@ -2332,7 +2604,19 @@
         "json.Unmarshal",
         "len",
         "utf8.Valid"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/openai_compatible.go",
+        "file_sha256": "bc8a7972302d6626187c3ef812f50b7ff01e9c8fc1971fffa36ce0366a4394ee",
+        "start_line": 47,
+        "end_line": 83,
+        "literal_tokens": [
+          "\"/v1/models\"",
+          "res.StatusCode != 200",
+          "m.ID == b.model"
+        ]
+      }
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.Cancel@84",
@@ -2343,13 +2627,24 @@
       "receiver": "LocalHTTP",
       "start_line": 84,
       "end_line": 92,
-      "label": "Method: Local HTTP Cancel",
-      "description": "Declared method in inference/openai_compatible.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Cancel tracked HTTP inference by request ID",
+      "description": "Invokes a synchronized stored context cancellation function if request is still active.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/openai_compatible.go#L84-L92",
       "syntax_calls": [
         "c"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/openai_compatible.go",
+        "file_sha256": "bc8a7972302d6626187c3ef812f50b7ff01e9c8fc1971fffa36ce0366a4394ee",
+        "start_line": 84,
+        "end_line": 92,
+        "literal_tokens": [
+          "b.active[id]",
+          "c()"
+        ]
+      }
     },
     {
       "id": "wingless:inference/openai_compatible.go::method::LocalHTTP.Invoke@93",
@@ -2360,9 +2655,9 @@
       "receiver": "LocalHTTP",
       "start_line": 93,
       "end_line": 221,
-      "label": "Method: Local HTTP Invoke",
-      "description": "Declared method in inference/openai_compatible.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Invoke and validate local bounded chat generation",
+      "description": "Validates input, deadline, request identity, HTTP status, output size/UTF-8, token usage and exact model; streams via readStream when configured.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/openai_compatible.go#L93-L221",
       "syntax_calls": [
         "Classify",
@@ -2386,7 +2681,20 @@
         "time.Now",
         "time.Since",
         "utf8.Valid"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/openai_compatible.go",
+        "file_sha256": "bc8a7972302d6626187c3ef812f50b7ff01e9c8fc1971fffa36ce0366a4394ee",
+        "start_line": 93,
+        "end_line": 221,
+        "literal_tokens": [
+          "r.Validate()",
+          "\"/v1/chat/completions\"",
+          "b.readStream",
+          "wire.Model != b.model"
+        ]
+      }
     },
     {
       "id": "wingless:inference/robustness_test.go::function::TestSSEFragmentationAndBounds@13",
@@ -2497,13 +2805,24 @@
       "name": "NewStreamingLocalHTTP",
       "start_line": 15,
       "end_line": 21,
-      "label": "Function: New Streaming Local HTTP",
-      "description": "Declared function in inference/stream.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Create stream-enabled local inference client",
+      "description": "Reuses numeric-loopback validation and enables streaming only on successful construction.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/stream.go#L15-L21",
       "syntax_calls": [
         "NewLocalHTTP"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/stream.go",
+        "file_sha256": "40a548275a1ce815cd917430f5ef6a196168103b26cefe4a765d2a4c247a2cf5",
+        "start_line": 15,
+        "end_line": 21,
+        "literal_tokens": [
+          "NewLocalHTTP",
+          "b.streaming = true"
+        ]
+      }
     },
     {
       "id": "wingless:inference/stream.go::method::LocalHTTP.Close@22",
@@ -2514,11 +2833,21 @@
       "receiver": "LocalHTTP",
       "start_line": 22,
       "end_line": 22,
-      "label": "Method: Local HTTP Close",
-      "description": "Declared method in inference/stream.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Close idle HTTP transport connections",
+      "description": "Releases idle transport connections without generating requests.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/stream.go#L22-L22",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/stream.go",
+        "file_sha256": "40a548275a1ce815cd917430f5ef6a196168103b26cefe4a765d2a4c247a2cf5",
+        "start_line": 22,
+        "end_line": 22,
+        "literal_tokens": [
+          "b.client.CloseIdleConnections()"
+        ]
+      }
     },
     {
       "id": "wingless:inference/stream.go::function::usageValid@23",
@@ -2528,11 +2857,22 @@
       "name": "usageValid",
       "start_line": 23,
       "end_line": 25,
-      "label": "Function: usage Valid",
-      "description": "Declared function in inference/stream.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Check stream token accounting bounds",
+      "description": "Requires optional token counts to be nonnegative and output count to fit the request limit.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/stream.go#L23-L25",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/stream.go",
+        "file_sha256": "40a548275a1ce815cd917430f5ef6a196168103b26cefe4a765d2a4c247a2cf5",
+        "start_line": 23,
+        "end_line": 25,
+        "literal_tokens": [
+          "u.PromptTokens == nil",
+          "u.OutputTokens <= max"
+        ]
+      }
     },
     {
       "id": "wingless:inference/stream.go::method::LocalHTTP.readStream@26",
@@ -2543,9 +2883,9 @@
       "receiver": "LocalHTTP",
       "start_line": 26,
       "end_line": 156,
-      "label": "Method: Local HTTP read Stream",
-      "description": "Declared method in inference/stream.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Parse SSE into a complete bounded candidate",
+      "description": "Rejects malformed or excessive events, mismatched models, tool calls, duplicates, truncation and content after finish; records latency only after valid stop and DONE.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/inference/stream.go#L26-L156",
       "syntax_calls": [
         "bufio.NewScanner",
@@ -2569,7 +2909,20 @@
         "time.Now",
         "usageValid",
         "utf8.ValidString"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "inference/stream.go",
+        "file_sha256": "40a548275a1ce815cd917430f5ef6a196168103b26cefe4a765d2a4c247a2cf5",
+        "start_line": 26,
+        "end_line": 156,
+        "literal_tokens": [
+          "io.LimitedReader",
+          "duplicate completion",
+          "unsupported stream choice/tool call",
+          "truncated stream"
+        ]
+      }
     },
     {
       "id": "wingless:inference/stream_test.go::function::TestStreamingValidation@13",
@@ -3294,11 +3647,22 @@
       "name": "TransportResources",
       "start_line": 33,
       "end_line": 38,
-      "label": "Type: Transport Resources",
-      "description": "Declared type in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Transport resource requirement schema",
+      "description": "Represents minimum host-resource floors and CPU ceiling for a bounded request.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L33-L38",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 33,
+        "end_line": 38,
+        "literal_tokens": [
+          "MinRAMBytes",
+          "MaxCPUPercent"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::TransportPolicy@40",
@@ -3308,11 +3672,23 @@
       "name": "TransportPolicy",
       "start_line": 40,
       "end_line": 49,
-      "label": "Type: Transport Policy",
-      "description": "Declared type in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Transport backend and context limitation policy",
+      "description": "Carries bounded read-path and backend allowlists, escalation flags, output limits and resource policy.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L40-L49",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 40,
+        "end_line": 49,
+        "literal_tokens": [
+          "ReadPaths",
+          "AllowedBackends",
+          "MaxContextBytes"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::TransportRequest@51",
@@ -3322,11 +3698,23 @@
       "name": "TransportRequest",
       "start_line": 51,
       "end_line": 68,
-      "label": "Type: Transport Request",
-      "description": "Declared type in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Frozen-source transport work identity",
+      "description": "Carries work/attempt ID, source/baseline/digest, workspace, bounded deadline and forbidden-actions constraints.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L51-L68",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 51,
+        "end_line": 68,
+        "literal_tokens": [
+          "WorkOrderDigest",
+          "ForbiddenActions",
+          "Deadline"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::EditOperation@70",
@@ -3336,11 +3724,22 @@
       "name": "EditOperation",
       "start_line": 70,
       "end_line": 75,
-      "label": "Type: Edit Operation",
-      "description": "Declared type in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Unapplied candidate file operation",
+      "description": "Describes untrusted write_text or delete_file proposal, its path and optional expected preimage hash.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L70-L75",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 70,
+        "end_line": 75,
+        "literal_tokens": [
+          "ExpectedBeforeSHA256",
+          "Content"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::EditEnvelope@77",
@@ -3350,11 +3749,22 @@
       "name": "EditEnvelope",
       "start_line": 77,
       "end_line": 86,
-      "label": "Type: Edit Envelope",
-      "description": "Declared type in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Identity-bound proposed edit collection",
+      "description": "Binds operations to the source SHA, request, attempt, workspace and work-order digest; does not apply edits.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L77-L86",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 77,
+        "end_line": 86,
+        "literal_tokens": [
+          "WorkOrderDigest",
+          "Operations"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::CandidateEnvelope@88",
@@ -3364,11 +3774,22 @@
       "name": "CandidateEnvelope",
       "start_line": 88,
       "end_line": 104,
-      "label": "Type: Candidate Envelope",
-      "description": "Declared type in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Non-authoritative candidate transport response",
+      "description": "Carries result identity, external_required acceptance, status, model/backend and optional unexecuted edits.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L88-L104",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 88,
+        "end_line": 104,
+        "literal_tokens": [
+          "Acceptance",
+          "Edits"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::interface::Intelligence@106",
@@ -3378,11 +3799,21 @@
       "name": "Intelligence",
       "start_line": 106,
       "end_line": 108,
-      "label": "Interface: Intelligence",
-      "description": "Declared interface in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Candidate generation callback contract",
+      "description": "Declares Run(ctx, request) returning one candidate envelope and error.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L106-L108",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 106,
+        "end_line": 108,
+        "literal_tokens": [
+          "Run(context.Context, TransportRequest)"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::type::Listener@110",
@@ -3392,11 +3823,22 @@
       "name": "Listener",
       "start_line": 110,
       "end_line": 113,
-      "label": "Type: Listener",
-      "description": "Declared type in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Session-bound candidate HTTP handler state",
+      "description": "Holds a session secret and intelligence engine reference without allocating a listener port.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L110-L113",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 110,
+        "end_line": 113,
+        "literal_tokens": [
+          "session string",
+          "engine  Intelligence"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::NewListener@115",
@@ -3406,14 +3848,25 @@
       "name": "NewListener",
       "start_line": 115,
       "end_line": 123,
-      "label": "Function: New Listener",
-      "description": "Declared function in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Require valid session and candidate engine",
+      "description": "Rejects an invalid lowercase-hex session or nil Intelligence implementation.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L115-L123",
       "syntax_calls": [
         "errors.New",
         "validSession"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 115,
+        "end_line": 123,
+        "literal_tokens": [
+          "!validSession(session)",
+          "engine == nil"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::validSession@125",
@@ -3423,13 +3876,24 @@
       "name": "validSession",
       "start_line": 125,
       "end_line": 135,
-      "label": "Function: valid Session",
-      "description": "Declared function in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Validate 64 lowercase hexadecimal session characters",
+      "description": "Rejects wrong length and non-hex characters.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L125-L135",
       "syntax_calls": [
         "len"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 125,
+        "end_line": 135,
+        "literal_tokens": [
+          "len(session) != 64",
+          "r < 'a' || r > 'f'"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::method::Listener.Handler@137",
@@ -3440,13 +3904,23 @@
       "receiver": "Listener",
       "start_line": 137,
       "end_line": 139,
-      "label": "Method: Listener Handler",
-      "description": "Declared method in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Wrap listener HTTP handler",
+      "description": "Exposes ServeHTTP as an http.Handler without binding a socket.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L137-L139",
       "syntax_calls": [
         "http.HandlerFunc"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 137,
+        "end_line": 139,
+        "literal_tokens": [
+          "http.HandlerFunc(l.ServeHTTP)"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::method::Listener.ServeHTTP@141",
@@ -3457,9 +3931,9 @@
       "receiver": "Listener",
       "start_line": 141,
       "end_line": 216,
-      "label": "Method: Listener Serve HTTP",
-      "description": "Declared method in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Validate one bounded transport request and candidate response",
+      "description": "Requires exact route, method, session and JSON media type, fully closes request body before one deadline-bound engine invocation, then validates returned candidate authority.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L141-L216",
       "syntax_calls": [
         "append",
@@ -3481,7 +3955,20 @@
         "w.Write",
         "w.WriteHeader",
         "writeListenerError"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 141,
+        "end_line": 216,
+        "literal_tokens": [
+          "subtle.ConstantTimeCompare",
+          "r.Body.Close()",
+          "l.engine.Run(ctx, req)",
+          "validateCandidateEnvelope"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::writeListenerError@218",
@@ -3509,9 +3996,9 @@
       "name": "decodeTransportRequest",
       "start_line": 224,
       "end_line": 239,
-      "label": "Function: decode Transport Request",
-      "description": "Declared function in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Strictly decode one unique-key JSON work envelope",
+      "description": "Rejects duplicate keys, unknown fields and any trailing JSON value.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L224-L239",
       "syntax_calls": [
         "bytes.NewReader",
@@ -3520,7 +4007,19 @@
         "errors.New",
         "json.NewDecoder",
         "rejectDuplicateJSONKeys"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 224,
+        "end_line": 239,
+        "literal_tokens": [
+          "rejectDuplicateJSONKeys(data)",
+          "d.DisallowUnknownFields()",
+          "trailing JSON"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::validateTransportRequest@241",
@@ -3530,9 +4029,9 @@
       "name": "validateTransportRequest",
       "start_line": 241,
       "end_line": 274,
-      "label": "Function: validate Transport Request",
-      "description": "Declared function in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Enforce frozen work identity and trusted request bounds",
+      "description": "Checks schema/source, exact attempt identity, digest/baseline, no local retry, deadline, backend allowlist and read-path rules.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L241-L274",
       "syntax_calls": [
         "errors.New",
@@ -3545,7 +4044,19 @@
         "strings.TrimSpace",
         "time.Now",
         "time.Until"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 241,
+        "end_line": 274,
+        "literal_tokens": [
+          "req.WorkOrderRetryBudget != 0",
+          "req.SourceCommit != FrozenPlaneSourceCommit",
+          "p.AllowedBackends"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::validateCandidateEnvelope@276",
@@ -3555,16 +4066,28 @@
       "name": "validateCandidateEnvelope",
       "start_line": 276,
       "end_line": 311,
-      "label": "Function: validate Candidate Envelope",
-      "description": "Declared function in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Forbid authority escalation in candidate response",
+      "description": "Matches all work identities, insists external_required acceptance, validates status, backend allowlist, text bounds and optional edit envelope.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L276-L311",
       "syntax_calls": [
         "errors.New",
         "len",
         "utf8.ValidString",
         "validateEditEnvelope"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 276,
+        "end_line": 311,
+        "literal_tokens": [
+          "c.Acceptance != \"external_required\"",
+          "validateEditEnvelope(*c.Edits, req)",
+          "candidate identity mismatch"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::validateEditEnvelope@313",
@@ -3574,9 +4097,9 @@
       "name": "validateEditEnvelope",
       "start_line": 313,
       "end_line": 348,
-      "label": "Function: validate Edit Envelope",
-      "description": "Declared function in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Validate but never apply bounded edit proposals",
+      "description": "Checks identity, unique paths, supported edit types, expected preimage hashes, per-file and aggregate byte caps.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L313-L348",
       "syntax_calls": [
         "errors.New",
@@ -3585,7 +4108,19 @@
         "strings.ContainsAny",
         "strings.TrimSpace",
         "utf8.ValidString"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 313,
+        "end_line": 348,
+        "literal_tokens": [
+          "len(e.Operations) > maxEditOperations",
+          "case \"write_text\"",
+          "maxEditAggregateBytes"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener.go::function::rejectDuplicateJSONKeys@350",
@@ -3595,9 +4130,9 @@
       "name": "rejectDuplicateJSONKeys",
       "start_line": 350,
       "end_line": 401,
-      "label": "Function: reject Duplicate JSON Keys",
-      "description": "Declared function in integration/ckbplane/listener.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Find duplicate JSON object keys recursively",
+      "description": "Walks nested objects and arrays using JSON tokens; rejects repeated keys and trailing values.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/listener.go#L350-L401",
       "syntax_calls": [
         "bytes.NewReader",
@@ -3607,7 +4142,19 @@
         "errors.New",
         "json.NewDecoder",
         "walk"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/listener.go",
+        "file_sha256": "2aa44bab55e2b8d84f8886002bee9d6cc2a4b2853a89393a2dd6eb5c0aef567b",
+        "start_line": 350,
+        "end_line": 401,
+        "literal_tokens": [
+          "seen[name]",
+          "d.More()",
+          "trailing JSON"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/listener_contract.go::const::AcceptedPlaneTransportCommit@6",
@@ -4385,11 +4932,22 @@
       "name": "LoopbackServiceReady",
       "start_line": 17,
       "end_line": 21,
-      "label": "Type: Loopback Service Ready",
-      "description": "Declared type in integration/ckbplane/service.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Ephemeral loopback readiness notice",
+      "description": "Announces schema, numeric-loopback endpoint and owning process PID.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/service.go#L17-L21",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/service.go",
+        "file_sha256": "0f7fd9fa4b73e0275f4e969c51d3b5a5cee5365d56cbd91c965eca12a7052453",
+        "start_line": 17,
+        "end_line": 21,
+        "literal_tokens": [
+          "Endpoint string",
+          "PID      int"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/service.go::function::ServeLoopbackService@27",
@@ -4399,9 +4957,9 @@
       "name": "ServeLoopbackService",
       "start_line": 27,
       "end_line": 105,
-      "label": "Function: Serve Loopback Service",
-      "description": "Declared function in integration/ckbplane/service.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Serve existing candidate handler on ephemeral loopback",
+      "description": "Requires context/session/ready writer, binds 127.0.0.1:0, reports the ready endpoint, and shuts down when the owning context ends; no queue consumer is registered.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/integration/ckbplane/service.go#L27-L105",
       "syntax_calls": [
         "NewListener",
@@ -4426,7 +4984,19 @@
         "server.Serve",
         "server.Shutdown",
         "time.After"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "integration/ckbplane/service.go",
+        "file_sha256": "0f7fd9fa4b73e0275f4e969c51d3b5a5cee5365d56cbd91c965eca12a7052453",
+        "start_line": 27,
+        "end_line": 105,
+        "literal_tokens": [
+          "\"127.0.0.1:0\"",
+          "NewListener(session, engine)",
+          "server.Shutdown"
+        ]
+      }
     },
     {
       "id": "wingless:integration/ckbplane/service_test.go::type::serviceEngineFunc@21",
@@ -5011,11 +5581,23 @@
       "name": "Config",
       "start_line": 23,
       "end_line": 47,
-      "label": "Type: Config",
-      "description": "Declared type in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Pinned bounded local llama-server configuration",
+      "description": "Carries executable/model SHA-256, absolute paths, resource requirements, GPU configuration, port, threads, context and time limits.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L23-L47",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 23,
+        "end_line": 47,
+        "literal_tokens": [
+          "ExecutableSHA256",
+          "ModelSHA256",
+          "RuntimeSeconds"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::type::Evidence@48",
@@ -5025,11 +5607,23 @@
       "name": "Evidence",
       "start_line": 48,
       "end_line": 61,
-      "label": "Type: Evidence",
-      "description": "Declared type in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Observed local model process lifecycle evidence",
+      "description": "Records process state, PID, timestamps, reason, exit code, metrics and bounded stdout/stderr tails.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L48-L61",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 48,
+        "end_line": 61,
+        "literal_tokens": [
+          "Containment",
+          "ProcessError",
+          "StderrTail"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::type::tail@62",
@@ -5039,11 +5633,22 @@
       "name": "tail",
       "start_line": 62,
       "end_line": 65,
-      "label": "Type: tail",
-      "description": "Declared type in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Synchronized bounded log-tail buffer",
+      "description": "Stores recent model subprocess log bytes behind mutex.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L62-L65",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 62,
+        "end_line": 65,
+        "literal_tokens": [
+          "mu sync.Mutex",
+          "b  []byte"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::tail.Write@67",
@@ -5054,14 +5659,25 @@
       "receiver": "tail",
       "start_line": 67,
       "end_line": 80,
-      "label": "Method: tail Write",
-      "description": "Declared method in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Retain only final 8192 bytes of logs",
+      "description": "Truncates oversized writes and growing buffers to the last 8192 bytes.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L67-L80",
       "syntax_calls": [
         "append",
         "len"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 67,
+        "end_line": 80,
+        "literal_tokens": [
+          "n >= 8192",
+          "t.b[len(t.b)-8192:]"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::tail.text@81",
@@ -5072,14 +5688,24 @@
       "receiver": "tail",
       "start_line": 81,
       "end_line": 85,
-      "label": "Method: tail text",
-      "description": "Declared method in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Return UTF-8-safe log tail",
+      "description": "Synchronizes reading and replaces malformed UTF-8 before reporting.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L81-L85",
       "syntax_calls": [
         "string",
         "strings.ToValidUTF8"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 81,
+        "end_line": 85,
+        "literal_tokens": [
+          "strings.ToValidUTF8(string(t.b), \"?\")"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::type::Supervisor@87",
@@ -5089,11 +5715,22 @@
       "name": "Supervisor",
       "start_line": 87,
       "end_line": 97,
-      "label": "Type: Supervisor",
-      "description": "Declared type in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Model process lifecycle supervisor state",
+      "description": "Owns explicit configuration, resource sampling, cancellation, containment, evidence and two bounded log tails.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L87-L97",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 87,
+        "end_line": 97,
+        "literal_tokens": [
+          "probe    *resources.ProcessProbe",
+          "evidence Evidence"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::function::New@99",
@@ -5103,9 +5740,9 @@
       "name": "New",
       "start_line": 99,
       "end_line": 117,
-      "label": "Function: New",
-      "description": "Declared function in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Validate model supervisor configuration before launch",
+      "description": "Defaults batch sizing and rejects bad paths, ports, runtime/resource budgets and unsupported executable names.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L99-L117",
       "syntax_calls": [
         "filepath.Base",
@@ -5113,7 +5750,19 @@
         "fmt.Errorf",
         "strings.ContainsAny",
         "strings.ToLower"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 99,
+        "end_line": 117,
+        "literal_tokens": [
+          "c.Batch = 512",
+          "!filepath.IsAbs(c.Executable)",
+          "only pinned llama-server supported"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::function::pinned@118",
@@ -5123,9 +5772,9 @@
       "name": "pinned",
       "start_line": 118,
       "end_line": 144,
-      "label": "Function: pinned",
-      "description": "Declared function in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Require exact regular-file SHA-256 identity",
+      "description": "Checks hex SHA-256, regular type and size bounds, streams the file hash, and fails closed on mismatch.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L118-L144",
       "syntax_calls": [
         "f.Close",
@@ -5142,7 +5791,19 @@
         "st.Size",
         "strings.EqualFold",
         "sum.Sum"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 118,
+        "end_line": 144,
+        "literal_tokens": [
+          "hex.DecodeString(want)",
+          "!st.Mode().IsRegular()",
+          "file hash mismatch"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::Supervisor.Endpoint@145",
@@ -5153,13 +5814,24 @@
       "receiver": "Supervisor",
       "start_line": 145,
       "end_line": 145,
-      "label": "Method: Supervisor Endpoint",
-      "description": "Declared method in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Format numeric-loopback model URL",
+      "description": "Builds an explicit localhost URL from the configured port; does not contact the model.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L145-L145",
       "syntax_calls": [
         "strconv.Itoa"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 145,
+        "end_line": 145,
+        "literal_tokens": [
+          "\"http://127.0.0.1:\"",
+          "strconv.Itoa(s.cfg.Port)"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::Supervisor.Status@146",
@@ -5170,13 +5842,25 @@
       "receiver": "Supervisor",
       "start_line": 146,
       "end_line": 175,
-      "label": "Method: Supervisor Status",
-      "description": "Declared method in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Snapshot bounded model lifecycle and process evidence",
+      "description": "Copies process state under lock, conditionally samples owned process usage and returns output tails.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L146-L175",
       "syntax_calls": [
         "err.Error"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 146,
+        "end_line": 175,
+        "literal_tokens": [
+          "s.probe.Snapshot()",
+          "s.out.text()",
+          "s.err.text()"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::Supervisor.Start@176",
@@ -5187,9 +5871,9 @@
       "receiver": "Supervisor",
       "start_line": 176,
       "end_line": 345,
-      "label": "Method: Supervisor Start",
-      "description": "Declared method in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Start SHA-pinned, contained, resource-approved local model",
+      "description": "Requires one-shot stopped state, pins executable/model, checks resources and loopback port, attaches subprocess containment with constrained environment and checks local readiness.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L176-L345",
       "syntax_calls": [
         "append",
@@ -5229,7 +5913,21 @@
         "time.Duration",
         "time.NewTicker",
         "time.Now"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 176,
+        "end_line": 345,
+        "literal_tokens": [
+          "pinned(s.cfg.Executable",
+          "resources.Check",
+          "cmd.Env = []string{}",
+          "job.Attach(cmd.Process)",
+          "backend.Health(ready)"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor.go::method::Supervisor.Stop@346",
@@ -5240,15 +5938,27 @@
       "receiver": "Supervisor",
       "start_line": 346,
       "end_line": 375,
-      "label": "Method: Supervisor Stop",
-      "description": "Declared method in modelhost/supervisor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Request controlled stop of model process",
+      "description": "Marks operator_stop, cancels the owned process and waits for shutdown or caller cancellation.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/modelhost/supervisor.go#L346-L375",
       "syntax_calls": [
         "ctx.Done",
         "ctx.Err",
         "s.cancel"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "modelhost/supervisor.go",
+        "file_sha256": "e92c125e2362817a1a6784e580e031a1feeb92a08c9186dbf6eb444dd19ada80",
+        "start_line": 346,
+        "end_line": 375,
+        "literal_tokens": [
+          "s.evidence.Reason = \"operator_stop\"",
+          "s.cancel()",
+          "case <-ctx.Done()"
+        ]
+      }
     },
     {
       "id": "wingless:modelhost/supervisor_test.go::type::unknown@13",
@@ -5333,11 +6043,23 @@
       "name": "Metrics",
       "start_line": 8,
       "end_line": 21,
-      "label": "Type: Metrics",
-      "description": "Declared type in resources/governor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Optional host and GPU measurement set",
+      "description": "Holds nullable RAM, VRAM, disk, CPU, GPU and related readings; unavailable metrics are not silently sufficient.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/governor.go#L8-L21",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/governor.go",
+        "file_sha256": "4f25bd3d71c99ec333b6fbd01a2a74b2ee2236800bc0ee169069a1eff23ccf6e",
+        "start_line": 8,
+        "end_line": 21,
+        "literal_tokens": [
+          "RAMFree",
+          "CPUPercent",
+          "GPUError"
+        ]
+      }
     },
     {
       "id": "wingless:resources/governor.go::type::Policy@22",
@@ -5347,11 +6069,22 @@
       "name": "Policy",
       "start_line": 22,
       "end_line": 27,
-      "label": "Type: Policy",
-      "description": "Declared type in resources/governor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Resource floor and CPU-ceiling policy",
+      "description": "Declares RAM, VRAM and disk floors plus a maximum admitted CPU percentage.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/governor.go#L22-L27",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/governor.go",
+        "file_sha256": "4f25bd3d71c99ec333b6fbd01a2a74b2ee2236800bc0ee169069a1eff23ccf6e",
+        "start_line": 22,
+        "end_line": 27,
+        "literal_tokens": [
+          "MinRAM",
+          "MaxCPU"
+        ]
+      }
     },
     {
       "id": "wingless:resources/governor.go::interface::Provider@28",
@@ -5361,11 +6094,21 @@
       "name": "Provider",
       "start_line": 28,
       "end_line": 28,
-      "label": "Interface: Provider",
-      "description": "Declared interface in resources/governor.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Resource measurement interface",
+      "description": "Requires a Snapshot method yielding Metrics and error.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/governor.go#L28-L28",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/governor.go",
+        "file_sha256": "4f25bd3d71c99ec333b6fbd01a2a74b2ee2236800bc0ee169069a1eff23ccf6e",
+        "start_line": 28,
+        "end_line": 28,
+        "literal_tokens": [
+          "Snapshot() (Metrics, error)"
+        ]
+      }
     },
     {
       "id": "wingless:resources/governor.go::function::Check@30",
@@ -5411,11 +6154,22 @@
       "name": "Host",
       "start_line": 9,
       "end_line": 13,
-      "label": "Type: Host",
-      "description": "Declared type in resources/host.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Stateful OS host metrics sampler",
+      "description": "Holds sample path and prior CPU ticks behind a mutex; metrics are host-wide, not process reservations.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/host.go#L9-L13",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/host.go",
+        "file_sha256": "3756a4f315fdd86d6c7ceee77ceb7c750d11cc1fb11093ac1abc74cec674faf2",
+        "start_line": 9,
+        "end_line": 13,
+        "literal_tokens": [
+          "previous *cpuTicks",
+          "sync.Mutex"
+        ]
+      }
     },
     {
       "id": "wingless:resources/host.go::type::cpuTicks@14",
@@ -5425,11 +6179,21 @@
       "name": "cpuTicks",
       "start_line": 14,
       "end_line": 14,
-      "label": "Type: cpu Ticks",
-      "description": "Declared type in resources/host.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "CPU tick sample pair",
+      "description": "Stores total and idle ticks used to derive CPU utilization between valid samples.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/host.go#L14-L14",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/host.go",
+        "file_sha256": "3756a4f315fdd86d6c7ceee77ceb7c750d11cc1fb11093ac1abc74cec674faf2",
+        "start_line": 14,
+        "end_line": 14,
+        "literal_tokens": [
+          "idle, total uint64"
+        ]
+      }
     },
     {
       "id": "wingless:resources/host.go::method::Host.Snapshot@16",
@@ -5440,15 +6204,27 @@
       "receiver": "Host",
       "start_line": 16,
       "end_line": 34,
-      "label": "Method: Host Snapshot",
-      "description": "Declared method in resources/host.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Sample host resources and compute CPU deltas",
+      "description": "Calls platform hostSnapshot and computes CPU percentage only for monotonic counters, rejecting impossible idle deltas.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/host.go#L16-L34",
       "syntax_calls": [
         "float64",
         "fmt.Errorf",
         "hostSnapshot"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/host.go",
+        "file_sha256": "3756a4f315fdd86d6c7ceee77ceb7c750d11cc1fb11093ac1abc74cec674faf2",
+        "start_line": 16,
+        "end_line": 34,
+        "literal_tokens": [
+          "hostSnapshot(h.Path)",
+          "t.total > h.previous.total",
+          "inconsistent CPU counters"
+        ]
+      }
     },
     {
       "id": "wingless:resources/host_linux.go::function::hostSnapshot@13",
@@ -5895,11 +6671,22 @@
       "name": "ProcessMetrics",
       "start_line": 12,
       "end_line": 21,
-      "label": "Type: Process Metrics",
-      "description": "Declared type in resources/process.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Per-process resource sample",
+      "description": "Records owned PID and optional resident memory, CPU time, runtime duration, disk I/O and GPU-memory usage.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/process.go#L12-L21",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/process.go",
+        "file_sha256": "b324703640a15232bc935fe8674046e52288d5381daf64419ab264d7cce3d4d3",
+        "start_line": 12,
+        "end_line": 21,
+        "literal_tokens": [
+          "PID            int",
+          "DiskWriteBytes"
+        ]
+      }
     },
     {
       "id": "wingless:resources/process.go::type::ProcessProbe@24",
@@ -5909,11 +6696,22 @@
       "name": "ProcessProbe",
       "start_line": 24,
       "end_line": 29,
-      "label": "Type: Process Probe",
-      "description": "Declared type in resources/process.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "PID identity-fenced process sampler",
+      "description": "Stores sampled identity and start time with synchronization to reject PID reuse.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/process.go#L24-L29",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/process.go",
+        "file_sha256": "b324703640a15232bc935fe8674046e52288d5381daf64419ab264d7cce3d4d3",
+        "start_line": 24,
+        "end_line": 29,
+        "literal_tokens": [
+          "identity string",
+          "started  time.Time"
+        ]
+      }
     },
     {
       "id": "wingless:resources/process.go::function::NewProcessProbe@31",
@@ -5923,15 +6721,27 @@
       "name": "NewProcessProbe",
       "start_line": 31,
       "end_line": 40,
-      "label": "Function: New Process Probe",
-      "description": "Declared function in resources/process.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Pin identity for an observed owned PID",
+      "description": "Rejects invalid PID and samples identity before creating a lifetime-tracking probe.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/process.go#L31-L40",
       "syntax_calls": [
         "fmt.Errorf",
         "sampleProcess",
         "time.Now"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/process.go",
+        "file_sha256": "b324703640a15232bc935fe8674046e52288d5381daf64419ab264d7cce3d4d3",
+        "start_line": 31,
+        "end_line": 40,
+        "literal_tokens": [
+          "pid <= 0",
+          "sampleProcess(pid)",
+          "time.Now()"
+        ]
+      }
     },
     {
       "id": "wingless:resources/process.go::method::ProcessProbe.Snapshot@41",
@@ -5942,15 +6752,27 @@
       "receiver": "ProcessProbe",
       "start_line": 41,
       "end_line": 54,
-      "label": "Method: Process Probe Snapshot",
-      "description": "Declared method in resources/process.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Sample process with reuse protection",
+      "description": "Refuses changed PID identity and adds observed elapsed lifetime to a successful sample.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/resources/process.go#L41-L54",
       "syntax_calls": [
         "fmt.Errorf",
         "sampleProcess",
         "time.Since"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "resources/process.go",
+        "file_sha256": "b324703640a15232bc935fe8674046e52288d5381daf64419ab264d7cce3d4d3",
+        "start_line": 41,
+        "end_line": 54,
+        "literal_tokens": [
+          "sampleProcess(p.pid)",
+          "id != p.identity",
+          "m.LifetimeMS = &ms"
+        ]
+      }
     },
     {
       "id": "wingless:resources/process_linux.go::function::processIdentity@12",
@@ -6113,11 +6935,22 @@
       "name": "Proposal",
       "start_line": 14,
       "end_line": 17,
-      "label": "Type: Proposal",
-      "description": "Declared type in toolboundary/tools.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Read-only tool request",
+      "description": "Names the proposed tool and relative workspace path; data alone never authorizes a call.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/toolboundary/tools.go#L14-L17",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "toolboundary/tools.go",
+        "file_sha256": "46e90c5a05df8887756dfd5f9cdedbb303ef59ce7b755cd5a43e546edabb6480",
+        "start_line": 14,
+        "end_line": 17,
+        "literal_tokens": [
+          "Tool string",
+          "Path string"
+        ]
+      }
     },
     {
       "id": "wingless:toolboundary/tools.go::type::Policy@18",
@@ -6127,11 +6960,22 @@
       "name": "Policy",
       "start_line": 18,
       "end_line": 24,
-      "label": "Type: Policy",
-      "description": "Declared type in toolboundary/tools.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Rooted file-tool admission policy",
+      "description": "Defines a workspace, exact tool and path allowlists, timeout, and maximum output bytes.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/toolboundary/tools.go#L18-L24",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "toolboundary/tools.go",
+        "file_sha256": "46e90c5a05df8887756dfd5f9cdedbb303ef59ce7b755cd5a43e546edabb6480",
+        "start_line": 18,
+        "end_line": 24,
+        "literal_tokens": [
+          "AllowedTools",
+          "MaxOutputBytes"
+        ]
+      }
     },
     {
       "id": "wingless:toolboundary/tools.go::type::Observation@25",
@@ -6141,11 +6985,22 @@
       "name": "Observation",
       "start_line": 25,
       "end_line": 33,
-      "label": "Type: Observation",
-      "description": "Declared type in toolboundary/tools.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Read-only tool result record",
+      "description": "Captures requested path, output, elapsed time, exit code, and reason.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/toolboundary/tools.go#L25-L33",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "toolboundary/tools.go",
+        "file_sha256": "46e90c5a05df8887756dfd5f9cdedbb303ef59ce7b755cd5a43e546edabb6480",
+        "start_line": 25,
+        "end_line": 33,
+        "literal_tokens": [
+          "Stdout",
+          "ElapsedMS"
+        ]
+      }
     },
     {
       "id": "wingless:toolboundary/tools.go::function::has@35",
@@ -6155,11 +7010,21 @@
       "name": "has",
       "start_line": 35,
       "end_line": 42,
-      "label": "Function: has",
-      "description": "Declared function in toolboundary/tools.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Exact allowlist membership check",
+      "description": "Returns true only when the target string equals an entry in the configured list.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/toolboundary/tools.go#L35-L42",
-      "syntax_calls": []
+      "syntax_calls": [],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "toolboundary/tools.go",
+        "file_sha256": "46e90c5a05df8887756dfd5f9cdedbb303ef59ce7b755cd5a43e546edabb6480",
+        "start_line": 35,
+        "end_line": 42,
+        "literal_tokens": [
+          "if v == x"
+        ]
+      }
     },
     {
       "id": "wingless:toolboundary/tools.go::function::Execute@43",
@@ -6169,9 +7034,9 @@
       "name": "Execute",
       "start_line": 43,
       "end_line": 106,
-      "label": "Function: Execute",
-      "description": "Declared function in toolboundary/tools.go; the title is derived from its symbol name, not a verified behavioral description.",
-      "evidence_basis": "lexical-provisional",
+      "label": "Enforce one bounded read-only file operation",
+      "description": "Requires read_file and matching allowlists, rooted workspace, safe path and size/time caps; opens with os.OpenRoot and returns data only from a regular file.",
+      "evidence_basis": "source-reviewed",
       "source_url": "https://github.com/spoonman136668-ai/Wingless/blob/b87899b50d2c1558e26d74a1921623786fde1282/toolboundary/tools.go#L43-L106",
       "syntax_calls": [
         "c",
@@ -6196,7 +7061,19 @@
         "strings.ContainsAny",
         "time.Now",
         "time.Since"
-      ]
+      ],
+      "review_evidence": {
+        "source_commit": "b87899b50d2c1558e26d74a1921623786fde1282",
+        "file": "toolboundary/tools.go",
+        "file_sha256": "46e90c5a05df8887756dfd5f9cdedbb303ef59ce7b755cd5a43e546edabb6480",
+        "start_line": 43,
+        "end_line": 106,
+        "literal_tokens": [
+          "a.Tool != \"read_file\"",
+          "os.OpenRoot(p.Workspace)",
+          "io.LimitReader"
+        ]
+      }
     },
     {
       "id": "wingless:toolboundary/tools_test.go::function::TestBoundary@11",

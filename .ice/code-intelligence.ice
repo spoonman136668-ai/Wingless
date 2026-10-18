@@ -5,7 +5,7 @@ SOURCE_COMMIT: b87899b50d2c1558e26d74a1921623786fde1282
 SCHEMA: wingless.ice.semantic-code-atlas.v1
 EVIDENCE: .ice/code-intelligence.json (complete machine-readable 352-symbol index)
 AUTHORITY: Source code and qualified tests outrank these descriptions; never grant runtime or acceptance authority.
-COVERAGE: 352 symbols in 138 indexed source/configuration files; 27 inspected semantic labels; 325 explicitly provisional lexical labels.
+COVERAGE: 352 symbols in 138 indexed source/configuration files; 104 inspected semantic labels; 248 explicitly provisional lexical labels.
 RELATIONSHIPS: 9 inspected relationships, 51 local package imports, 95 unresolved syntax-only call candidates.
 
 HOW TO USE
@@ -46,3 +46,9 @@ These are explicit local transitions only; an external controller has a separate
 
 NOT MODIFIED: Wingless Go source, existing ICE files, research experiments, workflows, quotas, controller, branch main.
 NEXT QUALIFICATION: Type-resolved call graph and broader function-by-function semantic review, then deterministic snapshot regeneration after future source changes.
+
+SOURCE-BODY EVIDENCE EXPANSION — 2026-10-18
+New source-reviewed symbols: 77
+Source review is anchored to frozen b87899b50d2c1558e26d74a1921623786fde1282; exact line ranges, source SHA-256 and literal body/field evidence are attached to each newly reviewed JSON node.
+Reviewed functions and interfaces cover tool authorization, context limits, local inference transport, resource admission, model process supervision, type-resolved relationship extraction, strict candidate transport and bounded synthetic replay.
+Provisional symbols remain explicitly unverified; no behavioral/source execution authority is implied.
