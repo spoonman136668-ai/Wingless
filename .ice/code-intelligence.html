@@ -50,6 +50,8 @@ add(detail,'div','File SHA-256: '+n.file_sha256).className='source';
 const items=related.get(n.id)||[];add(detail,'h3','Related definitions ('+items.length+')');
 const box=add(detail,'div');box.className='related';
 for(const e of items){const other=e.from===n.id?e.to:e.from,tgt=byId.get(other);if(!tgt)continue;const b=add(box,'button',(e.from===n.id?'→ ':'← ')+tgt.label);b.type='button';b.title=e.label+' ['+e.evidence_basis+']';b.onclick=()=>{show(tgt);render()};const desc=add(box,'small',e.label+' — '+e.evidence_basis);desc.style.display='block'}
+const imports=data.relationships.filter(e=>e.kind==='imports_local_package'&&e.from===n.file);
+if(imports.length){add(detail,'h3','Local package dependencies ('+imports.length+')');for(const x of imports)add(detail,'p',x.to+' — source-derived import; not a runtime call guarantee')}
 const calls=n.syntax_calls||[];if(calls.length){add(detail,'h3','Syntax call tokens (not type-resolved)');add(detail,'pre',calls.join(', '))}
 if(n.file==='inference/lifecycle.go'&&n.name==='Move'){add(detail,'h3','Permitted lifecycle transitions');for(const [from,to]of Object.entries(data.state_machines[0].transitions))add(detail,'p',from+' → '+to.join(', '))}
 }
