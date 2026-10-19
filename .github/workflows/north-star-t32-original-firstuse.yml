@@ -1,0 +1,61 @@
+name: T32 original new nonlinear causal law first-use
+on:
+  push:
+    branches: [research/t32-learned-parity-constraint-20261019]
+    paths: ['.github/workflows/north-star-t32-original-firstuse.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T32-original-parity-rules-once
+  cancel-in-progress: false
+jobs:
+  original-firstuse:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 45
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze source blobs and TRAIN-proven new constraint mechanism
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T32_ORIGINAL_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t32-parity-constraints-prereg.json'='67bf7d3a94cc0dfbb40f3b5fec8a2ba2210f69e8'
+            'research/north-star-transfer/20261019-wingless-t32-parity-causal-sources.py'='9240aef2918daa4b826d5fa7245624aaecb78eda'
+            'research/north-star-transfer/20261019-wingless-t32-learned-constraint-construction.py'='d715e51048fcd9e9060a9ad54c9859ba937c3451'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T32_ORIGINAL_SOURCE_CHANGED:$path"}
+          }
+          git merge-base --is-ancestor dbd40c8c380e7ddee4f489af5e624a34092e3b75 4158ce7a8400bc04494906ecb3e07f1a4ae92fcb
+          if($LASTEXITCODE -ne 0){throw 'T32_PREREG_MATHEMATICAL_FREEZE_ABSENT'}
+          git merge-base --is-ancestor 4158ce7a8400bc04494906ecb3e07f1a4ae92fcb 565df1366aa08c90c4de185e9a4a060334cea59c
+          if($LASTEXITCODE -ne 0){throw 'T32_MODEL_SOURCE_CHRONOLOGY_VIOLATION'}
+          git merge-base --is-ancestor 14006d58fa899c2207b9ce25140efeb154bb9543 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T32_WINDOWS_LINUX_PASSED_TRAIN_ABLATION_MISSING'}
+          Write-Output 'T32_PROSPECTIVE_SOURCE_AND_TRAIN_CUSTODY=PASS'
+      - name: Evaluate new H/J nonaffine unseen laws, five resource trials each exact arm
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t32-learned-constraint-construction.py > t32-original-firstuse.json
+          if($LASTEXITCODE -ne 0){throw 'T32_ORIGINAL_SCIENTIFIC_NEGATIVE_OR_ERROR_DEV_CONSUMED_NO_RERUN'}
+          python -c "import json;x=json.load(open('t32-original-firstuse.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==4 and x['TRAIN_cases']==40 and x['prospective_DEV_cases']==64 and x['counterfactuals']==192 and not x['scientific_positive'] and not x['optimizer_admission'] and not x['old_DEV_replayed'];assert all(v['correct_certified']+v['safe_abstentions']==192 and v['hard_false_positives']==0 and len(v['per_case'])==64 and len(v['five_complete_CPU_ns'])==5 and len(v['five_peak_RSS_bytes'])==5 for v in a.values());print('T32_ORIGINAL_TECHNICAL_CUSTODY=PASS');print('T32_ORIGINAL_METRICS='+json.dumps({k:{z:v[z] for z in ('correct_certified','safe_abstentions','learned_extra_unit_clauses','median_CPU_ns','max_peak_RSS_bytes')} for k,v in a.items()},sort_keys=True));print('T32_ORIGINAL_PARITY_CONTROLS='+json.dumps(x['comparison'],sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T32_ORIGINAL_INVALID_PROSPECTIVE_RECEIPT'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t32-original-parity-firstuse-${{ matrix.os }}
+          path: t32-original-firstuse.json
+          retention-days: 90
+          if-no-files-found: ignore
