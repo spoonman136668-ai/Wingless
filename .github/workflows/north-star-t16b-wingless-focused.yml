@@ -1,0 +1,50 @@
+name: T16B wingless nonconsuming novel representation checks
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t16b-wingless-focused.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t16b-wingless-sourceblind-focussed
+  cancel-in-progress: false
+jobs:
+  math-and-serialization:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact frozen prior source and novel representation identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T16B_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py').Trim() -cne '1041db8ff76365eba5eb8f31cecd0e2172d397d8'){throw 'T16B_REPRESENTATION_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings_test.py').Trim() -cne '21b7836fbd4727e151987828193397b859fccdae'){throw 'T16B_TEST_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t16-source.py').Trim() -cne '5bcec7c2440412bdb8c29f8f162edb485b655ab8'){throw 'T16B_ORIGINAL_SOURCE_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t16-freeze.json').Trim() -cne 'ebb161d30978fc2db215b9f55ff1057702b6de1a'){throw 'T16B_PREIMPLEMENTATION_DRIFT'}
+          Write-Output 'T16B_FROZEN_SOURCE_MODEL_AND_TEST_SHA=PASS'
+      - name: Nonconsuming cross-platform focused tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python 'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings_test.py'
+          if($LASTEXITCODE -ne 0){throw 'T16B_NOVEL_REPRESENTATION_FOCUSED_FAIL'}
+          Write-Output 'T16B_MATH_SERIALIZATION_FOCUSED_PASS'
+      - name: No first-use or scientific authority
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          Write-Output 'T16_ORIGINAL_PROSPECTIVE_COHORTS_USED=0'
+          Write-Output 'T16_INDEPENDENT_SCIENTIFIC_ACCEPTANCES=0'
+          Write-Output 'T16_OPTIMIZER_DISPATCH=0'
