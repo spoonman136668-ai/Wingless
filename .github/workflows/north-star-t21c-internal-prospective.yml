@@ -35,7 +35,7 @@ jobs:
             'research/north-star-transfer/20261019-wingless-t21c-learned-relations.py'='881b9a2ff21da734642eef9dc71a3126e5e0febc'
             'research/north-star-transfer/20261019-wingless-t21c-train-preflight.py'='37b7ba6bda2e3fef8ac3d032c4eafe11a778bd42'
             'research/north-star-transfer/20261019-wingless-t21-relational-bitmatrix.py'='0d2b53620d1824316294149062e3c035713c69ee'
-            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5ebf31cecd0e2172d397d8'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
           }
           foreach ($path in $expected.Keys) {
             $actual=(git hash-object -- $path).Trim()
@@ -60,7 +60,7 @@ jobs:
           if($LASTEXITCODE -ne 0){throw 'T21C_TRAIN_ALGEBRA_PREFLIGHT_FAILED'}
           python -c "import json; x=json.load(open('t21c-train-only-preflight.json',encoding='utf-8-sig')); assert x['passed'] and x['source_train_cases']==40 and x['source_DEV_cases_generated']==0 and not x['future_unseen_cases_used'] and not x['optimizer_admission']; assert len(x['arms'])==3; print('T21C_TRAIN_ONLY_PREFLIGHT=PASS'); print('T21C_TRAIN_COUNTS='+json.dumps(x['arms'],sort_keys=True))"
           if($LASTEXITCODE -ne 0){throw 'T21C_TRAIN_PREFLIGHT_RECEIPT_INVALID'}
-      - name: ONE first-use internal DEV: four controls plus learned, five processes each
+      - name: "ONE first-use internal DEV: four controls plus learned, five processes each"
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
