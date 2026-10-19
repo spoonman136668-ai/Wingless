@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.t30.unknown-rule-TRAIN-admission-negative.v1",
+  "date_EDT": "2026-10-19",
+  "original_frozen_precode": "2f573a96e5083670f6660a7ae9fc830950f64385",
+  "original_new_source": "64c495fbaee492081033a14de867a3fbe38cbc14",
+  "original_candidate": "acb911f3e30bb45c2ba250511a13709be1816a6b",
+  "original_TRAIN_run": {
+    "id": 39338024170,
+    "head": "e57fbbb3e3dfabe9d1b7b54fca3374aa78857359",
+    "result": "FAILED_FROZEN_HEADROOM_THRESHOLD_BOTH_WINDOWS_LINUX",
+    "Linux_artifact": 12227302122,
+    "Linux_provider_zip_sha256": "be21c7154b46e6526ce639df77da7e82f8cf86dff7a21f6b23b51bdd0deb9831",
+    "Windows_artifact": 12227421938,
+    "Windows_provider_zip_sha256": "0c3be19cfa7df93667f9c8b4192408e90d8868df9c02a7b581ba1cc40ee695e4"
+  },
+  "TRAIN_only": {
+    "cases": 40,
+    "public_observed_training_bits": 1080,
+    "hidden_rule_graph_truth_preserved": 40,
+    "exact_120_counterfactual_agreement_with_full_solver": true,
+    "correct_certified": 112,
+    "safe_abstained": 8,
+    "uncertainty_fraction": 0.06666666666666667,
+    "preregistered_min": 0.15,
+    "preregistered_max": 0.9,
+    "passed": false,
+    "all_16_two_parent_AND_256_three_parent_Boolean_laws_verified_against_ANF": true,
+    "mean_full_rule_graph_posterior": 2.925,
+    "source_M_n7_parent2_affine_TRAIN": true,
+    "source_N_n9_parent3_affine_TRAIN": true,
+    "prospective_nonaffine_disjoint_from_TRAIN": true,
+    "DEV_generated": 0,
+    "original_unseen_DEV_consumed": false
+  },
+  "scientific_judgment": "VALID_TRAIN_ONLY_NO_GO: Nine reset probes × three observed outputs all but identify the latent rule/graph on this training cohort. No DEV samples generated or tested; cannot lower threshold or tune these sealed source identities to force a positive. The solution correctly preserves unknown-rule hypotheses but does not yet show learned efficiency or ability beyond strongest symbolic controls. Future separately preregistered source may reduce disclosure before originating completely new source cases.",
+  "safety": {
+    "no_previous_DEV_read": true,
+    "no_scientific_positive": true,
+    "no_external_independence_claim": true,
+    "no_live_optimizer": true,
+    "no_merge": true,
+    "no_workstation": true,
+    "no_paid_API": true
+  }
+}
