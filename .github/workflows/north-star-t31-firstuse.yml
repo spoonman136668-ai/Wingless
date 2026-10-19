@@ -1,0 +1,63 @@
+name: T31 original one-time nonlinear causal program first-use
+on:
+  push:
+    branches: [research/t31-conditional-causal-program-20261019]
+    paths: ['.github/workflows/north-star-t31-firstuse.yml']
+permissions:
+  contents: read
+concurrency:
+  group: Wingless-T31-original-frozen-firstuse-ONLY
+  cancel-in-progress: false
+jobs:
+  original-source-firstuse:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 30
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify pinned original source and passed prior TRAIN gate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T31_ORIGINAL_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t31-conditional-program-prereg.json'='7fe3cb71d9ea58055442ec70ff390ea8793a6278'
+            'research/north-star-transfer/20261019-wingless-t31-new-causal-program-worlds.py'='c4ab52ee8b03798dc388961339405da948e08e01'
+            'research/north-star-transfer/20261019-wingless-t31-conditional-program.py'='ce156e0788bd986b0d286145cedbe2541894df7a'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T31_FROZEN_ORIGINAL_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor e3262c07e8f69559b076340ecef5a0ba3a8408e5 1ec479a74db24254bad64be8c832001331496665
+          if($LASTEXITCODE -ne 0){throw 'T31_SOURCE_NOT_PREREGISTERED'}
+          git merge-base --is-ancestor 1ec479a74db24254bad64be8c832001331496665 0008d925ef7624eb67b566fbb498926271f5a9ab
+          if($LASTEXITCODE -ne 0){throw 'T31_CODE_PRECEDES_SOURCE'}
+          git merge-base --is-ancestor 1c9c187909ad0b684b19dc3d4c3ea3c3ce931232 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T31_PASSED_TRAIN_WORKFLOW_NOT_PRESENT'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t31-conditional-program.py
+          if($LASTEXITCODE -ne 0){throw 'T31_ORIGINAL_SYNTAX_BAD'}
+          Write-Output 'T31_ORIGINAL_FROZEN_IDENTITY_AND_CHRONOLOGY=PASS'
+      - name: One original 64-world three-step prospective with four honest arms and five complete process trials
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t31-conditional-program.py > t31-original-firstuse.json
+          if($LASTEXITCODE -ne 0){throw 'T31_ORIGINAL_FIRSTUSE_FAILED_DEV_CONSUMED_DO_NOT_RERUN'}
+          python -c "import json;x=json.load(open('t31-original-firstuse.json',encoding='utf-8-sig'));assert x['new_DEV_worlds']==64 and x['counterfactuals']==192 and len(x['results'])==4 and all(a['certified']+a['safe_abstentions']==192 and a['hard_false_positives']==0 and len(a['five_CPU_ns'])==5 and len(a['five_peak_RSS_bytes'])==5 and len(a['per_case'])==64 for a in x['results'].values()) and not x['optimizer_admission'] and not x['external_independent_source'];print('T31_FIRSTUSE_EXACT_COMPLETE=PASS');print('T31_METRICS='+json.dumps({k:{z:v[z] for z in ('certified','safe_abstentions','world_target_visits','median_CPU_ns','max_peak_RSS_bytes')} for k,v in x['results'].items()},sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T31_ORIGINAL_VALIDATION_FAILED_DEV_CONSUMED_DO_NOT_RERUN'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t31-original-unknown-conditional-program-${{ matrix.os }}
+          path: t31-original-firstuse.json
+          retention-days: 90
+          if-no-files-found: ignore
