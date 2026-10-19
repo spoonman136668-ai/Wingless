@@ -50,7 +50,6 @@ def audit(t10,t11,k,c,w):
   query_cpu+=time.process_time_ns()-ts
   extra_queries+=1
 def main():
- t11=__import__("importlib").util
  from importlib.util import spec_from_file_location,module_from_spec
  import sys
  def load(p,n):
