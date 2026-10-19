@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.T26.first-sequence-source.TRAIN-only-no-go.v1",
+  "date_EDT": "2026-10-19",
+  "classification": "VALID_TRAIN_ONLY_NO_GO_INSUFFICIENT_SEQUENCE_UNCERTAINTY",
+  "original_run": {
+    "id": 39328317430,
+    "attempt": 1,
+    "url": "https://github.com/spoonman136668-ai/Wingless/actions/runs/39328317430",
+    "execution_sha": "63fc91427e58c4c5504c52db1f68e6feadf2139e",
+    "conclusion": "failure_due_to_predeclared_minimum_headroom",
+    "hosted_windows_linux": "same measured scientific headroom failure, both source-identity/syntax checks PASS"
+  },
+  "source_chronology": {
+    "preceding_T25_original_negative": "eddb62949b154fcaf6203c9a77dee6c9a75a1d09",
+    "hypothesis_precode": "457c139371ff3193b134ff67a0cc6bd320c60678",
+    "new_source_birth": "8c213ab0152b0da8de57fde3890370bfba642b05",
+    "learned_program_plus_strong_exact": "230e1bf36371fdfe655759b0623425261fac8e34"
+  },
+  "source_blobs": {
+    "precode": "bc00a72eee09459d1e90919b65e0254bad54904d",
+    "R_S_sequence_source": "cbff5c5f49d9405d1ac5fcee51dcfa1a5038c0b4",
+    "learnt_and_exact_recurrence": "d5d37499b80ade97fd7e539a6dded8789a478617"
+  },
+  "original_provider_evidence": {
+    "ubuntu": {
+      "job_id": 118319779047,
+      "artifact_id": 12223246315,
+      "zip_sha256": "3e5491c4cb64b75a7efa4db737a0c859bf936cd1d73993aa1e1d6a40aec2ff2c"
+    },
+    "windows": {
+      "job_id": 118319779382,
+      "artifact_id": 12224120120,
+      "zip_sha256": "6cb1d6a3d4f06d6af0ab9696e59cee6399ce1541bcef1e8df9150f184864acbd"
+    },
+    "artifact_expiration": "2027-01-17T21:32:41Z"
+  },
+  "TRAIN_only_observations": {
+    "TRAIN_worlds": 40,
+    "DEV_generated": 0,
+    "TRAIN_future_counterfactual_questions": 120,
+    "soundly_certified": 112,
+    "safely_abstained": 8,
+    "hard_false_positives": 0,
+    "headroom_fraction": 0.06666666666666667,
+    "frozen_minimum": 0.2,
+    "learned_temporal_transition_rows": 16,
+    "learned_public_transition_examples": 1249,
+    "original_TRUE_worlds_retained": 40,
+    "exact_recurrent_equivalences": 120,
+    "posterior_mean_hypotheses": 1.85,
+    "posterior_max_hypotheses": 12,
+    "total_possible_hidden_initial_graph_mode_worlds": 1536,
+    "original_gate_passed": false
+  },
+  "result": "Seven 3-of-6 masked frames and two historical interventions made the hidden-state/topology ensemble nearly identifiable on publicly observed TRAIN trajectories. The recurring Boolean dynamics and table are sound, but genuine counterfactual headroom is only 6.67%, below frozen 20%. The first-use T26-R/S DEV cases remain unopened. A follow-on new protocol must use NEW source families and refreeze before any new experiments; NEVER tune/reopen this original DEV after failed TRAIN gate.",
+  "safety": {
+    "all_original_DEV_unopened": true,
+    "prior_protected_sources_unopened": true,
+    "no_rerun_of_original_DEV": true,
+    "no_fabricated_external_independence": true,
+    "no_model_accepted": true,
+    "no_optimizer_admission": true,
+    "no_merge": true,
+    "no_workstation": true,
+    "no_new_controller": true,
+    "no_FORGE_CKB_plane_changes": true,
+    "no_paid_API": true
+  }
+}
