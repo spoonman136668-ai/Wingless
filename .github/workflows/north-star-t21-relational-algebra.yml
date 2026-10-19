@@ -1,0 +1,65 @@
+name: T21 source-free relational algebra qualification
+on:
+  push:
+    branches: [research/t21-relational-basis-20261019]
+    paths: ['.github/workflows/north-star-t21-relational-algebra.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t21-algebra-only
+  cancel-in-progress: false
+jobs:
+  exact-algebra:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 32
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify T21 chronology, exact source and no external DEV source
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if ((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA) { throw 'T21_HEAD_DRIFT' }
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t21-relational-basis-prereg.json'='fa659be83ce6e45fb5b736b4a1f69ee80dcec429'
+            'research/north-star-transfer/20261019-wingless-t21-relational-bitmatrix.py'='0d2b53620d1824316294149062e3c035713c69ee'
+            'research/north-star-transfer/20261019-wingless-t21-relational-algebra-test.py'='beccae5112db10bf2a87158b712d7de0e9d495ec'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+          }
+          foreach ($path in $expected.Keys) {
+            $actual=(git hash-object -- $path).Trim()
+            if ($actual -cne $expected[$path]) { throw "T21_BLOB_DRIFT:$path" }
+          }
+          git merge-base --is-ancestor e791c94922bb5cccac207fe50ec2be3643da460f 07c1e1fa0a782637d5745cd784cc77b54f484f42
+          if ($LASTEXITCODE -ne 0) { throw 'T21_IMPLEMENTATION_PRECEDES_FROZEN_PREREG' }
+          git merge-base --is-ancestor 07c1e1fa0a782637d5745cd784cc77b54f484f42 f24a73db4bdf971b235d85e0c7b95cb712c2f806
+          if ($LASTEXITCODE -ne 0) { throw 'T21_TEST_PRECEDES_IMPLEMENTATION' }
+          git merge-base --is-ancestor f24a73db4bdf971b235d85e0c7b95cb712c2f806 HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'T21_EXACT_HEAD_NOT_INCLUDED' }
+          python -m py_compile research/north-star-transfer/20261019-wingless-t21-relational-bitmatrix.py research/north-star-transfer/20261019-wingless-t21-relational-algebra-test.py
+          if ($LASTEXITCODE -ne 0) { throw 'T21_SYNTAX_FAILURE' }
+          Write-Output 'T21_PRECODE_SOURCE_CHRONOLOGY=PASS'
+      - name: Independent algebraic proof and adversarial verification only
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t21-relational-algebra-test.py > t21-math-foundation.json
+          if ($LASTEXITCODE -ne 0) { throw 'T21_EXACT_ALGEBRA_FAILURE' }
+          python -c "import json; d=json.load(open('t21-math-foundation.json',encoding='utf-8-sig')); c=d['checks']; assert d['result']=='PASS_ALGEBRA_NOT_SCIENCE' and c['universal_certifications']>=150 and c['composed_relations']>=145 and c['tamper_rejection']>=150 and c['oracle_public_agreement']>=4500 and c['source_cases_opened']==0; assert not d['independent_source_family_admitted'] and not d['learned_model_trained'] and not d['scientific_acceptance'] and not d['optimizer_admission'] and not d['T19_T20_DEV_reused'] and d['T16_originals_consumed']==0; print('T21_SOURCE_FREE_ALGEBRA=PASS'); print('T21_COUNTS='+json.dumps(c,sort_keys=True)); print('T21_SCIENTIFIC_ADMISSION=BLOCKED_INDEPENDENT_SOURCE')"
+          if ($LASTEXITCODE -ne 0) { throw 'T21_ALGEBRA_RECEIPT_INVALID' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t21-proof-carrying-relational-algebra-${{ matrix.os }}
+          path: t21-math-foundation.json
+          if-no-files-found: ignore
+          retention-days: 90
