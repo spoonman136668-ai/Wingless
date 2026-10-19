@@ -1,0 +1,57 @@
+name: T13 wingless causal sufficiency source-only qualification
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t13-wingless.yml']
+permissions:
+  contents: read
+concurrency:
+  group: northstar-t13-wingless-single-frozen-source
+  cancel-in-progress: false
+jobs:
+  focused-source-identity-and-causal-research:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify exact preimplementation freeze and baseline source
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T13_GIT_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t13-freeze.json').Trim() -cne '3a97153a41df100b027d114d22dfdcdcd20b3e11'){throw 'T13_PREREG_BLOB_DRIFT'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t13-freeze.json').Trim() -cne '2f4fa5e8879fb1362b3dc322927f7ce4951303e8'){throw 'T13_FREEZE_NOT_FIRST'}
+          git merge-base --is-ancestor 2f4fa5e8879fb1362b3dc322927f7ce4951303e8 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T13_PRECODE_FREEZE_NOT_ANCESTOR'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t13-mechanism.py').Trim() -cne '7ec2c542fc2505020c4fd4a76312db925904f0b4'){throw 'T13_SOURCE_CODE_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t12-mechanism.py').Trim() -cne 'c229a8b33f70797f6ca2854f19cb999b2737730c'){throw 'T13_T12_FROZEN_CONTROL_DRIFT'}
+          Write-Output 'T13_WINGLESS_SOURCE_IDENTITY_AND_FIRST_FREEZE=PASS'
+      - name: Run new source-only causal mechanism and resource comparison
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $py=if($IsWindows){'python'}else{'python3'}
+          & $py -B 'research/north-star-transfer/20261019-wingless-t13-mechanism.py' | Tee-Object 't13-wingless-original.json'
+          if($LASTEXITCODE -ne 0){throw 'T13_WINGLESS_SOURCE_OR_MECHANISM_FAILED'}
+          $d=Get-Content 't13-wingless-original.json' -Raw | ConvertFrom-Json
+          if($d.'protected_original_or_consumed_source_replayed' -ne $false -and $d.'protected_original_or_consumed_source_replayed' -ne 0){throw 'T13_PROTECTED_SOURCE_OR_REPLAY'}
+          if($d.'science_accepted' -ne $false){throw 'T13_SCIENCE_PROMOTION_UNAUTHORIZED'}
+          Write-Output 'T13_WINGLESS_NONPROTECTED_ENGINEERING=PASS'
+          Write-Output 'T13_WINGLESS_INDEPENDENT_SCIENCE_ADMISSION=false'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t13-wingless-source-original-${{ matrix.os }}-${{ github.sha }}
+          path: t13-wingless-original.json
+          retention-days: 90
+          if-no-files-found: warn
