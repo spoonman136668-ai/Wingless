@@ -31,7 +31,8 @@ def rss():
             _fields_=[("cb",wintypes.DWORD),("PageFaultCount",wintypes.DWORD),
               ("PeakWorkingSetSize",ctypes.c_size_t),("WorkingSetSize",ctypes.c_size_t),
               ("QuotaPeakPagedPoolUsage",ctypes.c_size_t),("QuotaPagedPoolUsage",ctypes.c_size_t),
-              ("QuotaPeakNonPagedPoolUsage",ctypes.c_size_t),("PagefileUsage",ctypes.c_size_t),
+              ("QuotaPeakNonPagedPoolUsage",ctypes.c_size_t),("QuotaNonPagedPoolUsage",ctypes.c_size_t),
+              ("PagefileUsage",ctypes.c_size_t),
               ("PeakPagefileUsage",ctypes.c_size_t)]
         k=ctypes.WinDLL("kernel32",use_last_error=True)
         p=ctypes.WinDLL("psapi",use_last_error=True)
