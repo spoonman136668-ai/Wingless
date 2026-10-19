@@ -1,0 +1,63 @@
+name: T27 one-time predictive latent-belief compression prospective original
+on:
+  push:
+    branches: [research/t27-learned-predictive-belief-20261019]
+    paths: ['.github/workflows/north-star-t27-first-use.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t27-new-WX-first-use-once
+  cancel-in-progress: false
+jobs:
+  first-use:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 60
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze original precode source amendment and qualified TRAIN blob identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T27_FIRST_USE_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t27-predictive-precode.json'='ed2639fb855eac9f2101a0328d20ae8abafbae78'
+            'research/north-star-transfer/20261019-wingless-t27-new-predictive-worlds.py'='5c5cb3028192cc7f284039a6eac1aaa0ba6d0d03'
+            'research/north-star-transfer/20261019-wingless-t27-predictive-belief.py'='75983fab91406e9b82e1e1faa94b481483b61a68'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T27_FIRST_USE_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 32c034789649cb520f92c8c6bb6fcc80643589f6 738c7a1f8055ff75a3bd386d91f7c2562665f7a6
+          if($LASTEXITCODE -ne 0){throw 'T27_PRECODE_ORIGINAL_MISSING'}
+          git merge-base --is-ancestor 738c7a1f8055ff75a3bd386d91f7c2562665f7a6 ca274d292aaceb41d4d0576ee561ba5a20e2b9a5
+          if($LASTEXITCODE -ne 0){throw 'T27_ORIGINAL_MODEL_AFTER_SOURCE_NOT_VERIFIED'}
+          git merge-base --is-ancestor a9cf373322a0c0b0bb4c333596e906a422717f1d 7cb8a3e3077b41b98f8ccab4c72b65da1309aabc
+          if($LASTEXITCODE -ne 0){throw 'T27_PRE_FIRST_USE_TRAIN_ONLY_FIX_NOT_QUALIFIED'}
+          git merge-base --is-ancestor 7cb8a3e3077b41b98f8ccab4c72b65da1309aabc HEAD
+          if($LASTEXITCODE -ne 0){throw 'T27_APPROVED_TRAIN_ONLY_HEAD_NOT_PRESENT'}
+          Write-Output 'T27_FIRST_USE_FROZEN_SOURCE_AND_TRAIN=PASS'
+      - name: One original W/X DEV first use with learned predictive code and strongest exact controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t27-predictive-belief.py > t27-original-predictive-belief.json
+          if($LASTEXITCODE -ne 0){throw 'T27_ORIGINAL_FAILED_OR_NEGATIVE_PRESERVE_LOG'}
+          python -c "import json;x=json.load(open('t27-original-predictive-belief.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==5 and x['TRAIN_cases']==40 and x['prospective_cases']==64 and x['counterfactual_queries']==192;assert all(v['correct_certified']+v['safe_abstained']==192 and v['hard_false_positives']==0 and len(v['per_case'])==64 and len(v['five_complete_cpu_ns'])==5 and len(v['five_peak_rss_bytes'])==5 for v in a.values());assert not x['scientific_joint_acceptance'] and not x['independent_external_replication'] and not x['optimizer_admission'] and not x['old_DEV_replayed'] and x['no_new_controllers'] and x['no_paid_API'];print('T27_ORIGINAL_VALID_TECHNICAL_ONLY=PASS');print('T27_CERTIFIED='+json.dumps({k:v['correct_certified'] for k,v in a.items()},sort_keys=True));print('T27_UNCERTAIN='+json.dumps({k:v['safe_abstained'] for k,v in a.items()},sort_keys=True));print('T27_MEDIAN_CPU='+json.dumps({k:v['median_complete_cpu_ns'] for k,v in a.items()},sort_keys=True));print('T27_MAX_RSS='+json.dumps({k:v['max_peak_rss_bytes'] for k,v in a.items()},sort_keys=True));print('T27_PREDICTIVE_MERGES='+json.dumps({k:v['world_to_predictive_class_merges'] for k,v in a.items()},sort_keys=True));print('T27_STRONG_CONTROL_COMPARISON='+json.dumps(x['comparison'],sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T27_SCIENTIFIC_RECEIPT_INVARIANT_FAILED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t27-original-predictive-belief-${{ matrix.os }}
+          path: t27-original-predictive-belief.json
+          if-no-files-found: ignore
+          retention-days: 90
