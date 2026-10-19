@@ -31,7 +31,7 @@ jobs:
           if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T27_HEAD_DRIFT'}
           $expected=@{
             'research/north-star-transfer/20261019-wingless-t27-predictive-precode.json'='ed2639fb855eac9f2101a0328d20ae8abafbae78'
-            'research/north-star-transfer/20261019-wingless-t27-new-predictive-worlds.py'='51aabb72a252e71ec45bf6c49425bd28b919ee74'
+            'research/north-star-transfer/20261019-wingless-t27-new-predictive-worlds.py'='5c5cb3028192cc7f284039a6eac1aaa0ba6d0d03'
             'research/north-star-transfer/20261019-wingless-t27-predictive-belief.py'='75983fab91406e9b82e1e1faa94b481483b61a68'
           }
           foreach($path in $expected.Keys){
@@ -41,6 +41,8 @@ jobs:
           if($LASTEXITCODE -ne 0){throw 'T27_SOURCE_PRECEDES_PRECODE'}
           git merge-base --is-ancestor 738c7a1f8055ff75a3bd386d91f7c2562665f7a6 ca274d292aaceb41d4d0576ee561ba5a20e2b9a5
           if($LASTEXITCODE -ne 0){throw 'T27_CANDIDATE_PRECEDES_SOURCE'}
+          git merge-base --is-ancestor a9cf373322a0c0b0bb4c333596e906a422717f1d HEAD
+          if($LASTEXITCODE -ne 0){throw 'T27_PREREG_TARGET_ARITY_CORRECTION_NOT_INCLUDED'}
           python -m py_compile research/north-star-transfer/20261019-wingless-t27-new-predictive-worlds.py research/north-star-transfer/20261019-wingless-t27-predictive-belief.py
           if($LASTEXITCODE -ne 0){throw 'T27_SYNTAX_FAILURE'}
           Write-Output 'T27_PREREG_BEFORE_FRESH_SOURCE_AND_LEARNER=PASS'
