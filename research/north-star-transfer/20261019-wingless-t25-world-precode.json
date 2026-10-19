@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.T25.learned-relational-causal-world-model.prereg.v1",
+  "date_edt": "2026-10-19",
+  "phase": "FROZEN_BEFORE_NEW_SOURCE_AND_MODEL",
+  "base_T24_no_go": "6d449df745477dd58ba7e149f1522f72c21b2143",
+  "north_star": "Learned causal world models that transfer persistent variable/entity bindings and interventions to unfamiliar graph families, with complete native resource parity and zero hard false positives.",
+  "hypothesis": "TRAIN-only reusable relational event statistics can form compact proof-carrying hypothesis states across partially observable nonlinear multi-entity worlds, allowing safer and cheaper prospective counterfactual inference than equally TRAIN-informed full symbolic and frequency-weighted controls, without cueing on entity IDs or source family.",
+  "structural_novelty": "Eight entities with latent directed two-parent conditional causal update functions, masked partial trajectory observations, multi-step interventions and exact certified counterfactual abstention. This is NOT finite S3 permutation composition, query-priority/motif cache, or a four-role public-pair puzzle.",
+  "world_algebra": {
+    "entities": 8,
+    "entity_states": "binary",
+    "latent_parent_pairs": "each target has two distinct parents, excluding itself",
+    "latent_gate": "AND or OR",
+    "transition": "simultaneous next[j]=old[j] XOR gate(old[parentA],old[parentB]), intervention optionally overrides resulting state of one target",
+    "partial_observations": "source draws one-step transition probes with full pre-state, but post-state reveals masked subset of targets",
+    "hypothesis_count_per_target": "2 * choose(7,2) = 42",
+    "target_belief_exact": "set of all hypothesis pairs+gates consistent with all observed public probes; no hidden latent label may enter candidate",
+    "intervention_query": "two consecutive transitions under a source-provided intervention schedule, 3 selected target predictions per case",
+    "proof": "interval-set forward propagation over all consistent per-node hypotheses is conservative; issue an answer only when every reachable state for that target is singleton. May abstain; no guessing.",
+    "minimum_information_headroom": "before prospective use, confirm on public TRAIN cases that at least 20% of counterfactual target queries have nontrivial unresolved parent hypotheses, a measured information gap from a full graph oracle; do not select or modify DEV based on outcomes."
+  },
+  "experiment": {
+    "fresh_family_P": "Causal fan-in / competing mediator graphs under limited partial observation, hidden nonlinear AND/OR rules",
+    "fresh_family_Q": "Long-range cross-entity feedback chains and intervention-conditional branching with unfamiliar node permutations",
+    "source_authoring": "internal source-only file without candidate imports, not external replication",
+    "TRAIN_cases_per_family": 20,
+    "DEV_cases_per_family": 32,
+    "TRAIN_total": 40,
+    "DEV_total": 64,
+    "public_training": "world probing traces and counterfactual words/input intervention schedule with no hidden graph or target truths",
+    "DEV_visibility": "public masked probes, intervention plan, visible initial state; hidden graph, latent gates and private counterfactual targets only to scorer",
+    "prior_cohorts_excluded": "all T16–T24 DEV and protected source families"
+  },
+  "arms": [
+    "TRAIN-learned-factorized-causal-belief",
+    "TRAIN-frequency-factorized-causal-belief",
+    "untrained-exact-factorized-belief",
+    "TRAIN-fully-trained-symbolic-causal-control"
+  ],
+  "comparators": "All four are exact safe online inference under same public observations; exact symbolic strongest fully trained baseline sees identical TRAIN. If one cannot prove a target value from public evidence it must abstain and be retained as ineligible, never converted into a guessed success.",
+  "predeclared_outcomes": {
+    "target_queries_per_case": 3,
+    "expect_64_cases": 64,
+    "minimum_correctness": "zero hard false positives and zero baseline correctly certified losses",
+    "strict_learned_capability_gain": "more independently provable correct counterfactual answers than the strongest fully trained symbolic control without reducing safety",
+    "or_strict_learned_efficiency_gain": "identical proven correct coverage, but lower complete CPU and no peak RSS regression, with genuine learned rather than algorithmic-only advantage over the equally TRAIN-informed frequency control",
+    "CPU": "5 independent complete-process repeats per arm on Windows and Linux; include TRAIN, source generation, world interpretation, posterior, proof and fallback",
+    "peak_memory": "whole-process peak RSS nonregression on both OS",
+    "no_hindsight": "No DEV retuning, source reseeding, discarded failures, or replay",
+    "scientific_acceptance": "only original prospective, source-blind, resource-qualified evidence; no external replication claimed and no optimizer adoption"
+  },
+  "gate_sequence": [
+    "T25-A freeze",
+    "T25-B birth new internal source families separate from model",
+    "T25-C qualify TRAIN-only exact abstract causal-world beliefs on both hosted OS; DEV unopened",
+    "T25-D run original prospective DEV once after all code and source SHA frozen if preflight passes",
+    "T25-E independently retain exact original provider result and negative evidence"
+  ],
+  "ops": {
+    "draft_only": true,
+    "no_merge": true,
+    "no_local_workstation": true,
+    "GitHub_hosted_runners_only": true,
+    "no_new_controller": true,
+    "no_FORGE_or_CKB_plane_coupling": true,
+    "no_paid_inference": true,
+    "no_accepted_scientific_ref_promotion": true
+  }
+}
