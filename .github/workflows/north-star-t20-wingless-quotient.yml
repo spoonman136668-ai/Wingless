@@ -1,0 +1,73 @@
+name: T20 Wingless structural quotient frozen internal qualification
+on:
+  push:
+    branches: [research/t20-structural-certificate-20261019]
+    paths: ['.github/workflows/north-star-t20-wingless-quotient.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t20-structural-internal
+  cancel-in-progress: false
+jobs:
+  first-use-dev-comparison:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen hypothesis, fresh source chronology and exact reused blobs
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA) { throw 'T20_HEAD_DRIFT' }
+          $expected = @{
+            'research/north-star-transfer/20261019-wingless-t20-structural-quotient-precode.json'='bc386b9e0979043414625194d18d1c29a809f3f8'
+            'research/north-star-transfer/20261019-wingless-t20-fresh-source.py'='2f261dd230261015b77a574a203dd773750ffa45'
+            'research/north-star-transfer/20261019-wingless-t20-structural-quotient.py'='d5f9f5d495a0d5261d37b30bdeccbdc04e249158'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+            'research/north-star-transfer/20261018-wingless-t3-typed-composition.py'='85dbd2673a94a6d72db29e57ee836619405f7f1e'
+          }
+          foreach ($path in $expected.Keys) {
+            $actual=(git hash-object -- $path).Trim()
+            if ($actual -cne $expected[$path]) { throw "T20_BLOB_DRIFT:$path" }
+          }
+          git merge-base --is-ancestor dc21d26c1ea619951fc2eaa0968adf4ae9daa133 b65394023d06b6b8803830bb4d6c427f5fe84828
+          if ($LASTEXITCODE -ne 0) { throw 'T20_SOURCE_PRECEDES_PREREG' }
+          git merge-base --is-ancestor b65394023d06b6b8803830bb4d6c427f5fe84828 f665429dcb365f9fa19802c81cccc9eb926aec23
+          if ($LASTEXITCODE -ne 0) { throw 'T20_MECHANISM_PRECEDES_SOURCE' }
+          git merge-base --is-ancestor f665429dcb365f9fa19802c81cccc9eb926aec23 HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'T20_IMPLEMENTATION_NOT_INCLUDED' }
+          python -m py_compile research/north-star-transfer/20261019-wingless-t20-fresh-source.py research/north-star-transfer/20261019-wingless-t20-structural-quotient.py
+          if ($LASTEXITCODE -ne 0) { throw 'T20_SYNTAX_FAILURE' }
+          Write-Output 'T20_FROZEN_HYPOTHESIS_BEFORE_FRESH_SOURCE_BEFORE_CODE=PASS'
+      - name: Exact live-binding quotient property tests before DEV use
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t20-structural-quotient.py --property
+          if ($LASTEXITCODE -ne 0) { throw 'T20_EXACT_QUOTIENT_PROPERTY_FAIL' }
+      - name: Single internal DEV comparison, five whole-process trials per arm
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t20-structural-quotient.py > t20-internal-quotient.json
+          if ($LASTEXITCODE -ne 0) { throw 'T20_INTERNAL_DEV_FAIL' }
+          python -c "import json; d=json.load(open('t20-internal-quotient.json',encoding='utf-8-sig')); r=d['results']; assert len(r)==4 and all(x['correct']==64 and len(x['cpu_five_process_ns'])==5 and len(x['rss_five_process_bytes'])==5 for x in r.values()); assert not d['T19_DEV_replayed'] and d['T16_originals_opened']==0 and not d['scientific_acceptance'] and not d['optimizer_admission']; print('T20_FRESH_INTERNAL_RESULTS=PASS'); print('T20_QUERIES='+json.dumps({k:v['queries'] for k,v in r.items()},sort_keys=True)); print('T20_JOINT_GATE='+str(d['complete_joint_gate_pass'])); print('T20_COMPARISON='+json.dumps(d['comparison'],sort_keys=True))"
+          if ($LASTEXITCODE -ne 0) { throw 'T20_REPORT_INVARIANT_FAIL' }
+          Write-Output 'T20_INTERNAL_ONLY_ZERO_SCIENTIFIC_OR_OPTIMIZER_ACCEPTANCE=PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t20-fresh-internal-structural-${{ matrix.os }}
+          path: t20-internal-quotient.json
+          if-no-files-found: ignore
+          retention-days: 90
