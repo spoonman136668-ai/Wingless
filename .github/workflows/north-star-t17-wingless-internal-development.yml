@@ -31,7 +31,7 @@ jobs:
           if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T17_EXACT_HEAD_DRIFT'}
           if((git hash-object 'research/north-star-transfer/20261019-wingless-t17-internal-experiment-freeze.json').Trim() -cne 'fb8596a7a735bb677e8bfc9095b9a70ebbcbcbc9'){throw 'T17_PROTOCOL_DRIFT'}
           if((git hash-object 'research/north-star-transfer/20261019-wingless-t17-internal-synthetic-source.py').Trim() -cne '51a2b5e1c9eb03eafa96de6ef59d920f46fa7d51'){throw 'T17_SOURCE_DRIFT'}
-          if((git hash-object 'research/north-star-transfer/20261019-wingless-t17-internal-experiment.py').Trim() -cne 'e5552a33374b631b5d1c6214b0c7ca0dfbcb6dd2'){throw 'T17_LEARNER_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t17-internal-experiment.py').Trim() -cne '28a5e29db956db0df722283fd89e04aad681e4f5'){throw 'T17_LEARNER_DRIFT'}
           if((git hash-object 'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py').Trim() -cne '1041db8ff76365eba5eb8f31cecd0e2172d397d8'){throw 'T17_CERTIFIER_DRIFT'}
           if((git hash-object 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py').Trim() -cne '85dbd2673a94a6d72db29e57ee836619405f7f1e'){throw 'T17_DOMAIN_KERNEL_DRIFT'}
           git merge-base --is-ancestor 8d4cf486d4ff0325a1c3c905edee1d9ace719032 HEAD
