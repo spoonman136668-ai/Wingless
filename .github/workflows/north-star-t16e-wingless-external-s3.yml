@@ -1,0 +1,40 @@
+name: T16E Wingless independent published S3 reference nonconsuming
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t16e-wingless-external-s3.yml']
+permissions:
+  contents: read
+jobs:
+  external-s3-algebra-proof:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 30
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify unchanged external semantic pin and frozen native operator identity
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T16E_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t16e-sn-grok-s3-public-algebra.py').Trim() -cne '6327465e0ef52a5a09bafb92f60dd2780386be01'){throw 'T16E_PUBLIC_S3_ADAPTER_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t16e-sn-grok-s3-public-algebra_test.py').Trim() -cne 'dea6ee43e9032d0afc555e480ddd90707686a0e4'){throw 'T16E_PUBLIC_S3_TEST_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py').Trim() -cne '85dbd2673a94a6d72db29e57ee836619405f7f1e'){throw 'T16E_FROZEN_WINGLESS_DOMAIN_CHANGED'}
+          Write-Output 'T16E_EXTERNAL_S3_OPERATOR_REFERENCE_FROZEN=PASS'
+      - name: Hermetic public S3 composition identity tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t16e-sn-grok-s3-public-algebra_test.py
+          if($LASTEXITCODE -ne 0){throw 'T16E_S3_COMPATIBILITY_FAIL'}
+          Write-Output 'T16E_S3_SEMANTICS_MATCH=PASS'
+          Write-Output 'T16E_NEW_SOURCE_FAMILY_NOT_QUALIFIED_NO_ORIGINAL_BIRTH=PASS'
