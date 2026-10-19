@@ -1,0 +1,64 @@
+name: T24 frozen TRAIN-only causal information headroom
+on:
+  push:
+    branches: [research/t24-causal-information-headroom-20261019]
+    paths: ['.github/workflows/north-star-t24-train-only.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t24-TRAIN-only-source-safe
+  cancel-in-progress: false
+jobs:
+  exact-headroom-preflight:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 48
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen preregistration precedes source and evaluator
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T24_SOURCE_REF_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t24-headroom-precode.json'='e47c5904156e77c776707e9f53d801618a160fa9'
+            'research/north-star-transfer/20261019-wingless-t24-new-source.py'='cb1420a7eeebd94a5e7f9f86e9cac560dde4c70c'
+            'research/north-star-transfer/20261019-wingless-t24-online-headroom.py'='2b8f8bae15c83dc7709b972468e314ff24d84792'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){
+              throw "T24_BLOB_IDENTITY_DRIFT:$path"
+            }
+          }
+          git merge-base --is-ancestor 2f660e33e5eb899c30818cb2040082fb094fa907 90891aa222c6a7f5174274036c056522bf76dfc1
+          if($LASTEXITCODE -ne 0){throw 'T24_NEW_SOURCE_PRECEDES_FROZEN_PREREG'}
+          git merge-base --is-ancestor 90891aa222c6a7f5174274036c056522bf76dfc1 c868c51023ef8cacc1ca201285357fff90042a7a
+          if($LASTEXITCODE -ne 0){throw 'T24_EVALUATOR_PRECEDES_SOURCE'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t24-new-source.py research/north-star-transfer/20261019-wingless-t24-online-headroom.py
+          if($LASTEXITCODE -ne 0){throw 'T24_BAD_PYTHON_SYNTAX'}
+          Write-Output 'T24_FROZEN_PREREG_SOURCE_AND_EVALUATOR=PASS'
+      - name: Prove exact binary assignment and optimal online DP on TRAIN only
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t24-online-headroom.py --train-only > t24-TRAIN-headroom.json
+          if($LASTEXITCODE -ne 0){throw 'T24_TRAIN_ONLY_BOUND_FAILED'}
+          python -c "import json; x=json.load(open('t24-TRAIN-headroom.json',encoding='utf-8-sig')); assert x['status']=='PASS_TRAIN_ONLY_NO_DEV' and x['source_cases']==40 and x['DEV_cases_generated']==0 and x['three_output_algebraic_identity_checks']==1920 and x['hindsight_bound_checked']==640 and x['DP_total_states']<=3240 and not x['learned_model_tested'] and not x['optimizer_admission']; print('T24_TRAIN_ONLY=PASS'); print('T24_INFORMATION_PROOF='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T24_TRAIN_ORIGINAL_RECEIPT_INVALID'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t24-TRAIN-headroom-${{ matrix.os }}
+          path: t24-TRAIN-headroom.json
+          retention-days: 90
+          if-no-files-found: ignore
