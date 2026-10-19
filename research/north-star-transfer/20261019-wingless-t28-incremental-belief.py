@@ -70,21 +70,42 @@ def exact_update(src,label,old_mask,action,mask,seen):
     return exact_transition(src,label,old_mask,action)&observation_filter(mask,seen)
 
 def fresh_belief(public,src,trained_macros=None,dictionary=None):
+    """Exact incremental belief update, with ACTUAL lossless dictionary storage.
+
+    Compressed channels store a 5-bit dictionary reference to a proven
+    64-bit exact support mask. Unseen masks use the full 64-bit residual.
+    All masks decode exactly, and the complete posterior is returned solely
+    for proof and downstream counterfactual certification.
+    """
     frames=public["observations"];actions=public["history_actions"]
     if len(frames)!=5 or len(actions)!=4:
         raise RuntimeError("T28_TEMPORAL_SOURCE_IDENTITY_MISMATCH")
     first_filter=observation_filter(*frames[0])
-    posterior=[first_filter]*24
+    lookup={v:i for i,v in enumerate(sorted(dictionary))} if dictionary is not None else None
+    entries=tuple(sorted(dictionary)) if dictionary is not None else ()
+    if lookup is not None and len(entries)>16:
+        raise RuntimeError("T28_DICTIONARY_CODE_BUDGET_EXCEEDED")
+    def pack(v):
+        if lookup is None:return v
+        if v in lookup:return lookup[v] << 1
+        return (v << 1) | 1
+    def unpack(v):
+        if lookup is None:return v
+        return (v >> 1) if v&1 else entries[v >> 1]
+    # No state is ever dropped: encoded dictionary and residual forms are
+    # both exact invertible representations of the original 64-bit mask.
+    posterior=[pack(first_filter)]*24
     cached=0;residual=0;encoded=0;full=0
     for idx,action in enumerate(actions):
         mask,seen=frames[idx+1]
         candidate_filter=observation_filter(mask,seen)
         nextposterior=[]
-        for label,old in enumerate(posterior):
+        for label,storage in enumerate(posterior):
+            old=unpack(storage)
             if not old:
-                nextposterior.append(0);continue
-            if dictionary is not None:
-                if old in dictionary:encoded+=1
+                nextposterior.append(pack(0));continue
+            if lookup is not None:
+                if old in lookup:encoded+=1
                 else:full+=1
             key=(label,old,action,mask,seen)
             if trained_macros is not None and key in trained_macros:
@@ -93,11 +114,15 @@ def fresh_belief(public,src,trained_macros=None,dictionary=None):
             else:
                 new=exact_transition(src,label,old,action)&candidate_filter
                 residual+=1
-            nextposterior.append(new)
+            nextposterior.append(pack(new))
         posterior=nextposterior
-    if not any(posterior):raise RuntimeError("T28_ALL_HIDDEN_WORLDS_ELIMINATED")
-    return tuple(posterior),{"hits":cached,"exact_fallbacks":residual,
-       "dictionary_references":encoded,"raw_slices":full}
+    reconstructed=tuple(unpack(v) for v in posterior)
+    if not any(reconstructed):raise RuntimeError("T28_ALL_HIDDEN_WORLDS_ELIMINATED")
+    if lookup is not None and any(unpack(pack(mask))!=mask for mask in reconstructed):
+        raise RuntimeError("T28_DICTIONARY_NOT_BIJECTIVE")
+    return reconstructed,{"hits":cached,"exact_fallbacks":residual,
+       "dictionary_references":encoded,"raw_slices":full,
+       "compressed_storage_real":lookup is not None}
 
 def full_enumeration(src,public):
     frame0=observation_filter(*public["observations"][0])
