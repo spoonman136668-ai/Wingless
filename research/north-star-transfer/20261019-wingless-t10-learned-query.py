@@ -40,7 +40,17 @@ def train(k,cases):
    dom,roles,w,start=c
    for j,rows in enumerate(roles):
     a=possible(k,dom,rows[:1])[0];b=possible(k,dom,rows)[0]
-    y=1 if a!=b and any(r==j for r,v in word(w)) else -1
+    # TRAIN-only causal intervention label using PUBLIC pairs:
+    # replace only this role's first-pair estimate and determine whether
+    # the final composed prediction changes, without hidden task answer.
+    decoded=[possible(k,dom,role_rows)[0] for role_rows in roles]
+    prior_ops=list(decoded);prior_ops[j]=a
+    after_ops=list(decoded);after_ops[j]=b
+    def run(ops):
+     state=k.start(dom)
+     for r,inv in word(w):state=k.compose_state(state,ops[r],dom,inv)
+     return k.apply(state,start)
+    y=1 if run(prior_ops)!=run(after_ops) else -1
     f=features(k,c,j)
     if y*sum(a*b for a,b in zip(weights,f))<=0:
      weights=[max(-127,min(127,a+y*b)) for a,b in zip(weights,f)]
