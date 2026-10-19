@@ -1,0 +1,461 @@
+{
+  "schema": "wingless.t23.original-multiquery-learned-negative.v1",
+  "label": "VALID_PROSPECTIVE_INTERNAL_LEARNED_GAIN_NOT_PROVEN",
+  "date_edt": "2026-10-19",
+  "original": {
+    "run_id": 39319380004,
+    "attempt": 1,
+    "head_commit": "4f13170b5b56272a112ac14cfb2e0b0bfbf72c57",
+    "url": "https://github.com/spoonman136668-ai/Wingless/actions/runs/39319380004",
+    "conclusion": "success",
+    "Windows_and_Linux": "2/2 PASS"
+  },
+  "source_chronology": {
+    "parent_T22_negative": "328c16eb7ab9aac36ceebc27032eebecb2184963",
+    "precode": "1c56aa5624ea4391393c9c3662d8a50dcfb86362",
+    "fresh_source": "ed5bfd66173b748a0e51306b707f36eb4aefbc7f",
+    "candidate_and_controls": "4d7e272a07202535a395a8b0e9e36ca03affc7ce",
+    "TRAIN_only": "48f7b73dae52bec5d3aa2e7d013e222c772da921",
+    "original_RUN": "4f13170b5b56272a112ac14cfb2e0b0bfbf72c57"
+  },
+  "source_identity_blobs": {
+    "precode": "c7d90c96d3d57612545b3619349f187893439b8f",
+    "source": "6f2f08cce6e97e960f87fd322d1f9008f276a5f0",
+    "learner": "1f081e02a08f5f58dc64efff759609c8d7c3e2ff",
+    "TRAIN_test": "4ef0353f0804a997d9669d704ae759df1d95e427",
+    "T16B": "1041db8ff76365eba5eb8f31cecd0e2172d397d8"
+  },
+  "TRAIN_only_qualification": {
+    "run_id": 39319173733,
+    "head": "df4d5125020d138370dec23c47023d28eb45ad15",
+    "Windows_and_Linux": "2/2 PASS",
+    "cases": 40,
+    "DEV_consumed": 0,
+    "source_public_equivalences_per_OS": 240,
+    "TRAIN_updates": 1434
+  },
+  "new_source": {
+    "origin": "INTERNAL_SOURCE_BLIND_NOT_OUTSIDE_INDEPENDENT",
+    "families": [
+      "I: causal shared branching",
+      "J: causal reconvergence"
+    ],
+    "TRAIN_cases": 40,
+    "DEV_cases": 64,
+    "DEV_questions": 256,
+    "protected_originals_opened": 0,
+    "prior_T19_T22_DEV_reused": 0
+  },
+  "original_platform_samples": {
+    "ubuntu": {
+      "job": 118289142649,
+      "artifact": 12219069206,
+      "zip": "2193ca0fb2019f72e9dbafc08a971db095c7993c4f1d1fe4b04e547f29cbad5b",
+      "json": "e245696d281bf2a4e1463af06c9a4ed5c625455f41a8f8fbbbd12a067084b507",
+      "arm_samples": {
+        "dynamic-exact-prefix-trie": {
+          "whole_cpu_five_ns": [
+            90543704,
+            91717645,
+            90805553,
+            90496726,
+            91415532
+          ],
+          "peak_rss_five_bytes": [
+            15175680,
+            15175680,
+            15175680,
+            15306752,
+            15306752
+          ],
+          "median_cpu_ns": 90805553,
+          "max_rss_bytes": 15306752,
+          "cache_hits": 8116,
+          "public_queries": 190,
+          "correct_answers": 256
+        },
+        "full-public-exact-batched": {
+          "whole_cpu_five_ns": [
+            16790270,
+            16715941,
+            16966098,
+            17115507,
+            16849250
+          ],
+          "peak_rss_five_bytes": [
+            15437824,
+            15437824,
+            15437824,
+            15437824,
+            15437824
+          ],
+          "median_cpu_ns": 16849250,
+          "max_rss_bytes": 15437824,
+          "cache_hits": 0,
+          "public_queries": 192,
+          "correct_answers": 256
+        },
+        "fully-trained-T16B-batched": {
+          "whole_cpu_five_ns": [
+            35654857,
+            35637011,
+            37902482,
+            35652470,
+            39081905
+          ],
+          "peak_rss_five_bytes": [
+            15306752,
+            15306752,
+            15306752,
+            15306752,
+            15306752
+          ],
+          "median_cpu_ns": 35654857,
+          "max_rss_bytes": 15306752,
+          "cache_hits": 0,
+          "public_queries": 190,
+          "correct_answers": 256
+        },
+        "learned-prefix-DAG": {
+          "whole_cpu_five_ns": [
+            36747151,
+            33622859,
+            33086230,
+            33511872,
+            33546798
+          ],
+          "peak_rss_five_bytes": [
+            15020032,
+            15044608,
+            15044608,
+            15044608,
+            15044608
+          ],
+          "median_cpu_ns": 33546798,
+          "max_rss_bytes": 15044608,
+          "cache_hits": 823,
+          "public_queries": 190,
+          "correct_answers": 256
+        },
+        "trained-frequency-prefix-DAG": {
+          "whole_cpu_five_ns": [
+            33915516,
+            33975057,
+            33769663,
+            33886152,
+            34013469
+          ],
+          "peak_rss_five_bytes": [
+            15044608,
+            15044608,
+            15175680,
+            15175680,
+            15175680
+          ],
+          "median_cpu_ns": 33915516,
+          "max_rss_bytes": 15175680,
+          "cache_hits": 1498,
+          "public_queries": 190,
+          "correct_answers": 256
+        }
+      }
+    },
+    "windows": {
+      "job": 118289142344,
+      "artifact": 12218807959,
+      "zip": "6cb3907cf820dac594ff81056e31ca6ff5ac7160f7a2135426c27bb1673e071a",
+      "json": "3b9c733ba1734e3264c05b152d1565c15bd1f8fe7d82e4477b83da9f3388708f",
+      "arm_samples": {
+        "dynamic-exact-prefix-trie": {
+          "whole_cpu_five_ns": [
+            93750000,
+            93750000,
+            93750000,
+            93750000,
+            93750000
+          ],
+          "peak_rss_five_bytes": [
+            17690624,
+            17575936,
+            17649664,
+            17793024,
+            17682432
+          ],
+          "median_cpu_ns": 93750000,
+          "max_rss_bytes": 17793024,
+          "cache_hits": 8116,
+          "public_queries": 190,
+          "correct_answers": 256
+        },
+        "full-public-exact-batched": {
+          "whole_cpu_five_ns": [
+            15625000,
+            15625000,
+            15625000,
+            15625000,
+            31250000
+          ],
+          "peak_rss_five_bytes": [
+            17530880,
+            17485824,
+            17227776,
+            17506304,
+            17534976
+          ],
+          "median_cpu_ns": 15625000,
+          "max_rss_bytes": 17534976,
+          "cache_hits": 0,
+          "public_queries": 192,
+          "correct_answers": 256
+        },
+        "fully-trained-T16B-batched": {
+          "whole_cpu_five_ns": [
+            46875000,
+            46875000,
+            31250000,
+            46875000,
+            31250000
+          ],
+          "peak_rss_five_bytes": [
+            17690624,
+            17657856,
+            17637376,
+            17698816,
+            17666048
+          ],
+          "median_cpu_ns": 46875000,
+          "max_rss_bytes": 17698816,
+          "cache_hits": 0,
+          "public_queries": 190,
+          "correct_answers": 256
+        },
+        "learned-prefix-DAG": {
+          "whole_cpu_five_ns": [
+            31250000,
+            46875000,
+            31250000,
+            31250000,
+            46875000
+          ],
+          "peak_rss_five_bytes": [
+            18104320,
+            17711104,
+            17661952,
+            17727488,
+            17727488
+          ],
+          "median_cpu_ns": 31250000,
+          "max_rss_bytes": 18104320,
+          "cache_hits": 823,
+          "public_queries": 190,
+          "correct_answers": 256
+        },
+        "trained-frequency-prefix-DAG": {
+          "whole_cpu_five_ns": [
+            46875000,
+            46875000,
+            31250000,
+            31250000,
+            31250000
+          ],
+          "peak_rss_five_bytes": [
+            17817600,
+            17469440,
+            17829888,
+            17641472,
+            17760256
+          ],
+          "median_cpu_ns": 31250000,
+          "max_rss_bytes": 17829888,
+          "cache_hits": 1498,
+          "public_queries": 190,
+          "correct_answers": 256
+        }
+      }
+    }
+  },
+  "case_query_evidence": {
+    "case_id_order": "t23-I-dev-000..031 then t23-J-dev-000..031",
+    "all_five_arms_each_answer_correct": "256/256",
+    "non_full_exact_query_counts": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      2,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      2,
+      3
+    ],
+    "full_public_exact_query_counts": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    "same_cases_on_both_OS": true
+  },
+  "interpretation": {
+    "all_5_arms_exact_256_of_256": true,
+    "false_positives": 0,
+    "baseline_correct_losses": 0,
+    "learned_query_count": 190,
+    "fully_trained_T16B_query_count": 190,
+    "trained_frequency_query_count": 190,
+    "dynamic_exact_query_count": 190,
+    "full_public_exact_query_count": 192,
+    "learned_no_query_savings_vs_strong_controls": true,
+    "linux_learned_median_cpu_ns": 33546798,
+    "linux_T16B_median_cpu_ns": 35654857,
+    "linux_trained_frequency_median_cpu_ns": 33915516,
+    "linux_strong_full_exact_median_cpu_ns": 16849250,
+    "windows_learned_median_cpu_ns": 31250000,
+    "windows_T16B_median_cpu_ns": 46875000,
+    "windows_trained_frequency_median_cpu_ns": 31250000,
+    "windows_learned_max_RSS_bytes": 18104320,
+    "windows_fully_trained_max_RSS_bytes": 17698816,
+    "windows_resource_regression": true,
+    "learned_cache_hits": 823,
+    "frequency_cache_hits": 1498,
+    "dynamic_exact_cache_hits": 8116,
+    "windows_CPU_timing_quantization_ns": 15625000,
+    "remote_pair_service_cost": "UNMEASURED",
+    "full_joint_acceptance": false,
+    "external_replication": false,
+    "optimizer_admission": false,
+    "result": "TRAIN-learned sparse shared-prefix cache preserved exact four-question bindings, but its query use equaled all trained exact comparators, it learned fewer reusable prefixes than frequency, full-public exact was more CPU efficient, and Windows RSS failed. Linux small median CPU reduction vs fully trained T16B is not sufficient as robust learned scientific transfer."
+  },
+  "safeguards": {
+    "DEV_opened_once_per_OS_run": true,
+    "no_post_DEV_tuning": true,
+    "no_old_DEV_replay": true,
+    "no_scientific_promotion": true,
+    "no_workstation": true,
+    "no_paid_API": true,
+    "no_controllers": true,
+    "no_FORGE_CKB_plane_modifications": true,
+    "no_merge": true
+  },
+  "retention": {
+    "provider_original_ZIPs_sha256_verified_locally": true,
+    "original_5_CPU_and_RSS_trials_preserved": true,
+    "per_case_query_counts_preserved": true,
+    "artifacts_expire": "2027-01-17T20:26:53Z"
+  }
+}
