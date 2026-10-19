@@ -1,0 +1,65 @@
+name: T25 original prospective learned eight-entity causal worlds
+on:
+  push:
+    branches: [research/t25-causal-world-inference-20261019]
+    paths: ['.github/workflows/north-star-t25-first-use.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t25-internal-prospective-original
+  cancel-in-progress: false
+jobs:
+  first-use:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 64
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify original frozen experiment and pre-DEV exact admission evidence
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T25_ORIGINAL_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t25-world-precode.json'='2cf22852a8c2a038bbd3bc44cbaa26fb1f2546f6'
+            'research/north-star-transfer/20261019-wingless-t25-new-world-source.py'='5e8514031bbe69cba3270f7c45ee11fb28d04451'
+            'research/north-star-transfer/20261019-wingless-t25-causal-belief-foundation.py'='b0d796026b768cd10db75b5201d057a1b0bdfb4b'
+            'research/north-star-transfer/20261019-wingless-t25-headroom-measure.py'='fe27d9802c9f6d5c1256409425fb51f51e6ee9b0'
+            'research/north-star-transfer/20261019-wingless-t25-learned-world-model.py'='9efa9256dc32b6f4bd1f3745e2a6e8967f91ac93'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){
+              throw "T25_ORIGINAL_SOURCE_DRIFT:$path"
+            }
+          }
+          git merge-base --is-ancestor dd745a39ef121032acdef7d80756f3c2d13737de b6a6d281077fc139b45d185315419c67195d6537
+          if($LASTEXITCODE -ne 0){throw 'T25_FROZEN_SOURCE_CHRONOLOGY_INVALID'}
+          git merge-base --is-ancestor ceb74bfa9b84f62bc1773aa041e5c95453603023 150a64750207c4a2119ebc0f7a59778cf8b64ac8
+          if($LASTEXITCODE -ne 0){throw 'T25_HEADROOM_NOT_MEASURED_PRIOR_TO_MODEL'}
+          git merge-base --is-ancestor 309456d59ed0ff4df621a39680c538925d66fb1e HEAD
+          if($LASTEXITCODE -ne 0){throw 'T25_TRAIN_ONLY_QUALIFICATION_NOT_INCLUDED'}
+          Write-Output 'T25_ORIGINAL_SOURCE_AND_TRAIN_SEAL=PASS'
+      - name: Original unseen nonlinear counterfactual comparison, all trained controls and 5 process repeats
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t25-learned-world-model.py > t25-original-world-model.json
+          if($LASTEXITCODE -ne 0){throw 'T25_ORIGINAL_SCIENCE_NEGATIVE_OR_EXECUTION_FAILURE'}
+          python -c "import json;r=json.load(open('t25-original-world-model.json',encoding='utf-8-sig'));a=r['arms'];assert len(a)==4 and r['DEV_cases']==64 and r['two_step_counterfactual_queries']==192 and r['TRAIN_cases']==40;assert all(v['hard_false_positives']==0 and v['correct_certifications']+v['safe_abstentions']==192 and len(v['per_case'])==64 and len(v['five_complete_CPU_ns'])==5 and len(v['five_peak_RSS_bytes'])==5 for v in a.values());assert r['all_hard_false_positives_zero'] and r['old_DEV_reused']==False and r['independent_external_replication']==False and r['optimizer_admission']==False and r['scientific_joint_acceptance']==False;print('T25_ORIGINAL_PROSPECTIVE_VALID=PASS');print('T25_CERTIFIED_COVERAGE='+json.dumps({k:v['correct_certifications'] for k,v in a.items()},sort_keys=True));print('T25_ABSTENTIONS='+json.dumps({k:v['safe_abstentions'] for k,v in a.items()},sort_keys=True));print('T25_CPU='+json.dumps({k:v['median_complete_CPU_ns'] for k,v in a.items()},sort_keys=True));print('T25_MAX_RSS='+json.dumps({k:v['maximum_peak_RSS_bytes'] for k,v in a.items()},sort_keys=True));print('T25_COMPARISONS='+json.dumps(r['comparisons'],sort_keys=True));print('T25_NO_OPTIMIZER_PROMOTION=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T25_ORIGINAL_RECEIPT_INVALID'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t25-original-causal-world-${{ matrix.os }}
+          path: t25-original-world-model.json
+          retention-days: 90
+          if-no-files-found: ignore
