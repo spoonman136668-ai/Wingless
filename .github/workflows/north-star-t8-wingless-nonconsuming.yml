@@ -1,0 +1,57 @@
+name: T8 wingless causal learning source-and-resource proof
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t8-wingless-nonconsuming.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t8-wingless-nonconsuming-source-proof
+  cancel-in-progress: false
+jobs:
+  true-causal-constraint-qualification:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest,windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Enforce frozen source before T8 code and exact unchanged historical control
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T8_GIT_HEAD_MISMATCH'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t8-source-freeze.json').Trim() -cne 'b9471a694ab4f94854325b5a8ecb98185261ce49'){throw 'T8_PREREG_SOURCE_DRIFT'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t8-source-freeze.json').Trim() -cne 'd5da58eb5e409cacf099ad99b5ed8fd1bce0a475'){throw 'T8_FREEZE_CHANGED_AFTER_IMPLEMENTATION'}
+          git merge-base --is-ancestor d5da58eb5e409cacf099ad99b5ed8fd1bce0a475 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T8_SOURCE_BORN_BEFORE_FREEZE'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t8-identifiability.py').Trim() -cne '0671eea7eebe2624ab9553733043cbad3536e87e'){throw 'T8_NEW_SOURCE_IDENTITY_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t6-learning.py').Trim() -cne 'e2591ae5c390438b14b6f622e902569c7b60b610'){throw 'T8_HISTORICAL_CONTROL_CHANGED'}
+          Write-Output 'T8_WINGLESS_PREREG_AND_SOURCE_IDENTITY=PASS'
+      - name: Test one source-neutral theorem/source or public TRAIN cost
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $py=if($IsWindows){'python'}else{'python3'}
+          & $py -B 'research/north-star-transfer/20261019-wingless-t8-identifiability.py' | Tee-Object 't8-wingless-nonconsuming.json'
+          if($LASTEXITCODE -ne 0){throw 'T8_WINGLESS_SOURCE_NEUTRAL_FAILED'}
+          $j=Get-Content 't8-wingless-nonconsuming.json' -Raw | ConvertFrom-Json
+          if($j.'T8_new_prospective_first_used' -ne $false){throw 'T8_SOURCE_FIRST_USE_FORBIDDEN'}
+          if($j.'universally_zero_baseline_regressions_with_one_pair_and_nonzero_override' -ne $false){throw 'T8_WING_INVALID_PROOF'}
+          Write-Output 'T8_WINGLESS_NONCONSUMING_ENGINEERING=PASS'
+          Write-Output 'T8_WINGLESS_ORIGINAL_PROTECTED_FIRST_USE=false'
+          Write-Output 'T8_WINGLESS_SCIENTIFIC_ACCEPTANCE=false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: t8-wingless-nonconsuming-${{ matrix.os }}-${{ github.sha }}
+          path: t8-wingless-nonconsuming.json
+          retention-days: 90
+          if-no-files-found: error
