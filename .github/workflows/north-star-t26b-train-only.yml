@@ -1,0 +1,61 @@
+name: T26B distinct new U/V TRAIN-only recurrent source qualification
+on:
+  push:
+    branches: [research/t26b-low-observability-20261019]
+    paths: ['.github/workflows/north-star-t26b-train-only.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t26b-train-only
+  cancel-in-progress: false
+jobs:
+  recurrent-memory-soundness:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 45
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify exact source identities and precode chronology
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T26_TRAIN_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t26b-precode.json'='8e5edb8785ec21912afd6c2de1bc669c00c84474'
+            'research/north-star-transfer/20261019-wingless-t26b-fresh-sequences.py'='38fbdeccf4794353275a936cf924e09f590199b5'
+            'research/north-star-transfer/20261019-wingless-t26b-recurrent-memory.py'='1f59b3ec81392044af8be5bc222c06ff5619c7dc'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T26_TRAIN_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 009a22ffc194b0ae04017a29b6e6ccb6e01c39c7 76b6625dd0704feb27b60056d147b8c42a26b177
+          if($LASTEXITCODE -ne 0){throw 'T26_SOURCE_BORN_BEFORE_PRECODE'}
+          git merge-base --is-ancestor 76b6625dd0704feb27b60056d147b8c42a26b177 1672d59cb9c3fbfbd3a159f8b0f0094b490912cc
+          if($LASTEXITCODE -ne 0){throw 'T26_MODEL_BORN_BEFORE_SOURCE'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t26b-fresh-sequences.py research/north-star-transfer/20261019-wingless-t26b-recurrent-memory.py
+          if($LASTEXITCODE -ne 0){throw 'T26_PYTHON_SYNTAX_FAILED'}
+          Write-Output 'T26_PREREG_PRECEDES_FRESH_SOURCE_AND_MODEL=PASS'
+      - name: TRAIN only exact recurrent filtering and independently verified local transitions
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t26b-recurrent-memory.py --train-only > t26b-train-memory.json
+          if($LASTEXITCODE -ne 0){throw 'T26_TRAIN_RECURRENT_MEMORY_FAILURE'}
+          python -c "import json;d=json.load(open('t26b-train-memory.json',encoding='utf-8-sig'));assert d['status']=='PASS_TRAIN_ONLY_NO_DEV' and d['TRAIN_cases']==40 and d['DEV_cases_generated']==0 and d['history_frames']==5 and d['TRAIN_worlds_truth_retained']==40 and d['TRAIN_future_target_queries']==120 and d['TRAIN_recurrent_exact_equivalences']==120 and d['learned_temporal_entries']>=8 and 0.20<=d['TRAIN_ambiguous_target_fraction']<=0.80 and d['proof_valid'] and not d['scientific_acceptance'] and not d['optimizer_admission'] and not d['previous_consumed_DEV_used'];print('T26_TRAIN_ONLY_CAUSAL_RECURRENT=PASS');print('T26_CAUSAL_MEMORY_TRAIN_EVIDENCE='+json.dumps(d,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T26_FROZEN_TRAIN_ADMISSION_FAILED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t26b-TRAIN-recurrent-memory-${{ matrix.os }}
+          path: t26b-train-memory.json
+          if-no-files-found: ignore
+          retention-days: 90

@@ -1,0 +1,61 @@
+name: T26B original unseen recurrent causal memory experiment
+on:
+  push:
+    branches: [research/t26b-low-observability-20261019]
+    paths: ['.github/workflows/north-star-t26b-original-first-use.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t26b-original-prospective-once
+  cancel-in-progress: false
+jobs:
+  first-use:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate frozen source, hypothesis and TRAIN-qualified exact identity
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T26B_ORIGINAL_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t26b-precode.json'='8e5edb8785ec21912afd6c2de1bc669c00c84474'
+            'research/north-star-transfer/20261019-wingless-t26b-fresh-sequences.py'='38fbdeccf4794353275a936cf924e09f590199b5'
+            'research/north-star-transfer/20261019-wingless-t26b-recurrent-memory.py'='1f59b3ec81392044af8be5bc222c06ff5619c7dc'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T26B_SOURCE_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 009a22ffc194b0ae04017a29b6e6ccb6e01c39c7 76b6625dd0704feb27b60056d147b8c42a26b177
+          if($LASTEXITCODE -ne 0){throw 'T26B_HYPOTHESIS_NOT_PRIOR_TO_NEW_SOURCE'}
+          git merge-base --is-ancestor 76b6625dd0704feb27b60056d147b8c42a26b177 1672d59cb9c3fbfbd3a159f8b0f0094b490912cc
+          if($LASTEXITCODE -ne 0){throw 'T26B_CANDIDATE_NOT_AFTER_SOURCE'}
+          git merge-base --is-ancestor f1d5bbd36426a61755361420f60e0f6f566f4a97 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T26B_QUALIFIED_TRAIN_HEAD_NOT_INCLUDED'}
+          Write-Output 'T26B_FROZEN_TRAIN_AND_ORIGINAL_SOURCE=PASS'
+      - name: Run one original unseen U/V DEV with exact recurrent controls and full resource measurements
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t26b-recurrent-memory.py > t26b-original-prospective.json
+          if($LASTEXITCODE -ne 0){throw 'T26B_ORIGINAL_NEGATIVE_OR_EXECUTION_FAILURE_PRESERVE_ARTIFACTS'}
+          python -c "import json;v=json.load(open('t26b-original-prospective.json',encoding='utf-8-sig'));a=v['arms'];assert len(a)==4 and v['TRAIN_worlds']==40 and v['prospective_DEV_worlds']==64 and v['prospective_target_questions']==192;assert all(x['certified']+x['abstained']==192 and x['hard_false_positives']==0 and len(x['per_case'])==64 and len(x['five_full_process_cpu_ns'])==5 and len(x['five_peak_process_rss_bytes'])==5 for x in a.values());assert not v['learned_cognition_positive'] and not v['joint_scientific_acceptance'] and not v['independent_external_replication'] and not v['optimizer_admission'] and not v['old_DEV_replayed'] and v['no_paid_models'];print('T26B_ORIGINAL_PROSPECTIVE_TECHNICAL=PASS');print('T26B_CERTIFIED='+json.dumps({k:x['certified'] for k,x in a.items()},sort_keys=True));print('T26B_ABSTENTIONS='+json.dumps({k:x['abstained'] for k,x in a.items()},sort_keys=True));print('T26B_CPU_MEDIAN='+json.dumps({k:x['median_full_process_cpu_ns'] for k,x in a.items()},sort_keys=True));print('T26B_PEAK_RSS='+json.dumps({k:x['max_peak_process_rss_bytes'] for k,x in a.items()},sort_keys=True));print('T26B_FULL_CONTROL_PARITY='+json.dumps(v['comparison'],sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T26B_ORIGINAL_PROVIDER_RECEIPT_INVALID'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t26b-original-recurrent-${{ matrix.os }}
+          path: t26b-original-prospective.json
+          if-no-files-found: ignore
+          retention-days: 90
