@@ -1,0 +1,68 @@
+name: T22 one-time internal sparse relational prospective original
+on:
+  push:
+    branches: [research/t22-sparse-certified-rewrite-20261019]
+    paths: ['.github/workflows/north-star-t22-prospective.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t22-frozen-original-once
+  cancel-in-progress: false
+jobs:
+  prospective:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 60
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify exact TRAIN-only qualification and original source identity
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T22_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t22-sparse-precode.json'='bca4bc40c3f35f754fe699a1ca2b5398ad74872c'
+            'research/north-star-transfer/20261019-wingless-t22-new-sources.py'='c4ce67bc3a08d9f1a5d9632ca2deab1074acac58'
+            'research/north-star-transfer/20261019-wingless-t22-sparse-learner.py'='a780eed0aa01591f1a6b437b56260dafac6e9283'
+            'research/north-star-transfer/20261019-wingless-t22-train-only.py'='4c6510a073ce369ed6558e46f18d1f7168d5f3a5'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+          }
+          foreach($path in $expected.Keys){
+            $actual=(git hash-object -- $path).Trim()
+            if($actual -cne $expected[$path]){throw "T22_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 9dc7d14bb530439989a3f8e3fb554ec27784d5cf 1c53ba14b77317c26bad1b281ee7f3b0c08570c6
+          if($LASTEXITCODE -ne 0){throw 'T22_SOURCE_PRECEDES_FREEZE'}
+          git merge-base --is-ancestor 1c53ba14b77317c26bad1b281ee7f3b0c08570c6 e26a8bd8288ab62a4ab4034b8c9301eefcf5944d
+          if($LASTEXITCODE -ne 0){throw 'T22_LEARNER_PRECEDES_SOURCE'}
+          git merge-base --is-ancestor e26a8bd8288ab62a4ab4034b8c9301eefcf5944d eb602a71f6b79bfc617d3be2fb2183f32c3d165f
+          if($LASTEXITCODE -ne 0){throw 'T22_TRAIN_ONLY_PRECHECK_IDENTITY_INVALID'}
+          git merge-base --is-ancestor 3a50da35a8a4098927fb9443cc3bc910b68436d5 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T22_TRAIN_ONLY_QUALIFIED_HEAD_MISSING'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t22-new-sources.py research/north-star-transfer/20261019-wingless-t22-sparse-learner.py
+          if($LASTEXITCODE -ne 0){throw 'T22_SYNTAX_FAILED'}
+          Write-Output 'T22_FROZEN_BLOB_AND_TRAIN_ONLY_QUALIFICATION=PASS'
+      - name: "Original DEV: evaluate all five frozen controls and learner, five processes each"
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t22-sparse-learner.py > t22-original-prospective.json
+          if($LASTEXITCODE -ne 0){throw 'T22_ORIGINAL_EXPERIMENT_NEGATIVE_OR_FAILED_RETAIN_LOG'}
+          python -c "import json; x=json.load(open('t22-original-prospective.json',encoding='utf-8-sig')); r=x['results']; assert len(r)==5 and all(v['correct']==64 and len(v['cpu_five_process_ns'])==5 and len(v['rss_five_process_bytes'])==5 for v in r.values()); assert x['no_old_DEV_replay'] and not x['independent_external_replication'] and not x['joint_scientific_acceptance'] and not x['optimizer_admission']; print('T22_FRESH_INTERNAL_COMPARISON=PASS'); print('T22_PUBLIC_QUERIES='+json.dumps({k:v['queries'] for k,v in r.items()},sort_keys=True)); print('T22_REWRITE_HITS='+json.dumps({k:v['DEV_rewrite_hits'] for k,v in r.items()},sort_keys=True)); print('T22_CPU_MEDIANS='+json.dumps({k:v['median_complete_cpu_ns'] for k,v in r.items()},sort_keys=True)); print('T22_RSS_MAX='+json.dumps({k:v['maximum_peak_rss_bytes'] for k,v in r.items()},sort_keys=True)); print('T22_MATCHED_CONTROL_COMPARISON='+json.dumps(x['comparisons'],sort_keys=True)); print('T22_NO_OPTIMIZER_ADMISSION=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T22_EXPERIMENT_RECEIPT_INVALID'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t22-original-internal-sparse-${{ matrix.os }}
+          path: t22-original-prospective.json
+          retention-days: 90
+          if-no-files-found: ignore

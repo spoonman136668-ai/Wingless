@@ -1,0 +1,64 @@
+name: T22 TRAIN-only sparse relational proof preflight
+on:
+  push:
+    branches: [research/t22-sparse-certified-rewrite-20261019]
+    paths: ['.github/workflows/north-star-t22-train-only.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t22-train-only
+  cancel-in-progress: false
+jobs:
+  train-only-preflight:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 60
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen source identities and precode chronology
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T22_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t22-sparse-precode.json'='bca4bc40c3f35f754fe699a1ca2b5398ad74872c'
+            'research/north-star-transfer/20261019-wingless-t22-new-sources.py'='c4ce67bc3a08d9f1a5d9632ca2deab1074acac58'
+            'research/north-star-transfer/20261019-wingless-t22-sparse-learner.py'='a780eed0aa01591f1a6b437b56260dafac6e9283'
+            'research/north-star-transfer/20261019-wingless-t22-train-only.py'='4c6510a073ce369ed6558e46f18d1f7168d5f3a5'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+          }
+          foreach($path in $expected.Keys){
+            $actual=(git hash-object -- $path).Trim()
+            if($actual -cne $expected[$path]){throw "T22_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 9dc7d14bb530439989a3f8e3fb554ec27784d5cf 1c53ba14b77317c26bad1b281ee7f3b0c08570c6
+          if($LASTEXITCODE -ne 0){throw 'T22_SOURCE_PRECEDES_FREEZE'}
+          git merge-base --is-ancestor 1c53ba14b77317c26bad1b281ee7f3b0c08570c6 e26a8bd8288ab62a4ab4034b8c9301eefcf5944d
+          if($LASTEXITCODE -ne 0){throw 'T22_IMPLEMENTATION_PRECEDES_SOURCE'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t22-new-sources.py research/north-star-transfer/20261019-wingless-t22-sparse-learner.py research/north-star-transfer/20261019-wingless-t22-train-only.py
+          if($LASTEXITCODE -ne 0){throw 'T22_SYNTAX_FAIL'}
+          Write-Output 'T22_FROZEN_SOURCE_IDENTITIES=PASS'
+      - name: TRAIN public proof only; DEV unopened
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t22-train-only.py > t22-train-only.json
+          if($LASTEXITCODE -ne 0){throw 'T22_TRAIN_PROOF_FAILED'}
+          python -c "import json; x=json.load(open('t22-train-only.json',encoding='utf-8-sig')); assert x['status']=='PASS_SOURCE_FREE_DEV_UNOPENED' and x['train_cases']==40 and x['DEV_cases_generated']==0 and not x['scientific_acceptance'] and not x['optimizer_admission']; assert len(x['arms'])==3 and all(v['public_TRAIN_proofs']==120 and v['candidates_verified']<=384 for v in x['arms'].values()); print('T22_TRAIN_ONLY=PASS'); print('T22_TRAIN_PROOFS='+json.dumps(x['arms'],sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T22_TRAIN_REPORT_FAILED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t22-train-only-${{ matrix.os }}
+          path: t22-train-only.json
+          retention-days: 90
+          if-no-files-found: ignore
