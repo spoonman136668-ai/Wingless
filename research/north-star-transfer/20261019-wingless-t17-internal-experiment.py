@@ -118,6 +118,8 @@ def whole_process_peak_rss():
         psapi=ctypes.WinDLL("psapi")
         kernel=ctypes.WinDLL("kernel32")
         kernel.GetCurrentProcess.restype=wintypes.HANDLE
+        psapi.GetProcessMemoryInfo.argtypes=[wintypes.HANDLE,ctypes.POINTER(Counters),wintypes.DWORD]
+        psapi.GetProcessMemoryInfo.restype=wintypes.BOOL
         c=Counters();c.cb=ctypes.sizeof(c)
         if psapi.GetProcessMemoryInfo(kernel.GetCurrentProcess(),
                                       ctypes.byref(c),ctypes.sizeof(c))==0:
