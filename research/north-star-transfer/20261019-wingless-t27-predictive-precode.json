@@ -1,0 +1,76 @@
+{
+  "schema": "wingless.T27.learned-predictive-belief-quotient.precode.v1",
+  "freeze_EDT": "2026-10-19",
+  "parent_sealed_T26B": "b9fbd525664f711a640aee507d9fd57ef3a9e237",
+  "state": "FROZEN_BEFORE_SOURCE_OR_CODE",
+  "hypothesis": "A TRAIN-derived compact predictive-coordinate code for hidden recurrent worlds can losslessly represent their two-step counterfactual behavior as a small sufficient statistic, retaining role bindings and original support, with reduced native inference work and memory relative to equally TRAIN-informed exact recurrent Bayesian and full-signature quotient controls on unfamiliar masked causal histories.",
+  "novel_mechanism": "Learn a 16-coordinate intervention-response feature basis over 72 public counterfactual outputs (6 target entities x 12 future interventions). Group complete latent terminal hypotheses by learned feature code; merge a class only after checking it against the independent 72-bit full predictive signature, and otherwise keep separate full predictive signature residuals. This is learned state-representation selection with proof-carrying exact fallback, not T26's redundant learned Boolean dynamics truth table.",
+  "world_finite": {
+    "entities": 6,
+    "source_hidden_graph_templates": 12,
+    "modes": 2,
+    "hidden_initial_states": 64,
+    "maximum_birth_worlds": 1536,
+    "public_frames": 5,
+    "visible_bits_per_frame": 2,
+    "two_past_interventions": true,
+    "two_future_steps_with_first_step_intervention": true,
+    "uncertainty": "complete unpruned posterior of (template,gate,current hidden state), keyed by stable entity roles"
+  },
+  "source": {
+    "W": "Event-timed rotating sensor blackout with delayed causal mediator intervention",
+    "X": "Hidden nonlinear feedback under attention-switching sparse readout",
+    "TRAIN_cases": 40,
+    "DEV_cases": 64,
+    "source_origin": "new internally created module with brand-new identifiers and seeds after precode; not externally independently originated",
+    "no_T16_T26b_prior_DEV_or_protected_source_replay": true,
+    "source_program_separate_from_candidate": true
+  },
+  "representation": {
+    "TRAIN_inputs": "public masked observations, public historic interventions, public prospective future actions/targets; NEVER private hidden graph, initial state, hidden trajectory or unseen DEV source labels",
+    "feature_selection": "greedy TRAIN-weighted reduction in ambiguity of full future-response signatures; at most 16 of 72 intervention-target coordinates; no after-the-fact feature tuning",
+    "soundness": "independent finite exhaustive source-algebra verifier constructs exact 72-bit predicted future response signature for any terminal (topology,mode,state); only state classes with same full 72-bit future signature are merged. Codes with collisions retain exact signature residual. No false positives or approximate answers.",
+    "predictions": "For each original public posterior, map consistent terminal worlds to a set of certified predictive-response equivalence classes; query response singleton certified, else abstain",
+    "budget": "max16 learned features; no state pruning; no hidden oracle during inference"
+  },
+  "comparators": [
+    "TRAIN-learned-predictive-state-quotient",
+    "TRAIN-frequency-predictive-quotient-control",
+    "deterministic-full-signature-quotient",
+    "fully-TRAIN-exact-recurrent-Bayesian",
+    "untrained-unpruned-exact-recurrent"
+  ],
+  "training_gate": {
+    "TRAIN_cases": 40,
+    "DEV_generated": 0,
+    "zero_false_positive": true,
+    "true_temporal_world_retained_40": true,
+    "minimum_ambiguous_future_target_fraction": 0.2,
+    "maximum_ambiguous_future_target_fraction": 0.85,
+    "full_72_bit_predictive_signatures_verified_against_independent_synchronous_transition": true,
+    "learned_coordinates_at_least": 8,
+    "learned_coordinates_at_most": 16,
+    "all_training_predicted_answers_equal_to_unpruned_exact": true
+  },
+  "prospective_gate": {
+    "run_once_on_GitHub_hosted_Windows_and_Linux": true,
+    "unseen_cases": 64,
+    "whole_process_repeats_per_arm_per_OS": 5,
+    "complete_CPU_and_peak_RSS_including_training_source_proof_cache": true,
+    "strict_certified_gain_over_strong_controls_or_strict_full_process_CPU_gain_with_nonregressing_peak_RSS": true,
+    "zero_baseline_certified_losses": true,
+    "zero_hard_false_positives": true,
+    "no_positive_claim_if_learned_equals_deterministic_quotient": true,
+    "retain_every_original_negative": true
+  },
+  "boundaries": {
+    "no_workstation": true,
+    "no_research_runner": true,
+    "no_paid_API": true,
+    "no_new_controller": true,
+    "no_CKB_plane_or_FORGE_changes": true,
+    "no_PR_merge": true,
+    "no_accepted_ref_promotion": true,
+    "no_external_recruitment": true
+  }
+}
