@@ -1,0 +1,61 @@
+name: T25 verify preregistered causal-parent headroom, TRAIN only
+on:
+  push:
+    branches: [research/t25-causal-world-inference-20261019]
+    paths: ['.github/workflows/north-star-t25-parent-headroom.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t25-parent-headroom
+  cancel-in-progress: false
+jobs:
+  preregistered-metric:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 48
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify original frozen source and distinct headroom measurement
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t25-world-precode.json'='2cf22852a8c2a038bbd3bc44cbaa26fb1f2546f6'
+            'research/north-star-transfer/20261019-wingless-t25-new-world-source.py'='5e8514031bbe69cba3270f7c45ee11fb28d04451'
+            'research/north-star-transfer/20261019-wingless-t25-causal-belief-foundation.py'='b0d796026b768cd10db75b5201d057a1b0bdfb4b'
+            'research/north-star-transfer/20261019-wingless-t25-headroom-measure.py'='fe27d9802c9f6d5c1256409425fb51f51e6ee9b0'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){
+              throw "T25_METRIC_BLOB_DRIFT:$path"
+            }
+          }
+          git merge-base --is-ancestor 71df9d82df8f48f59083c2daf8a7b59bbe5116e6 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T25_SOURCE_FREEZE_MISSING'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t25-headroom-measure.py
+          if($LASTEXITCODE -ne 0){throw 'T25_METRIC_SYNTAX_FAILED'}
+          Write-Output 'T25_ORIGINAL_SOURCES_UNCHANGED=PASS'
+      - name: Reconcile frozen distinct-parent measure vs output abstention, no DEV access
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t25-headroom-measure.py > t25-frozen-parent-headroom.json
+          if($LASTEXITCODE -ne 0){throw 'T25_MEASUREMENT_EXECUTION_FAILURE'}
+          python -c "import json;d=json.load(open('t25-frozen-parent-headroom.json',encoding='utf-8-sig'));assert d['status']=='PASS_TRAIN_ONLY_MEASUREMENT' and d['queries']==120 and d['DEV_cases_generated']==0 and not d['source_OR_model_blob_edited'] and not d['optimizer_admission'];print('T25_FROZEN_METRIC='+json.dumps(d,sort_keys=True));print('T25_PARENT_HEADDR0OM_ADMITTED='+str(d['admission_passed']))"
+          if($LASTEXITCODE -ne 0){throw 'T25_METRIC_RECEIPT_INVALID'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t25-parent-headroom-TRAIN-${{ matrix.os }}
+          path: t25-frozen-parent-headroom.json
+          if-no-files-found: ignore
+          retention-days: 90

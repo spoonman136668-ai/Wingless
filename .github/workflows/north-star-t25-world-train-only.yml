@@ -1,0 +1,80 @@
+name: T25 source-blind nonlinear causal world TRAIN-only qualification
+on:
+  push:
+    branches: [research/t25-causal-world-inference-20261019]
+    paths: ['.github/workflows/north-star-t25-world-train-only.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t25-multi-entity-train-only
+  cancel-in-progress: false
+jobs:
+  exact-causal-foundation:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 48
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify exact T25 precode and post-freeze source identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T25_SOURCE_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t25-world-precode.json'='2cf22852a8c2a038bbd3bc44cbaa26fb1f2546f6'
+            'research/north-star-transfer/20261019-wingless-t25-new-world-source.py'='5e8514031bbe69cba3270f7c45ee11fb28d04451'
+            'research/north-star-transfer/20261019-wingless-t25-causal-belief-foundation.py'='b0d796026b768cd10db75b5201d057a1b0bdfb4b'
+          }
+          foreach($path in $expected.Keys){
+            $actual=(git hash-object -- $path).Trim()
+            if($actual -cne $expected[$path]){throw "T25_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor dd745a39ef121032acdef7d80756f3c2d13737de b6a6d281077fc139b45d185315419c67195d6537
+          if($LASTEXITCODE -ne 0){throw 'T25_NEW_SOURCE_BEFORE_FROZEN_HYPOTHESIS'}
+          git merge-base --is-ancestor b6a6d281077fc139b45d185315419c67195d6537 06c4b9d565a257757ed6a1d3b8097956cb0cd361
+          if($LASTEXITCODE -ne 0){throw 'T25_BELIEF_BEFORE_SOURCE'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t25-new-world-source.py research/north-star-transfer/20261019-wingless-t25-causal-belief-foundation.py
+          if($LASTEXITCODE -ne 0){throw 'T25_SYNTAX_FAILED'}
+          Write-Output 'T25_FROZEN_SOURCE_CHRONOLOGY=PASS'
+      - name: Prove TRAIN-only causal posterior truth containment and counterfactual soundness
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          @'
+          import importlib.util,json,sys,pathlib
+          root=pathlib.Path("research/north-star-transfer")
+          def load(name,filename):
+              spec=importlib.util.spec_from_file_location(name,root/filename)
+              m=importlib.util.module_from_spec(spec);sys.modules[name]=m
+              spec.loader.exec_module(m);return m
+          source=load("t25_fresh_source","20261019-wingless-t25-new-world-source.py")
+          belief=load("t25_exact_foundation","20261019-wingless-t25-causal-belief-foundation.py")
+          result=belief.train_only(source)
+          with open("t25-causal-TRAIN.json","w",encoding="utf-8") as handle:
+              json.dump(result,handle,sort_keys=True)
+          assert result["status"]=="PASS_TRAIN_ONLY_DEV_UNOPENED"
+          assert result["TRAIN_cases"]==40 and result["DEV_generated"]==0
+          assert result["hard_false_positives"]==0 and result["counterfactual_questions"]==120
+          assert result["hidden_rule_contained_every_node"]
+          assert result["source_origin"]=="INTERNAL_NOT_OUTSIDE_REPLICATED"
+          assert not result["learned_candidate_trained"] and not result["scientific_acceptance"]
+          print("T25_TRAIN_ONLY_CAUSAL_SAFETY=PASS")
+          print("T25_NONLINEAR_HEADROOM="+json.dumps(result,sort_keys=True))
+          '@ | python -
+          if($LASTEXITCODE -ne 0){throw 'T25_TRAIN_CAUSAL_TRUTH_CONTAINMENT_FAILURE'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t25-causal-world-TRAIN-only-${{ matrix.os }}
+          path: t25-causal-TRAIN.json
+          if-no-files-found: ignore
+          retention-days: 90
