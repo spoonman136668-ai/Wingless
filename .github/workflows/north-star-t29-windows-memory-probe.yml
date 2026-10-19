@@ -20,7 +20,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
-          if((git hash-object -- research/north-star-transfer/20261019-wingless-t29-certified-causal-separator.py).Trim() -cne '6ef547a131af0abd1485551453d5ae00650a07f5'){throw 'T29_FUTURE_ONLY_RSS_REPAIR_DRIFT'}
+          if((git hash-object -- research/north-star-transfer/20261019-wingless-t29-certified-causal-separator.py).Trim() -cne 'ad67fec80931bb6db430cff89a686f9791a0e00f'){throw 'T29_FUTURE_ONLY_RSS_REPAIR_DRIFT'}
           @'
           import ctypes,importlib.util,json,subprocess,sys,pathlib
           from ctypes import wintypes
