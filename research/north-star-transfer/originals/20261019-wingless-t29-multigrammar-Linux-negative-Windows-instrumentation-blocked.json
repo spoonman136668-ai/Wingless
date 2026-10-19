@@ -45,7 +45,7 @@
       "zip_sha256": "2dcba7c3b597d3e1b630f828e967c1173f8d1f5dd5e4559e5513a8d0986b2140",
       "artifact_json_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "failure_message": "RuntimeError: T29_RSS_UNAVAILABLE",
-      "failure_site": "Psapi.GetProcessMemoryInfo returned failure in the original Windows subprocess despite ctypes argtypes/restype declarations being present. Native error code was not logged; specific root cause is unresolved. Do not claim a missing ABI declaration.",
+      "failure_site": "CONFIRMED: frozen original T29 ctypes PROCESS_MEMORY_COUNTERS omitted QuotaNonPagedPoolUsage, resulting in 64-byte struct and Win32 ERROR_INSUFFICIENT_BUFFER (122) on Psapi.GetProcessMemoryInfo. Native independently defined complete 72-byte struct succeeded; source-free helper repair also succeeded. The original Windows DEV run was NOT rerun.",
       "no_complete_windows_CPU_or_RSS_samples": true,
       "DEV_cases_opened": true,
       "do_not_rerun_original_DEV": true
@@ -316,7 +316,7 @@
     "no_optimizer_admission": true,
     "failing_Windows_job_not_treated_as_scientific_negative": true,
     "future_measurement_ABI_repair_can_be_qualified_ON_TRAIN_ONLY_and_unrelated_new_sources": true,
-    "instrumentation_root_cause": "UNRESOLVED: no native GetLastError in original logs; requires bounded TRAIN-only source-free diagnostic, not rerunning consumed DEV"
+    "instrumentation_root_cause": "CONFIRMED_AND_SOURCE_FREE_FIXED: add missing QuotaNonPagedPoolUsage field (64-byte to valid 72-byte struct), preserve GetProcessMemoryInfo ctypes prototype and check native Win32 error; bounded Windows-only no-data Actions probe #39336693313 passed. Cannot upgrade original first-use Windows result."
   },
   "safe_scope": {
     "no_PR_merge": true,
@@ -325,5 +325,24 @@
     "no_new_controllers": true,
     "no_CKB_plane_or_FORGE_changes": true,
     "no_workstation_runner": true
+  },
+  "future_only_windows_metering_repair": {
+    "instrumentation_fix_commit": "566a2ad76b2f3a8ba8b5b39d46c63915866ecbb9",
+    "source_free_probe_pass_run": 39336693313,
+    "source_free_probe_head": "8af1f190c1b7a3522a0774623bbeab5b66d7bca3",
+    "Windows_native_mem_counter_structure_bytes": 72,
+    "orig_bad_structure_bytes": 64,
+    "original_error": 122,
+    "probe_original_helper_peak_bytes": 18427904,
+    "probe_native_peak_bytes": 15785984,
+    "difference_explained_by_measurement_timing_not_scientific_data": true,
+    "DEV_reopened": false
+  },
+  "control_audit": {
+    "reported_control_names_frozen_at_first_use": true,
+    "fully_trained_exact_transition_bitset": "This arm is the strongest optimized exact bitset. It receives public TRAIN inputs as part of whole-process cost, but does not fit parameters on them; calling it 'fully-trained' reflects input parity, not learned weights.",
+    "untrained_exact_enumeration": "KNOWN IMPLEMENTATION MISLABEL: this arm also calls exact bitset posterior() and standard_answer(), NOT a separate enumerator. Do not count it as an independent algorithm or claim enumeration parity. The strong exact bitset itself is valid and overwhelmingly dominates the learner.",
+    "deterministic_minimal_ancestor_projection": "Compiled per-TRAIN observed query keys, not an exhaustive always-available ancestor compiler; some queries use exact fallback.",
+    "scientific_effect": "These comparator caveats weaken breadth of independent algorithmic controls, not the grounded fact that the distinct exact bitset reference produced 105/192 safe correct certifications with much lower measured Linux CPU and RSS."
   }
 }
