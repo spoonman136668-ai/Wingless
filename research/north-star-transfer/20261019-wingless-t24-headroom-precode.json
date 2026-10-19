@@ -1,0 +1,68 @@
+{
+  "schema": "wingless.T24.prospective-causal-information-headroom.precode.v1",
+  "date_edt": "2026-10-19",
+  "base": "44cb8c9cf422ee21ebb481e4564ae9ffd1cfd0df",
+  "status": "FROZEN_BEFORE_SOURCE_OR_EVALUATOR",
+  "question": "On genuinely new multi-intervention causal tasks, how many second calibration observations are information-theoretically necessary for sound causal answers, and what feasible saving remains against a fully TRAIN-informed exact solver? If headroom is small, do not spend compute training another representation in this domain.",
+  "no_model_positive_claim": true,
+  "domain": {
+    "operator_algebra": "S3 four globally persistent role permutations",
+    "first_public_pair": "one mapping per role, leaves exactly two admissible S3 operators",
+    "optional_second_public_pair": "one per role, disambiguates exact operator",
+    "multioutput_questions_per_case": 3,
+    "hidden_operator_assignments_per_case": 16,
+    "independent_role_bits": 4,
+    "max_additional_queries": 4
+  },
+  "new_source": {
+    "origin": "INTERNAL, not externally replicated",
+    "birth_after_precode": true,
+    "families": {
+      "K": "Causal mediator interventions: noncommutative branching paths and controlled mediator overrides with four persistent roles",
+      "L": "Context-transfer causal graph contrasts: distinct observed paths and counterfactual reconvergences with four persistent roles"
+    },
+    "cases": {
+      "TRAIN_per_family": 20,
+      "DEV_per_family": 32
+    },
+    "source_only_module": true,
+    "random_generator_fixed_before_first_DEV": true,
+    "excluded": [
+      "T19/T20/T21/T22/T23 consumed DEV",
+      "protected historical originals"
+    ],
+    "no_intentionally_handpicked_group_identities": true,
+    "candidate_public": "all causal words and starts, first pairs, queried second pairs only",
+    "private_oracle": "scorer only",
+    "no_post_DEV_tuning": true
+  },
+  "exact_optimizers": {
+    "a": "Fully TRAIN-informed exact greedy role-priority baseline, fixed score from TRAIN word-role frequencies, first pairs only until purchased, certifies all global bindings",
+    "b": "Deterministic fixed-priority exact baseline, not TRAIN selected",
+    "c": "Prospective mathematically optimal online expected-query decision tree, minimizes expected additional queries under UNIFORM remaining global operator assignments, without accessing the actual hidden operator",
+    "d": "Full-public exact, reference upper purchase bound",
+    "e": "Hindsight optimistic oracle disclosure floor for actual hidden assignment, computed by scorer after outcomes only; NEVER run as a predictive arm or counted as deployable",
+    "proof": "Each online policy must return a value only when every public-consistent assignment yields identical full 3-vector of outputs. DP enumerates exactly all 2^4=16 initial assignments and every observable query outcome, no hidden oracle access to optimal policy."
+  },
+  "qualification": {
+    "TRAIN_only_before_DEV": true,
+    "prove_DP_recurrence_exact_in_exhaustive_finite_state_for_new_TRAIN": true,
+    "source_and_evaluator_blob_pinning": true,
+    "GitHub_hosted_Windows_Linux": true,
+    "five_process_cpu_rss_trials_per_arm_OS": true,
+    "record_all_64_case_paths_and_query_costs": true,
+    "go_no_go_metric": "Prospective expected *online* exact policy headroom against fully TRAIN-informed exact greedy (measured across fresh DEV), plus actual realized queries and gap to hindsight floor. Continue learned cognition only if meaningful improvable headroom, not a positive result from nonlearned exact DP.",
+    "no_scientific_acceptance": true,
+    "exclude_remote_service_cost_if_unmeasured": true,
+    "independent_external_replication": false
+  },
+  "safety": {
+    "draft_only": true,
+    "no_merge": true,
+    "no_workstation": true,
+    "no_paid_API": true,
+    "no_new_controller": true,
+    "no_FORGE_or_CKB_plane_changes": true,
+    "no_optimizer_admission": true
+  }
+}
