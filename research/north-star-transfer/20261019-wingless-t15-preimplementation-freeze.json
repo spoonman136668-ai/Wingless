@@ -1,0 +1,35 @@
+{
+  "schema": "northstar.t15.wingless.freeze.v1",
+  "status": "FROZEN_SOURCE_BEFORE_CODE_NO_ORIGINAL_BIRTH",
+  "source_commit": "6bb313c45baa8ab40e3031d58fd558e2c3035c53",
+  "source_blob": "ffa1e00cf2ceec3ab412fd06f8da5d25d5794f49",
+  "source_path": "research/north-star-transfer/20261019-wingless-t15-source.py",
+  "prior_negative_head": "c5ad688f83d4d32ec22470d623c0722cdadd60f3",
+  "baseline": {
+    "T14": "2f83010cad7037b6aaa093cb3e40c1ad1cac10c5",
+    "T13": "7ec2c542fc2505020c4fd4a76312db925904f0b4",
+    "full": "0536f6907d48c1a083c39b68020407a34648a7cb"
+  },
+  "hypothesis": "Replace repeated T14 reachable-state certifier with work-capped joint-role public consistent enumeration; certify only if all joint assignments yield one final answer, else exact full-public fallback; TRAIN-only causal ranker orders query acquisition.",
+  "source_family": "OPEN 5/7-role repeated inverse compositions unlike TRAIN short 2/3; independent source-neutral generator, NOT independently externally witnessed OOD",
+  "original_train": "-51031..-51000",
+  "original_open": "-51163..-51100",
+  "limits": {
+    "MAX_JOINT_ASSIGNMENTS_PER_TASK": 32,
+    "MAX_SECOND_QUERIES_PER_TASK": 4
+  },
+  "control_tests": [
+    "full-public exact unchanged strongest control",
+    "T14 capped conservative DP",
+    "T13 bounded DP"
+  ],
+  "score": "exact paired accuracy, no baseline-positive regressions, reduction in full-public requests; complete CPU+memory+public query service including amortized training vs strongest eligible exact control",
+  "stop": "insufficient sound proof => full fallback; no post-OPEN tuning or consumed source rerun",
+  "guard": {
+    "protected_cohort": false,
+    "optimizer_activation": false,
+    "merge": false,
+    "production": false,
+    "signed_scientific_admission": false
+  }
+}
