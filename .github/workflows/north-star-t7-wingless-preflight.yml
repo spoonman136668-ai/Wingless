@@ -1,0 +1,43 @@
+name: T7 wingless independent source nonconsuming preflight
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t7-wingless-preflight.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t7-wingless-source-neutral-preflight
+  cancel-in-progress: false
+jobs:
+  frozen-source-preflight:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest,windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Independently check immutable source and only source-neutral fixture
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T7_EXACT_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t7-preregister.json').Trim() -cne 'f20df60f632fecab506040b855618e21e3c6472f'){throw 'T7_PREIMPLEMENTATION_SOURCE_DRIFT'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261018-wingless-t7-preregister.json').Trim() -cne '3e6566df5e3e972e0bd7fc88b1aabab9e7769a2b'){throw 'T7_FIRST_FREEZE_COMMIT_DRIFT'}
+          git merge-base --is-ancestor 3e6566df5e3e972e0bd7fc88b1aabab9e7769a2b HEAD
+          if($LASTEXITCODE -ne 0){throw 'T7_SOURCE_FIRST_USE_ORDER_FAIL'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t7-independent.py').Trim() -cne '9c289b16963837a3c4095f682cc0fe94534ff061'){throw 'T7_GENERATOR_SOURCE_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t6-learning.py').Trim() -cne 'e2591ae5c390438b14b6f622e902569c7b60b610'){throw 'T7_T6_FROZEN_CONTROL_CHANGED'}
+          $py=if($IsWindows){'python'}else{'python3'}
+          & $py -B 'research/north-star-transfer/20261018-wingless-t7-independent.py' --mode preflight
+          if($LASTEXITCODE -ne 0){throw 'T7_NONCONSUMING_GENERATOR_FAIL'}
+          Write-Output 'T7_WINGLESS_FROZEN_SOURCE_READINESS=PASS'
+          Write-Output 'T7_WINGLESS_PROSPECTIVE_A_OR_B_SOURCE_BORN=0'
+          Write-Output 'T7_WINGLESS_PROTECTED_ORIGINAL_COHORT_BORN=0'
