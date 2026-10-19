@@ -32,7 +32,7 @@ jobs:
           $expect=@{
             'research/north-star-transfer/20261019-wingless-t28-incremental-precode.json'='e1444373f9f9453c69c574b65101676da2b84262'
             'research/north-star-transfer/20261019-wingless-t28-new-streams.py'='66e8219c10b4932af776924f31ea1422a7d4835b'
-            'research/north-star-transfer/20261019-wingless-t28-incremental-belief.py'='d80f7f02af96f77720119eef4511b25eefec7234'
+            'research/north-star-transfer/20261019-wingless-t28-incremental-belief.py'='88deffa7d762fe0fd4da773d0cf88af1f2e66f86'
           }
           foreach($path in $expect.Keys){
             if((git hash-object -- $path).Trim() -cne $expect[$path]){throw "T28_FROZEN_BLOB_DRIFT:$path"}
@@ -41,6 +41,8 @@ jobs:
           if($LASTEXITCODE -ne 0){throw 'T28_SOURCE_PRECEDES_PRECODE'}
           git merge-base --is-ancestor 2149bfabeeab093e38792d6ba4d8521feaf12daa 8ebfc5bc6bcec4d881db36b4f6847a86834ba2d0
           if($LASTEXITCODE -ne 0){throw 'T28_MODEL_PRECEDES_NEW_SOURCE'}
+          git merge-base --is-ancestor 1ccc1fdc2c49cdddd72154f938b5c96c4136a0d8 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T28_REAL_REPRESENTATION_CORRECTION_MISSING'}
           python -m py_compile research/north-star-transfer/20261019-wingless-t28-new-streams.py research/north-star-transfer/20261019-wingless-t28-incremental-belief.py
           if($LASTEXITCODE -ne 0){throw 'T28_PYTHON_SYNTAX_FAILED'}
           Write-Output 'T28_FROZEN_PRECODE_AND_SOURCE_CHRONOLOGY=PASS'
@@ -50,7 +52,7 @@ jobs:
           $ErrorActionPreference='Stop'
           python research/north-star-transfer/20261019-wingless-t28-incremental-belief.py --train-only > t28-TRAIN-original.json
           if($LASTEXITCODE -ne 0){throw 'T28_TRAIN_BELIEF_PROOF_FAILED'}
-          python -c "import json;x=json.load(open('t28-TRAIN-original.json',encoding='utf-8-sig'));assert x['status']=='PASS_TRAIN_ONLY_DEV_UNOPENED' and x['TRAIN_cases']==40 and x['DEV_generated']==0 and x['TRAIN_true_persistent_worlds_retained']==40 and x['TRAIN_counterfactual_target_questions']==120 and x['TRAIN_exact_posterior_and_answer_equivalences']==120 and 0.2<=x['TRAIN_ambiguity_fraction']<=0.85 and x['TRAIN_dictionary_entries']>=8 and x['TRAIN_learned_cache_hits']>0 and x['independent_exact_macro_verification'] and x['no_predictive_signature_atlas'] and x['old_DEV_not_replayed'] and not x['optimizer_admission'];print('T28_TRAIN_ONLY_QUALIFIED=PASS');print('T28_TRAIN_EVIDENCE='+json.dumps(x,sort_keys=True))"
+          python -c "import json;x=json.load(open('t28-TRAIN-original.json',encoding='utf-8-sig'));assert x['status']=='PASS_TRAIN_ONLY_DEV_UNOPENED' and x['TRAIN_cases']==40 and x['DEV_generated']==0 and x['TRAIN_true_persistent_worlds_retained']==40 and x['TRAIN_counterfactual_target_questions']==120 and x['TRAIN_exact_posterior_and_answer_equivalences']==120 and 0.2<=x['TRAIN_ambiguity_fraction']<=0.85 and x['TRAIN_dictionary_entries']>=8 and x['TRAIN_learned_cache_hits']>0 and x['independent_exact_macro_verification'] and x['TRAIN_dictionary_references']>0 and x['no_predictive_signature_atlas'] and x['old_DEV_not_replayed'] and not x['optimizer_admission'];print('T28_TRAIN_ONLY_QUALIFIED=PASS');print('T28_TRAIN_EVIDENCE='+json.dumps(x,sort_keys=True))"
           if($LASTEXITCODE -ne 0){throw 'T28_FROZEN_TRAIN_ADMISSION_FAILED'}
       - uses: actions/upload-artifact@v4
         if: always()
