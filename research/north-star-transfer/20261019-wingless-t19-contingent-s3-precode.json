@@ -1,0 +1,93 @@
+{
+  "schema": "northstar.t19.wingless.s3-contingent-development-precode.v1",
+  "date_edt": "2026-10-19",
+  "state": "PREIMPLEMENTATION_FROZEN_NO_SOURCE_BIRTH",
+  "parent_commit": "dcf7506feea899b5db76800811a601712a51b04b",
+  "prior_T18": {
+    "run_id": 39273003679,
+    "source_blob": "7efdcf67817aea264321e33b1a82a8aae04c4a85",
+    "receipt_blob": "1dc59f115ad4aced80429ab47c768304dedd23e1",
+    "prereg_blob": "8462c468f3a0cfe04a07292ca0fe9e43e14b5083",
+    "certifier_blob": "1041db8ff76365eba5eb8f31cecd0e2172d397d8",
+    "kernel_blob": "85dbd2673a94a6d72db29e57ee836619405f7f1e",
+    "S3_hindsight_strict_cases": 10,
+    "S3_total_cases": 24,
+    "T18_hindsight_non_deployable": true
+  },
+  "prior_T17": {
+    "learned_extra_queries": 95,
+    "trained_extra_queries": 92,
+    "learned_cpu_and_rss_regression": true
+  },
+  "hypothesis": "TRAIN-learned contingent ranking of which shared-variable second public observation to buy next can exploit S3 structural information while preserving sound exact answers and complete resource parity versus equally trained certificate and full exact symbolic controls.",
+  "source": {
+    "path": "research/north-star-transfer/20261019-wingless-t19-s3-source.py",
+    "domain": "S3 only, 3 shared role variables, novel source words with distinct identities",
+    "train_prefix": "t19-train-",
+    "dev_prefix": "t19-dev-",
+    "train_cases": 40,
+    "dev_cases": 64,
+    "private_hidden_truth": "scorer-only",
+    "candidate_visible": "only first public role pairs; second role pair only through chosen query",
+    "prior_T7_T18_source_replay": false,
+    "T16_original_ids_unopened": true
+  },
+  "mechanism": {
+    "path": "research/north-star-transfer/20261019-wingless-t19-contingent-query.py",
+    "name": "trainable contingent public ambiguity reduction",
+    "training": "40 TRAIN cases, all training outcomes public only; train a deterministic bounded feature-weighted role selection ranker; no hidden oracle identities or DEV labels",
+    "decision": "After each purchased second pair, recompute ranking using only observed evidence. Never inspect unqueried public pairs.",
+    "soundness": "Use immutable exact shared-role certificate; cap exhaustion means UNKNOWN, never a guessed answer; fallback to frozen exact public solution."
+  },
+  "arms": [
+    "trained-contingent",
+    "trained-T16B",
+    "untrained-same-certificate",
+    "full-public-exact"
+  ],
+  "controls": {
+    "equal_public_TRAIN_cases": true,
+    "certifier_blob": "1041db8ff76365eba5eb8f31cecd0e2172d397d8",
+    "full_domain_blob": "85dbd2673a94a6d72db29e57ee836619405f7f1e",
+    "no_hindsight_policy": true
+  },
+  "measurement": {
+    "OS": [
+      "ubuntu-latest",
+      "windows-latest"
+    ],
+    "independent_whole_process_repetitions_per_arm": 5,
+    "include_training_and_generation": true,
+    "include_certificate_work": true,
+    "total_public_requests": true,
+    "complete_process_CPU": true,
+    "peak_process_RSS": true,
+    "public_service_cost": "instrument or qualify as UNMEASURED, never assert remote service parity",
+    "windows_clock_resolution": "zero-quantized CPU is not zero compute"
+  },
+  "joint_acceptance": {
+    "all_64_answers_exact": true,
+    "baseline_correct_losses": 0,
+    "hard_false_positives": 0,
+    "strictly_fewer_queries_than_trained_T16B": true,
+    "no_complete_CPU_regression_vs_strongest_eligible": true,
+    "no_peak_RSS_regression_vs_strongest_eligible": true,
+    "no_public_service_cost_regression": true,
+    "scaling_amortized_training_required": true,
+    "independent_transfer_positive": false
+  },
+  "chronology": "Commit this preimplementation freeze before any new T19 generator or candidate code. Preserve original T17/T18 negative and hindsight results; no post-DEV tuning or source replay.",
+  "limits": {
+    "internal_self_authored_DEV_only": true,
+    "original_science_first_use": false,
+    "no_protected_holdout": true,
+    "no_optimizer_admission": true,
+    "no_merge": true,
+    "no_activation": true,
+    "no_new_controller": true,
+    "no_paid_inference": true,
+    "no_CKB_plane_link": true,
+    "github_hosted_only": true,
+    "no_local_workstation": true
+  }
+}
