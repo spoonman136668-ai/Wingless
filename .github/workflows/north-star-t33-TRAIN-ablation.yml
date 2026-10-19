@@ -1,0 +1,69 @@
+name: T33 source-free learned-parameter causal ablation audit
+on:
+  push:
+    branches: [research/t33-predictive-syndrome-20261019]
+    paths: ['.github/workflows/north-star-t33-TRAIN-ablation.yml']
+permissions:
+  contents: read
+jobs:
+  source-free-ablation:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove learned pair certificates actually eliminate reductions beyond direct lookup
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git hash-object -- research/north-star-transfer/20261019-wingless-t33-predictive-dual.py).Trim() -cne '2784e9dfaf158eb09bc94fba1d92f043b4a7ce7f'){throw 'T33_CANDIDATE_AFTER_NEGATIVE_DRIFT'}
+          if((git hash-object -- research/north-star-transfer/20261019-wingless-t33-new-syndrome-worlds.py).Trim() -cne '63be8f621bf521b12fbfd115af8ee6091f6eaf0e'){throw 'T33_SOURCE_AFTER_NEGATIVE_DRIFT'}
+          @'
+          import importlib.util,json,sys
+          from pathlib import Path
+          p=Path("research/north-star-transfer/20261019-wingless-t33-predictive-dual.py")
+          s=importlib.util.spec_from_file_location("t33_verified_original_learner",p)
+          m=importlib.util.module_from_spec(s);sys.modules[s.name]=m;s.loader.exec_module(m)
+          src=m.source()
+          training=[src.public_train(src.sample(x)) for x in src.TRAIN]
+          trained,freq,stat=m.learn_dictionary(src,training)
+          ablation={f:() for f in src.FAMILIES}
+          result={"schema":"wingless.T33.source-free-real-learned-pair-ablation.v1","TRAIN_cases":len(training),
+                  "DEV_generated":0,"pair_certificates_deactivated":0,
+                  "actual_query_GF2_reductions_saved_BY_LEARNING":0,
+                  "worlds_where_learned_specific_pair_saved_work":0,
+                  "same_exact_certificates":True,"same_direct_observation_hits":True}
+          for public in training:
+              on,opts,s_on=m.infer(src,public,m.ARMS[0],trained,freq)
+              off,other,s_off=m.infer(src,public,m.ARMS[0],ablation,freq)
+              if on!=off or opts!=other:
+                  raise RuntimeError("T33_PARAM_ABLATION_CHANGED_EXACT_ANSWER")
+              if s_on["direct_certificate_hits"]!=s_off["direct_certificate_hits"]:
+                  raise RuntimeError("T33_PARAM_ABLATION_CHANGED_UNTRAINED_FASTPATH")
+              saved=s_off["full_GF2_query_reductions"]-s_on["full_GF2_query_reductions"]
+              if saved<0 or saved!=s_on["trained_pair_certificate_hits"]:
+                  raise RuntimeError("T33_LEARNED_PAIR_DOES_NOT_ACTUALLY_SAVE_EXACT_WORK")
+              if saved>0:result["worlds_where_learned_specific_pair_saved_work"]+=1
+              result["pair_certificates_deactivated"]+=s_on["trained_pair_certificate_hits"]
+              result["actual_query_GF2_reductions_saved_BY_LEARNING"]+=saved
+          assert result["TRAIN_cases"]==40 and result["DEV_generated"]==0
+          assert result["pair_certificates_deactivated"]>0
+          print("T33_GENUINE_TRAIN_PARAMETER_ABLATION="+json.dumps(result,sort_keys=True))
+          '@ | python - > t33-TRAIN-ablation.json
+          if($LASTEXITCODE -ne 0){throw 'T33_PREVIOUS_LEARNED_ABLATION_NOT_REPRODUCIBLE'}
+          Get-Content t33-TRAIN-ablation.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t33-source-free-real-ablation-${{ matrix.os }}
+          path: t33-TRAIN-ablation.json
+          if-no-files-found: ignore
+          retention-days: 90
