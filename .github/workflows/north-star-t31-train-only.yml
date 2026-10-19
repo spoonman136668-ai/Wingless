@@ -1,0 +1,61 @@
+name: T31 frozen conditional causal program TRAIN-only admission
+on:
+  push:
+    branches: [research/t31-conditional-causal-program-20261019]
+    paths: ['.github/workflows/north-star-t31-train-only.yml']
+permissions:
+  contents: read
+concurrency:
+  group: Wingless-T31-TRAIN-frozen-source
+  cancel-in-progress: false
+jobs:
+  exact-causal-source-gate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 30
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify prereg before NEW source before implementation and immutable blobs
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T31_GIT_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t31-conditional-program-prereg.json'='7fe3cb71d9ea58055442ec70ff390ea8793a6278'
+            'research/north-star-transfer/20261019-wingless-t31-new-causal-program-worlds.py'='c4ab52ee8b03798dc388961339405da948e08e01'
+            'research/north-star-transfer/20261019-wingless-t31-conditional-program.py'='ce156e0788bd986b0d286145cedbe2541894df7a'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T31_SOURCE_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor e3262c07e8f69559b076340ecef5a0ba3a8408e5 1ec479a74db24254bad64be8c832001331496665
+          if($LASTEXITCODE -ne 0){throw 'T31_FREEZE_AFTER_SOURCE'}
+          git merge-base --is-ancestor 1ec479a74db24254bad64be8c832001331496665 0008d925ef7624eb67b566fbb498926271f5a9ab
+          if($LASTEXITCODE -ne 0){throw 'T31_SOURCE_AFTER_IMPLEMENTATION'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t31-new-causal-program-worlds.py research/north-star-transfer/20261019-wingless-t31-conditional-program.py
+          if($LASTEXITCODE -ne 0){throw 'T31_PYTHON_SYNTAX_FAIL'}
+          Write-Output 'T31_SOURCE_FREEZE_AND_IDENTITY=PASS'
+      - name: TRAIN-only proof, independent exact comparisons, and REAL learned-parameter influence
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t31-conditional-program.py --train-only > t31-TRAIN-only.json
+          if($LASTEXITCODE -ne 0){throw 'T31_TRAIN_FIT_OR_SOUNDNESS_FAILURE'}
+          python -c "import json;x=json.load(open('t31-TRAIN-only.json',encoding='utf-8-sig'));assert x['TRAIN']==40 and x['DEV_opened']==0 and x['retained_true_graph_mode_law']==40 and x['counterfactual_decision_equivalences']==120 and x['exact_posterior_agreed_with_independent_enumerator']==40 and x['full_272_law_space_cross_mode_validated'] and x['valid_for_first_use'] and x['learned_parameter_changed_executed_proposal_order_cases']>0 and x['learned_parameter_changed_inference_work_cases']>0 and not x['optimizer_admission'];print('T31_TRAIN_ONLY_ADMISSION=PASS');print(json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T31_PREDEV_FROZEN_ADMISSION_FAILED_DO_NOT_OPEN_DEV'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t31-frozen-train-only-${{ matrix.os }}
+          path: t31-TRAIN-only.json
+          retention-days: 90
+          if-no-files-found: ignore
