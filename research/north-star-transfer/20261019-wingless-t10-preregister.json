@@ -1,0 +1,19 @@
+{
+  "schema": "northstar.t10.wingless.preregister.v1",
+  "state": "FROZEN_BEFORE_CODE_AND_NEW_SOURCE",
+  "parent_head": "462ca47d62df18284db6a8fd7f07c6ff6cce2147",
+  "hypothesis": "A TRAIN-learned int8 acquisition utility (public ambiguity, reduced causal role frequency, and domain) can reduce public second-role queries at fixed correctness relative to fully disambiguating T9, while preserving all one-pair-control positives and paying measured query service CPU and full training amortization.",
+  "source": "NEW synthetic TRAIN -22031..-22000 and OPEN -22163..-22100, disjoint from all T6-T9. Original typed F11/S3, source-only full operators never shown to inference; public first samples and requested second samples; exactly 4 roles and 10/12 compositional operations.",
+  "candidate": "Learn 6 signed int8 feature weights with two-pass TRAIN-only perceptron on whether second public pair materially changes fully identified final answer for the role. Public train labels use source truth/second public only, no OPEN truth. Query if model score positive and role survives exact cancellation. Never force zero-regression with oracle.",
+  "controls": "Frozen T9 active-role sufficient query policy, strongest all four second-pair exact public, no-query exact, and deterministic role-frequency-only budget control. Each query service records actual time.process_time_ns; CPU/peak include training and source service allocated request, metric separate cost of acquiring public observation.",
+  "scientific": "Require exact OPEN improvement vs same-query-budget strongest control, zero baseline-positive regressions, <= strongest full end-to-end resource CPU/peak, new independently replicated source later. No change to WNS protected or previously consumed sources.",
+  "authority": {
+    "fresh_synthetic_source_only": true,
+    "protected_original_first_use": false,
+    "never_replay_consumed_T7_T8": true,
+    "scientific_acceptance": false,
+    "optimizer_promotion": false,
+    "merge": false,
+    "production": false
+  }
+}
