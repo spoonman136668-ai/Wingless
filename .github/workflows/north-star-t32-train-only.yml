@@ -1,0 +1,61 @@
+name: T32 TRAIN-only learned causal clause construction and real ablation
+on:
+  push:
+    branches: [research/t32-learned-parity-constraint-20261019]
+    paths: ['.github/workflows/north-star-t32-train-only.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T32-source-free-TRAIN
+  cancel-in-progress: false
+jobs:
+  TRAIN-parity-clauses:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 40
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify chronology and content blobs, forbid source drift
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T32_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t32-parity-constraints-prereg.json'='67bf7d3a94cc0dfbb40f3b5fec8a2ba2210f69e8'
+            'research/north-star-transfer/20261019-wingless-t32-parity-causal-sources.py'='9240aef2918daa4b826d5fa7245624aaecb78eda'
+            'research/north-star-transfer/20261019-wingless-t32-learned-constraint-construction.py'='d715e51048fcd9e9060a9ad54c9859ba937c3451'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T32_FROZEN_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor dbd40c8c380e7ddee4f489af5e624a34092e3b75 4158ce7a8400bc04494906ecb3e07f1a4ae92fcb
+          if($LASTEXITCODE -ne 0){throw 'T32_SOURCE_BORN_BEFORE_MATHEMATICAL_FREEZE'}
+          git merge-base --is-ancestor 4158ce7a8400bc04494906ecb3e07f1a4ae92fcb 565df1366aa08c90c4de185e9a4a060334cea59c
+          if($LASTEXITCODE -ne 0){throw 'T32_CANDIDATE_PRECEDES_FRESH_SOURCE'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t32-parity-causal-sources.py research/north-star-transfer/20261019-wingless-t32-learned-constraint-construction.py
+          if($LASTEXITCODE -ne 0){throw 'T32_SYNTAX_FAILED'}
+          Write-Output 'T32_FROZEN_PREREG_BEFORE_SOURCE_AND_CANDIDATE=PASS'
+      - name: Prove TRAIN learned clause changes actual constructed posterior with independent exact oracle
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t32-learned-constraint-construction.py --train-only > t32-TRAIN-constraints.json
+          if($LASTEXITCODE -ne 0){throw 'T32_TRAIN_CONSTRAINT_CONSTRUCTION_FAILED'}
+          python -c "import json;x=json.load(open('t32-TRAIN-constraints.json',encoding='utf-8-sig'));assert x['status']=='PASS_TRAIN_NO_DEV' and x['TRAIN']==40 and x['DEV_opened']==0 and x['TRUE_hidden_rules_retained']==40 and x['exact_counterfactual_equivalences']==120 and x['full_brute_exact_posterior_equivalences']==40 and .15<=x['uncertainty_fraction']<=.90 and x['learned_parameters_change_actual_constructed_constraint_cases']>=1 and x['newly_constructed_unit_constraints_from_TRAIN_macros']>0 and x['witnessed_public_parity_inference_proofs']>0 and x['TRAIN_public_macros_learned']>0 and x['no_previous_consumed_scientific_cases'] and not x['optimizer_admission'];print('T32_TRUE_LEARNED_CONSTRAINT_UPDATE_TRAIN=PASS');print('T32_TRAIN_EVIDENCE='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T32_FROZEN_LEARNED_ABLATION_OR_INFO_GATE_FAILED_NO_DEV'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t32-TRAIN-parity-constraints-${{ matrix.os }}
+          path: t32-TRAIN-constraints.json
+          if-no-files-found: ignore
+          retention-days: 90
