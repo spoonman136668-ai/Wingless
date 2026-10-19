@@ -1,0 +1,116 @@
+{
+  "schema": "northstar.t18.wingless.new-internal-identifiability-qualification.v1",
+  "date_edt": "2026-10-19",
+  "classification": "INTERNAL_SYNTHETIC_EXACT_HINDSIGHT_HEADROOM_NOT_LEARNED_SCIENCE",
+  "provider": {
+    "repository": "spoonman136668-ai/Wingless",
+    "run_id": 39273003679,
+    "url": "https://github.com/spoonman136668-ai/Wingless/actions/runs/39273003679",
+    "head_sha": "441820b9d61c8c26332e978253961f44980da8c9",
+    "attempt": 1,
+    "event": "push",
+    "conclusion": "SUCCESS",
+    "linux": "PASS",
+    "windows": "PASS",
+    "linux_job_id": 118129952578,
+    "windows_job_id": 118129952630,
+    "linux_artifact_id": 12195863395,
+    "linux_artifact_zip_sha256": "6ae77dd3b9f63f2a30909361dea10496ca2b985087f60302663552420c6e9028",
+    "windows_artifact_id": 12196018126,
+    "windows_artifact_zip_sha256": "57ed44cc828bd696126e0977c7f2263768442807501439d50cda4aecf3c11c08"
+  },
+  "source_prereg": {
+    "preimplementation_sha": "e4f553fc61928b3c0a7e8562659f496ae845854a",
+    "preimplementation_blob": "8462c468f3a0cfe04a07292ca0fe9e43e14b5083",
+    "source_commit": "1f596326ced95ba0a96b260a544609b7cd7751ab",
+    "source_blob": "7efdcf67817aea264321e33b1a82a8aae04c4a85",
+    "experiment_blob": "a1521b8cf478afeff99729b2bc62d44dc3195a18",
+    "frozen_shared_role_certifier_blob": "1041db8ff76365eba5eb8f31cecd0e2172d397d8",
+    "frozen_domain_blob": "85dbd2673a94a6d72db29e57ee836619405f7f1e",
+    "train_internal_cases": 24,
+    "dev_internal_cases": 48,
+    "zero_overlap_with_T16_protected_original_ids": true
+  },
+  "cross_platform_original_result": {
+    "train_t16b": {
+      "correct": 48,
+      "queries": 115
+    },
+    "same_certifier_untrained": {
+      "correct": 48,
+      "queries": 115
+    },
+    "full_exact": {
+      "correct": 48,
+      "queries": 126
+    },
+    "non_deployable_hindsight_minimum_total_queries": 102,
+    "hindsight_cases_with_strict_savings": 12,
+    "hindsight_cases_total": 48,
+    "hindsight_fraction": 0.25,
+    "by_domain": {
+      "F11": {
+        "cases": 24,
+        "trained_queries": 52,
+        "hindsight_queries": 50,
+        "strict_headroom_cases": 2
+      },
+      "S3": {
+        "cases": 24,
+        "trained_queries": 63,
+        "hindsight_queries": 52,
+        "strict_headroom_cases": 10
+      }
+    },
+    "replication_ubuntu_and_windows_same_exact_metrics": true,
+    "cpu_rss": {
+      "ubuntu": {
+        "trained-t16b": {
+          "median_complete_cpu_ns": 12810445,
+          "max_rss_bytes": 14655488
+        },
+        "untrained-same-cert": {
+          "median_complete_cpu_ns": 11774703,
+          "max_rss_bytes": 14786560
+        },
+        "full-exact": {
+          "median_complete_cpu_ns": 5207323,
+          "max_rss_bytes": 14786560
+        }
+      },
+      "windows": {
+        "trained-t16b": {
+          "median_complete_cpu_ns": 15625000,
+          "max_rss_bytes": 17797120
+        },
+        "untrained-same-cert": {
+          "median_complete_cpu_ns": 15625000,
+          "max_rss_bytes": 17072128
+        },
+        "full-exact": {
+          "median_complete_cpu_ns": 0,
+          "max_rss_bytes": 16969728
+        }
+      },
+      "windows_cpu_timer_resolution_warning": "Full-exact CPU quantized to zero at observed clock resolution, not truly zero compute",
+      "sample_size_per_arm_platform": 5
+    }
+  },
+  "interpretation": {
+    "new_learned_policy_evaluated": false,
+    "non_clairvoyant_trainonly_policy_reached_hindsight_bound": false,
+    "unseen_independently_originated_source": false,
+    "mathematical_clairvoyant_lower_bound_is_not_scientific_positive": true,
+    "evidence_of_potential_S3_query_headroom": true,
+    "headroom_on_F11_weak": true,
+    "genuine_public_query_service_cost_not_measured": true,
+    "whole_system_control_resource_comparison_for_new_learned_policy": false,
+    "scientific_acceptance": false,
+    "optimizer_admission": false,
+    "production": false,
+    "merges": false,
+    "integrated_full_regression": false,
+    "T16_originals_consumed": 0
+  },
+  "next": "T19: on a truly new development-only S3 family, test whether a source-blind TRAIN-trained contingent shared-variable decision policy (never seeing unqueried outcomes) can realize any of T18 hindsight headroom against equally trained and symbolic strongest controls under exact CPU/RSS budget. Never claim clairvoyant bound as achieved improvement, and preserve external independent source-firstuse gate."
+}
