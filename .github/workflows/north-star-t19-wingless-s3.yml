@@ -1,0 +1,67 @@
+name: T19 Wingless fresh internal S3 contingent-query qualification
+on:
+  push:
+    branches: [research/t19-contingent-s3-20261019]
+    paths: ['.github/workflows/north-star-t19-wingless-s3.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t19-wingless-internal-s3
+  cancel-in-progress: false
+jobs:
+  fresh-train-only-comparison:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 60
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify precode chronology, exact source and immutable sound certifier
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T19_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t19-contingent-s3-precode.json'='a38eb8905fbac009e9a6f46309156886e9e1ca09'
+            'research/north-star-transfer/20261019-wingless-t19-s3-source.py'='34d3fda276cfecb8b3188dbf90c831c1509533e5'
+            'research/north-star-transfer/20261019-wingless-t19-contingent-query.py'='643406c9d30e74626dc4a9f9691902e366e60680'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+            'research/north-star-transfer/20261018-wingless-t3-typed-composition.py'='85dbd2673a94a6d72db29e57ee836619405f7f1e'
+          }
+          foreach($path in $expected.Keys){
+            $actual=(git hash-object -- $path).Trim()
+            if($actual -cne $expected[$path]){throw "T19_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 2e19f7b95973e9d17be541bc5e9f493bc4934d4c HEAD
+          if($LASTEXITCODE -ne 0){throw 'T19_PREIMPLEMENTATION_FREEZE_MISSING'}
+          git merge-base --is-ancestor 2e19f7b95973e9d17be541bc5e9f493bc4934d4c 2d2051c30646ba0d3f26221a7bc6b10b4fc1d97c
+          if($LASTEXITCODE -ne 0){throw 'T19_SOURCE_PRECEDES_FREEZE'}
+          git merge-base --is-ancestor 2d2051c30646ba0d3f26221a7bc6b10b4fc1d97c 2f7e33bba1fcd9274a2446c1b67a860f50328c34
+          if($LASTEXITCODE -ne 0){throw 'T19_IMPLEMENTATION_PRECEDES_SOURCE'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t19-s3-source.py research/north-star-transfer/20261019-wingless-t19-contingent-query.py
+          if($LASTEXITCODE -ne 0){throw 'T19_SYNTAX_FAILED'}
+          Write-Output 'T19_PREREG_BEFORE_SOURCE_BEFORE_MECHANISM=PASS'
+      - name: Five whole-process trials per arm, no T16 originals
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t19-contingent-query.py > t19-internal-S3.json
+          if($LASTEXITCODE -ne 0){throw 'T19_INTERNAL_EXPERIMENT_FAILED'}
+          python -c "import json; x=json.load(open('t19-internal-S3.json',encoding='utf-8-sig')); r=x['results']; assert len(r)==4 and all(z['correct']==64 and len(z['cpu_five_process_ns'])==5 and len(z['rss_five_process_bytes'])==5 for z in r.values()); assert x['T16_originals_consumed']==0 and x['scientific_acceptance'] is False and x['optimizer_admission'] is False; print('T19_FRESH_INTERNAL_COMPARISON=PASS'); print('T19_QUERIES='+json.dumps({k:v['queries'] for k,v in r.items()},sort_keys=True)); print('T19_RESOURCE_COMPARISONS='+json.dumps(x['comparison'],sort_keys=True)); print('T19_TRAINED_QUERY_SAVINGS='+str(x['trained_query_advantage_observed']))"
+          if($LASTEXITCODE -ne 0){throw 'T19_REPORT_INVALID'}
+          Write-Output 'T19_INTERNAL_ONLY_NO_OPTIMIZER_ADMISSION=PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t19-s3-new-internal-development-${{ matrix.os }}
+          path: t19-internal-S3.json
+          if-no-files-found: ignore
+          retention-days: 90
