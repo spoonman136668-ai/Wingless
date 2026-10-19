@@ -1,0 +1,117 @@
+{
+  "schema": "wingless.t19.original-internal-dev-negative-evidence.v1",
+  "date_edt": "2026-10-19",
+  "classification": "VALID_INTERNAL_TRAINED_CONTINGENT_QUERY_NEGATIVE_NOT_INDEPENDENT_SCIENCE",
+  "source": "self-authored S3-only, 40 disjoint TRAIN and 64 disjoint DEV cases, 3 persistent roles",
+  "source_freeze_commit": "2e19f7b95973e9d17be541bc5e9f493bc4934d4c",
+  "source_implementation_commit": "2d2051c30646ba0d3f26221a7bc6b10b4fc1d97c",
+  "learner_implementation_commit": "2f7e33bba1fcd9274a2446c1b67a860f50328c34",
+  "qualification_head": "254a8910b93b2fa4abe00107f76a36d8152dad5e",
+  "frozen_blobs": {
+    "precode": "a38eb8905fbac009e9a6f46309156886e9e1ca09",
+    "source": "34d3fda276cfecb8b3188dbf90c831c1509533e5",
+    "learner": "643406c9d30e74626dc4a9f9691902e366e60680",
+    "certifier": "1041db8ff76365eba5eb8f31cecd0e2172d397d8",
+    "algebra": "85dbd2673a94a6d72db29e57ee836619405f7f1e"
+  },
+  "original_provider": {
+    "repository": "spoonman136668-ai/Wingless",
+    "run_id": 39277649631,
+    "run_attempt": 1,
+    "event": "push",
+    "conclusion": "success",
+    "url": "https://github.com/spoonman136668-ai/Wingless/actions/runs/39277649631",
+    "github_timestamp_utc": "2026-10-19T15:24:18Z",
+    "ubuntu": {
+      "job_id": 118146061718,
+      "conclusion": "success",
+      "artifact_id": 12197344440,
+      "artifact_sha256": "ce1e5d6c08cadf8e67edd4a9b239ebd744965803ffb0050b28bfef6068e8da36"
+    },
+    "windows": {
+      "job_id": 118146061383,
+      "conclusion": "success",
+      "artifact_id": 12200175041,
+      "artifact_sha256": "18995ad46bd7f84833d7d16c02d0d4ff095b878decd605578146d846e19bc681"
+    }
+  },
+  "exact_counts_both_os": {
+    "trained-contingent": {
+      "correct": 64,
+      "extra_public_queries": 167,
+      "TRAIN_updates": 360
+    },
+    "trained-T16B": {
+      "correct": 64,
+      "extra_public_queries": 159
+    },
+    "untrained-same-cert": {
+      "correct": 64,
+      "extra_public_queries": 163
+    },
+    "full-public-exact": {
+      "correct": 64,
+      "extra_public_queries": 192
+    }
+  },
+  "linux_whole_process": {
+    "median_cpu_ns": {
+      "trained-contingent": 32892415,
+      "trained-T16B": 13244355,
+      "untrained-same-cert": 11829495,
+      "full-public-exact": 7108239
+    },
+    "maximum_rss_bytes": {
+      "trained-contingent": 15159296,
+      "trained-T16B": 15290368,
+      "untrained-same-cert": 15290368,
+      "full-public-exact": 15421440
+    },
+    "all_five_process_repetitions_preserved_in_provider_artifacts": true
+  },
+  "windows_whole_process": {
+    "median_cpu_ns": {
+      "trained-contingent": 31250000,
+      "trained-T16B": 15625000,
+      "untrained-same-cert": 15625000,
+      "full-public-exact": 0
+    },
+    "maximum_rss_bytes": {
+      "trained-contingent": 18288640,
+      "trained-T16B": 17457152,
+      "untrained-same-cert": 17412096,
+      "full-public-exact": 17354752
+    },
+    "clock_warning": "Windows 15.625ms process-time quantization; full exact median zero is measurement-resolution artifact, not zero compute.",
+    "all_five_process_repetitions_preserved_in_provider_artifacts": true
+  },
+  "evidence_judgement": {
+    "engineering_qualification": "PASS_2_OF_2",
+    "zero_wrong_answers": true,
+    "strict_query_savings_vs_equally_trained_control": false,
+    "whole_CPU_parity": false,
+    "peak_RSS_parity": "LINUX_PASS_WINDOWS_FAIL",
+    "remote_query_service_cost": "UNMEASURED",
+    "independent_external_source_birth": false,
+    "independent_replication_new_family": false,
+    "scientific_positive": false,
+    "optimizer_admission": false
+  },
+  "causal_interpretation": "T18's nondeployable hindsight 10/24 S3 headroom was not realized by T19. Trained query-contingent policy used 8 MORE public second-role requests than fully trained T16B and higher complete CPU. Do not retune this consumed DEV cohort; future candidate should change the structural certificate/representation, not fit more rank coefficients to these results.",
+  "authority_guards": {
+    "T16_protected_originals_opened": 0,
+    "original_T19_DEV_replay_permitted": false,
+    "no_pr_merge": true,
+    "no_accepted_ref_mutation": true,
+    "no_workstation_access": true,
+    "no_new_controller": true,
+    "no_live_optimizer": true,
+    "no_paid_inference": true,
+    "no_ckb_plane_coupling": true
+  },
+  "source_retention": {
+    "repo_receipt": "append-only source-bound evidence record",
+    "full_raw_five_process_originals": "provider artifact digests above; GitHub artifacts are retention-limited",
+    "no_unsafe_result_reinterpretation": true
+  }
+}
