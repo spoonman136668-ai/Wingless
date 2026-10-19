@@ -1,0 +1,80 @@
+{
+  "schema": "wingless.T32.learned-constraint-construction-prereg.v1",
+  "date_EDT": "2026-10-19",
+  "parent_T31_negative": "7d2a667e68c4ce94481f798999c0328fe120f3f0",
+  "status": "FROZEN_BEFORE_FRESH_SOURCE_AND_MECHANISM",
+  "hypothesis": "Public-TRAIN-learned parity-resolution templates can construct valid new constraints on unknown nonlinear causal-law truth-table bits from masked joint transition observations, reducing certified inference work versus equally trained exact Gaussian-elimination and deterministic closure baselines without wrong certified answers.",
+  "new_problem": "Public feedback supplies XOR of pairs of output nodes, not the individual output states; a shared hidden Boolean truth table is coupled across all entities. Relative to T31, posterior law construction requires actual GF(2) multi-observation inference, not rank-ordering fully enumerated worlds.",
+  "source": {
+    "families": {
+      "H": {
+        "entities": 7,
+        "parents": 2,
+        "graph_templates": 8,
+        "hidden_modes": 2,
+        "unknown_boolean_truth_table_bits": 4
+      },
+      "J": {
+        "entities": 9,
+        "parents": 3,
+        "graph_templates": 8,
+        "hidden_modes": 2,
+        "unknown_boolean_truth_table_bits": 8
+      }
+    },
+    "new_ids": "t32-H/J-train/dev only",
+    "TRAIN": 40,
+    "DEV": 64,
+    "public_reset_intervention_trials": 5,
+    "observations_per_trial": "two XOR pair outcomes of next entity outputs; no individual output values",
+    "future_query": "known query start, do at first step, 3 synchronous updates, three target nodes",
+    "TRAIN_rule_class": "affine",
+    "DEV_rule_class": "genuinely nonaffine, withheld and disjoint from TRAIN affine",
+    "no_old_consumed_sources": true,
+    "independent_external_replication": false
+  },
+  "learned_mechanism": {
+    "TRAIN": "Count publicly derived GF(2) rowmask-pair resolution signatures that produce new singleton law-bit clauses; select top 32 ordered rowmask pairs without private source labels.",
+    "inference": "Use trained templates to XOR matching observed parity rows and append new logically implied singleton truth-table constraints *before* any exact closure or law enumeration. Use the resulting learned unit clauses to filter law candidates; use exact GF(2) reduction on the remaining original constraints. Unseen patterns use exact fallback.",
+    "ablation": "Disable the learned clause templates on the SAME TRAIN public cases. Require >0 cases with new, nonduplicate singleton clauses AND a changed actual constraint-state construction, with identical complete truth-table posterior sets and counterfactual certifications. Merely sorting graph/law candidates does not qualify.",
+    "proof": "Every inferred clause (a XOR b, u XOR v) must be backed by the two public row equations; independently brute enumerate all graph/mode/law models to confirm the exact posterior, no unsupported clause, never prune true law.",
+    "limitations": "A parity XOR template is an algebraically sound learned inference policy, not proof of new learned physical dynamics; require strict evidence beyond the engineering ablation for scientific positive."
+  },
+  "strong_controls": [
+    "TRAIN-learned-parity-constraint-propagation",
+    "TRAIN-frequency-compiled-parity-closure",
+    "optimized-exact-GF2-solver",
+    "source-blind-exhaustive-rule-enumerator"
+  ],
+  "headroom_gate": {
+    "all_TRAIN_true_worlds_preserved": 40,
+    "TRAIN_exact_responses": 120,
+    "DEV_generated": 0,
+    "uncertainty_fraction_min": 0.15,
+    "uncertainty_fraction_max": 0.9,
+    "learned_constraint_influence_cases_min": 1,
+    "certified_soundness_zero_false_positives": true
+  },
+  "prospective": {
+    "run_only_after_two_OS_TRAIN_pass": true,
+    "unseen_cases": 64,
+    "target_answers": 192,
+    "complete_process_CPU_RSS_trials_per_arm_OS": 5,
+    "zero_wrong_answers": true,
+    "baseline_correctness_preserved": true,
+    "strict_resource_and_capability_acceptance": "No CPU or RSS regression relative to best fully TRAIN-informed exact control, and strictly lower complete native work or higher correctly certified sound coverage",
+    "original_DEV_consumed_one_time": true,
+    "no_post_result_replay_or_retune": true,
+    "no_optimizer_admission": true
+  },
+  "safety": {
+    "GitHub_hosted_Windows_Linux": true,
+    "no_workstation": true,
+    "no_self_hosted_research_runner": true,
+    "no_external_recruitment": true,
+    "no_paid_API": true,
+    "no_new_controller": true,
+    "no_FORGE_or_CKB_plane_change": true,
+    "no_merge": true
+  }
+}
