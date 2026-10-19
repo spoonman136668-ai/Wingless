@@ -1,0 +1,65 @@
+name: T30B first-use unseen nonaffine causal mechanism comparison
+on:
+  push:
+    branches: [research/t30b-sparse-law-observations-20261019]
+    paths: ['.github/workflows/north-star-t30b-original-first-use.yml']
+permissions:
+  contents: read
+concurrency:
+  group: Wingless-T30B-original-unknown-nonaffine-once
+  cancel-in-progress: false
+jobs:
+  source-bound-firstuse:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 60
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate independent new source birth and two-OS TRAIN-only science clearance
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T30B_PROSPECTIVE_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t30b-sparse-mechanism-prereg.json'='92c4b9d725e976d1a4c2d1b2d6a92519ca13b09c'
+            'research/north-star-transfer/20261019-wingless-t30b-new-sparse-rules.py'='cdf5e2a30aea872eb990bec26eda92d3bce0b454'
+            'research/north-star-transfer/20261019-wingless-t30b-learned-mechanism.py'='2ba4c2c95e4e4d027b3cb6cbeb685e6c8081c506'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){
+              throw "T30B_ORIGINAL_BLOB_DRIFT:$path"
+            }
+          }
+          git merge-base --is-ancestor c9134b45854ca4196017c513c53c612d85b8d35e 30394628b2a856a9870518c3280c1e9aa41f6d28
+          if($LASTEXITCODE -ne 0){throw 'T30B_SOURCE_PREDATED_NEW_PRECODE'}
+          git merge-base --is-ancestor 30394628b2a856a9870518c3280c1e9aa41f6d28 d550acd607f3b3b24680158eca71fdcf06b5b61a
+          if($LASTEXITCODE -ne 0){throw 'T30B_LEARNER_PRECEDED_SOURCE'}
+          git merge-base --is-ancestor e77cfa9c2305a65dfcb84d9cfd5d0d8643321b50 c54c9bca9da840d2f68cfd9b15b12db238951efd
+          if($LASTEXITCODE -ne 0){throw 'T30B_TARGET_ARITY_REPAIR_NOT_QUALIFIED'}
+          git merge-base --is-ancestor c54c9bca9da840d2f68cfd9b15b12db238951efd HEAD
+          if($LASTEXITCODE -ne 0){throw 'T30B_TWO_OS_TRAIN_PASSED_HEAD_NOT_PRESENT'}
+          Write-Output 'T30B_ORIGINAL_SOURCE_FREEZE_AND_TRAIN_CLEARANCE=PASS'
+      - name: One fresh nonaffine M/N DEV firstuse with exact matched controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t30b-learned-mechanism.py > t30b-firstuse-original.json
+          if($LASTEXITCODE -ne 0){throw 'T30B_ORIGINAL_FAILED_OR_NEGATIVE_PRESERVE_ARTIFACT'}
+          python -c "import json;x=json.load(open('t30b-firstuse-original.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==5 and x['TRAIN_cases']==40 and x['DEV_cases']==64 and x['future_counterfactual_questions']==192;assert all(v['correct_certified']+v['safe_abstentions']==192 and v['hard_false_positives']==0 and len(v['per_case'])==64 and len(v['five_complete_CPU_ns'])==5 and len(v['five_peak_RSS_bytes'])==5 for v in a.values());assert not x['scientific_positive'] and not x['external_independent_replication'] and not x['optimizer_admission'] and not x['old_DEV_replayed'] and x['no_paid_API'] and x['no_new_controller'];print('T30B_ORIGINAL_TECHNICAL=PASS');print('T30B_CERTIFIED='+json.dumps({k:v['correct_certified'] for k,v in a.items()},sort_keys=True));print('T30B_ABSTENTIONS='+json.dumps({k:v['safe_abstentions'] for k,v in a.items()},sort_keys=True));print('T30B_MEDIAN_CPU='+json.dumps({k:v['median_complete_CPU_ns'] for k,v in a.items()},sort_keys=True));print('T30B_MAX_RSS='+json.dumps({k:v['max_peak_RSS_bytes'] for k,v in a.items()},sort_keys=True));print('T30B_RESOURCE_CONTROLS='+json.dumps(x['comparisons'],sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T30B_ORIGINAL_EVIDENCE_RECEIPT_INVALID'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t30b-original-unknown-rules-${{ matrix.os }}
+          path: t30b-firstuse-original.json
+          retention-days: 90
+          if-no-files-found: ignore

@@ -1,0 +1,63 @@
+name: T30BB fresh sparse unknown causal mechanisms TRAIN-only qualification
+on:
+  push:
+    branches: [research/t30b-sparse-law-observations-20261019]
+    paths: ['.github/workflows/north-star-t30b-train-only.yml']
+permissions:
+  contents: read
+concurrency:
+  group: Wingless-T30BB-frozen-TRAIN-only
+  cancel-in-progress: false
+jobs:
+  source-blind-law-learning:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 40
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify T30B chronology and exact source identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T30B_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t30b-sparse-mechanism-prereg.json'='92c4b9d725e976d1a4c2d1b2d6a92519ca13b09c'
+            'research/north-star-transfer/20261019-wingless-t30b-new-sparse-rules.py'='cdf5e2a30aea872eb990bec26eda92d3bce0b454'
+            'research/north-star-transfer/20261019-wingless-t30b-learned-mechanism.py'='2ba4c2c95e4e4d027b3cb6cbeb685e6c8081c506'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T30B_FROZEN_SOURCE_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor c9134b45854ca4196017c513c53c612d85b8d35e 30394628b2a856a9870518c3280c1e9aa41f6d28
+          if($LASTEXITCODE -ne 0){throw 'T30B_NEW_SOURCE_PRECEDED_PREREG'}
+          git merge-base --is-ancestor 30394628b2a856a9870518c3280c1e9aa41f6d28 d550acd607f3b3b24680158eca71fdcf06b5b61a
+          if($LASTEXITCODE -ne 0){throw 'T30B_CANDIDATE_PRECEDED_NEW_SOURCE'}
+          git merge-base --is-ancestor e77cfa9c2305a65dfcb84d9cfd5d0d8643321b50 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T30B_PRE_DEV_TARGET_ARITY_CORRECTION_NOT_INCLUDED'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t30b-new-sparse-rules.py research/north-star-transfer/20261019-wingless-t30b-learned-mechanism.py
+          if($LASTEXITCODE -ne 0){throw 'T30B_SYNTAX_FAILED'}
+          Write-Output 'T30B_PREREG_BEFORE_SOURCE_AND_CANDIDATE=PASS'
+      - name: Prove unknown-rule posterior including unseen nonlinear ANF algebra without DEV
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t30b-learned-mechanism.py --train-only > t30b-TRAIN.json
+          if($LASTEXITCODE -ne 0){throw 'T30B_TRAIN_RULE_POSTERIOR_OR_CERT_FAILURE'}
+          python -c "import json;x=json.load(open('t30b-TRAIN.json',encoding='utf-8-sig'));assert x['status']=='PASS_TRAIN_ONLY_DEV_UNOPENED' and x['TRAIN_cases']==40 and x['DEV_generated']==0 and x['TRAIN_true_hidden_laws_retained']==40 and x['TRAIN_counterfactual_queries']==120 and x['TRAIN_exact_public_constraint_and_answer_equivalences']==120 and .15<=x['TRAIN_uncertainty_fraction']<=.90 and x['full_known_and_unknown_ANF_rules_verified']==272 and x['proof_does_not_assume_affine_DEV'] and not x['previous_consumed_cases_opened'] and not x['optimizer_admission'];print('T30B_UNKNOWN_RULE_TRAIN_ADMISSION=PASS');print('T30B_TRAIN_EVIDENCE='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T30B_FROZEN_TRAIN_GATE_FAILED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t30b-TRAIN-unknown-law-${{ matrix.os }}
+          path: t30b-TRAIN.json
+          retention-days: 90
+          if-no-files-found: ignore
