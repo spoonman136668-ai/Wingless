@@ -80,7 +80,7 @@ def build(identity):
         probes.append(probe)
     start=rng.randrange(1<<n)
     do=(rng.randrange(n),rng.randrange(2))
-    targets=tuple(rng.sample(range(n),2))
+    targets=tuple(rng.sample(range(n),3))
     after=update(family,start,topology,law,do)
     final=update(family,after,topology,law)
     answers=tuple((final>>j)&1 for j in targets)
