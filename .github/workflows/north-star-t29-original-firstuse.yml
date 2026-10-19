@@ -1,0 +1,63 @@
+name: T29 original prospective scalable causal-separator comparison
+on:
+  push:
+    branches: [research/t29-multigrammar-causal-separator-20261019]
+    paths: ['.github/workflows/north-star-t29-original-firstuse.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T29-FG-original-unseen-once
+  cancel-in-progress: false
+jobs:
+  original-prospective:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 50
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Confirm exact freeze, source and QUALIFIED TRAIN-only engineering identity
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T29_ORIGINAL_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t29-multigrammar-precode.json'='291f95184331d4f4d9d3084b98cde10418a4c9fc'
+            'research/north-star-transfer/20261019-wingless-t29-new-structural-worlds.py'='aa9ffc0df395ed3dd92e899764c5c664ca0b1b32'
+            'research/north-star-transfer/20261019-wingless-t29-certified-causal-separator.py'='33f33e95bb6fbc89557abd34dd5d91d68550261f'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){
+              throw "T29_FIRSTUSE_BLOB_DRIFT:$path"
+            }
+          }
+          git merge-base --is-ancestor 672a1fb40cfaf446a27d19df754f1f8205fa05be a40bc4d19d19000cc1b950ed815810e863e40e95
+          if($LASTEXITCODE -ne 0){throw 'T29_PRECODE_BEFORE_SOURCE_MISSING'}
+          git merge-base --is-ancestor a40bc4d19d19000cc1b950ed815810e863e40e95 ba41b07c2678c064a78f947b38ec6fd8efa0c9fb
+          if($LASTEXITCODE -ne 0){throw 'T29_MODEL_AFTER_SOURCE_MISSING'}
+          git merge-base --is-ancestor 8f0c13f58b6930943459b1a0c6bfc17235391145 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T29_PRE_DEV_TRAIN_WIN_LINUX_QUALIFIED_HEAD_MISSING'}
+          Write-Output 'T29_FIRST_USE_FROZEN_BLOBS_AND_ADMISSION=PASS'
+      - name: Original unseen F/G 64 cases, 192 counterfactuals, all strong exact controls and complete resources
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t29-certified-causal-separator.py > t29-original-results.json
+          if($LASTEXITCODE -ne 0){throw 'T29_ORIGINAL_SCIENTIFIC_FAILURE_OR_NEGATIVE_PRESERVE_LOG'}
+          python -c "import json;d=json.load(open('t29-original-results.json',encoding='utf-8-sig'));a=d['arms'];assert len(a)==5 and d['DEV_cases']==64 and d['counterfactual_questions']==192 and d['TRAIN_cases']==40;assert all(v['correct_certified']+v['sound_abstentions']==192 and v['hard_false_positives']==0 and len(v['per_case'])==64 and len(v['five_complete_CPU_ns'])==5 and len(v['five_peak_RSS_bytes'])==5 for v in a.values());assert not d['scientific_positive'] and not d['independent_external_replication'] and not d['optimizer_admission'] and not d['old_DEV_replayed'] and d['no_paid_models'] and d['no_new_controller'];print('T29_ORIGINAL_TECHNICAL=PASS');print('T29_CERTIFIED='+json.dumps({k:v['correct_certified'] for k,v in a.items()},sort_keys=True));print('T29_MEDIAN_CPU='+json.dumps({k:v['median_complete_CPU_ns'] for k,v in a.items()},sort_keys=True));print('T29_PEAK_RSS='+json.dumps({k:v['max_peak_RSS_bytes'] for k,v in a.items()},sort_keys=True));print('T29_FEATURE_HITS='+json.dumps({k:v['original_learned_macro_hits'] for k,v in a.items()},sort_keys=True));print('T29_STRONG_EXACT_COMPARISONS='+json.dumps(d['comparison'],sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T29_ORIGINAL_EVIDENCE_MALFORMED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t29-original-seven-nine-${{ matrix.os }}
+          path: t29-original-results.json
+          retention-days: 90
+          if-no-files-found: ignore

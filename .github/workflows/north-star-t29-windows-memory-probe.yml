@@ -1,0 +1,59 @@
+name: T29 Windows source-free memory measurement repair qualification
+on:
+  push:
+    branches: [research/t29-multigrammar-causal-separator-20261019]
+    paths: ['.github/workflows/north-star-t29-windows-memory-probe.yml']
+permissions:
+  contents: read
+jobs:
+  windows-only-no-data:
+    runs-on: windows-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compare original process memory API against Win32 current process without opening source cohort
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git hash-object -- research/north-star-transfer/20261019-wingless-t29-certified-causal-separator.py).Trim() -cne 'ad67fec80931bb6db430cff89a686f9791a0e00f'){throw 'T29_FUTURE_ONLY_RSS_REPAIR_DRIFT'}
+          @'
+          import ctypes,importlib.util,json,subprocess,sys,pathlib
+          from ctypes import wintypes
+          class Mem(ctypes.Structure):
+              _fields_=[("cb",wintypes.DWORD),("PageFaultCount",wintypes.DWORD),
+                        ("PeakWorkingSetSize",ctypes.c_size_t),("WorkingSetSize",ctypes.c_size_t),
+                        ("QuotaPeakPagedPoolUsage",ctypes.c_size_t),("QuotaPagedPoolUsage",ctypes.c_size_t),
+                        ("QuotaPeakNonPagedPoolUsage",ctypes.c_size_t),("QuotaNonPagedPoolUsage",ctypes.c_size_t),
+                        ("PagefileUsage",ctypes.c_size_t),("PeakPagefileUsage",ctypes.c_size_t)]
+          psapi=ctypes.WinDLL("psapi",use_last_error=True)
+          kernel=ctypes.WinDLL("kernel32",use_last_error=True)
+          kernel.GetCurrentProcess.restype=wintypes.HANDLE
+          psapi.GetProcessMemoryInfo.argtypes=[wintypes.HANDLE,ctypes.POINTER(Mem),wintypes.DWORD]
+          psapi.GetProcessMemoryInfo.restype=wintypes.BOOL
+          mem=Mem();mem.cb=ctypes.sizeof(mem)
+          handle=kernel.GetCurrentProcess()
+          ret=psapi.GetProcessMemoryInfo(handle,ctypes.byref(mem),mem.cb)
+          result={"native_success":bool(ret),"native_last_error":ctypes.get_last_error(),
+                  "handle":str(handle),"structure_size":mem.cb,
+                  "native_peak_bytes":int(mem.PeakWorkingSetSize) if ret else None}
+          path=pathlib.Path("research/north-star-transfer/20261019-wingless-t29-certified-causal-separator.py")
+          spec=importlib.util.spec_from_file_location("t29_memory_probe",path)
+          mod=importlib.util.module_from_spec(spec)
+          sys.modules[spec.name]=mod
+          spec.loader.exec_module(mod)
+          try:
+              result["original_unchanged_helper_peak_bytes"]=mod.rss()
+              result["helper_success"]=True
+          except Exception as exc:
+              result["helper_success"]=False
+              result["helper_exception"]=repr(exc)
+          print("T29_SOURCE_FREE_MEMORY_DIAGNOSTIC="+json.dumps(result,sort_keys=True))
+          assert ret and result["helper_success"],"Source-free Win32 process-memory interface rejected"
+          '@ | python -
+          if($LASTEXITCODE -ne 0){throw 'T29_SOURCE_FREE_WINDOWS_NATIVE_PROBE_FAILED'}
+          Write-Output 'T29_WINDOWS_MEMORY_PROBE=PASS_NO_DEV'
