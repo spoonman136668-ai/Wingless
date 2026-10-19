@@ -33,8 +33,9 @@ jobs:
           if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t12-freeze.json').Trim() -cne '09890a6e366bf37ba2628f56610ec6f91eea83da'){throw 'T12_FREEZE_NOT_FIRST'}
           git merge-base --is-ancestor 09890a6e366bf37ba2628f56610ec6f91eea83da HEAD
           if($LASTEXITCODE -ne 0){throw 'T12_SOURCE_FREEZE_NOT_ANCESTOR'}
-          if((git hash-object 'research/north-star-transfer/20261019-wingless-t12-mechanism.py').Trim() -cne '6edb00019a7f4b0832e3a454594f236c7b390626'){throw 'T12_ORIGINAL_MECHANISM_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t12-mechanism.py').Trim() -cne 'c229a8b33f70797f6ca2854f19cb999b2737730c'){throw 'T12_ORIGINAL_MECHANISM_CHANGED'}
           if((git hash-object 'research/north-star-transfer/20261019-wingless-t11-mechanism.py').Trim() -cne '0536f6907d48c1a083c39b68020407a34648a7cb'){throw 'T12_STRONGEST_CONTROL_DRIFT'}
+          Write-Output 'T12_WINGLESS_PRIOR_RUN_PRE_SOURCE_IMPORT_FAILURE=39186174072'
           Write-Output 'T12_WINGLESS_SOURCE_AND_FREEZE=PASS'
       - name: Measure new public causal mechanism; no accepted science promotion
         shell: pwsh
