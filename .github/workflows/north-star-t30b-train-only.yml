@@ -31,7 +31,7 @@ jobs:
           if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T30B_HEAD_DRIFT'}
           $expected=@{
             'research/north-star-transfer/20261019-wingless-t30b-sparse-mechanism-prereg.json'='92c4b9d725e976d1a4c2d1b2d6a92519ca13b09c'
-            'research/north-star-transfer/20261019-wingless-t30b-new-sparse-rules.py'='0bf81d95ab8aefad1f55732118bcb8d60c0ea4ca'
+            'research/north-star-transfer/20261019-wingless-t30b-new-sparse-rules.py'='cdf5e2a30aea872eb990bec26eda92d3bce0b454'
             'research/north-star-transfer/20261019-wingless-t30b-learned-mechanism.py'='2ba4c2c95e4e4d027b3cb6cbeb685e6c8081c506'
           }
           foreach($path in $expected.Keys){
@@ -41,6 +41,8 @@ jobs:
           if($LASTEXITCODE -ne 0){throw 'T30B_NEW_SOURCE_PRECEDED_PREREG'}
           git merge-base --is-ancestor 30394628b2a856a9870518c3280c1e9aa41f6d28 d550acd607f3b3b24680158eca71fdcf06b5b61a
           if($LASTEXITCODE -ne 0){throw 'T30B_CANDIDATE_PRECEDED_NEW_SOURCE'}
+          git merge-base --is-ancestor e77cfa9c2305a65dfcb84d9cfd5d0d8643321b50 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T30B_PRE_DEV_TARGET_ARITY_CORRECTION_NOT_INCLUDED'}
           python -m py_compile research/north-star-transfer/20261019-wingless-t30b-new-sparse-rules.py research/north-star-transfer/20261019-wingless-t30b-learned-mechanism.py
           if($LASTEXITCODE -ne 0){throw 'T30B_SYNTAX_FAILED'}
           Write-Output 'T30B_PREREG_BEFORE_SOURCE_AND_CANDIDATE=PASS'
