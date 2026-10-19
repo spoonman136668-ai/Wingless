@@ -1,0 +1,64 @@
+name: T23 one-time prospective multiquery relational experiment
+on:
+  push:
+    branches: [research/t23-multitask-relational-dag-20261019]
+    paths: ['.github/workflows/north-star-t23-prospective.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t23-original-prospective-once
+  cancel-in-progress: false
+jobs:
+  original:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 60
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check exact frozen source and prior TRAIN-only qualification
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T23_ORIGINAL_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t23-multitask-precode.json'='c7d90c96d3d57612545b3619349f187893439b8f'
+            'research/north-star-transfer/20261019-wingless-t23-new-multitask-source.py'='6f2f08cce6e97e960f87fd322d1f9008f276a5f0'
+            'research/north-star-transfer/20261019-wingless-t23-prefix-dag-learner.py'='1f081e02a08f5f58dc64efff759609c8d7c3e2ff'
+            'research/north-star-transfer/20261019-wingless-t23-train-only.py'='4ef0353f0804a997d9669d704ae759df1d95e427'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+          }
+          foreach($path in $expected.Keys){
+            $actual=(git hash-object -- $path).Trim()
+            if($actual -cne $expected[$path]){throw "T23_ORIGINAL_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 1c56aa5624ea4391393c9c3662d8a50dcfb86362 ed5bfd66173b748a0e51306b707f36eb4aefbc7f
+          if($LASTEXITCODE -ne 0){throw 'T23_SOURCE_PRECEDED_FREEZE'}
+          git merge-base --is-ancestor ed5bfd66173b748a0e51306b707f36eb4aefbc7f 4d7e272a07202535a395a8b0e9e36ca03affc7ce
+          if($LASTEXITCODE -ne 0){throw 'T23_CODE_PRECEDED_SOURCE'}
+          git merge-base --is-ancestor df4d5125020d138370dec23c47023d28eb45ad15 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T23_TRAIN_ONLY_QUALIFICATION_NOT_INCLUDED'}
+          Write-Output 'T23_ORIGINAL_FROZEN_SOURCE_AND_TRAIN_PASS=PASS'
+      - name: "Original prospective DEV: 64 cases x four causal questions, five whole processes per arm"
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t23-prefix-dag-learner.py > t23-original-multiquery.json
+          if($LASTEXITCODE -ne 0){throw 'T23_SCIENTIFIC_NEGATIVE_OR_EXECUTION_FAILURE_PRESERVE_LOG'}
+          python -c "import json; d=json.load(open('t23-original-multiquery.json',encoding='utf-8-sig')); a=d['arms']; assert len(a)==5 and all(v['correct_questions']==256 and v['correct_cases']==64 and len(v['five_whole_cpu_ns'])==5 and len(v['five_peak_rss_bytes'])==5 for v in a.values()); assert not d['old_DEV_reopened'] and not d['protected_originals_replayed'] and not d['independently_replicated'] and not d['optimizer_admission'] and not d['scientific_joint_acceptance']; print('T23_PROSPECTIVE_INTERNAL_COMPARISON=PASS'); print('T23_PUBLIC_QUERIES='+json.dumps({k:v['paid_queries'] for k,v in a.items()},sort_keys=True)); print('T23_PREFIX_CACHE_HITS='+json.dumps({k:v['prefix_cache_hits'] for k,v in a.items()},sort_keys=True)); print('T23_MEDIAN_CPU='+json.dumps({k:v['median_whole_cpu_ns'] for k,v in a.items()},sort_keys=True)); print('T23_PEAK_RSS='+json.dumps({k:v['max_peak_rss_bytes'] for k,v in a.items()},sort_keys=True)); print('T23_COMPARISON='+json.dumps(d['comparison'],sort_keys=True)); print('T23_NO_SCIENTIFIC_PROMOTION=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T23_ORIGINAL_RECEIPT_INVALID'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t23-original-multiquery-${{ matrix.os }}
+          path: t23-original-multiquery.json
+          retention-days: 90
+          if-no-files-found: ignore
