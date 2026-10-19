@@ -193,7 +193,9 @@ def main():
     for arm in ARMS:
         for trial in range(5):
             p=subprocess.run([sys.executable,str(Path(__file__).resolve()),
-                             "--arm",arm,str(trial)],capture_output=True,text=True,check=True)
+                             "--arm",arm,str(trial)],capture_output=True,text=True)
+            if p.returncode:
+                raise RuntimeError("T17_CHILD_FAILED arm="+arm+" trial="+str(trial)+"\n"+p.stderr)
             batch.append(json.loads(p.stdout))
     from statistics import median
     metrics={}
