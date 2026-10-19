@@ -1,0 +1,63 @@
+name: T28 one-time original learned incremental belief prospective
+on:
+  push:
+    branches: [research/t28-incremental-belief-dictionary-20261019]
+    paths: ['.github/workflows/north-star-t28-original-first-use.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t28-new-YZ-original-firstuse-once
+  cancel-in-progress: false
+jobs:
+  original:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 55
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check frozen scientific chronology, exact TRAIN-admitted representation, no-source drift
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T28_FIRSTUSE_HEAD_DRIFT'}
+          $expect=@{
+            'research/north-star-transfer/20261019-wingless-t28-incremental-precode.json'='e1444373f9f9453c69c574b65101676da2b84262'
+            'research/north-star-transfer/20261019-wingless-t28-new-streams.py'='66e8219c10b4932af776924f31ea1422a7d4835b'
+            'research/north-star-transfer/20261019-wingless-t28-incremental-belief.py'='88deffa7d762fe0fd4da773d0cf88af1f2e66f86'
+          }
+          foreach($path in $expect.Keys){
+            if((git hash-object -- $path).Trim() -cne $expect[$path]){throw "T28_ORIGINAL_FROZEN_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 12fe1a9f699402e34bc464d3fd61c35cf418f140 2149bfabeeab093e38792d6ba4d8521feaf12daa
+          if($LASTEXITCODE -ne 0){throw 'T28_ORIGINAL_PRECODE_NOT_FROZEN_FIRST'}
+          git merge-base --is-ancestor 2149bfabeeab093e38792d6ba4d8521feaf12daa 8ebfc5bc6bcec4d881db36b4f6847a86834ba2d0
+          if($LASTEXITCODE -ne 0){throw 'T28_SOURCE_BIRTH_MISSING'}
+          git merge-base --is-ancestor 1ccc1fdc2c49cdddd72154f938b5c96c4136a0d8 109289cfe7eb104025625840634cfb814dbea5ab
+          if($LASTEXITCODE -ne 0){throw 'T28_TRAIN_BUGFIX_NOT_QUALIFIED'}
+          git merge-base --is-ancestor 109289cfe7eb104025625840634cfb814dbea5ab HEAD
+          if($LASTEXITCODE -ne 0){throw 'T28_PASSED_TRAIN_ONLY_HEAD_MISSING'}
+          Write-Output 'T28_FROZEN_FIRST_USE_BLOBS_AND_TRAIN=PASS'
+      - name: Original 64 Y/Z unfamiliar worlds, 5 trained/full exact arms and 5 complete resource repeats
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t28-incremental-belief.py > t28-original-results.json
+          if($LASTEXITCODE -ne 0){throw 'T28_ORIGINAL_FAILED_OR_NEGATIVE_PRESERVE_LOGS'}
+          python -c "import json;x=json.load(open('t28-original-results.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==5 and x['TRAIN_cases']==40 and x['DEV_cases']==64 and x['counterfactual_target_questions']==192;assert all(v['correct_certified']+v['safe_abstained']==192 and v['hard_false_positives']==0 and len(v['per_case'])==64 and len(v['five_full_process_cpu_ns'])==5 and len(v['five_peak_process_rss_bytes'])==5 for v in a.values());assert not x['scientific_positive'] and not x['independent_external_replication'] and not x['optimizer_admission'] and not x['old_DEV_replayed'] and not x['paid_API'] and not x['new_controller_or_research_runner'];print('T28_ORIGINAL_PROSPECTIVE_TECHNICAL=PASS');print('T28_CERTIFIED='+json.dumps({k:v['correct_certified'] for k,v in a.items()},sort_keys=True));print('T28_ABSTENTIONS='+json.dumps({k:v['safe_abstained'] for k,v in a.items()},sort_keys=True));print('T28_MEDIAN_COMPLETE_CPU='+json.dumps({k:v['median_complete_cpu_ns'] for k,v in a.items()},sort_keys=True));print('T28_MAX_PEAK_RSS='+json.dumps({k:v['max_peak_rss_bytes'] for k,v in a.items()},sort_keys=True));print('T28_MACRO_HITS='+json.dumps({k:v['original_macro_hits'] for k,v in a.items()},sort_keys=True));print('T28_STRONG_CONTROL_COMPARISON='+json.dumps(x['comparison'],sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T28_ORIGINAL_RECEIPT_INVARIANT_FAILED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t28-original-YZ-incremental-${{ matrix.os }}
+          path: t28-original-results.json
+          if-no-files-found: ignore
+          retention-days: 90
