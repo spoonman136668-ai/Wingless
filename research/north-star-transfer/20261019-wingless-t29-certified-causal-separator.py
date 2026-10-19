@@ -33,13 +33,14 @@ def rss():
               ("QuotaPeakPagedPoolUsage",ctypes.c_size_t),("QuotaPagedPoolUsage",ctypes.c_size_t),
               ("QuotaPeakNonPagedPoolUsage",ctypes.c_size_t),("PagefileUsage",ctypes.c_size_t),
               ("PeakPagefileUsage",ctypes.c_size_t)]
-        k=ctypes.WinDLL("kernel32");p=ctypes.WinDLL("psapi")
+        k=ctypes.WinDLL("kernel32",use_last_error=True)
+        p=ctypes.WinDLL("psapi",use_last_error=True)
         k.GetCurrentProcess.restype=wintypes.HANDLE
         p.GetProcessMemoryInfo.argtypes=[wintypes.HANDLE,ctypes.POINTER(Mem),wintypes.DWORD]
         p.GetProcessMemoryInfo.restype=wintypes.BOOL
         m=Mem();m.cb=ctypes.sizeof(m)
         if not p.GetProcessMemoryInfo(k.GetCurrentProcess(),ctypes.byref(m),m.cb):
-            raise RuntimeError("T29_RSS_UNAVAILABLE")
+            raise RuntimeError("T29_RSS_UNAVAILABLE_WIN32_ERROR="+str(ctypes.get_last_error()))
         return int(m.PeakWorkingSetSize)
     import resource
     a=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
