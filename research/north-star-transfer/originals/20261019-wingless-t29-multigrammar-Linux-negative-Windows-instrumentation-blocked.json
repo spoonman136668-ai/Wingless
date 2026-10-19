@@ -1,7 +1,7 @@
 {
   "schema": "wingless.t29.original-multigrammar-scientific-linux-negative-windows-instrumentation-blocked.v1",
   "date_EDT": "2026-10-19",
-  "classification": "VALID_LINUX_INTERNAL_PROSPECTIVE_LEARNED_CAUSAL_SEPARATOR_NEGATIVE_WINDOWS_RESOURCE_QUALIFICATION_BLOCKED",
+  "classification": "VALID_LINUX_PROSPECTIVE_NEGATIVE_WINDOWS_PSAPI_RUNTIME_FAILURE_ROOT_CAUSE_UNRESOLVED",
   "trust_scope": "Complete original Linux first-use scientific negative; first-use Windows evaluation was opened and then aborted due to a Python ctypes Psapi process-memory ABI defect, not an independently valid full Windows scientific result.",
   "source_identity": {
     "repo": "spoonman136668-ai/Wingless",
@@ -45,7 +45,7 @@
       "zip_sha256": "2dcba7c3b597d3e1b630f828e967c1173f8d1f5dd5e4559e5513a8d0986b2140",
       "artifact_json_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "failure_message": "RuntimeError: T29_RSS_UNAVAILABLE",
-      "failure_site": "psapi.GetProcessMemoryInfo called without the pointer-safe ctypes argtypes and restype for HANDLE and Memory struct",
+      "failure_site": "Psapi.GetProcessMemoryInfo returned failure in the original Windows subprocess despite ctypes argtypes/restype declarations being present. Native error code was not logged; specific root cause is unresolved. Do not claim a missing ABI declaration.",
       "no_complete_windows_CPU_or_RSS_samples": true,
       "DEV_cases_opened": true,
       "do_not_rerun_original_DEV": true
@@ -315,7 +315,8 @@
     "no_retry_of_same_original_DEV": true,
     "no_optimizer_admission": true,
     "failing_Windows_job_not_treated_as_scientific_negative": true,
-    "future_measurement_ABI_repair_can_be_qualified_ON_TRAIN_ONLY_and_unrelated_new_sources": true
+    "future_measurement_ABI_repair_can_be_qualified_ON_TRAIN_ONLY_and_unrelated_new_sources": true,
+    "instrumentation_root_cause": "UNRESOLVED: no native GetLastError in original logs; requires bounded TRAIN-only source-free diagnostic, not rerunning consumed DEV"
   },
   "safe_scope": {
     "no_PR_merge": true,
