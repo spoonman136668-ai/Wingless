@@ -1,0 +1,64 @@
+name: T24 original prospective online causal information headroom
+on:
+  push:
+    branches: [research/t24-causal-information-headroom-20261019]
+    paths: ['.github/workflows/north-star-t24-original-headroom.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t24-original-firstuse-once
+  cancel-in-progress: false
+jobs:
+  headroom:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 48
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen headroom source and qualified preflight
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T24_ORIGINAL_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t24-headroom-precode.json'='e47c5904156e77c776707e9f53d801618a160fa9'
+            'research/north-star-transfer/20261019-wingless-t24-new-source.py'='cb1420a7eeebd94a5e7f9f86e9cac560dde4c70c'
+            'research/north-star-transfer/20261019-wingless-t24-online-headroom.py'='2b8f8bae15c83dc7709b972468e314ff24d84792'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){
+              throw "T24_ORIGINAL_CODE_DRIFT:$path"
+            }
+          }
+          git merge-base --is-ancestor 2f660e33e5eb899c30818cb2040082fb094fa907 90891aa222c6a7f5174274036c056522bf76dfc1
+          if($LASTEXITCODE -ne 0){throw 'T24_PRECODE_NOT_FROZEN'}
+          git merge-base --is-ancestor 90891aa222c6a7f5174274036c056522bf76dfc1 c868c51023ef8cacc1ca201285357fff90042a7a
+          if($LASTEXITCODE -ne 0){throw 'T24_SOURCE_BIRTH_NOT_QUALIFIED'}
+          git merge-base --is-ancestor c10a40a107462d3faeb302c09d4f8d51b3c92d4c HEAD
+          if($LASTEXITCODE -ne 0){throw 'T24_TRAIN_ONLY_QUALIFICATION_NOT_INCLUDED'}
+          Write-Output 'T24_ORIGINAL_EXACT_PRECODE_AND_TRAIN=PASS'
+      - name: First-use prospective exact online information headroom and matched trained controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t24-online-headroom.py > t24-original-headroom.json
+          if($LASTEXITCODE -ne 0){throw 'T24_ORIGINAL_SCIENTIFIC_NEGATIVE_OR_EXECUTION_FAILURE'}
+          python -c "import json;d=json.load(open('t24-original-headroom.json',encoding='utf-8-sig'));r=d['results'];assert len(r)==4 and all(v['correct_outputs']==192 and len(v['per_case'])==64 and len(v['five_complete_cpu_ns'])==5 and len(v['five_peak_rss_bytes'])==5 for v in r.values());assert d['source_cases']==64 and d['target_outputs']==192 and d['no_learning_candidate_trained'] and not d['no_scientific_accepted_positive']==False and not d['optimizer_admission'] and not d['old_DEV_replayed'] and not d['protected_originals_accessed'];print('T24_FIRST_USE_COMPARISON=PASS');print('T24_PUBLIC_QUERIES='+json.dumps({k:v['public_second_pair_queries'] for k,v in r.items()},sort_keys=True));print('T24_OPTIMAL_EXPECTED_QUERIES='+str(d['online_theoretical_EXPECTED_optimal_query_cost_sum']));print('T24_HINDSIGHT_NON_DEPLOYABLE_FLOOR='+str(d['optimistic_hindsight_non_deployable_floor_sum']));print('T24_OBSERVED_OPTIMAL_VS_GREEDY_GAP='+str(d['observed_greedy_vs_online_optimal_query_gap']));print('T24_NO_MODEL_POSITIVE_CLAIM=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T24_ORIGINAL_RECEIPT_INVARIANT_FAILED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t24-first-use-headroom-${{ matrix.os }}
+          path: t24-original-headroom.json
+          if-no-files-found: ignore
+          retention-days: 90
