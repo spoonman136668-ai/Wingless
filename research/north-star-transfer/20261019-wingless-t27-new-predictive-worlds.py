@@ -65,7 +65,7 @@ def sample(identity):
             visible=tuple(sorted(rng.sample(range(N),2)))
             observations.append(mask_value(rng,hidden,visible))
     future_do=(rng.randrange(N),rng.randrange(2))
-    target_nodes=tuple(rng.sample(range(N),2))
+    target_nodes=tuple(rng.sample(range(N),3))
     one=next_state(state,par,gate,future_do)
     two=next_state(one,par,gate)
     answers=tuple((two>>node)&1 for node in target_nodes)
