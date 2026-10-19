@@ -1,0 +1,57 @@
+name: T10 wingless learned cognition source-neutral qualification
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t10-wingless.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t10-wingless-frozen-new-nonprotected
+  cancel-in-progress: false
+jobs:
+  focused-learned-mechanism:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest,windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 60
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen prior protocol and exact original controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T10_SOURCE_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t10-preregister.json').Trim() -cne 'f6882bf0b56e7cd12b48416d17541bcea65fbcb2'){throw 'T10_FROZEN_PROTOCOL_DRIFT'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t10-preregister.json').Trim() -cne '9e6aa12c0067946d89b905fc9477a91e4f1dd6e0'){throw 'T10_PROTOCOL_NOT_FROZEN_FIRST'}
+          git merge-base --is-ancestor 9e6aa12c0067946d89b905fc9477a91e4f1dd6e0 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T10_FROZEN_COMMIT_NOT_ANCESTOR'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t10-learned-query.py').Trim() -cne '87cd2b01bbc4eedba18c8ab09a732d091b19a346'){throw 'T10_ACTUAL_LEARNER_CODE_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t9-causal-query.py').Trim() -cne 'b6950b0f8f03170d7d35afb5006771d641ea7b0d'){throw 'T10_ORIGINAL_STRONG_CONTROL_DRIFT'}
+          Write-Output 'T10_WINGLESS_PREREG_AND_ORIGINAL_CONTROL=PASS'
+      - name: Execute frozen nonprotected learning and original resource comparison
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $py=if($IsWindows){'python'}else{'python3'}
+          & $py -B 'research/north-star-transfer/20261019-wingless-t10-learned-query.py' | Tee-Object 't10-wingless-original.json'
+          if($LASTEXITCODE -ne 0){throw 'T10_WINGLESS_TRAIN_EVALUATION_FAILED'}
+          $v=Get-Content 't10-wingless-original.json' -Raw | ConvertFrom-Json
+          if($v.'scientific_acceptance' -ne $false){throw 'T10_SCIENCE_UNAUTHORIZED'}
+          if($v.'protected_or_consumed_cases_used' -ne 0 -and $v.'protected_or_consumed_cases_used' -ne $false){throw 'T10_PROTECTED_SOURCE_REPLAY'}
+          Write-Output 'T10_WINGLESS_FOCUSED_EVIDENCE=PASS'
+          Write-Output 'T10_WINGLESS_SCIENTIFIC_ADMISSION=false'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t10-wingless-new-nonprotected-${{ matrix.os }}-${{ github.sha }}
+          path: t10-wingless-original.json
+          retention-days: 90
+          if-no-files-found: warn

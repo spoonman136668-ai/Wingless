@@ -1,0 +1,57 @@
+name: T4 wingless train-only learning and real resource parity
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t4-wingless.yml']
+permissions:
+  contents: read
+concurrency:
+  group: northstar-t4-wingless-nonprotected-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  original-source-aware-open-diagnostic:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest,windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 40
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check immutable source, T3 controls and complete frozen T4 admission
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T4_EXACT_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t4-frozen-train-only.json').Trim() -cne 'd9b9cc5cf9445c188057fdffaff3c6e865e3fc3b'){throw 'T4_FREEZE_BLOB_CHANGED'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261018-wingless-t4-frozen-train-only.json').Trim() -cne 'd44c5be7e3c4596d330674a43f52dbc092f5e46f'){throw 'T4_FREEZE_NOT_PRECODE'}
+          git merge-base --is-ancestor 'd44c5be7e3c4596d330674a43f52dbc092f5e46f' HEAD
+          if($LASTEXITCODE -ne 0){throw 'T4_FREEZE_NOT_ANCESTOR'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t4-learning.py').Trim() -cne 'eed448dea7fc7a80daa682b4cb3935338365f1b4'){throw 'T4_TRAINING_SOURCE_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py').Trim() -cne '85dbd2673a94a6d72db29e57ee836619405f7f1e'){throw 'T4_T3_FROZEN_LEARNER_DRIFT'}
+          Write-Output 'T4_WINGLESS_EXACT_SOURCE_FREEZE=PASS'
+      - name: Execute disjoint public learning and compare genuine controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $py=if($IsWindows){'python'}else{'python3'}
+          & $py -B 'research/north-star-transfer/20261018-wingless-t4-learning.py' | Tee-Object -FilePath 't4-wingless-original.json'
+          if($LASTEXITCODE -ne 0){throw 'T4_WINGLESS_LEARNING_EVALUATION_FAIL'}
+          $j=Get-Content 't4-wingless-original.json' -Raw | ConvertFrom-Json
+          if($j.'scientific_transfer_accepted' -ne $false){throw 'T4_PROTECTED_SCIENCE_UNAUTHORIZED'}
+          if($j.'registered_original_holdouts_used' -ne 0 -and $j.'registered_original_holdouts_used' -ne $false){throw 'T4_PROTECTED_SOURCE_USED'}
+          Write-Output 'T4_WINGLESS_TRAINING_AND_RESOURCE_EVIDENCE=PASS'
+          Write-Output 'T4_WINGLESS_INDEPENDENT_PROTECTED_TRANSFER_ACCEPTANCE=false'
+          Write-Output 'T4_WINGLESS_AUTOMATIC_PROMOTION=false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: t4-wingless-nonprotected-${{ matrix.os }}-${{ github.sha }}
+          path: t4-wingless-original.json
+          retention-days: 90
+          if-no-files-found: error

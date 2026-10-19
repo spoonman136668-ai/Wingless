@@ -1,0 +1,63 @@
+{
+  "schema": "research.north-star-transfer.wingless.frozen-preimplementation.v1",
+  "status": "PRECODE_ONLY_NOT_EXECUTED",
+  "frozen_date": "2026-10-18",
+  "origin": {
+    "repo": "spoonman136668-ai/Wingless",
+    "source_head": "6361386c1c45077b23b31eebeef809b01b950ecd",
+    "PR": 285,
+    "implementation": "research/foundational/20261015-w-f55/source_pilot.py",
+    "implementation_blob": "d02fc933b52fc44d537ed45b061aef56ccd90a7f",
+    "comparison_PR": 264,
+    "comparison_source_blob": "4c8ae2799c255f4ca37c22d59ba8cd79465fa343"
+  },
+  "candidate_status": "Strongest inspected learned public-role candidate, not independently accepted; F55 uses 12 signed int8 supervised operator parameters and a 23-byte model-plus-state payload. No proof of equal whole-native memory against 576B, and full public algebraic solver may dominate.",
+  "hypothesis": "Learn a shared compositional role representation that can apply unseen role compositions with an operator algebra not encountered during fitting; use contextual public evidence to infer task-specific operators and a bounded recurrent state rather than fixed per-family algebraic role tables.",
+  "novel_mechanism": "Factor each public role example into learned transition-invariant basis and signed/inverse composition; train across mixed observed abelian and noncommuting training algebras, then evaluate a held-out, previously unobserved group composition rule and lengths greater than training. No hidden operator identity, role family label, or answer at evaluation.",
+  "cohort": {
+    "train_namespace": "WNS-TR-880000..880127",
+    "validation_namespace": "WNS-V-881000..881063",
+    "sealed_unseen_namespace": "WNS-U-882000..882127",
+    "trained_operator_classes": "two source-independent public composition algebras fixed before source code",
+    "sealed_operator_class": "third algebra with noncommuting role products and reversed/inverted unseen chains; not a mere mod7 seed change",
+    "held_lengths": [
+      10,
+      12
+    ],
+    "holdout_unused": true,
+    "source_generator_frozen_before_learner": true,
+    "independently_generated": true
+  },
+  "controls": [
+    "unchanged F55 learned 12-int8 posterior / variable-binding candidate",
+    "unchanged F52 quantized recurrent relational state",
+    "fully public exact algebraic symbolic solver",
+    "full exact public Bayesian posterior",
+    "same-work public MAP/beam",
+    "no-observation and memorization-without-role-composition ablations",
+    "private oracle evaluator ONLY"
+  ],
+  "budgets": {
+    "public_examples_and_noise": "identical per task across arms, values frozen before generation",
+    "model_plus_recurrent_payload_max_bytes": 23,
+    "total_native_residency": "must measure; cannot claim native 576B from Python model",
+    "compute": "candidate total FIT training+inference amortized over exactly 128 sealed unseen tasks <= cheapest correct frozen public symbolic control using deterministic operation count AND measured matched-runner CPU",
+    "memory": "max full-task measured resident+temporary bytes <= strongest eligible public control; model weights, indexing and recurrent buffers included",
+    "no_external_api": true
+  },
+  "admission": {
+    "primary": "on 128 completely unseen operator-class/composition tasks, strictly better exact answers and successful 10/12-hop composition than strongest public cost-matched control; >=5 percentage point gain precommitted",
+    "resource": "compute and full memory <= chosen strongest control; fail if cost exceeds, even if accuracy improves",
+    "secondary": "each held operator class and length must be nonregressing; independent source+model replication using two sealed source-birth environments",
+    "provenance": "full source/prereg Git blobs pinned BEFORE implementation and first use; per-example positive/negative, no retroactive tuning",
+    "no_leakage": "never use protected originals, previous F55 FIT/diagnostic, source-generation labels or held family identifiers to choose representations"
+  },
+  "authority": {
+    "science_accepted": false,
+    "runner_dispatched": false,
+    "protected_original_first_use": false,
+    "merge_allowed": false,
+    "promotion_allowed": false,
+    "accepted_ref_mutation": false
+  }
+}

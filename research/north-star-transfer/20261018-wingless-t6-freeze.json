@@ -1,0 +1,18 @@
+{
+  "schema": "research.northstar.t6.frozen.v1",
+  "parent_exact_head": "ee45c3f157f01292074fb7a14d4528bb8f980ccb",
+  "status": "PREIMPLEMENTATION_FROZEN",
+  "source": "source generator independent from T5: negative TRAIN -14031..-14000 and OPEN -14163..-14100; same biased F11/S3 operator distributions as T5, frozen before model, source-private truth only evaluator; no positive source labels at inference",
+  "candidate": "Direct F11 one-public-pair constant-time 10-slope enumeration with 12 signed training-only public-prior bytes, fixed minimum odds ratio 16:1 to override exact one-pair baseline; S3 six permutation enumeration, no hidden source label; 3-byte recurrent representation",
+  "controls": [
+    "same one-public-pair exact enumerative control",
+    "previous T5 public-prior all-overrides using same TRAIN learned weights",
+    "no-prior baseline"
+  ],
+  "evaluation": "all 64 independent OPEN tasks, baseline correct case regressions must be zero for acceptance, strict positive gain over exact control; full train-amortized CPU and Python peak under exact control; no postresult threshold tuning",
+  "source_identity_qualification": true,
+  "train_first_use": false,
+  "protected_source_first_use": false,
+  "merge": false,
+  "promotion": false
+}

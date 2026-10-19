@@ -1,0 +1,90 @@
+name: T15 wingless original source-only developmental comparison
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t15-wingless-original.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t15-wingless-single-original-source
+  cancel-in-progress: false
+jobs:
+  cross-platform-nonconsuming:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Immutable scientific preimplementation controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T15_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t15-source.py').Trim() -cne 'ffa1e00cf2ceec3ab412fd06f8da5d25d5794f49'){throw 'T15_SOURCE_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t15-preimplementation-freeze.json').Trim() -cne 'bb8e38c37121f2d9fda27731694c69ab1d67a623'){throw 'T15_ASSAY_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t15-mechanism.py').Trim() -cne 'e4ba1375f3d3c20367d9c11017679cdea20ad31f'){throw 'T15_MODEL_CHANGED'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t15-source.py').Trim() -cne '6bb313c45baa8ab40e3031d58fd558e2c3035c53'){throw 'T15_SOURCE_FIRST_USE_NOT_FROZEN'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t15-preimplementation-freeze.json').Trim() -cne 'c17a069fb8312116e4198986212f1a63307d4835'){throw 'T15_FREEZE_NOT_PREIMPLEMENTATION'}
+          git merge-base --is-ancestor c17a069fb8312116e4198986212f1a63307d4835 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T15_ASSAY_NOT_ANCESTOR'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t14-mechanism.py').Trim() -cne '2f83010cad7037b6aaa093cb3e40c1ad1cac10c5'){throw 'T15_FROZEN_CONTROL_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t11-mechanism.py').Trim() -cne '0536f6907d48c1a083c39b68020407a34648a7cb'){throw 'T15_FROZEN_CONTROL_CHANGED'}
+          Write-Output 'T15_WINGLESS_EXACT_HEAD_AND_CONTROLS=PASS'
+      - name: Nonconsuming syntax check
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python -m py_compile 'research/north-star-transfer/20261019-wingless-t15-source.py' 'research/north-star-transfer/20261019-wingless-t15-mechanism.py'
+          if($LASTEXITCODE -ne 0){throw 'T15_SYNTAX_FAILED_BEFORE_SOURCE_BIRTH'}
+          Write-Output 'T15_NO_NEW_SOURCE_BORN_IN_PREFLIGHT=PASS'
+  original:
+    needs: [cross-platform-nonconsuming]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify original execution identity and frozen controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T15_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t15-source.py').Trim() -cne 'ffa1e00cf2ceec3ab412fd06f8da5d25d5794f49'){throw 'T15_SOURCE_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t15-preimplementation-freeze.json').Trim() -cne 'bb8e38c37121f2d9fda27731694c69ab1d67a623'){throw 'T15_ASSAY_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t15-mechanism.py').Trim() -cne 'e4ba1375f3d3c20367d9c11017679cdea20ad31f'){throw 'T15_MODEL_CHANGED'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t15-source.py').Trim() -cne '6bb313c45baa8ab40e3031d58fd558e2c3035c53'){throw 'T15_SOURCE_FIRST_USE_NOT_FROZEN'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t15-preimplementation-freeze.json').Trim() -cne 'c17a069fb8312116e4198986212f1a63307d4835'){throw 'T15_FREEZE_NOT_PREIMPLEMENTATION'}
+          git merge-base --is-ancestor c17a069fb8312116e4198986212f1a63307d4835 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T15_ASSAY_NOT_ANCESTOR'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t14-mechanism.py').Trim() -cne '2f83010cad7037b6aaa093cb3e40c1ad1cac10c5'){throw 'T15_FROZEN_CONTROL_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t11-mechanism.py').Trim() -cne '0536f6907d48c1a083c39b68020407a34648a7cb'){throw 'T15_FROZEN_CONTROL_CHANGED'}
+          Write-Output 'T15_WINGLESS_EXACT_HEAD_AND_CONTROLS=PASS'
+      - name: One original nonprotected TRAIN and OPEN, no replay
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python 'research/north-star-transfer/20261019-wingless-t15-mechanism.py' > t15-wingless-original.json
+          if($LASTEXITCODE -ne 0){throw 'T15_ORIGINAL_FAILED_SOURCE_IDS_CONSUMED_NO_REPLAY'}
+          python -c "import json; z=json.load(open('t15-wingless-original.json',encoding='utf-8-sig')); assert z['schema']=='wingless.t15.original-public-joint-certificate.v1'; assert z['signed_scientific_acceptance'] is False and z['optimizer_admission'] is False; print('T15_ORIGINAL_SOURCE_VERIFIED_NOT_ADMITTED=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T15_ORIGINAL_RECEIPT_INVALID_SOURCE_IDS_CONSUMED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t15-wingless-original-nonadmitted
+          path: t15-wingless-original.json
+          if-no-files-found: ignore
+          retention-days: 90

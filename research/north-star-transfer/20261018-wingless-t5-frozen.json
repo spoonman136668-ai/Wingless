@@ -1,0 +1,28 @@
+{
+  "schema": "research.northstar.t5.public-ambiguity-prior.v1",
+  "state": "IMMUTABLE_PREIMPLEMENTATION",
+  "parent_t4_head": "1b6167a3c8792b6000c80505fd3a7b465cdb28d0",
+  "TRAIN_IDs": [
+    -13031,
+    -13000
+  ],
+  "OPEN_IDs": [
+    -13163,
+    -13100
+  ],
+  "protected_source_ids_not_callable": true,
+  "exact_information": "4 public role observations/task at OPEN, one input/output calibration pair per role; same for learned and exact public controls; TRAIN has 3 public pairs per role, all source-only truth excluded from learner",
+  "source_birth": "For each role public algebra F11/S3 chosen alternately by task parity. F11 slope=2 with probability 3/4 else uniformly among 10 nonzero slopes; offset uniform. S3 even cyclic permutation with probability 3/4 else uniform of six. TRUE operator never given to learner; TRAIN labels inferred from three public pairs only; OPEN uses one public pair per role and 10 or 12 signed composition steps; source bias is a training-distribution regularity, not a novel unseen family.",
+  "candidate": "12 byte online-trainable public-only Bayesian prior: 10 signed F11 slope weights and 2 signed S3 parity weights; no role table or operator IDs; rank only equally consistent one-pair candidates; full 3-byte typed state",
+  "control": [
+    "source-pinned T3 exact enumeration with same 1 pair per role, fixed deterministic tie break",
+    "zero-prior same learner",
+    "full exact public solver with all inputs only as unattainable ceiling, not information-matched baseline"
+  ],
+  "promotion": "Require strict correct-answer gain on independent OPEN at full training-amortized CPU and full peak memory <= best same-information control, zero baseline-correct regressions; a positive on source-distribution tasks still not proof of held out novel algebra transfer",
+  "authority": {
+    "protected_original_first_use": false,
+    "merge": false,
+    "promotion": false
+  }
+}

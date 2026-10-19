@@ -1,0 +1,55 @@
+name: T18 Wingless fresh internal query-identifiability experiment
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t18-wingless-headroom.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t18-wingless-query-identifiability
+  cancel-in-progress: false
+jobs:
+  independent-internal-platform-trials:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 40
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen source and TRAIN/DEV disjointness
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T18_EXACT_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t18-identifiability-prereg.json').Trim() -cne '8462c468f3a0cfe04a07292ca0fe9e43e14b5083'){throw 'T18_PREREG_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t18-headroom-source.py').Trim() -cne '7efdcf67817aea264321e33b1a82a8aae04c4a85'){throw 'T18_NEW_SOURCE_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t18-identifiability.py').Trim() -cne 'a1521b8cf478afeff99729b2bc62d44dc3195a18'){throw 'T18_EXPERIMENT_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py').Trim() -cne '1041db8ff76365eba5eb8f31cecd0e2172d397d8'){throw 'T18_CERTIFIER_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py').Trim() -cne '85dbd2673a94a6d72db29e57ee836619405f7f1e'){throw 'T18_KERNEL_DRIFT'}
+          git merge-base --is-ancestor e4f553fc61928b3c0a7e8562659f496ae845854a HEAD
+          if($LASTEXITCODE -ne 0){throw 'T18_FREEZE_NOT_BEFORE_SOURCE'}
+          Write-Output 'T18_FRESH_INTERNAL_SOURCE_FROZEN_BEFORE_USE=PASS'
+      - name: Exact oracle feasibility bound versus trained and untrained sound controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t18-identifiability.py > t18-internal-query-headroom.json
+          if($LASTEXITCODE -ne 0){throw 'T18_BOUND_DIAGNOSTIC_FAILED'}
+          python -c "import json;d=json.load(open('t18-internal-query-headroom.json',encoding='utf-8-sig'));assert all(z['correct']==48 and len(z['five_process_cpu_ns'])==5 and len(z['five_process_rss_bytes'])==5 for z in d['results'].values()) and d['T16_protected_originals_opened']==0 and d['scientific_acceptance'] is False and d['optimizer_admission'] is False; print('T18_15_FRESH_PROCESS_TRIALS_AND_EXACT_BOUND=PASS'); print('T18_PER_DOMAIN='+json.dumps(d['per_domain'],sort_keys=True));print('T18_TOTAL_QUERIES='+json.dumps({k:v['queries'] for k,v in d['results'].items()},sort_keys=True));print('T18_HINDSIGHT_HEADROOM_CASES='+str(d['hindsight_strict_headroom_cases']))"
+          if($LASTEXITCODE -ne 0){throw 'T18_UNTRUSTED_OUTPUT'}
+          Write-Output 'T18_NO_INDEPENDENT_SCIENCE_OR_ADMISSION=PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t18-new-internal-query-headroom-${{ matrix.os }}
+          path: t18-internal-query-headroom.json
+          if-no-files-found: ignore
+          retention-days: 90

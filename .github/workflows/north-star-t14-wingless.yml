@@ -1,0 +1,66 @@
+name: T14 wingless exact-source original scientific diagnostic
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t14-wingless.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t14-wingless-original-first-source
+  cancel-in-progress: false
+jobs:
+  source-pinned-qualification:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fail-closed exact source and original assay provenance
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T14_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t14-source.py').Trim() -cne '3b3d042254c0a123d9058800eec76439096ee47c'){throw 'T14_SOURCE_DEFINITION_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t14-mechanism.py').Trim() -cne '2f83010cad7037b6aaa093cb3e40c1ad1cac10c5'){throw 'T14_LEARNER_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t14-complete-source-and-assay-freeze.json').Trim() -cne 'ca5e45a18d3e234e9cbee96c6ba40dfa2e14b6a6'){throw 'T14_ASSAY_DRIFT'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t14-complete-source-and-assay-freeze.json').Trim() -cne '54ef1610469d032b9ad933c1e3660e41265b54ad'){throw 'T14_FREEZE_NOT_BEFORE_MECHANISM'}
+          git merge-base --is-ancestor 116837947a786c2250b383a843e79204f078296b HEAD
+          if($LASTEXITCODE -ne 0){throw 'T14_SOURCE_NOT_ANCESTOR'}
+          git merge-base --is-ancestor 54ef1610469d032b9ad933c1e3660e41265b54ad HEAD
+          if($LASTEXITCODE -ne 0){throw 'T14_ASSAY_NOT_ANCESTOR'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t10-learned-query.py').Trim() -cne '87cd2b01bbc4eedba18c8ab09a732d091b19a346'){throw 'T14_CONTROL_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t11-mechanism.py').Trim() -cne '0536f6907d48c1a083c39b68020407a34648a7cb'){throw 'T14_CONTROL_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t13-mechanism.py').Trim() -cne '7ec2c542fc2505020c4fd4a76312db925904f0b4'){throw 'T14_CONTROL_DRIFT'}
+          Write-Output 'T14_WINGLESS_ORIGINAL_PROVENANCE_PREFLIGHT=PASS'
+      - name: Nonconsuming Python structural preflight
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python -m py_compile 'research/north-star-transfer/20261019-wingless-t14-source.py' 'research/north-star-transfer/20261019-wingless-t14-mechanism.py'
+          if($LASTEXITCODE -ne 0){throw 'T14_STATIC_COMPILE_FAILED'}
+          Write-Output 'T14_NONCONSUMING_IMPORT_AND_SYNTAX=PASS'
+      - name: First original nonprotected TRAIN and OPEN qualification (Linux ONLY)
+        if: runner.os == 'Linux'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python 'research/north-star-transfer/20261019-wingless-t14-mechanism.py' > t14-wingless-original.json
+          if($LASTEXITCODE -ne 0){throw 'T14_ORIGINAL_FAILED_IDS_CONSUMED_NO_REPLAY'}
+          python -c "import json; d=json.load(open('t14-wingless-original.json',encoding='utf-8-sig')); assert d['schema']=='wingless.t14.original-sourceonly-diagnostic.v1' and d['signed_scientific_acceptance'] is False and d['optimizer_admission'] is False; print('T14_SOURCE_VERIFIED_NOT_SCIENTIFICALLY_ADMITTED=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T14_RESULT_ASSERTION_FAILED_IDS_CONSUMED_NO_REPLAY'}
+      - uses: actions/upload-artifact@v4
+        if: always() && runner.os == 'Linux'
+        with:
+          name: t14-wingless-original-source-stdout
+          path: t14-wingless-original.json
+          if-no-files-found: ignore
+          retention-days: 90

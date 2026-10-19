@@ -1,0 +1,44 @@
+name: T15 wingless source-only nonconsuming cross-platform preflight
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t15-wingless-preflight.yml']
+permissions:
+  contents: read
+jobs:
+  no-source-birth-preflight:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact model, source and control-preregistration identity
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T15_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t15-source.py').Trim() -cne 'ffa1e00cf2ceec3ab412fd06f8da5d25d5794f49'){throw 'T15_SOURCE_BLOB_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t15-preimplementation-freeze.json').Trim() -cne 'bb8e38c37121f2d9fda27731694c69ab1d67a623'){throw 'T15_ASSAY_BLOB_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t15-mechanism.py').Trim() -cne 'e4ba1375f3d3c20367d9c11017679cdea20ad31f'){throw 'T15_MODEL_BLOB_DRIFT'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t15-source.py').Trim() -cne '6bb313c45baa8ab40e3031d58fd558e2c3035c53'){throw 'T15_SOURCE_NOT_FROZEN'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261019-wingless-t15-preimplementation-freeze.json').Trim() -cne 'c17a069fb8312116e4198986212f1a63307d4835'){throw 'T15_ASSAY_NOT_FROZEN'}
+          git merge-base --is-ancestor c17a069fb8312116e4198986212f1a63307d4835 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T15_PREREG_NOT_ANCESTOR'}
+          Write-Output 'T15_WINGLESS_SOURCE_MODEL_ASSAY_FROZEN=PASS'
+      - name: Python syntax and inert module import without source birth
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python -m py_compile 'research/north-star-transfer/20261019-wingless-t15-source.py' 'research/north-star-transfer/20261019-wingless-t15-mechanism.py'
+          if($LASTEXITCODE -ne 0){throw 'T15_SYNTAX_FAIL'}
+          python -c "import importlib.util; p='research/north-star-transfer/20261019-wingless-t15-source.py'; s=importlib.util.spec_from_file_location('t15_inert_source',p); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); assert len(set(m.TRAIN)&set(m.OPEN))==0; assert all(i<0 for i in m.TRAIN+m.OPEN); print('T15_NO_ORIGINAL_SOURCE_BORN=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T15_INERT_SOURCE_BAD'}

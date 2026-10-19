@@ -1,0 +1,56 @@
+name: T6 wingless source-frozen causal learned-mechanism qualification
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t6-wingless.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t6-wingless-first-nonprotected-original
+  cancel-in-progress: false
+jobs:
+  independent-new-public-TRAIN-OPEN:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest,windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 60
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin preregistered T6 source and exact unchanged control
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T6_GITHUB_HEAD_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t6-freeze.json').Trim() -cne 'b813b427ba251254f3d8cd2c56ba688c1dc5f74a'){throw 'T6_SOURCE_FREEZE_BLOB_CHANGED'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261018-wingless-t6-freeze.json').Trim() -cne '9bb40ba9432fdc12da4bc5d88f7216f715f2d0df'){throw 'T6_FREEZE_NOT_PREIMPLEMENTATION'}
+          git merge-base --is-ancestor 9bb40ba9432fdc12da4bc5d88f7216f715f2d0df HEAD
+          if($LASTEXITCODE -ne 0){throw 'T6_FREEZE_NOT_ANCESTOR'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t6-learning.py').Trim() -cne 'e2591ae5c390438b14b6f622e902569c7b60b610'){throw 'T6_ENGINEERING_SOURCE_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t5-learning.py').Trim() -cne '1dc28993b6f1d507dfb8f7663a8e0721a50d5a64'){throw 'T6_ORIGINAL_T5_CONTROL_DRIFT'}
+          Write-Output 'T6_WINGLESS_PREIMPLEMENTATION_SOURCE_IDENTITY=PASS'
+      - name: Execute once on fresh OPEN diagnostics with complete public controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $py=if($IsWindows){'python'}else{'python3'}
+          & $py -B 'research/north-star-transfer/20261018-wingless-t6-learning.py' | Tee-Object 't6-wingless-original.json'
+          if($LASTEXITCODE -ne 0){throw 'T6_WINGLESS_SOURCE_OR_NATIVE_INVARIANT_FAILED'}
+          $j=Get-Content 't6-wingless-original.json' -Raw | ConvertFrom-Json
+          if($j.'protected_first_use' -ne $false -or $j.'science_accepted' -ne $false){throw 'T6_SCIENTIFIC_ORIGINAL_NOT_AUTHORIZED'}
+          Write-Output 'T6_WINGLESS_ORIGINAL_TRAIN_OPEN_EVIDENCE=PASS'
+          Write-Output 'T6_WINGLESS_PROTECTED_SOURCE_FIRST_USE=false'
+          Write-Output 'T6_WINGLESS_SCIENCE_ACCEPTANCE=false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: t6-wingless-original-${{ matrix.os }}-${{ github.sha }}
+          path: t6-wingless-original.json
+          retention-days: 90
+          if-no-files-found: error

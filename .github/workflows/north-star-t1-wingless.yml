@@ -1,0 +1,42 @@
+name: T1 WING transferable-cognition nonconsuming qualification
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t1-wingless.yml','research/north-star-transfer/20261018-wingless-precode.json','research/north-star-transfer/20261018-wingless-learned-kernel.py']
+permissions:
+  contents: read
+concurrency:
+  group: t1-wingless-public-only-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  exact-source-synthetic-kernel:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 15
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify immutable source, execute pure learned kernel only, seal scientific cohorts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T1_WING_EXACT_HEAD_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-precode.json').Trim() -cne 'e95318882247f79d954a1b48cb261bb8a8f60027'){throw 'T1_WING_FROZEN_PROTOCOL_DRIFT'}
+          if((git hash-object 'research/foundational/20261015-w-f55/source_pilot.py').Trim() -cne 'd02fc933b52fc44d537ed45b061aef56ccd90a7f'){throw 'T1_WING_PREVIOUS_LEARNER_DRIFT'}
+          if((git hash-object 'research/foundational/20261015-w-f52/source_pilot.py').Trim() -cne '4c8ae2799c255f4ca37c22d59ba8cd79465fa343'){throw 'T1_WING_INDEPENDENT_BASELINE_DRIFT'}
+          $py=if($IsWindows){'python'}else{'python3'}
+          & $py -B 'research/north-star-transfer/20261018-wingless-learned-kernel.py'
+          if($LASTEXITCODE -ne 0){throw 'T1_WING_PUBLIC_KERNEL_FOCUSED_FAIL'}
+          Write-Output 'T1_WING_SOURCE_BOUND_FOCUSED=PASS'
+          Write-Output 'T1_WING_NEW_TRAIN_SCREEN_UNSEEN_REPLICA_CONSUMED=false'
+          Write-Output 'T1_WING_EQUAL_TOTAL_COST_NOT_YET_QUALIFIED=true'
+          Write-Output 'T1_WING_SCIENTIFIC_ACCEPTANCE=false'
+          Write-Output 'T1_WING_PRODUCTION_AND_OPTIMIZER_PROMOTION=false'

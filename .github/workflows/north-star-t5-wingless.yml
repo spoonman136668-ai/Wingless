@@ -1,0 +1,55 @@
+name: T5 wingless actual learning-mechanism qualification
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t5-wingless.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t5-wingless-nonprotected-original-source
+  cancel-in-progress: false
+jobs:
+  prospective-open-source-mechanism:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze-before-code and unaltered original baseline
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T5_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t5-frozen.json').Trim() -cne 'c0b7cf892c52dd5b165716d42c8892f11a0b8401'){throw 'T5_FROZEN_SOURCE_CHANGED'}
+          if((git log -1 --format=%H -- 'research/north-star-transfer/20261018-wingless-t5-frozen.json').Trim() -cne '0546b25091e9032e3ae08e8cbe8a0995472ff8c2'){throw 'T5_SOURCE_NOT_FROZEN_FIRST'}
+          git merge-base --is-ancestor 0546b25091e9032e3ae08e8cbe8a0995472ff8c2 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T5_PREIMPLEMENTATION_NOT_ANCESTOR'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t5-learning.py').Trim() -cne '1dc28993b6f1d507dfb8f7663a8e0721a50d5a64'){throw 'T5_LEARNER_SOURCE_IDENTITY_CHANGED'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py').Trim() -cne '85dbd2673a94a6d72db29e57ee836619405f7f1e'){throw 'T5_PREVIOUS_BASELINE_CHANGED'}
+          Write-Output 'T5_WINGLESS_SOURCE_FROZEN_AND_CONTROLS=PASS'
+      - name: One first-use on fresh nonprotected TRAIN and OPEN source
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $python=if($IsWindows){'python'}else{'python3'}
+          & $python -B 'research/north-star-transfer/20261018-wingless-t5-learning.py' | Tee-Object 't5-wingless-original.json'
+          if($LASTEXITCODE -ne 0){throw 'T5_WINGLESS_PUBLIC_LEARNING_FAIL'}
+          $r=Get-Content 't5-wingless-original.json' -Raw | ConvertFrom-Json
+          if($r.'strict_advancement' -ne $false -or $r.'protected_scientific_first_use' -ne $false){throw 'T5_SCIENTIFIC_ADMISSION_NOT_AUTHORIZED'}
+          Write-Output 'T5_WINGLESS_ACTUAL_PUBLIC_LEARNING_RECORDED=PASS'
+          Write-Output 'T5_WINGLESS_PROTECTED_ORIGINAL_COHORTS_CONSUMED=0'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: t5-wingless-unprotected-original-${{ matrix.os }}-${{ github.sha }}
+          path: t5-wingless-original.json
+          retention-days: 90
+          if-no-files-found: error
