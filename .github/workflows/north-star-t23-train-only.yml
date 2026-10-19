@@ -1,0 +1,66 @@
+name: T23 TRAIN-only exact shared-binding DAG qualification
+on:
+  push:
+    branches: [research/t23-multitask-relational-dag-20261019]
+    paths: ['.github/workflows/north-star-t23-train-only.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t23-train-only
+  cancel-in-progress: false
+jobs:
+  proof:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 60
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify chronological source freeze and Git object identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T23_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t23-multitask-precode.json'='c7d90c96d3d57612545b3619349f187893439b8f'
+            'research/north-star-transfer/20261019-wingless-t23-new-multitask-source.py'='6f2f08cce6e97e960f87fd322d1f9008f276a5f0'
+            'research/north-star-transfer/20261019-wingless-t23-prefix-dag-learner.py'='1f081e02a08f5f58dc64efff759609c8d7c3e2ff'
+            'research/north-star-transfer/20261019-wingless-t23-train-only.py'='4ef0353f0804a997d9669d704ae759df1d95e427'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+          }
+          foreach($path in $expected.Keys){
+            $actual=(git hash-object -- $path).Trim()
+            if($actual -cne $expected[$path]){throw "T23_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 1c56aa5624ea4391393c9c3662d8a50dcfb86362 ed5bfd66173b748a0e51306b707f36eb4aefbc7f
+          if($LASTEXITCODE -ne 0){throw 'T23_SOURCE_BEFORE_FREEZE'}
+          git merge-base --is-ancestor ed5bfd66173b748a0e51306b707f36eb4aefbc7f 4d7e272a07202535a395a8b0e9e36ca03affc7ce
+          if($LASTEXITCODE -ne 0){throw 'T23_LEARNER_BEFORE_SOURCE'}
+          git merge-base --is-ancestor 4d7e272a07202535a395a8b0e9e36ca03affc7ce 48f7b73dae52bec5d3aa2e7d013e222c772da921
+          if($LASTEXITCODE -ne 0){throw 'T23_TEST_BEFORE_LEARNER'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t23-new-multitask-source.py research/north-star-transfer/20261019-wingless-t23-prefix-dag-learner.py research/north-star-transfer/20261019-wingless-t23-train-only.py
+          if($LASTEXITCODE -ne 0){throw 'T23_PYTHON_SYNTAX_FAIL'}
+          Write-Output 'T23_FROZEN_CHRONOLOGY=PASS'
+      - name: TRAIN-only exact S3 variable-identity and cache proof
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t23-train-only.py > t23-train-proofs.json
+          if($LASTEXITCODE -ne 0){throw 'T23_TRAIN_SOUNDNESS_FAIL'}
+          python -c "import json; v=json.load(open('t23-train-proofs.json',encoding='utf-8-sig')); assert v['status']=='PASS' and v['TRAIN_cases']==40 and v['DEV_generated']==0 and v['private_oracle_not_used'] and v['equality_checks']==240 and v['learned_prefix_nodes']<=32 and v['TRAIN_updates']<=2048 and not v['scientific_admission'] and not v['optimizer_admission']; print('T23_TRAIN_ONLY=PASS'); print('T23_TRAIN_PROOFS='+json.dumps(v,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T23_PREFLIGHT_RECEIPT_INVALID'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t23-train-only-${{ matrix.os }}
+          path: t23-train-proofs.json
+          retention-days: 90
+          if-no-files-found: ignore
