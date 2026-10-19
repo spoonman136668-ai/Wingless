@@ -1,0 +1,61 @@
+name: T30 unknown causal mechanisms TRAIN-only qualification
+on:
+  push:
+    branches: [research/t30-unknown-causal-mechanisms-20261019]
+    paths: ['.github/workflows/north-star-t30-train-only.yml']
+permissions:
+  contents: read
+concurrency:
+  group: Wingless-T30-frozen-TRAIN-only
+  cancel-in-progress: false
+jobs:
+  source-blind-law-learning:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 40
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify T30 chronology and exact source identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T30_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t30-unknown-mechanism-prereg.json'='11e7880cbf52c456fc5aee9ed4aba0e13fc37776'
+            'research/north-star-transfer/20261019-wingless-t30-new-unknown-rules.py'='5e058667b93e08995ef09ea010c825399c81bf8e'
+            'research/north-star-transfer/20261019-wingless-t30-learned-mechanism.py'='2a9849215d2ebfa62a5b0fca87904ea4f52ef7d3'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T30_FROZEN_SOURCE_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 2f573a96e5083670f6660a7ae9fc830950f64385 64c495fbaee492081033a14de867a3fbe38cbc14
+          if($LASTEXITCODE -ne 0){throw 'T30_NEW_SOURCE_PRECEDED_PREREG'}
+          git merge-base --is-ancestor 64c495fbaee492081033a14de867a3fbe38cbc14 acb911f3e30bb45c2ba250511a13709be1816a6b
+          if($LASTEXITCODE -ne 0){throw 'T30_CANDIDATE_PRECEDED_NEW_SOURCE'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t30-new-unknown-rules.py research/north-star-transfer/20261019-wingless-t30-learned-mechanism.py
+          if($LASTEXITCODE -ne 0){throw 'T30_SYNTAX_FAILED'}
+          Write-Output 'T30_PREREG_BEFORE_SOURCE_AND_CANDIDATE=PASS'
+      - name: Prove unknown-rule posterior including unseen nonlinear ANF algebra without DEV
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t30-learned-mechanism.py --train-only > t30-TRAIN.json
+          if($LASTEXITCODE -ne 0){throw 'T30_TRAIN_RULE_POSTERIOR_OR_CERT_FAILURE'}
+          python -c "import json;x=json.load(open('t30-TRAIN.json',encoding='utf-8-sig'));assert x['status']=='PASS_TRAIN_ONLY_DEV_UNOPENED' and x['TRAIN_cases']==40 and x['DEV_generated']==0 and x['TRAIN_true_hidden_laws_retained']==40 and x['TRAIN_counterfactual_queries']==120 and x['TRAIN_exact_public_constraint_and_answer_equivalences']==120 and .15<=x['TRAIN_uncertainty_fraction']<=.90 and x['full_known_and_unknown_ANF_rules_verified']==272 and x['proof_does_not_assume_affine_DEV'] and not x['previous_consumed_cases_opened'] and not x['optimizer_admission'];print('T30_UNKNOWN_RULE_TRAIN_ADMISSION=PASS');print('T30_TRAIN_EVIDENCE='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T30_FROZEN_TRAIN_GATE_FAILED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t30-TRAIN-unknown-law-${{ matrix.os }}
+          path: t30-TRAIN.json
+          retention-days: 90
+          if-no-files-found: ignore
