@@ -1,4 +1,4 @@
-name: T29 Windows source-free memory measurement diagnosis
+name: T29 Windows source-free memory measurement repair qualification
 on:
   push:
     branches: [research/t29-multigrammar-causal-separator-20261019]
@@ -20,6 +20,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
+          if((git hash-object -- research/north-star-transfer/20261019-wingless-t29-certified-causal-separator.py).Trim() -cne '6ef547a131af0abd1485551453d5ae00650a07f5'){throw 'T29_FUTURE_ONLY_RSS_REPAIR_DRIFT'}
           @'
           import ctypes,importlib.util,json,subprocess,sys,pathlib
           from ctypes import wintypes
