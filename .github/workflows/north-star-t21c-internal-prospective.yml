@@ -1,0 +1,80 @@
+name: T21-C prospective internal proof-carrying relational motifs
+on:
+  push:
+    branches: [research/t21-internal-prospective-20261019]
+    paths: ['.github/workflows/north-star-t21c-internal-prospective.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t21c-internal-original-once
+  cancel-in-progress: false
+jobs:
+  frozen-prospective:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 60
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze identity and chronology; no DEV accessed
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if ((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA) {throw 'T21C_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t21c-internal-precode.json'='f3908871558b563a232ae7dba998410f5934fba0'
+            'research/north-star-transfer/20261019-wingless-t21c-internal-sources.py'='a06b831ba66020e99f1d2cecc6d02b6a36c72944'
+            'research/north-star-transfer/20261019-wingless-t21c-learned-relations.py'='881b9a2ff21da734642eef9dc71a3126e5e0febc'
+            'research/north-star-transfer/20261019-wingless-t21c-train-preflight.py'='37b7ba6bda2e3fef8ac3d032c4eafe11a778bd42'
+            'research/north-star-transfer/20261019-wingless-t21-relational-bitmatrix.py'='0d2b53620d1824316294149062e3c035713c69ee'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+          }
+          foreach ($path in $expected.Keys) {
+            $actual=(git hash-object -- $path).Trim()
+            if($actual -cne $expected[$path]){throw "T21C_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 8cbac29e65dbe2f48021f68ffecdbe0b58a18710 9c16a844ce2226d705c15f1fa4c9d100807d5c08
+          if($LASTEXITCODE -ne 0){throw 'T21C_SOURCE_PRECEDES_PRECODE'}
+          git merge-base --is-ancestor 9c16a844ce2226d705c15f1fa4c9d100807d5c08 1f75650c1cc59f7eff07b697ea712e0900455b4f
+          if($LASTEXITCODE -ne 0){throw 'T21C_LEARNER_PRECEDES_SOURCE'}
+          git merge-base --is-ancestor 1f75650c1cc59f7eff07b697ea712e0900455b4f f1735b67139e6a9c1d038e3127ff6d567823a074
+          if($LASTEXITCODE -ne 0){throw 'T21C_PREFLIGHT_PRECEDES_LEARNER'}
+          git merge-base --is-ancestor f1735b67139e6a9c1d038e3127ff6d567823a074 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T21C_FROZEN_SOURCE_NOT_PRESENT'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t21c-internal-sources.py research/north-star-transfer/20261019-wingless-t21c-learned-relations.py research/north-star-transfer/20261019-wingless-t21c-train-preflight.py
+          if($LASTEXITCODE -ne 0){throw 'T21C_PYTHON_COMPILE_FAILED'}
+          Write-Output 'T21C_PREREG_BEFORE_FRESH_SOURCE_BEFORE_LEARNER=PASS'
+      - name: TRAIN-only relational preflight before first prospective DEV read
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t21c-train-preflight.py > t21c-train-only-preflight.json
+          if($LASTEXITCODE -ne 0){throw 'T21C_TRAIN_ALGEBRA_PREFLIGHT_FAILED'}
+          python -c "import json; x=json.load(open('t21c-train-only-preflight.json',encoding='utf-8-sig')); assert x['passed'] and x['source_train_cases']==40 and x['source_DEV_cases_generated']==0 and not x['future_unseen_cases_used'] and not x['optimizer_admission']; assert len(x['arms'])==3; print('T21C_TRAIN_ONLY_PREFLIGHT=PASS'); print('T21C_TRAIN_COUNTS='+json.dumps(x['arms'],sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T21C_TRAIN_PREFLIGHT_RECEIPT_INVALID'}
+      - name: "ONE first-use internal DEV: four controls plus learned, five processes each"
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t21c-learned-relations.py > t21c-original-internal-prospective.json
+          if($LASTEXITCODE -ne 0){throw 'T21C_FIRST_USE_COMPARISON_FAILED_RETAIN_NEGATIVE'}
+          python -c "import json; d=json.load(open('t21c-original-internal-prospective.json',encoding='utf-8-sig')); r=d['results']; assert len(r)==5 and all(v['correct']==64 and len(v['whole_cpu_five_process_ns'])==5 and len(v['peak_rss_five_process_bytes'])==5 for v in r.values()); assert not d['source_origin_independent_external'] and d['prospective_internal_first_use'] and not d['independent_replication'] and not d['scientific_acceptance'] and not d['optimizer_admission']; print('T21C_INTERNAL_PROSPECTIVE=PASS_TECHNICAL_ONLY'); print('T21C_QUERIES='+json.dumps({k:v['public_queries'] for k,v in r.items()},sort_keys=True)); print('T21C_COMPARISON='+json.dumps(d['comparisons'],sort_keys=True)); print('T21C_JOINT_ACCEPTANCE='+str(d['joint_acceptance']))"
+          if($LASTEXITCODE -ne 0){throw 'T21C_FIRST_USE_RECEIPT_INVALID'}
+          Write-Output 'T21C_NO_EXTERNAL_INDEPENDENCE_CLAIM=PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t21c-internal-prospective-${{ matrix.os }}
+          path: |
+            t21c-train-only-preflight.json
+            t21c-original-internal-prospective.json
+          if-no-files-found: ignore
+          retention-days: 90
