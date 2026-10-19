@@ -1,0 +1,61 @@
+name: T27 TRAIN-only learned predictive belief compression
+on:
+  push:
+    branches: [research/t27-learned-predictive-belief-20261019]
+    paths: ['.github/workflows/north-star-t27-train-only.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t27-frozen-TRAIN-only
+  cancel-in-progress: false
+jobs:
+  soundness:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 60
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check exact source births and trained learner blobs, NO DEV
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T27_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t27-predictive-precode.json'='ed2639fb855eac9f2101a0328d20ae8abafbae78'
+            'research/north-star-transfer/20261019-wingless-t27-new-predictive-worlds.py'='51aabb72a252e71ec45bf6c49425bd28b919ee74'
+            'research/north-star-transfer/20261019-wingless-t27-predictive-belief.py'='75983fab91406e9b82e1e1faa94b481483b61a68'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T27_SOURCE_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 32c034789649cb520f92c8c6bb6fcc80643589f6 738c7a1f8055ff75a3bd386d91f7c2562665f7a6
+          if($LASTEXITCODE -ne 0){throw 'T27_SOURCE_PRECEDES_PRECODE'}
+          git merge-base --is-ancestor 738c7a1f8055ff75a3bd386d91f7c2562665f7a6 ca274d292aaceb41d4d0576ee561ba5a20e2b9a5
+          if($LASTEXITCODE -ne 0){throw 'T27_CANDIDATE_PRECEDES_SOURCE'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t27-new-predictive-worlds.py research/north-star-transfer/20261019-wingless-t27-predictive-belief.py
+          if($LASTEXITCODE -ne 0){throw 'T27_SYNTAX_FAILURE'}
+          Write-Output 'T27_PREREG_BEFORE_FRESH_SOURCE_AND_LEARNER=PASS'
+      - name: TRAIN-only exact 72-bit predictive equivalence vs unpruned recurrence
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t27-predictive-belief.py --train-only > t27-train-belief.json
+          if($LASTEXITCODE -ne 0){throw 'T27_TRAIN_PREDICTIVE_PROOF_FAILED'}
+          python -c "import json;x=json.load(open('t27-train-belief.json',encoding='utf-8-sig'));assert x['status']=='PASS_TRAIN_ONLY_DEV_UNOPENED' and x['TRAIN_cases']==40 and x['DEV_generated']==0 and x['TRUE_hidden_worlds_retained']==40 and x['TRAIN_question_count']==120 and x['TRAIN_exact_answer_equivalence_checks']==120 and 0.20<=x['ambiguity_fraction']<=0.85 and len(x['learned_feature_coordinates'])==16 and x['global_hidden_state_certification_worlds']==1536 and x['no_source_private_labels_in_learning'] and not x['no_old_DEV_replay']==False and not x['optimizer_admission'];print('T27_TRAIN_ONLY_CERTIFIED=PASS');print('T27_PREDICTIVE_FEATURE_PROOF='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T27_FROZEN_TRAIN_HEADROOM_NOT_ADMITTED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t27-TRAIN-predictive-belief-${{ matrix.os }}
+          path: t27-train-belief.json
+          if-no-files-found: ignore
+          retention-days: 90
