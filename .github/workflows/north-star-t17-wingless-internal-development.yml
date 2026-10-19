@@ -1,0 +1,55 @@
+name: T17 Wingless internal experimental query-value research
+on:
+  push:
+    branches: [research/north-star-transfer-wingless-20261018]
+    paths: ['.github/workflows/north-star-t17-wingless-internal-development.yml']
+permissions:
+  contents: read
+concurrency:
+  group: t17-wingless-internal-new-uncertainty-science
+  cancel-in-progress: false
+jobs:
+  new-development-experiment:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 30
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze before fresh disjoint internal fixture
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T17_EXACT_HEAD_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t17-internal-experiment-freeze.json').Trim() -cne 'fb8596a7a735bb677e8bfc9095b9a70ebbcbcbc9'){throw 'T17_PROTOCOL_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t17-internal-synthetic-source.py').Trim() -cne '51a2b5e1c9eb03eafa96de6ef59d920f46fa7d51'){throw 'T17_SOURCE_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t17-internal-experiment.py').Trim() -cne 'e5552a33374b631b5d1c6214b0c7ca0dfbcb6dd2'){throw 'T17_LEARNER_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py').Trim() -cne '1041db8ff76365eba5eb8f31cecd0e2172d397d8'){throw 'T17_CERTIFIER_DRIFT'}
+          if((git hash-object 'research/north-star-transfer/20261018-wingless-t3-typed-composition.py').Trim() -cne '85dbd2673a94a6d72db29e57ee836619405f7f1e'){throw 'T17_DOMAIN_KERNEL_DRIFT'}
+          git merge-base --is-ancestor 8d4cf486d4ff0325a1c3c905edee1d9ace719032 HEAD
+          if($LASTEXITCODE -ne 0){throw 'T17_PROTOCOL_NOT_BEFORE_IMPLEMENTATION'}
+          Write-Output 'T17_SOURCE_AND_STRONG_CONTROLS_FROZEN=PASS'
+      - name: Five full-process CPU RSS trials each among four controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python 'research/north-star-transfer/20261019-wingless-t17-internal-experiment.py' > t17-internal-development.json
+          if($LASTEXITCODE -ne 0){throw 'T17_REAL_DIAGNOSTIC_EXPERIMENT_FAILURE'}
+          python -c "import json; v=json.load(open('t17-internal-development.json',encoding='utf-8-sig')); assert len(v['results'])==4 and all(len(r['cpu_five_process_measurements_ns'])==5 and len(r['rss_five_process_measurements_bytes'])==5 and r['correct']==64 for r in v['results'].values()) and v['protected_originals_consumed']==0 and v['scientific_acceptance'] is False and v['optimizer_admission'] is False; print('T17_FIVE_PROCESS_NATIVE_DIAGNOSTIC=PASS'); print('T17_LEARNED_EXACT_STRONG_EVIDENCE='+json.dumps({k:{'correct':x['correct'],'queries':x['queries'],'median_cpu_ns':x['median_complete_cpu_ns'],'peak_rss':x['max_complete_process_peak_rss_bytes']} for k,x in v['results'].items()},sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T17_UNVERIFIED_EXPERIMENT_OUTPUT'}
+          Write-Output 'T17_PROTECTED_FIRSTUSE_ZERO_NO_SCIENCE_ADMISSION=PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t17-internal-development-${{ matrix.os }}
+          path: t17-internal-development.json
+          if-no-files-found: ignore
+          retention-days: 90
