@@ -1,0 +1,251 @@
+{
+  "schema": "northstar.t17.wingless.internal-development-source-verified-negative.v1",
+  "date_edt": "2026-10-19",
+  "kind": "NEW_DISJOINT_SELF_AUTHORED_INTERNAL_DEVELOPMENT_NOT_EXTERNAL_INDEPENDENT_SOURCE",
+  "science_question": "Can public-TRAIN learned query-value reduce extra queries beyond strongest trained same-information T16B role ordering at no higher CPU/RSS and exact answer retention?",
+  "source_protocol": {
+    "preregistration_commit": "8d4cf486d4ff0325a1c3c905edee1d9ace719032",
+    "preregistration_blob": "fb8596a7a735bb677e8bfc9095b9a70ebbcbcbc9",
+    "fixture_committed_after_preimplementation_commit": "c39c4eeeba0df5733894450be446b0d02a183845",
+    "synthetic_fixture_blob": "51a2b5e1c9eb03eafa96de6ef59d920f46fa7d51",
+    "frozen_shared_binding_certificate_blob": "1041db8ff76365eba5eb8f31cecd0e2172d397d8",
+    "frozen_math_kernel_blob": "85dbd2673a94a6d72db29e57ee836619405f7f1e",
+    "diagnostic_measurement_fix_commit": "6afa289b19dcdaa1d7aaba8c877c24dd427b199c",
+    "final_source_head": "8f882f76b5786e481b1ca83b439b6674b2e491b6",
+    "final_experiment_blob": "1d99164d8b3a8759f0bc81c5194053bda9176ae0",
+    "TRAIN_count": 24,
+    "DEV_count": 64,
+    "distinct_T16_original_identity_overlap": false,
+    "firstuse_status": "SYNTHETIC_DEV_ONLY_NO_PROTECTED_FIRSTUSE",
+    "external_independent_source_signatures": false
+  },
+  "provider": {
+    "repo": "spoonman136668-ai/Wingless",
+    "failed_first_attempt": 39269283547,
+    "failed_second_attempt": 39269574019,
+    "failed_windows_issue": "ctypes PSAPI missing x64 HANDLE argtypes; before resource recording, not a candidate correctness failure",
+    "final_run_id": 39269782438,
+    "final_url": "https://github.com/spoonman136668-ai/Wingless/actions/runs/39269782438",
+    "final_windows": "PASS",
+    "final_ubuntu": "PASS",
+    "artifacts": {
+      "ubuntu": {
+        "id": 12195400756,
+        "zip_sha256": "70f430e43f9fb2173342f7b22f2919299b8c6463de5853199df5930272026e96"
+      },
+      "windows": {
+        "id": 12195176433,
+        "zip_sha256": "65ab262a5747269dddf1fa56fbd43f91a03164d856489511d5683f7eb09912f4"
+      }
+    }
+  },
+  "data": {
+    "ubuntu": {
+      "learned-value": {
+        "correct_out_of_64": 64,
+        "public_extra_queries": 95,
+        "training_updates_reported": 39,
+        "five_independent_process_CPU_ns": [
+          31738983,
+          23928983,
+          23805753,
+          24018100,
+          23726685
+        ],
+        "five_independent_process_whole_RSS_bytes": [
+          14168064,
+          13393920,
+          13352960,
+          13385728,
+          13357056
+        ],
+        "median_CPU_ns": 23928983,
+        "max_RSS_bytes": 14168064
+      },
+      "trained-T16B": {
+        "correct_out_of_64": 64,
+        "public_extra_queries": 92,
+        "training_updates_reported": 0,
+        "five_independent_process_CPU_ns": [
+          13581813,
+          13588445,
+          13363766,
+          13359808,
+          13198387
+        ],
+        "five_independent_process_whole_RSS_bytes": [
+          13385728,
+          13393920,
+          13389824,
+          13393920,
+          13352960
+        ],
+        "median_CPU_ns": 13363766,
+        "max_RSS_bytes": 13393920
+      },
+      "untrained-same-cert": {
+        "correct_out_of_64": 64,
+        "public_extra_queries": 92,
+        "training_updates_reported": 0,
+        "five_independent_process_CPU_ns": [
+          12628773,
+          12819924,
+          12745140,
+          12754878,
+          12918754
+        ],
+        "five_independent_process_whole_RSS_bytes": [
+          13389824,
+          13393920,
+          13357056,
+          13357056,
+          13357056
+        ],
+        "median_CPU_ns": 12754878,
+        "max_RSS_bytes": 13393920
+      },
+      "exact-full": {
+        "correct_out_of_64": 64,
+        "public_extra_queries": 104,
+        "training_updates_reported": 0,
+        "five_independent_process_CPU_ns": [
+          6090718,
+          6177881,
+          6164015,
+          6145380,
+          6104164
+        ],
+        "five_independent_process_whole_RSS_bytes": [
+          13262848,
+          13262848,
+          13185024,
+          13254656,
+          13213696
+        ],
+        "median_CPU_ns": 6145380,
+        "max_RSS_bytes": 13262848
+      }
+    },
+    "windows": {
+      "learned-value": {
+        "correct_out_of_64": 64,
+        "public_extra_queries": 95,
+        "training_updates_reported": 39,
+        "five_independent_process_CPU_ns": [
+          15625000,
+          15625000,
+          31250000,
+          31250000,
+          31250000
+        ],
+        "five_independent_process_whole_RSS_bytes": [
+          17526784,
+          16830464,
+          16867328,
+          16674816,
+          16666624
+        ],
+        "median_CPU_ns": 31250000,
+        "max_RSS_bytes": 17526784
+      },
+      "trained-T16B": {
+        "correct_out_of_64": 64,
+        "public_extra_queries": 92,
+        "training_updates_reported": 0,
+        "five_independent_process_CPU_ns": [
+          15625000,
+          15625000,
+          15625000,
+          15625000,
+          15625000
+        ],
+        "five_independent_process_whole_RSS_bytes": [
+          16572416,
+          16805888,
+          16859136,
+          16789504,
+          16760832
+        ],
+        "median_CPU_ns": 15625000,
+        "max_RSS_bytes": 16859136
+      },
+      "untrained-same-cert": {
+        "correct_out_of_64": 64,
+        "public_extra_queries": 92,
+        "training_updates_reported": 0,
+        "five_independent_process_CPU_ns": [
+          15625000,
+          15625000,
+          15625000,
+          15625000,
+          15625000
+        ],
+        "five_independent_process_whole_RSS_bytes": [
+          16678912,
+          16760832,
+          16879616,
+          16855040,
+          16863232
+        ],
+        "median_CPU_ns": 15625000,
+        "max_RSS_bytes": 16879616
+      },
+      "exact-full": {
+        "correct_out_of_64": 64,
+        "public_extra_queries": 104,
+        "training_updates_reported": 0,
+        "five_independent_process_CPU_ns": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "five_independent_process_whole_RSS_bytes": [
+          16826368,
+          16830464,
+          16781312,
+          16805888,
+          16777216
+        ],
+        "median_CPU_ns": 0,
+        "max_RSS_bytes": 16830464
+      }
+    }
+  },
+  "interpretation": {
+    "learned_T17_strictly_fewer_public_queries_than_strong_trained": false,
+    "learned_T17_strictly_fewer_public_queries_than_untrained": false,
+    "learned_T17_fewer_public_queries_than_full_exact": true,
+    "all_arms_64_of_64_correct": true,
+    "linux_median_learned_cpu_ns": 23928983,
+    "linux_median_strong_trained_cpu_ns": 13363766,
+    "linux_median_exact_full_cpu_ns": 6145380,
+    "linux_learned_peak_rss_bytes": 14168064,
+    "linux_trained_peak_rss_bytes": 13393920,
+    "linux_exact_peak_rss_bytes": 13262848,
+    "windows_cpu_measurement_coarse_15_625ms_tick": true,
+    "windows_full_exact_median_reported_zero_due_to_clock_resolution": true,
+    "complete_external_public_query_service_latency_not_measured": true,
+    "model_CPU_RSS_nonregression": false,
+    "source_independent_replication": false,
+    "scientific_disposition": "NEGATIVE_QUERY_VALUE_AND_RESOURCE_PARITY_INTERNAL_DEVELOPMENT_ONLY",
+    "no_trained_control_beaten": true
+  },
+  "controls_and_authority": {
+    "strongest_existing_trained_T16B_compared": true,
+    "untrained_same_representation_compared": true,
+    "full_exact_public_solution_compared": true,
+    "T16_original_cohorts_unopened": true,
+    "T14_T15_negatives_retained": true,
+    "externally_signed_source_birth_proven": false,
+    "accepted_transfer_positive": false,
+    "optimizer_admission": false,
+    "engineering_merge": false,
+    "new_controller": false,
+    "paid_API": false,
+    "production_promotion": false,
+    "integration_regression_not_triggered": true
+  },
+  "next_mechanistic_diagnosis": "Query ranking is not the bottleneck on these development words; same certifier fixed and existing TRAIN ranking use 92 queries vs 95. Focus next on cheaper compositional certificate/factorized persistent binding, not another ranking retune. Scientific claim still needs independent unfamiliar source and operational custody."
+}
