@@ -4,7 +4,7 @@
   "parent_T31_negative": "7d2a667e68c4ce94481f798999c0328fe120f3f0",
   "status": "FROZEN_BEFORE_FRESH_SOURCE_AND_MECHANISM",
   "hypothesis": "Public-TRAIN-learned parity-resolution templates can construct valid new constraints on unknown nonlinear causal-law truth-table bits from masked joint transition observations, reducing certified inference work versus equally trained exact Gaussian-elimination and deterministic closure baselines without wrong certified answers.",
-  "new_problem": "Public feedback supplies XOR of pairs of output nodes, not the individual output states; a shared hidden Boolean truth table is coupled across all entities. Relative to T31, posterior law construction requires actual GF(2) multi-observation inference, not rank-ordering fully enumerated worlds.",
+  "new_problem": "Public feedback supplies output-node parities over 2 and 3 nodes, not individual outputs; observed pair/triple parity equations permit algebraic elimination into learned singleton unknown-rule-bit constraints.",
   "source": {
     "families": {
       "H": {
@@ -26,7 +26,7 @@
     "TRAIN": 40,
     "DEV": 64,
     "public_reset_intervention_trials": 5,
-    "observations_per_trial": "two XOR pair outcomes of next entity outputs; no individual output values",
+    "observations_per_trial": "two XOR parity observations per trial: one over 2 distinct output nodes and one over 3 distinct output nodes, revealing neither individual output (degree-2 and degree-3 constraints permit TRAIN-induced singleton resolution)",
     "future_query": "known query start, do at first step, 3 synchronous updates, three target nodes",
     "TRAIN_rule_class": "affine",
     "DEV_rule_class": "genuinely nonaffine, withheld and disjoint from TRAIN affine",
@@ -76,5 +76,6 @@
     "no_new_controller": true,
     "no_FORGE_or_CKB_plane_change": true,
     "no_merge": true
-  }
+  },
+  "mechanism_mathematical_reason": "XOR of a degree-2 row and degree-3 row can cancel two unknown-law-bit terms to derive a sound degree-1 unit clause; pair-only constraints cannot derive unit clauses from XOR alone."
 }
