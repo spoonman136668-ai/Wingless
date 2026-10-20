@@ -102,6 +102,27 @@ def add(basis,mask,rhs,reverse=False):
         mask^=prev[0];rhs^=prev[1];work+=1
     if rhs:raise RuntimeError("T34_INCONSISTENT_PUBLIC_CAUSAL_EQUATIONS")
     return work
+def trained_pivot(mask,rank):
+    return max(bits(mask),key=lambda bit:rank[bit])
+def add_trained(basis,mask,rhs,rank):
+    work=0
+    while mask:
+        p=trained_pivot(mask,rank)
+        row=basis.get(p)
+        if row is None:
+            basis[p]=(mask,rhs)
+            return work
+        mask^=row[0];rhs^=row[1];work+=1
+    if rhs:raise RuntimeError("T34_INCONSISTENT_TRAINED_GF2")
+    return work
+def decide_trained(basis,mask,rank):
+    rhs=0
+    while mask:
+        p=trained_pivot(mask,rank)
+        row=basis.get(p)
+        if row is None:return None
+        mask^=row[0];rhs^=row[1]
+    return rhs
 def decide(basis,query,reverse=False):
     rhs=0
     while query:
@@ -220,6 +241,7 @@ def per_stream(dim,idx,groups,arm,pivotorder,validate_proofs=True):
     if arm==ARMS[0]:state=Factors(dim,groups)
     elif arm==ARMS[1]:state=Factors(dim,tuple((i,) for i in range(dim)))
     else:state={}
+    rank={b:i for i,b in enumerate(pivotorder)}
     rowhistory=[]
     outputs=[]
     ops=0;checkpoint=0
@@ -228,9 +250,9 @@ def per_stream(dim,idx,groups,arm,pivotorder,validate_proofs=True):
         if arm in ARMS[:2]:
             state.add(mask,rhs)
         elif arm==ARMS[2]:
-            # Full-width, TRAIN-informed pivot strategy retained as exact
-            # explicit basis order. Count no speculative learning gain.
-            ops+=add(state,mask,rhs,reverse=True)
+            # Full-width pivot priorities FIT from public TRAIN row
+            # frequencies. Never treated as an independent cognition win.
+            ops+=add_trained(state,mask,rhs,rank)
         elif arm==ARMS[3]:
             ops+=add(state,mask,rhs)
         elif arm==ARMS[4]:
@@ -243,7 +265,8 @@ def per_stream(dim,idx,groups,arm,pivotorder,validate_proofs=True):
                 basis={}
                 for m,r in rowhistory:add(basis,m,r)
                 out=decide(basis,query)
-            else:out=decide(state,query,reverse=(arm==ARMS[2]))
+            elif arm==ARMS[2]:out=decide_trained(state,query,rank)
+            else:out=decide(state,query)
             if validate_proofs:
                 expect=independent_exact(rowhistory,query)
                 if out!=expect:
@@ -252,8 +275,8 @@ def per_stream(dim,idx,groups,arm,pivotorder,validate_proofs=True):
                     raise RuntimeError("T34_FALSE_CERTIFICATION")
             outputs.append(-1 if out is None else out)
         checkpoint+=1
-    if len(outputs)!=CHECKPOINT_EVERY and not outputs:
-        raise RuntimeError("T34_MISSING_ALGEBRA_STREAM")
+    if len(outputs)!=(OBS//CHECKPOINT_EVERY)*QUERIES_PER_CHECKPOINT:
+        raise RuntimeError("T34_MISSING_SOURCEFREE_CHECKPOINT_QUERIES")
     proof={"dimension":dim,"stream_id":idx,
            "certified":sum(x!=-1 for x in outputs),
            "sound_abstentions":sum(x==-1 for x in outputs),
