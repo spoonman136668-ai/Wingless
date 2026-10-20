@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.t35.sourcefree-learned-block-gf2-prereg.v1",
+  "date_edT": "2026-10-19",
+  "parent_T34_negative": "5a3493a7b3b66bd7b9cdd22c9e294a9a9ead587a",
+  "hypothesis": "A TRAIN-selected small-block incremental GF2 elimination representation can replace multiple individual XOR eliminations on related unknown causal state constraints with one exact precompiled reduction lookup per block, lowering real row-elimination XOR counts and whole-process CPU without increasing peak RSS versus optimized exact scalar incremental GF2.",
+  "mechanism": "TRAIN sees ONLY public equation masks from synthetic source-free streams and ranks pivot coordinate frequency/co-occurrence. It chooses compact 3-4 bit pivot groups. Online candidate retains an exact triangular GF2 basis; per-block row-reduction tables are exact algebraic lookup transforms, rebuilt when basis pivots enter a group. Lookup reduces several already-known pivots with a single XOR. An unrecognized pivot falls back to scalar exact elimination. Unlike T34, this must reduce actual GF2 XOR update operations, not just factor merges.",
+  "sourcefree_stress": {
+    "source_free_only": true,
+    "no_new_scientific_cohort": true,
+    "TRAIN_public_streams_per_dim": 24,
+    "validation_streams_per_dim": 20,
+    "dimensions": [
+      32,
+      64
+    ],
+    "observations_per_stream": 64,
+    "checkpoints_every": 8,
+    "queries_per_checkpoint": 12,
+    "original_train_seed": 35023019,
+    "original_validation_seed": 35088031,
+    "public_masks": "sparse 2-4 bit within correlated eight-variable modules with occasional cross-module rows and repeated constraints",
+    "rhs": "exact independent hidden vector only used to generate consistent public equations; hidden vector never passed to learning or inference",
+    "source_free_independent_exact": "independent lower-pivot canonical batch Gaussian rebuilder verifies each query"
+  },
+  "comparators": [
+    "TRAIN-learned-block-exact-GF2",
+    "TRAIN-frequency-optimized-scalar-GF2",
+    "deterministic-block-exact-GF2",
+    "optimized-exact-incremental-GF2",
+    "optimized-batch-rebuild-GF2"
+  ],
+  "required_tests": {
+    "learned_parameter_ablation": "Learned grouping ON versus fixed grouping OFF must demonstrably change actual block lookup XOR reductions, with completely identical certified answers and no false positives",
+    "actual_xor_reduction": "count all basis-update XORs PLUS all LUT reconstruction XORs and all per-query transformations; strictly fewer than optimized exact incremental baseline on source-free validation before looking at native performance",
+    "TRAIN_public_only": true,
+    "full_rank_soundness": true,
+    "independent_proof_for_all_checkpoint_queries": true,
+    "sourcefree_no_existing_consumed_DEV": true
+  },
+  "frozen_acceptance": {
+    "five_full_native_processes_per_arm_per_OS": true,
+    "github_hosted_windows_and_linux": true,
+    "median_CPU_learned_strictly_below_each_strong_exact_control_BOTH_OS": true,
+    "peak_RSS_not_above_best_exact_control_BOTH_OS": true,
+    "no_real_scientific_sources_unless_all_pass": true,
+    "fail_closed_no_threshold_retune": true
+  },
+  "scope": {
+    "no_paid_API": true,
+    "no_workstation": true,
+    "no_selfhosted_runners": true,
+    "no_new_controller": true,
+    "no_FORGE_or_CKB_plane_change": true,
+    "no_PR_merge_or_optimizer_promotion": true
+  }
+}
