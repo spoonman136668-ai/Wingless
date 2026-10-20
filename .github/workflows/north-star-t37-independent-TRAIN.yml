@@ -1,0 +1,48 @@
+name: T37 independent original TRAIN-only causal-law exactness audit
+on:
+  push:
+    branches: [research/t37-sequential-causal-induction-20261019]
+    paths: ['.github/workflows/north-star-t37-independent-TRAIN.yml']
+permissions:
+  contents: read
+jobs:
+  independent-exact-no-DEV:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 35
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove candidate frozen and separate auditor original sources
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git hash-object -- research/north-star-transfer/20261019-wingless-t37-sequential-rule-sources.py).Trim() -cne '5614b7686745cea57fdedc01acc56096aa70e1f0'){throw 'T37_ORIGINAL_SOURCE_CHANGED_AFTER_NEGATIVE'}
+          if((git hash-object -- research/north-star-transfer/20261019-wingless-t37-learned-dynamics.py).Trim() -cne '9ac9e31e4a3b1f6ffa091be7008b9571713a1a3b'){throw 'T37_ORIGINAL_TRAINED_CANDIDATE_CHANGED'}
+          if((git hash-object -- research/north-star-transfer/20261019-wingless-t37-independent-TRAIN-exact.py).Trim() -cne '53b7fac802557ecaeb8b6c02cee79ef45d42fef2'){throw 'T37_INDEPENDENT_AUDITOR_DRIFT'}
+          git merge-base --is-ancestor b1c8718130be3a858f09a174615b2d8fcc8069a2 48e42d9704a762799d1be3f03dcc8d52f679dd10
+          if($LASTEXITCODE -ne 0){throw 'T37_AUDITOR_WROTE_BEFORE_ORIGINAL_TRAIN'}
+          Write-Output 'T37_INDEPENDENT_SOURCE_FROZEN=PASS'
+      - name: Independently enumerate all 256 hidden rules from raw observation sequences
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t37-independent-TRAIN-exact.py > t37-independent-original-TRAIN.json
+          if($LASTEXITCODE -ne 0){throw 'T37_INDEPENDENT_HIDDEN_CAUSAL_VERIFIER_FAILED'}
+          python -c "import json;x=json.load(open('t37-independent-original-TRAIN.json',encoding='utf-8-sig'));assert x['result']=='INDEPENDENT_TRAIN_ONLY_EXACT_PASS' and x['TRAIN_meta_cases_used_for_fit']==40 and x['TRAIN_validation_cases_independently_checked']==16 and x['causal_future_queries_independently_proved']==64 and x['correct_certified']==33 and x['sound_abstentions']==31 and x['hard_false_certifications']==0 and x['independent_full_256_rule_enumeration_not_candidate_code'] and x['learned_parameters_changed_actual_causal_beliefs_cases']==16 and x['scientific_DEV_generated']==0 and x['no_prior_consumed_scientific_source_touched'];print('T37_INDEPENDENT_CAUSAL_CORRECTNESS=PASS');print('T37_INDEPENDENT_TRAIN_EVIDENCE='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T37_SOURCE_INDEPENDENT_EVIDENCE_REJECTED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t37-independent-proof-${{ matrix.os }}
+          path: t37-independent-original-TRAIN.json
+          if-no-files-found: ignore
+          retention-days: 90
