@@ -1,0 +1,60 @@
+name: T40 original source-free causal learnability and Bayes information bound
+on:
+  push:
+    branches: [research/t40-causal-learnability-bounds-20261020]
+    paths: ['.github/workflows/north-star-t40-information-headroom.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T40-frozen-information-audit
+  cancel-in-progress: false
+jobs:
+  analytical-information-theory:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 35
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate source-free prereg and exact model code
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T40_SOURCE_HEAD_DRIFT'}
+          $expect=@{
+            'research/north-star-transfer/20261020-wingless-t40-information-headroom-prereg.json'='8d2ec2435decc7063d3f34b354f92d6df23eb719'
+            'research/north-star-transfer/20261020-wingless-t40-exact-learnability-audit.py'='e12f77ec624b64bfdd0b5d4a6a09ae723fed4a60'
+          }
+          foreach($path in $expect.Keys){
+            if((git hash-object -- $path).Trim() -cne $expect[$path]){throw "T40_FROZEN_SOURCE_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 93c1a1729a49550b15b7234f4df8c205fbae780e cc86b57956d1e4b0f3dff6e0dde02c5a9c3909f7
+          if($LASTEXITCODE -ne 0){throw 'T40_CODE_PRECEDED_PREREG'}
+          python -m py_compile research/north-star-transfer/20261020-wingless-t40-exact-learnability-audit.py
+          if($LASTEXITCODE -ne 0){throw 'T40_SOURCE_SYNTAX_FAILED'}
+          python research/north-star-transfer/20261020-wingless-t40-exact-learnability-audit.py --selftest
+          if($LASTEXITCODE -ne 0){throw 'T40_PROGRAM_GRAMMAR_SELFTEST_FAILED'}
+          Write-Output 'T40_PREREG_BEFORE_SOURCE_AND_SHA256_IDENTITY=PASS'
+      - name: Enumerate exact source-free 256-rule and 768-composition posterior information
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t40-exact-learnability-audit.py --audit > t40-original-information-headroom.json
+          if($LASTEXITCODE -ne 0){throw 'T40_FROZEN_SOURCEFREE_ANALYTIC_AUDIT_FAILED'}
+          python -c "import json;d=json.load(open('t40-original-information-headroom.json',encoding='utf-8-sig'));assert d['status']=='PASS_EXACT_INFORMATION_MATHEMATICS' and d['full_2input_gate_compositions_with_three_operators']==768 and d['analytically_evaluated_prior_by_observation_regimes']==9 and d['scientific_DEV_generated_or_opened']==0 and not d['new_C2_D2_scientific_sources_generated'] and not d['T38_T39_consumed_cases_replayed'] and not d['prior_values_used_by_models'];s=d['sourcefree_scenarios'];assert len(s)==3 and all(len(x['analytically_exact_scenarios'])==3 and x['TRAIN_public_cases']==64 for x in s.values());assert all(x['expected_Brier']['omniscient_source_oracle']<=min(x['expected_Brier'].values())+1e-10 and x['independent_oracle_program_vs_rule_difference']<1e-12 and x['logical_certified_answers_for_unobserved_input_with_256_rule_consistency']==0 for ss in s.values() for x in ss['analytically_exact_scenarios']);u=s['uniform_full_256']['analytically_exact_scenarios'];assert all(abs(x['oracle_Brier_lower_bound']-0.25)<1e-12 and abs(x['mean_mutual_information_bits_per_unseen_target'])<1e-12 for x in u);print('T40_ANALYTICAL_EXACT_PROOF=PASS');print('T40_INFORMATION_MAP='+json.dumps({p:[{'k':x['observed_patterns'],'I_bits':round(x['mean_mutual_information_bits_per_unseen_target'],6),'oracle_Brier':round(x['oracle_Brier_lower_bound'],6),'best_control':x['strongest_publicly_fitted_competitor'],'best_control_Brier':round(x['strongest_publicly_fitted_Brier'],6),'candidate_Brier':round(x['expected_Brier']['fitted_compositional_factors'],6),'maximum_gain_after_best_control':round(x['maximum_possible_relative_gain_beyond_best_publicly_trained_control'],6),'headroom_gt_5pct':x['theoretical_at_least_5pct_headroom']} for x in v['analytically_exact_scenarios']] for p,v in s.items()},sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T40_ANALYTICAL_EVIDENCE_INVALID'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t40-original-information-headroom-${{ matrix.os }}
+          path: t40-original-information-headroom.json
+          if-no-files-found: ignore
+          retention-days: 90
