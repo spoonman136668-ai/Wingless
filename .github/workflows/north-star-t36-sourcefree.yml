@@ -1,0 +1,68 @@
+name: T36 source-free learned exact predictive BDD math and native gate
+on:
+  push:
+    branches: [research/t36-learned-predictive-bdd-20261019]
+    paths: ['.github/workflows/north-star-t36-sourcefree.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T36-sourcefree-frozen
+  cancel-in-progress: false
+jobs:
+  exact-predictive-state-and-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 30
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate prereg freeze and exact unmodified candidate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T36_SOURCEFREE_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t36-sourcefree-robdd-precode.json'='a85c6f71545068543ac3fb9038740d9c17045463'
+            'research/north-star-transfer/20261019-wingless-t36-learned-predictive-bdd.py'='4d9b3ff3ad5971a5acf8937c769bbae5cfafb3fb'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T36_FROZEN_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 2b6634a32f2a4d3ccfa4137843aeeebc2c00cd73 4393b4edfe45ca0770f765fa9156f8d0ca87fa7b
+          if($LASTEXITCODE -ne 0){throw 'T36_CODE_PRECEDED_FROZEN_HYPOTHESIS'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t36-learned-predictive-bdd.py
+          if($LASTEXITCODE -ne 0){throw 'T36_SOURCEFREE_SYNTAX_FAIL'}
+          Write-Output 'T36_FROZEN_SOURCEFREE_IDENTITY=PASS'
+      - name: Prove exact predictive-state construction and genuine learned-order ablation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t36-learned-predictive-bdd.py --ablation > t36-sourcefree-ablation.json
+          if($LASTEXITCODE -ne 0){throw 'T36_SOURCEFREE_ROBDD_EXACTNESS_FAILED_NO_SCIENCE'}
+          python -c "import json;x=json.load(open('t36-sourcefree-ablation.json',encoding='utf-8-sig'));assert x['TRAIN_streams']==40 and x['sourcefree_streams']==24 and x['independent_exact_checkpoint_queries']==960 and x['scientific_DEV_created']==0 and x['exact_certifications_preserved'] and x['learned_order_changes_actual_BDD_structure_streams']>0;print('T36_PROOF_AND_TRAINED_ORDER_ABLATION=PASS');print('T36_ABLATION='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T36_FROZEN_LEARNED_STATE_INFLUENCE_NO_GO'}
+      - name: Qualify whole-process native CPU and RSS against optimized exact and learned controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t36-learned-predictive-bdd.py > t36-native-sourcefree.json
+          if($LASTEXITCODE -ne 0){throw 'T36_SOURCEFREE_NATIVE_OR_SOUNDNESS_FAILED_NO_SCIENCE'}
+          python -c "import json;x=json.load(open('t36-native-sourcefree.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==5 and x['sourcefree_all_queries_exact'] and x['scientific_DEV_created']==0 and x['TRAIN_public_streams']==40 and x['sourcefree_validation_streams']==24 and all(v['sourcefree_cases']==24 and v['query_count']==960 and len(v['five_full_CPU_ns'])==5 and len(v['five_peak_RSS_bytes'])==5 for v in a.values());print('T36_SOURCEFREE_MATHEMATICAL_EXACT=PASS');print('T36_NATIVE_METRICS='+json.dumps({k:{q:v[q] for q in ('certified','sound_abstentions','BDD_nodes_allocated','BDD_apply_misses','median_full_CPU_ns','max_peak_RSS_bytes')} for k,v in a.items()},sort_keys=True));print('T36_FROZEN_NATIVE_ADMISSION='+str(x['strict_scientific_source_admission']));assert x['strict_scientific_source_admission'],'T36_FROZEN_NATIVE_NO_GO_HOLD_ALL_PROSPECTIVE_SOURCES';print('T36_FIRST_SOURCE_ADMITTED=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T36_FROZEN_NATIVE_NO_GO_OR_NOT_VERIFIED_HOLD_SOURCE'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t36-sourcefree-proof-and-native-${{ matrix.os }}
+          path: |
+            t36-sourcefree-ablation.json
+            t36-native-sourcefree.json
+          if-no-files-found: ignore
+          retention-days: 90
