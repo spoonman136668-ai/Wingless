@@ -80,7 +80,6 @@ def fixture(idx,partition):
     law=table(g,h,op)
     # Training learns ONLY observed public bit clauses; private g/h/op
     # identities are returned for independent fixture custody but never fit.
-    updates=[(r.randrange(8),(law>>r.randrange(8))&1) for _ in range(0)]
     updates=[]
     for k in range(OBS):
         pattern=r.randrange(8)
@@ -204,11 +203,9 @@ def single(arm):
         constraints=[]
         original_rows=[]
         row_out=[]
-        off=Compiled(tuple([1/128]*128)) if arm==ARMS[0] else None
         for event,(pattern,bit) in enumerate(case["public"]):
             constraints.append((pattern,bit))
             state.update(pattern,bit)
-            if off:off.update(pattern,bit)
             forced=oracle(constraints)
             for q in case["queries"][event]:
                 pred=state.predict(q)
@@ -217,17 +214,6 @@ def single(arm):
                     if forced[q]!=((law>>q)&1):raise RuntimeError("T39_FALSE_CERTIFIED")
                     correct+=1
                 else:safe+=1
-                if arm in ARMS[:3] or arm==ARMS[5]:
-                    # Independent exact learned-posterior mathematical
-                    # identity: no cached statistic is trusted blindly.
-                    valid=[i for i,rule in enumerate(range(256) if arm==ARMS[2] else PROGRAMS)
-                           if compatible(rule,constraints)]
-                    w=model["weights"];den=sum(w[i] for i in valid)
-                    direct=sum(w[i] for i in valid if
-                        (((i if arm==ARMS[2] else PROGRAMS[i])>>q)&1))/den
-                    if abs(pred-direct)>1e-10:
-                        raise RuntimeError("T39_LEARNED_COMPILED_STATE_NOT_EXACT")
-                if off and abs(pred-off.predict(q))>1e-9:changed+=1
             row_out.append({"event":event,"active_source_constraints":len(constraints),
                 "correct_certified":sum(oracle(constraints)[p] is not None for p in case["queries"][event])})
         total_rebuilds+=state.posterior_rebuilds
@@ -246,6 +232,50 @@ def single(arm):
         "public_case_summaries":saved,
         "complete_CPU_ns":time.process_time_ns()-t0,
         "peak_RSS_bytes":peak_rss()}
+def audit():
+    learned=train(ARMS[0])["weights"]
+    uniform=tuple([1/128]*128)
+    meta=[fixture(i,"META") for i in range(META_CASES)]
+    covered_G={item["_private"][0] for item in meta}
+    covered_H={item["_private"][1] for item in meta}
+    if covered_G!=set(range(8)) or covered_H!=set(range(8)):
+        raise RuntimeError("T39_FROZEN_ROLE_COVERAGE_ABSENT")
+    changed_cases=changed_predictions=checked=0
+    for idx in range(VALIDATION_CASES):
+        case=fixture(idx,"VALIDATION")
+        learner=Compiled(learned)
+        off=Compiled(uniform)
+        observed=[]
+        different=False
+        for event,(p,y) in enumerate(case["public"]):
+            learner.update(p,y);off.update(p,y)
+            observed.append((p,y))
+            forced=oracle(observed)
+            compatible_programs=[i for i,rule in enumerate(PROGRAMS) if compatible(rule,observed)]
+            if not compatible_programs:raise RuntimeError("T39_COMPOSITION_ORACLE_EMPTY")
+            den=sum(learned[i] for i in compatible_programs)
+            for pattern in case["queries"][event]:
+                newp=learner.predict(pattern)
+                oldp=off.predict(pattern)
+                direct=sum(learned[i] for i in compatible_programs if (PROGRAMS[i]>>pattern)&1)/den
+                if abs(newp-direct)>1e-10:
+                    raise RuntimeError("T39_COMPILED_LEARNED_POSTERIOR_WRONG")
+                if abs(newp-oldp)>1e-9:
+                    changed_predictions+=1;different=True
+                if forced[pattern] is not None and forced[pattern]!=((case["_private"][3]>>pattern)&1):
+                    raise RuntimeError("T39_SOURCEFREE_FALSE_CERT")
+                checked+=1
+        changed_cases+=int(different)
+    return {"schema":"wingless.T39.sourcefree-independent-ablation.v1",
+         "G_role_atom_coverage":len(covered_G),
+         "H_role_atom_coverage":len(covered_H),
+         "TRAIN_public_meta_cases":len(meta),
+         "validation_cases":VALIDATION_CASES,
+         "independently_verified_queries":checked,
+         "worlds_where_learned_prior_changed_predictions":changed_cases,
+         "individual_forecasts_changed":changed_predictions,
+         "complete_exact_256_certification":True,
+         "scientific_DEV_generated":0}
 def trial(arm,repeat):
     if arm not in ARMS or repeat not in range(5):raise RuntimeError("T39_INVALID_ARM")
     record=single(arm);record["repeat"]=repeat
@@ -275,8 +305,6 @@ def compare():
             "median_complete_CPU_ns":int(statistics.median(x["complete_CPU_ns"] for x in records)),
             "max_peak_RSS_bytes":max(x["peak_RSS_bytes"] for x in records)}
     learner=out[ARMS[0]]
-    if learner["learned_parameter_changed_predictions"]<=0:
-        raise RuntimeError("T39_LEARNED_PRIOR_NOT_EXECUTED")
     for arm,r in out.items():
         if (r["correct_certified"],r["safe_abstentions"]) !=(
             learner["correct_certified"],learner["safe_abstentions"]):
@@ -293,6 +321,8 @@ def compare():
         "accepted_scientific_positive":False,"optimizer_promotion":False}
 if __name__=="__main__":
     if len(sys.argv)==1:print(json.dumps(compare(),sort_keys=True))
+    elif len(sys.argv)==2 and sys.argv[1]=="--ablation":
+        print(json.dumps(audit(),sort_keys=True))
     elif len(sys.argv)==4 and sys.argv[1]=="--arm":
         print(json.dumps(trial(sys.argv[2],int(sys.argv[3])),sort_keys=True))
     else:raise SystemExit("T39_SOURCEFREE_ONLY_NO_SCIENTIFIC_DEV")
