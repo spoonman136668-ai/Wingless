@@ -1,0 +1,61 @@
+{
+  "schema": "nci04.self_organizing_predictive_state.source_only.v1",
+  "project": "Wingless",
+  "parent_sha": "816de3726dcf00ccea2bb0f4cc39f801a0dd41a4",
+  "architecture": "event-driven recurrent predictive state, no label-identified relations or fixed causal path",
+  "scientific_question": "Can a bounded native, query-blind predictor learn from consecutive observed transitions and retain useful information across A-B-A task switches, beating similarly informed controls without graph labels?",
+  "research_truth": "The hidden dynamics generator is evaluator-only; model sees only observations x(t), observes x(t+1) as its self-supervised prediction target, and never receives causal edges, task identifiers or intermediate causal answers.",
+  "frozen_design": {
+    "world": "four observable bounded continuous state coordinates with independently sampled hidden sparse transition operators and exogenous pulses",
+    "training_seeds": [
+      41000,
+      41031
+    ],
+    "dev_seeds": [
+      42000,
+      42031
+    ],
+    "stress_seeds": [
+      43000,
+      43031
+    ],
+    "switch_sequence": "context A 24 ticks, context B 24 ticks, context A 24 ticks; context identity never passed to learner",
+    "source_family": "source-free deterministic xorshift32 world and state permutations; out-of-training stress changes sparsity and signed influence structure",
+    "observation": "Only state vectors at consecutive ticks. No hidden graph, edge sign, context ID or future query.",
+    "readout": "Predict one-step next state; two-step rollout composes solely through the model's own dynamics",
+    "learning": "Streaming next-observation predictive-error updates; no heldout tuning; fixed train-only rates/configs",
+    "train_epochs": 1,
+    "development_runs": 32,
+    "stress_runs": 32,
+    "hard_false_positives": "Report adverse sign/activation predictions rather than suppressing negatives"
+  },
+  "comparison": [
+    "same observational streams for all arms",
+    "fixed-size no-learning ablation",
+    "trained recurrent/EMA and local-state controls with explicitly reported parameter and memory sizes",
+    "raw persistent-state erasure",
+    "frozen initial A vs returning A error and later-B interference"
+  ],
+  "metrics": [
+    "MAE and MSE by A1/B/A2 phases",
+    "two-step autonomous rollout error",
+    "post-switch recovery rate",
+    "memory-erasure effect",
+    "persistent bytes, active params, per-transition arithmetic operations, CPU time",
+    "native capability claims withheld until independently validated"
+  ],
+  "qualification": {
+    "development_signal": "At least 5% relative MSE gain versus strongest fully trained resource-matched control in stress and no phase A2 degradation beyond 10%; memory removal worsens predictive loss by 10% or more; no compute/memory nonregression; positive remains development-only.",
+    "negative": "Any failed hard gate, report exact values; do not tune on evaluation.",
+    "invalid": "Generator leakage, hidden task labels, unbounded memory, non-independent streams, after-result threshold change or unfair comparator.",
+    "result_scope": "SOURCE_ONLY_DEVELOPMENT_NOT_SCIENTIFIC_ADMISSION"
+  },
+  "constraints": {
+    "first_use": 0,
+    "production": false,
+    "external_model": false,
+    "transformer": false,
+    "no_paid_API": true,
+    "merge_without_final_regression": false
+  }
+}
