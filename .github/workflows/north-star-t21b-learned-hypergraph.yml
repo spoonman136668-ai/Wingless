@@ -1,0 +1,75 @@
+name: T21B Wingless exact learned hypergraph internal qualification
+on:
+  push:
+    branches: [research/t21b-learned-hypergraph-20261019]
+    paths: ['.github/workflows/north-star-t21b-learned-hypergraph.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t21b-first-DEV-internal
+  cancel-in-progress: false
+jobs:
+  qualified-first-internal-DEV:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify preimplementation freeze, new source origin and exact inherited foundations
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if ((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA) { throw 'T21B_HEAD_DRIFT' }
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t21b-learned-hypergraph-precode.json'='a05489abe4d66324f6a8df73690d8f8b79c108f8'
+            'research/north-star-transfer/20261019-wingless-t21b-fresh-source.py'='49f46e32839d49f08831f60cb20bcfdb49479525'
+            'research/north-star-transfer/20261019-wingless-t21b-learned-hypergraph.py'='eea6fa686f1ae1ea0e28e4b6bb3e6cd6716af9f9'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+            'research/north-star-transfer/20261018-wingless-t3-typed-composition.py'='85dbd2673a94a6d72db29e57ee836619405f7f1e'
+            'research/north-star-transfer/originals/20261019-wingless-t21-source-free-feasibility.json'='d93ce4ef32e740f525c9af8b118f564f9e1ab65c'
+          }
+          foreach ($path in $expected.Keys) {
+            if ((git hash-object -- $path).Trim() -cne $expected[$path]) { throw "T21B_IDENTITY_DRIFT:$path" }
+          }
+          git merge-base --is-ancestor 6479d126ffe021f4f566d3c6552238f4b703a148 042dfe5df9309475bb1482169bd2131f6b70fc89
+          if ($LASTEXITCODE -ne 0) { throw 'T21B_INCORRECT_PARENT' }
+          git merge-base --is-ancestor 042dfe5df9309475bb1482169bd2131f6b70fc89 579a5bb199de307c583058d822e3dd4019c92650
+          if ($LASTEXITCODE -ne 0) { throw 'T21B_SOURCE_BEFORE_FREEZE' }
+          git merge-base --is-ancestor 579a5bb199de307c583058d822e3dd4019c92650 61e0d3ecf4d26a1decde96d87a89dab15e9f7cc8
+          if ($LASTEXITCODE -ne 0) { throw 'T21B_IMPLEMENTATION_BEFORE_SOURCE' }
+          git merge-base --is-ancestor 61e0d3ecf4d26a1decde96d87a89dab15e9f7cc8 HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'T21B_IMPLEMENTATION_NOT_INCLUDED' }
+          python -m py_compile research/north-star-transfer/20261019-wingless-t21b-learned-hypergraph.py research/north-star-transfer/20261019-wingless-t21b-fresh-source.py
+          if ($LASTEXITCODE -ne 0) { throw 'T21B_SYNTAX_ERROR' }
+          Write-Output 'T21B_FROZEN_CHRONOLOGY_AND_EXACT_CODE=PASS'
+      - name: Sound exact public algebra properties BEFORE new DEV first-use
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t21b-learned-hypergraph.py --property
+          if ($LASTEXITCODE -ne 0) { throw 'T21B_PROPERTY_FAIL_DEV_MUST_REMAIN_UNOPENED' }
+          Write-Output 'T21B_PUBLIC_MATHEMATICAL_PROPERTIES=PASS'
+      - name: First source-specific internal DEV 5 whole-process repetitions all exact arms
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t21b-learned-hypergraph.py > t21b-internal-first-use.json
+          if ($LASTEXITCODE -ne 0) { throw 'T21B_FIRST_DEV_FAILED_AND_IS_CONSUMED' }
+          python -c "import json;d=json.load(open('t21b-internal-first-use.json',encoding='utf-8-sig'));r=d['results'];assert len(r)==5 and all(v['correct']==96 and len(v['cpu_five_process_ns'])==5 and len(v['rss_five_process_bytes'])==5 for v in r.values());assert d['T20_DEV_replayed'] is False and d['T16_originals_opened']==0 and d['scientific_acceptance'] is False and d['optimizer_admission'] is False;print('T21B_FIRST_INTERNAL_DEV_PASS');print('T21B_QUERIES='+json.dumps({k:v['queries'] for k,v in r.items()},sort_keys=True));print('T21B_COMPARISON='+json.dumps(d['comparison'],sort_keys=True));print('T21B_JOINT_ACCEPTANCE='+str(d['joint_acceptance']))"
+          if ($LASTEXITCODE -ne 0) { throw 'T21B_REPORT_INVALID' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t21b-internal-first-use-${{ matrix.os }}
+          path: t21b-internal-first-use.json
+          if-no-files-found: ignore
+          retention-days: 90
