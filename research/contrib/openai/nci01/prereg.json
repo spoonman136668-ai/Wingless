@@ -1,0 +1,33 @@
+{
+  "schema": "native-cognition.nci01.wingless.dev-prereg.v1",
+  "gate": "NCI01-W",
+  "parent": "f016c5803f479626c2a78f781c3c09be9ce649b4",
+  "purpose": "Native Go query-blind recurrent scalar experience memory with bounded online error-driven adaptation; explicit component seam only",
+  "arch": "Wingless",
+  "files": [
+    "nativecognition/recurrent.go",
+    "nativecognition/recurrent_test.go"
+  ],
+  "source_kind": "invented deterministic source-free unit streams",
+  "training": "online streaming squared prediction error, no queries, no external models",
+  "test_intent": [
+    "persistent state across observations",
+    "parameter adaptation from prediction errors",
+    "query without state mutation",
+    "bounded resource and snapshot value copying",
+    "invalid input fail closed"
+  ],
+  "comparators": [
+    "frozen-weight predictor on same inputs"
+  ],
+  "scientific_first_use": false,
+  "accepted_model": false,
+  "worker_integration": false,
+  "no_token_model": true,
+  "capacity": {
+    "channels": 4,
+    "max_events": "streaming bounded state",
+    "parameters": "two floats per channel, including learned gate and readout"
+  },
+  "success_scope": "source-only native primitive contract, not causal transfer or cognitive capability"
+}
