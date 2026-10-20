@@ -295,7 +295,7 @@ def generate(root, receipts_path=None):
             "HTML regenerated machine data mismatch")
     narrative = (root / ICE).read_text(encoding="utf-8")
     orig_marker = "SOURCE_COMMIT: " + previous
-    require(narrative.count(orig_marker) == 1, "durable header source ambiguous")
+    require(narrative.splitlines().count(orig_marker) == 1, "durable header source ambiguous")
     require("STATUS: ADVISORY" in narrative, "durable authority is not advisory")
     narrative = narrative.replace(orig_marker, "SOURCE_COMMIT: " + target, 1)
     narrative += (
