@@ -1,0 +1,80 @@
+{
+  "schema": "wingless.t37.learned-sequential-causal-law-belief.prereg.v1",
+  "date_EDT": "2026-10-19",
+  "parent_T36_negative": "1654f1cf5b436b2c690f76a07203fb01d8fc8ee8",
+  "hypothesis": "TRAIN-induced pairwise conditional dependencies between an unknown causal law's truth-table entries improve forecast accuracy and total inference work on unfamiliar delayed-input entity relationships, relative to equally TRAIN-informed exact rule-prior Bayesian inference and fully trained independent-pattern controls.",
+  "mechanism": "The model learns P(local-rule response bit j | already observed response bit k) for all 8 input patterns from public multientity intervention sequences. During test it maintains a persistent exact partial truth-table constraint memory, then updates probabilistic predictions for unobserved causal-input patterns using TRAIN-fitted conditional dependencies. Disable the weights and predictions revert to a TRAIN-fitted independent-pattern estimate. A distinct exact-certification channel emits a claim only when all hidden rule choices consistent with public data agree; never certifies a probable prediction.",
+  "source": {
+    "original_new_source_module_after_precode": true,
+    "families": {
+      "R": {
+        "entities": 7,
+        "parents_per_node": 3,
+        "temporal_delay": "third input is node state two time steps ago",
+        "TRAIN_graph": "acyclic parent templates",
+        "DEV_graph": "cyclic/rewired parent templates"
+      },
+      "S": {
+        "entities": 11,
+        "parents_per_node": 3,
+        "temporal_delay": "second input is parent state one previous observation before latest",
+        "TRAIN_graph": "local ring templates",
+        "DEV_graph": "nonlocal hub/feedback templates"
+      }
+    },
+    "unknown_shared_rule": "3-input Boolean truth table with 8 bits, new per case; TRAIN polynomial algebraic normal form degree <=2, unseen DEV degree 3 (disjoint); no preloaded rule identity supplied",
+    "TRAIN_meta_cases": 40,
+    "TRAIN_validation_cases": 16,
+    "DEV_prospective_cases": 64,
+    "public_training_evidence": "3 reset-history intervention sequences with 2 selected next outputs each, including known 3-frame prior entity states, observed selected output node indices, known explicit interventions",
+    "future_queries": "4 genuinely new intervention-conditioned one-step causal targets on novel state histories, private labels held only for evaluation",
+    "source_identity": "t37-R/S-train/dev distinct from all prior Wingless cohorts, new seeds",
+    "time_horizon": "persistent public constraint memory across 3 intervention sequences; variable delayed entity bindings",
+    "internal_origin_no_external_recruitment": true
+  },
+  "comparators": [
+    "TRAIN-learned-conditional-causal-belief",
+    "TRAIN-fitted-full-rule-empirical-Bayes-256",
+    "TRAIN-fitted-independent-Beta-pattern",
+    "uniform-exact-version-space"
+  ],
+  "source_free_preflight": {
+    "prove_posterior_and_certification_exhaustively_for_all_256_possible_boolean_rules": true,
+    "negative_training_data_do_not_create_scientific_DEV": true,
+    "independent_counterfactual_truth_does_not_enter_fit": true,
+    "conditional_parameter_ablation_changes_predictions_on_TRAIN_validation": true,
+    "all_certified_answers_exact": true
+  },
+  "TRAIN_admission": {
+    "TRAIN_meta_cases": 40,
+    "TRAIN_validation_cases": 16,
+    "headroom_min_ambiguous_fraction": 0.2,
+    "headroom_max_ambiguous_fraction": 0.9,
+    "zero_false_certified": true,
+    "Brier_learned_improvement_vs_best_fully_trained_control_at_least_pct": 5,
+    "strict_nondecreasing_CPU": false,
+    "complete_native_CPU_strictly_below_best_strong_control_BOTH_Github_OS": true,
+    "maximum_RSS_no_greater_than_best_strong_control_BOTH_Github_OS": true,
+    "five_complete_process_trials_per_arm_per_OS": 5,
+    "DEV_generated": 0
+  },
+  "prospective_acceptance": {
+    "only_after_qualified_TRAIN": true,
+    "original_DEV_cases": 64,
+    "zero_hard_false_certifications": true,
+    "TRAIN_meta_frozen_before_DEV": true,
+    "lower_Brier_vs_best_STRONG_TRAIN_control_pct_at_least": 5,
+    "full_CPU_and_memory_nonregression_BOTH_OS": true,
+    "independent_external_replication_required_for_full_claim": false,
+    "no_old_DEV_replay": true
+  },
+  "scope": {
+    "draft_only": true,
+    "no_merge_or_optimizer_admission": true,
+    "no_paid_API": true,
+    "no_workstation": true,
+    "no_selfhosted_research_runner": true,
+    "no_new_controller": true,
+    "no_FORGE_CKB_plane_change": true
+  }
+}

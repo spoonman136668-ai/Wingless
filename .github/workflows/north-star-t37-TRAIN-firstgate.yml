@@ -1,0 +1,77 @@
+name: T37 unknown sequential causal dynamics TRAIN admission
+on:
+  push:
+    branches: [research/t37-sequential-causal-induction-20261019]
+    paths: ['.github/workflows/north-star-t37-TRAIN-firstgate.yml']
+permissions:
+  contents: read
+concurrency:
+  group: Wingless-T37-original-TRAIN-no-prospective
+  cancel-in-progress: false
+jobs:
+  original-TRAIN:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 35
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen hypothesis precedes new R S sources and model
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T37_SOURCE_IDENTITY_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t37-causal-rule-transfer-precode.json'='0b75a50b0fa2fcec55c4916351005ff52d162027'
+            'research/north-star-transfer/20261019-wingless-t37-sequential-rule-sources.py'='5614b7686745cea57fdedc01acc56096aa70e1f0'
+            'research/north-star-transfer/20261019-wingless-t37-learned-dynamics.py'='9ac9e31e4a3b1f6ffa091be7008b9571713a1a3b'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T37_FROZEN_SOURCE_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 6b49f8ea4fa874118cba446506773006bca60694 e75982f88224dce7c60e3968cb7d05d2be354d2c
+          if($LASTEXITCODE -ne 0){throw 'T37_NEW_SOURCE_PRECEDES_HYPOTHESIS'}
+          git merge-base --is-ancestor e75982f88224dce7c60e3968cb7d05d2be354d2c c4cd0470d30c02bdb763e1d9965bcec7c85d1ac0
+          if($LASTEXITCODE -ne 0){throw 'T37_CAUSAL_LEARNER_PRECEDES_SOURCE'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t37-sequential-rule-sources.py research/north-star-transfer/20261019-wingless-t37-learned-dynamics.py
+          if($LASTEXITCODE -ne 0){throw 'T37_PYTHON_COMPILE_FAILED'}
+          Write-Output 'T37_PRECODE_SOURCE_LEARNER_CHRONOLOGY=PASS'
+      - name: Independently verify 256 rule posterior and genuine trained forecast effect
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t37-learned-dynamics.py --train-only > t37-TRAIN-science.json
+          if($LASTEXITCODE -ne 0){throw 'T37_TRAIN_CAUSAL_POSTERIOR_PROOF_FAILED'}
+          python -c "import json;x=json.load(open('t37-TRAIN-science.json',encoding='utf-8-sig'));assert x['status']=='PASS_TECHNICAL_TRAIN_ONLY' and x['TRAIN_meta_cases']==40 and x['TRAIN_validation_cases']==16 and x['DEV_generated']==0 and x['TRAIN_true_hidden_rules_preserved']==16 and x['TRAIN_counterfactual_forecasts']==64 and x['hard_false_positives']==0 and x['all_hidden_true_laws_tested_by_independent_256_rule_exact_certifier'] and x['probability_forecasts_never_called_certified'] and x['learned_weights_change_actual_uncertainty_forecast_cases']>0 and x['no_previous_DEV_opened'] and .2<=x['headroom_fraction']<=.9;print('T37_TRAIN_CAUSAL_LEARNING_TECHNICAL=PASS');print('T37_TRAIN_BRIER_AND_HEADROOM='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T37_FROZEN_HEADROOM_OR_PARAM_CAUSAL_ABLATION_NO_GO'}
+      - name: Measure five full-process TRAIN source and inference costs with strongest fitted controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t37-learned-dynamics.py --train-cost > t37-TRAIN-native.json
+          if($LASTEXITCODE -ne 0){throw 'T37_TRAIN_COST_EVALUATION_FAILED'}
+          python -c "import json;x=json.load(open('t37-TRAIN-native.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==4 and x['DEV_generated']==0 and x['TRAIN_meta_cases']==40 and x['TRAIN_validation_cases']==16 and all(v['correct_certified']+v['sound_abstentions']==64 and v['hard_false_positives']==0 and len(v['five_complete_CPU_ns'])==5 and len(v['five_peak_RSS_bytes'])==5 for v in a.values());print('T37_TRAIN_NATIVE_TECHNICAL=PASS');print('T37_TRAIN_RESOURCE='+json.dumps({k:{p:v[p] for p in ('correct_certified','sound_abstentions','Brier_all','median_complete_CPU_ns','max_peak_RSS_bytes')} for k,v in a.items()},sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T37_TRAIN_RESOURCE_INCOMPLETE'}
+      - name: Apply the frozen scientific and native admission jointly
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python -c "import json;s=json.load(open('t37-TRAIN-science.json',encoding='utf-8-sig'));n=json.load(open('t37-TRAIN-native.json',encoding='utf-8-sig'));improvement=s['relative_Brier_improvement_vs_best_strong_control'];admit=improvement>=.05 and n['native_all_CPU_better'] and n['native_RSS_nondegression'];print('T37_FROZEN_BRIER_GAIN='+str(improvement));print('T37_FROZEN_NATIVE_CPU='+str(n['native_all_CPU_better']));print('T37_FROZEN_NATIVE_RSS='+str(n['native_RSS_nondegression']));print('T37_TRAIN_ADMISSION='+str(admit));assert admit,'T37_VALID_TRAIN_NO_GO_HOLD_NEW_PROSPECTIVE_DEV';print('T37_ELIGIBLE_TO_ORIGINATE_FRESH_DEV=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T37_NO_UNSEEN_ORIGINAL_EVALUATION_AUTHORIZED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t37-original-TRAIN-causal-${{ matrix.os }}
+          path: |
+            t37-TRAIN-science.json
+            t37-TRAIN-native.json
+          if-no-files-found: ignore
+          retention-days: 90
