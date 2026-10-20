@@ -1,0 +1,60 @@
+name: T42 exact sourceblind causal class identifiability and Brier bounds
+on:
+  push:
+    branches: [research/t42-sourceblind-causal-recognition-bounds-20261020]
+    paths: ['.github/workflows/north-star-t42-exact-identifiability.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T42-original-frozen-sourcefree-info-only
+  cancel-in-progress: false
+jobs:
+  exact-Bayes-information:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 35
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate precode-before-math source and immutable identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T42_GITHUB_HEAD_DRIFT'}
+          $blobs=@{
+            'research/north-star-transfer/20261020-wingless-t42-identifiability-headroom-prereg.json'='6a054cea5b377fb275004668453c0ee7e8aa2c9c'
+            'research/north-star-transfer/20261020-wingless-t42-source-class-information-exact.py'='2cbd134861eccceae6dcfda6e7014c1f3c4f942e'
+          }
+          foreach($path in $blobs.Keys){
+            if((git hash-object -- $path).Trim() -cne $blobs[$path]){throw "T42_PRECODE_OR_AUDIT_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 8b72d34d6628106ab2a25e16b0a2e4b35a5204a2 e0be61e1c4691b13b2e91b462fb916cdddd9dfc5
+          if($LASTEXITCODE -ne 0){throw 'T42_EXPERIMENT_HYPOTHESIS_NOT_FROZEN_BEFORE_ALGEBRA'}
+          python -m py_compile research/north-star-transfer/20261020-wingless-t42-source-class-information-exact.py
+          if($LASTEXITCODE -ne 0){throw 'T42_SOURCE_SYNTAX_FAILED'}
+          python research/north-star-transfer/20261020-wingless-t42-source-class-information-exact.py --selftest
+          if($LASTEXITCODE -ne 0){throw 'T42_MATH_GRAMMAR_SELFTEST_FAILED'}
+          Write-Output 'T42_FROZEN_PREREG_AND_ORIGINAL_MATH_SOURCE=PASS'
+      - name: Prove exact class recognition and source-free Bayes forecast loss ceiling
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t42-source-class-information-exact.py --audit > t42-original-exact-sourceblind-headroom.json
+          if($LASTEXITCODE -ne 0){throw 'T42_ORIGINAL_MATHEMATICAL_INFORMATION_ANALYSIS_FAILED'}
+          python -c "import json;x=json.load(open('t42-original-exact-sourceblind-headroom.json',encoding='utf-8-sig'));assert x['status']=='EXACT_INFORMATION_BOUND_PASS' and x['sourcefree_rule_programs']==768 and x['uniform_unrestricted_rules']==256 and x['number_of_observation_budgets']==9 and len(x['exact_source_prior_frequencies'])==5 and x['balanced_50pct_mixture_is_already_Bayes_optimal'] and x['correct_model_source_class_never_fully_identifiable_even_after_eight_bits'] and x['no_scientific_DEV_created'] and not x['T16_T41_previous_case_reuse'] and len(x['independent_direct_768_program_vs_projected_256_rule_checks'])>=9;src=x['sourcefree_information_and_risk'];assert len(src)==5 and all(len(v['exact_observation_budget_rows'])==9 for v in src.values());assert all(r['source_class_Bayes_MAP_accuracy']>=.5 and r['source_class_irreducible_MAP_error']>0 and r['class_source_mutual_information_bits']>=-1e-9 for v in src.values() for r in v['exact_observation_budget_rows']);balanced=src['0.5']['exact_observation_budget_rows'];assert all(abs(r['learning_class_prior_gain_over_fixed_50pct'])<1e-10 for r in balanced[:-1]);print('T42_EXACT_SOURCE_CLASS_AND_FORECAST_BAYES_BOUNDS=PASS');print('T42_COMPACT_INFORMATION_RESULTS='+json.dumps({k:{'first75':v['first_k_source_MAP_accuracy_at_least_75pct'],'first90':v['first_k_source_MAP_accuracy_at_least_90pct'],'k_rows':[{'k':r['observed_inputs'],'source_class_accuracy':round(r['source_class_Bayes_MAP_accuracy'],6),'MI_bits':round(r['class_source_mutual_information_bits'],6),'fixed_Brier':None if r['expected_Brier'] is None else round(r['expected_Brier']['fixed_50pct_sourceblind_Bayes_mixture'],6),'true_prior_Brier':None if r['expected_Brier'] is None else round(r['expected_Brier']['true_class_frequency_sourceblind_Bayes_optimum'],6),'max_gain_from_correct_prior':None if r['learning_class_prior_gain_over_fixed_50pct'] is None else round(r['learning_class_prior_gain_over_fixed_50pct'],6),'class_known_oracle_headroom':None if r['private_known_class_oracle_headroom_vs_true_prior_Bayes'] is None else round(r['private_known_class_oracle_headroom_vs_true_prior_Bayes'],6)} for r in v['exact_observation_budget_rows']]} for k,v in src.items()},sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T42_EXACT_ORIGINAL_INFORMATION_RECEIPT_INVALID'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t42-original-exact-information-${{ matrix.os }}
+          path: t42-original-exact-sourceblind-headroom.json
+          if-no-files-found: ignore
+          retention-days: 90
