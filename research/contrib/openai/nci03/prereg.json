@@ -1,0 +1,100 @@
+{
+  "schema": "native-cognition.nci03.unfamiliar-entity-causal-composition.dev-prereg.v1",
+  "gate": "NCI-03",
+  "project": "Wingless",
+  "parent": "816de3726dcf00ccea2bb0f4cc39f801a0dd41a4",
+  "prereg_before_implementation": true,
+  "primary_question": "Can a query-blind, resource-bounded native learned-associative and learned-composition mechanism answer causal-sign queries across unfamiliar entity identities and changed graph structures better than equally informed trained recurrent and exact symbolic controls?",
+  "candidate_mechanism": "fixed 8-record query-blind key-value fast memory; trained 16-bit key feature reliability and 4-hidden-neuron neural composition; trainable associative retrieval without entity-indexed slots",
+  "task": {
+    "entities": "unique 8-bit IDs, with independent query and observation nuisance features",
+    "edges": "directed signed causal links, shuffled in an 8-record store without fixed entity-to-slot mapping",
+    "training_graphs": "two- and three-hop linear DAGs with disconnected distractors",
+    "development_graphs": "three-hop unseen entity assignments and structure permutations",
+    "stress_graphs": "four-hop chains with disconnected cycle/distractor, novel entity-ID block",
+    "query": "source entity and requested causal horizon; no query during retention",
+    "label": "signed intervention influence of complete path, from source-free graph generator only (never inserted as memory key or rule)",
+    "model": "trainable 4-hidden-unit tanh composition network; no built-in sign-product composition during inference",
+    "key_encoder": "trainable per-feature reliability for stable entity bits vs per-visit nuisance bits; no raw entity equality in candidate recall",
+    "physical_capacity": "at most 8 retained causal edges, no unbounded task-specific memory"
+  },
+  "frozen_cohorts": {
+    "train_seeds": [
+      14000,
+      14063
+    ],
+    "dev_seeds": [
+      15000,
+      15031
+    ],
+    "stress_seeds": [
+      16000,
+      16031
+    ],
+    "train_id_range": [
+      0,
+      127
+    ],
+    "dev_id_range": [
+      128,
+      191
+    ],
+    "stress_id_range": [
+      192,
+      255
+    ]
+  },
+  "training": {
+    "epochs": 64,
+    "learning_rate": 0.04,
+    "hidden_width": 4,
+    "parameter_seed": 7,
+    "training_supervision": "train-only prefix influence labels and contrastive same-vs-different entity pairs",
+    "candidate_test_info": "same observations and horizon available to controls",
+    "no_dev_tuning": true
+  },
+  "controls": [
+    "train-fitted recurrent tanh network with equal trainable compose parameters and identical edge information",
+    "exact symbolic graph traversal upper bound",
+    "candidate erased memory",
+    "frozen random key reliability",
+    "candidate frozen (untrained) composition"
+  ],
+  "acceptance": {
+    "exact_symbolic_accuracy_min": 0.99,
+    "native_stress_accuracy_min": 0.75,
+    "required_gain_over_trained_recurrent": 0.05,
+    "required_memory_lesion_drop": 0.2,
+    "required_unfamiliar_structure_nonregression": true,
+    "compute_and_memory_nongrowth_vs_matched_recurrent": true,
+    "strict_decision": "ACCEPT_DEVELOPMENT_SIGNAL_ONLY only if every requirement met; otherwise NEGATIVE, invalid source/design if fairness/leakage breaks"
+  },
+  "reporting": [
+    "train loss",
+    "test accuracy by graph family",
+    "identity collisions",
+    "memory lesion outcomes",
+    "learning ablation",
+    "trainable parameters",
+    "retained bytes",
+    "per-query neighbor/similarity/activation operations",
+    "instance provenance and frozen seeds",
+    "first failed requirement"
+  ],
+  "strict_limits": {
+    "protected_first_use": 0,
+    "no_prod_access": true,
+    "no_external_model": true,
+    "no_paid_api": true,
+    "no_controller_change": true,
+    "no_autopromotion": true
+  },
+  "no_claims": [
+    "scientific accepted transferable reasoning",
+    "novel general intelligence",
+    "language competence",
+    "functional regeneration",
+    "zero false positives without data"
+  ],
+  "no_changes_after_results": true
+}
