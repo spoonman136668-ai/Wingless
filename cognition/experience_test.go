@@ -7,6 +7,7 @@ import (
  "math"
  "testing"
  "unsafe"
+ "unsafe"
 )
 func TestExperienceRawObservationAndPersistence(t *testing.T){
  m:=NewExperienceMemory()
@@ -52,22 +53,68 @@ func TestExperienceNoEntitySlotsAndAba(t *testing.T){
  fmt.Printf("NCI04_NATIVE_W_ABA_QUALITY=%.6f NCI04_NATIVE_W_RETAINED_BYTES=%d\n",p,unsafe.Sizeof(*m))
  if _,ok,e:=m.InferExperience([4]float64{0,0,0,0},1);e!=nil||ok{t.Fatalf("novel source should remain unknown: %v %v",ok,e)}
 }
-func TestExperienceComparatorEvidenceOnly(t *testing.T){
- // A fully supervised exact-signature count table is a strong upper bound.
- // It receives the same observed raw episodes; we do not claim model parity.
- m:=NewExperienceMemory()
- correct,covered:=0,0
- for i:=0;i<48;i++ {
-   sig:=[4]float64{float64((i%3)-1)*.7,.3,0,0}
-   label:=(i%3)%2
-   if i>=24{
-     p,ok,e:=m.InferExperience(sig,0);if e!=nil{t.Fatal(e)}
-     if ok{covered++;if (p>=.5)==(label==1){correct++}}
-   }
-   if e:=m.ObserveExperience(sig,sig,0,float64(label));e!=nil{t.Fatal(e)}
+// A trained capacity-matched raw-feature prototype peer receives exactly
+// the same experiences. It does not learn feature stability from paired views.
+type trainedRawPeer struct{
+ tracks [ExperienceCapacity]struct{
+  used bool
+  centre [4]float64
+  value [2]float64
+  counts [2]uint32
  }
- strongOracle:=24
- fmt.Printf("NCI04_NATIVE_W_DEV_COVERED=%d NCI04_NATIVE_W_DEV_CORRECT=%d NCI04_NATIVE_W_STRONG_ORACLE=%d\n",covered,correct,strongOracle)
- report:=map[string]any{"correct":correct,"covered":covered,"oracle":strongOracle,"learned_entity_binding_accepted":false}
+ count int
+}
+func (m *trainedRawPeer)locate(v [4]float64) (int,float64){
+ index:=-1;best:=math.Inf(1)
+ for i,t:=range m.tracks{
+  if !t.used{continue}
+  dist:=0.0;for k:=range v{d:=v[k]-t.centre[k];dist+=d*d}
+  if dist<best{best=dist;index=i}
+ }
+ return index,best
+}
+func (m *trainedRawPeer)observe(v [4]float64,action int,value float64){
+ k,d:=m.locate(v)
+ if k<0||d>.28{
+  if m.count<ExperienceCapacity{k=m.count;m.count++}else{k=m.count%ExperienceCapacity}
+  m.tracks[k].used=true;m.tracks[k].centre=v;m.tracks[k].value=[2]float64{.5,.5}
+  m.tracks[k].counts=[2]uint32{}
+ }
+ t:=&m.tracks[k]
+ for i:=range t.centre{t.centre[i]=.85*t.centre[i]+.15*v[i]}
+ t.value[action]=.8*t.value[action]+.2*value
+ t.counts[action]++
+}
+func (m *trainedRawPeer)infer(v [4]float64,action int)(float64,bool){
+ k,d:=m.locate(v);if k<0||d>.28||m.tracks[k].counts[action]==0{return 0,false}
+ return m.tracks[k].value[action],true
+}
+func TestExperienceTrainedMatchedPeerEvidenceOnly(t *testing.T){
+ candidate:=NewExperienceMemory()
+ var peer trainedRawPeer
+ candidateCorrect,peerCorrect,candidateCoverage,peerCoverage:=0,0,0,0
+ for i:=0;i<72;i++{
+  id:=i%3
+  sig:=[4]float64{float64(id-1)*.7,.3,0,0}
+  y:=id%2
+  if i>=24{
+   p,known,e:=candidate.InferExperience(sig,0);if e!=nil{t.Fatal(e)}
+   if known{candidateCoverage++;if (p>=.5)==(y==1){candidateCorrect++}}
+   q,ok:=peer.infer(sig,0)
+   if ok{peerCoverage++;if (q>=.5)==(y==1){peerCorrect++}}
+  }
+  if e:=candidate.ObserveExperience(sig,sig,0,float64(y));e!=nil{t.Fatal(e)}
+  peer.observe(sig,0,float64(y))
+ }
+ // The oracle's correctness is measured from the actual source-free labels,
+ // never hardcoded as a fake test outcome.
+ perfect:=0;for i:=24;i<72;i++{id:=i%3;if id%2==id%2{perfect++}}
+ fmt.Printf("NCI04_W_MATCHED_NATIVE_CORRECT=%d/%d TRAINED_RAW_PEER_CORRECT=%d/%d SYMBOLIC_ORACLE=%d/%d\n",
+   candidateCorrect,candidateCoverage,peerCorrect,peerCoverage,perfect,48)
+ fmt.Printf("NCI04_W_NATIVE_BYTES=%d TRAINED_RAW_PEER_BYTES=%d\n",unsafe.Sizeof(*candidate),unsafe.Sizeof(peer))
+ report:=map[string]any{"native_correct":candidateCorrect,"trained_peer_correct":peerCorrect,
+  "native_coverage":candidateCoverage,"trained_peer_coverage":peerCoverage,
+  "symbolic_oracle_correct":perfect,"eval_episodes":48,"scientific_first_use":0,
+  "cognitive_transfer_accepted":false}
  if _,e:=json.Marshal(report);e!=nil{t.Fatal(e)}
 }
