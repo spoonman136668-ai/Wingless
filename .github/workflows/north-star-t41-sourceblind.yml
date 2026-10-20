@@ -1,0 +1,81 @@
+name: T41 Wingless source-blind causal law selection frozen internal qualification
+on:
+  push:
+    branches: [research/t41-sourceblind-causal-prior-selector-20261020]
+    paths: ['.github/workflows/north-star-t41-sourceblind.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t41-internal-first-eval
+  cancel-in-progress: false
+jobs:
+  exact-first-use-sourcefree:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin exact chronology and source-free identities before any evaluation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if ((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA) { throw 'T41_HEAD_DRIFT' }
+          $expected=@{
+            'research/north-star-transfer/20261020-wingless-t41-sourceblind-prereg.json'='eaac4d96f96dca8457c0147b1a3314a3f303edc8'
+            'research/north-star-transfer/20261020-wingless-t41-fresh-sourcefree.py'='455418b88337fcaf2ead373053af9f88bc3ea0b1'
+            'research/north-star-transfer/20261020-wingless-t41-sourceblind-selector.py'='c59c06a7b65e9229a667b75723532c903f7ea193'
+            'research/north-star-transfer/20261020-wingless-t40-exact-learnability-audit.py'='e12f77ec624b64bfdd0b5d4a6a09ae723fed4a60'
+            'research/north-star-transfer/originals/20261020-wingless-t40-exact-causal-learnability-information-headroom.json'='d0e2ef8859a7c829094c5278a10239870483c5f0'
+          }
+          foreach ($path in $expected.Keys) {
+            $actual=(git hash-object -- $path).Trim()
+            if ($actual -cne $expected[$path]) { throw "T41_SOURCE_DRIFT:$path" }
+          }
+          git merge-base --is-ancestor 8d3c12c4b136e09bcfe978b42f4f8ede499e4848 ed496b4c52a2e1e7398b29d1aa5f6577b1662991
+          if ($LASTEXITCODE -ne 0) { throw 'T41_T40_ORIGINAL_MISSING' }
+          git merge-base --is-ancestor ed496b4c52a2e1e7398b29d1aa5f6577b1662991 ae4fe86b4ddc44eb79b3e29e610d5085a0af7fb2
+          if ($LASTEXITCODE -ne 0) { throw 'T41_SOURCE_BEFORE_PREREG' }
+          git merge-base --is-ancestor ae4fe86b4ddc44eb79b3e29e610d5085a0af7fb2 d8248d4bf33c5e9b15ad5fe736f9ce87909ef7e1
+          if ($LASTEXITCODE -ne 0) { throw 'T41_MECHANISM_BEFORE_SOURCE' }
+          git merge-base --is-ancestor d8248d4bf33c5e9b15ad5fe736f9ce87909ef7e1 HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'T41_EXPECTED_IMPLEMENTATION_MISSING' }
+          python -m py_compile research/north-star-transfer/20261020-wingless-t40-exact-learnability-audit.py research/north-star-transfer/20261020-wingless-t41-fresh-sourcefree.py research/north-star-transfer/20261020-wingless-t41-sourceblind-selector.py
+          if ($LASTEXITCODE -ne 0) { throw 'T41_SOURCE_SYNTAX_FAILURE' }
+          Write-Output 'T41_CHRONOLOGY_PREREG_BEFORE_NEW_SOURCE_BEFORE_CODE=PASS'
+      - name: Exact 256-law public-only hard-certification properties, before evaluation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t41-sourceblind-selector.py --property
+          if ($LASTEXITCODE -ne 0) { throw 'T41_PREEVAL_EXACT_PROPERTY_FAILED' }
+      - name: Assert only NEW public TRAIN source shape and atom custody
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python -c "import importlib.util,pathlib; b=pathlib.Path('research/north-star-transfer'); s=importlib.util.spec_from_file_location('t40',b/'20261020-wingless-t40-exact-learnability-audit.py'); core=importlib.util.module_from_spec(s);s.loader.exec_module(core);s=importlib.util.spec_from_file_location('t41src',b/'20261020-wingless-t41-fresh-sourcefree.py');src=importlib.util.module_from_spec(s);s.loader.exec_module(src);[(__import__('builtins').exec('')) for _ in ()]; audits=[src.cases(reg,'train',core)[1] for reg in src.REGIMES];assert all(a['sourcefree_cases']==64 and a['no_T40_case_replay'] for a in audits);assert all(a['coverage_G']==16 and a['coverage_H']==16 for a in audits[1:]);print('T41_FRESH_TRAIN_ONLY_ATOM_CUSTODY=PASS')"
+          if ($LASTEXITCODE -ne 0) { throw 'T41_TRAIN_ONLY_CUSTODY_FAILED' }
+      - name: Original one-time source-free evaluation, seven arms five full processes each
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t41-sourceblind-selector.py > t41-original-sourcefree-results.json
+          if ($LASTEXITCODE -ne 0) { throw 'T41_FIRST_EVAL_EXECUTION_FAILED' }
+          python -c "import json;d=json.load(open('t41-original-sourcefree-results.json',encoding='utf-8-sig')); a=d['arms'];assert len(a)==7 and all(len(v['five_cpu_ns'])==5 and len(v['five_peak_rss_bytes'])==5 and v['scored_targets']==3456 and v['hard_false_certifications']==0 for v in a.values());assert d['no_hard_false_certification'] and d['scientific_DEV_opened']==0 and not d['T40_previous_cases_replayed'] and not d['scientific_acceptance'] and not d['optimizer_admission'];print('T41_ORIGINAL_INTERNAL_EVIDENCE=PASS');print('T41_BRIER='+json.dumps(d['comparisons'],sort_keys=True));print('T41_SELECTOR_WEIGHTS='+json.dumps(a['sourceblind-mixture']['selector_weights'],sort_keys=True));print('T41_NATIVE='+str(d['two_OS_full_native_required_native_regression_pass_this_OS']));print('T41_UNRESTRICTED_NONCOLLAPSE='+str(d['unrestricted_Brier_noncollapse']));print('T41_STRUCTURED='+str(d['structured_all_strong_controls_beaten']))"
+          if ($LASTEXITCODE -ne 0) { throw 'T41_RESULT_INVARIANT_FAILURE' }
+          Write-Output 'T41_SOURCEFREE_ONLY_NOT_SCIENCE=PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t41-original-sourceblind-${{ matrix.os }}
+          path: t41-original-sourcefree-results.json
+          if-no-files-found: ignore
+          retention-days: 90
