@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.T44.two-step-adaptive-causal-planning-sourcefree-prereg.v1",
+  "date_EDT": "2026-10-20",
+  "parent_T43_negative": "43baf300594aaef5b456184e08009f65bb337ddf",
+  "question": "Does genuinely contingent two-step intervention choice supply information or computational headroom absent from T43's cheap one-step exact solver? Can a TRAIN-distilled policy preserve exact planning utility and reduce complete native costs compared with equally informed optimized exact Bellman dynamic programming?",
+  "model_and_science": {
+    "sourcefree_only": true,
+    "rule_space": "Three-input Boolean rule, 8 truth-table bits; known prior 50/50 mixture of uniform full-256 Boolean rules and all 768 syntactic two-atom gates G(a,b) XOR/AND/OR H(b,c), retaining multiplicity.",
+    "TRAIN_source_cases": 64,
+    "TRAIN_seed": 44002026,
+    "TRAIN_split": "source-free public law observations; source-generation hidden regime never used by candidate or exact planner",
+    "VALIDATION_cases": 32,
+    "VALIDATION_seed": 44012026,
+    "case_stride": 17011,
+    "fixture": "Each case has 2 distinct public observed rule bits, 2 disjoint future counterfactual target bits and 4 remaining allowable actions. Exactly 2 actions are requested adaptively, the second depending on the first observed action output.",
+    "target_utility": "Minimize the exact expected final mean Brier risk over only TWO disjoint target bits. Revealing an action response gives no direct score; final forecast probabilities must be exact posterior marginals. Both intervention budgets identical for all policies.",
+    "version_space": "Each exact Bayesian posterior includes all 256 rule tables; logical certification requires unanimity of all public-consistent rules. No confidence threshold may certify a probability.",
+    "controls": [
+      "optimized-exact-2step-Bellman-DP",
+      "memoized-exact-2step-Bellman-DP",
+      "exact-myopic-first-then-optimal-second",
+      "fixed-first-then-fixed-second",
+      "TRAIN-distilled-contingent-value-policy"
+    ],
+    "precode_math_gate": "Determine on 32 source-free validation cases whether exact adaptive 2-step DP improves expected information-gain utility by >=2.0% relative to exact myopic first choice plus the best exact second-stage choice. Count full posterior node expansion and memo cache hits. If no consequential planning headroom, stop before admitting any new unfamiliar scientific source.",
+    "learner": "If mathematical headroom exists, fit a small source-blind linear contextual value model (public TRAIN states and exact DP value targets; no private rule or source-regime labels), selecting both first and branch-contingent second actions with its learned parameters. Ablate learned parameters to fixed action ranking, require different decisions.",
+    "exactness_proof": "Independently verify two-stage expected final Brier risk by enumerating every first response branch and every second response branch under the exact public posterior; confirm Bellman optimizer cannot be beaten and all disclosed source truths survive; zero false hard certifications.",
+    "native_gate": "Five distinct complete whole-process CPU and peak RSS trials per policy on Github-hosted Windows+Ubuntu, including source-free public TRAIN, teacher labels and candidate parameter fit for learned arm, source-free validation generation, planning, all branch scoring and final certification verification. Learned policy must attain >=99.0% of exact optimal gain, and strictly lower complete process CPU with no peak RSS regression against the strongest exact DP on BOTH OS. Report inference-only timings separately but they cannot substitute for full-process acceptance.",
+    "firstuse": "Never generate genuine novel causal scientific DEV or open T38-T43 consumed sources in this gate; any prospective birth needs separate prereg and independent source-custody acceptance."
+  },
+  "safeguards": {
+    "no_workstation": true,
+    "github_hosted_only": true,
+    "no_paid_API": true,
+    "no_extra_controller": true,
+    "no_FORGE_or_CKB_plane_changes": true,
+    "no_merge_or_optimizer_promotion": true,
+    "draft_only": true,
+    "no_post_result_retuning_or_threshold_change": true
+  }
+}
