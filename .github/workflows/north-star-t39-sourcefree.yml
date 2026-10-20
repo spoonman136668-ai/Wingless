@@ -1,0 +1,68 @@
+name: T39 source-free amortized learned causal program native gate
+on:
+  push:
+    branches: [research/t39-amortized-causal-program-20261020]
+    paths: ['.github/workflows/north-star-t39-sourcefree.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T39-sourcefree-frozen
+  cancel-in-progress: false
+jobs:
+  exact-math-and-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 30
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate frozen T39 source-free chronology and executable
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T39_EXECUTION_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261020-wingless-t39-sourcefree-composition-prereg.json'='68da565c7e637fa864906b823731a2a8736de70c'
+            'research/north-star-transfer/20261020-wingless-t39-sourcefree-compiled-causal-state.py'='9b7bc1dd47ad5923749fe2f6b52cc0b03700fcea'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T39_FROZEN_SOURCE_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 9ea39e911e0b4857e6b2ce08d6b86a8db58e4f04 069808f917343839f47e0fddfa32110a419089ae
+          if($LASTEXITCODE -ne 0){throw 'T39_CODE_PRECEDED_HYPOTHESIS'}
+          python -m py_compile research/north-star-transfer/20261020-wingless-t39-sourcefree-compiled-causal-state.py
+          if($LASTEXITCODE -ne 0){throw 'T39_SYNTAX_FAILED'}
+          Write-Output 'T39_FROZEN_SOURCEFREE_CODE_AND_PRECODE=PASS'
+      - name: Prove full atomic-role exposure, exact posterior, and causal learned-weight ablation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t39-sourcefree-compiled-causal-state.py --ablation > t39-sourcefree-ablation.json
+          if($LASTEXITCODE -ne 0){throw 'T39_INDEPENDENT_PRELIMINARY_MATH_FAIL'}
+          python -c "import json;x=json.load(open('t39-sourcefree-ablation.json',encoding='utf-8-sig'));assert x['G_role_atom_coverage']==8 and x['H_role_atom_coverage']==8 and x['TRAIN_public_meta_cases']==40 and x['validation_cases']==24 and x['independently_verified_queries']==4608 and x['worlds_where_learned_prior_changed_predictions']>=1 and x['individual_forecasts_changed']>0 and x['complete_exact_256_certification'] and x['scientific_DEV_generated']==0;print('T39_GENUINE_AMORTIZED_BELIEF_ABLATION=PASS');print('T39_MATH_AND_GUARANTEED_ATOM_COVERAGE='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T39_LEARNED_OPERATOR_ABLATION_OR_ATOM_ROLE_GAP_NO_GO'}
+      - name: Five entire native process CPU RSS trials versus every equally cached trained control
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t39-sourcefree-compiled-causal-state.py > t39-native-sourcefree.json
+          if($LASTEXITCODE -ne 0){throw 'T39_ORIGINAL_NATIVE_INFERENCE_OR_PROOF_FAILED'}
+          python -c "import json;x=json.load(open('t39-native-sourcefree.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==6 and x['TRAIN_meta_cases']==40 and x['sourcefree_validation_streams']==24 and x['sourcefree_validation_queries']==4608 and x['scientific_DEV_created']==0 and not x['real_unknown_structure_source_created'] and x['all_sourcefree_exact'] and x['full_meta_G_and_H_role_exposure'] and all(v['correct_certified']+v['safe_abstentions']==4608 and v['hard_false_certifications']==0 and len(v['five_complete_CPU_ns'])==5 and len(v['five_peak_RSS_bytes'])==5 for v in a.values());print('T39_SOURCEFREE_TECHNICAL_EXACT=PASS');print('T39_NATIVE_MEASUREMENTS='+json.dumps({k:{n:v[n] for n in ('correct_certified','safe_abstentions','posterior_rebuild_events','weighted_rule_checks','median_complete_CPU_ns','max_peak_RSS_bytes')} for k,v in a.items()},sort_keys=True));print('T39_FROZEN_CPU_ADVANTAGE='+str(x['strict_cpu_gate']));print('T39_FROZEN_RSS_NONREGRESSION='+str(x['strict_RSS_gate']));assert x['scientific_source_admission'],'T39_FROZEN_NATIVE_NO_GO_NO_SCIENTIFIC_C2_D2_SOURCE';print('T39_QUALIFIED_ORIGINATE_NEW_SCIENCE=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T39_NATIVE_GATE_FAILED_COHORT_STILL_UNBORN'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t39-original-sourcefree-${{ matrix.os }}
+          path: |
+            t39-sourcefree-ablation.json
+            t39-native-sourcefree.json
+          if-no-files-found: ignore
+          retention-days: 90
