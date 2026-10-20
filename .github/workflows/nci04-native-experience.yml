@@ -1,0 +1,54 @@
+name: NCI04 native experience observation qualification
+on:
+  push:
+    branches: [development/nci04-native-experience-seam-20261020]
+    paths: ['.github/workflows/nci04-native-experience.yml']
+permissions:
+  contents: read
+jobs:
+  native-experience:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify preregistration and exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 789d5c4137c6c5e7f578440f6f458165f7d102fc "$GITHUB_SHA"
+          test "$(git hash-object cognition/experience.go)" = ffab814422f804f2e366ce2c399d0ccffda6d86d
+          test "$(git hash-object cognition/experience_test.go)" = 00df834ffe4a2a3d97d3ceee5c97f10f64564062
+          test "$(git hash-object cmd/wingless/cognition.go)" = eceddf76fbb82ba8f6440b39748a30ab7e8d0836
+          test "$(git hash-object cmd/wingless/experience_test.go)" = a8a5066f692b83fa617aaf526305218b95b42393
+          python - <<'PY'
+          import json
+          p=json.load(open("research/contrib/openai/nci04/native-experience-prereg.json"))
+          assert p["schema"]=="nci04.native-experience-mechanism.qualification.v1"
+          assert p["project"]=="Wingless"
+          assert p["permissions"]["development_only"] and not p["permissions"]["scientific_first_use"]
+          print("NCI04_W_NATIVE_SOURCE_FROZEN=PASS")
+          PY
+      - name: Run native observation, retention and CLI regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./cognition ./cmd/wingless -count=1 -v
+          go vet ./cognition ./cmd/wingless
+          echo "NCI04_W_NATIVE_FOCUSED=PASS"
+      - name: Full source Go regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./... -count=1
+          echo "NCI04_W_FULL_GO_REGRESSION=PASS"
