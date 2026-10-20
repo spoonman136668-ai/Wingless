@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.t36.sourcefree-learned-predictive-BDD.prereg.v1",
+  "date_EDT": "2026-10-19",
+  "parent_T35_negative": "b0a43e3d64cde9e9118a7789e39b5bd1e6b4ac7b",
+  "hypothesis": "A TRAIN-learned variable order for a canonical reduced ordered binary decision diagram (ROBDD) can maintain the complete exact hidden causal-law belief set under online parity constraints, answer predictive queries using the decision graph without ever constructing or maintaining a Gaussian elimination basis, and lower both total native CPU and peak RSS relative to equally informed optimized exact incremental GF2 controls.",
+  "scientific_interpretation": "ROBDD is a known exact representation; learning a variable ordering is not discovering new causal physics. This is a source-free test of whether learned predictive-state representation is computationally viable, not a positive unfamiliar-causal-world experiment.",
+  "representation": "Each observed parity row becomes an exact XOR Boolean constraint BDD. Posterior BDD is incrementally updated by conjunction using reduction, hash-consing and exact memoized apply. Query parity entailment is computed by recursively visiting accepting BDD paths with explicit skipped-variable handling; no Gaussian basis appears in the candidate code path.",
+  "learning": "Fit the ROBDD variable ordering from co-occurrence adjacency of PUBLIC TRAIN observation masks only. The exact causal-bit truth and all query outcomes are hidden from the learner. Ablation uses identity-order ROBDD on identical public TRAIN and source-free feasibility streams. Both strategies must produce identical exact certificates, and learned ordering must change actual BDD allocations/operations, not merely labels.",
+  "source_free_experiment": {
+    "dimensions": [
+      16,
+      24
+    ],
+    "public_TRAIN_streams_per_dimension": 20,
+    "source_free_validation_streams_per_dimension": 12,
+    "observations_per_stream": 40,
+    "queries_per_checkpoint": 8,
+    "checkpoints_at_observations": [
+      8,
+      16,
+      24,
+      32,
+      40
+    ],
+    "TRAIN_seed": 360119019,
+    "validation_seed": 360119813,
+    "public_rows": "mostly sparse local 2-4-input constraints from a dimension-specific randomly permuted correlation grammar, occasional cross-cluster rows, truth-consistent equation RHS",
+    "public_queries": "new parity mask over local and cross-cluster causal variables; exact entailment or safe abstention",
+    "new_real_scientific_source_cohort": false,
+    "consumed_prior_Wingless_DEV_reused": false
+  },
+  "controls": [
+    "TRAIN-learned-exact-predictive-ROBDD",
+    "deterministic-identity-exact-ROBDD",
+    "TRAIN-informed-pivot-exact-incremental-GF2",
+    "optimized-incremental-exact-GF2",
+    "independent-lower-pivot-batch-GF2"
+  ],
+  "independent_soundness": "Recompute exact GF2 entailment from all public rows after each checkpoint for every query, and compare with all five algorithm outputs. Check correct state truth for certified results, zero false positives and identical abstentions; budgeted BDD node cap fail-closed.",
+  "gates": {
+    "source_free_correctness_first": true,
+    "ablation_learned_parameters_change_BDD_allocations_or_apply_calls": true,
+    "five_whole_process_trials_per_arm_per_OS": true,
+    "strict_native_CPU_less_than_every_comparator_BOTH_OS": true,
+    "peak_RSS_no_more_than_lowest_strong_exact_comparator_BOTH_OS": true,
+    "no_scientific_DEV_without_both_OS_native_acceptance": true,
+    "any_fail_preserve_negative_and_do_not_tune_frozen_validation": true
+  },
+  "safeguards": {
+    "no_scientific_first_use_yet": true,
+    "no_paid_API": true,
+    "no_workstation": true,
+    "no_selfhosted_research_runner": true,
+    "no_new_controller": true,
+    "no_FORGE_CKB_plane_changes": true,
+    "no_merge_or_optimizer_admission": true
+  }
+}
