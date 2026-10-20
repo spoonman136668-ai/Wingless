@@ -1,0 +1,68 @@
+name: T35 source-free learned block GF2 exact XOR and native qualification
+on:
+  push:
+    branches: [research/t35-learned-block-elimination-20261019]
+    paths: ['.github/workflows/north-star-t35-sourcefree.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T35-sourcefree-once
+  cancel-in-progress: false
+jobs:
+  sourcefree-proof-and-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 45
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify exact T35 prereg then source-free implementation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T35_GITHUB_SOURCE_HEAD_DRIFT'}
+          $expect=@{
+            'research/north-star-transfer/20261019-wingless-t35-learned-block-precode.json'='b87f45864ffaaf6e2b9e85d62b922f1a50006a4d'
+            'research/north-star-transfer/20261019-wingless-t35-sourcefree-block-gf2.py'='26658f0fd5d82b92f02ed6a0428efe42524095e8'
+          }
+          foreach($path in $expect.Keys){
+            if((git hash-object -- $path).Trim() -cne $expect[$path]){throw "T35_FROZEN_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 43f62a000590a04fe3cf56ebff84227a7b3b9167 aea9a16099cbbbebe0cf6952fd373e6241f7450e
+          if($LASTEXITCODE -ne 0){throw 'T35_ALGORITHM_BEFORE_PREREG'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t35-sourcefree-block-gf2.py
+          if($LASTEXITCODE -ne 0){throw 'T35_SYNTAX_INVALID'}
+          Write-Output 'T35_EXACT_SOURCEFREE_CHRONOLOGY=PASS'
+      - name: Prove learned parameters change actual XOR work, with full cache costs
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t35-sourcefree-block-gf2.py --ablation > t35-XOR-ablation.json
+          if($LASTEXITCODE -ne 0){throw 'T35_SOURCEFREE_MATH_ABLATION_ERROR'}
+          python -c "import json;x=json.load(open('t35-XOR-ablation.json',encoding='utf-8-sig'));assert x['TRAIN_public_streams']==48 and x['sourcefree_validation_streams']==40 and x['checked_exact_queries']==3840 and x['scientific_DEV_generated']==0 and x['certified_answers_exact'] if 'certified_answers_exact' in x else x['answers_identical'];assert x['streams_learned_parameters_change_real_XOR_work']>0;print('T35_EXACT_LEARNED_XOR_ABLATION=PASS');print('T35_ABLATION='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T35_SOURCEFREE_PARAMETERS_NO_GENUINE_EFFECT'}
+      - name: Complete five native whole-process comparisons and fail closed unless true improvement
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t35-sourcefree-block-gf2.py > t35-native-sourcefree.json
+          if($LASTEXITCODE -ne 0){throw 'T35_EXACT_GF2_ORIGINAL_SOURCEFREE_FAILED'}
+          python -c "import json;x=json.load(open('t35-native-sourcefree.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==5 and x['source_free_proof_all_queries'] and x['scientific_DEV_generated']==0 and x['TRAIN_only_public_streams']==48 and x['source_free_validation_streams']==40 and all(v['query_results']==3840 and v['streams']==40 and len(v['five_complete_CPU_ns'])==5 and len(v['five_peak_RSS_bytes'])==5 for v in a.values());print('T35_ALL_SOURCEFREE_TECHNICAL_EXACT=PASS');print('T35_SOURCEFREE_NATIVE='+json.dumps({k:{name:v[name] for name in ('correct_certified','sound_abstentions','all_total_GF2_XORs','row_reduction_XORs','cache_materialization_XORs','median_complete_CPU_ns','max_peak_RSS_bytes')} for k,v in a.items()},sort_keys=True));print('T35_XOR_GATE='+str(x['XOR_gate']));print('T35_CPU_GATE='+str(x['native_CPU_gate']));print('T35_RSS_GATE='+str(x['native_RSS_gate']));assert x['strict_scientific_source_admission'],'T35_FROZEN_NATIVE_OR_XOR_NO_GO_DO_NOT_CREATE_NEW_SCIENCE_SOURCES';print('T35_SOURCE_FREE_FEASIBILITY_ADMITTED=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T35_FROZEN_NATIVE_NO_GO_NO_NEW_CAUSAL_COHORT'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t35-original-sourcefree-${{ matrix.os }}
+          path: |
+            t35-XOR-ablation.json
+            t35-native-sourcefree.json
+          if-no-files-found: ignore
+          retention-days: 90
