@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.t38.compositional-causal-operator.prereg.v1",
+  "date_EDT": "2026-10-20",
+  "parent_T37_sealed_negative": "ef9bab3d099b2731d7f6066c9adab316a1f8cecb",
+  "hypothesis": "Public-observation TRAIN learns a modular probability distribution over reusable two-input Boolean causal gates and their composition operator. Factorized learned gate priors improve calibrated counterfactual forecasts on source-born unfamiliar combinations and causal relationships at complete native cost no greater than the strongest equally trained independent, full-rule and fully trained joint-composition controls.",
+  "mechanism": {
+    "known_hypothesis_grammar": "Eight distinct two-input Boolean gate atoms; two shared gates compose as XOR or AND on three delayed entity inputs: F(a,b,c)=G(a,b) OP H(b,c). Hidden gate identities, OP and causal rule unknown for each case.",
+    "train": "Fit probabilities P(G),P(H),P(OP) by exact public-likelihood EM over every possible 8x8x2 latent composition; no hidden pair labels or query truth in fitting.",
+    "prediction": "Bayesian model averaging across public-consistent gate compositions using TRAIN factors; exact hard certifications separately from all 256 Boolean truth tables matching public evidence. Unknown future outcomes must be forecast probabilistically, never certified by threshold.",
+    "ablation": "Remove fitted factor distributions, replace with uniform gate/operator weights on identical source evidence, show numerical change in TRAIN-validation probabilities and identical hard certifications.",
+    "fairness": "Competitor trains complete categorical P(G,H,OP) with identical EM iterations, public cases, support and smoothing. Also train complete P(256 truth tables), and independent Beta-per-input patterns; verify strongest."
+  },
+  "source": {
+    "genuinely_new_internal_source_birth_after_prereg": true,
+    "families": {
+      "C": "8 entities, delayed three-input Boolean causal updates, TRAIN chain histories, prospective new rewired feedback graphs",
+      "D": "10 entities, cross-time lagged causal updates, TRAIN local ring relationships, prospective hub/feedback graphs"
+    },
+    "meta_TRAIN_cases": 40,
+    "separate_TRAIN_validation_cases": 16,
+    "prospective_DEV_cases": 64,
+    "public_history_trials_per_case": 5,
+    "public_outputs_per_history": 2,
+    "future_counterfactual_queries_per_case": 4,
+    "new_pair_holdout": "Prospective component pairs never used in TRAIN-meta or TRAIN-validation but individual atom gate identities are observed across public TRAIN; holdout criteria fixed before source birth.",
+    "source_no_private_labels_in_fit": true,
+    "source_new_seeds_not_T16_T37": true,
+    "internally_originated_not_independent_external": true
+  },
+  "scoring": {
+    "certification": "zero wrong hard certifications verified against independently reconstructed all-256-function exact posterior",
+    "uncertainty": "at least 20% and no more than 90% of TRAIN-validation 64 questions unresolved",
+    "proper_forecasting": "Brier loss over unresolved answers, at least 5% lower versus BEST equally informed fully trained comparator on separate TRAIN-validation",
+    "ablation": "fitted parameters change numerical forecasts for at least one TRAIN-validation world",
+    "native": "five whole-process trials per arm on GitHub-hosted Windows and Linux including training, generation, scoring; strict median CPU below every strongest fully trained exact control and maximum peak RSS no greater than best comparator BOTH OS",
+    "admit_DEV_only_if_all_pass": true
+  },
+  "identity": "Preregister exact case counts, seeds, new pair partition, hypotheses and native thresholds before source code. Original prospective DEV never generated/opened prior to successful TRAIN admission. No post-hoc retuning/selection.",
+  "boundaries": {
+    "draft_only": true,
+    "no_merge_or_optimizer_promotion": true,
+    "no_extra_controllers": true,
+    "no_paid_API": true,
+    "no_workstation": true,
+    "no_selfhosted_research_runners": true,
+    "no_FORGE_or_CKB_plane_changes": true,
+    "no_external_recruitment_gate": true
+  }
+}
