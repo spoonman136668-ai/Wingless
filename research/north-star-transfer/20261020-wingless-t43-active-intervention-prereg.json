@@ -1,0 +1,49 @@
+{
+  "schema": "wingless.T43.sourcefree-active-causal-intervention-prereg.v1",
+  "date_EDT": "2026-10-20",
+  "parent_T42_sealed": "32dab6ee0ffc18a8dfd67d6317579d5ff77ac934",
+  "hypothesis": "A source-blind TRAIN-fitted covariance policy chooses causal input-pattern observations reducing exact counterfactual forecast Brier loss almost as much as the optimized one-step exact Bayes chooser, with lower whole-process CPU and no peak memory regression.",
+  "source_free_only": {
+    "world": "Unknown three-input 8-bit Boolean transition rule; true prior is equal mixture of U uniform 256 rules and C uniform over 16x16x3 latent two-input gate compositions joined XOR/AND/OR, with syntactic multiplicity.",
+    "TRAIN_public_meta_complete_rule_streams": 96,
+    "TRAIN_seed": 43002026,
+    "VALIDATION_sourcefree_worlds": 48,
+    "VALIDATION_seed": 43012026,
+    "case_stride": 17011,
+    "separate_META_VALIDATION": true,
+    "private_composition_unrestricted_regime_hidden_from_all_policies": true,
+    "fixture_per_case": "2 previously observed public causal input patterns with truth; 2 disjoint target patterns with hidden counterfactual truth; remaining 4 available intervention patterns; choose exactly 1 intervention, then forecast both targets under same exact posterior.",
+    "validation_distribution": "Fresh source-free seeds under frozen 50/50 mixture; no prior T16-T42 consumed source identity or case replay.",
+    "new_scientific_graph_families_or_original_DEV_created": 0
+  },
+  "exact_scientific_objective": {
+    "utility": "Expected conditional reduction in mean Brier loss on TWO disjoint target bits AFTER observing selected intervention pattern, unknown rule from exact 50/50 class mixture. Do not reward revealing the intervention bit; targets are disjoint from selectable interventions.",
+    "exact_formula": "sum over both target bits of Cov(rule_bit_action, rule_bit_target given public history)^2 /(2 Var(rule_bit_action given public history)); gain 0 at Var=0. Compute from posterior over all 256 rules, and independently compare with exhaustive two-outcome Bayes risk difference.",
+    "proof": "For every validation case compute exact utility of all four actions from same public posterior, prove chosen gain <= optimized exact maximal gain, independently verify covariance identity to tolerance 1e-11, zero hard false certifications."
+  },
+  "native_and_loss": {
+    "primary_learning_condition": "Learned policy captures >=99% of aggregate exact optimal expected utility on frozen source-free validation worlds, with zero incorrect certified target answers.",
+    "secondary_genuine_parameter_ablation": "Disable TRAIN-fitted cross-pattern covariance and use tie-first intervention on same source-free worlds; selected action or expected utility must differ in at least one validation case.",
+    "controls": [
+      "TRAIN-covariance-approximate-one-step-policy",
+      "optimized-exact-covariance-one-step-optimal",
+      "cached-exact-one-step-optimal",
+      "TRAIN-mutual-information-pairwise-control",
+      "fixed-first-action-control"
+    ],
+    "fairness": "All arms see same public 96 TRAIN rules and 48 validation worlds. Native whole-process includes meta-source generation, training for learned arms, validation source generation, selecting an intervention, exact proof/scoring, intervention observation and exact target forecast. Five separate native process CPU and RSS trials per arm and OS.",
+    "CPU_acceptance": "Learned median complete CPU strictly below BOTH optimized exact and cached exact controls on BOTH GitHub-hosted Windows and Ubuntu; peak RSS at or below best comparator per OS. Cache construction and training included.",
+    "stop_rule": "Any utility/ablation/certification/native regression fails closed; no new scientific DEV, threshold relaxations, or consumed validation retuning."
+  },
+  "scientific_boundaries": {
+    "no_new_unfamiliar_scientific_source_claim": true,
+    "sourcefree_learned_policy_not_cognition_proof": true,
+    "firstuse_custody_separately_required_later": true,
+    "no_paid_API": true,
+    "no_user_workstation": true,
+    "no_selfhosted_research_runner": true,
+    "no_added_controller": true,
+    "no_FORGE_CKB_plane_changes": true,
+    "no_merge_or_optimizer_promotion": true
+  }
+}

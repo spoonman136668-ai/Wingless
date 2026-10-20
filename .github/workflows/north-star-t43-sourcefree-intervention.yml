@@ -1,0 +1,68 @@
+name: T43 source-free exact optimal causal intervention admission
+on:
+  push:
+    branches: [research/t43-causal-intervention-information-20261020]
+    paths: ['.github/workflows/north-star-t43-sourcefree-intervention.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T43-original-sourcefree-intervention
+  cancel-in-progress: false
+jobs:
+  optimal-exact-policy-and-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 40
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove prereg and executable source identity and chronology
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T43_SOURCE_IDENTITY_DRIFT'}
+          $blobs=@{
+            'research/north-star-transfer/20261020-wingless-t43-active-intervention-prereg.json'='8451d29d497e6e6665fad18530a78313a1d6194d'
+            'research/north-star-transfer/20261020-wingless-t43-active-intervention.py'='09cbe9de4da0964b35bcee32551369ed40274d80'
+          }
+          foreach($path in $blobs.Keys){
+            if((git hash-object -- $path).Trim() -cne $blobs[$path]){throw "T43_FROZEN_PREREG_OR_CANDIDATE_CHANGED:$path"}
+          }
+          git merge-base --is-ancestor f18af4b7d5ab5ff626f8463b7f4b2fbc57d94e8a 8cc39fbd2762cec572206ad310fbcc3d1f2a1cd6
+          if($LASTEXITCODE -ne 0){throw 'T43_LEARNED_CANDIDATE_PRECEDED_PREREG'}
+          python -m py_compile research/north-star-transfer/20261020-wingless-t43-active-intervention.py
+          if($LASTEXITCODE -ne 0){throw 'T43_PYTHON_ORIGINAL_SOURCE_SYNTAX_ERROR'}
+          Write-Output 'T43_EXACT_SOURCEFREE_IDENTITY_BEFORE_ORIGINAL_VALIDATION=PASS'
+      - name: Prove exact utility, independent outcome enumeration and genuine learned policy ablation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t43-active-intervention.py --ablation > t43-original-sourcefree-ablation.json
+          if($LASTEXITCODE -ne 0){throw 'T43_SOURCEFREE_EXACT_UTILITY_OR_ABLATION_INVALID'}
+          python -c "import json;x=json.load(open('t43-original-sourcefree-ablation.json',encoding='utf-8-sig'));assert x['TRAIN_public_cases']==96 and x['sourcefree_validation_cases']==48 and x['scientific_DEV_generated']==0 and x['no_previous_scientific_cases_replayed'] and x['exact_covariance_equal_exhaustive_outcome_risk'] and x['learned_vs_disabled_first_action_changed_cases']>0 and len(x['original_learned_case_trace'])==48;v=x['policy'];assert len(v)==4 and all(z['hard_false_certifications']==0 and z['correct_certified']+z['sound_abstentions']==96 for z in v.values());assert abs(v['optimized-exact-covariance-one-step-optimal']['fraction_exact_optimal_utility']-1)<1e-10;print('T43_SOURCEFREE_EXACT_AND_GENUINE_LEARNED_ABLATION=PASS');print('T43_ORIGINAL_EXPECTED_UTILITY='+json.dumps({k:{'fraction_exact_optimal':round(z['fraction_exact_optimal_utility'],9),'gain':round(z['total_selected_expected_gain'],9),'Brier':round(z['realized_disjoint_target_Brier'],9)} for k,z in v.items()},sort_keys=True));print('T43_ORIGINAL_ABLATION_ACTIONS_CHANGED='+str(x['learned_vs_disabled_first_action_changed_cases']))"
+          if($LASTEXITCODE -ne 0){throw 'T43_ORIGINAL_ABLATION_PROOF_REJECTED'}
+      - name: Run complete native five-process CPU peak RSS comparisons, all 5 arms
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t43-active-intervention.py --native > t43-original-sourcefree-native.json
+          if($LASTEXITCODE -ne 0){throw 'T43_NATIVE_FULL_PROCESS_MEASUREMENTS_FAILED'}
+          python -c "import json;x=json.load(open('t43-original-sourcefree-native.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==5 and x['TRAIN_public_cases']==96 and x['sourcefree_validation_cases']==48 and x['scientific_DEV_generated']==0 and x['all_independent_exact_controls_truly_optimal'] and all(len(r['five_full_CPU_ns'])==5 and len(r['five_peak_RSS_bytes'])==5 and r['hard_false_certifications']==0 and r['correct_certified']+r['sound_abstentions']==96 for r in a.values());print('T43_ORIGINAL_FULL_NATIVE_EVIDENCE=PASS');print('T43_NATIVE_METRICS='+json.dumps({k:{p:r[p] for p in ('fraction_exact_optimal_utility','median_full_CPU_ns','max_peak_RSS_bytes')} for k,r in a.items()},sort_keys=True));print('T43_FROZEN_99_PERCENT_UTILITY='+str(x['learned_99pct_optimal_utility']));print('T43_FROZEN_NATIVE_CPU='+str(x['strict_CPU_below_both_exact_controls']));print('T43_FROZEN_NATIVE_MEMORY='+str(x['peak_RSS_no_more_than_best_control']));assert x['prospective_scientific_source_admitted'],'T43_VALID_SOURCEFREE_NO_GO_HOLD_ALL_NEW_SCIENTIFIC_DEV';print('T43_PROSPECTIVE_SOURCE_CREATION_ADMITTED=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T43_FROZEN_UTILITY_OR_NATIVE_NONREGRESSION_NOT_MET_NO_DEV'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t43-original-sourcefree-${{ matrix.os }}
+          path: |
+            t43-original-sourcefree-ablation.json
+            t43-original-sourcefree-native.json
+          if-no-files-found: ignore
+          retention-days: 90
