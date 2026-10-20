@@ -1,0 +1,59 @@
+name: NCI04 Wingless native predictive-state source-only
+on:
+  push:
+    branches: [research/nci04-predictive-state-20261020]
+    paths: ['.github/workflows/nci04-predictive-state.yml']
+permissions:
+  contents: read
+jobs:
+  nci04:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify precode freeze and exact source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 89af54108926d6221b75541e41352d163d822034 "$GITHUB_SHA"
+          test "$(git hash-object nativecognition/predictive.go)" = 694f14796ea35d95cbe6aac00b91e3d45dd240ca
+          test "$(git hash-object nativecognition/predictive_test.go)" = fdb18f668722b6b44cd4b096ddcca6296dfc6f0b
+          python - <<'PY'
+          import json
+          p=json.load(open('research/contrib/openai/nci04/prereg.json'))
+          assert p['schema']=='nci04.self_organizing_predictive_state.source_only.v1'
+          assert p['constraints']['first_use']==0 and not p['constraints']['production']
+          assert p['frozen_design']['training_seeds']==[41000,41031]
+          assert p['frozen_design']['stress_seeds']==[43000,43031]
+          print('NCI04_W_PRECODE_PROTOCOL=PASS')
+          PY
+      - name: Native self-supervised A-B-A and frozen control regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          NCI04_EVIDENCE="$RUNNER_TEMP/nci04-wingless.json" go test ./nativecognition -run 'TestNCI04' -count=1 -v
+          go vet ./nativecognition
+          go test ./... -count=1
+          python - <<'PY'
+          import json,os,pathlib
+          j=json.loads((pathlib.Path(os.environ['RUNNER_TEMP'])/'nci04-wingless.json').read_text())
+          assert j['result'] in ('NEGATIVE','PASS_DEVELOPMENT_SIGNAL_ONLY')
+          assert j['first_use']==0 and not j['entity_binding_proven']
+          assert not j['intermediate_causal_labels'] and not j['symbolic_traversal']
+          print('NCI04_W_ACTUAL_RESULT='+j['result'])
+          print('NCI04_W_FULL_GO_REGRESSION=PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nci04-wingless-native-predictive-state
+          path: ${{ runner.temp }}/nci04-wingless.json
+          if-no-files-found: warn
+          retention-days: 90
