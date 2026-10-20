@@ -1,0 +1,49 @@
+{
+  "schema": "native-cognition.nci02.post-run-negative-review.v1",
+  "program": "Wingless",
+  "source_pr_head": "8f4df8766e0dc730aad7b71e3116847edade456e",
+  "dev_procedure": "source-only with preregistration preceding implementation; no protected first-use",
+  "dev_two_link_correct": {
+    "native": 21,
+    "trained_ema": 30,
+    "total": 32
+  },
+  "stress_three_link_correct": {
+    "native": 19,
+    "trained_ema": 31,
+    "total": 32
+  },
+  "stress_after_memory_ablation": {
+    "correct": 0,
+    "total": 32
+  },
+  "stress_after_second_context": {
+    "correct": 19,
+    "total": 32
+  },
+  "exact_symbolic_upper_bound": {
+    "correct": 32,
+    "total": 32
+  },
+  "frozen_result": "NEGATIVE",
+  "native_causal_reasoning_claim": "DENIED",
+  "scientific_transfer_assessment": "INVALID_FOR_NATIVE_CAUSAL_TRANSFER",
+  "reason": [
+    "fixed relation slots supplied rather than learned",
+    "composition implemented by evaluator as sign product rather than learned",
+    "xorshift32 low-bit correlation makes all 32 training and all 32 development two-link targets negative",
+    "resource equivalence/compute nonregression not established; EMA is lighter and substantially stronger"
+  ],
+  "label_audit": {
+    "train_two_link_positive": 0,
+    "train_two_link_negative": 32,
+    "dev_two_link_positive": 0,
+    "dev_two_link_negative": 32,
+    "stress_three_link_positive": 16,
+    "stress_three_link_negative": 16
+  },
+  "resource_caveat": "4 state values + 4 readout values + 4 recurrent gate values vs 4-state lower-cost EMA",
+  "disposition": "Preserve original negative; do not retune thresholds, relabel it as an infrastructure failure, merge the negative mechanism, or claim new transfer",
+  "scientific_firstuse": 0,
+  "architecture_independence_preserved": true
+}
