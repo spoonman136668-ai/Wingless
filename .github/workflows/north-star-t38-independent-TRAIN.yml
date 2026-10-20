@@ -1,0 +1,49 @@
+name: T38 independent exact compositional TRAIN-only audit
+on:
+  push:
+    branches: [research/t38-compositional-causal-program-20261020]
+    paths: ['.github/workflows/north-star-t38-independent-TRAIN.yml']
+permissions:
+  contents: read
+jobs:
+  independent-TRAIN:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 35
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Confirm source and learner unchanged after first original TRAIN result
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git hash-object -- research/north-star-transfer/20261020-wingless-t38-compositional-prereg.json).Trim() -cne '9f5d95ddd5bdc2fa6f5d2178dec52e1505a9fcd9'){throw 'T38_PRECODE_CHANGED_AFTER_ORIGINAL'}
+          if((git hash-object -- research/north-star-transfer/20261020-wingless-t38-new-compositional-sources.py).Trim() -cne '4b49df78884254acc28527389d3b59e6df5906d4'){throw 'T38_SOURCE_CHANGED_AFTER_ORIGINAL'}
+          if((git hash-object -- research/north-star-transfer/20261020-wingless-t38-learned-composition.py).Trim() -cne '01642cce8cffd1f14463add2b27d72ee6e7f6dfd'){throw 'T38_LEARNER_CHANGED_AFTER_ORIGINAL'}
+          if((git hash-object -- research/north-star-transfer/20261020-wingless-t38-independent-TRAIN-audit.py).Trim() -cne 'f6a184d3a3702c6e040142ff64c93df6f28618f9'){throw 'T38_INDEPENDENT_AUDITOR_DRIFT'}
+          git merge-base --is-ancestor f2505e6d10e66381f3220001b24ccf829009c85a 6d28974424ef7c9c3f25ec2f17b1e9725f25aa8d
+          if($LASTEXITCODE -ne 0){throw 'T38_AUDITOR_BORN_BEFORE_ORIGINAL_TRAIN'}
+          Write-Output 'T38_FROZEN_MODEL_SOURCE_AND_AUDIT=PASS'
+      - name: Reconstruct independent causal posteriors, Brier and ablations without DEV
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t38-independent-TRAIN-audit.py > t38-independent-original-TRAIN.json
+          if($LASTEXITCODE -ne 0){throw 'T38_INDEPENDENT_READONLY_AUDIT_FAILED'}
+          python -c "import json;x=json.load(open('t38-independent-original-TRAIN.json',encoding='utf-8-sig'));assert x['result']=='PASS_READONLY_INDEPENDENT_EXACT_TRAIN_VALIDATION' and x['TRAIN_meta_public_cases']==40 and x['TRAIN_validation_independently_checked']==16 and x['counterfactuals_exactly_verified']==64 and x['full_composed_tables_verified']==128 and x['parameter_ablation_changed_validation_cases']==7 and x['heldout_DEV_pair_class_disjoint_and_not_generated'] and x['no_original_DEV_generation'] and x['no_old_DEV_replay'];assert all(a['correct_certified']==45 and a['unresolved']==19 for a in x['all_arms_recomputed_Brier'].values());print('T38_INDEPENDENT_EXACT_CAUSAL_PROOF=PASS');print('T38_INDEPENDENT_BRIER_AND_ATOM_COVERAGE='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T38_INDEPENDENT_EVIDENCE_REJECTED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t38-independent-TRAIN-${{ matrix.os }}
+          path: t38-independent-original-TRAIN.json
+          if-no-files-found: ignore
+          retention-days: 90
