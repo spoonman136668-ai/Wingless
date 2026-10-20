@@ -1,0 +1,72 @@
+{
+  "schema": "wingless.T40.sourcefree-compositional-causal-learnability-information-bound.prereg.v1",
+  "date_EDT": "2026-10-20",
+  "parent_T39_original_no_go": "4c404c711c71b2ef84f340ab24c04d7f99050a6d",
+  "scientific_question": "For genuinely unknown three-input nonlinear causal rules, how much exactly identifiable *forecast* information can 2,4,6 public Boolean transition observations provide, and what best-case Brier advantage remains over equally publicly TRAIN-fitted full-rule, independent-bit and compositional competitors? Determine if further prospective learned-cognition experiments have information-theoretic headroom before source birth.",
+  "hypothesis": "Under compositional priors with latent reusable two-input Boolean gates and an unknown XOR, AND or OR operator, public observations can reduce expected counterfactual Brier loss below the best equally trained full-256-rule posterior. Under a uniform unrestricted 256-rule prior, no predictions about truly unobserved pattern bits are possible; all methods have irreducible expected Brier 0.25.",
+  "geometry": {
+    "gate_atoms": "All 16 possible two-input Boolean functions, indexed by their four output bits; each of G(a,b) and H(b,c) has complete identity coverage",
+    "composition_operators": [
+      "XOR",
+      "AND",
+      "OR"
+    ],
+    "all_compositional_programs": 768,
+    "different_causal_rule_tables_upper_bound": 256,
+    "public_causal_input_patterns": 8,
+    "observation_masks_all_combinations_k": [
+      2,
+      4,
+      6
+    ],
+    "every_unobserved_pattern_target": "All 8-k patterns, equally weighted within mask",
+    "public_histories": "An already-resolved causal input pattern and its observed Boolean output; no synthetic entity-graph source or original prospective DEV created",
+    "training_information": "64 distinct source-free public TRAIN partial-response cases per source prior, 4 fixed observed patterns each. First 32 compositional-source TRAIN fixture programs guarantee each G- and H-role atom exposed; these PRIVATE fixture identities never enter model fitting. Uniform-full-256 source has no atomic role.",
+    "source_priors": {
+      "uniform_unrestricted_full256": "Probability 1/256 for each of 256 truth tables",
+      "uniform_composition_768": "Probability 1/768 per syntactically distinct composition",
+      "nonuniform_composition_768": "Independent positive atom weights: G=(1+((7*i+3)%11)) for i 0..15, H=(1+((5*i+1)%13)) for i 0..15, OP=(5,2,3) for XOR,AND,OR; normalized across 768 programs. Distribution is evaluator-only, not passed to candidate or controls."
+    },
+    "seeds": {
+      "TRAIN_public_fixture_seed": 40002026,
+      "train_case_index_stride": 9817,
+      "train_source_prior_stride": 39011
+    },
+    "no_prior_consumed_T16_T39_scientific_case_ids_or_train_validation_replay": true
+  },
+  "trained_competitors": {
+    "compositional_factors": "Public-only 3-iteration smoothed EM for P(G) P(H) P(OP), with strictly positive weights and all 768 program hypotheses, trained separately per source prior",
+    "strong_joint_program": "Public-only 3-iteration smoothed EM for full categorical 768-program prior; same public TRAIN and iterations",
+    "strong_full256_rule": "Public-only 3-iteration smoothed EM for all 256 unrestricted truth tables, equal TRAIN data",
+    "TRAIN_fitted_independent_Beta": "Public-only per-bit Beta(2,2) marginal trained on all publicly observed pattern bits",
+    "uniform_unrestricted_exact": "Independent uniform 256-rule posterior with P=0.5 for every unobserved Boolean input",
+    "oracle": "Evaluator-only exact Bayes posterior from source-private true prior, an unattainable upper bound on expected forecast performance. Never pass this prior or evaluation response outcomes to trained candidates."
+  },
+  "exact_enumeration": {
+    "true_distribution": "Project weighted 768 programs onto 256 eight-bit tables, preserving latent program multiplicities; or use exact uniform 256 law distribution",
+    "observation_groups": "For every k and every observation mask, enumerate every possible observed response signature with positive prior probability. Sum exact event probability and posterior target-bit conditional mean.",
+    "expected_brier": "For each unseen target with true posterior p and model prediction q, exact expected Brier = p*(1-q)^2+(1-p)*q^2. Oracle Bayes risk p*(1-p). No sampling uncertainty in final expectation.",
+    "identifiability": "Report exactly realizable 3-input Boolean truth tables, syntactically observationally indistinguishable programs, conditional entropy/information gain and fraction of event-target combinations whose predictive outcome is deterministically entailed by all full 256 rules (always zero for unobserved bit under unrestricted consistency).",
+    "validation": "Independent direct probability check against a second implementation of the oracle conditioning using program-space rather than weighted 256-table grouping, at least one row per prior×k; posterior masses sum to one; Bayes risk <= any trained competitor; uniform unrestricted prior produces Brier 0.25 and zero mutual information on every unseen bit."
+  },
+  "gates": {
+    "minimum_theoretical_headroom_for_new_source_candidate": 0.05,
+    "definition": "(Brier_best_equally_TRAIN_fitted_strong_comparator - Brier_clairvoyant_true_prior_oracle)/Brier_best_strong_comparator, measured independently for each prior×k; this is a CEILING on what any learned model could gain beyond strong comparators, not an achieved advantage.",
+    "require_candidate_gain_separately": "Do NOT claim a scientific positive if oracle headroom exceeds 5%; demand genuinely better held-out data-based candidate, actual parameter ablation, and complete CPU/RSS nonregression before prospective first use.",
+    "no_new_scientific_source_even_if_info_bound_positive": "T40 is information audit only. Any subsequent scientific experiment needs fresh prereg, independently new source birth, exact source identity and separate trained-resource admission.",
+    "no_gpu_paid_api_or_workstation": true,
+    "failure": "Retain negative and uncertainty, no repeated score optimization against this frozen exhaustive audit."
+  },
+  "guards": {
+    "new_scientific_DEV_generated": 0,
+    "old_consumed_original_scientific_holdouts_opened": 0,
+    "github_hosted_windows_linux": true,
+    "save_exact_audit_receipt": true,
+    "draft_unmerged": true,
+    "no_optimizer_promotion": true,
+    "no_paid_API": true,
+    "no_additional_controller": true,
+    "no_FORGE_CKB_plane_changes": true,
+    "no_user_workstation": true
+  }
+}
