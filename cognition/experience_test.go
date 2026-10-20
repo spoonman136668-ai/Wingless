@@ -7,7 +7,6 @@ import (
  "math"
  "testing"
  "unsafe"
- "unsafe"
 )
 func TestExperienceRawObservationAndPersistence(t *testing.T){
  m:=NewExperienceMemory()
