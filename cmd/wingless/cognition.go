@@ -25,7 +25,7 @@ func runCognition(in io.Reader,out io.Writer)error {
      Op string `json:"op"`
      Action int `json:"action"`
      Prior int `json:"prior"`
-     Outcome int `json:"outcome"`
+     Outcome *int `json:"outcome"`
      Rate float64 `json:"rate"`
      NextAction int `json:"next_action"`
      Snapshot json.RawMessage `json:"snapshot"`
@@ -37,7 +37,9 @@ func runCognition(in io.Reader,out io.Writer)error {
    if err:=d.Decode(&event);err!=nil{return err}
    if err:=d.Decode(new(any));err!=io.EOF{return errors.New("extra JSON data")}
    switch event.Op{
-   case "observe":if err:=s.Observe(event.Action,event.Prior,event.Outcome,event.Rate);err!=nil{return err}
+   case "observe":
+      if event.Outcome==nil{return errors.New("missing outcome")}
+      if err:=s.Observe(event.Action,event.Prior,*event.Outcome,event.Rate);err!=nil{return err}
    case "predict":
       p,err:=s.Predict(event.Action,event.Prior);if err!=nil{return err}
       if err=enc.Encode(map[string]any{"probability":p});err!=nil{return err}
@@ -49,8 +51,8 @@ func runCognition(in io.Reader,out io.Writer)error {
       if _,err=fmt.Fprintln(out,string(b));err!=nil{return err}
    case "restore":if err:=s.Restore(event.Snapshot);err!=nil{return err}
    case "experience":
-      if event.Before==nil||event.After==nil{return errors.New("missing temporal sensory pair")}
-      if err:=experience.ObserveExperience(*event.Before,*event.After,event.Action,float64(event.Outcome));err!=nil{return err}
+      if event.Before==nil||event.After==nil||event.Outcome==nil{return errors.New("missing temporal sensory pair or outcome")}
+      if err:=experience.ObserveExperience(*event.Before,*event.After,event.Action,float64(*event.Outcome));err!=nil{return err}
    case "infer_experience":
       if event.Sensory==nil{return errors.New("missing sensory observation")}
       value,known,err:=experience.InferExperience(*event.Sensory,event.Action)
