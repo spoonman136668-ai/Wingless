@@ -1,0 +1,65 @@
+name: T21 Wingless source-free adaptive certificate feasibility
+on:
+  push:
+    branches: [research/t21-counterexample-hypergraph-20261019]
+    paths: ['.github/workflows/north-star-t21-source-free.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-t21-source-free-proof
+  cancel-in-progress: false
+jobs:
+  structural-feasibility:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assert exact source-free precode ordering and certifier identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if ((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA) { throw 'T21_HEAD_DRIFT' }
+          $expected=@{
+            'research/north-star-transfer/20261019-wingless-t21-counterexample-hypergraph-precode.json'='89f06947bc40cdd00146b1513838248129db1252'
+            'research/north-star-transfer/20261019-wingless-t21-source-free-decision-audit.py'='ff8e3632d317ae43435e9bdefb75712cad162568'
+            'research/north-star-transfer/20261019-wingless-t16b-persistent-bindings.py'='1041db8ff76365eba5eb8f31cecd0e2172d397d8'
+            'research/north-star-transfer/originals/20261019-wingless-t20-structural-internal-negative.json'='acd08fbe0e39c954333c4dc73136009202669af6'
+          }
+          foreach ($path in $expected.Keys) {
+            $actual=(git hash-object -- $path).Trim()
+            if ($actual -cne $expected[$path]) { throw "T21_BLOB_IDENTITY_DRIFT:$path" }
+          }
+          git merge-base --is-ancestor c8052105e4c730573ba7cb56a1ea56eaf3fd4fa1 971021eb847ce09b7ce87b67bf147bbf3ab5fb13
+          if ($LASTEXITCODE -ne 0) { throw 'T21_WRONG_PREDECESSOR' }
+          git merge-base --is-ancestor 971021eb847ce09b7ce87b67bf147bbf3ab5fb13 04c3f7d302d05ea160936e4611028aa0408e77b9
+          if ($LASTEXITCODE -ne 0) { throw 'T21_AUDIT_CODE_BEFORE_HYPOTHESIS' }
+          git merge-base --is-ancestor 04c3f7d302d05ea160936e4611028aa0408e77b9 HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'T21_CODE_NOT_QUALIFIED' }
+          python -m py_compile research/north-star-transfer/20261019-wingless-t21-source-free-decision-audit.py
+          if ($LASTEXITCODE -ne 0) { throw 'T21_AUDIT_SYNTAX_ERROR' }
+          Write-Output 'T21_FROZEN_BEFORE_SOURCE_FREE_AUDIT_AND_CUSTODY=PASS'
+      - name: Source-free full S3 first-pair structural feasibility
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t21-source-free-decision-audit.py > t21-source-free-feasibility.json
+          if ($LASTEXITCODE -ne 0) { throw 'T21_MATH_AUDIT_FAILURE' }
+          python -c "import json; d=json.load(open('t21-source-free-feasibility.json',encoding='utf-8-sig')); assert d['public_templates']==3888 and d['strict_adaptive_advantages']>0 and d['role_renaming_invariance_checks']==360 and d['source_consumed'] is False and d['TRAIN_used']==0 and d['DEV_used']==0 and d['independent_science'] is False and d['scientific_acceptance'] is False and d['optimizer_admission'] is False; print('T21_SOURCE_FREE_AUDIT=PASS'); print('T21_STRICT_ADAPTIVE='+str(d['strict_adaptive_advantages'])); print('T21_MAX_EXPECTED_GAIN='+d['max_exact_expected_query_gain']); print('T21_DECLARED_WITNESS='+json.dumps(d['predeclared_example'],sort_keys=True)); print('T21_TOTAL='+str(d['public_templates']))"
+          if ($LASTEXITCODE -ne 0) { throw 'T21_AUDIT_INVARIANT_FAILURE' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t21-source-free-feasibility-${{ matrix.os }}
+          path: t21-source-free-feasibility.json
+          if-no-files-found: ignore
+          retention-days: 90
