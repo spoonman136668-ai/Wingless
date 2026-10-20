@@ -108,7 +108,7 @@ func TestExperienceTrainedMatchedPeerEvidenceOnly(t *testing.T){
  }
  // The oracle's correctness is measured from the actual source-free labels,
  // never hardcoded as a fake test outcome.
- perfect:=0;for i:=24;i<72;i++{id:=i%3;if id%2==id%2{perfect++}}
+ perfect:=0;for i:=24;i<72;i++{id:=i%3;if int(float64(id%2))==id%2{perfect++}}
  fmt.Printf("NCI04_W_MATCHED_NATIVE_CORRECT=%d/%d TRAINED_RAW_PEER_CORRECT=%d/%d SYMBOLIC_ORACLE=%d/%d\n",
    candidateCorrect,candidateCoverage,peerCorrect,peerCoverage,perfect,48)
  fmt.Printf("NCI04_W_NATIVE_BYTES=%d TRAINED_RAW_PEER_BYTES=%d\n",unsafe.Sizeof(*candidate),unsafe.Sizeof(peer))
