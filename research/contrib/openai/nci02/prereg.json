@@ -1,0 +1,65 @@
+{
+  "schema": "nci02.wingless.sourcefree-development.v1",
+  "gate": "NCI02-W",
+  "parent": "816de3726dcf00ccea2bb0f4cc39f801a0dd41a4",
+  "question": "Does the native four-channel error-trained recurrent state retain causal-link signs and beat an equally informed train-selected 4-slot EMA on unseen 3-link proxy queries?",
+  "limitations": "Relation slots and path composition are supplied by the evaluator; these are NOT learned entity bindings or learned composition.",
+  "cohorts": {
+    "train": [
+      6000,
+      6031
+    ],
+    "development": [
+      6100,
+      6131
+    ],
+    "stress": [
+      6200,
+      6231
+    ]
+  },
+  "task": {
+    "relations": 4,
+    "exposures_per_relation": 3,
+    "links_development": 2,
+    "links_stress": 3,
+    "sign_noise": "one in ten deterministic xorshift draws"
+  },
+  "training": {
+    "candidate_rates": [
+      0.05,
+      0.1,
+      0.2
+    ],
+    "ema_rates": [
+      0.05,
+      0.1,
+      0.2
+    ],
+    "selection": "train only; highest train 2-link score, first-on-tie"
+  },
+  "controls": [
+    "tuned 4-slot EMA with same observations",
+    "native frozen-rate control",
+    "memory-reset ablation",
+    "exact symbolic upper bound"
+  ],
+  "criteria": {
+    "gain_over_ema_stress": 0.05,
+    "minimum_stress_accuracy": 0.75,
+    "minimum_ablation_loss": 0.1,
+    "max_interference_drop": 0.1
+  },
+  "classification": [
+    "PASS_PROXY_ONLY",
+    "NEGATIVE",
+    "INVALID"
+  ],
+  "constraint": {
+    "native_channels": 4,
+    "no_unbounded_storage": true,
+    "scientific_first_use": 0,
+    "production_mutation": false,
+    "source_only": true
+  }
+}
