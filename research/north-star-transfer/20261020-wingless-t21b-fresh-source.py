@@ -26,7 +26,7 @@ def build(label,cert):
         base=[relabel[j%3] for j in range(length)]
         for j in range(3,length):
             if j%4==3:
-                options=[r for r in range(3) if r!=base[j-1]]
+                options=[r for r in range(3) if r!=base[j-1] and (j+1>=length or r!=base[j+1])]
                 base[j]=rng.choice(options)
     else:
         # Disjoint DEV generator regime: longer interleaved mirrored
