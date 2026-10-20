@@ -361,8 +361,37 @@ def run():
       "scientific_positive":False,"optimizer_admission":False,
       "conclusion":"PRE_SOURCE_FEASIBLE" if native_admission else "PRE_SOURCE_NATIVE_NO_GO"
     }
+def audit():
+    streams=changed=less_merges=total_learned_merges=total_ablated_merges=0
+    independent_proofs=0
+    for dim in DIMS:
+        groups,order,_=fit(dim)
+        for i in range(VALIDATE_PER_DIM):
+            on=per_stream(dim,i,groups,ARMS[0],order)
+            off=per_stream(dim,i,groups,ARMS[1],order)
+            if on["all_outputs"]!=off["all_outputs"]:
+                raise RuntimeError("T34_PARAMETER_ABLATION_CHANGED_CERTIFICATE")
+            if (on["factor_count"],on["factor_merges"],on["max_component_width"],on["basis_xor_updates"])!=(
+                 off["factor_count"],off["factor_merges"],off["max_component_width"],off["basis_xor_updates"]):
+                changed+=1
+            if on["factor_merges"]<off["factor_merges"]:less_merges+=1
+            total_learned_merges+=on["factor_merges"]
+            total_ablated_merges+=off["factor_merges"]
+            independent_proofs+=len(on["all_outputs"])
+            streams+=1
+    return {"schema":"wingless.T34.sourcefree-real-factor-state-ablation.v1",
+        "TRAIN_public_streams":TRAIN_PER_DIM*len(DIMS),
+        "sourcefree_validation_streams":streams,"scientific_DEV_generated":0,
+        "learned_partition_changed_exact_factor_state_streams":changed,
+        "learned_partition_fewer_real_component_merges_streams":less_merges,
+        "total_learned_component_merges":total_learned_merges,
+        "total_ablated_component_merges":total_ablated_merges,
+        "independently_checked_exact_query_results":independent_proofs,
+        "same_certificates":True,"optimizer_admission":False}
 if __name__=="__main__":
     if len(sys.argv)==1:print(json.dumps(run(),sort_keys=True))
+    elif len(sys.argv)==2 and sys.argv[1]=="--ablation":
+        print(json.dumps(audit(),sort_keys=True))
     elif len(sys.argv)==4 and sys.argv[1]=="--child":
         print(json.dumps(child(sys.argv[2],int(sys.argv[3])),sort_keys=True))
     else:raise SystemExit("T34_SOURCEFREE_ONLY")
