@@ -47,7 +47,7 @@ jobs:
           $ErrorActionPreference='Stop'
           python research/north-star-transfer/20261019-wingless-t35-sourcefree-block-gf2.py --ablation > t35-XOR-ablation.json
           if($LASTEXITCODE -ne 0){throw 'T35_SOURCEFREE_MATH_ABLATION_ERROR'}
-          python -c "import json;x=json.load(open('t35-XOR-ablation.json',encoding='utf-8-sig'));assert x['TRAIN_public_streams']==48 and x['sourcefree_validation_streams']==40 and x['checked_exact_queries']==3840 and x['scientific_DEV_generated']==0 and x['certified_answers_exact'] if 'certified_answers_exact' in x else x['answers_identical'];assert x['streams_learned_parameters_change_real_XOR_work']>0;print('T35_EXACT_LEARNED_XOR_ABLATION=PASS');print('T35_ABLATION='+json.dumps(x,sort_keys=True))"
+          python -c "import json;x=json.load(open('t35-XOR-ablation.json',encoding='utf-8-sig'));assert x['TRAIN_public_streams']==48 and x['sourcefree_validation_streams']==40 and x['checked_exact_queries']==3840 and x['scientific_DEV_generated']==0 and x['answers_identical'];assert x['streams_learned_parameters_change_real_XOR_work']>0;print('T35_EXACT_LEARNED_XOR_ABLATION=PASS');print('T35_ABLATION='+json.dumps(x,sort_keys=True))"
           if($LASTEXITCODE -ne 0){throw 'T35_SOURCEFREE_PARAMETERS_NO_GENUINE_EFFECT'}
       - name: Complete five native whole-process comparisons and fail closed unless true improvement
         shell: pwsh
