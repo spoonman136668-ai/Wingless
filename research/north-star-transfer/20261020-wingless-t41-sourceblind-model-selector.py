@@ -90,8 +90,15 @@ def fixture(regime,split,index):
             "public":public,"_private_rule":law,
             "_private_regime":regime,"_private_program":program}
 def make_meta():
-    return tuple(fixture(regime,"META",i)
-                 for regime in ("C","U") for i in range(META_N))
+    # Frozen prereg: only four public source-bit observations per META case.
+    # Validation receives six; neither gets private regime labels in fit.
+    cases=[]
+    for regime in ("C","U"):
+        for i in range(META_N):
+            entry=fixture(regime,"META",i)
+            entry["public"]=entry["public"][:4]
+            cases.append(entry)
+    return tuple(cases)
 def make_validation():
     return tuple(fixture(regime,"VALIDATION",i)
                  for regime in ("C","U") for i in range(VALID_N))
