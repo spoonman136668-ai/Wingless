@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.t34.source-free-learned-incremental-causal-factorization.prereg.v1",
+  "date_edT": "2026-10-19",
+  "parent_T33": "c7db494fd7f877344a5e24af71c4944c45f3417a",
+  "stage": "SOURCE_FREE_MATH_FEASIBILITY_ONLY",
+  "hypothesis": "TRAIN-derived causal-coordinate partitions can represent streaming GF(2) unknown-law constraints as an exact product of small affine subspaces, with dynamic component merging on cross-factor observations, avoiding global full-basis reconstruction and reducing complete native CPU and peak memory compared with optimized exact batch and online solvers.",
+  "method": "Learn weighted co-occurrence graph from PUBLIC synthetic row-mask training only; deterministically form up to 8 compact connected factors. Each new observation either reduces one local GF2 factor, or triggers exact factor merge and union elimination. Never discard equations. For queries, combine exactly the factors touched by the query; unrestricted cross-factor queries must be certified by componentwise linear-algebra. Learned parameters must change the factor structure, basis update work, and number of full-width reductions vs an ablated equal-information control.",
+  "benchmark": {
+    "purpose": "source-free algebraic stress, NOT new Wingless causal source cohorts or scientific first use",
+    "dimensions": [
+      32,
+      64
+    ],
+    "train_public_streams_per_dimension": 32,
+    "feasibility_streams_per_dimension": 24,
+    "observations_per_stream": 64,
+    "stream_query_checkpoints": 8,
+    "queries_per_checkpoint": 12,
+    "nonuniform_structure": "variable-bit permutations shared within dimension; local row-mask density 2-4, cross-module observations about 1 per 16; query masks mix local and global",
+    "generator_fixed_seed_before_code": 340119019,
+    "validation_seed": 340119813,
+    "separation": "only TRAIN rowmasks for partition fitting, no hypothesis label or hidden law training, validation source-free equations generated after frozen algorithm, no new historical or prospective DEV world accessed",
+    "full_equation_truth": "each public row rhs is dot(row, privately drawn 32/64-bit state), truth used only by independent exact verifier, not learner or inference",
+    "workload": "Each stream emits public observation rows online and public queries after 8,16,...,64 rows; full exact baselines must handle same online query schedule with proper caching."
+  },
+  "matched_controls": [
+    "TRAIN-learned-incremental-exact-factorization",
+    "untrained-adaptive-component-GF2",
+    "TRAIN-informed-frequency-pivot-optimized-incremental-GF2",
+    "optimized-exact-incremental-GF2",
+    "optimized-batch-rebuild-GF2"
+  ],
+  "proof_required": {
+    "independently_verifiable": "identical exact three-state result {entailed 0, entailed 1, undetermined} for every original checkpoint query against a separate canonical Gaussian basis recomputed from all rows; exact witness assignment never discarded",
+    "ablation": "disabling learned partition must change actual factorization/basis update behavior, not merely iteration order",
+    "information_integrity": "no query outcome or hidden truth used in fitting",
+    "edge_cases": "zero masks, duplicate equations, fully dependent rows, disconnected factors, cross-factor merges, inconsistent public rows rejected",
+    "source_free_validation_before_real_cohort": true
+  },
+  "acceptance": {
+    "mechanism_causal_ablation_required": true,
+    "zero_false_certifications": true,
+    "five_fresh_whole_process_CPU_and_peak_RSS_per_arm_per_OS": true,
+    "strict_native_gate": "learned factorization lower median full-process CPU than EVERY strong exact online and batch baseline on BOTH GitHub-hosted Windows and Linux; maximum RSS no higher than best exact control on either OS",
+    "no_DEV_cohort_until_pass": true,
+    "if_gate_fails": "retain valid source-free mathematical result; no generation or consumption of prospective source, no threshold adjustment, no retry of validation for selection"
+  },
+  "restrictions": {
+    "github_hosted_only": true,
+    "no_paid_API": true,
+    "no_workstation": true,
+    "no_self_hosted_research_runner": true,
+    "no_new_controller": true,
+    "no_FORGE_or_CKB_plane_change": true,
+    "no_merge": true,
+    "no_optimizer_admission": true
+  }
+}

@@ -1,0 +1,72 @@
+name: T34 source-free learned incremental causal factorization feasibility
+on:
+  push:
+    branches: [research/t34-source-free-incremental-factorization-20261019]
+    paths: ['.github/workflows/north-star-t34-sourcefree-feasibility.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T34-sourcefree-exact-one-shot
+  cancel-in-progress: false
+jobs:
+  factorized-exactness-and-native-cost:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 45
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin prereg and exact first source-free executable identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T34_HEAD_DRIFT'}
+          $expect=@{
+            'research/north-star-transfer/20261019-wingless-t34-sourcefree-factorization-precode.json'='7fa8aa9117d9d30a7ee2bbb51ed4d3aa57c5067f'
+            'research/north-star-transfer/20261019-wingless-t34-sourcefree-factorization.py'='084c4bd9b86f9ad5a4a6c9a03bcf33bfbc796ae3'
+          }
+          foreach($path in $expect.Keys){
+            if((git hash-object -- $path).Trim() -cne $expect[$path]){
+              throw "T34_SOURCEFREE_OR_PREREG_BLOB_DRIFT:$path"
+            }
+          }
+          git merge-base --is-ancestor 4cb9d9e247d8b25cc6dd81206556f2102cfa6d4b 9400feab1289664f6a404598b0b6dc71b9580d8c
+          if($LASTEXITCODE -ne 0){throw 'T34_FROZEN_PRECODE_AFTER_MECHANISM'}
+          git merge-base --is-ancestor 9400feab1289664f6a404598b0b6dc71b9580d8c 108c69eb707e2583e78207c418b53bb5bb6ebf9c
+          if($LASTEXITCODE -ne 0){throw 'T34_EXACT_SOURCEFREE_AUDIT_INCOMPLETE'}
+          python -m py_compile research/north-star-transfer/20261019-wingless-t34-sourcefree-factorization.py
+          if($LASTEXITCODE -ne 0){throw 'T34_SOURCEFREE_SYNTAX_INVALID'}
+          Write-Output 'T34_SOURCEFREE_PRECODE_CODE_AND_AUDIT=PASS'
+      - name: Prove trained parameter changes actual incremental factor state, without touching DEV
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t34-sourcefree-factorization.py --ablation > t34-math-ablation.json
+          if($LASTEXITCODE -ne 0){throw 'T34_EXACT_FACTOR_ABLATION_FAILED'}
+          python -c "import json;x=json.load(open('t34-math-ablation.json',encoding='utf-8-sig'));assert x['TRAIN_public_streams']==64 and x['sourcefree_validation_streams']==48 and x['scientific_DEV_generated']==0 and x['same_certificates'] and x['independently_checked_exact_query_results']==4608 and x['learned_partition_changed_exact_factor_state_streams']>0 and x['learned_partition_fewer_real_component_merges_streams']>0 and x['total_learned_component_merges']<x['total_ablated_component_merges'] and not x['optimizer_admission'];print('T34_REAL_FACTORIZATION_ABLATION=PASS');print('T34_SOURCEFREE_ABLATION='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T34_PARAMETER_INFLUENCE_NO_GO_NO_NEW_SOURCE'}
+      - name: Source-free five whole-process CPU RSS trials against strongest exact controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261019-wingless-t34-sourcefree-factorization.py > t34-native-feasibility.json
+          if($LASTEXITCODE -ne 0){throw 'T34_NATIVE_TECHNICAL_OR_EXACTNESS_FAIL_NO_SOURCE'}
+          python -c "import json;x=json.load(open('t34-native-feasibility.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==5 and x['TRAIN_public_streams']==64 and x['SOURCE_FREE_validation_streams']==48 and x['scientific_DEV_cohort_created']==False and x['full_exact_per_query_independent_rebuild_verified'] and all(v['source_free_checkpoint_questions']==4608 and v['source_free_streams']==48 and len(v['five_complete_native_CPU_ns'])==5 and len(v['five_peak_process_RSS_bytes'])==5 for v in a.values());print('T34_SOURCEFREE_TECHNICAL_EXACT=PASS');print('T34_NATIVE_SUMMARY='+json.dumps({k:{n:v[n] for n in ('correct_certified','sound_abstentions','factor_merges','total_factor_update_xor_ops','mean_max_factor_width','median_complete_native_CPU_ns','max_peak_process_RSS_bytes')} for k,v in a.items()},sort_keys=True));print('T34_FROZEN_ADMISSION='+str(x['strict_native_admission']));assert x['strict_native_admission'],'T34_FROZEN_NATIVE_FEASIBILITY_NO_GO_DO_NOT_CREATE_NEW_COHORT';print('T34_NATIVE_FEASIBILITY_ADMITTED=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T34_NATIVE_FROZEN_NO_GO_NO_NEW_COHORT'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t34-sourcefree-factorization-${{ matrix.os }}
+          path: |
+            t34-math-ablation.json
+            t34-native-feasibility.json
+          if-no-files-found: ignore
+          retention-days: 90
