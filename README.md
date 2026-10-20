@@ -1,6 +1,6 @@
 # Wingless
 
-Independent, offline-first Go foundation for a resource-efficient coding/reasoning worker. Intended to sit beneath ckb-plane after its interfaces stabilize. This stage supplies testable broker contracts and mock execution, not a production autonomous coding agent or evidence of Codex parity.
+**Research objective:** build Wingless as an independent non-transformer, non-token-centric cognitive architecture with persistent learning, memory, native reasoning and compositional generalization, eventually reaching LLM-class capability with substantially lower resource cost where possible. The present offline-first Go worker and broker contracts are an early engineering application, not the cognitive system or its definition. They do not yet demonstrate native learned cognition, autonomous coding or Codex parity. See [the standing cognitive North Star](docs/architecture.md#standing-cognitive-north-star).
 
 ## Run locally
 
@@ -22,7 +22,7 @@ if ($LASTEXITCODE -ne 0) { throw "build failed" }
 
 `demo` returns a mock candidate with `acceptance: external_required`. `benchmark` compares a mock response against a fixed expected value. It does not run a model or touch CKB. There is no installable daemon yet.
 
-## Local host and small-model experiments
+## Local host and small-model comparison experiments
 
 ```powershell
 go run ./cmd/wingless host
@@ -33,7 +33,7 @@ go run ./cmd/wingless local-benchmark --endpoint http://127.0.0.1:8080 --model y
 go run ./cmd/wingless local-benchmark --config .\local-model.json
 ```
 
-The configuration helper records hashes of your chosen files; it does not authenticate their source. Obtain a trusted runtime/model first. No automatic downloads occur. The model experiment uses only fixed public prompts, CPU inference and a bounded owned process. It does not execute generated code. See [real benchmark results and limits](docs/internal-stage-2.md). Run `scripts/Test-Native.ps1` for evidence-producing native validation.
+**The local llama/GGUF experiments measure conventional model backends; they are not Wingless' target cognitive architecture.** The configuration helper records hashes of your chosen files; it does not authenticate their source. Obtain a trusted runtime/model first. No automatic downloads occur. The model experiment uses only fixed public prompts, CPU inference and a bounded owned process. It does not execute generated code. See [real benchmark results and limits](docs/internal-stage-2.md). Run `scripts/Test-Native.ps1` for evidence-producing native validation.
 
 ## Context retrieval
 

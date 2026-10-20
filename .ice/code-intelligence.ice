@@ -1,7 +1,7 @@
 TITLE: Wingless Human/Machine Symbol and Relationship Atlas
 STATUS: ADVISORY SOURCE-BOUND NAVIGATION
 REPOSITORY: spoonman136668-ai/Wingless
-SOURCE_COMMIT: b87899b50d2c1558e26d74a1921623786fde1282
+SOURCE_COMMIT: a6f825ad6420e769db8fadee560fd2a379b94ce9
 SCHEMA: wingless.ice.semantic-code-atlas.v1
 EVIDENCE: .ice/code-intelligence.json (complete machine-readable 352-symbol index)
 AUTHORITY: Source code and qualified tests outrank these descriptions; never grant runtime or acceptance authority.
@@ -89,3 +89,39 @@ The qualified Windows workflow now runs a separate fail-closed negative suite in
 
 INDEPENDENT REVIEW P1 — SOURCE-ONLY PR FRESHNESS (2026-10-18)
 Review found that the prior workflow trigger observed atlas changes but could miss changes to indexed source on another pull request. The PR workflow now watches every source type accepted by ice.Build (.go/.md/.json/.ps1/.yml/.yaml, go.mod, .gitattributes and .gitignore) and both standalone validators. A read-only contract checks every file in the frozen 138-file ICE inventory and representative future new files against trigger patterns before performing the eight negative mutations. Source-only PRs must not bypass ICE freshness validation; the existing fail-closed no-merge decision is preserved. Broad patterns may schedule more validation runs, but the workflow remains read-only and does not execute scientific research.
+
+G26 SOURCE-AWARE ATLAS MAINTENANCE
+TARGET_SOURCE_COMMIT: d312f2ada99cce4d994f271bbed54cbe7d52027e
+PREVIOUS_SOURCE_COMMIT: b87899b50d2c1558e26d74a1921623786fde1282
+EXACT_DECLARATION_REUSE_COUNT: 352
+FRESH_RECEIPT_COUNT: 0
+FRESH_RECEIPTS_ARE_SELF_ASSERTED: TRUE
+INDEPENDENT_HUMAN_REVIEW_REQUIRED_FOR_PROMOTION: TRUE
+Historical evidence is retained as lineage, never silently renewed for changed declarations. Syntax-only edges remain provisional.
+
+G26 SOURCE-AWARE ATLAS MAINTENANCE
+TARGET_SOURCE_COMMIT: f49548c28c3c2aa8434c93b8a26546b8dcba4db5
+PREVIOUS_SOURCE_COMMIT: d312f2ada99cce4d994f271bbed54cbe7d52027e
+EXACT_DECLARATION_REUSE_COUNT: 352
+FRESH_RECEIPT_COUNT: 0
+FRESH_RECEIPTS_ARE_SELF_ASSERTED: TRUE
+INDEPENDENT_HUMAN_REVIEW_REQUIRED_FOR_PROMOTION: TRUE
+Historical evidence is retained as lineage, never silently renewed for changed declarations. Syntax-only edges remain provisional.
+
+G26 SOURCE-AWARE ATLAS MAINTENANCE
+TARGET_SOURCE_COMMIT: c206a9f4b3bd452d5ab1be293f361f8a704858e9
+PREVIOUS_SOURCE_COMMIT: f49548c28c3c2aa8434c93b8a26546b8dcba4db5
+EXACT_DECLARATION_REUSE_COUNT: 352
+FRESH_RECEIPT_COUNT: 0
+FRESH_RECEIPTS_ARE_SELF_ASSERTED: TRUE
+INDEPENDENT_HUMAN_REVIEW_REQUIRED_FOR_PROMOTION: TRUE
+Historical evidence is retained as lineage, never silently renewed for changed declarations. Syntax-only edges remain provisional.
+
+G26 SOURCE-AWARE ATLAS MAINTENANCE
+TARGET_SOURCE_COMMIT: a6f825ad6420e769db8fadee560fd2a379b94ce9
+PREVIOUS_SOURCE_COMMIT: c206a9f4b3bd452d5ab1be293f361f8a704858e9
+EXACT_DECLARATION_REUSE_COUNT: 352
+FRESH_RECEIPT_COUNT: 0
+FRESH_RECEIPTS_ARE_SELF_ASSERTED: TRUE
+INDEPENDENT_HUMAN_REVIEW_REQUIRED_FOR_PROMOTION: TRUE
+Historical evidence is retained as lineage, never silently renewed for changed declarations. Syntax-only edges remain provisional.
