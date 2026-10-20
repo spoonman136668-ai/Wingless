@@ -1,0 +1,77 @@
+name: T38 original compositional causal operator TRAIN-only qualification
+on:
+  push:
+    branches: [research/t38-compositional-causal-program-20261020]
+    paths: ['.github/workflows/north-star-t38-TRAIN.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T38-frozen-TRAIN-only
+  cancel-in-progress: false
+jobs:
+  exact-composition-TRAIN:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 45
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify hypotheses and source were frozen ahead of model, no changed source
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T38_COMPOSITION_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261020-wingless-t38-compositional-prereg.json'='9f5d95ddd5bdc2fa6f5d2178dec52e1505a9fcd9'
+            'research/north-star-transfer/20261020-wingless-t38-new-compositional-sources.py'='4b49df78884254acc28527389d3b59e6df5906d4'
+            'research/north-star-transfer/20261020-wingless-t38-learned-composition.py'='01642cce8cffd1f14463add2b27d72ee6e7f6dfd'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T38_FROZEN_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor 446db1c7dce64dec58db5afe2809e969502043cb b29f15e54bd953392e282e9aafafcd15062cf96d
+          if($LASTEXITCODE -ne 0){throw 'T38_NEW_SOURCE_PRECEDES_FROZEN_PAIR_HOLDOUT'}
+          git merge-base --is-ancestor b29f15e54bd953392e282e9aafafcd15062cf96d 6435150e9509849b6a31a6652c8d8eba9de510cf
+          if($LASTEXITCODE -ne 0){throw 'T38_LEARNED_COMPOSITION_PRECEDES_SOURCE'}
+          python -m py_compile research/north-star-transfer/20261020-wingless-t38-new-compositional-sources.py research/north-star-transfer/20261020-wingless-t38-learned-composition.py
+          if($LASTEXITCODE -ne 0){throw 'T38_PYTHON_SOURCE_SYNTAX_FAILED'}
+          Write-Output 'T38_SOURCE_FREEZE_CHRONOLOGY_AND_IDENTITY=PASS'
+      - name: Verify exact posterior and learned gate-parameter ablation on distinct TRAIN validation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t38-learned-composition.py --train-only > t38-original-TRAIN-science.json
+          if($LASTEXITCODE -ne 0){throw 'T38_TRAIN_PROOF_FAILURE_NO_DEV'}
+          python -c "import json;x=json.load(open('t38-original-TRAIN-science.json',encoding='utf-8-sig'));assert x['status']=='PASS_TECHNICAL_TRAIN_ONLY' and x['TRAIN_meta_cases']==40 and x['TRAIN_validation_cases']==16 and x['DEV_generated']==0 and x['TRAIN_worlds_true_rule_retained']==16 and x['TRAIN_heldout_forecasts']==64 and x['hard_false_certified']==0 and x['full_256_truth_table_certification_verified'] and x['source_new_pair_partition_sealed'] and x['old_DEV_unopened'] and .20<=x['unresolved_fraction']<=.90 and x['learned_parameters_changed_actual_belief_worlds']>0;print('T38_TRAIN_TECHNICAL_CAUSAL_TRANSFER=PASS');print('T38_ORIGINAL_TRAIN_FORECAST='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T38_FROZEN_TRAIN_HEADROOM_OR_ABLATION_NO_GO'}
+      - name: Compare five complete native CPU RSS processes with all fully TRAIN-fitted baselines
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t38-learned-composition.py --train-cost > t38-original-TRAIN-native.json
+          if($LASTEXITCODE -ne 0){throw 'T38_ORIGINAL_NATIVE_COST_INCOMPLETE'}
+          python -c "import json;x=json.load(open('t38-original-TRAIN-native.json',encoding='utf-8-sig'));a=x['arms'];assert len(a)==5 and x['TRAIN_meta_cases']==40 and x['TRAIN_validation_cases']==16 and x['DEV_opened']==0 and all(v['correct_certified']+v['sound_abstentions']==64 and v['hard_false_certifications']==0 and len(v['five_full_CPU_ns'])==5 and len(v['five_peak_RSS_bytes'])==5 for v in a.values());print('T38_TRAIN_NATIVE_TECHNICAL=PASS');print('T38_ORIGINAL_NATIVE_RESOURCES='+json.dumps({k:{z:v[z] for z in ('correct_certified','sound_abstentions','Brier_unresolved','median_full_CPU_ns','max_peak_RSS_bytes')} for k,v in a.items()},sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T38_FROZEN_NATIVE_EVIDENCE_INVALID'}
+      - name: Apply frozen compositional transfer and full native admission
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python -c "import json;s=json.load(open('t38-original-TRAIN-science.json',encoding='utf-8-sig'));n=json.load(open('t38-original-TRAIN-native.json',encoding='utf-8-sig'));gain=s['learned_Brier_gain_vs_best_equally_trained'];admit=gain>=.05 and n['CPU_advantage_all_controls'] and n['RSS_nondegression'];print('T38_BRIER_GAIN='+str(gain));print('T38_NATIVE_CPU='+str(n['CPU_advantage_all_controls']));print('T38_NATIVE_RSS='+str(n['RSS_nondegression']));print('T38_PROSPECTIVE_ADMISSION='+str(admit));assert admit,'T38_VALID_TRAIN_NO_GO_DO_NOT_GENERATE_FRESH_DEV';print('T38_QUALIFIED_FOR_NEW_FIRSTUSE=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T38_UNFAMILIAR_CAUSAL_ORIGINAL_FIRSTUSE_DENIED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t38-original-TRAIN-compositional-${{ matrix.os }}
+          path: |
+            t38-original-TRAIN-science.json
+            t38-original-TRAIN-native.json
+          if-no-files-found: ignore
+          retention-days: 90
