@@ -1,0 +1,58 @@
+name: T44 exact two-step contingent causal planning headroom preflight
+on:
+  push:
+    branches: [research/t44-two-step-contingent-causal-planning-20261020]
+    paths: ['.github/workflows/north-star-t44-contingent-headroom.yml']
+permissions:
+  contents: read
+concurrency:
+  group: Wingless-T44-original-sourcefree-first-math
+  cancel-in-progress: false
+jobs:
+  mathematical-headroom:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 30
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate frozen T44 preregistration before original math
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T44_EXECUTION_SOURCE_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261020-wingless-t44-contingent-planning-prereg.json'='39f6695072cd6b58c08f1e1d9f1c9a2d13b63785'
+            'research/north-star-transfer/20261020-wingless-t44-two-step-exact-headroom.py'='2e249dbe157a14334ac68f3d78cd1cd9a3cb4d09'
+          }
+          foreach($path in $expected.Keys){
+            if((git hash-object -- $path).Trim() -cne $expected[$path]){throw "T44_FROZEN_BLOB_MISMATCH:$path"}
+          }
+          git merge-base --is-ancestor 0cd5ff831e6757d13164611d767bd45e317080a2 f8297ea87bf9ec3ef316810f580c66dd35d018a8
+          if($LASTEXITCODE -ne 0){throw 'T44_MATH_SOURCE_PRECEDED_FROZEN_HYPOTHESIS'}
+          python -m py_compile research/north-star-transfer/20261020-wingless-t44-two-step-exact-headroom.py
+          if($LASTEXITCODE -ne 0){throw 'T44_TWO_STEP_ORIGINAL_SYNTAX_FAILED'}
+          Write-Output 'T44_FROZEN_HYPOTHESIS_AND_EXACT_SOURCE_IDENTITY=PASS'
+      - name: Enumerate all contingent 2-step exact observation trees and independent 256-world proofs
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t44-two-step-exact-headroom.py --headroom > t44-original-exact-2step-headroom.json
+          if($LASTEXITCODE -ne 0){throw 'T44_BELLMAN_OR_INDEPENDENT_POSTERIOR_PROOF_FAILED'}
+          python -c "import json;x=json.load(open('t44-original-exact-2step-headroom.json',encoding='utf-8-sig'));assert x['status']=='EXACT_MATHEMATICAL_PRE_FIRSTUSE_QUALIFICATION_PASS' and x['TRAIN_sourcefree_cases_reserved']==64 and x['validation_sourcefree_cases']==32 and x['two_adaptive_interventions_budget']==2 and x['causal_targets_disjoint_from_all_actions'] and x['sourcefree_prior_programs']==768 and x['full_exact_Boolean_rules']==256 and x['independent_full_256_world_terminal_Brier_proofs']==32 and x['hard_false_certifications']==0 and x['hard_correct_certifications']+x['safe_abstentions']==64 and x['scientific_DEV_generated']==0 and not x['previous_consumed_scientific_cases_replayed'] and not x['learned_candidate_admitted'];assert len(x['sourcefree_case_rows'])==32;print('T44_TECHNICAL_TWO_STAGE_EXACT_ORACLE=PASS');print('T44_HEADROOM_EVIDENCE='+json.dumps({k:x[k] for k in ('optimal_two_step_expected_gain','exact_myopic_first_two_step_expected_gain','best_noncontingent_pair_expected_gain','relative_contingent_DP_advantage_vs_myopic','relative_DP_advantage_vs_best_precommitted_pair','cases_where_optimal_first_beats_myopic','cases_with_branch_contingent_different_second_actions','original_whole_analytic_CPU_ns')},sort_keys=True));print('T44_FROZEN_MINIMUM_NONMYOPIC_HEADROOM='+str(x['DP_two_percent_nonmyopic_headroom_pass']));assert x['DP_two_percent_nonmyopic_headroom_pass'],'T44_VALID_MATHEMATICAL_NO_GO_DO_NOT_TRAIN_SOURCEFREE_CANDIDATE_OR_ORIGINATE_SCIENCE';print('T44_ELIGIBLE_TO_TRAIN_REAL_TWO_STEP_POLICY=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T44_FROZEN_PLANNING_HEADROOM_NOT_PROVEN_NO_SCIENTIFIC_DEV'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t44-original-contingent-math-${{ matrix.os }}
+          path: t44-original-exact-2step-headroom.json
+          if-no-files-found: ignore
+          retention-days: 90
