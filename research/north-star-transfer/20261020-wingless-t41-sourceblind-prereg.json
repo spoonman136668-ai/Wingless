@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.T41.sourceblind-compositional-vs-unrestricted-causal-model-selection.prereg.v1",
+  "date_EDT": "2026-10-20",
+  "parent_sealed_T40": "8d3c12c4b136e09bcfe978b42f4f8ede499e4848",
+  "hypothesis": "Without knowing source regime, a public-TRAIN learned mixture weight between a compositional causal-rule prior and an unrestricted 256-rule prior can update its posterior model probability as observations arrive, transferring structural predictions to unfamiliar atom pairings while avoiding materially worse Brier forecasts on unrestricted laws.",
+  "new_operator": "Fit scalar compositional mixture prior pi in [0.05,0.95] by four unsupervised EM updates over public meta TRAIN 4-bit observations. Given observation mask/output, compute exact Bayes factor L_comp/L_full and update pi_observed = pi*L_comp/(pi*L_comp+(1-pi)*L_full). Future distribution is pi_observed times exact compositional predictive P plus (1-pi_observed) times exact unrestricted predictive P. Learned pi must materially change predictions versus fixed pi=0.5 or disabled pi=0 on disjoint TRAIN validation.",
+  "source_free_regimes": {
+    "nature": "Algebraic TRAIN-only causal-rule source, not new unknown graph scientifically prospective cohort",
+    "gates": "All 16 two-input Boolean atoms in both G/H roles; three operators XOR,AND,OR; 768 syntactic programs with shared 3-input truth tables",
+    "TRAIN_meta": {
+      "structured": 32,
+      "unrestricted": 32
+    },
+    "TRAIN_validation": {
+      "structured": 16,
+      "unrestricted": 16
+    },
+    "TRAIN_structured_pair_partition": "(G+3*H)%4!=0; 192 of 256 ordered pairs",
+    "VALIDATION_structured_pair_partition": "(G+3*H)%4==0; 64 disjoint pairs, complete reuse of exposed gate atoms",
+    "source_training_atom_role_coverage": "Force first 16 structured META G=i and H=(i+1)%16; both roles cover 0..15, all pairs satisfy (G+3H)%4=3",
+    "unrestricted_law_source": "Uniform 0..255 full three-input Boolean truth table; no gate program or latent source-regime label presented to candidate",
+    "private_regime_labels": "Withheld from all model fitting and inference; source evaluator uses them only for stratified scoring and source identity audits",
+    "public_META_observations_per_case": 4,
+    "public_validation_unique_patterns_in_source_order": 6,
+    "public_validation_checkpoints": [
+      2,
+      4,
+      6
+    ],
+    "public_queries_at_each_checkpoint": "All eight causal input patterns; exact hard certifications only for previously observed truth-table entries; probability Brier on unobserved targets only",
+    "TRAIN_source_seed_structured": 41002026,
+    "TRAIN_source_seed_unrestricted": 41012026,
+    "VALIDATION_seed_structured": 41022026,
+    "VALIDATION_seed_unrestricted": 41032026,
+    "stride": 9817,
+    "no_T16_T40_previous_source_case_reuse": true
+  },
+  "strong_controls": [
+    "TRAIN-learned-sourceblind-Bayes-factor-selector",
+    "fixed-50pct-sourceblind-mixture",
+    "TRAIN-fitted-full256-categorical-EM",
+    "TRAIN-fitted-compositional-factor-EM",
+    "TRAIN-fitted-independent-Beta",
+    "uniform-exact-unrestricted-256"
+  ],
+  "fitting_fairness": "Full256 categorical and factor compositional both receive identical public meta observations and four EM rounds with nonzero smoothing. Fixed mixture uses full 768 compositional prior and full 256 base; all posterior likelihoods normalized and exact. Source labels are unavailable to models.",
+  "exact_safety": "An independent all-256-version-space oracle reconstructs every public bit observation and every future query; hard certifications must be implied by all unrestricted consistent truth tables. No nonzero confidence is interpreted as certainty.",
+  "TRAIN_admission": {
+    "learned_scalar_pi_ablation_change_worlds_min": 1,
+    "nondecreasing_certification_and_zero_false_positives": true,
+    "structured_heldout_unresolved_Brier_improvement_vs_best_strong_fitted_control_min": 0.05,
+    "unrestricted_heldout_unresolved_Brier_regression_vs_uniform_exact_max": 0.01,
+    "no_wrong_certified": true,
+    "native_CPU_median_less_than_all_strong_controls_on_BOTH_GitHub_hosted_Windows_Ubuntu": true,
+    "peak_RSS_no_more_than_best_strong_control_on_BOTH_OS": true,
+    "native_repeats_each_arm_OS": 5,
+    "whole_process_includes_META_fitting_generation_public_validation_inference_exact_verifier_and_scoring": true,
+    "DEV_case_generated": 0,
+    "no_retroactive_changes_to_sources_scoring_or_thresholds_after_original_validation": true
+  },
+  "future_science_boundary": "Even if TRAIN validation passes, fresh *scientific* unfamiliar graph/cohort source birth requires separate preregistration, new source IDs and independent one-time source custody. Do not treat source-free TRAIN validation as first-use evidence.",
+  "no_paid_API": true,
+  "no_workstation": true,
+  "no_selfhosted_research_runner": true,
+  "no_new_controller": true,
+  "no_FORGE_or_CKB_changes": true,
+  "draft_only": true,
+  "no_merge_or_optimizer_promotion": true
+}
