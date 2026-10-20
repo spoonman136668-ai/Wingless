@@ -1,0 +1,50 @@
+name: T41 independent exact TRAIN-only sourceblind audit
+on:
+  push:
+    branches: [research/t41-sourceblind-structure-selector-20261020]
+    paths: ['.github/workflows/north-star-t41-independent-TRAIN.yml']
+permissions:
+  contents: read
+jobs:
+  independent-proof:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 35
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Recheck frozen original candidate and separate auditor identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git hash-object -- research/north-star-transfer/20261020-wingless-t41-sourceblind-prereg.json).Trim() -cne 'e860338bc52287b993f0d151f9b45b15a1a99696'){throw 'T41_FROZEN_PRECODE_DRIFT'}
+          if((git hash-object -- research/north-star-transfer/20261020-wingless-t41-sourceblind-model-selector.py).Trim() -cne 'c633c2aa78d96c44dba68c91434cdfd4599e88d3'){throw 'T41_ORIGINAL_MODEL_CHANGED_AFTER_NO_GO'}
+          if((git hash-object -- research/north-star-transfer/20261020-wingless-t41-independent-TRAIN-audit.py).Trim() -cne 'bf3f63e725b3fa80e07a6cb20dae458b7dd8d8e8'){throw 'T41_SEPARATE_AUDIT_CODE_DRIFT'}
+          git merge-base --is-ancestor 5c72b57d344a311bc02a838f3a6f5eab2866883d 8f86b6db5a91bfe1d2b9ec7e2d6ed20a2d369caa
+          if($LASTEXITCODE -ne 0){throw 'T41_AUDITOR_PRECEDED_ORIGINAL_FIRST_TRAIN'}
+          python -m py_compile research/north-star-transfer/20261020-wingless-t41-independent-TRAIN-audit.py
+          if($LASTEXITCODE -ne 0){throw 'T41_INDEPENDENT_AUDIT_SYNTAX_ERROR'}
+          Write-Output 'T41_ORIGINAL_FROZEN_MODEL_AND_SEPARATE_AUDITOR_IDENTITY=PASS'
+      - name: Independently enumerate 256 rule posteriors and all Brier forecast scores
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t41-independent-TRAIN-audit.py > t41-independent-TRAIN-proof.json
+          if($LASTEXITCODE -ne 0){throw 'T41_INDEPENDENT_SOURCEFREE_POSTERIOR_INCORRECT'}
+          python -c "import json;x=json.load(open('t41-independent-TRAIN-proof.json',encoding='utf-8-sig'));assert x['result']=='PASS_INDEPENDENT_TRAIN_ONLY_SOURCEBLIND_CHECK' and x['META_cases']==64 and x['VALIDATION_cases']==32 and x['total_exactly_evaluated_counterfactuals']==768 and x['per_arm_correct_certified']==384 and x['per_arm_safe_abstentions']==384 and x['hard_false_certifications']==0 and x['G_atom_coverage']==16 and x['H_atom_coverage']==16 and x['learned_ablation_affected_worlds']==32 and x['independent_full_rule_posteriors_enumerated'] and x['new_scientific_DEV_created']==0 and not x['old_consumed_scientific_DEV_replayed'];print('T41_INDEPENDENT_TRAIN_CAUSAL_ORACLE_PASS');print('T41_INDEPENDENT_SCORE_AND_ABLATION='+json.dumps(x,sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T41_INDEPENDENT_EXACT_PROOF_REJECTED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t41-independent-frozen-TRAIN-${{ matrix.os }}
+          path: t41-independent-TRAIN-proof.json
+          if-no-files-found: ignore
+          retention-days: 90

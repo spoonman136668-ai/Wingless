@@ -1,0 +1,76 @@
+name: T41 source-blind causal structure selection frozen TRAIN gate
+on:
+  push:
+    branches: [research/t41-sourceblind-structure-selector-20261020]
+    paths: ['.github/workflows/north-star-t41-TRAIN-sourceblind.yml']
+permissions:
+  contents: read
+concurrency:
+  group: wingless-T41-original-sourceblind-TRAIN-only
+  cancel-in-progress: false
+jobs:
+  sourceblind-train-validation:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 35
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen source-free original hypothesis before code and unchanged model
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if((git rev-parse HEAD).Trim() -cne $env:GITHUB_SHA){throw 'T41_EXECUTION_HEAD_DRIFT'}
+          $expected=@{
+            'research/north-star-transfer/20261020-wingless-t41-sourceblind-prereg.json'='e860338bc52287b993f0d151f9b45b15a1a99696'
+            'research/north-star-transfer/20261020-wingless-t41-sourceblind-model-selector.py'='c633c2aa78d96c44dba68c91434cdfd4599e88d3'
+          }
+          foreach($path in $expected.Keys) {
+            if((git hash-object -- $path).Trim() -cne $expected[$path]) {throw "T41_FROZEN_BLOB_DRIFT:$path"}
+          }
+          git merge-base --is-ancestor bc7270980e335b7fb51b1dca220469bb17beff37 a2ba27c41a21cbb139250d624d832d8ff8e8b78d
+          if($LASTEXITCODE -ne 0){throw 'T41_HYPOTHESIS_NOT_FROZEN_BEFORE_CANDIDATE'}
+          git merge-base --is-ancestor a2ba27c41a21cbb139250d624d832d8ff8e8b78d fa5abe1c9d77cd88e84804f9c3d7465fe26d302a
+          if($LASTEXITCODE -ne 0){throw 'T41_PREQUALIFICATION_PUBLIC_META_FIX_NOT_PRESENT'}
+          python -m py_compile research/north-star-transfer/20261020-wingless-t41-sourceblind-model-selector.py
+          if($LASTEXITCODE -ne 0){throw 'T41_ORIGINAL_SOURCE_SYNTAX_ERROR'}
+          Write-Output 'T41_PREREG_MODEL_AND_META_SOURCE_IDENTITY=PASS'
+      - name: Verify new gate atom coverage, learned source-blind model selection and exact certificates
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t41-sourceblind-model-selector.py --train-only > t41-original-TRAIN-science.json
+          if($LASTEXITCODE -ne 0){throw 'T41_TRAIN_TECHNICAL_SOUNDNESS_FAILED'}
+          python -c "import json;x=json.load(open('t41-original-TRAIN-science.json',encoding='utf-8-sig'));assert x['status']=='PASS_TECHNICAL_EXACT_TRAIN_ONLY' and x['public_META_cases']==64 and x['META_structured']==32 and x['META_unrestricted']==32 and x['TRAIN_validation_structured_cases']==16 and x['TRAIN_validation_unrestricted_cases']==16 and x['scientific_DEV_created']==0 and not x['old_research_DEV_reused'] and x['G_role_complete_atoms']==16 and x['H_role_complete_atoms']==16 and x['private_regime_labels_not_used_in_fit_or_inference'] and x['hard_certification_oracle_independent_all_256_rules'] and x['structural_parameter_ablation_changed_worlds']>0 and x['posterior_structural_weight_changed_with_observation_cases']>0;assert all(z['correct']==192 and z['unresolved']==192 for rg in x['results'].values() for z in rg.values());print('T41_GENUINE_SOURCEBLIND_TRAINED_SELECTOR=PASS');print('T41_ORIGINAL_TRAIN_SOURCE_SHIFT='+json.dumps({k:x[k] for k in ('learned_pi','structural_parameter_ablation_changed_worlds','posterior_structural_weight_changed_with_observation_cases','structured_gain_vs_best_strong_control','strongest_structured_control','unrestricted_regression_relative_uniform','structured_5pct_gain_pass','unrestricted_max_1pct_regression_pass')},sort_keys=True));print('T41_CAUSAL_TRAIN_BRIER='+json.dumps({r:{a:round(v['Brier'],8) for a,v in models.items()} for r,models in x['results'].items()},sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T41_FROZEN_SOURCEBLIND_CAUSAL_EVIDENCE_INVALID'}
+      - name: Measure five complete native CPU RSS processes for all equally trained and exact controls
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python research/north-star-transfer/20261020-wingless-t41-sourceblind-model-selector.py --native > t41-original-TRAIN-native.json
+          if($LASTEXITCODE -ne 0){throw 'T41_ORIGINAL_NATIVE_TECHNICAL_INCOMPLETE'}
+          python -c "import json;x=json.load(open('t41-original-TRAIN-native.json',encoding='utf-8-sig'));a=x['arms'];assert x['sourcefree_META']==64 and x['sourcefree_VALIDATION']==32 and x['scientific_DEV_created']==0 and len(a)==6 and all(z['correct_certified']==384 and z['safely_unresolved']==384 and len(z['original_five_whole_CPU_ns'])==5 and len(z['original_five_peak_RSS_bytes'])==5 for z in a.values());print('T41_COMPLETE_NATIVE_RESOURCE_TECHNICAL=PASS');print('T41_NATIVE_COST='+json.dumps({k:{z:v[z] for z in ('median_whole_CPU_ns','max_peak_RSS_bytes','Brier_by_source_regime')} for k,v in a.items()},sort_keys=True))"
+          if($LASTEXITCODE -ne 0){throw 'T41_NATIVE_EVIDENCE_NOT_COMPLETE'}
+      - name: Apply preregistered joint source-shift Brier and native scientific admission
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python -c "import json;s=json.load(open('t41-original-TRAIN-science.json',encoding='utf-8-sig'));n=json.load(open('t41-original-TRAIN-native.json',encoding='utf-8-sig'));eligible=s['structured_5pct_gain_pass'] and s['unrestricted_max_1pct_regression_pass'] and n['strict_CPU_better_than_all_controls'] and n['peak_RSS_nondegression_vs_best_control'];print('T41_FROZEN_STRUCTURED_GAIN='+str(s['structured_5pct_gain_pass']));print('T41_FROZEN_OOD_NO_COLLAPSE='+str(s['unrestricted_max_1pct_regression_pass']));print('T41_FROZEN_CPU='+str(n['strict_CPU_better_than_all_controls']));print('T41_FROZEN_PEAK_RSS='+str(n['peak_RSS_nondegression_vs_best_control']));print('T41_PROSPECTIVE_SCIENTIFIC_SOURCE_ADMISSION='+str(eligible));assert eligible,'T41_VALID_TRAIN_NO_GO_FUTURE_DEV_UNOPENED';print('T41_ELIGIBLE_FOR_SEPARATELY_ORIGINATED_PROSPECTIVE_SOURCE=PASS')"
+          if($LASTEXITCODE -ne 0){throw 'T41_STRICT_SCIENTIFIC_FIRSTUSE_DENIED'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t41-original-TRAIN-sourceblind-${{ matrix.os }}
+          path: |
+            t41-original-TRAIN-science.json
+            t41-original-TRAIN-native.json
+          if-no-files-found: ignore
+          retention-days: 90
