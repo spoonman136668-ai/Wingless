@@ -22,10 +22,11 @@
     "public_history_trials_per_case": 5,
     "public_outputs_per_history": 2,
     "future_counterfactual_queries_per_case": 4,
-    "new_pair_holdout": "Prospective component pairs never used in TRAIN-meta or TRAIN-validation but individual atom gate identities are observed across public TRAIN; holdout criteria fixed before source birth.",
+    "new_pair_holdout": "G,H are indexed 0..7. Source TRAIN-meta and TRAIN-validation draw pairs exclusively satisfying (G+3*H)%4 != 0. Source DEV pairs are exclusively (G+3*H)%4 == 0; the same 8 atom gates and two composition operators have nonzero support in both. Models see neither pair identity nor partition label. Per-atom sampling weights for G=[5,4,3,2,3,2,1,1], H=[1,3,2,4,3,2,1,4], OP weights XOR=3,AND=1 are SOURCE-PRIVATE, never passed to training.",
     "source_no_private_labels_in_fit": true,
     "source_new_seeds_not_T16_T37": true,
-    "internally_originated_not_independent_external": true
+    "internally_originated_not_independent_external": true,
+    "seeds": "Source RNG seed 38002011 + (family D ? 870011 : 0) + (DEV ? 601291 : 0) + case_index*9209; graph seed generated independently from the same case RNG. All 40 meta TRAIN, 16 TRAIN validation, and 64 DEV names fixed as t38-C/D-train-000..027, t38-C/D-dev-000..031."
   },
   "scoring": {
     "certification": "zero wrong hard certifications verified against independently reconstructed all-256-function exact posterior",
