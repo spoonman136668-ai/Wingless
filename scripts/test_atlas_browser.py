@@ -115,7 +115,7 @@ def main():
             wait.until(lambda d: "Admit and start one bounded inference job" ==
                        d.find_element(By.CSS_SELECTOR, "#detail h3").text)
             worker_link = browser.find_element(By.CSS_SELECTOR, "#detail a").get_attribute("href")
-            require(f"/blob/{FROZEN_SOURCE}/worker/service.go#L57-L95" in worker_link,
+            require(f"/blob/{source_commit}/worker/service.go#L57-L95" in worker_link,
                     "selected symbol has a different source definition link")
             recorded.append("actual_symbol_selection_and_source_anchor")
 
@@ -128,7 +128,7 @@ def main():
                        "Execute bounded candidate inference with deterministic verification")
             source = browser.find_element(By.CSS_SELECTOR, "#detail a")
             expected_link = source.get_attribute("href")
-            require(f"/blob/{FROZEN_SOURCE}/broker/runner.go#L33-L112" in expected_link,
+            require(f"/blob/{source_commit}/broker/runner.go#L33-L112" in expected_link,
                     "cross-file graph traversal led to wrong pinned source")
             recorded.append("actual_click_cross_file_relationship")
 
