@@ -1,6 +1,6 @@
 # Wingless
 
-**Research objective:** build Wingless as an independent non-transformer, non-token-centric cognitive architecture with persistent learning, memory, native reasoning and compositional generalization, eventually reaching LLM-class capability with substantially lower resource cost where possible. The present offline-first Go worker and broker contracts are an early engineering application, not the cognitive system or its definition. They do not yet demonstrate native learned cognition, autonomous coding or Codex parity. See [the standing cognitive North Star](docs/COGNITIVE_NORTH_STAR.md).
+**Research objective:** build Wingless as an independent non-transformer, non-token-centric cognitive architecture with persistent learning, memory, native reasoning and compositional generalization, eventually reaching LLM-class capability with substantially lower resource cost where possible. The present offline-first Go worker and broker contracts are an early engineering application, not the cognitive system or its definition. They do not yet demonstrate native learned cognition, autonomous coding or Codex parity. See [the standing cognitive North Star](docs/architecture.md#standing-cognitive-north-star).
 
 ## Run locally
 
