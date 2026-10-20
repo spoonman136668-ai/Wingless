@@ -1,0 +1,68 @@
+name: NCI02 Wingless source-free causal memory feasibility
+on:
+  push:
+    branches: [research/nci02-causal-memory-feasibility-20261020]
+    paths: ['.github/workflows/nci02-causal-memory.yml']
+permissions:
+  contents: read
+concurrency:
+  group: nci02-wingless-sourcefree
+  cancel-in-progress: false
+jobs:
+  causal-retention:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify frozen parent, source identity, scope and source-free status
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 9f8eadf8e2c5e93409043bfca65bc92fc3ea68f3 "$GITHUB_SHA"
+          test "$(git hash-object nativecognition/nci02_test.go)" = 1fa3675ce814c6a82f9cc95a60542ada3997882f
+          python - <<'PY'
+          import json
+          d=json.load(open("research/contrib/openai/nci02/prereg.json"))
+          assert d["schema"]=="nci02.wingless.sourcefree-development.v1"
+          assert d["parent"]=="816de3726dcf00ccea2bb0f4cc39f801a0dd41a4"
+          assert d["constraint"]["scientific_first_use"]==0
+          assert d["cohorts"]["train"]==[6000,6031]
+          assert d["cohorts"]["stress"]==[6200,6231]
+          print("NCI02_W_FROZEN_IDENTITY=PASS")
+          PY
+      - name: Train models on train cohort, evaluate disjoint development and stress once
+        shell: bash
+        run: |
+          set -euo pipefail
+          NCI02_RESULT_PATH="$RUNNER_TEMP/nci02-wingless.json" go test ./nativecognition -run 'TestNCI02' -count=1 -v
+          python - <<'PY'
+          import json,os,pathlib
+          d=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"nci02-wingless.json").read_text())
+          assert d["schema"]=="nci02.wingless.sourcefree-development-result.v1"
+          assert d["result"] in ("PASS_PROXY_ONLY","NEGATIVE")
+          assert d["protected_scientific_first_use"]==0
+          assert not d["entity_binding_learned"] and not d["native_composition_learned"]
+          assert d["training_episodes_per_arm"]==32
+          print("NCI02_W_REAL_RESULT="+d["result"])
+          PY
+      - name: One complete Wingless Go regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./... -count=1
+          go vet ./nativecognition
+          echo 'NCI02_W_FULL_REGRESSION=PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nci02-wingless-causal-memory-development
+          path: ${{ runner.temp }}/nci02-wingless.json
+          if-no-files-found: warn
+          retention-days: 90
