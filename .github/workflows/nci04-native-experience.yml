@@ -28,8 +28,8 @@ jobs:
           set -euo pipefail
           git merge-base --is-ancestor 789d5c4137c6c5e7f578440f6f458165f7d102fc "$GITHUB_SHA"
           test "$(git hash-object cognition/experience.go)" = ffab814422f804f2e366ce2c399d0ccffda6d86d
-          test "$(git hash-object cognition/experience_test.go)" = 00df834ffe4a2a3d97d3ceee5c97f10f64564062
-          test "$(git hash-object cmd/wingless/cognition.go)" = eceddf76fbb82ba8f6440b39748a30ab7e8d0836
+          test "$(git hash-object cognition/experience_test.go)" = f2c83c660b8134f052baf1343187a84612b5a608
+          test "$(git hash-object cmd/wingless/cognition.go)" = ce6e30a6fc4ff1595f8e405e93d2dba776e46474
           test "$(git hash-object cmd/wingless/experience_test.go)" = a8a5066f692b83fa617aaf526305218b95b42393
           python - <<'PY'
           import json
