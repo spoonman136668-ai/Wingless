@@ -1,0 +1,35 @@
+{
+  "schema": "nci04.postrun.sourceonly-provenance-negative.v1",
+  "program": "Wingless",
+  "frozen_commit": "89af54108926d6221b75541e41352d163d822034",
+  "actual_source_commit": "4d1f7a9a17e221e267b43fc8ae1c2d4ffe9a2c5f",
+  "qualification_url": "https://github.com/spoonman136668-ai/Wingless/actions/runs/39514644664",
+  "qualification_job_id": 118943764875,
+  "artifact_id": 12308050278,
+  "artifact_zip_sha256": "71fd0a86a056b1b9f17c7ff2d57a33788a70334c24df68d4294795de50a97995",
+  "source_paths": "nativecognition/predictive.go;nativecognition/predictive_test.go",
+  "observed_result": "NEGATIVE",
+  "frozen_criteria_met": false,
+  "sourcefree_stress_return_A_MSE": {
+    "candidate": 0.0006108231188580775,
+    "trained_strong_recurrent": 0.0009259140381471002,
+    "erased_or_reset_candidate": 0.0006499691482728707
+  },
+  "relative_gain_vs_strong_control": 0.3403025619090615,
+  "ablation_absolute_mse_delta": 0.000039146029414793186,
+  "analysis": "observed return-A MSE reduction relative to 32-weight trained recurrent comparator; ablation error rises only 6.4% vs the candidate, below 10% required",
+  "test_and_ci": "PASS: prerequisite frozen identity, focused native tests, affected full regression where specified",
+  "scientific_interpretation": "NO NATIVE_ENTITY_BINDING OR CAUSAL_TRANSFER ACCEPTANCE. Input remains four fixed sensory coordinates, original stream operator hidden; new contexts generated deterministically.",
+  "methodological_limits": [
+    "The precode implementation's world resets model state across independently seeded worlds; there is no cumulative cross-world learned knowledge.",
+    "Training seed cohort was evaluated with fixed update hyperparameters but no separately trained persistent weights carried to the other cohorts; therefore this is an online-adaptation feasibility screen, not learned source-to-new-source parameter transfer.",
+    "Observational next-state prediction does not identify causal interventions; interpreting the hidden matrix as a causal model is not justified by observations alone.",
+    "Memory erasure is performed at the start of returning A and not independently strong evidence of learned identity retention.",
+    "Resource fairness of all comparators includes declared but unmatched resident state sizes, arithmetic and learning-cost accounting; no superiority claim."
+  ],
+  "first_use": 0,
+  "no_external_model": true,
+  "protected_main_mutated": false,
+  "original_negative_preserved": true,
+  "verdict": "RETAIN_DEVELOPMENT_NEGATIVE__DO_NOT_MERGE__DO_NOT_ACCEPT"
+}
