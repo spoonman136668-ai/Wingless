@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 8318afcb5d1c44c98bdc35df078c37d906c79538
+          ref: d312f2ada99cce4d994f271bbed54cbe7d52027e
           fetch-depth: 0
           persist-credentials: true
       - uses: actions/setup-go@v5
@@ -28,7 +28,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $target = '8318afcb5d1c44c98bdc35df078c37d906c79538'
+          $target = 'd312f2ada99cce4d994f271bbed54cbe7d52027e'
           $branch = 'docs/northstar-nontransformer-governance-20261020'
           if ((git rev-parse HEAD).Trim() -cne $target) { throw 'SOURCE_IDENTITY_DRIFT' }
           git fetch origin $branch --quiet
