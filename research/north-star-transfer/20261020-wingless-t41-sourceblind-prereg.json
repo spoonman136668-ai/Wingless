@@ -1,0 +1,69 @@
+{
+  "schema": "wingless.T41.source-blind-causal-prior-selector.preimplementation.v1",
+  "date_edt": "2026-10-20",
+  "exact_parent_commit": "8d3c12c4b136e09bcfe978b42f4f8ede499e4848",
+  "parent_pr": "https://github.com/spoonman136668-ai/Wingless/pull/328",
+  "identity_scope": "Wingless research optimizer only. No FORGE, CKB-plane, KTRADE, K-Terminal, or workstation.",
+  "original_T40_summary": "Compositional public-trained predictions beat strong controls under structured priors, but under unrestricted laws Brier 0.265-0.349 vs uniform 0.25; native performance unproven.",
+  "question": "Can a model choose between a compositional and unrestricted causal-law prior from public TRAIN evidence alone, preserving forecast gains under structured mechanisms without suffering systematic unrestricted-law miscalibration?",
+  "hypothesis": "A public-TRAIN-heldout marginal-likelihood selector over a factorized compositional law prior versus an unrestricted uniform 256-rule prior may learn when exact compositional constraints are informative. The selector never alters the independently exact all-256 hard-certification standard.",
+  "candidate": {
+    "fit": "Given 64 public TRAIN trajectories per source-free regime, first 48 fit an S3-free 768 program-factorization model using exactly three EM sweeps; on a disjoint 16 held-out TRAIN trajectories infer a scalar mixture weight selected from the fixed grid [0,0.25,0.5,0.75,1] by joint-signature log likelihood; refit factorized model on all 64 public TRAIN trajectories for forecast use.",
+    "priors": "Composition prior over all 16x16x3 causal programs; unrestricted prior over all 256 truth tables. No private regime, law, or identity labels available to candidate.",
+    "prediction": "Condition learned mixture over all public-TRAIN-consistent 256 laws; forecast unobserved bits only. Never infer that a distributional score licenses hard certification.",
+    "exact_guard": "Independent exact all-256 legal-law version space; only observed bits or logical entailment can be hard certified. No confidence-to-proof conversion.",
+    "safety_on_unsupported_training": "Trained selection must be empirically demonstrated; an unrestricted prior that is merely hard-coded as a fallback is not accepted as learned cognition."
+  },
+  "sourcefree_custody": {
+    "new_public_META_train_per_regime": 64,
+    "new_sourcefree_eval_per_regime": 96,
+    "sourcefree_regimes": [
+      "unrestricted256",
+      "uniform_composition768",
+      "nonuniform_composition768"
+    ],
+    "sourcefree_eval_observation_budgets": [
+      2,
+      4,
+      6
+    ],
+    "no_T40_case_or_seed_reuse": true,
+    "distinct_public_train_vs_eval_generators": true,
+    "G_H_gate_coverage": "all 16 input-output gates independently guaranteed in G and H public TRAIN program-origin identities for compositional families, but identity only visible to generation auditor",
+    "out_of_class_control": "unrestricted 256, including 64 Boolean functions not realizable by specified compositional grammar",
+    "independent_first_use": false,
+    "native_scientific_DEV_unborn": true,
+    "no_previous_consumed_DEV_opened": true
+  },
+  "fair_controls": [
+    "Equal-TRAIN-fitted factored-composition 768",
+    "Equal-TRAIN-fitted full joint 768 categorical",
+    "Equal-TRAIN-fitted full unrestricted 256 categorical",
+    "Equal-TRAIN-fitted independent Beta-bit predictor",
+    "Exact uniform unrestricted 256",
+    "Untrained fixed mixture 0.5 composition / unrestricted as selection ablation",
+    "TRAIN-fitting selector only, source-identity-labeled oracle excluded from eligible controls"
+  ],
+  "prereg_acceptance": {
+    "correct_hard_certifications": "zero hard false certifications under all 256 laws",
+    "risk": "No >0.01 mean Brier regression vs uniform 0.25 on unrestricted, across 2/4/6 public masks. Structured regimes require lower Brier than best equally TRAIN-fitted comparator across each public mask budget to claim superiority.",
+    "causal_ablation": "TRAIN-fitted selector must demonstrably change weights or forecasts compared to fixed 0.5 mixture; no selection inferred from test labels.",
+    "complete_cost": "Five fresh whole-process trials per arm on both GitHub-hosted Windows and Linux. Include all sourcefree TRAIN creation, fitting, heldout selection, eval construction, exact verification, and prediction.",
+    "native_admission": "No complete CPU regression and no peak-RSS regression against strongest eligible equally trained comparator, zero correctness regression, and measured query-service parity; else do not advance to original scientific first use.",
+    "unknown_service_cost": "UNMEASURED => scientific and optimizer adoption remain false.",
+    "preserve_failure": "Do not modify thresholds after evaluation, reuse consumed sourcefree eval, or relabel mathematical feasibility as scientific transfer.",
+    "scope": "Source-free internal feasibility; even full gate pass only warrants proposing separate independently authenticated new causal source-family first use."
+  },
+  "execution": "freeze -> new sourcefree generator commit -> candidate+controls commit -> sourcefree property checks before evaluation -> exactly one Windows/Linux GH-hosted comparison -> seal original hashes and positive/negative evidence",
+  "authority": {
+    "draft_PR_only": true,
+    "no_merge": true,
+    "no_paid_inference": true,
+    "no_new_controller": true,
+    "no_owner_workstation": true,
+    "no_self_hosted_runner": true,
+    "no_CKB_plane_or_FORGE": true,
+    "no_scientific_firstuse": true,
+    "no_optimizer_promotion": true
+  }
+}
