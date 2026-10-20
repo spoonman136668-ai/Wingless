@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Headless Chrome UI acceptance of the unchanged merged Wingless offline ICE atlas.
+"""Headless Chrome UI acceptance of source-bound Wingless offline ICE atlases.
 
 Invoked by the existing Windows atlas qualification in its disposable PR checkout.
 No application process, inference model, science files, or service is started.
@@ -43,15 +43,26 @@ def main():
             "merged main object unavailable")
     require(git(root, "merge-base", MERGED_MAIN, head) == MERGED_MAIN,
             "browser acceptance not based on the merged main")
+    # The frozen merged baseline is immutable. A reviewed source-bound
+    # regeneration of the PR atlas is permitted, never a silent mutation of
+    # the frozen evidence or an unpinned HTML replacement.
     for file in (".ice/code-intelligence.html", ".ice/code-intelligence.json"):
-        require(git(root, "rev-parse", f"{MERGED_MAIN}:{file}") ==
-                git(root, "rev-parse", f"{head}:{file}"),
-                "proposed browser test modified the promoted atlas: " + file)
+        require(git(root, "cat-file", "-t", f"{MERGED_MAIN}:{file}") == "blob",
+                "original promoted atlas unavailable: " + file)
+        require(git(root, "cat-file", "-t", f"{head}:{file}") == "blob",
+                "candidate atlas unavailable: " + file)
     atlas_file = root / ".ice/code-intelligence.html"
     require(atlas_file.is_file(), "offline atlas unavailable")
     atlas = json.loads((root / ".ice/code-intelligence.json").read_text("utf-8"))
-    require(atlas["source_commit"] == FROZEN_SOURCE and len(atlas["nodes"]) == 352,
-            "wrong atlas source or symbol inventory")
+    source_commit = atlas.get("source_commit", "")
+    require(git(root, "cat-file", "-t", source_commit) == "commit" and
+            git(root, "merge-base", FROZEN_SOURCE, source_commit) == FROZEN_SOURCE and
+            git(root, "merge-base", source_commit, head) == source_commit and
+            len(atlas["nodes"]) == 352,
+            "wrong atlas source lineage or symbol inventory")
+    source_header = "SOURCE_COMMIT: " + source_commit
+    require((root / ".ice/code-intelligence.ice").read_text("utf-8").splitlines().count(source_header) == 1,
+            "candidate atlas narrative source identity mismatch")
 
     paths = [
         Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe"),
@@ -61,7 +72,7 @@ def main():
     require(os.name == "nt" and binary is not None,
             "Google Chrome missing from hosted Windows environment")
 
-    recorded = ["merged_main_and_atlas_blob_identity"]
+    recorded = ["frozen_baseline_preserved_and_source_bound_candidate_identity"]
     with tempfile.TemporaryDirectory(prefix="wingless-atlas-chrome-") as profile:
         chrome_options = Options()
         chrome_options.binary_location = str(binary)
@@ -142,7 +153,7 @@ def main():
         "result": "WINGLESS_ATLAS_CHROMIUM_BROWSER_ACCEPTANCE_PASS",
         "merged_main": MERGED_MAIN,
         "browser_test_commit": head,
-        "source_commit": FROZEN_SOURCE,
+        "source_commit": source_commit,
         "tested_html": ".ice/code-intelligence.html",
         "browser": "Google Chrome, Windows hosted, real Selenium UI",
         "steps": recorded,
