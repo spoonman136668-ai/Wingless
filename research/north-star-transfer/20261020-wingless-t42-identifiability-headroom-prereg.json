@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.T42.sourcefree-exact-causal-structure-information-identifiability-prereg.v1",
+  "date_EDT": "2026-10-20",
+  "parent_T41_original_no_go": "3a00fed77190c574194b3d310eb68bd539e21acb",
+  "mathematical_hypothesis": "A correctly specified 50/50 compositional/unrestricted Bayes-factor mixture is already optimal in expected Brier risk if the actual source-class frequency is exactly 50/50; learning the source-class prior alone cannot add expected accuracy under this matched distribution. Class recognition is information limited by overlap between the two rule distributions; T42 enumerates attainable class accuracy and conditional predictive risk from 0 to 8 public observed causal truth-table bits without another learned model.",
+  "causal_rule_families": {
+    "C": "Uniform over all 16x16x3 syntactic compositions G(a,b) OP H(b,c), OP in XOR/AND/OR, projected to a probability over all 256 three-input Boolean truth tables preserving syntactic multiplicities",
+    "U": "Uniform over every one of 256 three-input Boolean truth tables, truly independent bits",
+    "grammar": "Each of 16 two-input Boolean gates is represented by its complete 4-bit truth table. Exact causal program prior source-blind via projected counts over latent syntactic programs.",
+    "true_source_class_priors": [
+      0.1,
+      0.25,
+      0.5,
+      0.75,
+      0.9
+    ],
+    "observed_public_rule_bit_budgets": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "sourcefree_not_scientific_DEV": true
+  },
+  "exact_exhaustive_protocol": {
+    "each_k": "Enumerate every combination of k distinct public causal input-pattern bits among 8 and every 2^k public output assignment. For each (mask,signature), independently sum projected composition and unrestricted source-prior masses.",
+    "recognition": "Bayes optimal source-class posterior odds from public Bayes factor, MAP source recognition accuracy, likelihood-ratio total variation and equivocation H(source|public), source/evidence mutual information in bits averaged across all input masks and output signatures weighted by generating probabilities.",
+    "nonidentifiability": "Quantify irreducible source-class Bayes classification error; at k=8 the unrestricted source still assigns positive probability to every complete eight-bit rule so class can never be recognized perfectly.",
+    "forecast": "For each k=0..7 and every unseen input bit target compute exact source-conditioned predictive probabilities and source-mixed expected Brier risk under actual mixture pi. Compare true-pi source-blind Bayes optimum, fixed 50/50 Bayes mixture, simple unrestricted 0.5 forecast, and evaluator-only clairvoyant class-known oracle. Average evenly over masks/targets and according to true event probabilities; no Monte Carlo.",
+    "gain": "report attainable relative reduction in expected Brier of correctly calibrated true-pi mixture versus fixed 0.5; class-known oracle upper bound as distinct unattainable information; do not call clairvoyant information a learned benefit.",
+    "independent_checks": "A separate direct 768-program source-class likelihood/predictive calculation must match the 256-table projected sums for all k for a deterministic independent set of input masks and each positive-probability response signature. Verify Bayes posterior normalization, nonnegative proper scoring regret, equality true-pi to fixed-50/50 at pi=0.5 to 1e-11, zero uniform-unrestricted unseen-bit information, exact class-error lower bound, and no full class identifiability at k=8.",
+    "independent_result": "no scientific source/regime labels revealed to a learned candidate, and no DEV generated."
+  },
+  "decision": {
+    "native_speed_not_claimed": "This is an exact analytical information audit, not an executable learned model's native-performance qualification. Do not make any new science-firstuse or learned-cognition claim.",
+    "scientific_HEADROOM_required": "Report when even a hypothetically perfect source-class recognizer could improve forecast risk by >=5% over the matched true-prior mixture, and whether simply learning class prior could improve >=5% beyond fixed mixture under skewed source frequencies.",
+    "prospective_requirements": "If a later mechanism is warranted, it needs separate prereg, truly new source-born case IDs, TRAIN-only source-blind model selection with strong equally trained controls, independent exact verification, five whole-process CPU and RSS measures per arm on hosted Linux and Windows, and zero incorrect certifications before one authentic scientific first-use.",
+    "no_test_on_old_T16_T41_consumed_case_data": true,
+    "no_thirdparty_recruitment_gate": true
+  },
+  "guards": {
+    "only_new_mathematical_source_free_files": true,
+    "no_scientific_DEV_generated_or_opened": true,
+    "no_prior_DEV_reused": true,
+    "no_API_costs": true,
+    "no_workstation": true,
+    "no_new_runner_or_controller": true,
+    "no_merge_or_optimizer_promotion": true,
+    "no_FORGE_CKB_plane_changes": true
+  }
+}
