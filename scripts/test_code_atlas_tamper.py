@@ -96,6 +96,18 @@ def mutate_viewer(raw):
     return (src[:start] + encoded + src[end:]).encode("utf-8")
 
 
+
+def mutate_provisional_promotion(doc):
+    node = next(n for n in doc["nodes"]
+                if n.get("evidence_basis") == "lexical-provisional")
+    node["evidence_basis"] = "source-reviewed"
+
+def mutate_provisional_source_token(doc):
+    node = next(n for n in doc["nodes"]
+                if n.get("evidence_basis") == "lexical-provisional")
+    node["provenance_lineage"]["literal_tokens"] = [
+        "FORGED_PROVISIONAL_TOKEN_MUST_NOT_EXIST_782149"]
+
 def mutate_typed(raw):
     doc = json.loads(raw.decode("utf-8-sig"))
     require(doc.get("relationships"), "no relationships to remove")
@@ -170,15 +182,39 @@ def main():
         run_negative("type-resolved-edge-forgery", work, Path("../typed-forgery.json"),
                      mutate_typed, typed_validation, PROOF_MARKER + " type-unverified reviewed relationship")
 
+        # G28 candidate-head additions are always unreviewed; actively prove
+        # they cannot impersonate independent review or cite fabricated tokens.
+        run_negative("provisional-promotion-forgery", work, ATLAS,
+                     lambda b: replace_json(b, mutate_provisional_promotion),
+                     validation, PROOF_MARKER + " source-reviewed symbol has no explicit proof")
+        run_negative("provisional-source-token-forgery", work, ATLAS,
+                     lambda b: replace_json(b, mutate_provisional_source_token),
+                     validation, PROOF_MARKER + " G28 provisional receipt source tokens invalid")
+
         # The original source-derived ICE gate must independently detect file drift.
         go_validation = ["go", "run", "./cmd/ice", "validate"]
         run_negative("canonical-ice-source-staleness", work, SOURCE,
                      lambda b: b + b"\n// negative qualification index staleness only\n",
                      go_validation, "ICE_STALE:")
-        # G26 maintenance must be qualified in separate exact-head clones.
+        # G26/G28 maintenance of the original 352 human-reviewed declarations
+        # must be tested on its *qualified historical source*; trying to relabel
+        # the 51 new provisional declarations as historical reviewed entries is
+        # explicitly forbidden. This second checkout is disposable and source-pinned.
+        reviewed_base = "48ba343b403bc9b4389ce1777130e546b3c446bd"
+        ancestry = execute(["git", "merge-base", "--is-ancestor",
+                            reviewed_base, current_commit], cwd=work)
+        require(ancestry.returncode == 0,
+                "historical reviewed base does not precede candidate")
+        old_work = Path(tmp) / "original-reviewed-352"
+        hist_clone = execute(["git", "clone", "--quiet", "--no-hardlinks",
+                              "--no-checkout", str(root), str(old_work)], cwd=root)
+        require(hist_clone.returncode == 0, "historical scratch clone failed")
+        hist_checkout = execute(["git", "checkout", "--quiet", "--detach",
+                                 reviewed_base], cwd=old_work)
+        require(hist_checkout.returncode == 0, "historical reviewed head unavailable")
         g26 = execute([sys.executable, "-B", "scripts/test_source_aware_atlas.py",
-                       "--root", str(root), "--scratch-parent", str(args.scratch_parent or Path(tmp))],
-                      cwd=root, timeout=900)
+                       "--root", str(old_work), "--scratch-parent", str(args.scratch_parent or Path(tmp))],
+                      cwd=old_work, timeout=900)
         require(g26.returncode == 0 and
                 "G26_ISOLATED_MAINTENANCE_QUALIFICATION_PASS" in g26.stdout,
                 "G26 source-aware regeneration qualification failed: " + g26.stdout[-2400:])
@@ -188,7 +224,7 @@ def main():
         print(json.dumps({
             "result": "WINGLESS_ATLAS_NEGATIVE_QUALIFICATION_PASS",
             "head": current_commit,
-            "expected_rejections": 8,
+            "expected_rejections": 10,
             "positive_control": "PASS",
             "source_checkout_changed": False,
             "scratch_cleanup": "automatic",
