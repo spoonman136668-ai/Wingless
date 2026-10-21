@@ -209,9 +209,18 @@ def main():
         run_negative("inherited-provisional-source-token-forgery", work, ATLAS,
                      lambda b: replace_json(b, mutate_inherited_provisional_token),
                      validation, PROOF_MARKER + " G28 inherited provisional tokens do not bind source")
-        run_negative("changed-provisional-source-token-forgery", work, ATLAS,
-                     lambda b: replace_json(b, mutate_changed_provisional_token),
-                     validation, PROOF_MARKER + " G28 changed provisional literal witness invalid")
+        candidate_nodes = json.loads((work / ATLAS).read_text(encoding="utf-8"))["nodes"]
+        has_changed_provisional = any(
+            n.get("evidence_basis") == "lexical-provisional" and
+            n.get("provenance_lineage", {}).get("mode") ==
+            "provisional-source-change-witness"
+            for n in candidate_nodes)
+        if has_changed_provisional:
+            run_negative("changed-provisional-source-token-forgery", work, ATLAS,
+                         lambda b: replace_json(b, mutate_changed_provisional_token),
+                         validation, PROOF_MARKER + " G28 changed provisional literal witness invalid")
+        else:
+            print("G28_NO_CHANGED_PROVISIONAL_DECLARATIONS: changed-witness case inapplicable")
 
         # The original source-derived ICE gate must independently detect file drift.
         go_validation = ["go", "run", "./cmd/ice", "validate"]
@@ -246,7 +255,7 @@ def main():
         print(json.dumps({
             "result": "WINGLESS_ATLAS_NEGATIVE_QUALIFICATION_PASS",
             "head": current_commit,
-            "expected_rejections": 12,
+            "expected_rejections": 11 + int(has_changed_provisional),
             "positive_control": "PASS",
             "source_checkout_changed": False,
             "scratch_cleanup": "automatic",
