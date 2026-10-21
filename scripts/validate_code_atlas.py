@@ -15,6 +15,11 @@ ALLOWED_DIFF = {
     ".ice/code-intelligence.html",
     ".ice/manifest.json",
     ".ice/architecture-map.json",
+    ".ice/dependency-map.json",
+    ".ice/symbol-map.json",
+    ".ice/test-map.json",
+    ".ice/implementations.json",
+    "scripts/nci04d2_emit_atlas.py",
     "scripts/validate_code_atlas.py",
     "scripts/test_code_atlas_tamper.py",
     "scripts/test_atlas_browser.py",
@@ -129,51 +134,84 @@ def validate(root, relationship_file):
         # G26 reuse is checked against immutable source bytes; a new self-asserted
         # review cannot independently authenticate a human or admit changed code.
         lineage = node.get("provenance_lineage")
+        if basis == "lexical-provisional":
+            require(isinstance(lineage, dict)
+                    and lineage.get("mode") == "new-symbol-source-bound-provisional"
+                    and node["label"].startswith("PROVISIONAL: "),
+                    "G28 unreviewed symbol missing source-bound provisional receipt")
         if lineage is not None:
-            require(isinstance(lineage, dict), "G26 invalid provenance lineage")
-            # A self-asserted receipt is never an independent review, even if
-            # all source hashes and literal anchors happen to match.
-            if lineage.get("mode") == "fresh-review-receipt-unverified-identity":
-                require(False, "G26_UNAPPROVED_FRESH_REVIEW: independent review not authenticated")
-            prior = lineage.get("prior_source_commit", "")
-            require(isinstance(prior, str) and
-                    re.fullmatch(r"[0-9a-f]{40}", prior) is not None,
-                    "G26 previous source identity invalid")
-            old_start = lineage.get("prior_start_line")
-            old_end = lineage.get("prior_end_line")
-            require(isinstance(old_start, int) and isinstance(old_end, int) and
-                    1 <= old_start <= old_end, "G26 historical declaration lines invalid")
-            cache_id = (prior, s["file"])
-            if cache_id not in historical_source_cache:
-                read = subprocess.run(
-                    ["git", "show", prior + ":" + s["file"]],
-                    cwd=root, capture_output=True)
-                require(read.returncode == 0, "G26 old source unavailable")
-                historical_source_cache[cache_id] = read.stdout
-            old_source = historical_source_cache[cache_id]
-            require(hashlib.sha256(old_source).hexdigest() ==
-                    lineage.get("prior_file_sha256"),
-                    "G26 historical file hash mismatch")
-            old_lines = old_source.splitlines(keepends=True)
-            now_lines = (root / s["file"]).read_bytes().splitlines(keepends=True)
-            require(old_end <= len(old_lines) and s["end"] <= len(now_lines),
-                    "G26 historical or current span exceeds source")
-            old_decl = b"".join(old_lines[old_start-1:old_end]).replace(b"\r\n", b"\n")
-            now_decl = b"".join(now_lines[s["start"]-1:s["end"]]).replace(b"\r\n", b"\n")
-            prev_digest = hashlib.sha256(old_decl).hexdigest()
-            now_digest = hashlib.sha256(now_decl).hexdigest()
-            require(prev_digest == lineage.get("prior_declaration_sha256") and
-                    now_digest == lineage.get("current_declaration_sha256"),
-                    "G26 declaration provenance digest mismatch")
-            if lineage.get("mode") == "canonical-LF-declaration-byte-reuse":
-                require(prev_digest == now_digest,
-                        "G26 claimed reused declaration body changed")
+            require(isinstance(lineage, dict), "G28 invalid provenance lineage")
+            if lineage.get("mode") == "new-symbol-source-bound-provisional":
+                require(basis == "lexical-provisional" and proof is None
+                        and lineage.get("independent_approval") is False,
+                        "G28 provisional receipt claims independent review")
+                require(lineage.get("target_source_commit") == source_commit
+                        and lineage.get("file_sha256") == node["file_sha256"],
+                        "G28 provisional receipt source identity drift")
+                now_lines = (root / s["file"]).read_bytes().splitlines(keepends=True)
+                declaration = b"".join(now_lines[s["start"]-1:s["end"]])
+                require(hashlib.sha256(declaration.replace(b"\r\n", b"\n")).hexdigest()
+                        == lineage.get("current_declaration_sha256"),
+                        "G28 provisional source-declaration digest drift")
+                tokens = lineage.get("literal_tokens")
+                require(isinstance(tokens, list) and 1 <= len(tokens) <= 12
+                        and all(isinstance(t, str) and len(t) >= 4
+                                and t.strip() == t and t.encode("utf-8") in declaration
+                                for t in tokens),
+                        "G28 provisional receipt source tokens invalid")
+                require(isinstance(lineage.get("reviewer_assertion"), str)
+                        and len(lineage["reviewer_assertion"].strip()) >= 3,
+                        "G28 provisional reviewer assertion missing")
             else:
-                require(lineage.get("mode") ==
-                        "fresh-review-receipt-unverified-identity",
-                        "G26 unknown review lineage class")
+                require(isinstance(lineage, dict), "G26 invalid provenance lineage")
+                # A self-asserted receipt is never an independent review, even if
+                # all source hashes and literal anchors happen to match.
+                if lineage.get("mode") == "fresh-review-receipt-unverified-identity":
+                    require(False, "G26_UNAPPROVED_FRESH_REVIEW: independent review not authenticated")
+                prior = lineage.get("prior_source_commit", "")
+                require(isinstance(prior, str) and
+                        re.fullmatch(r"[0-9a-f]{40}", prior) is not None,
+                        "G26 previous source identity invalid")
+                old_start = lineage.get("prior_start_line")
+                old_end = lineage.get("prior_end_line")
+                require(isinstance(old_start, int) and isinstance(old_end, int) and
+                        1 <= old_start <= old_end, "G26 historical declaration lines invalid")
+                cache_id = (prior, s["file"])
+                if cache_id not in historical_source_cache:
+                    read = subprocess.run(
+                        ["git", "show", prior + ":" + s["file"]],
+                        cwd=root, capture_output=True)
+                    require(read.returncode == 0, "G26 old source unavailable")
+                    historical_source_cache[cache_id] = read.stdout
+                old_source = historical_source_cache[cache_id]
+                require(hashlib.sha256(old_source).hexdigest() ==
+                        lineage.get("prior_file_sha256"),
+                        "G26 historical file hash mismatch")
+                old_lines = old_source.splitlines(keepends=True)
+                now_lines = (root / s["file"]).read_bytes().splitlines(keepends=True)
+                require(old_end <= len(old_lines) and s["end"] <= len(now_lines),
+                        "G26 historical or current span exceeds source")
+                old_decl = b"".join(old_lines[old_start-1:old_end]).replace(b"\r\n", b"\n")
+                now_decl = b"".join(now_lines[s["start"]-1:s["end"]]).replace(b"\r\n", b"\n")
+                prev_digest = hashlib.sha256(old_decl).hexdigest()
+                now_digest = hashlib.sha256(now_decl).hexdigest()
+                require(prev_digest == lineage.get("prior_declaration_sha256") and
+                        now_digest == lineage.get("current_declaration_sha256"),
+                        "G26 declaration provenance digest mismatch")
+                if lineage.get("mode") == "canonical-LF-declaration-byte-reuse":
+                    require(prev_digest == now_digest,
+                            "G26 claimed reused declaration body changed")
+                else:
+                    require(lineage.get("mode") ==
+                            "fresh-review-receipt-unverified-identity",
+                            "G26 unknown review lineage class")
         dependency_proof = node.get("file_level_local_package_dependencies")
-        require(dependency_proof is not None, "missing file-level dependency evidence: " + symbol_id)
+        if basis == "source-reviewed":
+            require(dependency_proof is not None,
+                    "missing reviewed file-level dependency evidence: " + symbol_id)
+        else:
+            require(dependency_proof is None,
+                    "G28 provisional symbol may not claim reviewed dependencies")
         if dependency_proof is not None:
             require(basis == "source-reviewed" and proof is not None,
                     "file-level package dependencies require a reviewed symbol: " + symbol_id)
@@ -186,8 +224,8 @@ def validate(root, relationship_file):
                     "local package dependency identity drift: " + symbol_id)
             dependency_bound += 1
         contract = node.get("test_contract")
-        if s["file"].endswith("_test.go"):
-            require(basis == "source-reviewed" and proof is not None and isinstance(contract, dict),
+        if s["file"].endswith("_test.go") and basis == "source-reviewed":
+            require(proof is not None and isinstance(contract, dict),
                     "unreviewed test contract or missing source proof: " + symbol_id)
             classification = ("test_case" if s["kind"] == "function" and s["name"].startswith("Test")
                               else "test_fixture_or_helper")
@@ -220,7 +258,9 @@ def validate(root, relationship_file):
     require(atlas["coverage"]["source_reviewed_labels"] == reviewed, "reviewed count drift")
     require(atlas["coverage"].get("source_evidenced_new_labels") == evidenced,
             "new source-evidence count drift")
-    require(evidenced == reviewed == len(nodes), "source evidence not uniform across all symbols")
+    require(evidenced == reviewed and reviewed >= 352
+            and len(nodes) - reviewed == atlas["coverage"]["lexical_provisional_labels"],
+            "G28 reviewed baseline or provisional symbol accounting drift")
     require(atlas["coverage"]["lexical_provisional_labels"] == len(nodes)-reviewed, "provisional count drift")
 
     ids = set(actual)

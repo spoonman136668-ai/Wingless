@@ -97,7 +97,7 @@
   },
   {
     "path": ".github/workflows/wingless-code-atlas.yml",
-    "sha256": "3210bd132d31d4116014060f316172e699b858505e637a4775e99c4fb51049bf"
+    "sha256": "6f4ad88a80f22dff5c1e1100a27eeeda03ff26ab566ae9b13e3391d439a048c3"
   },
   {
     "path": ".gitignore",
@@ -263,6 +263,31 @@
     ]
   },
   {
+    "path": "cmd/wingless/cognition.go",
+    "sha256": "5b3fcb3b36c8ccfedd8f883df8146ec58bf7eff9bb869ec296df70f3b6052882",
+    "package": "main",
+    "imports": [
+      "bufio",
+      "bytes",
+      "encoding/json",
+      "errors",
+      "fmt",
+      "io",
+      "os",
+      "github.com/spoonman136668-ai/Wingless/cognition"
+    ]
+  },
+  {
+    "path": "cmd/wingless/cognition_test.go",
+    "sha256": "9c9f5f029e4a426d4e2b46512b0eb8f77bd12b1ec7ac3384139791b628a2ab75",
+    "package": "main",
+    "imports": [
+      "bytes",
+      "strings",
+      "testing"
+    ]
+  },
+  {
     "path": "cmd/wingless/gpu.go",
     "sha256": "c5ae2639d35132a2fb5e65315e8805a852b8096b2179b0ec5c66ef6963631109",
     "package": "main",
@@ -272,6 +297,17 @@
       "flag",
       "github.com/spoonman136668-ai/Wingless/resources",
       "os"
+    ]
+  },
+  {
+    "path": "cmd/wingless/ice_cognition.go",
+    "sha256": "24f57e3d80f4923fca43989443943c6a7bae730964f59184f551e7f55319b13f",
+    "package": "main",
+    "imports": [
+      "encoding/json",
+      "fmt",
+      "os",
+      "github.com/spoonman136668-ai/Wingless/cognition"
     ]
   },
   {
@@ -308,6 +344,110 @@
       "github.com/spoonman136668-ai/Wingless/resources",
       "os",
       "time"
+    ]
+  },
+  {
+    "path": "cmd/wingless/nci04a.go",
+    "sha256": "c8cc15141886356d6ac76d598bd7c6578cd6d9e23293ae78e47f127edbe5b5c0",
+    "package": "main",
+    "imports": [
+      "bufio",
+      "bytes",
+      "encoding/json",
+      "errors",
+      "fmt",
+      "io",
+      "os",
+      "github.com/spoonman136668-ai/Wingless/cognition"
+    ]
+  },
+  {
+    "path": "cmd/wingless/nci04a_test.go",
+    "sha256": "5e75930b0b20ba9641249d5253065aa253c226c8ab6729482ed4e2833be75c3e",
+    "package": "main",
+    "imports": [
+      "bytes",
+      "testing",
+      "strings"
+    ]
+  },
+  {
+    "path": "cmd/wingless-ice-cognition/main.go",
+    "sha256": "8221e99fb197cb139b4e2a8a37c5b40d153a9c4f041c93b6e66119d1415d398c",
+    "package": "main",
+    "imports": [
+      "encoding/json",
+      "fmt",
+      "os",
+      "github.com/spoonman136668-ai/Wingless/cognition"
+    ]
+  },
+  {
+    "path": "cognition/continual.go",
+    "sha256": "7a42411598e59f66510b4c6505d9e4270156ba3a965be235b06ba001a0d53efa",
+    "package": "cognition",
+    "imports": [
+      "encoding/json",
+      "errors",
+      "math"
+    ]
+  },
+  {
+    "path": "cognition/continual_test.go",
+    "sha256": "33c88bf63af756beda0cdcaa5cff86ff55c9cf498da5604e3d50f2ad8201a295",
+    "package": "cognition",
+    "imports": [
+      "bytes",
+      "math",
+      "testing"
+    ]
+  },
+  {
+    "path": "cognition/ice_task.go",
+    "sha256": "ee5699a64718ddf73992182268e754b0b05596c827ed7bb5a19163d9953106ee",
+    "package": "cognition",
+    "imports": [
+      "crypto/sha256",
+      "encoding/hex",
+      "encoding/json",
+      "errors",
+      "fmt",
+      "os",
+      "path/filepath",
+      "strings",
+      "github.com/spoonman136668-ai/Wingless/ice"
+    ]
+  },
+  {
+    "path": "cognition/ice_task_test.go",
+    "sha256": "00c9af084150632b6d87c394c7f7612903893d8771c52d74dc9b659d686012f0",
+    "package": "cognition",
+    "imports": [
+      "bytes",
+      "os",
+      "path/filepath",
+      "testing",
+      "github.com/spoonman136668-ai/Wingless/ice"
+    ]
+  },
+  {
+    "path": "cognition/latent_bind.go",
+    "sha256": "a586e38ba8efd810a345ad23c794de9183e0043a9a5d317e7ee41fa55ee8b985",
+    "package": "cognition",
+    "imports": [
+      "encoding/json",
+      "errors",
+      "math"
+    ]
+  },
+  {
+    "path": "cognition/latent_bind_test.go",
+    "sha256": "45ce4c9128bc3bdfa4d7d7b2aabbccc81dea1430bbf3268dfcbc137863327ecf",
+    "package": "cognition",
+    "imports": [
+      "bytes",
+      "testing",
+      "math"
     ]
   },
   {
@@ -416,6 +556,10 @@
   {
     "path": "docs/resource-model.md",
     "sha256": "4d71bc6d55d26b9269817f89dbd72ebb6ff8540a5e7f6943c344cef250094615"
+  },
+  {
+    "path": "docs/t45o-native-cognition.md",
+    "sha256": "cf3e4e002f7f77cabde4e11ec1a1eee808c5438b7484688c4688195d7f8fda9c"
   },
   {
     "path": "docs/worker-protocol.md",

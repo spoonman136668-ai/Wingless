@@ -623,6 +623,72 @@
     ]
   },
   {
+    "name": "runCognition",
+    "kind": "function",
+    "file": "cmd/wingless/cognition.go",
+    "start": 15,
+    "end": 51,
+    "calls": [
+      "bufio.NewScanner",
+      "bytes.NewReader",
+      "d.Decode",
+      "d.Decode",
+      "d.DisallowUnknownFields",
+      "enc.Encode",
+      "enc.Encode",
+      "errors.New",
+      "errors.New",
+      "fmt.Errorf",
+      "fmt.Fprintln",
+      "io.LimitReader",
+      "json.NewDecoder",
+      "json.NewEncoder",
+      "make",
+      "new",
+      "s.ForecastTwo",
+      "s.Observe",
+      "s.Predict",
+      "s.Restore",
+      "s.Snapshot",
+      "scanner.Buffer",
+      "scanner.Bytes",
+      "scanner.Err",
+      "scanner.Scan",
+      "string"
+    ]
+  },
+  {
+    "name": "cognitionCLI",
+    "kind": "function",
+    "file": "cmd/wingless/cognition.go",
+    "start": 52,
+    "end": 52,
+    "calls": [
+      "runCognition"
+    ]
+  },
+  {
+    "name": "TestOfflineCognition",
+    "kind": "function",
+    "file": "cmd/wingless/cognition_test.go",
+    "start": 3,
+    "end": 9,
+    "calls": [
+      "out.String",
+      "out.String",
+      "out.String",
+      "runCognition",
+      "runCognition",
+      "strings.Contains",
+      "strings.Contains",
+      "strings.NewReader",
+      "strings.NewReader",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
     "name": "runGPU",
     "kind": "function",
     "file": "cmd/wingless/gpu.go",
@@ -635,6 +701,24 @@
       "f.String",
       "flag.NewFlagSet",
       "json.NewEncoder"
+    ]
+  },
+  {
+    "name": "runICESourceCognition",
+    "kind": "function",
+    "file": "cmd/wingless/ice_cognition.go",
+    "start": 10,
+    "end": 24,
+    "calls": [
+      "cognition.OpenSourceReasoner",
+      "fmt.Errorf",
+      "json.NewEncoder",
+      "os.IsNotExist",
+      "os.Lstat",
+      "session.Load",
+      "session.ObserveExistingCall",
+      "session.PredictCall",
+      "session.Save"
     ]
   },
   {
@@ -781,6 +865,747 @@
       "runner.Run",
       "time.Now",
       "time.Sleep"
+    ]
+  },
+  {
+    "name": "latentEvent",
+    "kind": "type",
+    "file": "cmd/wingless/nci04a.go",
+    "start": 14,
+    "end": 23
+  },
+  {
+    "name": "runNCI04A",
+    "kind": "function",
+    "file": "cmd/wingless/nci04a.go",
+    "start": 24,
+    "end": 53,
+    "calls": [
+      "bufio.NewScanner",
+      "bytes.NewReader",
+      "d.Decode",
+      "d.Decode",
+      "d.DisallowUnknownFields",
+      "enc.Encode",
+      "enc.Encode",
+      "errors.New",
+      "errors.New",
+      "fmt.Errorf",
+      "fmt.Fprintln",
+      "io.LimitReader",
+      "json.NewDecoder",
+      "json.NewEncoder",
+      "make",
+      "model.ForecastVia",
+      "model.Observe",
+      "model.Predict",
+      "model.Restore",
+      "model.Snapshot",
+      "new",
+      "scanner.Buffer",
+      "scanner.Bytes",
+      "scanner.Err",
+      "scanner.Scan",
+      "string"
+    ]
+  },
+  {
+    "name": "nci04aCLI",
+    "kind": "function",
+    "file": "cmd/wingless/nci04a.go",
+    "start": 54,
+    "end": 54,
+    "calls": [
+      "runNCI04A"
+    ]
+  },
+  {
+    "name": "TestNativeNCI04AOfflineCLI",
+    "kind": "function",
+    "file": "cmd/wingless/nci04a_test.go",
+    "start": 3,
+    "end": 10,
+    "calls": [
+      "out.String",
+      "out.String",
+      "out.String",
+      "runNCI04A",
+      "runNCI04A",
+      "strings.Contains",
+      "strings.Contains",
+      "strings.NewReader",
+      "strings.NewReader",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "run",
+    "kind": "function",
+    "file": "cmd/wingless-ice-cognition/main.go",
+    "start": 11,
+    "end": 27,
+    "calls": [
+      "cognition.OpenSourceReasoner",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "json.NewEncoder",
+      "len",
+      "os.IsNotExist",
+      "os.Lstat",
+      "r.Load",
+      "r.ObserveExistingCall",
+      "r.PredictCall",
+      "r.Save"
+    ]
+  },
+  {
+    "name": "main",
+    "kind": "function",
+    "file": "cmd/wingless-ice-cognition/main.go",
+    "start": 28,
+    "end": 30,
+    "calls": [
+      "fmt.Fprintln",
+      "os.Exit",
+      "run"
+    ]
+  },
+  {
+    "name": "State",
+    "kind": "type",
+    "file": "cognition/continual.go",
+    "start": 11,
+    "end": 14
+  },
+  {
+    "name": "features",
+    "kind": "function",
+    "file": "cognition/continual.go",
+    "start": 15,
+    "end": 19,
+    "calls": [
+      "errors.New",
+      "float64",
+      "float64"
+    ]
+  },
+  {
+    "name": "sigmoid",
+    "kind": "function",
+    "file": "cognition/continual.go",
+    "start": 20,
+    "end": 23,
+    "calls": [
+      "math.Exp",
+      "math.Exp"
+    ]
+  },
+  {
+    "name": "Predict",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 24,
+    "end": 28,
+    "receiver": "State",
+    "calls": [
+      "features",
+      "sigmoid"
+    ]
+  },
+  {
+    "name": "Observe",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 30,
+    "end": 37,
+    "receiver": "State",
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "features",
+      "float64",
+      "math.IsInf",
+      "math.IsInf",
+      "math.IsNaN",
+      "math.IsNaN",
+      "s.Predict"
+    ]
+  },
+  {
+    "name": "ForecastTwo",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 39,
+    "end": 44,
+    "receiver": "State",
+    "calls": [
+      "s.Predict",
+      "s.Predict",
+      "s.Predict"
+    ]
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 45,
+    "end": 45,
+    "receiver": "State",
+    "calls": [
+      "json.Marshal"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 46,
+    "end": 54,
+    "receiver": "State",
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "json.Unmarshal",
+      "len",
+      "len",
+      "math.IsInf",
+      "math.IsNaN"
+    ]
+  },
+  {
+    "name": "TestOnlineLearningSnapshot",
+    "kind": "function",
+    "file": "cognition/continual_test.go",
+    "start": 3,
+    "end": 15,
+    "calls": [
+      "bytes.Equal",
+      "copy.Restore",
+      "copy.Snapshot",
+      "s.ForecastTwo",
+      "s.Observe",
+      "s.Predict",
+      "s.Predict",
+      "s.Snapshot",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestFailClosedAndMarginal",
+    "kind": "function",
+    "file": "cognition/continual_test.go",
+    "start": 16,
+    "end": 29,
+    "calls": [
+      "bad",
+      "bytes.Equal",
+      "math.Abs",
+      "math.NaN",
+      "s.ForecastTwo",
+      "s.Observe",
+      "s.Observe",
+      "s.Observe",
+      "s.Predict",
+      "s.Predict",
+      "s.Predict",
+      "s.Restore",
+      "s.Snapshot",
+      "s.Snapshot",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "SourceReasoner",
+    "kind": "type",
+    "file": "cognition/ice_task.go",
+    "start": 17,
+    "end": 21
+  },
+  {
+    "name": "sourceEnvelope",
+    "kind": "type",
+    "file": "cognition/ice_task.go",
+    "start": 22,
+    "end": 26
+  },
+  {
+    "name": "OpenSourceReasoner",
+    "kind": "function",
+    "file": "cognition/ice_task.go",
+    "start": 27,
+    "end": 33,
+    "calls": [
+      "filepath.Join",
+      "hex.EncodeToString",
+      "ice.Validate",
+      "os.ReadFile",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "validate",
+    "kind": "method",
+    "file": "cognition/ice_task.go",
+    "start": 34,
+    "end": 40,
+    "receiver": "SourceReasoner",
+    "calls": [
+      "errors.New",
+      "filepath.Join",
+      "hex.EncodeToString",
+      "ice.Validate",
+      "os.ReadFile",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "symbol",
+    "kind": "method",
+    "file": "cognition/ice_task.go",
+    "start": 41,
+    "end": 49,
+    "receiver": "SourceReasoner",
+    "calls": [
+      "append",
+      "errors.New",
+      "fmt.Errorf",
+      "ice.Query",
+      "len",
+      "len"
+    ]
+  },
+  {
+    "name": "vectorFromSource",
+    "kind": "function",
+    "file": "cognition/ice_task.go",
+    "start": 50,
+    "end": 55,
+    "calls": [
+      "float32",
+      "int",
+      "int",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "lexicalCall",
+    "kind": "function",
+    "file": "cognition/ice_task.go",
+    "start": 56,
+    "end": 61,
+    "calls": [
+      "strings.HasSuffix"
+    ]
+  },
+  {
+    "name": "ObserveExistingCall",
+    "kind": "method",
+    "file": "cognition/ice_task.go",
+    "start": 64,
+    "end": 70,
+    "receiver": "SourceReasoner",
+    "calls": [
+      "errors.New",
+      "lexicalCall",
+      "r.symbol",
+      "r.symbol",
+      "r.validate",
+      "vectorFromSource",
+      "vectorFromSource"
+    ]
+  },
+  {
+    "name": "SourcePrediction",
+    "kind": "type",
+    "file": "cognition/ice_task.go",
+    "start": 71,
+    "end": 76
+  },
+  {
+    "name": "PredictCall",
+    "kind": "method",
+    "file": "cognition/ice_task.go",
+    "start": 77,
+    "end": 83,
+    "receiver": "SourceReasoner",
+    "calls": [
+      "lexicalCall",
+      "r.symbol",
+      "r.symbol",
+      "r.validate",
+      "vectorFromSource",
+      "vectorFromSource"
+    ]
+  },
+  {
+    "name": "Save",
+    "kind": "method",
+    "file": "cognition/ice_task.go",
+    "start": 84,
+    "end": 98,
+    "receiver": "SourceReasoner",
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "f.Chmod",
+      "f.Close",
+      "f.Close",
+      "f.Close",
+      "f.Close",
+      "f.Name",
+      "f.Sync",
+      "f.Write",
+      "filepath.Dir",
+      "json.Marshal",
+      "len",
+      "os.CreateTemp",
+      "os.IsNotExist",
+      "os.Lstat",
+      "os.Remove",
+      "os.Rename",
+      "r.validate",
+      "st.Mode"
+    ]
+  },
+  {
+    "name": "Load",
+    "kind": "method",
+    "file": "cognition/ice_task.go",
+    "start": 99,
+    "end": 112,
+    "receiver": "SourceReasoner",
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "json.Marshal",
+      "json.Unmarshal",
+      "next.Restore",
+      "os.Lstat",
+      "os.ReadFile",
+      "r.validate",
+      "st.Mode",
+      "st.Size"
+    ]
+  },
+  {
+    "name": "TestICEStateTaskRoundtripAndStrongExactControl",
+    "kind": "function",
+    "file": "cognition/ice_task_test.go",
+    "start": 10,
+    "end": 34,
+    "calls": [
+      "OpenSourceReasoner",
+      "OpenSourceReasoner",
+      "append",
+      "bytes.Equal",
+      "filepath.Join",
+      "filepath.Join",
+      "filepath.Join",
+      "ice.Save",
+      "os.WriteFile",
+      "os.WriteFile",
+      "restarted.Load",
+      "restarted.ObserveExistingCall",
+      "restarted.PredictCall",
+      "restarted.PredictCall",
+      "restarted.Save",
+      "session.ObserveExistingCall",
+      "session.ObserveExistingCall",
+      "session.PredictCall",
+      "session.PredictCall",
+      "session.Save",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.TempDir",
+      "t.TempDir"
+    ]
+  },
+  {
+    "name": "TestICEStateAmbiguityAndNoInventedNegatives",
+    "kind": "function",
+    "file": "cognition/ice_task_test.go",
+    "start": 35,
+    "end": 42,
+    "calls": [
+      "OpenSourceReasoner",
+      "filepath.Join",
+      "ice.Save",
+      "os.WriteFile",
+      "s.ObserveExistingCall",
+      "s.PredictCall",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.TempDir"
+    ]
+  },
+  {
+    "name": "MaxEntities",
+    "kind": "const",
+    "file": "cognition/latent_bind.go",
+    "start": 11,
+    "end": 11
+  },
+  {
+    "name": "MaxActions",
+    "kind": "const",
+    "file": "cognition/latent_bind.go",
+    "start": 12,
+    "end": 12
+  },
+  {
+    "name": "FeatureWidth",
+    "kind": "const",
+    "file": "cognition/latent_bind.go",
+    "start": 13,
+    "end": 13
+  },
+  {
+    "name": "LatentRelation",
+    "kind": "type",
+    "file": "cognition/latent_bind.go",
+    "start": 17,
+    "end": 20
+  },
+  {
+    "name": "EntityPrototype",
+    "kind": "type",
+    "file": "cognition/latent_bind.go",
+    "start": 21,
+    "end": 24
+  },
+  {
+    "name": "LatentState",
+    "kind": "type",
+    "file": "cognition/latent_bind.go",
+    "start": 25,
+    "end": 30
+  },
+  {
+    "name": "validVector",
+    "kind": "function",
+    "file": "cognition/latent_bind.go",
+    "start": 32,
+    "end": 35,
+    "calls": [
+      "float64",
+      "float64",
+      "math.IsInf",
+      "math.IsNaN"
+    ]
+  },
+  {
+    "name": "nearest",
+    "kind": "function",
+    "file": "cognition/latent_bind.go",
+    "start": 36,
+    "end": 45,
+    "calls": [
+      "float32",
+      "int"
+    ]
+  },
+  {
+    "name": "bind",
+    "kind": "method",
+    "file": "cognition/latent_bind.go",
+    "start": 46,
+    "end": 60,
+    "receiver": "LatentState",
+    "calls": [
+      "errors.New",
+      "float32",
+      "float32",
+      "int",
+      "int",
+      "nearest"
+    ]
+  },
+  {
+    "name": "probability",
+    "kind": "function",
+    "file": "cognition/latent_bind.go",
+    "start": 61,
+    "end": 65,
+    "calls": [
+      "float64",
+      "math.Exp",
+      "math.Exp"
+    ]
+  },
+  {
+    "name": "Observe",
+    "kind": "method",
+    "file": "cognition/latent_bind.go",
+    "start": 68,
+    "end": 82,
+    "receiver": "LatentState",
+    "calls": [
+      "errors.New",
+      "float32",
+      "float64",
+      "float64",
+      "next.bind",
+      "next.bind",
+      "probability",
+      "validVector",
+      "validVector"
+    ]
+  },
+  {
+    "name": "Predict",
+    "kind": "method",
+    "file": "cognition/latent_bind.go",
+    "start": 84,
+    "end": 91,
+    "receiver": "LatentState",
+    "calls": [
+      "errors.New",
+      "nearest",
+      "nearest",
+      "probability",
+      "validVector",
+      "validVector"
+    ]
+  },
+  {
+    "name": "ForecastVia",
+    "kind": "method",
+    "file": "cognition/latent_bind.go",
+    "start": 92,
+    "end": 96,
+    "receiver": "LatentState",
+    "calls": [
+      "s.Predict",
+      "s.Predict"
+    ]
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "cognition/latent_bind.go",
+    "start": 97,
+    "end": 97,
+    "receiver": "LatentState",
+    "calls": [
+      "json.Marshal"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "method",
+    "file": "cognition/latent_bind.go",
+    "start": 98,
+    "end": 110,
+    "receiver": "LatentState",
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "float64",
+      "float64",
+      "float64",
+      "int",
+      "int",
+      "int",
+      "json.Unmarshal",
+      "len",
+      "math.Abs",
+      "math.IsInf",
+      "math.IsNaN",
+      "validVector"
+    ]
+  },
+  {
+    "name": "TestNCI04ALearnedBindingAndComposition",
+    "kind": "function",
+    "file": "cognition/latent_bind_test.go",
+    "start": 3,
+    "end": 16,
+    "calls": [
+      "bytes.Equal",
+      "math.Abs",
+      "restored.Restore",
+      "restored.Snapshot",
+      "s.ForecastVia",
+      "s.Observe",
+      "s.Observe",
+      "s.Predict",
+      "s.Predict",
+      "s.Predict",
+      "s.Snapshot",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestNCI04AFailClosedAndNoQueryMutation",
+    "kind": "function",
+    "file": "cognition/latent_bind_test.go",
+    "start": 17,
+    "end": 26,
+    "calls": [
+      "bytes.Equal",
+      "bytes.Equal",
+      "bytes.Equal",
+      "float32",
+      "float32",
+      "float32",
+      "float32",
+      "s.Observe",
+      "s.Observe",
+      "s.Observe",
+      "s.Observe",
+      "s.Predict",
+      "s.Snapshot",
+      "s.Snapshot",
+      "s.Snapshot",
+      "s.Snapshot",
+      "s.Snapshot",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
     ]
   },
   {
