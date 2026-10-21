@@ -43,7 +43,10 @@ def main():
     current=json.loads((root/".ice/symbol-map.json").read_text("utf-8"))
     indexed=json.loads((root/".ice/manifest.json").read_text("utf-8"))
     oldkeys={(n["file"],n["kind"],n["name"],n.get("receiver","")) for n in old["nodes"]}
+    old_reviewed=sum(n["evidence_basis"]=="source-reviewed" for n in old["nodes"])
+    old_provisional=sum(n["evidence_basis"]=="lexical-provisional" for n in old["nodes"])
     assert len(oldkeys)==len(old["nodes"])>=352
+    assert old_reviewed==352 and old_provisional==len(old["nodes"])-352
     assert len(current)>len(oldkeys)
     filehash={f["path"]:f["sha256"] for f in indexed["files"]}
     receipts=[]
@@ -81,14 +84,15 @@ def main():
     atlas=json.loads((root/".ice/code-intelligence.json").read_text("utf-8"))
     if atlas["source_commit"]!=target or atlas["coverage"]["source_reviewed_labels"]!=352:
         raise ValueError("source pin or historical reviewed baseline lost")
-    if atlas["coverage"]["lexical_provisional_labels"]!=len(receipts):
-        raise ValueError("incorrect provisional evidence accounting")
+    total_provisional=old_provisional+len(receipts)
+    if atlas["coverage"]["lexical_provisional_labels"]!=total_provisional:
+        raise ValueError("incorrect inherited+new provisional evidence accounting")
     artifacts={}
     for path in CANONICAL:
         artifacts[path]=(root/path).read_text(encoding="utf-8")
     obj={"schema":"wingless.nci04d2.provisional-index-bundle.v1",
          "source_commit":target,"reviewed_count":352,
-         "provisional_count":len(receipts),
+         "provisional_count":total_provisional,
          "independent_review":False,"artifacts":artifacts}
     b64=base64.b64encode(json.dumps(obj,ensure_ascii=True).encode()).decode("ascii")
     parts=[b64[i:i+14000] for i in range(0,len(b64),14000)]
