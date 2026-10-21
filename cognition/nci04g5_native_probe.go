@@ -44,6 +44,36 @@ type NativeProbe struct {
  sequence uint8
 }
 
+type nativeProbeCustody struct {
+ Schema string `json:"schema"`
+ Sequence uint8 `json:"sequence"`
+ SourceSHA256 string `json:"source_sha256"`
+}
+
+func probeCustodyRead(root string)(nativeProbeCustody,error){
+ var zero nativeProbeCustody
+ name:=filepath.Join(root,"probe-custody.json")
+ info,err:=os.Lstat(name);if err!=nil{return zero,err}
+ if !info.Mode().IsRegular()||info.Size()>512{return zero,errors.New("invalid durable probe custody")}
+ raw,err:=os.ReadFile(name);if err!=nil{return zero,err}
+ if err:=json.Unmarshal(raw,&zero);err!=nil{return nativeProbeCustody{},err}
+ if zero.Schema!="wingless.nci04g5.probe-custody.v1"||int(zero.Sequence)>nativeProbeMaxInterventions{
+  return nativeProbeCustody{},errors.New("probe custody schema/budget invalid")
+ }
+ return zero,nil
+}
+func probeCustodyWrite(root string,seq uint8,sourceHash string)error{
+ state:=nativeProbeCustody{"wingless.nci04g5.probe-custody.v1",seq,sourceHash}
+ raw,err:=json.Marshal(state);if err!=nil{return err}
+ temp,err:=os.CreateTemp(root,".probe-custody-*");if err!=nil{return err}
+ name:=temp.Name();defer os.Remove(name)
+ if err:=temp.Chmod(0600);err!=nil{temp.Close();return err}
+ if _,err:=temp.Write(raw);err!=nil{temp.Close();return err}
+ if err:=temp.Sync();err!=nil{temp.Close();return err}
+ if err:=temp.Close();err!=nil{return err}
+ return os.Rename(name,filepath.Join(root,"probe-custody.json"))
+}
+
 func exactProbeSource(b []byte) bool {
  return string(b)==probeFalse || string(b)==probeTrue
 }
@@ -69,6 +99,7 @@ func NewNativeProbe(root string)(*NativeProbe,error){
  }
  if err:=ice.Save(root);err!=nil{return nil,err}
  if err:=ice.Validate(root);err!=nil{return nil,err}
+ if err:=probeCustodyWrite(root,0,probeHash([]byte(probeFalse)));err!=nil{return nil,err}
  return &NativeProbe{root:root},nil
 }
 
@@ -76,9 +107,11 @@ func NewNativeProbe(root string)(*NativeProbe,error){
 // existing sandbox. The sequence lives solely in the caller-owned receipt;
 // no hidden mutable identity ledger is introduced.
 func OpenNativeProbe(root string)(*NativeProbe,error){
- if _,err:=probeRead(root);err!=nil{return nil,err}
+ source,err:=probeRead(root);if err!=nil{return nil,err}
  if err:=ice.Validate(root);err!=nil{return nil,err}
- return &NativeProbe{root:root},nil
+ state,err:=probeCustodyRead(root);if err!=nil{return nil,err}
+ if state.SourceSHA256!=probeHash(source){return nil,errors.New("durable custody/source drift")}
+ return &NativeProbe{root:root,sequence:state.Sequence},nil
 }
 
 // Intervene uses one predefined actuator (a controlled Boolean transition)
@@ -87,7 +120,11 @@ func OpenNativeProbe(root string)(*NativeProbe,error){
 func (p *NativeProbe) Intervene(ctx context.Context, enable bool)(NativeProbeObservation,error){
  if p==nil || p.root=="" {return NativeProbeObservation{},errors.New("nil probe")}
  if int(p.sequence)>=nativeProbeMaxInterventions{return NativeProbeObservation{},errors.New("probe action budget exhausted")}
- if _,err:=probeRead(p.root);err!=nil{return NativeProbeObservation{},err}
+ source,err:=probeRead(p.root);if err!=nil{return NativeProbeObservation{},err}
+ state,err:=probeCustodyRead(p.root);if err!=nil{return NativeProbeObservation{},err}
+ if state.SourceSHA256!=probeHash(source) || state.Sequence!=p.sequence{
+  return NativeProbeObservation{},errors.New("durable custody/source or sequence drift")
+ }
  if err:=ice.Validate(p.root);err!=nil{return NativeProbeObservation{},err}
  // Any eligible intervention may change only this bounded, fixed source body.
  next:=probeFalse
@@ -109,7 +146,11 @@ func (p *NativeProbe) Intervene(ctx context.Context, enable bool)(NativeProbeObs
  observed:=strings.TrimSpace(string(output))
  if observed!="0"&&observed!="1"{return NativeProbeObservation{},errors.New("invalid executed consequence")}
  if deadline.Err()!=nil{return NativeProbeObservation{},deadline.Err()}
- p.sequence++
+ nextSequence:=p.sequence+1
+ if err:=probeCustodyWrite(p.root,nextSequence,probeHash(rootSource));err!=nil{
+  return NativeProbeObservation{},err
+ }
+ p.sequence=nextSequence
  result:=NativeProbeObservation{SourceSHA256:probeHash(rootSource),
   CanonicalICESHA256:probeHash(manifest),Action:action,Sequence:p.sequence,
   EvidenceBasis:"exact-generated-source; sandboxed native Go execution"}
@@ -118,11 +159,13 @@ func (p *NativeProbe) Intervene(ctx context.Context, enable bool)(NativeProbeObs
 }
 
 // Snapshot provides a bounded, source-pinned restart receipt. The caller must
-// retain it; a plain OpenNativeProbe does not silently restore spent budget.
+// retain it; a plain OpenNativeProbe reads the private durable counter.
 func (p *NativeProbe) Snapshot()([]byte,error){
  if p==nil{return nil,errors.New("nil probe")}
  source,err:=probeRead(p.root);if err!=nil{return nil,err}
  if err:=ice.Validate(p.root);err!=nil{return nil,err}
+ state,err:=probeCustodyRead(p.root);if err!=nil{return nil,err}
+ if state.SourceSHA256!=probeHash(source)||state.Sequence!=p.sequence{return nil,errors.New("durable custody drift")}
  return json.Marshal(struct {
   Schema string `json:"schema"`
   Sequence uint8 `json:"sequence"`
@@ -140,6 +183,9 @@ func (p *NativeProbe) Restore(data []byte)error{
  if v.Schema!="wingless.nci04g5.native-probe.v1" || int(v.Sequence)>nativeProbeMaxInterventions{return errors.New("invalid receipt identity or budget")}
  source,err:=probeRead(p.root);if err!=nil{return err}
  if err:=ice.Validate(p.root);err!=nil{return err}
- if v.SourceSHA256!=probeHash(source){return errors.New("receipt source identity drift")}
+ state,err:=probeCustodyRead(p.root);if err!=nil{return err}
+ if v.SourceSHA256!=probeHash(source) || state.SourceSHA256!=v.SourceSHA256 || state.Sequence!=v.Sequence {
+  return errors.New("receipt/durable source or budget mismatch")
+ }
  p.sequence=v.Sequence;return nil
 }
