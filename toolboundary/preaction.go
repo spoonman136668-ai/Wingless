@@ -29,7 +29,7 @@ func ObservePreaction(parent context.Context, p Policy, a Proposal) (PreactionOb
     if p.Timeout <= 0 || p.Timeout > time.Minute || p.MaxOutputBytes <= 0 || p.MaxOutputBytes > 1048576 || !filepath.IsAbs(p.Workspace) {
         return none, errors.New("unbounded tool policy")
     }
-    if !filepath.IsLocal(a.Path) || strings.ContainsAny(a.Path, "\:") {
+    if !filepath.IsLocal(a.Path) || strings.Contains(a.Path, ":") || strings.ContainsRune(a.Path, 92) {
         return none, errors.New("workspace escape denied")
     }
     ctx, cancel := context.WithTimeout(parent, p.Timeout)
