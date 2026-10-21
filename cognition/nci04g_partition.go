@@ -4,7 +4,6 @@ package cognition
 import (
  "encoding/json"
  "errors"
- "math"
 )
 
 var ErrUnknownCausalState = errors.New("causal evidence insufficient")
@@ -70,7 +69,7 @@ func (s *CausalPartition) ObserveCausal(sensor,probe [FeatureWidth]float32,conse
   // No hidden authority can silently overwrite an established relation.
   return errors.New("conflicting function evidence: abstain")
  }
- if next.Modes[midx].Samples==math.MaxUint16 || next.Probes[pidx].Outcomes[consequence]==math.MaxUint16 {
+ if next.Modes[midx].Samples==^uint16(0) || next.Probes[pidx].Outcomes[consequence]==^uint16(0) {
   return errors.New("counter capacity exceeded")
  }
  next.Modes[midx].Samples++
