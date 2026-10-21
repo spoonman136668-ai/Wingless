@@ -1,0 +1,25 @@
+{
+  "schema": "nci04e.wingless.necessary_identifiability.v1",
+  "parent_design_commit": "2d2feae96c22b8f85f0e2a5585c34407b0d12b35",
+  "experiment_type": "SOURCE_FREE_ENGINEERING_NECESSARY_CONDITION_ONLY",
+  "intervention_fixture": "Two latent sources with identical sensor appearances, 2 allowed actions: source A outcomes [1,0], source B outcomes [0,1]. Learner sees only ordered (action,outcome) stream and terminal session boundaries, never the latent source ID, task label or query answer.",
+  "positive_training": "8 unlabelled sessions of 8 alternating controlled actions, with source identity selected by hidden fixture; train without class labels. Two novel sessions evaluated after one action-0 probe, then action-1 prediction; all outcomes deterministic.",
+  "negative_fixture": "8 sessions from two nominally distinct but response-identical source instances, action response [1,0] for both; learner must not split them or claim an identity before probe.",
+  "algorithm": "online action-conditioned two-state Beta response posterior; create a new state only on a highly surprising action outcome after mature evidence; retain response profiles between sessions and clear only active-session pointer",
+  "capacity": {
+    "states": 2,
+    "actions": 2,
+    "unbounded_storage": false
+  },
+  "comparators": [
+    "single-state fully trained Beta response predictor",
+    "two-state known-identity oracle (upper bound)"
+  ],
+  "acceptance": "After training, distinguish the differing action-response sources and predict action 1 accurately, while negative identical-response condition retains one state and unknown pre-probe identity. Any hallucinated negative-control split is a hard false positive. No claim of unseen transfer.",
+  "constraints": {
+    "first_use": 0,
+    "protected_main": false,
+    "legacy_runtime_unchanged": true,
+    "auto_merge": false
+  }
+}
