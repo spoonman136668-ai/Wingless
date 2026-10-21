@@ -136,7 +136,9 @@ def validate(root, relationship_file):
         lineage = node.get("provenance_lineage")
         if basis == "lexical-provisional":
             require(isinstance(lineage, dict)
-                    and lineage.get("mode") == "new-symbol-source-bound-provisional"
+                    and lineage.get("mode") in (
+                        "new-symbol-source-bound-provisional",
+                        "provisional-source-byte-reuse")
                     and node["label"].startswith("PROVISIONAL: "),
                     "G28 unreviewed symbol missing source-bound provisional receipt")
         if lineage is not None:
@@ -198,13 +200,28 @@ def validate(root, relationship_file):
                 require(prev_digest == lineage.get("prior_declaration_sha256") and
                         now_digest == lineage.get("current_declaration_sha256"),
                         "G26 declaration provenance digest mismatch")
-                if lineage.get("mode") == "canonical-LF-declaration-byte-reuse":
+                if lineage.get("mode") in ("canonical-LF-declaration-byte-reuse",
+                                           "provisional-source-byte-reuse"):
                     require(prev_digest == now_digest,
-                            "G26 claimed reused declaration body changed")
+                            "G26/G28 claimed reused declaration body changed")
                 else:
                     require(lineage.get("mode") ==
                             "fresh-review-receipt-unverified-identity",
                             "G26 unknown review lineage class")
+                if lineage.get("mode") == "provisional-source-byte-reuse":
+                    require(basis == "lexical-provisional" and proof is None
+                            and lineage.get("independent_approval") is False,
+                            "G28 inherited provisional tried to claim review")
+                    tokens = lineage.get("literal_tokens")
+                    require(isinstance(tokens, list) and 1 <= len(tokens) <= 12
+                            and all(isinstance(t, str) and len(t) >= 4
+                                    and t.strip() == t
+                                    and t.encode("utf-8") in old_decl
+                                    and t.encode("utf-8") in now_decl for t in tokens),
+                            "G28 inherited provisional tokens do not bind source")
+                    require(isinstance(lineage.get("reviewer_assertion"), str)
+                            and len(lineage["reviewer_assertion"].strip()) >= 3,
+                            "G28 inherited provisional reviewer identity absent")
         dependency_proof = node.get("file_level_local_package_dependencies")
         if basis == "source-reviewed":
             require(dependency_proof is not None,

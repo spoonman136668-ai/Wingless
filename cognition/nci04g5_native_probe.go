@@ -126,6 +126,14 @@ func (p *NativeProbe) Intervene(ctx context.Context, enable bool)(NativeProbeObs
   return NativeProbeObservation{},errors.New("durable custody/source or sequence drift")
  }
  if err:=ice.Validate(p.root);err!=nil{return NativeProbeObservation{},err}
+ // Reserve one action BEFORE modifying source or executing the program.
+ // A crash or failed execution may consume capacity but can never regain it.
+ // If it happens after source mutation, source/custody will intentionally
+ // diverge and reopening fails closed instead of replaying that action.
+ nextSequence:=p.sequence+1
+ if err:=probeCustodyWrite(p.root,nextSequence,probeHash(source));err!=nil{
+  return NativeProbeObservation{},err
+ }
  // Any eligible intervention may change only this bounded, fixed source body.
  next:=probeFalse
  var action uint8
@@ -135,18 +143,17 @@ func (p *NativeProbe) Intervene(ctx context.Context, enable bool)(NativeProbeObs
  if err:=ice.Validate(p.root);err!=nil{return NativeProbeObservation{},err}
  rootSource,err:=probeRead(p.root);if err!=nil{return NativeProbeObservation{},err}
  manifest,err:=os.ReadFile(filepath.Join(p.root,".ice","manifest.json"));if err!=nil{return NativeProbeObservation{},err}
- // This process executes only our exact generated source. It cannot run
+ // Run the exact checked source file, rather than a directory glob. No other\n // source file can join the compiled package. It cannot run
  // external code via network-based Go modules, go.work or toolchain download.
  deadline,cancel:=context.WithTimeout(ctx,25*time.Second);defer cancel()
- cmd:=exec.CommandContext(deadline,"go","run",".")
+ cmd:=exec.CommandContext(deadline,"go","run","probe.go")
  cmd.Dir=p.root
- cmd.Env=append(os.Environ(),"GOWORK=off","GOPROXY=off","GOSUMDB=off","GOTOOLCHAIN=local")
+ cmd.Env=append(os.Environ(),"GOFLAGS=","GO111MODULE=on","GOWORK=off","GOPROXY=off","GOSUMDB=off","GOTOOLCHAIN=local")
  output,err:=cmd.CombinedOutput()
  if err!=nil{return NativeProbeObservation{},fmt.Errorf("native probe execution unsuccessful: %w",err)}
  observed:=strings.TrimSpace(string(output))
  if observed!="0"&&observed!="1"{return NativeProbeObservation{},errors.New("invalid executed consequence")}
  if deadline.Err()!=nil{return NativeProbeObservation{},deadline.Err()}
- nextSequence:=p.sequence+1
  if err:=probeCustodyWrite(p.root,nextSequence,probeHash(rootSource));err!=nil{
   return NativeProbeObservation{},err
  }

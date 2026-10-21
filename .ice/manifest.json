@@ -83,6 +83,14 @@
       "sha256": "3719dbdb91e821263564348ef8432bcdcc51a8951687babdd1cd7e6a85a044e2"
     },
     {
+      "path": ".github/workflows/nci04g5-observation.yml",
+      "sha256": "1b91cf282710e5db2e6e45b3be65d85bd98b5b5aa0f693f3c5ac7b9ff4c6040d"
+    },
+    {
+      "path": ".github/workflows/nci04g6-focused.yml",
+      "sha256": "ee9bd47729d283eb07c5479c7a503c438de477d68bed3689e1b7da1af56c97ae"
+    },
+    {
       "path": ".github/workflows/qualify-proxy-auto-fanout-r4.yml",
       "sha256": "f01d3f0ff6b45de64299e978370178208ad6c38b77acf98879a682d9fb9a4021"
     },
@@ -120,7 +128,7 @@
     },
     {
       "path": ".github/workflows/wingless-code-atlas.yml",
-      "sha256": "6f4ad88a80f22dff5c1e1100a27eeeda03ff26ab566ae9b13e3391d439a048c3"
+      "sha256": "164e1cd19bf847308ae939b251d1928465acadab33a202bac30afa4c2889ff12"
     },
     {
       "path": ".gitignore",
@@ -471,6 +479,64 @@
         "bytes",
         "testing",
         "math"
+      ]
+    },
+    {
+      "path": "cognition/nci04g5_native_probe.go",
+      "sha256": "2b6cd7ee5d17a052cf7c0758fd97c99a02a1deb36902a73228ec5240c549b508",
+      "package": "cognition",
+      "imports": [
+        "context",
+        "crypto/sha256",
+        "encoding/hex",
+        "encoding/json",
+        "errors",
+        "fmt",
+        "os",
+        "os/exec",
+        "path/filepath",
+        "strings",
+        "time",
+        "github.com/spoonman136668-ai/Wingless/ice"
+      ]
+    },
+    {
+      "path": "cognition/nci04g5_native_probe_test.go",
+      "sha256": "c8e8702e07177b89ac343e1dc2cd987f001d61991a4f910c7b5227a23c096c9d",
+      "package": "cognition",
+      "imports": [
+        "bytes",
+        "context",
+        "os",
+        "path/filepath",
+        "testing",
+        "unsafe"
+      ]
+    },
+    {
+      "path": "cognition/nci04g6_executed_learning.go",
+      "sha256": "42feecfe17a79567091e7e92d14f198359cd0ee16c4c6dc57f0f7c27e251a3ac",
+      "package": "cognition",
+      "imports": [
+        "context",
+        "encoding/json",
+        "errors",
+        "unsafe"
+      ]
+    },
+    {
+      "path": "cognition/nci04g6_executed_learning_test.go",
+      "sha256": "4212f0a9414b6c49b24ec74fc7745bb0221726c69d317da36825d072f92e1e72",
+      "package": "cognition",
+      "imports": [
+        "context",
+        "encoding/json",
+        "fmt",
+        "math",
+        "path/filepath",
+        "testing",
+        "time",
+        "unsafe"
       ]
     },
     {
@@ -2901,6 +2967,539 @@
         "t.Fatal",
         "t.Fatal",
         "t.Fatal"
+      ]
+    },
+    {
+      "name": "probeModule",
+      "kind": "const",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 28,
+      "end": 28
+    },
+    {
+      "name": "probeFalse",
+      "kind": "const",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 29,
+      "end": 29
+    },
+    {
+      "name": "probeTrue",
+      "kind": "const",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 30,
+      "end": 30
+    },
+    {
+      "name": "nativeProbeMaxInterventions",
+      "kind": "const",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 31,
+      "end": 31
+    },
+    {
+      "name": "NativeProbeObservation",
+      "kind": "type",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 33,
+      "end": 40
+    },
+    {
+      "name": "NativeProbe",
+      "kind": "type",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 42,
+      "end": 45
+    },
+    {
+      "name": "nativeProbeCustody",
+      "kind": "type",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 47,
+      "end": 51
+    },
+    {
+      "name": "probeCustodyRead",
+      "kind": "function",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 53,
+      "end": 64,
+      "calls": [
+        "errors.New",
+        "errors.New",
+        "filepath.Join",
+        "info.Mode",
+        "info.Size",
+        "int",
+        "json.Unmarshal",
+        "os.Lstat",
+        "os.ReadFile"
+      ]
+    },
+    {
+      "name": "probeCustodyWrite",
+      "kind": "function",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 65,
+      "end": 75,
+      "calls": [
+        "filepath.Join",
+        "json.Marshal",
+        "os.CreateTemp",
+        "os.Remove",
+        "os.Rename",
+        "temp.Chmod",
+        "temp.Close",
+        "temp.Close",
+        "temp.Close",
+        "temp.Close",
+        "temp.Name",
+        "temp.Sync",
+        "temp.Write"
+      ]
+    },
+    {
+      "name": "exactProbeSource",
+      "kind": "function",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 77,
+      "end": 79,
+      "calls": [
+        "string",
+        "string"
+      ]
+    },
+    {
+      "name": "probeHash",
+      "kind": "function",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 80,
+      "end": 82,
+      "calls": [
+        "hex.EncodeToString",
+        "sha256.Sum256"
+      ]
+    },
+    {
+      "name": "probeRead",
+      "kind": "function",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 83,
+      "end": 90,
+      "calls": [
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "exactProbeSource",
+        "filepath.Join",
+        "filepath.Join",
+        "filepath.Join",
+        "info.Mode",
+        "info.Size",
+        "os.Lstat",
+        "os.ReadFile",
+        "os.ReadFile",
+        "string"
+      ]
+    },
+    {
+      "name": "NewNativeProbe",
+      "kind": "function",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 94,
+      "end": 104,
+      "calls": [
+        "errors.New",
+        "filepath.Clean",
+        "filepath.Join",
+        "ice.Save",
+        "ice.Validate",
+        "os.Mkdir",
+        "os.WriteFile",
+        "probeCustodyWrite",
+        "probeHash"
+      ]
+    },
+    {
+      "name": "OpenNativeProbe",
+      "kind": "function",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 109,
+      "end": 115,
+      "calls": [
+        "errors.New",
+        "ice.Validate",
+        "probeCustodyRead",
+        "probeHash",
+        "probeRead"
+      ]
+    },
+    {
+      "name": "Intervene",
+      "kind": "method",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 120,
+      "end": 166,
+      "receiver": "NativeProbe",
+      "calls": [
+        "append",
+        "cancel",
+        "cmd.CombinedOutput",
+        "context.WithTimeout",
+        "deadline.Err",
+        "deadline.Err",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "exec.CommandContext",
+        "filepath.Join",
+        "filepath.Join",
+        "fmt.Errorf",
+        "ice.Save",
+        "ice.Validate",
+        "ice.Validate",
+        "int",
+        "os.Environ",
+        "os.ReadFile",
+        "os.WriteFile",
+        "probeCustodyRead",
+        "probeCustodyWrite",
+        "probeCustodyWrite",
+        "probeHash",
+        "probeHash",
+        "probeHash",
+        "probeHash",
+        "probeHash",
+        "probeRead",
+        "probeRead",
+        "string",
+        "strings.TrimSpace"
+      ]
+    },
+    {
+      "name": "Snapshot",
+      "kind": "method",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 170,
+      "end": 181,
+      "receiver": "NativeProbe",
+      "calls": [
+        "errors.New",
+        "errors.New",
+        "ice.Validate",
+        "json.Marshal",
+        "probeCustodyRead",
+        "probeHash",
+        "probeHash",
+        "probeRead"
+      ]
+    },
+    {
+      "name": "Restore",
+      "kind": "method",
+      "file": "cognition/nci04g5_native_probe.go",
+      "start": 182,
+      "end": 198,
+      "receiver": "NativeProbe",
+      "calls": [
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "ice.Validate",
+        "int",
+        "json.Unmarshal",
+        "len",
+        "probeCustodyRead",
+        "probeHash",
+        "probeRead"
+      ]
+    },
+    {
+      "name": "TestNCI04G5NativeExecutableActionConsequence",
+      "kind": "function",
+      "file": "cognition/nci04g5_native_probe_test.go",
+      "start": 14,
+      "end": 43,
+      "calls": [
+        "NewNativeProbe",
+        "OpenNativeProbe",
+        "OpenNativeProbe",
+        "bytes.Equal",
+        "context.Background",
+        "context.Background",
+        "context.Background",
+        "context.Background",
+        "context.Background",
+        "filepath.Join",
+        "len",
+        "len",
+        "p.Intervene",
+        "p.Intervene",
+        "p.Snapshot",
+        "p.Snapshot",
+        "reopened.Intervene",
+        "reopened.Restore",
+        "restarted.Intervene",
+        "restarted.Intervene",
+        "restarted.Restore",
+        "restarted.Restore",
+        "restarted.Snapshot",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Logf",
+        "t.TempDir",
+        "unsafe.Sizeof",
+        "unsafe.Sizeof"
+      ]
+    },
+    {
+      "name": "TestNCI04G5RejectUntrustedSourceOrExistingWorktree",
+      "kind": "function",
+      "file": "cognition/nci04g5_native_probe_test.go",
+      "start": 45,
+      "end": 53,
+      "calls": [
+        "NewNativeProbe",
+        "NewNativeProbe",
+        "OpenNativeProbe",
+        "append",
+        "context.Background",
+        "filepath.Join",
+        "filepath.Join",
+        "filepath.Join",
+        "os.ReadFile",
+        "os.WriteFile",
+        "p.Intervene",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.TempDir"
+      ]
+    },
+    {
+      "name": "TestNCI04G5CancelledExecutionCannotReplayReservedAction",
+      "kind": "function",
+      "file": "cognition/nci04g5_native_probe_test.go",
+      "start": 55,
+      "end": 66,
+      "calls": [
+        "NewNativeProbe",
+        "OpenNativeProbe",
+        "cancel",
+        "context.Background",
+        "context.Background",
+        "context.WithCancel",
+        "filepath.Join",
+        "p.Intervene",
+        "p.Intervene",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.TempDir"
+      ]
+    },
+    {
+      "name": "ExecutedLearningSession",
+      "kind": "type",
+      "file": "cognition/nci04g6_executed_learning.go",
+      "start": 13,
+      "end": 16
+    },
+    {
+      "name": "nativeLearningWire",
+      "kind": "type",
+      "file": "cognition/nci04g6_executed_learning.go",
+      "start": 18,
+      "end": 22
+    },
+    {
+      "name": "descriptors",
+      "kind": "method",
+      "file": "cognition/nci04g6_executed_learning.go",
+      "start": 26,
+      "end": 35,
+      "receiver": "ExecutedLearningSession",
+      "calls": [
+        "probeHash",
+        "probeHash",
+        "probeHash",
+        "vectorFromDigest",
+        "vectorFromDigest",
+        "vectorFromDigest"
+      ]
+    },
+    {
+      "name": "vectorFromDigest",
+      "kind": "function",
+      "file": "cognition/nci04g6_executed_learning.go",
+      "start": 37,
+      "end": 45,
+      "calls": [
+        "float32",
+        "int"
+      ]
+    },
+    {
+      "name": "ActAndLearn",
+      "kind": "method",
+      "file": "cognition/nci04g6_executed_learning.go",
+      "start": 46,
+      "end": 55,
+      "receiver": "ExecutedLearningSession",
+      "calls": [
+        "errors.New",
+        "int",
+        "int",
+        "s.descriptors"
+      ]
+    },
+    {
+      "name": "PredictExecutable",
+      "kind": "method",
+      "file": "cognition/nci04g6_executed_learning.go",
+      "start": 56,
+      "end": 61,
+      "receiver": "ExecutedLearningSession",
+      "calls": [
+        "errors.New",
+        "s.descriptors"
+      ]
+    },
+    {
+      "name": "Snapshot",
+      "kind": "method",
+      "file": "cognition/nci04g6_executed_learning.go",
+      "start": 62,
+      "end": 67,
+      "receiver": "ExecutedLearningSession",
+      "calls": [
+        "errors.New",
+        "json.Marshal"
+      ]
+    },
+    {
+      "name": "Restore",
+      "kind": "method",
+      "file": "cognition/nci04g6_executed_learning.go",
+      "start": 68,
+      "end": 79,
+      "receiver": "ExecutedLearningSession",
+      "calls": [
+        "candidate.Restore",
+        "errors.New",
+        "errors.New",
+        "json.Unmarshal",
+        "len"
+      ]
+    },
+    {
+      "name": "ResidentBytes",
+      "kind": "method",
+      "file": "cognition/nci04g6_executed_learning.go",
+      "start": 80,
+      "end": 83,
+      "receiver": "ExecutedLearningSession",
+      "calls": [
+        "unsafe.Sizeof",
+        "unsafe.Sizeof"
+      ]
+    },
+    {
+      "name": "exactExecutedControl",
+      "kind": "type",
+      "file": "cognition/nci04g6_executed_learning_test.go",
+      "start": 16,
+      "end": 18
+    },
+    {
+      "name": "Learn",
+      "kind": "method",
+      "file": "cognition/nci04g6_executed_learning_test.go",
+      "start": 19,
+      "end": 19,
+      "receiver": "exactExecutedControl"
+    },
+    {
+      "name": "Forecast",
+      "kind": "method",
+      "file": "cognition/nci04g6_executed_learning_test.go",
+      "start": 20,
+      "end": 23,
+      "receiver": "exactExecutedControl",
+      "calls": [
+        "float64",
+        "float64",
+        "float64"
+      ]
+    },
+    {
+      "name": "TestNCI04G6SourceBoundLearningAgainstTrainedCountControl",
+      "kind": "function",
+      "file": "cognition/nci04g6_executed_learning_test.go",
+      "start": 25,
+      "end": 67,
+      "calls": [
+        "NewNativeProbe",
+        "OpenNativeProbe",
+        "c.Forecast",
+        "c.Learn",
+        "context.Background",
+        "context.Background",
+        "filepath.Join",
+        "fmt.Println",
+        "json.Marshal",
+        "len",
+        "math.Abs",
+        "nativeDur.Nanoseconds",
+        "replay.ActAndLearn",
+        "replay.PredictExecutable",
+        "replay.Restore",
+        "s.ActAndLearn",
+        "s.PredictExecutable",
+        "s.PredictExecutable",
+        "s.ResidentBytes",
+        "s.ResidentBytes",
+        "s.Snapshot",
+        "string",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.TempDir",
+        "time.Now",
+        "time.Now",
+        "time.Since",
+        "time.Since",
+        "timeDur.Nanoseconds",
+        "unsafe.Sizeof"
       ]
     },
     {
