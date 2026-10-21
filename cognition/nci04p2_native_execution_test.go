@@ -14,15 +14,13 @@ func TestNCI04P2NativeProjectAssertionOwnership(t *testing.T){
   fields:=fmt.Sprintf(`"Action":%q,"Package":%q`,action,pkg)
   if test!=""{fields+=fmt.Sprintf(`,"Test":%q`,test)}
   if output!=""{fields+=fmt.Sprintf(`,"Output":%q`,output)}
-  return "{"+fields+"}
-"
+  return "{"+fields+"}\n"
  }
  success:=mk("start","","")+mk("run",task.Name,"")+mk("pass",task.Name,"")+mk("pass","","")
  label,err:=nativeGoTestVerdict([]byte(success),task,nil)
  if err!=nil||label!=1{t.Fatalf("valid executable success denied: label=%d err=%v",label,err)}
  failure:=mk("start","","")+mk("run",task.Name,"")+
-  mk("output",task.Name,"    source contract assertion failed
-")+
+  mk("output",task.Name,"    source contract assertion failed\n")+
   mk("fail",task.Name,"")+mk("fail","","")
  label,err=nativeGoTestVerdict([]byte(failure),task,errors.New("exit status 1"))
  if err!=nil||label!=0{t.Fatalf("real test assertion negative could not be represented: label=%d err=%v",label,err)}
@@ -32,16 +30,14 @@ func TestNCI04P2RejectsNoisyNonexecutionsAndMismatchedVerdicts(t *testing.T){
  task:=nativeReasoningTest{Name:"TestSourceWins",Package:"./ice",Source:"ice/index_test.go"}
  pkg:="github.com/spoonman136668-ai/Wingless/ice"
  ev:=func(a,p,test,output string)string {
-  return fmt.Sprintf(`{"Action":%q,"Package":%q,"Test":%q,"Output":%q}`+"
-",a,p,test,output)
+  return fmt.Sprintf(`{"Action":%q,"Package":%q,"Test":%q,"Output":%q}`+"\n",a,p,test,output)
  }
  run:=ev("run",pkg,task.Name,"")
  pass:=run+ev("pass",pkg,task.Name,"")+ev("pass",pkg,"","")
  fail:=run+ev("fail",pkg,task.Name,"")+ev("fail",pkg,"","")
  cases:=[]struct{name,data string;status error}{
   {"no_test_run",ev("fail",pkg,"","compilation errors"),errors.New("build failed")},
-  {"plain_text","FAIL
-",errors.New("exit status 1")},
+  {"plain_text","FAIL\n",errors.New("exit status 1")},
   {"wrong_package",ev("run","evil/package",task.Name,"")+ev("pass","evil/package",task.Name,"")+ev("pass","evil/package","",""),nil},
   {"wrong_test",ev("run",pkg,"TestOther","")+ev("pass",pkg,"TestOther","")+ev("pass",pkg,"",""),nil},
   {"no_summary",run+ev("pass",pkg,task.Name,""),nil},
