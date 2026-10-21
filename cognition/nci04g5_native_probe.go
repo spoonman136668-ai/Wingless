@@ -52,7 +52,7 @@ type nativeProbeCustody struct {
 
 func probeCustodyRead(root string)(nativeProbeCustody,error){
  var zero nativeProbeCustody
- name:=filepath.Join(root,"probe-custody.json")
+ name:=filepath.Join(root,".probe-custody.dat")
  info,err:=os.Lstat(name);if err!=nil{return zero,err}
  if !info.Mode().IsRegular()||info.Size()>512{return zero,errors.New("invalid durable probe custody")}
  raw,err:=os.ReadFile(name);if err!=nil{return zero,err}
@@ -71,7 +71,7 @@ func probeCustodyWrite(root string,seq uint8,sourceHash string)error{
  if _,err:=temp.Write(raw);err!=nil{temp.Close();return err}
  if err:=temp.Sync();err!=nil{temp.Close();return err}
  if err:=temp.Close();err!=nil{return err}
- return os.Rename(name,filepath.Join(root,"probe-custody.json"))
+ return os.Rename(name,filepath.Join(root,".probe-custody.dat"))
 }
 
 func exactProbeSource(b []byte) bool {
