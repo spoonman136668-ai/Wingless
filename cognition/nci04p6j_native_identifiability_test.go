@@ -9,7 +9,6 @@ import (
     "bytes"
     "context"
     "encoding/json"
-    "os"
     "os/exec"
     "path/filepath"
     "reflect"
