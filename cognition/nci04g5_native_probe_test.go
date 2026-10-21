@@ -33,6 +33,12 @@ func TestNCI04G5NativeExecutableActionConsequence(t *testing.T) {
  obs2,err:=restarted.Intervene(context.Background(),false)
  if err!=nil||obs2.Sequence!=3||obs2.Consequence!=0{t.Fatal("failed third and final causal intervention",err)}
  if _,err=restarted.Intervene(context.Background(),true);err==nil{t.Fatal("hidden fourth intervention allowed")}
+ // Fresh process without a receipt must still see the consumed durable budget.
+ reopened,err:=OpenNativeProbe(root);if err!=nil{t.Fatal(err)}
+ if _,err=reopened.Intervene(context.Background(),true);err==nil{
+  t.Fatal("reopened sandbox reset durable action limit")
+ }
+ if err=reopened.Restore(state);err==nil{t.Fatal("stale receipt rewound durable sequence")}
  t.Logf("NCI04G5_WINGLESS_NATIVE_SEAM_PASS source_authenticated_interventions=3 receipt_bytes=%d resident_struct_bytes=%d",len(state),unsafe.Sizeof(*p))
 }
 
