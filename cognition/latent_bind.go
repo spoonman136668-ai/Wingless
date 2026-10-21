@@ -63,13 +63,64 @@ func probability(v float32)float64{
     if z>=0 {q:=math.Exp(-z);return 1/(1+q)}
     q:=math.Exp(z);return q/(1+q)
 }
+// contradictionCandidate creates a distinct causal state only when the
+// EXISTING trained action relation strongly contradicts a newly observed
+// consequence AND the new observation is perceptually distinguishable.
+// It adds no fields: prototypes and relations use the original fixed budget.
+// A novel state has no confident answer until it learns from consequences.
+// It never splits two truly identical observations; those remain uncertain.
+// Candidate-only learning policy; not an independent scientific threshold.
+func (s *LatentState) contradictionCandidate(src,dst [FeatureWidth]float32,action,outcome int)(bool,bool){
+    i,ds:=nearest(s,src)
+    j,dd:=nearest(s,dst)
+    if i<0||j<0||i==j||ds>0.0625||dd>0.0625{return false,false}
+    edge:=s.Relations[i][j][action]
+    if edge.Updates<24{return false,false}
+    p:=probability(edge.LogOdds)
+    if !((outcome==0&&p>=0.90)||(outcome==1&&p<=0.10)){return false,false}
+    // A distant observation is already a new entity under normal binding.
+    // Split only the perceptually divergent endpoint, not a task label.
+    if ds>=dd&&ds>0.0016{return true,false}
+    if dd>0.0016{return false,true}
+    return false,false
+}
+func (s *LatentState) ambiguousNeighbor(v [FeatureWidth]float32,chosen int,chosenDistance float32)bool{
+    for i:=0;i<int(s.Count);i++ {
+        if i==chosen{continue}
+        var d float32
+        for k,x:=range v{q:=x-s.Entities[i].Mean[k];d+=q*q}
+        if d<=0.0625&&math.Abs(float64(d-chosenDistance))<=0.0008{return true}
+    }
+    return false
+}
+
 // Observe receives a sensory pair, an action and an observed consequence.
 // No task label, symbolic entity ID or future query is supplied.
 func (s *LatentState) Observe(src,dst [FeatureWidth]float32,action,outcome int)error{
     if !validVector(src)||!validVector(dst)||action<0||action>=MaxActions||(outcome!=0&&outcome!=1){return errors.New("invalid latent observation")}
     next:=*s
-    i,e:=next.bind(src);if e!=nil{return e}
-    j,e:=next.bind(dst);if e!=nil{return e}
+    splitSource,splitTarget:=next.contradictionCandidate(src,dst,action,outcome)
+    // Transactional capacity handling. Never silently overwrite a learned
+    // prototype or convert a contradictory single observation into truth.
+    if (splitSource||splitTarget)&&int(next.Count)>=MaxEntities{
+        return errors.New("causal state revision exceeds fixed entity capacity")
+    }
+    var i,j int
+    var e error
+    if splitSource{
+        i=int(next.Count)
+        next.Count++
+        next.Entities[i]=EntityPrototype{Mean:src,Seen:1}
+    }else{
+        i,e=next.bind(src);if e!=nil{return e}
+    }
+    if splitTarget{
+        j=int(next.Count)
+        next.Count++
+        next.Entities[j]=EntityPrototype{Mean:dst,Seen:1}
+    }else{
+        j,e=next.bind(dst);if e!=nil{return e}
+    }
     edge:= &next.Relations[i][j][action]
     p:=probability(edge.LogOdds)
     v:=float64(edge.LogOdds)+0.15*(float64(outcome)-p)
@@ -85,6 +136,10 @@ func (s *LatentState) Predict(src,dst [FeatureWidth]float32,action int)(float64,
     if !validVector(src)||!validVector(dst)||action<0||action>=MaxActions{return 0,errors.New("invalid latent query")}
     i,a:=nearest(s,src);j,b:=nearest(s,dst)
     if i<0||j<0||a>0.0625||b>0.0625{return 0.5,nil}
+    // A boundary between learned causal states carries insufficient
+    // evidence for confident identity binding. Abstain rather than choose
+    // an arbitrary nearest prototype.
+    if s.ambiguousNeighbor(src,i,a)||s.ambiguousNeighbor(dst,j,b){return 0.5,nil}
     edge:=s.Relations[i][j][action]
     if edge.Updates==0{return 0.5,nil}
     return probability(edge.LogOdds),nil
