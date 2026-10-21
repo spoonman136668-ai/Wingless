@@ -94,8 +94,11 @@ func TestNCI04P4P6IAuthenticStateChangingNativeTransfer(t *testing.T) {
     }
     changed:=p6iGit(t,clone,"status","--porcelain")
     if changed=="" {t.Fatal("source-changing native action produced no artifacts")}
+    // git status --porcelain uses XY + space + path. p6iGit trims the
+    // left padding on status lines; normalize XY rather than indexing at 3.
     for _,line:=range strings.Split(changed,"\n"){
-        if len(line)<4 || !strings.HasPrefix(line[3:],".ice/") {
+        fields:=strings.Fields(line)
+        if len(fields)!=2 || !strings.HasPrefix(fields[1],".ice/") {
             t.Fatalf("original source escaped isolated index-only action: %q",line)
         }
     }
