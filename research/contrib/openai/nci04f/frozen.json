@@ -1,0 +1,43 @@
+{
+  "schema": "nci04f.wingless.ambiguous_probe_falsification.v1",
+  "parent_source": "309425be26908dfd25adc152f7abf7fe02f39cf7",
+  "parent_evidence": "6f21af6ba30237a46f79d3f5cde004838d34692e",
+  "scope": "ONE_FINAL_SOURCE_ONLY_DISCRIMINATING_FAILURE_TEST",
+  "hypothesis": "A mode learned without latent identity must abstain on unprobed actions when a first action gives identical outcomes across distinct previously observed source response modes.",
+  "frozen": {
+    "modes": 2,
+    "actions": 2,
+    "profiles": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "identical_first_action": 0,
+    "distinguishing_action": 1,
+    "train_sessions": 12,
+    "train_actions_per_session": 8,
+    "query_after_action_zero": true,
+    "novel_trials": 8,
+    "negative_control": "identical source profiles must never produce a claimed physical identity",
+    "source_seeds": "deterministic fixed alternation, no task labels visible to learner"
+  },
+  "strong_controls": [
+    "train-only unlabeled completed-session response-signature model, set-valued Bayesian-compatible predictive abstention",
+    "one pooled trained Beta response predictor",
+    "known-latent-identity oracle reported only as unreachable ceiling"
+  ],
+  "required": "Zero hard confident incorrect predictions on action 1 after only action-0 observation, and valid prediction when the evidence uniquely identifies a response mode. Source-conditional unknown allowed; no retuning existing implementation.",
+  "constraints": {
+    "original_nci04e_source_untouched": true,
+    "new_learning_mechanism": false,
+    "no_paid_api": true,
+    "scientific_first_use": 0,
+    "protected_main_unchanged": true,
+    "auto_merge": false
+  }
+}
