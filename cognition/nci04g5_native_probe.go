@@ -135,12 +135,12 @@ func (p *NativeProbe) Intervene(ctx context.Context, enable bool)(NativeProbeObs
  if err:=ice.Validate(p.root);err!=nil{return NativeProbeObservation{},err}
  rootSource,err:=probeRead(p.root);if err!=nil{return NativeProbeObservation{},err}
  manifest,err:=os.ReadFile(filepath.Join(p.root,".ice","manifest.json"));if err!=nil{return NativeProbeObservation{},err}
- // This process executes only our exact generated source. It cannot run
+ // Run the exact checked source file, rather than a directory glob. No other\n // source file can join the compiled package. It cannot run
  // external code via network-based Go modules, go.work or toolchain download.
  deadline,cancel:=context.WithTimeout(ctx,25*time.Second);defer cancel()
- cmd:=exec.CommandContext(deadline,"go","run",".")
+ cmd:=exec.CommandContext(deadline,"go","run","probe.go")
  cmd.Dir=p.root
- cmd.Env=append(os.Environ(),"GOWORK=off","GOPROXY=off","GOSUMDB=off","GOTOOLCHAIN=local")
+ cmd.Env=append(os.Environ(),"GOFLAGS=","GO111MODULE=on","GOWORK=off","GOPROXY=off","GOSUMDB=off","GOTOOLCHAIN=local")
  output,err:=cmd.CombinedOutput()
  if err!=nil{return NativeProbeObservation{},fmt.Errorf("native probe execution unsuccessful: %w",err)}
  observed:=strings.TrimSpace(string(output))
