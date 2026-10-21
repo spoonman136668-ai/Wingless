@@ -1,0 +1,30 @@
+name: Wingless NCI-04 Native Causal Revision
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Native learned partition and original regressions
+        run: |
+          go test ./cognition -run '^TestNCI04(A|Contradiction|Rejects|Revision)' -count=1 -v
+          go vet ./cognition
+      - name: Explicitly retain full ICE/atlas gate
+        run: echo 'Full native G7 + canonical ICE and Windows atlas remain a separate mandatory source-bound qualification; no skip is authorized' 
+      - name: Verify exact source
+        run: |
+          test -z "$(git status --porcelain)"
+          echo "NCI04_NATIVE_REVISION_SOURCE=$(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
