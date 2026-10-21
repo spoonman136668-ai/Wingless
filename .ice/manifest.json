@@ -83,6 +83,10 @@
       "sha256": "3719dbdb91e821263564348ef8432bcdcc51a8951687babdd1cd7e6a85a044e2"
     },
     {
+      "path": ".github/workflows/nci04-native-causal-revision.yml",
+      "sha256": "32c667e864ac19029d55634396be819f48ea290e0338ea47a2c124053397efee"
+    },
+    {
       "path": ".github/workflows/nci04g5-observation.yml",
       "sha256": "1b91cf282710e5db2e6e45b3be65d85bd98b5b5aa0f693f3c5ac7b9ff4c6040d"
     },
@@ -132,7 +136,7 @@
     },
     {
       "path": ".github/workflows/wingless-code-atlas.yml",
-      "sha256": "3bab9e352630c0d6f2b47bb821f6bf119de2e591c39351dc1bd809ca057195d0"
+      "sha256": "ca2a58cdba9050ad0d61f2ed0bf06bb77023c41f9cab674b2bb43ba1e34f621b"
     },
     {
       "path": ".gitignore",
@@ -408,13 +412,26 @@
     },
     {
       "path": "cmd/wingless-ice-cognition/main.go",
-      "sha256": "8221e99fb197cb139b4e2a8a37c5b40d153a9c4f041c93b6e66119d1415d398c",
+      "sha256": "97f1c75b2fcfce8cbcb9dd4de7513dc0ee722f04ad45b66ac1914eee82411152",
       "package": "main",
       "imports": [
+        "context",
         "encoding/json",
         "fmt",
+        "path/filepath",
         "os",
+        "strings",
         "github.com/spoonman136668-ai/Wingless/cognition"
+      ]
+    },
+    {
+      "path": "cmd/wingless-ice-cognition/p2_native_test.go",
+      "sha256": "f47754d186de646178fe10c519b22a508975c2fe984e85045a3e075fab9f540b",
+      "package": "main",
+      "imports": [
+        "os",
+        "path/filepath",
+        "testing"
       ]
     },
     {
@@ -467,7 +484,7 @@
     },
     {
       "path": "cognition/latent_bind.go",
-      "sha256": "a586e38ba8efd810a345ad23c794de9183e0043a9a5d317e7ee41fa55ee8b985",
+      "sha256": "1760a2fbc4a3ece984a17bbd7117c01d5980daaa56d03069dd13f2286af9b93c",
       "package": "cognition",
       "imports": [
         "encoding/json",
@@ -483,6 +500,17 @@
         "bytes",
         "testing",
         "math"
+      ]
+    },
+    {
+      "path": "cognition/nci04_native_revision_test.go",
+      "sha256": "b9cf3ad41fc035415d075a3a63168890b09dc38aec38458863b7e7ea0bd31297",
+      "package": "cognition",
+      "imports": [
+        "bytes",
+        "math",
+        "testing",
+        "unsafe"
       ]
     },
     {
@@ -545,10 +573,13 @@
     },
     {
       "path": "cognition/nci04g7_source_task.go",
-      "sha256": "6f388df74f021c8a344cd0daf5219b96baa9d62af261a4acc7cede2e111b9ad4",
+      "sha256": "16415ba8c01f7b9ea98ff422668dc810057ee6b5323bba5d20840c3a65ac2e54",
       "package": "cognition",
       "imports": [
         "context",
+        "bufio",
+        "bytes",
+        "encoding/json",
         "crypto/sha256",
         "encoding/hex",
         "errors",
@@ -574,6 +605,17 @@
         "testing",
         "time",
         "unsafe"
+      ]
+    },
+    {
+      "path": "cognition/nci04p2_native_execution_test.go",
+      "sha256": "bf02a74d3a61a5924a77a7309afba9cbf0caf649698065da1f45f1552548b7de",
+      "package": "cognition",
+      "imports": [
+        "errors",
+        "fmt",
+        "strings",
+        "testing"
       ]
     },
     {
@@ -2339,22 +2381,61 @@
       ]
     },
     {
+      "name": "checkedNativeAction",
+      "kind": "function",
+      "file": "cmd/wingless-ice-cognition/main.go",
+      "start": 17,
+      "end": 25,
+      "calls": [
+        "fmt.Errorf",
+        "fmt.Errorf"
+      ]
+    },
+    {
+      "name": "checkedNativeSnapshot",
+      "kind": "function",
+      "file": "cmd/wingless-ice-cognition/main.go",
+      "start": 26,
+      "end": 36,
+      "calls": [
+        "filepath.Abs",
+        "filepath.Abs",
+        "filepath.Dir",
+        "filepath.EvalSymlinks",
+        "filepath.EvalSymlinks",
+        "filepath.IsAbs",
+        "filepath.Rel",
+        "fmt.Errorf",
+        "string",
+        "strings.HasPrefix"
+      ]
+    },
+    {
       "name": "run",
       "kind": "function",
       "file": "cmd/wingless-ice-cognition/main.go",
-      "start": 11,
-      "end": 27,
+      "start": 38,
+      "end": 64,
       "calls": [
+        "checkedNativeAction",
+        "checkedNativeAction",
+        "checkedNativeSnapshot",
         "cognition.OpenSourceReasoner",
+        "context.Background",
         "fmt.Errorf",
         "fmt.Errorf",
+        "json.NewEncoder",
+        "json.NewEncoder",
         "json.NewEncoder",
         "len",
         "os.IsNotExist",
         "os.Lstat",
         "r.Load",
         "r.ObserveExistingCall",
+        "r.ObserveNativeReasoningTask",
         "r.PredictCall",
+        "r.PredictNativeReasoningTask",
+        "r.Save",
         "r.Save"
       ]
     },
@@ -2362,12 +2443,38 @@
       "name": "main",
       "kind": "function",
       "file": "cmd/wingless-ice-cognition/main.go",
-      "start": 28,
-      "end": 30,
+      "start": 65,
+      "end": 67,
       "calls": [
         "fmt.Fprintln",
         "os.Exit",
         "run"
+      ]
+    },
+    {
+      "name": "TestNCI04P2NativeCLIRejectsTargetAnswersAndUntrustedSnapshotPaths",
+      "kind": "function",
+      "file": "cmd/wingless-ice-cognition/p2_native_test.go",
+      "start": 8,
+      "end": 26,
+      "calls": [
+        "checkedNativeAction",
+        "checkedNativeAction",
+        "checkedNativeSnapshot",
+        "checkedNativeSnapshot",
+        "filepath.Join",
+        "filepath.Join",
+        "filepath.Join",
+        "os.Mkdir",
+        "rune",
+        "string",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.TempDir",
+        "t.TempDir"
       ]
     },
     {
@@ -2861,19 +2968,50 @@
       ]
     },
     {
+      "name": "contradictionCandidate",
+      "kind": "method",
+      "file": "cognition/latent_bind.go",
+      "start": 73,
+      "end": 86,
+      "receiver": "LatentState",
+      "calls": [
+        "nearest",
+        "nearest",
+        "probability"
+      ]
+    },
+    {
+      "name": "ambiguousNeighbor",
+      "kind": "method",
+      "file": "cognition/latent_bind.go",
+      "start": 87,
+      "end": 95,
+      "receiver": "LatentState",
+      "calls": [
+        "float64",
+        "int",
+        "math.Abs"
+      ]
+    },
+    {
       "name": "Observe",
       "kind": "method",
       "file": "cognition/latent_bind.go",
-      "start": 68,
-      "end": 82,
+      "start": 99,
+      "end": 133,
       "receiver": "LatentState",
       "calls": [
+        "errors.New",
         "errors.New",
         "float32",
         "float64",
         "float64",
+        "int",
+        "int",
+        "int",
         "next.bind",
         "next.bind",
+        "next.contradictionCandidate",
         "probability",
         "validVector",
         "validVector"
@@ -2883,14 +3021,16 @@
       "name": "Predict",
       "kind": "method",
       "file": "cognition/latent_bind.go",
-      "start": 84,
-      "end": 91,
+      "start": 135,
+      "end": 146,
       "receiver": "LatentState",
       "calls": [
         "errors.New",
         "nearest",
         "nearest",
         "probability",
+        "s.ambiguousNeighbor",
+        "s.ambiguousNeighbor",
         "validVector",
         "validVector"
       ]
@@ -2899,8 +3039,8 @@
       "name": "ForecastVia",
       "kind": "method",
       "file": "cognition/latent_bind.go",
-      "start": 92,
-      "end": 96,
+      "start": 147,
+      "end": 151,
       "receiver": "LatentState",
       "calls": [
         "s.Predict",
@@ -2911,8 +3051,8 @@
       "name": "Snapshot",
       "kind": "method",
       "file": "cognition/latent_bind.go",
-      "start": 97,
-      "end": 97,
+      "start": 152,
+      "end": 152,
       "receiver": "LatentState",
       "calls": [
         "json.Marshal"
@@ -2922,8 +3062,8 @@
       "name": "Restore",
       "kind": "method",
       "file": "cognition/latent_bind.go",
-      "start": 98,
-      "end": 110,
+      "start": 153,
+      "end": 165,
       "receiver": "LatentState",
       "calls": [
         "errors.New",
@@ -3000,6 +3140,85 @@
         "t.Fatal",
         "t.Fatal",
         "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestNCI04ContradictionDrivenStateRevision",
+      "kind": "function",
+      "file": "cognition/nci04_native_revision_test.go",
+      "start": 14,
+      "end": 54,
+      "calls": [
+        "bytes.Equal",
+        "math.Abs",
+        "math.Abs",
+        "restored.Predict",
+        "restored.Predict",
+        "restored.Restore",
+        "restored.Snapshot",
+        "s.Observe",
+        "s.Observe",
+        "s.Observe",
+        "s.Predict",
+        "s.Predict",
+        "s.Predict",
+        "s.Predict",
+        "s.Predict",
+        "s.Snapshot",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Logf",
+        "unsafe.Sizeof",
+        "unsafe.Sizeof"
+      ]
+    },
+    {
+      "name": "TestNCI04RejectsUndistinguishableOrUntrainedCausalSplit",
+      "kind": "function",
+      "file": "cognition/nci04_native_revision_test.go",
+      "start": 56,
+      "end": 72,
+      "calls": [
+        "s.Observe",
+        "s.Observe",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "trained.Observe",
+        "trained.Observe"
+      ]
+    },
+    {
+      "name": "TestNCI04RevisionFailClosedWhenFixedSlotsExhausted",
+      "kind": "function",
+      "file": "cognition/nci04_native_revision_test.go",
+      "start": 74,
+      "end": 94,
+      "calls": [
+        "bytes.Equal",
+        "int",
+        "s.Observe",
+        "s.Observe",
+        "s.Observe",
+        "s.Snapshot",
+        "s.Snapshot",
         "t.Fatal",
         "t.Fatal",
         "t.Fatal",
@@ -3543,29 +3762,65 @@
       "name": "NativeReasoningConsequence",
       "kind": "type",
       "file": "cognition/nci04g7_source_task.go",
-      "start": 21,
-      "end": 29
+      "start": 24,
+      "end": 32
     },
     {
       "name": "nativeReasoningTest",
       "kind": "type",
       "file": "cognition/nci04g7_source_task.go",
-      "start": 31,
-      "end": 33
+      "start": 34,
+      "end": 36
     },
     {
       "name": "nativeReasoningTasks",
       "kind": "var",
       "file": "cognition/nci04g7_source_task.go",
-      "start": 34,
-      "end": 38
+      "start": 37,
+      "end": 41
+    },
+    {
+      "name": "nativeGoTestVerdict",
+      "kind": "function",
+      "file": "cognition/nci04g7_source_task.go",
+      "start": 47,
+      "end": 94,
+      "calls": [
+        "bufio.NewScanner",
+        "bytes.NewReader",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "json.Unmarshal",
+        "len",
+        "len",
+        "make",
+        "scanner.Buffer",
+        "scanner.Bytes",
+        "scanner.Err",
+        "scanner.Scan",
+        "strings.Contains",
+        "strings.Contains",
+        "strings.Contains",
+        "strings.Contains",
+        "strings.TrimPrefix"
+      ]
     },
     {
       "name": "ObserveNativeReasoningTask",
       "kind": "method",
       "file": "cognition/nci04g7_source_task.go",
-      "start": 43,
-      "end": 78,
+      "start": 99,
+      "end": 134,
       "receiver": "SourceReasoner",
       "calls": [
         "append",
@@ -3575,7 +3830,6 @@
         "context.WithTimeout",
         "deadline.Err",
         "deadline.Err",
-        "errors.New",
         "errors.New",
         "errors.New",
         "errors.New",
@@ -3591,6 +3845,7 @@
         "hex.EncodeToString",
         "len",
         "len",
+        "nativeGoTestVerdict",
         "os.Environ",
         "os.ReadFile",
         "r.symbol",
@@ -3600,11 +3855,8 @@
         "string",
         "string",
         "string",
-        "string",
-        "string",
-        "strings.Contains",
-        "strings.Contains",
         "strings.TrimSpace",
+        "uint8",
         "uint8",
         "vectorFromSource",
         "vectorFromSource"
@@ -3614,8 +3866,8 @@
       "name": "PredictNativeReasoningTask",
       "kind": "method",
       "file": "cognition/nci04g7_source_task.go",
-      "start": 79,
-      "end": 85,
+      "start": 135,
+      "end": 141,
       "receiver": "SourceReasoner",
       "calls": [
         "errors.New",
@@ -3734,6 +3986,71 @@
         "t.Fatal",
         "t.Fatal",
         "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestNCI04P2NativeProjectAssertionOwnership",
+      "kind": "function",
+      "file": "cognition/nci04p2_native_execution_test.go",
+      "start": 10,
+      "end": 28,
+      "calls": [
+        "errors.New",
+        "fmt.Sprintf",
+        "fmt.Sprintf",
+        "fmt.Sprintf",
+        "mk",
+        "mk",
+        "mk",
+        "mk",
+        "mk",
+        "mk",
+        "mk",
+        "mk",
+        "mk",
+        "nativeGoTestVerdict",
+        "nativeGoTestVerdict",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Log"
+      ]
+    },
+    {
+      "name": "TestNCI04P2RejectsNoisyNonexecutionsAndMismatchedVerdicts",
+      "kind": "function",
+      "file": "cognition/nci04p2_native_execution_test.go",
+      "start": 29,
+      "end": 59,
+      "calls": [
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "ev",
+        "fmt.Sprintf",
+        "nativeGoTestVerdict",
+        "strings.Repeat",
+        "t.Fatalf",
+        "t.Run"
       ]
     },
     {
