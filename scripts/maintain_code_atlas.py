@@ -246,10 +246,10 @@ def generate(root, receipts_path=None):
                     and lineage.get("file_sha256") == sha(old_file)
                     and lineage.get("independent_approval") is False
                     and lineage.get("current_declaration_sha256") ==
-                        sha(old_decl.replace(b"\\r\\n", b"\\n")),
+                        sha(old_decl.replace(b"\r\n", b"\n")),
                     "G28_INVALID_HISTORICAL_PROVISIONAL_WITNESS: " + repr(key))
-            require(old_decl.replace(b"\\r\\n", b"\\n") ==
-                    new_decl.replace(b"\\r\\n", b"\\n"),
+            require(old_decl.replace(b"\r\n", b"\n") ==
+                    new_decl.replace(b"\r\n", b"\n"),
                     "G28_CHANGED_PROVISIONAL_REQUIRES_NEW_SOURCE_REVIEW: " + repr(key))
             require(key not in receipt_by_key,
                     "G28_UNNECESSARY_PROVISIONAL_RECEIPT: " + repr(key))
@@ -271,7 +271,7 @@ def generate(root, receipts_path=None):
             prov["prior_provisional_source_commit"] = previous
             prov["target_source_commit"] = target
             prov["file_sha256"] = sha(new_file)
-            prov["current_declaration_sha256"] = sha(new_decl.replace(b"\\r\\n", b"\\n"))
+            prov["current_declaration_sha256"] = sha(new_decl.replace(b"\r\n", b"\n"))
             id_mapping[oldnode["id"]] = n["id"]
             new_nodes.append(n)
             continue
