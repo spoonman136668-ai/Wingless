@@ -128,7 +128,7 @@
     },
     {
       "path": ".github/workflows/wingless-code-atlas.yml",
-      "sha256": "164e1cd19bf847308ae939b251d1928465acadab33a202bac30afa4c2889ff12"
+      "sha256": "a82cda3d178f37258356a9d6f9266e80180fc491b5b4179ba9ccdf85d893c46a"
     },
     {
       "path": ".gitignore",
@@ -511,6 +511,24 @@
         "path/filepath",
         "testing",
         "unsafe"
+      ]
+    },
+    {
+      "path": "cognition/nci04g6_cold_process_test.go",
+      "sha256": "14a1ed96098f8031ebf0e9d7077401efce5fa01e6bd4bbb6ce01e1d295b6cf46",
+      "package": "cognition",
+      "imports": [
+        "context",
+        "crypto/sha256",
+        "encoding/hex",
+        "encoding/json",
+        "errors",
+        "fmt",
+        "os",
+        "os/exec",
+        "path/filepath",
+        "strings",
+        "testing"
       ]
     },
     {
@@ -3316,6 +3334,131 @@
         "t.Fatal",
         "t.Fatal",
         "t.Fatal",
+        "t.TempDir"
+      ]
+    },
+    {
+      "name": "coldModeEnv",
+      "kind": "const",
+      "file": "cognition/nci04g6_cold_process_test.go",
+      "start": 17,
+      "end": 17
+    },
+    {
+      "name": "coldRootEnv",
+      "kind": "const",
+      "file": "cognition/nci04g6_cold_process_test.go",
+      "start": 18,
+      "end": 18
+    },
+    {
+      "name": "coldSnapshotEnv",
+      "kind": "const",
+      "file": "cognition/nci04g6_cold_process_test.go",
+      "start": 19,
+      "end": 19
+    },
+    {
+      "name": "coldReportMarker",
+      "kind": "const",
+      "file": "cognition/nci04g6_cold_process_test.go",
+      "start": 20,
+      "end": 20
+    },
+    {
+      "name": "coldReport",
+      "kind": "type",
+      "file": "cognition/nci04g6_cold_process_test.go",
+      "start": 22,
+      "end": 29
+    },
+    {
+      "name": "TestNCI04G6ColdProcessHelper",
+      "kind": "function",
+      "file": "cognition/nci04g6_cold_process_test.go",
+      "start": 34,
+      "end": 119,
+      "calls": [
+        "NewNativeProbe",
+        "OpenNativeProbe",
+        "context.Background",
+        "context.Background",
+        "errors.New",
+        "fmt.Println",
+        "fmt.Println",
+        "hex.EncodeToString",
+        "json.Marshal",
+        "json.Marshal",
+        "len",
+        "os.Getenv",
+        "os.Getenv",
+        "os.Getenv",
+        "os.ReadFile",
+        "os.WriteFile",
+        "probe.Snapshot",
+        "probeHash",
+        "probeRead",
+        "session.ActAndLearn",
+        "session.ActAndLearn",
+        "session.PredictExecutable",
+        "session.Restore",
+        "session.Snapshot",
+        "sha256.Sum256",
+        "string",
+        "string",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf"
+      ]
+    },
+    {
+      "name": "TestNCI04G6ColdProcessRestart",
+      "kind": "function",
+      "file": "cognition/nci04g6_cold_process_test.go",
+      "start": 125,
+      "end": 174,
+      "calls": [
+        "append",
+        "command.CombinedOutput",
+        "exec.Command",
+        "filepath.Join",
+        "filepath.Join",
+        "filepath.Join",
+        "json.Unmarshal",
+        "len",
+        "os.Environ",
+        "os.Executable",
+        "os.Getenv",
+        "run",
+        "run",
+        "run",
+        "run",
+        "string",
+        "strings.Index",
+        "strings.Split",
+        "strings.TrimSpace",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Helper",
+        "t.Logf",
         "t.TempDir"
       ]
     },
