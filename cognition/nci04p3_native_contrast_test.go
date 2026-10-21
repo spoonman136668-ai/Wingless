@@ -98,8 +98,7 @@ func TestNCI04P3ActualICECausalInterventionAndReversal(t *testing.T) {
 
 func TestNCI04P3NativeAssertionRejectsOperationalFailure(t *testing.T) {
  test:=nativeReasoningTest{Name:"TestSourceWins",Package:"./ice",Source:"ice/index_test.go"}
- raw:=[]byte(`{"Action":"fail","Package":"github.com/spoonman136668-ai/Wingless/ice"}`+"
-")
+ raw:=[]byte(`{"Action":"fail","Package":"github.com/spoonman136668-ai/Wingless/ice"}`+"\n")
  if _,err:=nativeGoTestVerdict(raw,test,errors.New("build failure"));err==nil{
   t.Fatal("unexecuted build failure admitted as causal label")
  }
