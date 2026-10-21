@@ -30,13 +30,13 @@ func p6oConventionalEntropy(p float64)float64{
 // counter state has exactly the same actually executed outcome history,
 // independent of the native learner's representation and predictor code.
 func p6oIndependentBayesianController(c p6mCountControl,motors [2]float32)(float32,float64,[2]float64){
-    changed:=float64(c.success[0]+c.success[1])
-    unchanged:=float64(c.n[0]+c.n[1]-c.success[0]-c.success[1])
+    changed:=float64(c.positives[0]+c.positives[1])
+    unchanged:=float64(c.n[0]+c.n[1]-c.positives[0]-c.positives[1])
     baselineP:=(changed+1)/(changed+unchanged+2)
     logBF:=-p6oConventionalBeta(changed+1,unchanged+1)
     for i:=0;i<2;i++{
-        yes:=float64(c.success[i])
-        no:=float64(c.n[i]-c.success[i])
+        yes:=float64(c.positives[i])
+        no:=float64(c.n[i]-c.positives[i])
         logBF+=p6oConventionalBeta(yes+1,no+1)
     }
     w:=1/(1+math.Exp(-logBF))
@@ -45,7 +45,7 @@ func p6oIndependentBayesianController(c p6mCountControl,motors [2]float32)(float
     best:=-1.
     for i,motor:=range motors{
         j:=p6mMotorClass(motor)
-        conditional:=(float64(c.success[j])+1)/(float64(c.n[j])+2)
+        conditional:=(float64(c.positives[j])+1)/(float64(c.n[j])+2)
         mixture:=(1-w)*baselineP+w*conditional
         info:=p6oConventionalEntropy(mixture)-
             (1-w)*p6oConventionalEntropy(baselineP)-
