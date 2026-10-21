@@ -202,6 +202,75 @@ def run(root, scratch_parent):
                "--root", ".", "--relationships", report)
         print("G26_CHANGED_DECLARATION_FRESH_RECEIPT_REQUIRES_INDEPENDENT_APPROVAL=PASS", new_head)
 
+        # G28: an additional Go declaration must be source-witnessed,
+        # remain explicitly unreviewed, and never inherit the 352 old reviews.
+        added = Path(t) / "provisional-new-symbol"
+        clone(root, added, baseline)
+        existing = (added / SOURCE).read_text("utf-8")
+        with_new = (existing +
+                    "\nfunc G28AtlasSourceWitnessFixture() int { return 1 }\n")
+        added_head = make_commit(added, existing, with_new)
+        good(added, "go", "run", "./cmd/ice", "build")
+        reject(added, "G28_NEW_SYMBOL_SOURCE_RECEIPTS_REQUIRED",
+               sys.executable, "-B", "scripts/maintain_code_atlas.py",
+               "--root", ".")
+        idx = json.loads((added / ".ice/symbol-map.json").read_text("utf-8"))
+        fresh_node = next(n for n in idx
+                          if n["file"] == SOURCE.as_posix()
+                          and n["name"] == "G28AtlasSourceWitnessFixture")
+        raw = (added / SOURCE).read_bytes()
+        decl = b"".join(raw.splitlines(keepends=True)[
+            fresh_node["start"]-1:fresh_node["end"]])
+        review = [{
+            "key": [SOURCE.as_posix(), fresh_node["kind"], fresh_node["name"], ""],
+            "target_source_commit": added_head,
+            "file_sha256": hashlib.sha256(raw).hexdigest(),
+            "declaration_sha256": hashlib.sha256(decl).hexdigest(),
+            "start_line": fresh_node["start"], "end_line": fresh_node["end"],
+            "reviewer": "G28 SYNTHETIC UNVERIFIED",
+            "label": "Synthetic source-witnessed new symbol",
+            "description": "Synthetic test-only lexical definition with no independently verified behavior",
+            "literal_tokens": ["G28AtlasSourceWitnessFixture"],
+        }]
+        review_file = Path(t) / "g28-added.json"
+        review_file.write_text(json.dumps(review), "utf-8")
+        review[0]["file_sha256"] = "0" * 64
+        forged_file = Path(t) / "g28-forged.json"
+        forged_file.write_text(json.dumps(review), "utf-8")
+        reject(added, "G28_NEW_SYMBOL_RECEIPT_IDENTITY_DRIFT",
+               sys.executable, "-B", "scripts/maintain_code_atlas.py",
+               "--root", ".", "--receipts", forged_file)
+        accepted = good(added, sys.executable, "-B",
+                        "scripts/maintain_code_atlas.py",
+                        "--root", ".", "--receipts", review_file)
+        result = json.loads(accepted.strip().splitlines()[-1])
+        require(result["new_source_bound_provisional"] == 1
+                and result["reused_declarations"] == 352,
+                "G28 new source-bound symbol result incorrect")
+        expanded = json.loads((added / ATLAS).read_text("utf-8"))
+        marker = next(n for n in expanded["nodes"]
+                      if n["name"] == "G28AtlasSourceWitnessFixture")
+        require(len(expanded["nodes"]) == 353
+                and marker["evidence_basis"] == "lexical-provisional"
+                and marker["review_evidence"] is None
+                and marker["provenance_lineage"]["independent_approval"] is False,
+                "G28 provisional additions were silently promoted to reviewed")
+        g28_types = Path(t) / "types-g28.json"
+        with g28_types.open("w", encoding="utf-8") as out:
+            p = subprocess.run(["go", "run", "./cmd/ice", "relationships"],
+                               cwd=added, stdout=out, stderr=subprocess.PIPE,
+                               text=True, timeout=240)
+            require(p.returncode == 0, "G28 typed extraction failed: " + p.stderr)
+        good(added, sys.executable, "-B", "scripts/validate_code_atlas.py",
+             "--root", ".", "--relationships", g28_types)
+        print("G28_NEW_SOURCE_BOUND_PROVISIONAL=PASS", added_head)
+        marker["evidence_basis"] = "source-reviewed"
+        (added / ATLAS).write_text(json.dumps(expanded), "utf-8")
+        reject(added, "source-reviewed symbol has no explicit proof",
+               sys.executable, "-B", "scripts/validate_code_atlas.py",
+               "--root", ".", "--relationships", g28_types)
+        print("G28_UNAUTHENTICATED_REVIEW_PROMOTION_REJECTED=PASS")
+
         require(not good(root, "git", "status", "--porcelain").strip(),
                 "original checkout modified")
     print(json.dumps({

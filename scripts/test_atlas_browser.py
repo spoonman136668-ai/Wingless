@@ -58,8 +58,9 @@ def main():
     require(git(root, "cat-file", "-t", source_commit) == "commit" and
             git(root, "merge-base", FROZEN_SOURCE, source_commit) == FROZEN_SOURCE and
             git(root, "merge-base", source_commit, head) == source_commit and
-            len(atlas["nodes"]) == 352,
-            "wrong atlas source lineage or symbol inventory")
+            len(atlas["nodes"]) >= 352
+            and atlas["coverage"]["source_reviewed_labels"] >= 352,
+            "wrong atlas source lineage or reviewed baseline")
     source_header = "SOURCE_COMMIT: " + source_commit
     require((root / ".ice/code-intelligence.ice").read_text("utf-8").splitlines().count(source_header) == 1,
             "candidate atlas narrative source identity mismatch")
@@ -72,6 +73,7 @@ def main():
     require(os.name == "nt" and binary is not None,
             "Google Chrome missing from hosted Windows environment")
 
+    total_symbols = len(atlas["nodes"])
     recorded = ["frozen_baseline_preserved_and_source_bound_candidate_identity"]
     with tempfile.TemporaryDirectory(prefix="wingless-atlas-chrome-") as profile:
         chrome_options = Options()
@@ -86,17 +88,17 @@ def main():
             browser.set_page_load_timeout(25)
             wait = WebDriverWait(browser, 18)
             browser.get(atlas_file.as_uri())
-            wait.until(lambda d: d.find_element(By.ID, "nodesCount").text == "352")
+            wait.until(lambda d: d.find_element(By.ID, "nodesCount").text == str(total_symbols))
             require(browser.find_element(By.ID, "linksCount").text == "155",
                     "relationship total did not render")
-            require("352 of 352" in browser.find_element(By.ID, "shown").text,
+            require(f"{total_symbols} of {total_symbols}" in browser.find_element(By.ID, "shown").text,
                     "initial unfiltered list not rendered")
             recorded.append("headless_chromium_offline_boot_and_full_index")
 
             q = browser.find_element(By.ID, "q")
             q.click()
             q.send_keys("SubmitWork")
-            wait.until(lambda d: "4 of 352" in d.find_element(By.ID, "shown").text)
+            wait.until(lambda d: f"4 of {total_symbols}" in d.find_element(By.ID, "shown").text)
             matches = browser.find_elements(By.CSS_SELECTOR, "button.symbol")
             require(any("Admit and start one bounded inference job" in b.text
                         for b in matches), "typed search failed to find SubmitWork")
@@ -104,7 +106,7 @@ def main():
 
             Select(browser.find_element(By.ID, "basis")).select_by_value("source-reviewed")
             Select(browser.find_element(By.ID, "kind")).select_by_value("method")
-            wait.until(lambda d: "1 of 352" in d.find_element(By.ID, "shown").text)
+            wait.until(lambda d: f"1 of {total_symbols}" in d.find_element(By.ID, "shown").text)
             matching = browser.find_elements(By.CSS_SELECTOR, "button.symbol")
             require(len(matching) == 1 and
                     "Admit and start one bounded inference job" in matching[0].text,
