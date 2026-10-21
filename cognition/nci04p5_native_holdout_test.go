@@ -96,6 +96,14 @@ func TestNCI04P5TransferToOriginalToolAuthorization(t *testing.T){
  // authorization package, with exactly one reversible source intervention.
  originalPath:=filepath.Join(detached,"toolboundary","tools.go")
  original,e:=os.ReadFile(originalPath);if e!=nil{t.Fatal(e)}
+ // Canonical ICE generated in the disposable checkout is an authorized
+ // preexisting artifact delta. Freeze it BEFORE the intervention, then
+ // demand that the only EXTRA delta is toolboundary/tools.go.
+ baselineDiff:=exec.Command("git","-C",detached,"diff","--name-only")
+ baselineNames,e:=baselineDiff.Output();if e!=nil{t.Fatal(e)}
+ if bytes.Contains(baselineNames,[]byte("toolboundary/tools.go")) {
+  t.Fatal("native holdout already modified before intervention")
+ }
  trusted:=exec.Command("git","-C",detached,"show","HEAD:toolboundary/tools.go")
  blob,e:=trusted.Output();if e!=nil||!bytes.Equal(blob,original){t.Fatal("native holdout source differs from Git")}
  const policyGuard = `if a.Tool != "read_file" || !has(p.AllowedTools, a.Tool) || !has(p.AllowedPaths, a.Path) {`
@@ -110,7 +118,9 @@ func TestNCI04P5TransferToOriginalToolAuthorization(t *testing.T){
  if e=os.WriteFile(originalPath,changed,0600);e!=nil{t.Fatal(e)}
  scope:=exec.Command("git","-C",detached,"diff","--name-only")
  files,e:=scope.Output()
- if e!=nil||strings.TrimSpace(string(files))!="toolboundary/tools.go"{t.Fatalf("unbounded authorization intervention: %q %v",files,e)}
+ if e!=nil||string(files)!=string(baselineNames)+"toolboundary/tools.go\n" {
+  t.Fatalf("unbounded authorization intervention compared with frozen ICE artifact delta: %q original=%q %v",files,baselineNames,e)
+ }
  var negative []byte
  actual[1],wall[1],negative,e=runNativeToolBoundaryTest(context.Background(),detached)
  if e!=nil{t.Fatalf("holdout failure not a completed native assertion: %v",e)}
@@ -127,6 +137,11 @@ func TestNCI04P5TransferToOriginalToolAuthorization(t *testing.T){
  // tracked artifacts except source-index metadata from the disposable head.
  dirty,e:=status.Output();if e!=nil{t.Fatal(e)}
  if bytes.Contains(dirty,[]byte("toolboundary/tools.go")){t.Fatalf("holdout source remained dirty: %q",dirty)}
+ finalDiff:=exec.Command("git","-C",detached,"diff","--name-only")
+ delta,e:=finalDiff.Output()
+ if e!=nil||!bytes.Equal(delta,baselineNames){
+  t.Fatalf("holdout source or canonical ICE artifact delta changed after intervention: %q, baseline=%q, err=%v",delta,baselineNames,e)
+ }
  if _,e=cold.State.Snapshot();e!=nil{t.Fatal(e)}
  if cold.State.Observations!=3{t.Fatal("held-out outcomes leaked into learner")}
  candidateBrier:=p5Brier(priorPredictions,actual)
