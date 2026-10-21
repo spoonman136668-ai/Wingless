@@ -65,6 +65,17 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          # Do not dirty the exact-head acceptance checkout: generation happens
+          # only in a disposable full-history clone.
+          $source = (git rev-parse HEAD).Trim()
+          $tmp = Join-Path $env:RUNNER_TEMP 'nci04e-source-only-generator'
+          if (Test-Path $tmp) { throw 'NCI04E_UNEXPECTED_SCRATCH_PATH' }
+          git clone --quiet --no-hardlinks --no-checkout . $tmp
+          if ($LASTEXITCODE -ne 0) { throw 'NCI04E_SCRATCH_CLONE_FAILED' }
+          git -C $tmp checkout --quiet --detach $source
+          if ($LASTEXITCODE -ne 0) { throw 'NCI04E_SCRATCH_CHECKOUT_FAILED' }
+          Push-Location $tmp
+          try {
           go run ./cmd/ice build
           if ($LASTEXITCODE -ne 0) { throw 'NCI04E_ICE_BUILD_FAILED' }
           python scripts/maintain_code_atlas.py --root .
@@ -89,6 +100,10 @@ jobs:
           print('NCI04E_INDEX_SOURCE_PASS '+sha)
           '@ | python -
           if ($LASTEXITCODE -ne 0) { throw 'NCI04E_ICE_PROPOSAL_FAILED' }
+          } finally {
+            Pop-Location
+            Remove-Item -Recurse -Force $tmp
+          }
 
       - name: Tamper-resistance negative acceptance in disposable exact-head clone
         if: steps.scope.outputs.atlas_relevant == 'true'
