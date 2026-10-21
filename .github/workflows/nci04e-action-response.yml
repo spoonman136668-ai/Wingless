@@ -1,0 +1,60 @@
+name: NCI04E Wingless action-conditioned distinguishability
+on:
+  push:
+    branches: [research/nci04e-action-response-identifiability-20261020]
+    paths: ['.github/workflows/nci04e-action-response.yml']
+permissions:
+  contents: read
+jobs:
+  sourcefree:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Enforce preimplementation freeze and exact source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 425e52c468fa5e01d6adcd49ac4f9d0d43d9ab3e "$GITHUB_SHA"
+          test "$(git hash-object cognition/action_response_identity.go)" = b00301e961410b7a728841a36d45467dc08a926c
+          test "$(git hash-object cognition/action_response_identity_test.go)" = ba80d822153de2bfb389c5d00badb87945c1d729
+          python - <<'PY'
+          import json
+          p=json.load(open('research/contrib/openai/nci04e/frozen.json'))
+          assert p['schema']=='nci04e.wingless.necessary_identifiability.v1'
+          assert p['constraints']['first_use']==0
+          assert p['negative_fixture'].startswith('8 sessions')
+          print('NCI04E_W_PRECODE_SOURCE=PASS')
+          PY
+      - name: Run necessary-condition positive, impossibility control and Go vet
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./cognition -run 'TestNCI04E' -count=1 -v | tee "$RUNNER_TEMP/nci04e-wingless.log"
+          go vet ./cognition
+          echo 'NCI04E_W_FOCUSED=PASS'
+      - name: One full Go regression on Linux only
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./... -count=1
+          echo 'NCI04E_W_FULL_GO_REGRESSION=PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nci04e-wingless-${{ matrix.os }}
+          path: ${{ runner.temp }}/nci04e-wingless.log
+          if-no-files-found: warn
+          retention-days: 90
