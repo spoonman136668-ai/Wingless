@@ -66,7 +66,7 @@ func TestNCI04HICEPositiveEvidenceAndNoUnverifiedNegatives(t *testing.T){
  result,err:=r.ObserveVerifiedCallPartition("runICESourceCognition","ObserveExistingCall")
  if err!=nil||result.Split||result.Abstained||r.State.Observations!=before+1{t.Fatalf("native ICE-positive update failed: %+v %v",result,err)}
  beforeSnap,_:=r.State.Snapshot()
- if _,err:=r.ObserveVerifiedCallPartition("runICESourceCognition","PredictCall");err==nil{
+ if _,err:=r.ObserveVerifiedCallPartition("runICESourceCognition","vectorFromSource");err==nil{
   t.Fatal("unsupported source negative incorrectly admitted")
  }
  afterSnap,_:=r.State.Snapshot()
