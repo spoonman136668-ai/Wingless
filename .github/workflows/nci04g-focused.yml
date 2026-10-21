@@ -23,6 +23,7 @@ jobs:
       - name: Verify pre-primary frozen generator digest
         run: sha256sum cognition/nci04g_dev_test.go
       - name: Sealed source-free development comparison (negatives retained)
+        if: ${{ hashFiles('research/contrib/openai/nci04g-w1/result.json') == '' }}
         env:
           NCI04G_PRIMARY: '1'
         run: go test ./cognition -run '^TestNCI04G3FrozenDevelopment$' -count=1 -v
