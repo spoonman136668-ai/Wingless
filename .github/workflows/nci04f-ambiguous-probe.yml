@@ -1,0 +1,69 @@
+name: NCI04F Wingless first-probe ambiguity falsification
+on:
+  push:
+    branches: [research/nci04f-ambiguous-probe-control-20261020]
+    paths: ['.github/workflows/nci04f-ambiguous-probe.yml']
+permissions:
+  contents: read
+jobs:
+  bounded-probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify frozen earlier registration and unchanged NCI04E model
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 22d4aae1d102a968648b8e0e5a55861cbde794a0 "$GITHUB_SHA"
+          test "$(git hash-object cognition/action_response_identity.go)" = b00301e961410b7a728841a36d45467dc08a926c
+          test "$(git hash-object cognition/nci04f_test.go)" = 8490e14aaf01b3753344f20a814cfe6aea48c4b9
+          python - <<'PY'
+          import json
+          d=json.load(open('research/contrib/openai/nci04f/frozen.json'))
+          assert d['schema']=='nci04f.wingless.ambiguous_probe_falsification.v1'
+          assert d['constraints']['original_nci04e_source_untouched']
+          assert d['constraints']['scientific_first_use']==0
+          print("NCI04F_W_FROZEN_SOURCE=PASS")
+          PY
+      - name: Unmodified NCI04E candidate vs trained unlabeled response-signature control
+        shell: bash
+        run: |
+          set -euo pipefail
+          NCI04F_RESULT_PATH="$RUNNER_TEMP/nci04f-wingless.json" go test ./cognition -run 'TestNCI04F' -count=1 -v | tee "$RUNNER_TEMP/nci04f-wingless.log"
+          go vet ./cognition
+          python - <<'PY'
+          import os,json,pathlib
+          r=json.loads((pathlib.Path(os.environ['RUNNER_TEMP'])/'nci04f-wingless.json').read_text())
+          assert r['result'] in ('NEGATIVE','PASS_NECESSARY_CONDITION_ONLY')
+          assert r['scientific_first_use']==0 and r['latent_identity_exposed_to_candidate'] is False
+          assert r['strong_control_abstention_after_ambiguous_probe']==8
+          print('NCI04F_W_ACTUAL_RESULT='+r['result'])
+          PY
+      - name: One full Linux Go source regression
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./... -count=1
+          echo 'NCI04F_W_FULL_GO_REGRESSION=PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nci04f-wingless-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/nci04f-wingless.json
+            ${{ runner.temp }}/nci04f-wingless.log
+          if-no-files-found: warn
+          retention-days: 90
