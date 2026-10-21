@@ -126,6 +126,14 @@ func (p *NativeProbe) Intervene(ctx context.Context, enable bool)(NativeProbeObs
   return NativeProbeObservation{},errors.New("durable custody/source or sequence drift")
  }
  if err:=ice.Validate(p.root);err!=nil{return NativeProbeObservation{},err}
+ // Reserve one action BEFORE modifying source or executing the program.
+ // A crash or failed execution may consume capacity but can never regain it.
+ // If it happens after source mutation, source/custody will intentionally
+ // diverge and reopening fails closed instead of replaying that action.
+ nextSequence:=p.sequence+1
+ if err:=probeCustodyWrite(p.root,nextSequence,probeHash(source));err!=nil{
+  return NativeProbeObservation{},err
+ }
  // Any eligible intervention may change only this bounded, fixed source body.
  next:=probeFalse
  var action uint8
@@ -146,7 +154,6 @@ func (p *NativeProbe) Intervene(ctx context.Context, enable bool)(NativeProbeObs
  observed:=strings.TrimSpace(string(output))
  if observed!="0"&&observed!="1"{return NativeProbeObservation{},errors.New("invalid executed consequence")}
  if deadline.Err()!=nil{return NativeProbeObservation{},deadline.Err()}
- nextSequence:=p.sequence+1
  if err:=probeCustodyWrite(p.root,nextSequence,probeHash(rootSource));err!=nil{
   return NativeProbeObservation{},err
  }
