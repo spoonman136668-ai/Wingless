@@ -234,6 +234,47 @@ def generate(root, receipts_path=None):
         new_file = current_sources[path]
         old_decl = span(old_file, oldnode["start_line"], oldnode["end_line"])
         new_decl = span(new_file, current["start"], current["end"])
+        if oldnode.get("evidence_basis") == "lexical-provisional":
+            # Keep historically unreviewed symbols unreviewed across exact-
+            # declaration source transitions. Altered provisional definitions
+            # must be treated as new source and independently re-witnessed.
+            lineage = oldnode.get("provenance_lineage")
+            require(oldnode.get("review_evidence") is None
+                    and isinstance(lineage, dict)
+                    and lineage.get("mode") == "new-symbol-source-bound-provisional"
+                    and lineage.get("target_source_commit") == previous
+                    and lineage.get("file_sha256") == sha(old_file)
+                    and lineage.get("independent_approval") is False
+                    and lineage.get("current_declaration_sha256") ==
+                        sha(old_decl.replace(b"\r\n", b"\n")),
+                    "G28_INVALID_HISTORICAL_PROVISIONAL_WITNESS: " + repr(key))
+            require(old_decl.replace(b"\r\n", b"\n") ==
+                    new_decl.replace(b"\r\n", b"\n"),
+                    "G28_CHANGED_PROVISIONAL_REQUIRES_NEW_SOURCE_REVIEW: " + repr(key))
+            require(key not in receipt_by_key,
+                    "G28_UNNECESSARY_PROVISIONAL_RECEIPT: " + repr(key))
+            require(all(token.encode("utf-8") in new_decl
+                        for token in lineage["literal_tokens"]),
+                    "G28_PROVISIONAL_SOURCE_WITNESS_DRIFT: " + repr(key))
+            n = copy.deepcopy(oldnode)
+            n["start_line"], n["end_line"] = current["start"], current["end"]
+            n["id"] = symbol_id({
+                "file": path, "kind": current["kind"], "name": current["name"],
+                "receiver": current.get("receiver", ""), "start_line": current["start"]})
+            n["receiver"] = current.get("receiver", "")
+            n["file_sha256"] = sha(new_file)
+            n["syntax_calls"] = sorted(set(current.get("calls") or []))
+            n["source_url"] = ("https://github.com/" + REPO + "/blob/" +
+                               target + "/" + path + "#L" +
+                               str(current["start"]) + "-L" + str(current["end"]))
+            prov = n["provenance_lineage"]
+            prov["prior_provisional_source_commit"] = previous
+            prov["target_source_commit"] = target
+            prov["file_sha256"] = sha(new_file)
+            prov["current_declaration_sha256"] = sha(new_decl.replace(b"\r\n", b"\n"))
+            id_mapping[oldnode["id"]] = n["id"]
+            new_nodes.append(n)
+            continue
         oldproof = oldnode.get("review_evidence")
         require(oldnode.get("evidence_basis") == "source-reviewed"
                 and isinstance(oldproof, dict)
@@ -340,13 +381,17 @@ def generate(root, receipts_path=None):
     revised["nodes"] = new_nodes
     revised["coverage"]["symbols"] = len(new_nodes)
     revised["coverage"]["source_files"] = len(files)
-    reviewed_count = len(new_nodes) - provisional_added
-    require(reviewed_count >= 352, "G28_HISTORICAL_REVIEW_LOST")
+    reviewed_count = sum(n["evidence_basis"] == "source-reviewed"
+                         for n in new_nodes)
+    provisional_total = sum(n["evidence_basis"] == "lexical-provisional"
+                            for n in new_nodes)
+    require(reviewed_count >= 352 and reviewed_count + provisional_total == len(new_nodes),
+            "G28_HISTORICAL_REVIEW_LOST")
     revised["coverage"]["source_reviewed_labels"] = reviewed_count
     revised["coverage"]["source_evidenced_new_labels"] = reviewed_count
     revised["coverage"]["source_dependency_bound_labels"] = reviewed_count
     revised["coverage"]["all_reviewed_source_evidenced_labels"] = reviewed_count
-    revised["coverage"]["lexical_provisional_labels"] = provisional_added
+    revised["coverage"]["lexical_provisional_labels"] = provisional_total
     for edge in revised.get("relationships", []):
         if edge.get("kind") != "imports_local_package":
             require(edge["from"] in id_mapping and edge["to"] in id_mapping,
@@ -377,12 +422,12 @@ def generate(root, receipts_path=None):
         narrative = re.sub(r"(?m)^EVIDENCE: .*?$",
                            "EVIDENCE: .ice/code-intelligence.json ("
                            + str(len(new_nodes)) + " source-indexed symbols; "
-                           + str(provisional_added) + " provisional)", narrative)
+                           + str(provisional_total) + " provisional)", narrative)
         narrative = re.sub(r"(?m)^COVERAGE: .*?$",
                            "COVERAGE: " + str(len(new_nodes)) + " symbols in "
                            + str(len(files)) + " indexed files; "
                            + str(reviewed_count) + " source-reviewed labels; "
-                           + str(provisional_added) + " unreviewed provisional labels.",
+                           + str(provisional_total) + " unreviewed provisional labels.",
                            narrative)
     narrative += (
         "\nG26 SOURCE-AWARE ATLAS MAINTENANCE\n"
