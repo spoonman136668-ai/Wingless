@@ -49,7 +49,7 @@ func TestNCI04ContradictionDrivenStateRevision(t *testing.T){
  a2,_:=restored.Predict(a,dst,0)
  b2,_:=restored.Predict(b,dst,0)
  if math.Abs(a2-positive)>1e-8||math.Abs(b2-negative)>1e-8{t.Fatal("restart changed native causal response")}
- if unsafe.Sizeof(s)!=unsafe.Sizeof(LatentState{}){t.Fatal("native learned state grew")}
+ if unsafe.Sizeof(s)!=6472{t.Fatal("native learned state grew")}
  t.Logf("NCI04_CAUSAL_REVISION_DEVELOPMENT_PASS: native entity slots=%d bytes=%d; controls, real native consequences, full resource parity and scientific transfer NOT QUALIFIED",s.Count,unsafe.Sizeof(s))
 }
 
@@ -80,8 +80,10 @@ func TestNCI04RevisionFailClosedWhenFixedSlotsExhausted(t *testing.T){
  // further causal splits rather than overwrite learned evidence.
  for s.Count<MaxEntities{
   var newv [FeatureWidth]float32
-  v:=float32(s.Count)
-  newv=[FeatureWidth]float32{-.8+v*.1,-.8,.8,0}
+  id:=int(s.Count)
+  for k:=0;k<FeatureWidth;k++{
+   if id&(1<<k)==0{newv[k]=-.8}else{newv[k]=.8}
+  }
   if e:=s.Observe(newv,newv,1,1);e!=nil{t.Fatal(e)}
  }
  original,_:=s.Snapshot()
