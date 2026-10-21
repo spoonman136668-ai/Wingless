@@ -54,7 +54,7 @@ func TestNCI04P3ActualICECausalInterventionAndReversal(t *testing.T) {
  first,_,initialTime:=run()
  if first!=1{t.Fatal("original native ICE test not passing")}
  before:=sha256.Sum256(original)
- patched:=bytes.Replace(original,[]byte("if string(a) != string(b) {"),[]byte("if false {"),1)
+ patched:=bytes.Replace(original,[]byte("if string(a) != string(b) {"),[]byte("if string(a) != string(b) && false {"),1)
  if err:=os.WriteFile(source,patched,0600);err!=nil{t.Fatal(err)}
  diff:=exec.Command("git","-C",checkout,"diff","--name-only")
  names,err:=diff.Output();if err!=nil||strings.TrimSpace(string(names))!="ice/index.go"{
