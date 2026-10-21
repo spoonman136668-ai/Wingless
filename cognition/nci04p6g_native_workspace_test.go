@@ -7,6 +7,8 @@ import (
     "crypto/sha256"
     "encoding/hex"
     "encoding/json"
+    "errors"
+    "io"
     "os"
     "path/filepath"
     "testing"
@@ -14,6 +16,38 @@ import (
 
     tb "github.com/spoonman136668-ai/Wingless/toolboundary"
 )
+
+
+func p6gControlHas(xs []string, want string) bool {
+    for _, value := range xs { if value==want { return true } }
+    return false
+}
+// Independent conventional source+rooted-filesystem inspection. This receives
+// the same public policy, action and workspace information as ObservePreaction.
+// It never reads the candidate observation or a future Execute result.
+func p6gConventionalPolicyAndFile(p tb.Policy,a tb.Proposal)(bool,string,error) {
+    if a.Tool!="read_file" || !p6gControlHas(p.AllowedTools,a.Tool) || !p6gControlHas(p.AllowedPaths,a.Path) || !filepath.IsLocal(a.Path) {
+        return false,"",errors.New("conventional unauthorized")
+    }
+    root,err:=os.OpenRoot(p.Workspace)
+    if err!=nil {return false,"",err}
+    defer root.Close()
+    file,err:=root.Open(a.Path)
+    if errors.Is(err,os.ErrNotExist) {return false,"",nil}
+    if err!=nil {return false,"",err}
+    defer file.Close()
+    info,err:=file.Stat()
+    if err!=nil {return false,"",err}
+    if !info.Mode().IsRegular() || info.Size()>int64(p.MaxOutputBytes) {
+        return false,"",errors.New("conventional read denied")
+    }
+    data,err:=io.ReadAll(io.LimitReader(file,int64(p.MaxOutputBytes)+1))
+    if err!=nil || len(data)>p.MaxOutputBytes {
+        return false,"",errors.New("conventional read failed or over limit")
+    }
+    digest:=sha256.Sum256(data)
+    return true,hex.EncodeToString(digest[:]),nil
+}
 
 func TestNCI04P4P6GOriginalWorkspacePreaction(t *testing.T) {
     p6fPinOriginalSource(t)
@@ -23,6 +57,8 @@ func TestNCI04P4P6GOriginalWorkspacePreaction(t *testing.T) {
 
     missing,err:=tb.ObservePreaction(context.Background(),p,action)
     if err!=nil || missing.Resource!="missing" || missing.SHA256!="" {t.Fatalf("missing-file observation: %+v %v",missing,err)}
+    controlMissing, controlMissingHash,controlErr:=p6gConventionalPolicyAndFile(p,action)
+    if controlErr!=nil || controlMissing || controlMissingHash!="" {t.Fatal("conventional missing-file inspection failed",controlErr)}
     _,err=tb.Execute(context.Background(),p,action)
     if err==nil {t.Fatal("original missing-file native execution succeeded")}
     if err:=os.WriteFile(filepath.Join(root,"ok.txt"),[]byte("alpha"),0600);err!=nil {t.Fatal(err)}
@@ -30,6 +66,8 @@ func TestNCI04P4P6GOriginalWorkspacePreaction(t *testing.T) {
     if err!=nil || present.Resource!="regular" || present.Size!=5 {t.Fatalf("existing-file observation: %+v %v",present,err)}
     expected:=sha256.Sum256([]byte("alpha"))
     if present.SHA256!=hex.EncodeToString(expected[:]) {t.Fatal("preaction bytes were not source-authenticated")}
+    controlPresent, controlPresentHash,controlErr:=p6gConventionalPolicyAndFile(p,action)
+    if controlErr!=nil || !controlPresent || controlPresentHash!=present.SHA256 {t.Fatal("conventional present-file inspection differs",controlErr)}
     observed,err:=tb.Execute(context.Background(),p,action)
     if err!=nil || observed.Stdout!="alpha" || observed.ExitCode!=0 {t.Fatalf("original native valid read failed: %+v %v",observed,err)}
 
@@ -38,12 +76,14 @@ func TestNCI04P4P6GOriginalWorkspacePreaction(t *testing.T) {
     if err!=nil || changed.Resource!="regular" || changed.Size!=present.Size || changed.SHA256==present.SHA256 {
         t.Fatalf("same-length content change was missed: %+v %v",changed,err)
     }
+    controlChanged, controlChangedHash,controlErr:=p6gConventionalPolicyAndFile(p,action)
+    if controlErr!=nil || !controlChanged || controlChangedHash!=changed.SHA256 {t.Fatal("conventional changed-file inspection differs",controlErr)}
     observed,err=tb.Execute(context.Background(),p,action)
     if err!=nil || observed.Stdout!="bravo" {t.Fatal("changed original file native call not completed",err)}
 
     // Equal public information: a conventional rooted source inspector knows
     // the same existence signal. There is no learned advantage here.
-    conventional:=[]bool{false,true,true}
+    conventional:=[]bool{controlMissing,controlPresent,controlChanged}
     candidate:=[]bool{missing.Resource=="regular",present.Resource=="regular",changed.Resource=="regular"}
     for i:=range conventional {if conventional[i]!=candidate[i] {t.Fatal("candidate inconsistent with equally informed conventional source inspector")}}
     report:=map[string]any{
@@ -51,7 +91,9 @@ func TestNCI04P4P6GOriginalWorkspacePreaction(t *testing.T) {
         "three_original_native_calls":true,
         "candidate_observes_missing_vs_present":true,
         "candidate_observes_same_size_content_change":true,
+        "independent_conventional_source_inspection_executed":true,
         "conventional_source_inspection_equivalent":true,
+        "all_in_parent_child_resource_parity":"NOT_QUALIFIED",
         "candidate_superiority":false,
         "native_preaction_to_outcome_atomicity":"NOT_GUARANTEED_TOCTOU",
         "learner_mutation":false,"scientific_first_use":false,
