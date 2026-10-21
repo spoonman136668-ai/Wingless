@@ -104,9 +104,17 @@ def mutate_provisional_promotion(doc):
 
 def mutate_provisional_source_token(doc):
     node = next(n for n in doc["nodes"]
-                if n.get("evidence_basis") == "lexical-provisional")
+                if n.get("evidence_basis") == "lexical-provisional" and
+                n.get("provenance_lineage", {}).get("mode") == "new-symbol-source-bound-provisional")
     node["provenance_lineage"]["literal_tokens"] = [
         "FORGED_PROVISIONAL_TOKEN_MUST_NOT_EXIST_782149"]
+
+def mutate_inherited_provisional_token(doc):
+    node = next(n for n in doc["nodes"]
+                if n.get("evidence_basis") == "lexical-provisional" and
+                n.get("provenance_lineage", {}).get("mode") == "provisional-source-byte-reuse")
+    node["provenance_lineage"]["literal_tokens"] = [
+        "FORGED_PRIOR_PROVISIONAL_SOURCE_WITNESS_461782"]
 
 def mutate_typed(raw):
     doc = json.loads(raw.decode("utf-8-sig"))
@@ -190,6 +198,9 @@ def main():
         run_negative("provisional-source-token-forgery", work, ATLAS,
                      lambda b: replace_json(b, mutate_provisional_source_token),
                      validation, PROOF_MARKER + " G28 provisional receipt source tokens invalid")
+        run_negative("inherited-provisional-source-token-forgery", work, ATLAS,
+                     lambda b: replace_json(b, mutate_inherited_provisional_token),
+                     validation, PROOF_MARKER + " G28 inherited provisional tokens do not bind source")
 
         # The original source-derived ICE gate must independently detect file drift.
         go_validation = ["go", "run", "./cmd/ice", "validate"]
@@ -224,7 +235,7 @@ def main():
         print(json.dumps({
             "result": "WINGLESS_ATLAS_NEGATIVE_QUALIFICATION_PASS",
             "head": current_commit,
-            "expected_rejections": 10,
+            "expected_rejections": 11,
             "positive_control": "PASS",
             "source_checkout_changed": False,
             "scratch_cleanup": "automatic",
