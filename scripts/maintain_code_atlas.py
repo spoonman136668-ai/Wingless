@@ -248,32 +248,80 @@ def generate(root, receipts_path=None):
                     and oldnode["label"].startswith("PROVISIONAL: ")
                     and prior.get("mode") in (
                         "new-symbol-source-bound-provisional",
-                        "provisional-source-byte-reuse")
+                        "provisional-source-byte-reuse",
+                        "provisional-source-change-witness")
                     and prior.get("independent_approval") is False
                     and isinstance(tokens, list) and 1 <= len(tokens) <= 12
                     and all(isinstance(t, str) and len(t) >= 4
                             and t.encode("utf-8") in oldcanonical for t in tokens)
-                    and prior.get("current_declaration_sha256") == sha(oldcanonical)
-                    and oldcanonical == nowcanonical
-                    and key not in receipt_by_key,
+                    and prior.get("current_declaration_sha256") == sha(oldcanonical),
                     "G28_PROVISIONAL_HISTORY_OR_DECLARATION_DRIFT: " + repr(key))
             if prior.get("mode") == "new-symbol-source-bound-provisional":
                 require(prior.get("target_source_commit") == previous
                         and prior.get("file_sha256") == sha(old_file),
                         "G28_PROVISIONAL_SOURCE_BIRTH_MISMATCH: " + repr(key))
             n = copy.deepcopy(oldnode)
-            n["provenance_lineage"] = {
-                "mode": "provisional-source-byte-reuse",
-                "prior_source_commit": previous,
-                "prior_start_line": oldnode["start_line"],
-                "prior_end_line": oldnode["end_line"],
-                "prior_file_sha256": sha(old_file),
-                "prior_declaration_sha256": sha(oldcanonical),
-                "current_declaration_sha256": sha(nowcanonical),
-                "literal_tokens": tokens,
-                "reviewer_assertion": prior["reviewer_assertion"],
-                "independent_approval": False,
-            }
+            if oldcanonical == nowcanonical:
+                require(key not in receipt_by_key,
+                        "G28_UNCHANGED_PROVISIONAL_RECEIPT_FORBIDDEN")
+                n["provenance_lineage"] = {
+                    "mode": "provisional-source-byte-reuse",
+                    "prior_source_commit": previous,
+                    "prior_start_line": oldnode["start_line"],
+                    "prior_end_line": oldnode["end_line"],
+                    "prior_file_sha256": sha(old_file),
+                    "prior_declaration_sha256": sha(oldcanonical),
+                    "current_declaration_sha256": sha(nowcanonical),
+                    "literal_tokens": tokens,
+                    "reviewer_assertion": prior["reviewer_assertion"],
+                    "independent_approval": False,
+                }
+                reused += 1
+            else:
+                receipt = receipt_by_key.get(key)
+                require(receipt is not None,
+                        "G28_CHANGED_PROVISIONAL_RECEIPT_REQUIRED " + repr(key))
+                require(receipt.get("target_source_commit") == target
+                        and receipt.get("file_sha256") == sha(new_file)
+                        and receipt.get("declaration_sha256") == sha(new_decl)
+                        and receipt.get("start_line") == current["start"]
+                        and receipt.get("end_line") == current["end"],
+                        "G28_CHANGED_PROVISIONAL_SOURCE_IDENTITY_DRIFT " + repr(key))
+                require(isinstance(receipt.get("reviewer"), str)
+                        and len(receipt["reviewer"].strip()) >= 3
+                        and isinstance(receipt.get("label"), str)
+                        and len(receipt["label"].strip()) >= 12
+                        and isinstance(receipt.get("description"), str)
+                        and len(receipt["description"].strip()) >= 12
+                        and receipt.get("independent_approval") in (None, False),
+                        "G28_CHANGED_PROVISIONAL_REVIEW_CLAIM_INVALID")
+                latest_tokens = receipt.get("literal_tokens")
+                require(isinstance(latest_tokens, list)
+                        and 1 <= len(latest_tokens) <= 12
+                        and all(isinstance(t, str) and len(t) >= 4
+                                and t.strip() == t
+                                and t.encode("utf-8") in new_decl
+                                for t in latest_tokens),
+                        "G28_CHANGED_PROVISIONAL_LITERAL_PROOF_INVALID")
+                n["label"] = "PROVISIONAL: " + receipt["label"]
+                n["description"] = (receipt["description"]
+                                    + " — not a verified behavioral description")
+                n["provenance_lineage"] = {
+                    "mode": "provisional-source-change-witness",
+                    "prior_source_commit": previous,
+                    "prior_start_line": oldnode["start_line"],
+                    "prior_end_line": oldnode["end_line"],
+                    "prior_file_sha256": sha(old_file),
+                    "prior_declaration_sha256": sha(oldcanonical),
+                    "target_source_commit": target,
+                    "file_sha256": sha(new_file),
+                    "current_declaration_sha256": sha(nowcanonical),
+                    "literal_tokens": latest_tokens,
+                    "reviewer_assertion": receipt["reviewer"],
+                    "independent_approval": False,
+                }
+                used_receipts.add(key)
+                fresh += 1
             n["start_line"] = current["start"]
             n["end_line"] = current["end"]
             n["id"] = symbol_id(n)
@@ -284,7 +332,6 @@ def generate(root, receipts_path=None):
             n["syntax_calls"] = sorted(set(current.get("calls") or []))
             id_mapping[oldnode["id"]] = n["id"]
             new_nodes.append(n)
-            reused += 1
             continue
         require(oldnode.get("evidence_basis") == "source-reviewed"
                 and isinstance(oldproof, dict)
