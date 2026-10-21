@@ -69,14 +69,15 @@ func (s *LatentState) PredictNativeTransition(before [FeatureWidth]float32,actio
     src,d:=nearest(s,before)
     if src<0 || d>0.0625 || s.ambiguousNeighbor(before,src,d){return empty,false,nil}
     best:=-1
-    bestCount:=uint16(0)
-    tied:=false
+    // Distinct supported native consequences from indistinguishable public
+    // preaction information are not resolvable by choosing a majority.
+    // A plurality here can confidently predict the wrong real native action.
+    // Reject without adding any state fields, thresholds, or action identities.
     for j:=0;j<int(s.Count);j++ {
-        if s.Entities[j].Mean[2]!=1{continue}
-        n:=s.Relations[src][j][action].Updates
-        if n==0 {continue}
-        if n>bestCount {best=j;bestCount=n;tied=false} else if n==bestCount {tied=true}
+        if s.Entities[j].Mean[2]!=1 || s.Relations[src][j][action].Updates==0 {continue}
+        if best>=0{return empty,false,nil}
+        best=j
     }
-    if best<0 || tied{return empty,false,nil}
+    if best<0{return empty,false,nil}
     return s.Entities[best].Mean,true,nil
 }
