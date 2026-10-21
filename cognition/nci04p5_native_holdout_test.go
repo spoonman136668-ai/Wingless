@@ -9,7 +9,6 @@ import (
  "bytes"
  "context"
  "encoding/json"
- "errors"
  "fmt"
  "math"
  "os"
