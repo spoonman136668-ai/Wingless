@@ -240,8 +240,8 @@ def generate(root, receipts_path=None):
             # declaration-byte identity; it can never gain human review,
             # dependencies or a behavioral test contract by inheritance.
             prior = oldnode.get("provenance_lineage") or {}
-            oldcanonical = old_decl.replace(b"\\r\\n", b"\\n")
-            nowcanonical = new_decl.replace(b"\\r\\n", b"\\n")
+            oldcanonical = old_decl.replace(b"\r\n", b"\n")
+            nowcanonical = new_decl.replace(b"\r\n", b"\n")
             tokens = prior.get("literal_tokens")
             require(oldproof is None and oldnode.get("test_contract") is None
                     and oldnode.get("file_level_local_package_dependencies") is None
