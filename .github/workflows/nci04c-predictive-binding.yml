@@ -1,0 +1,59 @@
+name: NCI04C Wingless predictive equivalence feasibility
+on:
+  push:
+    branches: [research/nci04c-predictive-binding-20261020]
+    paths: ['.github/workflows/nci04c-predictive-binding.yml']
+permissions:
+  contents: read
+jobs:
+  native-predictive-binding:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify immutable preregistration and exact mechanism identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor fc4f69c1752fd74b98f42d7e195e43572d18d9ab "$GITHUB_SHA"
+          test "$(git hash-object cognition/predictive_partition.go)" = bdb8144dbf72117602912bdaafca82a0438f9293
+          test "$(git hash-object cognition/predictive_partition_test.go)" = 0ea8f82e499730d96755c33ab1835cb3285436f5
+          python - <<'PY'
+          import json
+          d=json.load(open('research/contrib/openai/nci04c/frozen.json'))
+          assert d['schema']=='nci04c.native-mechanism-feasibility.v1'
+          assert d['project']=='Wingless' and not d['independent_science_first_use']
+          print('NCI04C_W_PREREG_AND_IDENTITY=PASS')
+          PY
+      - name: Native learning, A-B-A, ambiguity and stronger conventional comparator
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./cognition -run 'TestPartition' -count=1 -v | tee "$RUNNER_TEMP/nci04c-wingless.log"
+          go vet ./cognition
+          echo 'NCI04C_W_FOCUSED=PASS'
+      - name: Full unchanged-source Go regression
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./... -count=1
+          echo 'NCI04C_W_FULL_GO_REGRESSION=PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nci04c-wingless-${{ matrix.os }}
+          path: ${{ runner.temp }}/nci04c-wingless.log
+          if-no-files-found: warn
+          retention-days: 90
