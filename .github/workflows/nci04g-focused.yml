@@ -20,18 +20,13 @@ jobs:
           cache: false
       - name: Focused development-only learning contracts
         run: go test ./cognition -run '^TestNCI04G3' -count=1 -v
-      - name: Emit pre-primary generator digest (no outcomes)
-        shell: bash
+      - name: Verify pre-primary frozen generator digest
         run: sha256sum cognition/nci04g_dev_test.go
-      - name: Frozen source-free development comparison (negative retained)
-        shell: bash
-        run: NCI04G_PRIMARY=1 go test ./cognition -run '^TestNCI04G3FrozenDevelopment        shell: bash
-        run: |
-          test -z "$(git status --porcelain)"
-          echo "NCI04G_WINGLESS_FOCUSED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
- -count=1 -v
+      - name: Sealed source-free development comparison (negatives retained)
+        env:
+          NCI04G_PRIMARY: '1'
+        run: go test ./cognition -run '^TestNCI04G3FrozenDevelopment$' -count=1 -v
       - name: Read-only source identity and clean checkout
-        shell: bash
         run: |
           test -z "$(git status --porcelain)"
           echo "NCI04G_WINGLESS_FOCUSED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
