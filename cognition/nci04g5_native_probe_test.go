@@ -51,3 +51,16 @@ func TestNCI04G5RejectUntrustedSourceOrExistingWorktree(t *testing.T){
  if _,err=p.Intervene(context.Background(),true);err==nil{t.Fatal("source identity drift accepted")}
  if _,err=OpenNativeProbe(root);err==nil{t.Fatal("unreviewed source accepted on restart")}
 }
+
+func TestNCI04G5CancelledExecutionCannotReplayReservedAction(t *testing.T) {
+ root:=filepath.Join(t.TempDir(),"private")
+ p,err:=NewNativeProbe(root);if err!=nil{t.Fatal(err)}
+ ctx,cancel:=context.WithCancel(context.Background());cancel()
+ if _,err:=p.Intervene(ctx,true);err==nil{t.Fatal("cancelled native execution accepted")}
+ if _,err:=OpenNativeProbe(root);err==nil {
+  t.Fatal("crash-window reopen accepted source/custody mismatch")
+ }
+ if _,err:=p.Intervene(context.Background(),false);err==nil {
+  t.Fatal("attempt replayed reserved action after failed execution")
+ }
+}
