@@ -235,6 +235,57 @@ def generate(root, receipts_path=None):
         old_decl = span(old_file, oldnode["start_line"], oldnode["end_line"])
         new_decl = span(new_file, current["start"], current["end"])
         oldproof = oldnode.get("review_evidence")
+        if oldnode.get("evidence_basis") == "lexical-provisional":
+            # G6: A prior PROVISIONAL may carry forward only by exact
+            # declaration-byte identity; it can never gain human review,
+            # dependencies or a behavioral test contract by inheritance.
+            prior = oldnode.get("provenance_lineage") or {}
+            oldcanonical = old_decl.replace(b"\\r\\n", b"\\n")
+            nowcanonical = new_decl.replace(b"\\r\\n", b"\\n")
+            tokens = prior.get("literal_tokens")
+            require(oldproof is None and oldnode.get("test_contract") is None
+                    and oldnode.get("file_level_local_package_dependencies") is None
+                    and oldnode["label"].startswith("PROVISIONAL: ")
+                    and prior.get("mode") in (
+                        "new-symbol-source-bound-provisional",
+                        "provisional-source-byte-reuse")
+                    and prior.get("independent_approval") is False
+                    and isinstance(tokens, list) and 1 <= len(tokens) <= 12
+                    and all(isinstance(t, str) and len(t) >= 4
+                            and t.encode("utf-8") in oldcanonical for t in tokens)
+                    and prior.get("current_declaration_sha256") == sha(oldcanonical)
+                    and oldcanonical == nowcanonical
+                    and key not in receipt_by_key,
+                    "G28_PROVISIONAL_HISTORY_OR_DECLARATION_DRIFT: " + repr(key))
+            if prior.get("mode") == "new-symbol-source-bound-provisional":
+                require(prior.get("target_source_commit") == previous
+                        and prior.get("file_sha256") == sha(old_file),
+                        "G28_PROVISIONAL_SOURCE_BIRTH_MISMATCH: " + repr(key))
+            n = copy.deepcopy(oldnode)
+            n["provenance_lineage"] = {
+                "mode": "provisional-source-byte-reuse",
+                "prior_source_commit": previous,
+                "prior_start_line": oldnode["start_line"],
+                "prior_end_line": oldnode["end_line"],
+                "prior_file_sha256": sha(old_file),
+                "prior_declaration_sha256": sha(oldcanonical),
+                "current_declaration_sha256": sha(nowcanonical),
+                "literal_tokens": tokens,
+                "reviewer_assertion": prior["reviewer_assertion"],
+                "independent_approval": False,
+            }
+            n["start_line"] = current["start"]
+            n["end_line"] = current["end"]
+            n["id"] = symbol_id(n)
+            n["file_sha256"] = sha(new_file)
+            n["source_url"] = ("https://github.com/" + REPO + "/blob/" +
+                               target + "/" + path + "#L" +
+                               str(n["start_line"]) + "-L" + str(n["end_line"]))
+            n["syntax_calls"] = sorted(set(current.get("calls") or []))
+            id_mapping[oldnode["id"]] = n["id"]
+            new_nodes.append(n)
+            reused += 1
+            continue
         require(oldnode.get("evidence_basis") == "source-reviewed"
                 and isinstance(oldproof, dict)
                 and oldproof.get("source_commit") == previous
@@ -340,7 +391,8 @@ def generate(root, receipts_path=None):
     revised["nodes"] = new_nodes
     revised["coverage"]["symbols"] = len(new_nodes)
     revised["coverage"]["source_files"] = len(files)
-    reviewed_count = len(new_nodes) - provisional_added
+    reviewed_count = sum(n["evidence_basis"] == "source-reviewed" for n in new_nodes)
+    provisional_added = sum(n["evidence_basis"] == "lexical-provisional" for n in new_nodes)
     require(reviewed_count >= 352, "G28_HISTORICAL_REVIEW_LOST")
     revised["coverage"]["source_reviewed_labels"] = reviewed_count
     revised["coverage"]["source_evidenced_new_labels"] = reviewed_count
