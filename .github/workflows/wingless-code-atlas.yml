@@ -60,6 +60,51 @@ jobs:
           python scripts/validate_code_atlas.py --root . --relationships "$env:RUNNER_TEMP\wingless-type-relationships.json"
           if ($LASTEXITCODE -ne 0) { throw 'SEMANTIC_ATLAS_VALIDATION_FAILED' }
 
+      - name: NCI-04E read-only index proposal for source-only research contract
+        if: always() && github.event.pull_request.head.ref == 'research/nci04e-mechanism-feasibility-20261021'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # Do not dirty the exact-head acceptance checkout: generation happens
+          # only in a disposable full-history clone.
+          $source = (git rev-parse HEAD).Trim()
+          $tmp = Join-Path $env:RUNNER_TEMP 'nci04e-source-only-generator'
+          if (Test-Path $tmp) { throw 'NCI04E_UNEXPECTED_SCRATCH_PATH' }
+          git clone --quiet --no-hardlinks --no-checkout . $tmp
+          if ($LASTEXITCODE -ne 0) { throw 'NCI04E_SCRATCH_CLONE_FAILED' }
+          git -C $tmp checkout --quiet --detach $source
+          if ($LASTEXITCODE -ne 0) { throw 'NCI04E_SCRATCH_CHECKOUT_FAILED' }
+          Push-Location $tmp
+          try {
+          go run ./cmd/ice build
+          if ($LASTEXITCODE -ne 0) { throw 'NCI04E_ICE_BUILD_FAILED' }
+          python scripts/maintain_code_atlas.py --root .
+          if ($LASTEXITCODE -ne 0) { throw 'NCI04E_G26_REGEN_FAILED' }
+          @'
+          import base64, json, pathlib, subprocess
+          root=pathlib.Path('.')
+          paths=['.ice/manifest.json','.ice/architecture-map.json','.ice/symbol-map.json',
+                 '.ice/dependency-map.json','.ice/test-map.json','.ice/implementations.json',
+                 '.ice/code-intelligence.json','.ice/code-intelligence.html',
+                 '.ice/code-intelligence.ice']
+          sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          atlas=json.loads((root/'.ice/code-intelligence.json').read_text(encoding='utf-8'))
+          if atlas['source_commit']!=sha or atlas['coverage']['source_reviewed_labels']!=352:
+              raise SystemExit('NCI04E_SOURCE_REVIEWED_PROVENANCE_FAILED')
+          data={'source_commit':sha,'reviewed':352,
+                'artifacts':{p:(root/p).read_text(encoding='utf-8') for p in paths}}
+          encoded=base64.b64encode(json.dumps(data,ensure_ascii=True).encode()).decode()
+          pieces=[encoded[i:i+14000] for i in range(0,len(encoded),14000)]
+          print('NCI04E_INDEX_PARTS='+str(len(pieces)))
+          for i,part in enumerate(pieces):print('NCI04E_INDEX_PART:'+str(i)+':'+part)
+          print('NCI04E_INDEX_SOURCE_PASS '+sha)
+          '@ | python -
+          if ($LASTEXITCODE -ne 0) { throw 'NCI04E_ICE_PROPOSAL_FAILED' }
+          } finally {
+            Pop-Location
+            Remove-Item -Recurse -Force $tmp
+          }
+
       - name: Tamper-resistance negative acceptance in disposable exact-head clone
         if: steps.scope.outputs.atlas_relevant == 'true'
         shell: pwsh
