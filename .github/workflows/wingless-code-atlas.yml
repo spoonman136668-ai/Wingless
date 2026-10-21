@@ -48,6 +48,14 @@ jobs:
           go-version: '1.25.5'
           cache: false
 
+      - name: NCI-04D2 exact-head focused native learning checks
+        if: steps.scope.outputs.atlas_relevant == 'true'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          go test ./cognition ./cmd/wingless-ice-cognition
+          if ($LASTEXITCODE -ne 0) { throw 'NCI04D2_FOCUSED_NATIVE_TEST_FAILURE' }
+
       - name: Validate source-index freshness and typed relationships
         if: steps.scope.outputs.atlas_relevant == 'true'
         shell: pwsh
@@ -59,6 +67,14 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'TYPE_RELATIONSHIP_EXTRACTION_FAILED' }
           python scripts/validate_code_atlas.py --root . --relationships "$env:RUNNER_TEMP\wingless-type-relationships.json"
           if ($LASTEXITCODE -ne 0) { throw 'SEMANTIC_ATLAS_VALIDATION_FAILED' }
+
+      - name: Emit NCI-04D2 source-pinned provisional ICE proposal (no write permission)
+        if: always() && steps.scope.outputs.atlas_relevant == 'true' && github.event.pull_request.head.ref == 'research/nci04d2-native-consumer-20261020'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python -B scripts/nci04d2_emit_atlas.py
+          if ($LASTEXITCODE -ne 0) { throw 'NCI04D2_G28_PROVISIONAL_GENERATION_FAILED' }
 
       - name: Tamper-resistance negative acceptance in disposable exact-head clone
         if: steps.scope.outputs.atlas_relevant == 'true'
