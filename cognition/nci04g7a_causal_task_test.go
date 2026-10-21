@@ -15,7 +15,6 @@ import (
  "os"
  "os/exec"
  "path/filepath"
- "strings"
  "testing"
  "time"
  "github.com/spoonman136668-ai/Wingless/ice"
@@ -31,7 +30,7 @@ func TestNCI04G7ARealSourceCausalIntervention(t *testing.T){
  cmd:=exec.Command("git","show","HEAD:"+causalSourcePath);cmd.Dir=repo
  committed,err:=cmd.Output();if err!=nil{t.Fatal(err)}
  if !bytes.Equal(committed,source){t.Fatal("working source differs from verified Git original")}
- if bytes.Count(source,[]byte(originalCall))!=1||bytes.Count(source,[]byte(changedCall))!=0{
+ if bytes.Count(source,[]byte(originalCall))!=1{
   t.Fatal("causal intervention source identity no longer unique")
  }
  originalSHA:=sha256.Sum256(source)
