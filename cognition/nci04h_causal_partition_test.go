@@ -2,6 +2,8 @@ package cognition
 import (
  "bytes"
  "math"
+ "os"
+ "github.com/spoonman136668-ai/Wingless/ice"
  "path/filepath"
  "testing"
  "unsafe"
@@ -48,7 +50,17 @@ func TestNCI04HContradictionDrivenNativeStateRevision(t *testing.T){
 }
 
 func TestNCI04HICEPositiveEvidenceAndNoUnverifiedNegatives(t *testing.T){
- root,err:=filepath.Abs("..");if err!=nil{t.Fatal(err)}
+ repo,err:=filepath.Abs("..");if err!=nil{t.Fatal(err)}
+ root:=t.TempDir()
+ // Index a disposable exact copy of actual project-native source rather than
+ // using the (correctly stale) canonical index of an unqualified PR head.
+ for _,rel:=range []string{"cmd/wingless/ice_cognition.go","cognition/ice_task.go"}{
+  b,e:=os.ReadFile(filepath.Join(repo,rel));if e!=nil{t.Fatal(e)}
+  dest:=filepath.Join(root,rel)
+  if e=os.MkdirAll(filepath.Dir(dest),0700);e!=nil{t.Fatal(e)}
+  if e=os.WriteFile(dest,b,0600);e!=nil{t.Fatal(e)}
+ }
+ if err:=ice.Save(root);err!=nil{t.Fatal(err)}
  r,err:=OpenSourceReasoner(root);if err!=nil{t.Fatal(err)}
  before:=r.State.Observations
  result,err:=r.ObserveVerifiedCallPartition("runICESourceCognition","ObserveExistingCall")
