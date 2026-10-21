@@ -1,0 +1,52 @@
+{
+  "schema": "nci04f.wingless.authenticated_negative.v1",
+  "outcome": "NEGATIVE",
+  "scope": "SOURCE_ONLY_DISCRIMINATING_PROBE_NOT_SCIENCE",
+  "precode_prereg_commit": "22d4aae1d102a968648b8e0e5a55861cbde794a0",
+  "tested_commit": "56174de27ea3a995746aabf6e008da26a1d3e10e",
+  "mechanism_source_blob": "b00301e961410b7a728841a36d45467dc08a926c",
+  "mechanism_source_modified": false,
+  "test_blob": "8490e14aaf01b3753344f20a814cfe6aea48c4b9",
+  "runner": {
+    "run_id": 39524320357,
+    "linux_job": 118975302339,
+    "windows_job": 118975302123,
+    "linux_conclusion": "PASS",
+    "windows_conclusion": "PASS",
+    "full_go_regression": "PASS_LINUX",
+    "go_vet": "PASS_BOTH",
+    "artifact_linux": {
+      "id": 12311829329,
+      "zip_sha256": "f4e6bf5dbf004d006cd4dc866230b08487eaa5a9d2398b966416817f8b7a0122"
+    },
+    "artifact_windows": {
+      "id": 12312543779,
+      "zip_sha256": "fd7343d73a17e12aa6e9bacb30a391ad9c7940ac64c866ae65bcfcb44f239720"
+    }
+  },
+  "results": {
+    "training_unlabelled_sessions": 12,
+    "heldout_sessions": 8,
+    "candidate_learned_modes": 1,
+    "control_observed_response_signatures": 2,
+    "candidate_reported_known_after_ambiguous_probe": 8,
+    "strong_control_correctly_abstained_after_ambiguous_probe": 8,
+    "candidate_correct_after_distinguishing_probe": 8,
+    "strong_control_correct_after_distinguishing_probe": 8,
+    "identical_profile_negative_mode_count": 1,
+    "resident_candidate_bytes": 48,
+    "resident_control_bytes": 64
+  },
+  "interpretation": "The candidate cannot preserve two modes when the first action shares identical response. The 'known' indicator was set for ambiguous probes, but output could be probability ~0.5: not evidence of confident incorrect assertions. Correctness after observing the distinguishing action cannot be counted as prior unseen-action prediction; it is not transfer.",
+  "method_limits": [
+    "Conventional control uses discrete deterministic observed response signatures and is not a trained GRU",
+    "The source-free trial boundaries are externally provided",
+    "No unfamiliar continuous source physics or independently novel task family",
+    "No CPU/RSS matched qualification",
+    "No protected scientific first-use"
+  ],
+  "scientific_first_use": 0,
+  "accepted": false,
+  "promote": false,
+  "main_changed": false
+}
