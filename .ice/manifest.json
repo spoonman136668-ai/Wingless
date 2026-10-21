@@ -91,6 +91,10 @@
       "sha256": "ee9bd47729d283eb07c5479c7a503c438de477d68bed3689e1b7da1af56c97ae"
     },
     {
+      "path": ".github/workflows/nci04g7-focused.yml",
+      "sha256": "eb2128275ee5124838c8af43d40505f86401d6d17768bec55434729b2b22bc63"
+    },
+    {
       "path": ".github/workflows/qualify-proxy-auto-fanout-r4.yml",
       "sha256": "f01d3f0ff6b45de64299e978370178208ad6c38b77acf98879a682d9fb9a4021"
     },
@@ -128,7 +132,7 @@
     },
     {
       "path": ".github/workflows/wingless-code-atlas.yml",
-      "sha256": "164e1cd19bf847308ae939b251d1928465acadab33a202bac30afa4c2889ff12"
+      "sha256": "3bab9e352630c0d6f2b47bb821f6bf119de2e591c39351dc1bd809ca057195d0"
     },
     {
       "path": ".gitignore",
@@ -534,6 +538,39 @@
         "fmt",
         "math",
         "path/filepath",
+        "testing",
+        "time",
+        "unsafe"
+      ]
+    },
+    {
+      "path": "cognition/nci04g7_source_task.go",
+      "sha256": "6f388df74f021c8a344cd0daf5219b96baa9d62af261a4acc7cede2e111b9ad4",
+      "package": "cognition",
+      "imports": [
+        "context",
+        "crypto/sha256",
+        "encoding/hex",
+        "errors",
+        "fmt",
+        "os",
+        "os/exec",
+        "path/filepath",
+        "strings",
+        "time"
+      ]
+    },
+    {
+      "path": "cognition/nci04g7_source_task_test.go",
+      "sha256": "df123025651297ebbfc3acd8d2755622de4c5c3bd2070805a5cd0ee3bd46f654",
+      "package": "cognition",
+      "imports": [
+        "context",
+        "encoding/json",
+        "fmt",
+        "math",
+        "path/filepath",
+        "runtime",
         "testing",
         "time",
         "unsafe"
@@ -3500,6 +3537,203 @@
         "time.Since",
         "timeDur.Nanoseconds",
         "unsafe.Sizeof"
+      ]
+    },
+    {
+      "name": "NativeReasoningConsequence",
+      "kind": "type",
+      "file": "cognition/nci04g7_source_task.go",
+      "start": 21,
+      "end": 29
+    },
+    {
+      "name": "nativeReasoningTest",
+      "kind": "type",
+      "file": "cognition/nci04g7_source_task.go",
+      "start": 31,
+      "end": 33
+    },
+    {
+      "name": "nativeReasoningTasks",
+      "kind": "var",
+      "file": "cognition/nci04g7_source_task.go",
+      "start": 34,
+      "end": 38
+    },
+    {
+      "name": "ObserveNativeReasoningTask",
+      "kind": "method",
+      "file": "cognition/nci04g7_source_task.go",
+      "start": 43,
+      "end": 78,
+      "receiver": "SourceReasoner",
+      "calls": [
+        "append",
+        "cancel",
+        "cmd.CombinedOutput",
+        "commitCmd.Output",
+        "context.WithTimeout",
+        "deadline.Err",
+        "deadline.Err",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "exec.CommandContext",
+        "exec.CommandContext",
+        "exec.CommandContext",
+        "filepath.Join",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "git.Output",
+        "hex.EncodeToString",
+        "len",
+        "len",
+        "os.Environ",
+        "os.ReadFile",
+        "r.symbol",
+        "r.symbol",
+        "r.validate",
+        "sha256.Sum256",
+        "string",
+        "string",
+        "string",
+        "string",
+        "string",
+        "strings.Contains",
+        "strings.Contains",
+        "strings.TrimSpace",
+        "uint8",
+        "vectorFromSource",
+        "vectorFromSource"
+      ]
+    },
+    {
+      "name": "PredictNativeReasoningTask",
+      "kind": "method",
+      "file": "cognition/nci04g7_source_task.go",
+      "start": 79,
+      "end": 85,
+      "receiver": "SourceReasoner",
+      "calls": [
+        "errors.New",
+        "len",
+        "r.symbol",
+        "r.symbol",
+        "r.validate",
+        "vectorFromSource",
+        "vectorFromSource"
+      ]
+    },
+    {
+      "name": "nativeOutcomeCount",
+      "kind": "type",
+      "file": "cognition/nci04g7_source_task_test.go",
+      "start": 17,
+      "end": 17
+    },
+    {
+      "name": "Observe",
+      "kind": "method",
+      "file": "cognition/nci04g7_source_task_test.go",
+      "start": 18,
+      "end": 18,
+      "receiver": "nativeOutcomeCount"
+    },
+    {
+      "name": "Predict",
+      "kind": "method",
+      "file": "cognition/nci04g7_source_task_test.go",
+      "start": 19,
+      "end": 22,
+      "receiver": "nativeOutcomeCount",
+      "calls": [
+        "float64",
+        "float64"
+      ]
+    },
+    {
+      "name": "TestNCI04G7RealSourceTaskAndCostAccounting",
+      "kind": "function",
+      "file": "cognition/nci04g7_source_task_test.go",
+      "start": 24,
+      "end": 82,
+      "calls": [
+        "OpenSourceReasoner",
+        "OpenSourceReasoner",
+        "context.Background",
+        "context.Background",
+        "controlWall.Nanoseconds",
+        "count.Observe",
+        "count.Predict",
+        "filepath.Abs",
+        "filepath.Join",
+        "fmt.Println",
+        "json.Marshal",
+        "len",
+        "math.IsNaN",
+        "modelWall.Nanoseconds",
+        "r.ObserveNativeReasoningTask",
+        "r.ObserveNativeReasoningTask",
+        "r.PredictNativeReasoningTask",
+        "r.PredictNativeReasoningTask",
+        "r.Save",
+        "restored.Load",
+        "restored.PredictNativeReasoningTask",
+        "runtime.ReadMemStats",
+        "sourceWall.Nanoseconds",
+        "string",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.TempDir",
+        "time.Now",
+        "time.Now",
+        "time.Now",
+        "time.Now",
+        "time.Since",
+        "time.Since",
+        "time.Since",
+        "time.Since",
+        "uint8",
+        "unsafe.Sizeof",
+        "unsafe.Sizeof",
+        "unsafe.Sizeof",
+        "unsafe.Sizeof",
+        "unsafe.Sizeof",
+        "unsafe.Sizeof"
+      ]
+    },
+    {
+      "name": "TestNCI04G7InvalidActionRejectsWithoutExecuting",
+      "kind": "function",
+      "file": "cognition/nci04g7_source_task_test.go",
+      "start": 84,
+      "end": 90,
+      "calls": [
+        "OpenSourceReasoner",
+        "context.Background",
+        "context.Background",
+        "filepath.Abs",
+        "r.ObserveNativeReasoningTask",
+        "r.ObserveNativeReasoningTask",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal"
       ]
     },
     {
