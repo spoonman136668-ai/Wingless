@@ -20,6 +20,9 @@ jobs:
           cache: false
       - name: Focused development-only learning contracts
         run: go test ./cognition -run '^TestNCI04G3' -count=1 -v
+      - name: Emit pre-primary generator digest (no outcomes)
+        shell: bash
+        run: sha256sum cognition/nci04g_dev_test.go
       - name: Read-only source identity and clean checkout
         shell: bash
         run: |
