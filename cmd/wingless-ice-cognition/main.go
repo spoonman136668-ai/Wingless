@@ -36,13 +36,19 @@ func checkedNativeSnapshot(root,snapshot string)error{
 }
 
 func run(args []string)error{
- if len(args)!=5{return fmt.Errorf("usage: wingless-ice-cognition ROOT SNAPSHOT observe|predict|native-observe|native-predict FROM TO")}
+ if len(args)!=5{return fmt.Errorf("usage: wingless-ice-cognition ROOT SNAPSHOT observe|predict|native-observe|native-predict|native-intervene FROM TO")}
  root,path,op,source,target:=args[0],args[1],args[2],args[3],args[4]
  r,e:=cognition.OpenSourceReasoner(root);if e!=nil{return e}
  if _,e=os.Lstat(path);e==nil{
    if e=r.Load(path);e!=nil{return e}
  }else if !os.IsNotExist(e){return e}
  switch op{
+ case "native-intervene":
+   if source!="-"||target!="-" {return fmt.Errorf("native intervention does not accept outcome/identity arguments")}
+   if err:=checkedNativeSnapshot(root,path);err!=nil{return err}
+   receipt,err:=r.ObserveNativeICEIntervention(context.Background());if err!=nil{return err}
+   if err:=r.Save(path);err!=nil{return err}
+   return json.NewEncoder(os.Stdout).Encode(receipt)
  case "native-observe":
    action,err:=checkedNativeAction(source,target);if err!=nil{return err}
    if err=checkedNativeSnapshot(root,path);err!=nil{return err}
