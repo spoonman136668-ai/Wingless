@@ -1,0 +1,72 @@
+name: Wingless NCI-04G7B Scientific Admission Audit
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  no-scientific-admission-without-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      NCI04G7B_PARENT: '38a0a102d6aac3cde2e663d829ace044e1a54b1c'
+      NCI04G7B_REPO: 'spoonman136668-ai/Wingless'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Validate evidence provenance and no native-source mutations
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "${NCI04G7B_PARENT}^{commit}"
+          git merge-base --is-ancestor "$NCI04G7B_PARENT" HEAD
+          python3 - <<'PY'
+          import os, json, subprocess, copy
+          root="research/contrib/openai/nci04g7b/readiness.json"
+          with open(root,encoding="utf-8") as f: d=json.load(f)
+          assert d["schema"]=="nci04g7b.source-readiness-audit.v1"
+          assert d["gate"]=="NCI-04G7B"
+          assert d["repository"]==os.environ["NCI04G7B_REPO"]
+          assert d["source_parent"]==os.environ["NCI04G7B_PARENT"]
+          assert d["admission"]=="NO_GO"
+          assert d["status"]=="DEVELOPMENT_EVIDENCE_INSUFFICIENT"
+          assert d["scientific_first_use_consumed"] is False
+          assert d["authority"]["protected_scientific_first_use"] is False
+          assert d["authority"]["merge_authorized"] is False
+          evidence=d["evidence"]
+          assert evidence["observed_intervention_independent_source_family"] is False
+          assert evidence["learned_transfer_on_unseen_native_structures"]=="NOT_ESTABLISHED"
+          assert evidence["equal_or_lower_total_compute_and_memory"]=="NOT_ESTABLISHED"
+          assert evidence["source_custody"].startswith("GIT_COMMIT_VERIFIED_")
+          findings=d["blocking_findings"]
+          assert len(findings)==3 and len({x["code"] for x in findings})==3
+          assert all(x["proof"] and len(x["proof"])>30 for x in findings)
+          # All changes from the last qualified G7A parent must remain
+          # evidence-only: no changed native tasks, code, tests or atlas.
+          changed=set(subprocess.check_output(
+              ["git","diff","--name-only",d["source_parent"],"HEAD"],
+              text=True).splitlines())
+          allowed={root,".github/workflows/nci04g7b-admission.yml"}
+          assert changed==allowed,(changed,allowed)
+          # Negative admission proof: flipping a summary field cannot
+          # transform missing independent evidence into accepted science.
+          def claimed_admissible(x):
+              return (x["admission"]=="GO"
+                and x["evidence"]["observed_intervention_independent_source_family"] is True
+                and x["evidence"]["learned_transfer_on_unseen_native_structures"]=="ESTABLISHED"
+                and x["evidence"]["equal_or_lower_total_compute_and_memory"]=="QUALIFIED"
+                and len(x["blocking_findings"])==0)
+          assert not claimed_admissible(d)
+          forged=copy.deepcopy(d)
+          forged["admission"]="GO"
+          assert not claimed_admissible(forged),"claim-only promotion accepted"
+          print("NCI04G7B_EVIDENCE_ONLY_SOURCE_IDENTITY_PASS")
+          print("NCI04G7B_SCIENTIFIC_FIRST_USE=BLOCKED")
+          print("NCI04G7B_DECISION=NO_GO")
+          for x in findings: print("NCI04G7B_BLOCKER="+x["code"])
+          PY
+          test -z "$(git status --porcelain)"
