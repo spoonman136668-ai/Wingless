@@ -69,7 +69,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'SEMANTIC_ATLAS_VALIDATION_FAILED' }
 
       - name: Emit NCI-04D2 source-pinned provisional ICE proposal (no write permission)
-        if: always() && steps.scope.outputs.atlas_relevant == 'true' && (github.event.pull_request.head.ref == 'research/nci04d2-native-consumer-20261020' || github.event.pull_request.head.ref == 'research/nci04g6-wingless-source-resource-20261021' || github.event.pull_request.head.ref == 'research/nci04g7-native-task-20261021' || github.event.pull_request.head.ref == 'research/nci04p2-native-execution-consequence-20261021' || github.event.pull_request.head.ref == 'research/nci04p3-native-intervention-contrast-20261021')
+        if: always() && steps.scope.outputs.atlas_relevant == 'true' && (github.event.pull_request.head.ref == 'research/nci04d2-native-consumer-20261020' || github.event.pull_request.head.ref == 'research/nci04g6-wingless-source-resource-20261021' || github.event.pull_request.head.ref == 'research/nci04g7-native-task-20261021' || github.event.pull_request.head.ref == 'research/nci04p2-native-execution-consequence-20261021' || github.event.pull_request.head.ref == 'research/nci04p3-native-intervention-contrast-20261021' || github.event.pull_request.head.ref == 'research/nci04p4-native-observation-learning-20261021')
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'

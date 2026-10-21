@@ -20,7 +20,7 @@ jobs:
           cache: false
       - name: Native learned partition and original regressions
         run: |
-          go test ./cognition ./cmd/wingless-ice-cognition -run '^TestNCI04(A|Contradiction|Rejects|Revision|P2|P3)' -count=1 -v
+          go test ./cognition ./cmd/wingless-ice-cognition -run '^TestNCI04(A|Contradiction|Rejects|Revision|P2|P3|P4)' -count=1 -v
           go vet ./cognition ./cmd/wingless-ice-cognition
       - name: Explicitly retain full ICE/atlas gate
         run: echo 'Full native G7 + canonical ICE and Windows atlas remain a separate mandatory source-bound qualification; no skip is authorized' 
