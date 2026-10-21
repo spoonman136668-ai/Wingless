@@ -32,6 +32,12 @@ def main():
     target=run(["git","rev-parse","HEAD"]).decode().strip()
     if not re.fullmatch("[0-9a-f]{40}",target):
         raise ValueError("target git commit invalid")
+    # A source-only artifact commit legitimately follows its pinned source birth.
+    # If the canonical index is already current, emit no replacement artifact.
+    ready=subprocess.run(["go","run","./cmd/ice","validate"],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    if ready.returncode==0:
+        print("NCI04D2_CANONICAL_ICE_CURRENT "+target)
+        return
     run(["go","run","./cmd/ice","build"])
     old=json.loads((root/".ice/code-intelligence.json").read_text("utf-8"))
     current=json.loads((root/".ice/symbol-map.json").read_text("utf-8"))
