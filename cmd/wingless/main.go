@@ -17,27 +17,6 @@ type unknown struct{}
 
 func (unknown) Snapshot() (resources.Metrics, error) { return resources.Metrics{}, nil }
 func main() {
-	if len(os.Args) == 7 && os.Args[1] == "ice-cognition" {
-		if e := runICESourceCognition(os.Args[2], os.Args[3], os.Args[4], os.Args[5], os.Args[6]); e != nil {
-			fmt.Fprintln(os.Stderr, e)
-			os.Exit(1)
-		}
-		return
-	}
-	if len(os.Args) == 2 && os.Args[1] == "nci04a" {
-		if e := nci04aCLI(); e != nil {
-			fmt.Fprintln(os.Stderr, e)
-			os.Exit(1)
-		}
-		return
-	}
-	if len(os.Args) == 2 && os.Args[1] == "cognition" {
-		if e := cognitionCLI(); e != nil {
-			fmt.Fprintln(os.Stderr, e)
-			os.Exit(1)
-		}
-		return
-	}
 	if len(os.Args) > 1 && os.Args[1] == "gpu" {
 		if e := runGPU(os.Args[2:]); e != nil {
 			fmt.Fprintln(os.Stderr, e)
@@ -71,7 +50,7 @@ func main() {
 	}
 
 	if len(os.Args) != 2 || (os.Args[1] != "demo" && os.Args[1] != "benchmark") {
-		fmt.Fprintln(os.Stderr, "usage: wingless host|demo|benchmark|cognition|nci04a|ice-cognition|local-benchmark (--config FILE or --endpoint URL --model ID)")
+		fmt.Fprintln(os.Stderr, "usage: wingless host|demo|benchmark|local-benchmark (--config FILE or --endpoint URL --model ID)")
 		os.Exit(2)
 	}
 	reg := &broker.Registry{}
