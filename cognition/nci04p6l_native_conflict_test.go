@@ -11,6 +11,7 @@ import (
     "context"
     "encoding/json"
     "os"
+    "os/exec"
     "path/filepath"
     "testing"
     "time"
@@ -27,14 +28,17 @@ func p6lOriginalCognitionPreaction(t *testing.T) [FeatureWidth]float32 {
     nativeSource,err:=os.ReadFile(filepath.Join(root,"cognition","latent_bind.go"))
     if err!=nil{t.Fatal(err)}
     if len(nativeSource)==0||len(nativeSource)>16384 {t.Fatal("unbounded original cognition source")}
-    if pinned:=p6iGit(t,root,"show","HEAD:cognition/latent_bind.go");pinned!=string(nativeSource){
-        t.Fatal("original native cognition source differs from committed source")
+    cmd:=exec.Command("git","show","HEAD:cognition/latent_bind.go")
+    cmd.Dir=root
+    committed,err:=cmd.Output()
+    if err!=nil || !bytes.Equal(committed,nativeSource){
+        t.Fatal("original native cognition source differs from committed source",err)
     }
     p:=tb.Policy{Workspace:root,AllowedTools:[]string{"read_file"},AllowedPaths:[]string{"cognition/latent_bind.go"},Timeout:time.Second,MaxOutputBytes:16384}
     observed,err:=tb.ObservePreaction(context.Background(),p,tb.Proposal{Tool:"read_file",Path:"cognition/latent_bind.go"})
     if err!=nil||observed.Resource!="regular"{t.Fatal("native preaction source not authenticated",err)}
     source,err:=NativePreactionFeatures(observed)
-    if err!=nil{return source}
+    if err!=nil{t.Fatal(err)}
     return source
 }
 
