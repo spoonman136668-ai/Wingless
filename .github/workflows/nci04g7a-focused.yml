@@ -21,7 +21,7 @@ jobs:
           go-version: '1.25.5'
           cache: false
       - name: G7A authentic-source causal observation and controls
-        run: go test ./cognition -run '^TestNCI04G7A' -count=1 -v
+        run: go test ./cognition -run '^TestNCI04(G7A|H)' -count=1 -v
       - name: Exact-source read-only acceptance
         run: |
           test -z "$(git status --porcelain)"
