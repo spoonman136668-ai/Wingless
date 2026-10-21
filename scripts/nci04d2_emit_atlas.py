@@ -81,7 +81,8 @@ def main():
     atlas=json.loads((root/".ice/code-intelligence.json").read_text("utf-8"))
     if atlas["source_commit"]!=target or atlas["coverage"]["source_reviewed_labels"]!=352:
         raise ValueError("source pin or historical reviewed baseline lost")
-    if atlas["coverage"]["lexical_provisional_labels"]!=len(receipts):
+    prior_provisional=sum(n.get("evidence_basis") == "lexical-provisional" for n in old["nodes"])
+    if atlas["coverage"]["lexical_provisional_labels"]!=prior_provisional+len(receipts):
         raise ValueError("incorrect provisional evidence accounting")
     artifacts={}
     for path in CANONICAL:
