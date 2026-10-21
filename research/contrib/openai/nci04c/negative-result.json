@@ -1,0 +1,36 @@
+{
+  "schema": "nci04c.negative-development-qualification.v1",
+  "architecture": "Wingless",
+  "prereg_sha": "fc4f69c1752fd74b98f42d7e195e43572d18d9ab",
+  "source_commit": "0e3be15b4941de4fcf447a7768d2322e312f9658",
+  "run": 39519796973,
+  "conclusion": "SUCCESS_TECHNICAL_NEGATIVE_COGNITIVE",
+  "jobs": [
+    "ubuntu-latest PASS",
+    "windows-latest PASS"
+  ],
+  "full_go_regression": "PASS",
+  "observations": {
+    "two_predictive_states_formed": true,
+    "return_A_probability": 0.996185,
+    "candidate_correct": 24,
+    "evaluation_total": 48,
+    "train_peer_correct": 48,
+    "peer_total": 48,
+    "candidate_bytes": 1392,
+    "peer_bytes": 328
+  },
+  "identifiability": {
+    "ambiguous_sensor_evidence_abstains": true,
+    "entity_identity_proven": false,
+    "learned_causal_composition": false,
+    "unfamiliar_transfer_proven": false
+  },
+  "reason": "Trained lower-cost associative control dominates both correctness and state memory. The native prototype is a predictive state partition, not a transfer-valid learned entity-binding mechanism.",
+  "control_caveat": "Eight-prototype EMA receives the same observations but is not precisely parameter/compute matched; it is smaller, so evidence rules out resource-superior gain in this cohort, not all architecture families.",
+  "first_use": 0,
+  "accepted": false,
+  "merged": false,
+  "disposition": "NEGATIVE_NO_PROMOTION",
+  "evidence_url": "https://github.com/spoonman136668-ai/Wingless/actions/runs/39519796973"
+}
