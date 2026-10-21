@@ -1,0 +1,23 @@
+{
+  "id": "W-R9-HELDOUT-TEMPORAL-TRANSFER",
+  "parent": "3d26a66a39e0d12794f34c8ba286becae42cb28b",
+  "freeze": "Before execution: evaluate fixed train seeds 0..3 and disjoint heldout seeds 4..7; no parameter selection after holdout",
+  "generator": "Nine entity support groups, three families, 16 contexts; original W-R8 modular context formula with preregistered per-seed entity bijection and per-seed channel offsets; no mutation of temporal orientation",
+  "arms": [
+    "A0 synchronized context index zero",
+    "A1 family-relative fixed offsets 0,5,10"
+  ],
+  "metric": "fraction of nine entity triplets exactly aligned on each heldout seed",
+  "success": "all 4 heldout seeds: A0=9 complete triplets and A1 fewer than 9",
+  "negative": "any heldout seed fails success while deterministic controls pass",
+  "invalid": "generator bijection, disjoint seed, or source identity check fails",
+  "budget": {
+    "seeds": 8,
+    "heldout": 4,
+    "entities": 9,
+    "families": 3,
+    "ticks": 16,
+    "model_calls": 0
+  },
+  "scope": "synthetic transfer; no accepted-ref or first-use authority"
+}
