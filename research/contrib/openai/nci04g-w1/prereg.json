@@ -1,0 +1,114 @@
+{
+  "schema": "wingless.external-research-prereg.v1",
+  "project": "Wingless",
+  "experiment_id": "NCI04G-W1",
+  "contributor": "openai-chatgpt-assisted-source-free-development",
+  "contribution_class": "successor-proposal",
+  "scope": "NCI-04G source-bound DEVELOPMENT feasibility only; not independently accepted science",
+  "code_preexistence": "No NCI-04G replacement implementation exists in parent. This preregistration must precede all NCI-04G experiment code and results.",
+  "protected_scientific_first_use": 0,
+  "authority": {
+    "research_only": true,
+    "production_authority": false,
+    "accepted_ref_mutation": false,
+    "promotion_authority": false,
+    "scheduler_or_queue_authority": false,
+    "independent_first_use": false
+  },
+  "prohibited_after_primary_run": [
+    "threshold changes",
+    "split changes",
+    "post-result policy selection",
+    "capacity growth",
+    "extra data/compute/model calls unless preregistered",
+    "held-out/evaluator leakage",
+    "silently reclassifying a true negative as infrastructure failure",
+    "automatic merge or promotion"
+  ],
+  "resource_acceptance": "Record wall/CPU time, peak RSS, resident state and serialized bytes, training observations, prediction calls, intervention calls, rebuild/recovery work, message bytes where relevant. Any deterioration against the exact-parent conventional and native controls is NO-GO, not a hidden optimization trade.",
+  "question": "Can a compact native learner discover discriminating interventions and correct causal-state mergers while preserving prior learned relations, rather than using an identity oracle or predefined diagnostic action list?",
+  "hypothesis": "A bounded action-conditioned causal partition learner using consequence-derived uncertainty, learned intervention value, and retention-preserving split/revision will outperform its equal-information trained controls or match them at less resource cost on unseen source-free causal dynamics, without false identity assertions.",
+  "exact_parent_sha": "1fca4d2ae2d631cb87b33810090fc9f42d2e2f82",
+  "predecessor_evidence": [
+    "https://github.com/spoonman136668-ai/Wingless/pull/349",
+    "https://github.com/spoonman136668-ai/Wingless/pull/350",
+    "https://github.com/spoonman136668-ai/Wingless/actions/runs/39527164573"
+  ],
+  "changed_paths": [
+    "cognition/nci04g_partition.go",
+    "cognition/nci04g_partition_test.go",
+    "research/contrib/openai/nci04g-w1/**",
+    ".ice/** (only if source-bound atlas regeneration becomes required)"
+  ],
+  "inputs": [],
+  "frozen_design": {
+    "status": "PRECODE_DEVELOPMENT_DESIGN; not independent scientific preregistration",
+    "seeds": {
+      "train": [
+        1101,
+        1102,
+        1103,
+        1104,
+        1105,
+        1106,
+        1107,
+        1108
+      ],
+      "development_heldout": [
+        2101,
+        2102,
+        2103,
+        2104,
+        2105,
+        2106,
+        2107,
+        2108,
+        2109,
+        2110,
+        2111,
+        2112,
+        2113,
+        2114,
+        2115,
+        2116
+      ]
+    },
+    "split": "Procedural families fixed before code: distinguishable hidden-state pairs with identical passive observations and one or more variable feature-conditioned informative actions; observationally identical nonidentifiable negative family; initially merged then contradicted consequence family; postrevision old-task and snapshot/restart reuse family. No hidden-state label supplied to target.",
+    "ordering": "First train using 8 train seeds; freeze trained target and controls, test all 16 source-free development seeds once each including all stated families; report all failures without seed selection.",
+    "data_budget": "At most 128 unlabeled action/outcome training episodes per seed and at most three test interventions per episode. Candidate and comparators see exactly the same experience; only candidate-controlled interventions may alter the common transcript, and action cost is charged to every model.",
+    "compute_budget": "Identical training examples, update/evaluation passes, feature dimensions, and inference budgets; no external models, transformers as foundation, model API calls, oracle IDs, or learned-state growth above native exact-parent budget.",
+    "capacity": "At most exact-parent cognition.LatentState serialized/resident footprint and MaxEntities=16 effective slots. Action affordances are runtime feature vectors; no fixed diagnostic action ID registry.",
+    "evaluator": "Unambiguous heldout partition accuracy after chosen actions; abstention on observational-equivalence cases; causal prediction preservation after split; unchanged old-task performance on snapshot/restart; complete CPU/RSS/call/state ledger; frozen before running results.",
+    "deterministic_expected": true,
+    "source_birth": "procedural source-free; exact generator hash and input manifest must be sealed before first primary evaluation, or classify INVALID",
+    "comparison_rule": "candidate must beat strongest fully trained equal-information conventional control at equal/lower cost OR match its correct heldout decisions with at least 10% lower total CPU and no memory deterioration. Accuracy floor >= 12/16 distinguishable development cases. No hard false positives in nonidentifiable cases."
+  },
+  "controls": [
+    "fully trained conventional response-signature learner with abstention",
+    "fully trained bounded recurrent state learner under identical feature/data/compute budgets",
+    "original fixed NCI-04D2 latent binding native baseline",
+    "split-disabled pooled state",
+    "learned-intervention-selection-disabled matched random admissible selection",
+    "memory-preservation-disabled state reset after revision"
+  ],
+  "metrics": [
+    "distinguishing_interventions_used",
+    "heldout_causal_partition_accuracy",
+    "nonidentifiable_hard_false_positives",
+    "old-task_prediction_retention",
+    "postrestart_consistency",
+    "total_cpu_time",
+    "peak_rss",
+    "resident_state_bytes",
+    "serialization_bytes",
+    "action_and_training_budget",
+    "split_and_policy_ablation_effect"
+  ],
+  "classification_rules": {
+    "supported": "DEVELOPMENT-FEASIBLE only if >=12/16 distinguishable cases correct, zero nonidentifiable hard false positives, >=95% pre-split correct old-task predictions retained after revision AND restart, candidate exceeds strongest fully trained equal-information comparator at equal/lower total cost OR equals accuracy with >=10% lower total CPU and no memory regression, and both split and learned-intervention ablations reduce heldout success.",
+    "mixed": "Some necessary conditions pass but any controlled difference/retention/resource criterion lacks complete evidence. No scientific admission.",
+    "negative": "All provenance valid and a necessary or comparison acceptance requirement fails, including ablations showing no causal contribution.",
+    "invalid": "Any source drift, incomplete comparator training, oracle identity/action leakage, output-driven task or threshold revisions, missing resource ledger, changed data/compute budget, or false zero-hard-FP claim."
+  },
+  "methodological_limits": "Source-free bounded necessary-condition study only. Development success does not establish language-level reasoning, broad causal discovery, novel scientific generalization, or independent scientific eligibility."
+}
