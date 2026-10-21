@@ -138,7 +138,8 @@ def validate(root, relationship_file):
             require(isinstance(lineage, dict)
                     and lineage.get("mode") in (
                         "new-symbol-source-bound-provisional",
-                        "provisional-source-byte-reuse")
+                        "provisional-source-byte-reuse",
+                        "provisional-source-change-witness")
                     and node["label"].startswith("PROVISIONAL: "),
                     "G28 unreviewed symbol missing source-bound provisional receipt")
         if lineage is not None:
@@ -200,14 +201,34 @@ def validate(root, relationship_file):
                 require(prev_digest == lineage.get("prior_declaration_sha256") and
                         now_digest == lineage.get("current_declaration_sha256"),
                         "G26 declaration provenance digest mismatch")
-                if lineage.get("mode") in ("canonical-LF-declaration-byte-reuse",
-                                           "provisional-source-byte-reuse"):
+                mode = lineage.get("mode")
+                if mode in ("canonical-LF-declaration-byte-reuse",
+                            "provisional-source-byte-reuse"):
                     require(prev_digest == now_digest,
                             "G26/G28 claimed reused declaration body changed")
+                elif mode == "provisional-source-change-witness":
+                    require(prev_digest != now_digest,
+                            "G28 changed provisional declaration was not changed")
                 else:
-                    require(lineage.get("mode") ==
-                            "fresh-review-receipt-unverified-identity",
+                    require(mode == "fresh-review-receipt-unverified-identity",
                             "G26 unknown review lineage class")
+                if mode == "provisional-source-change-witness":
+                    require(basis == "lexical-provisional" and proof is None
+                            and lineage.get("independent_approval") is False,
+                            "G28 changed provisional may not claim reviewed status")
+                    require(lineage.get("target_source_commit") == source_commit
+                            and lineage.get("file_sha256") == node["file_sha256"],
+                            "G28 changed provisional target source mismatch")
+                    tokens = lineage.get("literal_tokens")
+                    require(isinstance(tokens, list) and 1 <= len(tokens) <= 12
+                            and all(isinstance(t, str) and len(t) >= 4
+                                    and t.strip() == t
+                                    and t.encode("utf-8") in now_decl
+                                    for t in tokens),
+                            "G28 changed provisional literal witness invalid")
+                    require(isinstance(lineage.get("reviewer_assertion"), str)
+                            and len(lineage["reviewer_assertion"].strip()) >= 3,
+                            "G28 changed provisional source witness absent")
                 if lineage.get("mode") == "provisional-source-byte-reuse":
                     require(basis == "lexical-provisional" and proof is None
                             and lineage.get("independent_approval") is False,

@@ -60,6 +60,10 @@
     "sha256": "3719dbdb91e821263564348ef8432bcdcc51a8951687babdd1cd7e6a85a044e2"
   },
   {
+    "path": ".github/workflows/nci04-native-causal-revision.yml",
+    "sha256": "32c667e864ac19029d55634396be819f48ea290e0338ea47a2c124053397efee"
+  },
+  {
     "path": ".github/workflows/nci04g5-observation.yml",
     "sha256": "1b91cf282710e5db2e6e45b3be65d85bd98b5b5aa0f693f3c5ac7b9ff4c6040d"
   },
@@ -109,7 +113,7 @@
   },
   {
     "path": ".github/workflows/wingless-code-atlas.yml",
-    "sha256": "3bab9e352630c0d6f2b47bb821f6bf119de2e591c39351dc1bd809ca057195d0"
+    "sha256": "ca2a58cdba9050ad0d61f2ed0bf06bb77023c41f9cab674b2bb43ba1e34f621b"
   },
   {
     "path": ".gitignore",
@@ -385,13 +389,26 @@
   },
   {
     "path": "cmd/wingless-ice-cognition/main.go",
-    "sha256": "8221e99fb197cb139b4e2a8a37c5b40d153a9c4f041c93b6e66119d1415d398c",
+    "sha256": "97f1c75b2fcfce8cbcb9dd4de7513dc0ee722f04ad45b66ac1914eee82411152",
     "package": "main",
     "imports": [
+      "context",
       "encoding/json",
       "fmt",
+      "path/filepath",
       "os",
+      "strings",
       "github.com/spoonman136668-ai/Wingless/cognition"
+    ]
+  },
+  {
+    "path": "cmd/wingless-ice-cognition/p2_native_test.go",
+    "sha256": "f47754d186de646178fe10c519b22a508975c2fe984e85045a3e075fab9f540b",
+    "package": "main",
+    "imports": [
+      "os",
+      "path/filepath",
+      "testing"
     ]
   },
   {
@@ -444,7 +461,7 @@
   },
   {
     "path": "cognition/latent_bind.go",
-    "sha256": "a586e38ba8efd810a345ad23c794de9183e0043a9a5d317e7ee41fa55ee8b985",
+    "sha256": "1760a2fbc4a3ece984a17bbd7117c01d5980daaa56d03069dd13f2286af9b93c",
     "package": "cognition",
     "imports": [
       "encoding/json",
@@ -460,6 +477,17 @@
       "bytes",
       "testing",
       "math"
+    ]
+  },
+  {
+    "path": "cognition/nci04_native_revision_test.go",
+    "sha256": "b9cf3ad41fc035415d075a3a63168890b09dc38aec38458863b7e7ea0bd31297",
+    "package": "cognition",
+    "imports": [
+      "bytes",
+      "math",
+      "testing",
+      "unsafe"
     ]
   },
   {
@@ -522,10 +550,13 @@
   },
   {
     "path": "cognition/nci04g7_source_task.go",
-    "sha256": "6f388df74f021c8a344cd0daf5219b96baa9d62af261a4acc7cede2e111b9ad4",
+    "sha256": "16415ba8c01f7b9ea98ff422668dc810057ee6b5323bba5d20840c3a65ac2e54",
     "package": "cognition",
     "imports": [
       "context",
+      "bufio",
+      "bytes",
+      "encoding/json",
       "crypto/sha256",
       "encoding/hex",
       "errors",
@@ -551,6 +582,17 @@
       "testing",
       "time",
       "unsafe"
+    ]
+  },
+  {
+    "path": "cognition/nci04p2_native_execution_test.go",
+    "sha256": "bf02a74d3a61a5924a77a7309afba9cbf0caf649698065da1f45f1552548b7de",
+    "package": "cognition",
+    "imports": [
+      "errors",
+      "fmt",
+      "strings",
+      "testing"
     ]
   },
   {

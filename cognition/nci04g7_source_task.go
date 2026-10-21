@@ -7,6 +7,9 @@ package cognition
 // errors, NOT an invented negative supervision label.
 import (
  "context"
+ "bufio"
+ "bytes"
+ "encoding/json"
  "crypto/sha256"
  "encoding/hex"
  "errors"
@@ -37,6 +40,59 @@ var nativeReasoningTasks=[3]nativeReasoningTest{
  {"TestICEStateAmbiguityAndNoInventedNegatives","./cognition","cognition/ice_task_test.go"},
 }
 
+// nativeGoTestVerdict admits only a completed Go test's own assertion result.
+// A compile error, timeout, panic, skipped test, missing exact test event, or
+// arbitrary process output is NOT a negative learning label. The verifier
+// owns the observed consequence; the caller never supplies an answer.
+func nativeGoTestVerdict(raw []byte, task nativeReasoningTest, executionErr error)(int,error){
+ if len(raw)==0||len(raw)>1<<20{return 0,errors.New("unbounded or empty native test evidence")}
+ expectedPackage:="github.com/spoonman136668-ai/Wingless/"+strings.TrimPrefix(task.Package,"./")
+ scanner:=bufio.NewScanner(bytes.NewReader(raw))
+ scanner.Buffer(make([]byte,4096),1<<20)
+ var started,finished,packageFinished bool
+ var result int
+ for scanner.Scan(){
+  var event struct{
+   Action string `json:"Action"`
+   Package string `json:"Package"`
+   Test string `json:"Test"`
+   Output string `json:"Output"`
+  }
+  if err:=json.Unmarshal(scanner.Bytes(),&event);err!=nil{
+   return 0,errors.New("non-JSON native process output")
+  }
+  if event.Package!=expectedPackage{return 0,errors.New("native test package identity drift")}
+  if event.Test!=""&&event.Test!=task.Name{return 0,errors.New("additional test outcome or nested subtest not admitted")}
+  if strings.Contains(event.Output,"panic:")||
+    strings.Contains(event.Output,"fatal error:")||
+    strings.Contains(event.Output,"signal:")||
+    strings.Contains(event.Output,"runtime error:"){
+    return 0,errors.New("native test failure is operational, not an assertion label")
+  }
+  if event.Test==task.Name{
+   switch event.Action{
+   case "run":
+    if started||finished{return 0,errors.New("duplicate native test start")}
+    started=true
+   case "pass","fail":
+    if !started||finished{return 0,errors.New("native test result out of sequence")}
+    finished=true
+    if event.Action=="pass"{result=1}
+   case "skip":
+    return 0,errors.New("skipped native test cannot supervise cognition")
+   }
+  }else if event.Test==""&&(event.Action=="pass"||event.Action=="fail"){
+   if !finished||packageFinished{return 0,errors.New("native package terminated without isolated test result")}
+   packageFinished=true
+   if (event.Action=="pass")!=(result==1){return 0,errors.New("native package and test outcomes conflict")}
+  }
+ }
+ if err:=scanner.Err();err!=nil{return 0,err}
+ if !started||!finished||!packageFinished{return 0,errors.New("missing completed native assertion receipt")}
+ if (executionErr==nil)!=(result==1){return 0,errors.New("native process exit and assertion disagree")}
+ return result,nil
+}
+
 // ObserveNativeReasoningTask learns from a real, source-checked Wingless
 // reasoning/ICE test execution. No caller-supplied labels or arbitrary test
 // names are permitted. All other SourceReasoner operations remain unchanged.
@@ -59,22 +115,22 @@ func (r *SourceReasoner) ObserveNativeReasoningTask(ctx context.Context,action i
  commit:=strings.TrimSpace(string(sha))
  if len(commit)!=40{return empty,errors.New("invalid exact native source commit")}
  deadline,cancel:=context.WithTimeout(ctx,50*time.Second);defer cancel()
- cmd:=exec.CommandContext(deadline,"go","test",task.Package,"-run","^"+task.Name+"$","-count=1")
+ cmd:=exec.CommandContext(deadline,"go","test","-json",task.Package,"-run","^"+task.Name+"$","-count=1")
  cmd.Dir=r.Root
  cmd.Env=append(os.Environ(),"GOFLAGS=","GOWORK=off","GOPROXY=off","GOSUMDB=off","GOTOOLCHAIN=local")
- output,err:=cmd.CombinedOutput()
- if err!=nil{return empty,fmt.Errorf("native reasoning task failed or unavailable: %w",err)}
+ output,runErr:=cmd.CombinedOutput()
  if deadline.Err()!=nil{return empty,deadline.Err()}
- if !strings.Contains(string(output),"ok")||!strings.Contains(string(output),"Wingless/"){
-   return empty,errors.New("native test lacked source-bound successful Go test receipt")
- }
+ // A Go test failure is evidence ONLY when the exact test ran to an
+ // assertion result. Build failures and environment errors never train.
+ observed,err:=nativeGoTestVerdict(output,task,runErr)
+ if err!=nil{return empty,fmt.Errorf("unqualified native action consequence: %w",err)}
  dest,err:=r.symbol("ObserveExistingCall");if err!=nil{return empty,err}
- if err:=r.State.Observe(vectorFromSource(symbol),vectorFromSource(dest),action,1);err!=nil{return empty,err}
+ if err:=r.State.Observe(vectorFromSource(symbol),vectorFromSource(dest),action,observed);err!=nil{return empty,err}
  digest:=sha256.Sum256(b)
  return NativeReasoningConsequence{TaskName:task.Name,SourceCommit:commit,
   SourceFileSHA256:hex.EncodeToString(digest[:]),IndexSHA:r.IndexSHA,
-  Action:uint8(action),ObservedPass:1,
-  EvidenceBasis:"exact-ICE-index+git-blob+executed-native-Wingless-go-test"},nil
+  Action:uint8(action),ObservedPass:uint8(observed),
+  EvidenceBasis:"exact-ICE-index+git-blob+completed-native-go-test-json-assertion"},nil
 }
 func (r *SourceReasoner) PredictNativeReasoningTask(action int)(float64,error){
  if r==nil||action<0||action>=len(nativeReasoningTasks){return 0,errors.New("invalid native reasoning action")}

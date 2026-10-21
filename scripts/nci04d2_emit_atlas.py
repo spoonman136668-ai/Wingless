@@ -42,7 +42,8 @@ def main():
     old=json.loads((root/".ice/code-intelligence.json").read_text("utf-8"))
     current=json.loads((root/".ice/symbol-map.json").read_text("utf-8"))
     indexed=json.loads((root/".ice/manifest.json").read_text("utf-8"))
-    oldkeys={(n["file"],n["kind"],n["name"],n.get("receiver","")) for n in old["nodes"]}
+    old_by_key={(n["file"],n["kind"],n["name"],n.get("receiver","")):n for n in old["nodes"]}
+    oldkeys=set(old_by_key)
     old_reviewed=sum(n["evidence_basis"]=="source-reviewed" for n in old["nodes"])
     old_provisional=sum(n["evidence_basis"]=="lexical-provisional" for n in old["nodes"])
     assert len(oldkeys)==len(old["nodes"])>=352
@@ -52,15 +53,25 @@ def main():
     receipts=[]
     for n in current:
         key=(n["file"],n["kind"],n["name"],n.get("receiver",""))
-        if key in oldkeys:
-            continue
         path=n["file"]
+        previous_node=old_by_key.get(key)
+        if previous_node is not None:
+            if previous_node["evidence_basis"] != "lexical-provisional":
+                # Changing a source-reviewed declaration always requires
+                # actual source-review evidence outside this automation.
+                continue
+            ancestor=run(["git","show",old["source_commit"]+":"+path])
+            prior_decl=b"".join(ancestor.splitlines(keepends=True)[
+                previous_node["start_line"]-1:previous_node["end_line"]])
         raw=(root/path).read_bytes()
         git_raw=run(["git","show",target+":"+path])
         if raw!=git_raw or hashlib.sha256(raw).hexdigest()!=filehash[path]:
             raise ValueError("new source not committed or digest mismatch "+path)
         lines=raw.splitlines(keepends=True)
         declaration=b"".join(lines[n["start"]-1:n["end"]])
+        if previous_node is not None:
+            if prior_decl.replace(b"\r\n",b"\n") == declaration.replace(b"\r\n",b"\n"):
+                continue
         decoded=declaration.decode("utf-8")
         matches=re.findall(r"[A-Za-z_][A-Za-z_0-9]{3,}",decoded)
         if not matches:
@@ -84,7 +95,8 @@ def main():
     atlas=json.loads((root/".ice/code-intelligence.json").read_text("utf-8"))
     if atlas["source_commit"]!=target or atlas["coverage"]["source_reviewed_labels"]!=352:
         raise ValueError("source pin or historical reviewed baseline lost")
-    total_provisional=old_provisional+len(receipts)
+    total_provisional=old_provisional+sum(
+        tuple(r["key"]) not in oldkeys for r in receipts)
     if atlas["coverage"]["lexical_provisional_labels"]!=total_provisional:
         raise ValueError("incorrect inherited+new provisional evidence accounting")
     artifacts={}
