@@ -100,7 +100,7 @@ func (s *LatentState) NativeEffectHypothesisExperiment(before [FeatureWidth]floa
         if score<0 && score> -1e-12 {score=0}
         if math.IsNaN(score)||math.IsInf(score,0)||score<0 {return NativeEffectHypothesis{},errors.New("invalid native hypothesis information score")}
         h.ExpectedInformationNats[i]=score
-        if score>best {
+        if score>best+1e-12 {
             h.ChosenMotor=motors[i]
             best=score
         }
