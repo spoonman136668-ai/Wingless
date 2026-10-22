@@ -49,6 +49,25 @@ jobs:
           set -euo pipefail
           go run ./research/native/itd01/r7/cmd/report > itd01_wingless_native_result.json
           python -c 'import json; r=json.load(open("itd01_wingless_native_result.json")); assert not r["scientific_first_use"] and len(r["results"])==3 and all(v["delayed_public_feedback_updates"]==640 for v in r["results"]); print("ITD01_WINGLESS_NATIVE_COHORTS=PASS")'
+      - name: Preserve all three frozen scientific scores even when prereg gate is NO GO
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          go run ./research/native/itd01/r7/cmd/report > itd01_wingless_native_result.json
+          result=$?
+          set -e
+          test "$result" -eq 0 -o "$result" -eq 2
+          python -c 'import json; d=json.load(open("itd01_wingless_native_result.json")); assert len(d["results"])==3 and not d["scientific_first_use"]; print("WINGLESS_R7_FROZEN_OUTCOME="+d["primary_gate"])'
+          echo WINGLESS_R7_EVIDENCE_CAPTURED_WITHOUT_RETUNING=PASS
+      - name: Independently vet and build original Wingless packages
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          go vet ./...
+          go build ./...
+          echo WINGLESS_R7_SOURCE_BUILD_AND_VET=PASS
       - name: Exactly one full existing Wingless Go regression vet build
         shell: bash
         run: |
