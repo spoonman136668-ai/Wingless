@@ -1,0 +1,75 @@
+name: ITD-01 R7 Wingless native packed cognitive-state DEV
+on:
+  push:
+    branches: [research/itd01-r7-native-wingless-state-20261022]
+permissions:
+  contents: read
+concurrency:
+  group: itd01-r7-wingless-native-20261022
+  cancel-in-progress: false
+jobs:
+  native-learned-public-state:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      GOMAXPROCS: '2'
+      GOFLAGS: '-p=2'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 24
+          clean: true
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Frozen first-commit prereg and source-only scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 48ba343b403bc9b4389ce1777130e546b3c446bd HEAD
+          git show --format= --name-only bb66a3a36a2021f2da19cb77f850ae860e540e31 | python -c 'import sys; a=sys.stdin.read().splitlines(); assert a==["research/native/itd01/r7/PREREG.md"],a'
+          git diff --name-only 48ba343b403bc9b4389ce1777130e546b3c446bd HEAD | python -c 'import sys; a=set(sys.stdin.read().splitlines()); allowed={".github/workflows/qualify-itd01-r7-native.yml","research/native/itd01/r7/PREREG.md","research/native/itd01/r7/native.go","research/native/itd01/r7/native_test.go","research/native/itd01/r7/cmd/report/main.go"}; assert a==allowed,(a,allowed)'
+          echo ITD01_WINGLESS_R7_FROZEN_IDENTITY=PASS
+      - name: Actual native online public delayed-feedback focused qualification
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd01/r7 > itd01_wingless_native_tests.log 2>&1
+          cat itd01_wingless_native_tests.log
+          echo ITD01_WINGLESS_NATIVE_FOCUSED=PASS
+      - name: Record full frozen three-seed actual native-learning results
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./research/native/itd01/r7/cmd/report > itd01_wingless_native_result.json
+          python -c 'import json; r=json.load(open("itd01_wingless_native_result.json")); assert not r["scientific_first_use"] and len(r["results"])==3 and all(v["delayed_public_feedback_updates"]==640 for v in r["results"]); print("ITD01_WINGLESS_NATIVE_COHORTS=PASS")'
+      - name: Exactly one full existing Wingless Go regression vet build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./...
+          go vet ./...
+          go build ./...
+          echo ITD01_WINGLESS_FULL_REGRESSION=PASS
+      - name: Preserve research-only source isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git status --porcelain --untracked-files=all | python -c 'import sys; x=sys.stdin.read().splitlines(); allowed={"?? itd01_wingless_native_tests.log","?? itd01_wingless_native_result.json"}; assert all(r in allowed for r in x),x'
+          echo ITD01_WINGLESS_PROTECTED_H1_H2=NOT_USED
+          echo ITD01_WINGLESS_KTRADE_BROKER=UNTOUCHED
+      - name: Save real native learning or negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: itd01-r7-wingless-native-${{ matrix.os }}
+          path: |
+            itd01_wingless_native_tests.log
+            itd01_wingless_native_result.json
+          if-no-files-found: ignore
