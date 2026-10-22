@@ -57,7 +57,7 @@ jobs:
           go run ./research/native/itd01/r7/cmd/report > itd01_wingless_native_result.json
           result=$?
           set -e
-          test "$result" -eq 0 -o "$result" -eq 2
+          test "$result" -eq 0 -o "$result" -eq 1 -o "$result" -eq 2 # go run maps os.Exit(2) to shell 1
           python -c 'import json; d=json.load(open("itd01_wingless_native_result.json")); assert len(d["results"])==3 and not d["scientific_first_use"]; print("WINGLESS_R7_FROZEN_OUTCOME="+d["primary_gate"])'
           echo WINGLESS_R7_EVIDENCE_CAPTURED_WITHOUT_RETUNING=PASS
       - name: Independently vet and build original Wingless packages
