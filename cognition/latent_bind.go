@@ -127,6 +127,12 @@ func (s *LatentState) Observe(src,dst [FeatureWidth]float32,action,outcome int)e
     if v>12 {v=12};if v< -12 {v= -12}
     edge.LogOdds=float32(v)
     if edge.Updates<65535 {edge.Updates++}
+    // Preserve the original fixed-size online evidence counter. Saturating
+    // instead of wrapping avoids treating exhausted memory as untrained state.
+    // The staged copy has not been committed if this guard fails.
+    if next.Observations == ^uint32(0) {
+        return errors.New("native causal observation counter exhausted")
+    }
     next.Observations++
     *s=next
     return nil
