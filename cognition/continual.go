@@ -39,7 +39,11 @@ func (s *State) Observe(action,prior,outcome int,rate float64)error {
  // leave both weights and metadata untouched.
  if s.Updates==^uint64(0){return errors.New("native learning update counter exhausted")}
  next:=s.Weights
- for i,v:=range f {next[i]+=rate*(float64(outcome)-p)*v;if math.IsNaN(next[i])||math.IsInf(next[i],0){return errors.New("nonfinite state")}}
+ for i,v:=range f {
+  next[i]+=rate*(float64(outcome)-p)*v
+  if math.IsNaN(next[i])||math.IsInf(next[i],0){return errors.New("nonfinite state")}
+  if next[i]>8 {next[i]=8};if next[i]<-8 {next[i]=-8}
+ }
  s.Weights=next;s.Updates++;return nil
 }
 // ForecastTwo marginalizes the first, unobserved consequence.
