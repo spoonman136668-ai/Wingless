@@ -27,6 +27,7 @@ func (s *State) Predict(action,prior int)(float64,error) {
  f,err:=features(action,prior);if err!=nil{return 0,err}
  for _,w:=range s.Weights{if math.IsNaN(w)||math.IsInf(w,0){return 0,errors.New("nonfinite state")}}
  z:=0.0;for i,x:=range f{z+=s.Weights[i]*x}
+ if math.IsNaN(z)||math.IsInf(z,0){return 0,errors.New("nonfinite predictive logit")}
  return sigmoid(z),nil
 }
 // Observe learns only after observing a consequence, without a task ID.
