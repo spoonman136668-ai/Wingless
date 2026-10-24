@@ -11,6 +11,7 @@ import (
  "encoding/json"
  "errors"
  "math"
+ "io"
 )
 
 const Schema = "wingless.itd02.r1.public-grid-action-state.v1"
@@ -153,13 +154,7 @@ func Restore(raw []byte)(*Policy,error) {
  var wire envelope
  dec:=json.NewDecoder(bytes.NewReader(raw));dec.DisallowUnknownFields()
  if e:=dec.Decode(&wire);e!=nil{return nil,e}
- if dec.Decode(new(struct{}))!=nil {
-  // A complete explicit EOF check happens below.
- }
- tail:=json.NewDecoder(bytes.NewReader(raw))
- var check json.RawMessage
- if e:=tail.Decode(&check);e!=nil{return nil,e}
- if e:=tail.Decode(&check);e==nil{return nil,errors.New("R1_CHECKPOINT_TRAILING_DATA")}
+ if e:=dec.Decode(new(struct{}));e!=io.EOF{return nil,errors.New("R1_CHECKPOINT_TRAILING_DATA")}
  if wire.Schema!=Schema || !wire.Payload.healthy(){return nil,errors.New("R1_CHECKPOINT_SCHEMA_OR_VALUES")}
  body,e:=json.Marshal(wire.Payload);if e!=nil{return nil,e}
  sum:=sha256.Sum256(body)
