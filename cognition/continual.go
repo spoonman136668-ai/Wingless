@@ -61,3 +61,61 @@ func (s *State) Restore(blob []byte)error{
  for i,v:=range wire.Weights{if math.IsNaN(v)||math.IsInf(v,0){return errors.New("invalid weight")};next.Weights[i]=v}
  next.Updates=wire.Updates;*s=next;return nil
 }
+
+// FastSlowState tests complementary fast and slow local learning as a
+// development-only alternative to a single-rate State. Both traces learn
+// from the same observed outcome; neither has access to future labels or
+// source-family identifiers. Memory and training cost are higher than State.
+type FastSlowState struct {
+ Fast State `json:"fast"`
+ Slow State `json:"slow"`
+}
+
+// Predict averages two separately acquired predictive states. This is an
+// explicit matched-resource research candidate, not a capability claim.
+func (d *FastSlowState) Predict(action, prior int) (float64, error) {
+ fast, err := d.Fast.Predict(action, prior)
+ if err != nil { return 0, err }
+ slow, err := d.Slow.Predict(action, prior)
+ if err != nil { return 0, err }
+ return 0.5*fast + 0.5*slow, nil
+}
+
+// Observe uses one public consequence to update both traces at fixed
+// timescales. Copy-on-success prevents a partial update if either step fails.
+func (d *FastSlowState) Observe(action, prior, outcome int, rate float64) error {
+ next := *d
+ if err := next.Fast.Observe(action, prior, outcome, rate); err != nil {
+  return err
+ }
+ if err := next.Slow.Observe(action, prior, outcome, rate/8); err != nil {
+  return err
+ }
+ *d = next
+ return nil
+}
+
+// Snapshot and Restore retain both learned traces across process restarts;
+// the existing single-trace State checkpoint schema remains untouched.
+func (d FastSlowState) Snapshot() ([]byte, error) {
+ return json.Marshal(d)
+}
+
+func (d *FastSlowState) Restore(blob []byte) error {
+ if len(blob) > 8192 { return errors.New("oversized two-timescale snapshot") }
+ var wire struct {
+  Fast json.RawMessage `json:"fast"`
+  Slow json.RawMessage `json:"slow"`
+ }
+ dec := json.NewDecoder(bytes.NewReader(blob))
+ dec.DisallowUnknownFields()
+ if err := dec.Decode(&wire); err != nil { return err }
+ if err := dec.Decode(&struct{}{}); err != io.EOF {
+  return errors.New("trailing two-timescale snapshot data")
+ }
+ var next FastSlowState
+ if err := next.Fast.Restore(wire.Fast); err != nil { return err }
+ if err := next.Slow.Restore(wire.Slow); err != nil { return err }
+ *d = next
+ return nil
+}
