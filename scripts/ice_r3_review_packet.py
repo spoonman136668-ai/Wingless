@@ -105,8 +105,8 @@ def build(root):
         # Canonical ICE rebuild only proves agreement with WORKTREE content.
         # Bind all reviewed source candidates independently to immutable HEAD,
         # even when a malicious or stale Git assume-unchanged bit hides edits.
-        actual = path.read_bytes().replace(b"\\r\\n", b"\\n")
-        committed = command(root, "show", "HEAD:" + filename).replace(b"\\r\\n", b"\\n")
+        actual = path.read_bytes().replace(b"\r\n", b"\n")
+        committed = command(root, "show", "HEAD:" + filename).replace(b"\r\n", b"\n")
         require(actual == committed,
                 "HEAD_COMMITTED_SOURCE_MISMATCH:" + filename)
     source_ref = reviewed["source_commit"]
