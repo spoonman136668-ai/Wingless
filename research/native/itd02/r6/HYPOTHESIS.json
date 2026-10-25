@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.itd02.r6.empirically-verified-observed-route-v1",
+  "parent_R5_commit": "978825064dd6076058a1a38ae1a9a3d80e28d99e",
+  "parent_R5_blob": "239a5f2ab6d122b10cd5c7cc9388d154929b9888",
+  "standing_science": "F4 public development first use official NO_REPEATABLE_R5_COST_AWARE_NAVIGATION_ADVANCEMENT despite R5 8/8 FourRooms, same-sixfield conventional 8/8 and R5 slower (586 steps) than R4 (558)",
+  "mechanism": "distinct nonparametric learned local public episode transition graph: record only actual chosen-action pose-to-pose public source outcomes, estimate observed edge reliability as count/success, prefer verified shortest routes to a discovered public goal or observed novel physical frontier, retain R5 as evidence-insufficient fallback",
+  "immutable_source_preconditions": [
+    "original R1-R5 source unchanged",
+    "no prior DEV worlds reused",
+    "R6 source-only first; no source external world until separately frozen FORGE cohort"
+  ],
+  "state_contract": {
+    "max_observed_pose_action_pairs": 4096,
+    "max_total_episode_steps": 4096,
+    "max_search_nodes": 2048,
+    "no_graph_content_from_fitted_R3_predictions": true,
+    "only_actual_FIT_or_ephemeral_evaluation_feedback": true,
+    "one_legal_action_one_actual_consequence": true,
+    "world_episode_reset_drops_observed_map": true,
+    "persistent_R5_R3_model_unchanged": true,
+    "cold_snapshot_retains_source_proof": true
+  },
+  "mechanism_tests": [
+    "route prefers empirically shorter confirmed action path over unexplored longer model route",
+    "unobserved movement can never enter verified graph",
+    "unreliable contradictory effect remains untrusted",
+    "reject mismatched actual action, invalid pose or nonlocal jump transactionally",
+    "shortest confirmed route needs actually observed goal location not privileged map",
+    "weights identical before/after episode and after cold restore",
+    "native Linux Windows focused source identity and race"
+  ],
+  "evaluation_claims": {
+    "protected_first_use": false,
+    "scientific_acceptance": false,
+    "novelty_claim": false,
+    "normalization_of_F4_negative": false,
+    "retrospective_F4_tuning": false,
+    "explicit_conventional_sixfield_control_required": true
+  },
+  "operational": {
+    "draft_only": true,
+    "no_CKB_plane": true,
+    "no_paid_API": true,
+    "FORGE_scientific_authority": true
+  }
+}
