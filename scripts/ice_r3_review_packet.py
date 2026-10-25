@@ -107,8 +107,13 @@ def build(root):
             "INVALID_PRIOR_SOURCE_ID")
     require(command(root, "cat-file", "-t", source_ref).strip() == b"commit",
             "AUTHENTICATED_HISTORICAL_SOURCE_UNAVAILABLE")
-    require(command(root, "merge-base", source_ref, head).strip() ==
-            source_ref.encode("ascii"), "HISTORICAL_REVIEW_SOURCE_NOT_ANCESTOR")
+    # Protected main used a squash integration; the authentic historical
+    # review source may be a non-ancestor even when every source blob is
+    # available. Report the custody boundary; never silently re-anchor it.
+    ancestry = subprocess.run(["git","merge-base","--is-ancestor",source_ref,head],
+                              cwd=root, capture_output=True)
+    require(ancestry.returncode in (0,1), "HISTORICAL_SOURCE_ANCESTRY_CHECK_ERROR")
+    historical_ancestor = ancestry.returncode == 0
 
     historic_files = {}
     old_review_status = {"unchanged_declaration": 0,
@@ -180,6 +185,8 @@ def build(root):
         "repository": REPO,
         "target_source_commit": head,
         "historical_review_source_commit": source_ref,
+        "historical_source_is_current_ancestor": historical_ancestor,
+        "historical_pin_requires_independent_reanchor": not historical_ancestor,
         "previous_reviewed_symbols": OLD_DECLARATIONS,
         "previous_reviewed_files": OLD_FILES,
         "current_syntax_symbols": len(new_symbols),
