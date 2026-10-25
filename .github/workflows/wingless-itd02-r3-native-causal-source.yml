@@ -44,6 +44,11 @@ jobs:
           trap cleanup EXIT
           (
             cd "$scratch/source"
+            # Original reviewed semantic source was squash-integrated. Fetch
+            # its exact immutable commit by SHA for independent Git-blob custody
+            # without altering any branch, promoting labels, or claiming ancestry.
+            git fetch --quiet --no-tags --depth=1 origin a6f825ad6420e769db8fadee560fd2a379b94ce9
+            test "$(git cat-file -t a6f825ad6420e769db8fadee560fd2a379b94ce9)" = commit
             go run ./cmd/ice build
             go run ./cmd/ice validate
             python -B - <<'PY'
