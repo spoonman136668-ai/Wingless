@@ -1,0 +1,74 @@
+name: Wingless ITD-02 R8 real native outcome-belief learning
+on:
+  push:
+    branches: [research/itd02-r8-native-outcome-belief-20261025]
+permissions:
+  contents: read
+jobs:
+  native-model-focused:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Native R5 source frozen, R8 precode protocol intact
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 978825064dd6076058a1a38ae1a9a3d80e28d99e HEAD
+          test "$(git hash-object research/native/itd02/r5/cost_frontier.go)" = 239a5f2ab6d122b10cd5c7cc9388d154929b9888
+          test "$(git hash-object research/native/itd02/r3/transitions.go)" = 3c8a60a5037e6c0f04648ae53175ed1187b5f8ac
+          test "$(git hash-object research/native/itd02/r8/FROZEN_PROTOCOL.json)" = fad87a7e24bc80f5d430bfda6a38c8d313cfdb59
+          test "$(git hash-object research/native/itd02/r8/PRECODE_FIT_CLARIFICATION.json)" = 1528cd7bc06826c8f90ffe69a1a0d6829557194e
+          echo R8_ORIGINAL_NATIVE_MODEL_IDENTITY=PASS
+      - name: Native R1-R5 and R8 actual model fit Choose Feedback tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r8
+          go vet ./research/native/itd02/r8
+          go build ./research/native/itd02/r8
+          git diff --exit-code
+          echo R8_NATIVE_MODEL_FOCUSED_TEST_VET_BUILD=PASS
+      - name: Native model data-race safety
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -race -count=1 ./research/native/itd02/r8
+          echo R8_NATIVE_MODEL_RACE=PASS
+  final-regression:
+    needs: [native-model-focused]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    env:
+      GOMAXPROCS: "2"
+      GOFLAGS: "-p=2"
+      GOMEMLIMIT: "1536MiB"
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: One final whole-repository native regression and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          go build ./...
+          git diff --exit-code
+          echo R8_NATIVE_FINAL_FULL_REGRESSION=PASS
