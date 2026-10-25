@@ -1,0 +1,54 @@
+name: Wingless ITD-02 R7 source-only physical frontier
+on:
+  push:
+    branches: [research/itd02-r7-physical-frontier-20261025]
+permissions:
+  contents: read
+jobs:
+  r7-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 32
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Original R5 and failed R6 source ancestry unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse 'e3723e2d5d3bb60ae47b9872c916780c0b73f5ba^')" = c6850eabab1a0deafdfc71883c1e33f24c035d31
+          git merge-base --is-ancestor e3723e2d5d3bb60ae47b9872c916780c0b73f5ba HEAD
+          test "$(git hash-object research/native/itd02/r5/cost_frontier.go)" = 239a5f2ab6d122b10cd5c7cc9388d154929b9888
+          test "$(git hash-object research/native/itd02/r6/observed_edges.go)" = 08af1b25ed6e5a260ef27e6baf0310e974e71f4c
+          echo R7_R5_R6_FROZEN_ORIGINAL_SOURCE=PASS
+      - name: Actual native R1-R7 focused tests, vet, build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r6 ./research/native/itd02/r7
+          go vet ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r6 ./research/native/itd02/r7
+          go build ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r6 ./research/native/itd02/r7
+          echo R7_NATIVE_ORIGINAL_SOURCE_TESTS_VET_BUILD=PASS
+      - name: Go race and separate OS process cold checkpoint
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -race ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r6 ./research/native/itd02/r7
+          echo R7_NATIVE_RACE=PASS
+      - name: No real-world scientific first use
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo R7_REAL_WORLD_SOURCE_USE=NOT_PERFORMED
+          echo R7_SCIENTIFIC_ACCEPTED=FALSE
