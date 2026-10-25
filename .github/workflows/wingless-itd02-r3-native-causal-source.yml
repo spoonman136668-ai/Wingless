@@ -1,0 +1,55 @@
+name: Wingless ITD-02 R3 original source-only causal edges
+on:
+  push:
+    branches: [research/itd02-r3-native-causal-edges-20261024]
+permissions:
+  contents: read
+jobs:
+  native-r3-mechanism-not-science:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Frozen original R1/R2 lineage and new R3 source only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor c8156515890cc6742289d9850b2be9dd5a77030a HEAD
+          test "$(git hash-object research/native/itd02/r1/policy.go)" = 8d1845d82dd8578a709b00e8841bdc5edc8dbc10
+          test "$(git hash-object research/native/itd02/r2/affordance.go)" = e1564172079359ca4c450dcc87487a4733210584
+          test "$(git hash-object research/native/itd02/r2/affordance_test.go)" = e63c7bf2cd5e55a9eb04ed35b25b18fa41ac4afe
+          echo R3_ORIGINAL_PARENT_AND_SOURCE_IDENTITY=PASS
+      - name: Native R1 R2 R3 focused learning integrity tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3
+          go vet ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3
+          go build ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3
+          echo R3_NATIVE_SOURCE_ONLY_TEST_VET_BUILD=PASS
+      - name: Linux bounded native race integrity
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -race -count=1 ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3
+          echo R3_NATIVE_RACE=PASS
+      - name: Clean source and explicit scientific non-acceptance
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo R3_REPOSITORY_CLEAN=PASS
+          echo R3_ORIGINAL_ENVIRONMENT_EXECUTION=NOT_PERFORMED
+          echo R3_SCIENTIFIC_FIRST_USE=NOT_PERFORMED
+          echo R3_NOVEL_CAUSAL_TRANSFER=NOT_CLAIMED
