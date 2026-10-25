@@ -84,6 +84,7 @@ jobs:
           print("R3_ICE_SEMANTIC_ATLAS_ADMISSION=BLOCKED_PENDING_AUTHENTICATED_GRAPH_REVIEW")
           PY
             python -B scripts/ice_r3_review_packet.py --root . --output "$RUNNER_TEMP/r3-ice-review-packet.json"
+            python -B scripts/test_ice_r3_review_packet.py --root . --scratch-parent "$RUNNER_TEMP"
           )
           test -z "$(git status --porcelain --untracked-files=all)"
           echo R3_ORIGINAL_CHECKOUT_UNCHANGED=PASS
