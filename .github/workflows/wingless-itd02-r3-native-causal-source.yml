@@ -78,9 +78,18 @@ jobs:
               raise SystemExit("R3_UNEXPECTED_NO_NATIVE_GRAPH_EXPANSION")
           print("R3_ICE_SEMANTIC_ATLAS_ADMISSION=BLOCKED_PENDING_AUTHENTICATED_GRAPH_REVIEW")
           PY
+            python -B scripts/ice_r3_review_packet.py --root . --output "$RUNNER_TEMP/r3-ice-review-packet.json"
           )
           test -z "$(git status --porcelain --untracked-files=all)"
           echo R3_ORIGINAL_CHECKOUT_UNCHANGED=PASS
+      - name: Preserve exact-head source-review queue in GitHub artifacts
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-itd02-r3-ice-source-review-queue
+          path: ${{ runner.temp }}/r3-ice-review-packet.json
+          if-no-files-found: error
+          retention-days: 90
       - name: Native R1 R2 R3 focused learning integrity tests
         shell: bash
         run: |
