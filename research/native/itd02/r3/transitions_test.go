@@ -102,46 +102,10 @@ func TestInvalidIsTransactionalAndBoundsAreReal(t *testing.T){
   if e:=p.Observe(bad.before,bad.arm,bad.after,bad.reward,true);e==nil{t.Fatal("invalid source transition accepted")}
   now,e:=p.Snapshot();if e!=nil||!bytes.Equal(original,now){t.Fatal("rejected source mutated learning or checkpoint")}
  }
-}
-func TestStrictModelCheckpointTamperAndColdOSRestart(t *testing.T){
- if input:=os.Getenv("WINGLESS_R3_CHILD_CHECKPOINT");input!=""{
-  raw,e:=base64.StdEncoding.DecodeString(input);if e!=nil{t.Fatal(e)}
-  p,e:=Restore(raw);if e!=nil{t.Fatal(e)}
-  s:=state(40,40,0,42,40,true)
-  a,e:=p.Choose(s);if e!=nil{t.Fatal(e)}
-  want,e:=strconv.Atoi(os.Getenv("WINGLESS_R3_CHILD_ACTION"));if e!=nil{t.Fatal(e)}
-  if a!=want||p.Events!=192{t.Fatal("cold OS restore lost independent learned state")}
-  return
- }
- p:=New();teachAll(t,p)
- raw,e:=p.Snapshot();if e!=nil{t.Fatal(e)}
- restored,e:=Restore(raw);if e!=nil{t.Fatal(e)}
- again,e:=restored.Snapshot();if e!=nil||!bytes.Equal(raw,again){t.Fatal("snapshot not canonical or restorable")}
- probe:=state(40,40,0,42,40,true)
- want,e:=p.Choose(probe);if e!=nil{t.Fatal(e)}
- a,e:=restored.Choose(probe);if e!=nil||a!=want{t.Fatal("restored decision drift")}
- var wire map[string]interface{}
- if e=json.Unmarshal(raw,&wire);e!=nil{t.Fatal(e)}
- data:=wire["data"].(map[string]interface{})
- data["completed_events"]=float64(191)
- altered,_:=json.Marshal(wire)
- if _,e=Restore(altered);e==nil{t.Fatal("signed checkpoint accepted modified event identity")}
- if _,e=Restore(append(append([]byte{},raw...),byte('X')));e==nil{t.Fatal("trailing garbage accepted")}
- cmd:=exec.Command(os.Args[0],"-test.run=^TestStrictModelCheckpointTamperAndColdOSRestart$")
- cmd.Env=append(os.Environ(),"WINGLESS_R3_CHILD_CHECKPOINT="+base64.StdEncoding.EncodeToString(raw),
-  "WINGLESS_R3_CHILD_ACTION="+strconv.Itoa(want))
- if output,e:=cmd.CombinedOutput();e!=nil{t.Fatalf("cold OS process model restore failed: %v %s",e,output)}
-}
-func TestIncompleteSourceNoPrematurePlanning(t *testing.T){
- p:=New()
- s:=state(20,20,0,22,20,false)
- for i:=0;i<3;i++{if e:=p.Observe(s,2,afterTestFixture(s,2),0,true);e!=nil{t.Fatal(e)}}
- _,ok,e:=p.Predict(s,2);if e!=nil||ok{t.Fatal("under-evidenced action given a fictitious prediction")}
- _,ok,e=p.Plan(s);if e!=nil||ok{t.Fatal("under-evidenced plan should fail closed")}
-}
-
-func TestUnobservedCausalPhysicsCannotBeInjected(t *testing.T){
- s:=state(20,20,0,22,20,false)
+ // Coupled-source custody regression: a model may not invent action physics,
+ // world occupancy, or completed observations and then checkpoint them.
+ {
+s:=state(20,20,0,22,20,false)
  for _,alter:=range []struct{
   name string
   mutate func(*Policy)
@@ -180,4 +144,43 @@ func TestUnobservedCausalPhysicsCannotBeInjected(t *testing.T){
  teachAll(t,p)
  if p.Events!=p.Core.Core.Updates{t.Fatal("genuine source custody missing")}
  if _,e:=p.Snapshot();e!=nil{t.Fatalf("genuine observed model incorrectly rejected: %v",e)}
+
+ }
+
+}
+func TestStrictModelCheckpointTamperAndColdOSRestart(t *testing.T){
+ if input:=os.Getenv("WINGLESS_R3_CHILD_CHECKPOINT");input!=""{
+  raw,e:=base64.StdEncoding.DecodeString(input);if e!=nil{t.Fatal(e)}
+  p,e:=Restore(raw);if e!=nil{t.Fatal(e)}
+  s:=state(40,40,0,42,40,true)
+  a,e:=p.Choose(s);if e!=nil{t.Fatal(e)}
+  want,e:=strconv.Atoi(os.Getenv("WINGLESS_R3_CHILD_ACTION"));if e!=nil{t.Fatal(e)}
+  if a!=want||p.Events!=192{t.Fatal("cold OS restore lost independent learned state")}
+  return
+ }
+ p:=New();teachAll(t,p)
+ raw,e:=p.Snapshot();if e!=nil{t.Fatal(e)}
+ restored,e:=Restore(raw);if e!=nil{t.Fatal(e)}
+ again,e:=restored.Snapshot();if e!=nil||!bytes.Equal(raw,again){t.Fatal("snapshot not canonical or restorable")}
+ probe:=state(40,40,0,42,40,true)
+ want,e:=p.Choose(probe);if e!=nil{t.Fatal(e)}
+ a,e:=restored.Choose(probe);if e!=nil||a!=want{t.Fatal("restored decision drift")}
+ var wire map[string]interface{}
+ if e=json.Unmarshal(raw,&wire);e!=nil{t.Fatal(e)}
+ data:=wire["data"].(map[string]interface{})
+ data["completed_events"]=float64(191)
+ altered,_:=json.Marshal(wire)
+ if _,e=Restore(altered);e==nil{t.Fatal("signed checkpoint accepted modified event identity")}
+ if _,e=Restore(append(append([]byte{},raw...),byte('X')));e==nil{t.Fatal("trailing garbage accepted")}
+ cmd:=exec.Command(os.Args[0],"-test.run=^TestStrictModelCheckpointTamperAndColdOSRestart$")
+ cmd.Env=append(os.Environ(),"WINGLESS_R3_CHILD_CHECKPOINT="+base64.StdEncoding.EncodeToString(raw),
+  "WINGLESS_R3_CHILD_ACTION="+strconv.Itoa(want))
+ if output,e:=cmd.CombinedOutput();e!=nil{t.Fatalf("cold OS process model restore failed: %v %s",e,output)}
+}
+func TestIncompleteSourceNoPrematurePlanning(t *testing.T){
+ p:=New()
+ s:=state(20,20,0,22,20,false)
+ for i:=0;i<3;i++{if e:=p.Observe(s,2,afterTestFixture(s,2),0,true);e!=nil{t.Fatal(e)}}
+ _,ok,e:=p.Predict(s,2);if e!=nil||ok{t.Fatal("under-evidenced action given a fictitious prediction")}
+ _,ok,e=p.Plan(s);if e!=nil||ok{t.Fatal("under-evidenced plan should fail closed")}
 }
