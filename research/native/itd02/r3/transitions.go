@@ -59,7 +59,7 @@ func valid(p *Policy)bool{
   if v.Samples>=1<<30{return false}
   var sum uint64
   for _,e:=range v.Outcomes{
-   if e.Count>0&&(e.DX<-1||e.DX>1||e.DY<-1||e.DY>1||e.Heading>3){return false}
+   if e.Count>0&&(e.DX < -1||e.DX>1||e.DY < -1||e.DY>1||e.Heading>3){return false}
    sum+=uint64(e.Count)
   }
   if sum!=uint64(v.Samples){return false}
