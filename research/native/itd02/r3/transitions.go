@@ -55,8 +55,14 @@ func legal(g r1.PublicGrid)bool{
 }
 func valid(p *Policy)bool{
  if p==nil||p.Core==nil||p.Core.Core==nil||len(p.Cells)>MaxCells||p.Events>=1<<52{return false}
+ // Every R3 observation updates exactly one chosen-action effect, exactly
+ // one public pose, and exactly one original R2/R1 event. Without this
+ // conservation check a caller could inject fictitious learned physics
+ // into an otherwise valid, SHA-authenticated checkpoint.
+ var effectEvents uint64
  for _,v:=range p.Learned{
   if v.Samples>=1<<30{return false}
+  effectEvents+=uint64(v.Samples)
   var sum uint64
   for _,e:=range v.Outcomes{
    if e.Count>0&&(e.DX < -1||e.DX>1||e.DY < -1||e.DY>1||e.Heading>3){return false}
@@ -64,12 +70,14 @@ func valid(p *Policy)bool{
   }
   if sum!=uint64(v.Samples){return false}
  }
+ var cellEvents uint64
  for k,v:=range p.Cells{
   if k>(64<<9|64<<2|3)||v.Seen==0||v.Seen>=1<<30||v.Contradictions>v.Seen{return false}
+  cellEvents+=uint64(v.Seen)
   x,y,d:=int(k>>9),int((k>>2)&127),int(k&3)
   if x>64||y>64||d>3{return false}
  }
- return true
+ return effectEvents==p.Events&&cellEvents==p.Events&&p.Events==p.Core.Core.Updates
 }
 func poseKey(x,y,d int)uint32{return uint32((x<<9)|(y<<2)|d)}
 func effectKey(s r1.PublicGrid,a int)int{
