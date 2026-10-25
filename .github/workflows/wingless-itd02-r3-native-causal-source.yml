@@ -30,6 +30,57 @@ jobs:
           test "$(git hash-object research/native/itd02/r2/affordance.go)" = e1564172079359ca4c450dcc87487a4733210584
           test "$(git hash-object research/native/itd02/r2/affordance_test.go)" = e63c7bf2cd5e55a9eb04ed35b25b18fa41ac4afe
           echo R3_ORIGINAL_PARENT_AND_SOURCE_IDENTITY=PASS
+      - name: Exact ICE structural and reviewed-graph migration census (scratch only)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          scratch="$(mktemp -d)"
+          git worktree add --quiet --detach "$scratch/source" HEAD
+          cleanup() {
+            git worktree remove --force "$scratch/source" || true
+            rmdir "$scratch" || true
+          }
+          trap cleanup EXIT
+          (
+            cd "$scratch/source"
+            go run ./cmd/ice build
+            go run ./cmd/ice validate
+            python -B - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          old=json.loads(subprocess.check_output(["git","show","HEAD:.ice/manifest.json"]))
+          current=json.loads(Path(".ice/manifest.json").read_text())
+          earlier=json.loads(subprocess.check_output(["git","show","HEAD:.ice/code-intelligence.json"]))
+          source_file_ids={f["path"] for f in old["files"]}
+          current_file_ids={f["path"] for f in current["files"]}
+          def key(s):
+              return (s["file"],s["kind"],s["name"],s.get("receiver",""))
+          old_symbols={key(s) for s in old["symbols"]}
+          new_symbols={key(s) for s in current["symbols"]}
+          introduced=sorted(current_file_ids-source_file_ids)
+          retired=sorted(source_file_ids-current_file_ids)
+          new_declarations=sorted(new_symbols-old_symbols)
+          removed_declarations=sorted(old_symbols-new_symbols)
+          print("R3_ICE_STRUCTURAL_SCRATCH_REBUILD=PASS")
+          print("R3_ICE_REVIEWED_BASE_FILES="+str(len(source_file_ids)))
+          print("R3_ICE_REBUILT_SOURCE_FILES="+str(len(current_file_ids)))
+          print("R3_ICE_REVIEWED_BASE_SYMBOLS="+str(len(old_symbols)))
+          print("R3_ICE_REBUILT_SOURCE_SYMBOLS="+str(len(new_symbols)))
+          print("R3_ICE_SOURCE_FILES_ADDED="+str(len(introduced)))
+          print("R3_ICE_DECLARATIONS_ADDED="+str(len(new_declarations)))
+          print("R3_ICE_DECLARATIONS_REMOVED="+str(len(removed_declarations)))
+          print("R3_ICE_NEW_FILES="+json.dumps(introduced))
+          print("R3_ICE_NEW_R3_SYMBOLS="+json.dumps([list(k) for k in new_declarations if k[0].startswith("research/native/itd02/r3/")]))
+          if len(source_file_ids)!=138 or len(old_symbols)!=352 or earlier["coverage"]["symbols"]!=352:
+              raise SystemExit("R3_ORIGINAL_REVIEWED_GRAPH_IDENTITY_DRIFT")
+          if not introduced or not new_declarations:
+              raise SystemExit("R3_UNEXPECTED_NO_NATIVE_GRAPH_EXPANSION")
+          print("R3_ICE_SEMANTIC_ATLAS_ADMISSION=BLOCKED_PENDING_AUTHENTICATED_GRAPH_REVIEW")
+          PY
+          )
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo R3_ORIGINAL_CHECKOUT_UNCHANGED=PASS
       - name: Native R1 R2 R3 focused learning integrity tests
         shell: bash
         run: |
