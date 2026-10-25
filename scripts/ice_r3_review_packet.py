@@ -102,6 +102,13 @@ def build(root):
         require(path.is_file() and not path.is_symlink() and
                 digest(path.read_bytes()) == file["sha256"],
                 "REBUILT_FILE_HASH_DRIFT:" + filename)
+        # Canonical ICE rebuild only proves agreement with WORKTREE content.
+        # Bind all reviewed source candidates independently to immutable HEAD,
+        # even when a malicious or stale Git assume-unchanged bit hides edits.
+        actual = path.read_bytes().replace(b"\\r\\n", b"\\n")
+        committed = command(root, "show", "HEAD:" + filename).replace(b"\\r\\n", b"\\n")
+        require(actual == committed,
+                "HEAD_COMMITTED_SOURCE_MISMATCH:" + filename)
     source_ref = reviewed["source_commit"]
     require(re.fullmatch("[0-9a-f]{40}", source_ref) is not None,
             "INVALID_PRIOR_SOURCE_ID")
