@@ -1,0 +1,58 @@
+name: Wingless ITD-02 R6 source-only observed-route qualification
+on:
+  push:
+    branches: [research/itd02-r6-observed-edges-20261025]
+permissions:
+  contents: read
+jobs:
+  native-r6-source-only:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 32
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Authenticate R1 to R5 exact source and pre-code R6 freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse '12b670af7bf4d0b47d529af8199a76b67bcdef8f^')" = 978825064dd6076058a1a38ae1a9a3d80e28d99e
+          git merge-base --is-ancestor 12b670af7bf4d0b47d529af8199a76b67bcdef8f HEAD
+          test "$(git hash-object research/native/itd02/r1/policy.go)" = 8d1845d82dd8578a709b00e8841bdc5edc8dbc10
+          test "$(git hash-object research/native/itd02/r2/affordance.go)" = e1564172079359ca4c450dcc87487a4733210584
+          test "$(git hash-object research/native/itd02/r3/transitions.go)" = 3c8a60a5037e6c0f04648ae53175ed1187b5f8ac
+          test "$(git hash-object research/native/itd02/r4/frontier.go)" = 61678ff1c95966151f1b1731fef62b804504cdf8
+          test "$(git hash-object research/native/itd02/r5/cost_frontier.go)" = 239a5f2ab6d122b10cd5c7cc9388d154929b9888
+          echo R6_ORIGINAL_R1_TO_R5_AND_FREEZE=PASS
+      - name: Native authentic source and R6 selected-edge tests vet build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r6
+          go vet ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r6
+          go build ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r6
+          echo R6_NATIVE_SOURCE_TEST_VET_BUILD=PASS
+      - name: Race and actual native snapshot cold process
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -race -count=1 ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r6
+          echo R6_NATIVE_RACE=PASS
+      - name: No actual external-world or protected scientific first use
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo R6_EXTERNAL_SOURCE_FIRST_USE=NOT_PERFORMED
+          echo R6_SCIENTIFIC_RESULT=UNQUALIFIED
+          echo R6_PROTECTED_MAIN=UNCHANGED
