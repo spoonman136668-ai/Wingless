@@ -139,3 +139,45 @@ func TestIncompleteSourceNoPrematurePlanning(t *testing.T){
  _,ok,e:=p.Predict(s,2);if e!=nil||ok{t.Fatal("under-evidenced action given a fictitious prediction")}
  _,ok,e=p.Plan(s);if e!=nil||ok{t.Fatal("under-evidenced plan should fail closed")}
 }
+
+func TestUnobservedCausalPhysicsCannotBeInjected(t *testing.T){
+ s:=state(20,20,0,22,20,false)
+ for _,alter:=range []struct{
+  name string
+  mutate func(*Policy)
+ }{
+  {"fabricated_action_effect",func(p *Policy){
+   v:=&p.Learned[effectKey(s,2)]
+   v.Samples=4
+   v.Outcomes[0]=Effect{DX:1,DY:0,Heading:0,Count:4}
+  }},
+  {"fabricated_public_pose",func(p *Policy){
+   p.Cells[poseKey(s.X,s.Y,s.Direction)]=CellEvidence{Seen:4,Blocked:false}
+  }},
+  {"fabricated_total_events",func(p *Policy){p.Events=4}},
+  {"fabricated_original_core_events",func(p *Policy){p.Core.Core.Updates=4}},
+  {"internally_balanced_but_without_original_core",func(p *Policy){
+   v:=&p.Learned[effectKey(s,2)]
+   v.Samples=4
+   v.Outcomes[0]=Effect{DX:1,DY:0,Heading:0,Count:4}
+   p.Cells[poseKey(s.X,s.Y,s.Direction)]=CellEvidence{Seen:4}
+   p.Events=4
+  }},
+  {"original_core_events_do_not_replace_public_source",func(p *Policy){
+   p.Core.Core.Updates=4
+   p.Events=4
+  }},
+ }{
+  t.Run(alter.name,func(t *testing.T){
+   p:=New()
+   alter.mutate(p)
+   if _,_,e:=p.Predict(s,2);e==nil{t.Fatal("unobserved transition accepted")}
+   if _,_,e:=p.Plan(s);e==nil{t.Fatal("unobserved plan accepted")}
+   if _,e:=p.Snapshot();e==nil{t.Fatal("unobserved state serialized as signed model")}
+  })
+ }
+ p:=New()
+ teachAll(t,p)
+ if p.Events!=p.Core.Core.Updates{t.Fatal("genuine source custody missing")}
+ if _,e:=p.Snapshot();e!=nil{t.Fatalf("genuine observed model incorrectly rejected: %v",e)}
+}
