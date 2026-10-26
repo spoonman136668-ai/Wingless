@@ -49,3 +49,10 @@ func(s *Selected) BeginEpisode()error {
  }
  return errors.New("OUTCOME_RESET_REQUIRES_TERMINAL")
 }
+
+// RewardEvidence returns the observed mean reward for a valid action.
+// It does not bypass the native selected-action custodian.
+func (s *Selected) RewardEvidence(action int) (float64, bool) {
+ if s == nil || s.Rewards == nil { return 0, false }
+ return s.Rewards.Value(action)
+}
