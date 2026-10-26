@@ -27,6 +27,7 @@ func(s *Selected) SnapshotSelected()([]byte,error){
  if s==nil||s.Policy==nil||s.Rewards==nil{return nil,errors.New("OUTCOME_SELECTED_INVALID")}
  native,err:=s.Policy.Snapshot();if err!=nil{return nil,err}
  rewards,err:=s.Rewards.Snapshot();if err!=nil{return nil,err}
+ if s.Rewards.NextID!=s.Policy.LiveSeen+1||s.Rewards.Closed&&s.Policy.Armed{return nil,errors.New("OUTCOME_SELECTED_EVENT_MISMATCH")}
  state:=selectedState{Native:native,Rewards:rewards}
  body,err:=json.Marshal(state);if err!=nil{return nil,err}
  return json.Marshal(selectedEnvelope{Schema:SelectedSchema,State:state,Digest:sha256.Sum256(body)})
