@@ -1,7 +1,7 @@
 name: Wingless ITD-02 R8 real native outcome-belief learning
 on:
   push:
-    branches: [research/itd02-r8-native-outcome-belief-20261025]
+    branches: [research/itd02-r8-native-outcome-belief-20261025, research/itd02-r8-bridge-qualification-20261025]
 permissions:
   contents: read
 jobs:
@@ -29,15 +29,16 @@ jobs:
           test "$(git hash-object research/native/itd02/r5/cost_frontier.go)" = 239a5f2ab6d122b10cd5c7cc9388d154929b9888
           test "$(git hash-object research/native/itd02/r3/transitions.go)" = 3c8a60a5037e6c0f04648ae53175ed1187b5f8ac
           test "$(git hash-object research/native/itd02/r8/FROZEN_PROTOCOL.json)" = fad87a7e24bc80f5d430bfda6a38c8d313cfdb59
+          test "$(git hash-object research/native/itd02/r8/online_beliefs.go)" = 6857ecbef2d63f459a432a5d68c7edda2b5347c4
           test "$(git hash-object research/native/itd02/r8/PRECODE_FIT_CLARIFICATION.json)" = 1528cd7bc06826c8f90ffe69a1a0d6829557194e
           echo R8_ORIGINAL_NATIVE_MODEL_IDENTITY=PASS
       - name: Native R1-R5 and R8 actual model fit Choose Feedback tests
         shell: bash
         run: |
           set -euo pipefail
-          go test -count=1 -v ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r8
-          go vet ./research/native/itd02/r8
-          go build ./research/native/itd02/r8
+          go test -count=1 -v ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5 ./research/native/itd02/r8 ./research/native/itd02/r8bridge
+          go vet ./research/native/itd02/r8 ./research/native/itd02/r8bridge
+          go build ./research/native/itd02/r8 ./research/native/itd02/r8bridge
           git diff --exit-code
           echo R8_NATIVE_MODEL_FOCUSED_TEST_VET_BUILD=PASS
       - name: Native model data-race safety
@@ -45,7 +46,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          go test -race -count=1 ./research/native/itd02/r8
+          go test -race -count=1 ./research/native/itd02/r8 ./research/native/itd02/r8bridge
           echo R8_NATIVE_MODEL_RACE=PASS
   final-regression:
     needs: [native-model-focused]
