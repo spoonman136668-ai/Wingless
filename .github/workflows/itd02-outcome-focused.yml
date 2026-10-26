@@ -41,13 +41,21 @@ jobs:
         run: |
           go run ./cmd/ice build
           go run ./cmd/ice validate
-      - name: Package only regenerated ICE index
+      - name: Record exact generated delta
         run: |
-          test -d .ice
+          git diff --binary -- .ice > "$RUNNER_TEMP/itd02-ice-index.patch"
+          git diff --stat -- .ice > "$RUNNER_TEMP/itd02-ice-index-stat.txt"
+          git diff --name-only -- .ice > "$RUNNER_TEMP/itd02-ice-index-files.txt"
+          test -s "$RUNNER_TEMP/itd02-ice-index.patch"
+      - name: Package generated delta and index
+        run: |
           tar -czf "$RUNNER_TEMP/itd02-ice-index.tar.gz" .ice
-          git status --short -- .ice
       - uses: actions/upload-artifact@v4
         with:
           name: itd02-ice-index
-          path: ${{ runner.temp }}/itd02-ice-index.tar.gz
+          path: |
+            ${{ runner.temp }}/itd02-ice-index.tar.gz
+            ${{ runner.temp }}/itd02-ice-index.patch
+            ${{ runner.temp }}/itd02-ice-index-stat.txt
+            ${{ runner.temp }}/itd02-ice-index-files.txt
           retention-days: 3
