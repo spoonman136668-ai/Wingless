@@ -84,4 +84,6 @@ jobs:
           fi
           git diff --cached --name-only | awk '!/^\.ice\// { bad=1 } END { exit bad }'
           git commit -m "ITD-02: refresh generated ICE indexes"
+          git fetch origin research/itd02-selected-outcome-learner-20261026
+          git rebase origin/research/itd02-selected-outcome-learner-20261026
           git push origin HEAD:research/itd02-selected-outcome-learner-20261026
