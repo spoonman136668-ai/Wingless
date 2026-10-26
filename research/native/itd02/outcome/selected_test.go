@@ -59,3 +59,12 @@ func TestRewardRecommendationCustodyAndEvidence(t *testing.T){
  s.Rewards.Closed=true
  if _,err:=s.RecommendRewardAction(2);err==nil{t.Fatal("bypassed terminal boundary")}
 }
+
+func TestSelectedSnapshotRejectsUnownedRewardEvidence(t *testing.T) {
+ s:=NewSelected()
+ s.Rewards.Bins[1]=Bin{Count:1,Sum:3}
+ s.Rewards.NextID=2
+ if _,err:=s.SnapshotSelected();err==nil {
+  t.Fatal("accepted reward evidence without matching native selected feedback")
+ }
+}
