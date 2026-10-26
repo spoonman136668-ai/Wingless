@@ -42,3 +42,20 @@ func TestUnselectedFeedbackDoesNotConsumeReward(t *testing.T){
  if err:=s.Feedback(before,(a+1)%3,after,Event{ID:1,Action:(a+1)%3,Reward:9});err==nil{t.Fatal("unselected action accepted")}
  if s.Rewards.NextID!=1||!s.Policy.Armed{t.Fatal("rejected action consumed state")}
 }
+
+func TestRewardRecommendationCustodyAndEvidence(t *testing.T){
+ s:=NewSelected()
+ if _,err:=s.RecommendRewardAction(2);err==nil{t.Fatal("accepted absent evidence")}
+ s.Rewards.Bins=[3]Bin{{Count:2,Sum:2},{Count:2,Sum:8},{Count:2,Sum:4}}
+ s.Rewards.NextID=7
+ a,err:=s.RecommendRewardAction(2)
+ if err!=nil||a!=1{t.Fatalf("expected action 1, got %d %v",a,err)}
+ s.Rewards.Bins[2].Sum=8
+ if _,err:=s.RecommendRewardAction(2);err==nil{t.Fatal("accepted reward tie")}
+ s.Rewards.Bins[2].Sum=4
+ s.Policy.Armed=true
+ if _,err:=s.RecommendRewardAction(2);err==nil{t.Fatal("bypassed pending selected action")}
+ s.Policy.Armed=false
+ s.Rewards.Closed=true
+ if _,err:=s.RecommendRewardAction(2);err==nil{t.Fatal("bypassed terminal boundary")}
+}
