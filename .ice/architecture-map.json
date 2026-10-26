@@ -48,6 +48,18 @@
     "sha256": "fcb685f14733881579d94fb337ab757abe3677cd58730c7601bcf4e84e0f834e"
   },
   {
+    "path": ".github/workflows/itd02-outcome-focused.yml",
+    "sha256": "3e3056498962a24f12680d0f7d1f031e5e2b5f5aebcb6d25efa44f59844f9691"
+  },
+  {
+    "path": ".github/workflows/itd02-r1-native-policy.yml",
+    "sha256": "6241a5a63e67ade6c9cb7f28280bdc90d26204aaf2c4077b233f5a7d98c41a55"
+  },
+  {
+    "path": ".github/workflows/itd02-r2-affordance.yml",
+    "sha256": "387e095d5ca09ae89957b65d66d8499e054b26008089814c151ba4b2d4bcfaac"
+  },
+  {
     "path": ".github/workflows/mind-palace-cross-repo-probe.yml",
     "sha256": "fc182a8a801e75b18034c4bd4edfbb367b450382e1ddae1495887d8f4efc26f4"
   },
@@ -98,6 +110,22 @@
   {
     "path": ".github/workflows/wingless-code-atlas.yml",
     "sha256": "3210bd132d31d4116014060f316172e699b858505e637a4775e99c4fb51049bf"
+  },
+  {
+    "path": ".github/workflows/wingless-itd02-r3-native-causal-source.yml",
+    "sha256": "ac2bab89c5a993391ef7d0d010f4c7ea5cf3e9e75fea715b773d44e8d4792ec6"
+  },
+  {
+    "path": ".github/workflows/wingless-itd02-r4-native-frontier.yml",
+    "sha256": "5b2bfb1f2057a84ad22c08e7dc6f179b87369768f5679e15ad6f4cedca9087e4"
+  },
+  {
+    "path": ".github/workflows/wingless-itd02-r5-native-cost-frontier.yml",
+    "sha256": "9e65ba7c0447b8b5a913cab8cd3297ce5b3e67bf86d0e1284ede3de6eb0ee57d"
+  },
+  {
+    "path": ".github/workflows/wingless-itd02-r8-native-online-beliefs.yml",
+    "sha256": "dbd42b364b5aec9112f7497016ce371f1cf28ca4b36ad373a10796492d902576"
   },
   {
     "path": ".gitignore",
@@ -263,6 +291,31 @@
     ]
   },
   {
+    "path": "cmd/wingless/cognition.go",
+    "sha256": "5b3fcb3b36c8ccfedd8f883df8146ec58bf7eff9bb869ec296df70f3b6052882",
+    "package": "main",
+    "imports": [
+      "bufio",
+      "bytes",
+      "encoding/json",
+      "errors",
+      "fmt",
+      "io",
+      "os",
+      "github.com/spoonman136668-ai/Wingless/cognition"
+    ]
+  },
+  {
+    "path": "cmd/wingless/cognition_test.go",
+    "sha256": "9c9f5f029e4a426d4e2b46512b0eb8f77bd12b1ec7ac3384139791b628a2ab75",
+    "package": "main",
+    "imports": [
+      "bytes",
+      "strings",
+      "testing"
+    ]
+  },
+  {
     "path": "cmd/wingless/gpu.go",
     "sha256": "c5ae2639d35132a2fb5e65315e8805a852b8096b2179b0ec5c66ef6963631109",
     "package": "main",
@@ -296,7 +349,7 @@
   },
   {
     "path": "cmd/wingless/main.go",
-    "sha256": "fec2fbc7059ff366c24e85a8ecd8598cb6f8adc0b95276c0767d08d1f91d8f5f",
+    "sha256": "254ff6be49eb8b4bd7813283cea226a6a4b7a44cfa9f69eae32eaa7ffdf7ebd5",
     "package": "main",
     "imports": [
       "context",
@@ -308,6 +361,28 @@
       "github.com/spoonman136668-ai/Wingless/resources",
       "os",
       "time"
+    ]
+  },
+  {
+    "path": "cognition/continual.go",
+    "sha256": "a60645b093757f156f7da77072ab8c7463c1d1e2b4d7aa87a3e290679bc79ca3",
+    "package": "cognition",
+    "imports": [
+      "bytes",
+      "encoding/json",
+      "errors",
+      "io",
+      "math"
+    ]
+  },
+  {
+    "path": "cognition/continual_test.go",
+    "sha256": "33c88bf63af756beda0cdcaa5cff86ff55c9cf498da5604e3d50f2ad8201a295",
+    "package": "cognition",
+    "imports": [
+      "bytes",
+      "math",
+      "testing"
     ]
   },
   {
@@ -416,6 +491,10 @@
   {
     "path": "docs/resource-model.md",
     "sha256": "4d71bc6d55d26b9269817f89dbd72ebb6ff8540a5e7f6943c344cef250094615"
+  },
+  {
+    "path": "docs/t45o-native-cognition.md",
+    "sha256": "cf3e4e002f7f77cabde4e11ec1a1eee808c5438b7484688c4688195d7f8fda9c"
   },
   {
     "path": "docs/worker-protocol.md",
@@ -888,6 +967,295 @@
   {
     "path": "research/fanout/smoke_fixture.json",
     "sha256": "7b7f1eec6fabeacb34206f253d37a91f129c44efe7cb1d4aff9ec98d34397937"
+  },
+  {
+    "path": "research/native/itd02/outcome/ledger.go",
+    "sha256": "6cf60d2ef1e6b5fcddd6bbc146183bf336bfb0e0f314d9fe480dfad8ffb882c0",
+    "package": "outcome",
+    "imports": [
+      "crypto/sha256",
+      "encoding/json",
+      "errors",
+      "math"
+    ]
+  },
+  {
+    "path": "research/native/itd02/outcome/ledger_test.go",
+    "sha256": "a15314b612146e38e508f0639b5d7ab8e321f95918d0ee5d5dcc680adc7d352f",
+    "package": "outcome",
+    "imports": [
+      "math",
+      "testing"
+    ]
+  },
+  {
+    "path": "research/native/itd02/outcome/selected.go",
+    "sha256": "0f25ee30079a12e3479457424dbfbf84339072f465ae134a18c5a9409fe3b5f9",
+    "package": "outcome",
+    "imports": [
+      "errors",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r8"
+    ]
+  },
+  {
+    "path": "research/native/itd02/outcome/selected_checkpoint.go",
+    "sha256": "517eb3343097f2d9b544a209fcae8ce9c05eacb68c11031682c988ab203697be",
+    "package": "outcome",
+    "imports": [
+      "bytes",
+      "crypto/sha256",
+      "encoding/json",
+      "errors",
+      "io",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r8"
+    ]
+  },
+  {
+    "path": "research/native/itd02/outcome/selected_checkpoint_test.go",
+    "sha256": "0b6d11cd9d0ab42eee73da216175df08f30d5cdc385eba9f87f352ae3703b93d",
+    "package": "outcome",
+    "imports": [
+      "bytes",
+      "crypto/sha256",
+      "encoding/json",
+      "testing"
+    ]
+  },
+  {
+    "path": "research/native/itd02/outcome/selected_test.go",
+    "sha256": "d191e4f73ea99d49d1b8099ec3957df295b3e623e304636a0faa9a6d86baab0d",
+    "package": "outcome",
+    "imports": [
+      "bytes",
+      "testing",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r1/PREREG.json",
+    "sha256": "ab5c4e18f622cedec0b5fd378becbe5049efd32271a272c20e01db2862f3eb25"
+  },
+  {
+    "path": "research/native/itd02/r1/policy.go",
+    "sha256": "4d1587c8c3ce0e9529e70826e215c737879e2ee9c5ab734ae198acf96e4cd519",
+    "package": "r1",
+    "imports": [
+      "bytes",
+      "crypto/sha256",
+      "encoding/hex",
+      "encoding/json",
+      "errors",
+      "math",
+      "io"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r1/policy_test.go",
+    "sha256": "6efe3c4c82340d19a6cdd39f0efb11c0e4ade07ec0fc3d2a710df9b557325e43",
+    "package": "r1",
+    "imports": [
+      "bytes",
+      "encoding/base64",
+      "math",
+      "os",
+      "os/exec",
+      "reflect",
+      "strconv",
+      "testing"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r2/PREREG.json",
+    "sha256": "a7769c0fc7ce74f28300bd27946885c431bc555c37cd46792043aa5635ab757e"
+  },
+  {
+    "path": "research/native/itd02/r2/affordance.go",
+    "sha256": "ccd456e740a5559ddf0752d7b5bcf73dfb6d03c15b75842a4380f92f9dfa943c",
+    "package": "r2",
+    "imports": [
+      "bytes",
+      "crypto/sha256",
+      "encoding/hex",
+      "encoding/json",
+      "errors",
+      "io",
+      "math",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r2/affordance_test.go",
+    "sha256": "0a3665cef28043d67e62e5bfcdbfe9f2f79e6e76e1c7760a7dd6ff0b62669cde",
+    "package": "r2",
+    "imports": [
+      "bytes",
+      "encoding/base64",
+      "os",
+      "os/exec",
+      "strconv",
+      "testing",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r3/transitions.go",
+    "sha256": "489bc410def31bd80d8fd0f5bd4d2921b62b88bc7d2666997b42b1b6febf2ebf",
+    "package": "r3",
+    "imports": [
+      "bytes",
+      "crypto/sha256",
+      "encoding/hex",
+      "encoding/json",
+      "errors",
+      "io",
+      "math",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r2"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r3/transitions_test.go",
+    "sha256": "14efae73fe595d7dafd11d6cef8793e9d20a292ec19e6e5ed5c43ad67d2a2cd1",
+    "package": "r3",
+    "imports": [
+      "bytes",
+      "encoding/base64",
+      "encoding/json",
+      "math",
+      "os",
+      "os/exec",
+      "strconv",
+      "testing",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r4/HYPOTHESIS.json",
+    "sha256": "9b9776e638619d63243e1e9a7abd30dd0e47b20b36cea8e906bcbfdff89dc254"
+  },
+  {
+    "path": "research/native/itd02/r4/frontier.go",
+    "sha256": "2e049e06942f13df23633976e70e024fcd5852a3d4d632a36bdd487f06f92d3e",
+    "package": "r4",
+    "imports": [
+      "bytes",
+      "crypto/sha256",
+      "encoding/hex",
+      "encoding/json",
+      "errors",
+      "io",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r3"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r4/frontier_test.go",
+    "sha256": "b46ca475d45cc670e58cea4c478118e471e4293c946d1320650e3e7b9599aec0",
+    "package": "r4",
+    "imports": [
+      "bytes",
+      "encoding/json",
+      "os",
+      "os/exec",
+      "strconv",
+      "testing",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r5/HYPOTHESIS.json",
+    "sha256": "9ef557a7cebae8549018ed6000a38f0993849bf56827942770ea4f0d8af7a3dd"
+  },
+  {
+    "path": "research/native/itd02/r5/cost_frontier.go",
+    "sha256": "99afe896810b71bf3ec1eb2851f9e5053c96f96e8a10e2f83e90a8b91f4e36f7",
+    "package": "r5",
+    "imports": [
+      "errors",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r4"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r5/cost_frontier_test.go",
+    "sha256": "93cabd80d30b20b735e6acb2b14a801b02534cf33a37590abe45eb20fec47b15",
+    "package": "r5",
+    "imports": [
+      "bytes",
+      "os",
+      "os/exec",
+      "testing",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r8/FROZEN_PROTOCOL.json",
+    "sha256": "fd345a9d575eed69152c0645bb28c390e1b604df3af57c1991e179d98faeb71a"
+  },
+  {
+    "path": "research/native/itd02/r8/PRECODE_FIT_CLARIFICATION.json",
+    "sha256": "864148a26523e2d6b8eaef55094db66d227448ea6762bc04416164e21203becf"
+  },
+  {
+    "path": "research/native/itd02/r8/online_beliefs.go",
+    "sha256": "53ccfb0040e73137dc341a2da0cf86965f7c43f68522a704bbc4771b906687e5",
+    "package": "r8",
+    "imports": [
+      "bytes",
+      "crypto/sha256",
+      "encoding/hex",
+      "encoding/json",
+      "errors",
+      "io",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r5"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r8/online_beliefs_test.go",
+    "sha256": "bec8e91706f0761c9c07a3faf00fc1450255e6d8e9a4d496c31088d780984dc8",
+    "package": "r8",
+    "imports": [
+      "bytes",
+      "os",
+      "os/exec",
+      "testing",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r5"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r8bridge/main.go",
+    "sha256": "5ee458efa42d631aca637146b8033c62de8e469d3b490fe248c3daf05517a3ed",
+    "package": "main",
+    "imports": [
+      "bufio",
+      "bytes",
+      "encoding/base64",
+      "encoding/json",
+      "errors",
+      "fmt",
+      "io",
+      "os",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r8"
+    ]
+  },
+  {
+    "path": "research/native/itd02/r8bridge/main_test.go",
+    "sha256": "88276524e49cf4cf9cc9f1bf94c947078d99c844ef81986a9f89388bf252018e",
+    "package": "main",
+    "imports": [
+      "bytes",
+      "encoding/base64",
+      "encoding/json",
+      "strings",
+      "testing",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r5",
+      "github.com/spoonman136668-ai/Wingless/research/native/itd02/r8"
+    ]
   },
   {
     "path": "research/portability/README.md",

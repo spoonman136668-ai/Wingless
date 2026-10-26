@@ -623,6 +623,72 @@
     ]
   },
   {
+    "name": "runCognition",
+    "kind": "function",
+    "file": "cmd/wingless/cognition.go",
+    "start": 15,
+    "end": 51,
+    "calls": [
+      "bufio.NewScanner",
+      "bytes.NewReader",
+      "d.Decode",
+      "d.Decode",
+      "d.DisallowUnknownFields",
+      "enc.Encode",
+      "enc.Encode",
+      "errors.New",
+      "errors.New",
+      "fmt.Errorf",
+      "fmt.Fprintln",
+      "io.LimitReader",
+      "json.NewDecoder",
+      "json.NewEncoder",
+      "make",
+      "new",
+      "s.ForecastTwo",
+      "s.Observe",
+      "s.Predict",
+      "s.Restore",
+      "s.Snapshot",
+      "scanner.Buffer",
+      "scanner.Bytes",
+      "scanner.Err",
+      "scanner.Scan",
+      "string"
+    ]
+  },
+  {
+    "name": "cognitionCLI",
+    "kind": "function",
+    "file": "cmd/wingless/cognition.go",
+    "start": 52,
+    "end": 52,
+    "calls": [
+      "runCognition"
+    ]
+  },
+  {
+    "name": "TestOfflineCognition",
+    "kind": "function",
+    "file": "cmd/wingless/cognition_test.go",
+    "start": 3,
+    "end": 9,
+    "calls": [
+      "out.String",
+      "out.String",
+      "out.String",
+      "runCognition",
+      "runCognition",
+      "strings.Contains",
+      "strings.Contains",
+      "strings.NewReader",
+      "strings.NewReader",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
     "name": "runGPU",
     "kind": "function",
     "file": "cmd/wingless/gpu.go",
@@ -743,9 +809,10 @@
     "kind": "function",
     "file": "cmd/wingless/main.go",
     "start": 19,
-    "end": 81,
+    "end": 88,
     "calls": [
       "benchmark.Replay",
+      "cognitionCLI",
       "context.Background",
       "context.Background",
       "enc.Encode",
@@ -757,6 +824,7 @@
       "fmt.Fprintln",
       "fmt.Fprintln",
       "fmt.Fprintln",
+      "fmt.Fprintln",
       "h.Snapshot",
       "h.Snapshot",
       "json.NewEncoder",
@@ -765,6 +833,8 @@
       "len",
       "len",
       "len",
+      "len",
+      "os.Exit",
       "os.Exit",
       "os.Exit",
       "os.Exit",
@@ -781,6 +851,231 @@
       "runner.Run",
       "time.Now",
       "time.Sleep"
+    ]
+  },
+  {
+    "name": "State",
+    "kind": "type",
+    "file": "cognition/continual.go",
+    "start": 13,
+    "end": 16
+  },
+  {
+    "name": "features",
+    "kind": "function",
+    "file": "cognition/continual.go",
+    "start": 17,
+    "end": 21,
+    "calls": [
+      "errors.New",
+      "float64",
+      "float64"
+    ]
+  },
+  {
+    "name": "sigmoid",
+    "kind": "function",
+    "file": "cognition/continual.go",
+    "start": 22,
+    "end": 25,
+    "calls": [
+      "math.Exp",
+      "math.Exp"
+    ]
+  },
+  {
+    "name": "Predict",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 26,
+    "end": 31,
+    "receiver": "State",
+    "calls": [
+      "errors.New",
+      "features",
+      "math.IsInf",
+      "math.IsNaN",
+      "sigmoid"
+    ]
+  },
+  {
+    "name": "Observe",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 33,
+    "end": 44,
+    "receiver": "State",
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "features",
+      "float64",
+      "math.IsInf",
+      "math.IsInf",
+      "math.IsNaN",
+      "math.IsNaN",
+      "s.Predict",
+      "uint64"
+    ]
+  },
+  {
+    "name": "ForecastTwo",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 46,
+    "end": 51,
+    "receiver": "State",
+    "calls": [
+      "s.Predict",
+      "s.Predict",
+      "s.Predict"
+    ]
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 52,
+    "end": 52,
+    "receiver": "State",
+    "calls": [
+      "json.Marshal"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 53,
+    "end": 63,
+    "receiver": "State",
+    "calls": [
+      "bytes.NewReader",
+      "dec.Decode",
+      "dec.Decode",
+      "dec.DisallowUnknownFields",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "json.NewDecoder",
+      "len",
+      "len",
+      "math.IsInf",
+      "math.IsNaN"
+    ]
+  },
+  {
+    "name": "FastSlowState",
+    "kind": "type",
+    "file": "cognition/continual.go",
+    "start": 69,
+    "end": 72
+  },
+  {
+    "name": "Predict",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 76,
+    "end": 82,
+    "receiver": "FastSlowState"
+  },
+  {
+    "name": "Observe",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 86,
+    "end": 96,
+    "receiver": "FastSlowState"
+  },
+  {
+    "name": "ChooseDisagreementProbe",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 106,
+    "end": 120,
+    "receiver": "FastSlowState",
+    "calls": [
+      "math.Abs",
+      "math.Abs"
+    ]
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 124,
+    "end": 126,
+    "receiver": "FastSlowState",
+    "calls": [
+      "json.Marshal"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "method",
+    "file": "cognition/continual.go",
+    "start": 128,
+    "end": 145,
+    "receiver": "FastSlowState",
+    "calls": [
+      "bytes.NewReader",
+      "dec.Decode",
+      "dec.Decode",
+      "dec.DisallowUnknownFields",
+      "errors.New",
+      "errors.New",
+      "json.NewDecoder",
+      "len"
+    ]
+  },
+  {
+    "name": "TestOnlineLearningSnapshot",
+    "kind": "function",
+    "file": "cognition/continual_test.go",
+    "start": 3,
+    "end": 15,
+    "calls": [
+      "bytes.Equal",
+      "copy.Restore",
+      "copy.Snapshot",
+      "s.ForecastTwo",
+      "s.Observe",
+      "s.Predict",
+      "s.Predict",
+      "s.Snapshot",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestFailClosedAndMarginal",
+    "kind": "function",
+    "file": "cognition/continual_test.go",
+    "start": 16,
+    "end": 29,
+    "calls": [
+      "bad",
+      "bytes.Equal",
+      "math.Abs",
+      "math.NaN",
+      "s.ForecastTwo",
+      "s.Observe",
+      "s.Observe",
+      "s.Observe",
+      "s.Predict",
+      "s.Predict",
+      "s.Predict",
+      "s.Restore",
+      "s.Snapshot",
+      "s.Snapshot",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
     ]
   },
   {
@@ -3974,6 +4269,3132 @@
       "len",
       "make",
       "t.Fatal"
+    ]
+  },
+  {
+    "name": "Schema",
+    "kind": "const",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 12,
+    "end": 12
+  },
+  {
+    "name": "MaxEvents",
+    "kind": "const",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 13,
+    "end": 13
+  },
+  {
+    "name": "RewardLimit",
+    "kind": "const",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 14,
+    "end": 14
+  },
+  {
+    "name": "Event",
+    "kind": "type",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 16,
+    "end": 22
+  },
+  {
+    "name": "Bin",
+    "kind": "type",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 23,
+    "end": 23
+  },
+  {
+    "name": "Ledger",
+    "kind": "type",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 24,
+    "end": 24
+  },
+  {
+    "name": "New",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 25,
+    "end": 25
+  },
+  {
+    "name": "Valid",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 26,
+    "end": 31,
+    "receiver": "Ledger",
+    "calls": [
+      "float64",
+      "math.Abs",
+      "math.IsInf",
+      "math.IsNaN",
+      "uint64"
+    ]
+  },
+  {
+    "name": "Accept",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 34,
+    "end": 44,
+    "receiver": "Ledger",
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "l.Valid",
+      "math.Abs",
+      "math.IsInf",
+      "math.IsInf",
+      "math.IsNaN",
+      "math.IsNaN"
+    ]
+  },
+  {
+    "name": "Reset",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 45,
+    "end": 45,
+    "receiver": "Ledger",
+    "calls": [
+      "errors.New",
+      "l.Valid"
+    ]
+  },
+  {
+    "name": "Value",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 46,
+    "end": 49,
+    "receiver": "Ledger",
+    "calls": [
+      "float64",
+      "l.Valid"
+    ]
+  },
+  {
+    "name": "checkpoint",
+    "kind": "type",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 50,
+    "end": 50
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 51,
+    "end": 54,
+    "receiver": "Ledger",
+    "calls": [
+      "errors.New",
+      "json.Marshal",
+      "json.Marshal",
+      "l.Valid",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/ledger.go",
+    "start": 55,
+    "end": 62,
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "json.Marshal",
+      "json.Unmarshal",
+      "len",
+      "len",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "TestRewardDependentLearningAndRevision",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/ledger_test.go",
+    "start": 8,
+    "end": 18,
+    "calls": [
+      "New",
+      "New",
+      "a.Accept",
+      "a.Accept",
+      "a.Value",
+      "a.Value",
+      "b.Accept",
+      "b.Value",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "uint64"
+    ]
+  },
+  {
+    "name": "TestDuplicateAndInvalidEventsFailClosed",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/ledger_test.go",
+    "start": 20,
+    "end": 36,
+    "calls": [
+      "New",
+      "l.Accept",
+      "l.Accept",
+      "l.Snapshot",
+      "l.Snapshot",
+      "math.Inf",
+      "math.NaN",
+      "string",
+      "string",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestTerminalResetAndColdRestore",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/ledger_test.go",
+    "start": 38,
+    "end": 51,
+    "calls": [
+      "New",
+      "Restore",
+      "Restore",
+      "l.Accept",
+      "l.Accept",
+      "l.Snapshot",
+      "restored.Accept",
+      "restored.Reset",
+      "restored.Value",
+      "restored.Value",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "Selected",
+    "kind": "type",
+    "file": "research/native/itd02/outcome/selected.go",
+    "start": 12,
+    "end": 15
+  },
+  {
+    "name": "NewSelected",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/selected.go",
+    "start": 16,
+    "end": 16,
+    "calls": [
+      "New",
+      "r8.New"
+    ]
+  },
+  {
+    "name": "Feedback",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/selected.go",
+    "start": 21,
+    "end": 36,
+    "receiver": "Selected",
+    "calls": [
+      "Restore",
+      "errors.New",
+      "l.Accept",
+      "p.Feedback",
+      "r8.Restore"
+    ]
+  },
+  {
+    "name": "BeginEpisode",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/selected.go",
+    "start": 38,
+    "end": 51,
+    "receiver": "Selected",
+    "calls": [
+      "Restore",
+      "errors.New",
+      "errors.New",
+      "l.Reset",
+      "p.BeginEpisode",
+      "r8.Restore"
+    ]
+  },
+  {
+    "name": "SelectedSchema",
+    "kind": "const",
+    "file": "research/native/itd02/outcome/selected_checkpoint.go",
+    "start": 13,
+    "end": 13
+  },
+  {
+    "name": "selectedState",
+    "kind": "type",
+    "file": "research/native/itd02/outcome/selected_checkpoint.go",
+    "start": 15,
+    "end": 18
+  },
+  {
+    "name": "selectedEnvelope",
+    "kind": "type",
+    "file": "research/native/itd02/outcome/selected_checkpoint.go",
+    "start": 19,
+    "end": 23
+  },
+  {
+    "name": "SnapshotSelected",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/selected_checkpoint.go",
+    "start": 26,
+    "end": 33,
+    "receiver": "Selected",
+    "calls": [
+      "errors.New",
+      "json.Marshal",
+      "json.Marshal",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "RestoreSelected",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/selected_checkpoint.go",
+    "start": 37,
+    "end": 53,
+    "calls": [
+      "Restore",
+      "bytes.Equal",
+      "bytes.NewReader",
+      "dec.Decode",
+      "dec.Decode",
+      "dec.DisallowUnknownFields",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "json.Marshal",
+      "json.Marshal",
+      "json.NewDecoder",
+      "len",
+      "len",
+      "new",
+      "r8.Restore",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "TestSelectedCheckpointColdRestartAndPendingAction",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/selected_checkpoint_test.go",
+    "start": 10,
+    "end": 26,
+    "calls": [
+      "NewSelected",
+      "RestoreSelected",
+      "RestoreSelected",
+      "again.BeginEpisode",
+      "cold.Feedback",
+      "cold.SnapshotSelected",
+      "s.SnapshotSelected",
+      "selectedFixture",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestSelectedCheckpointRejectsCorruptionAndMismatchedCounts",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/selected_checkpoint_test.go",
+    "start": 28,
+    "end": 47,
+    "calls": [
+      "NewSelected",
+      "Restore",
+      "RestoreSelected",
+      "RestoreSelected",
+      "RestoreSelected",
+      "append",
+      "append",
+      "append",
+      "byte",
+      "bytes.Equal",
+      "json.Marshal",
+      "json.Marshal",
+      "json.Unmarshal",
+      "l.Accept",
+      "l.Snapshot",
+      "len",
+      "s.SnapshotSelected",
+      "sha256Sum",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "sha256Sum",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/selected_checkpoint_test.go",
+    "start": 49,
+    "end": 49,
+    "calls": [
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "selectedFixture",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/selected_test.go",
+    "start": 10,
+    "end": 12
+  },
+  {
+    "name": "TestSelectedFeedbackAtomicity",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/selected_test.go",
+    "start": 13,
+    "end": 36,
+    "calls": [
+      "NewSelected",
+      "bytes.Equal",
+      "bytes.Equal",
+      "s.BeginEpisode",
+      "s.Feedback",
+      "s.Feedback",
+      "s.Feedback",
+      "selectedFixture",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUnselectedFeedbackDoesNotConsumeReward",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/selected_test.go",
+    "start": 38,
+    "end": 44,
+    "calls": [
+      "NewSelected",
+      "s.Feedback",
+      "selectedFixture",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "Schema",
+    "kind": "const",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 17,
+    "end": 17
+  },
+  {
+    "name": "Features",
+    "kind": "const",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 18,
+    "end": 18
+  },
+  {
+    "name": "Actions",
+    "kind": "const",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 19,
+    "end": 19
+  },
+  {
+    "name": "PublicGrid",
+    "kind": "type",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 23,
+    "end": 30
+  },
+  {
+    "name": "Policy",
+    "kind": "type",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 33,
+    "end": 37
+  },
+  {
+    "name": "New",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 39,
+    "end": 39
+  },
+  {
+    "name": "allowed",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 41,
+    "end": 45
+  },
+  {
+    "name": "clipped",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 47,
+    "end": 51
+  },
+  {
+    "name": "features",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 53,
+    "end": 65,
+    "calls": [
+      "allowed",
+      "clipped",
+      "clipped",
+      "clipped",
+      "errors.New",
+      "float64",
+      "float64",
+      "float64"
+    ]
+  },
+  {
+    "name": "finite",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 67,
+    "end": 67,
+    "calls": [
+      "math.IsInf",
+      "math.IsNaN"
+    ]
+  },
+  {
+    "name": "healthy",
+    "kind": "method",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 68,
+    "end": 76,
+    "receiver": "Policy",
+    "calls": [
+      "finite",
+      "finite",
+      "math.Abs",
+      "math.Abs"
+    ]
+  },
+  {
+    "name": "score",
+    "kind": "method",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 77,
+    "end": 81,
+    "receiver": "Policy"
+  },
+  {
+    "name": "Scores",
+    "kind": "method",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 87,
+    "end": 93,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "features",
+      "p.healthy",
+      "p.score"
+    ]
+  },
+  {
+    "name": "Choose",
+    "kind": "method",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 94,
+    "end": 99,
+    "receiver": "Policy",
+    "calls": [
+      "p.Scores"
+    ]
+  },
+  {
+    "name": "taxi",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 100,
+    "end": 104,
+    "calls": [
+      "float64"
+    ]
+  },
+  {
+    "name": "bounded",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 105,
+    "end": 109
+  },
+  {
+    "name": "Observe",
+    "kind": "method",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 113,
+    "end": 137,
+    "receiver": "Policy",
+    "calls": [
+      "bounded",
+      "bounded",
+      "clipped",
+      "errors.New",
+      "errors.New",
+      "features",
+      "features",
+      "finite",
+      "math.Abs",
+      "next.healthy",
+      "p.Scores",
+      "p.healthy",
+      "p.score",
+      "taxi",
+      "taxi",
+      "uint64"
+    ]
+  },
+  {
+    "name": "envelope",
+    "kind": "type",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 139,
+    "end": 143
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 145,
+    "end": 150,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.Marshal",
+      "p.healthy",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy.go",
+    "start": 152,
+    "end": 163,
+    "calls": [
+      "bytes.NewReader",
+      "dec.Decode",
+      "dec.Decode",
+      "dec.DisallowUnknownFields",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.NewDecoder",
+      "len",
+      "len",
+      "new",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "scene",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy_test.go",
+    "start": 14,
+    "end": 16
+  },
+  {
+    "name": "TestR1AllThreeActionsCanBeLearned",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy_test.go",
+    "start": 18,
+    "end": 34,
+    "calls": [
+      "New",
+      "p.Choose",
+      "p.Choose",
+      "p.Choose",
+      "p.Observe",
+      "p.Observe",
+      "scene",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestR1ValidPublicTransitionsAndAtomicFailures",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy_test.go",
+    "start": 36,
+    "end": 54,
+    "calls": [
+      "New",
+      "math.Inf",
+      "math.NaN",
+      "p.Choose",
+      "p.Observe",
+      "p.Observe",
+      "p.Observe",
+      "reflect.DeepEqual",
+      "reflect.DeepEqual",
+      "scene",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestR1AuthenticatedCheckpointAndNoMutation",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy_test.go",
+    "start": 56,
+    "end": 69,
+    "calls": [
+      "New",
+      "Restore",
+      "Restore",
+      "Restore",
+      "append",
+      "bytes.Replace",
+      "len",
+      "out.Scores",
+      "p.Observe",
+      "p.Scores",
+      "p.Snapshot",
+      "reflect.DeepEqual",
+      "scene",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestR1ColdChild",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy_test.go",
+    "start": 71,
+    "end": 83,
+    "calls": [
+      "Restore",
+      "os.Getenv",
+      "os.Getenv",
+      "p.Choose",
+      "scene",
+      "strconv.Atoi",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestR1ActualColdOSProcessRestoration",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy_test.go",
+    "start": 85,
+    "end": 98,
+    "calls": [
+      "New",
+      "append",
+      "cmd.CombinedOutput",
+      "exec.Command",
+      "os.Environ",
+      "os.Getenv",
+      "p.Choose",
+      "p.Observe",
+      "p.Snapshot",
+      "scene",
+      "strconv.Itoa",
+      "string",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestR1FutureSourceNotClaimed",
+    "kind": "function",
+    "file": "research/native/itd02/r1/policy_test.go",
+    "start": 100,
+    "end": 104,
+    "calls": [
+      "New",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "Schema",
+    "kind": "const",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 14,
+    "end": 14
+  },
+  {
+    "name": "Policy",
+    "kind": "type",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 15,
+    "end": 19
+  },
+  {
+    "name": "New",
+    "kind": "function",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 20,
+    "end": 20,
+    "calls": [
+      "r1.New"
+    ]
+  },
+  {
+    "name": "valid",
+    "kind": "method",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 21,
+    "end": 21,
+    "receiver": "Policy"
+  },
+  {
+    "name": "Scores",
+    "kind": "method",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 22,
+    "end": 31,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "float64",
+      "float64",
+      "math.IsInf",
+      "math.IsNaN",
+      "p.valid"
+    ]
+  },
+  {
+    "name": "Choose",
+    "kind": "method",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 32,
+    "end": 36,
+    "receiver": "Policy",
+    "calls": [
+      "p.Scores"
+    ]
+  },
+  {
+    "name": "Observe",
+    "kind": "method",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 37,
+    "end": 53,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "next.Observe",
+      "p.valid"
+    ]
+  },
+  {
+    "name": "payload",
+    "kind": "type",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 54,
+    "end": 58
+  },
+  {
+    "name": "signed",
+    "kind": "type",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 59,
+    "end": 63
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 64,
+    "end": 71,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.Marshal",
+      "p.valid",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "function",
+    "file": "research/native/itd02/r2/affordance.go",
+    "start": 72,
+    "end": 87,
+    "calls": [
+      "bytes.NewReader",
+      "dec.Decode",
+      "dec.Decode",
+      "dec.DisallowUnknownFields",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.NewDecoder",
+      "len",
+      "len",
+      "new",
+      "p.valid",
+      "r1.Restore",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "sample",
+    "kind": "function",
+    "file": "research/native/itd02/r2/affordance_test.go",
+    "start": 11,
+    "end": 11
+  },
+  {
+    "name": "TestNoUnobservedHardcodedAvoidance",
+    "kind": "function",
+    "file": "research/native/itd02/r2/affordance_test.go",
+    "start": 12,
+    "end": 18,
+    "calls": [
+      "New",
+      "p.Scores",
+      "sample",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestActualEightBlockedCausalEventsLearnPenalty",
+    "kind": "function",
+    "file": "research/native/itd02/r2/affordance_test.go",
+    "start": 19,
+    "end": 29,
+    "calls": [
+      "New",
+      "p.Choose",
+      "p.Observe",
+      "p.Scores",
+      "p.Scores",
+      "sample",
+      "sample",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestOnlySelectedActionAndTransactionalInvalid",
+    "kind": "function",
+    "file": "research/native/itd02/r2/affordance_test.go",
+    "start": 30,
+    "end": 37,
+    "calls": [
+      "New",
+      "bytes.Equal",
+      "p.Observe",
+      "p.Observe",
+      "p.Snapshot",
+      "p.Snapshot",
+      "sample",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestAuthenticationAndColdRestart",
+    "kind": "function",
+    "file": "research/native/itd02/r2/affordance_test.go",
+    "start": 38,
+    "end": 59,
+    "calls": [
+      "New",
+      "Restore",
+      "Restore",
+      "Restore",
+      "append",
+      "bytes.Equal",
+      "bytes.Replace",
+      "cmd.CombinedOutput",
+      "exec.Command",
+      "os.Environ",
+      "os.Getenv",
+      "os.Getenv",
+      "p.Choose",
+      "p.Choose",
+      "p.Observe",
+      "p.Snapshot",
+      "restored.Choose",
+      "sample",
+      "sample",
+      "strconv.Atoi",
+      "strconv.Itoa",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestSourceIsNotNavigationSuccess",
+    "kind": "function",
+    "file": "research/native/itd02/r2/affordance_test.go",
+    "start": 60,
+    "end": 60,
+    "calls": [
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "Schema",
+    "kind": "const",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 20,
+    "end": 20
+  },
+  {
+    "name": "MaxCells",
+    "kind": "const",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 21,
+    "end": 21
+  },
+  {
+    "name": "MaxNodes",
+    "kind": "const",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 22,
+    "end": 22
+  },
+  {
+    "name": "MinEffectObservations",
+    "kind": "const",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 23,
+    "end": 23
+  },
+  {
+    "name": "Effect",
+    "kind": "type",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 27,
+    "end": 32
+  },
+  {
+    "name": "Consequences",
+    "kind": "type",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 33,
+    "end": 36
+  },
+  {
+    "name": "CellEvidence",
+    "kind": "type",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 39,
+    "end": 43
+  },
+  {
+    "name": "Policy",
+    "kind": "type",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 44,
+    "end": 49
+  },
+  {
+    "name": "New",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 50,
+    "end": 50,
+    "calls": [
+      "make",
+      "r2.New"
+    ]
+  },
+  {
+    "name": "legal",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 51,
+    "end": 55
+  },
+  {
+    "name": "valid",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 56,
+    "end": 81,
+    "calls": [
+      "int",
+      "int",
+      "int",
+      "len",
+      "uint64",
+      "uint64",
+      "uint64",
+      "uint64"
+    ]
+  },
+  {
+    "name": "poseKey",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 82,
+    "end": 82,
+    "calls": [
+      "uint32"
+    ]
+  },
+  {
+    "name": "effectKey",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 83,
+    "end": 86
+  },
+  {
+    "name": "same",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 87,
+    "end": 87
+  },
+  {
+    "name": "updateConsequences",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 88,
+    "end": 100,
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "same"
+    ]
+  },
+  {
+    "name": "Observe",
+    "kind": "method",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 103,
+    "end": 128,
+    "receiver": "Policy",
+    "calls": [
+      "effectKey",
+      "effectKey",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "int8",
+      "int8",
+      "legal",
+      "legal",
+      "len",
+      "make",
+      "math.Abs",
+      "math.IsInf",
+      "math.IsNaN",
+      "nextCore.Observe",
+      "poseKey",
+      "uint8",
+      "updateConsequences",
+      "valid"
+    ]
+  },
+  {
+    "name": "Predict",
+    "kind": "method",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 131,
+    "end": 144,
+    "receiver": "Policy",
+    "calls": [
+      "effectKey",
+      "errors.New",
+      "int",
+      "int",
+      "int",
+      "legal",
+      "poseKey",
+      "uint64",
+      "uint64",
+      "valid"
+    ]
+  },
+  {
+    "name": "routeNode",
+    "kind": "type",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 145,
+    "end": 149
+  },
+  {
+    "name": "Plan",
+    "kind": "method",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 154,
+    "end": 176,
+    "receiver": "Policy",
+    "calls": [
+      "append",
+      "errors.New",
+      "legal",
+      "len",
+      "len",
+      "p.Predict",
+      "poseKey",
+      "poseKey",
+      "valid"
+    ]
+  },
+  {
+    "name": "Choose",
+    "kind": "method",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 177,
+    "end": 181,
+    "receiver": "Policy",
+    "calls": [
+      "p.Plan"
+    ]
+  },
+  {
+    "name": "payload",
+    "kind": "type",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 182,
+    "end": 187
+  },
+  {
+    "name": "signed",
+    "kind": "type",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 188,
+    "end": 192
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 193,
+    "end": 200,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.Marshal",
+      "sha256.Sum256",
+      "valid"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions.go",
+    "start": 201,
+    "end": 217,
+    "calls": [
+      "bytes.NewReader",
+      "d.Decode",
+      "d.Decode",
+      "d.DisallowUnknownFields",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.NewDecoder",
+      "len",
+      "len",
+      "make",
+      "new",
+      "r2.Restore",
+      "sha256.Sum256",
+      "valid"
+    ]
+  },
+  {
+    "name": "state",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions_test.go",
+    "start": 15,
+    "end": 17
+  },
+  {
+    "name": "afterTestFixture",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions_test.go",
+    "start": 20,
+    "end": 31
+  },
+  {
+    "name": "teachAll",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions_test.go",
+    "start": 32,
+    "end": 45,
+    "calls": [
+      "afterTestFixture",
+      "p.Observe",
+      "state",
+      "t.Fatalf",
+      "t.Helper"
+    ]
+  },
+  {
+    "name": "TestZeroSourceActionsNoHardcodedWorld",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions_test.go",
+    "start": 46,
+    "end": 54,
+    "calls": [
+      "New",
+      "len",
+      "p.Choose",
+      "p.Plan",
+      "state",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestLearnedActionsCanPlanWithoutHardcodedDynamics",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions_test.go",
+    "start": 55,
+    "end": 75,
+    "calls": [
+      "New",
+      "p.Plan",
+      "p.Plan",
+      "p.Plan",
+      "p.Predict",
+      "p.Predict",
+      "state",
+      "state",
+      "state",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "teachAll"
+    ]
+  },
+  {
+    "name": "TestConflictingNativeObservationsReviseLocalCell",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions_test.go",
+    "start": 76,
+    "end": 90,
+    "calls": [
+      "New",
+      "afterTestFixture",
+      "p.Observe",
+      "p.Observe",
+      "p.Predict",
+      "p.Predict",
+      "poseKey",
+      "state",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestInvalidIsTransactionalAndBoundsAreReal",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions_test.go",
+    "start": 91,
+    "end": 150,
+    "calls": [
+      "New",
+      "New",
+      "New",
+      "alter.mutate",
+      "bytes.Equal",
+      "effectKey",
+      "effectKey",
+      "math.NaN",
+      "p.Observe",
+      "p.Plan",
+      "p.Predict",
+      "p.Snapshot",
+      "p.Snapshot",
+      "p.Snapshot",
+      "p.Snapshot",
+      "poseKey",
+      "poseKey",
+      "state",
+      "state",
+      "state",
+      "state",
+      "state",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Run",
+      "teachAll",
+      "teachAll"
+    ]
+  },
+  {
+    "name": "TestStrictModelCheckpointTamperAndColdOSRestart",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions_test.go",
+    "start": 151,
+    "end": 179,
+    "calls": [
+      "New",
+      "Restore",
+      "Restore",
+      "Restore",
+      "Restore",
+      "append",
+      "append",
+      "append",
+      "byte",
+      "bytes.Equal",
+      "cmd.CombinedOutput",
+      "exec.Command",
+      "float64",
+      "json.Marshal",
+      "json.Unmarshal",
+      "os.Environ",
+      "os.Getenv",
+      "os.Getenv",
+      "p.Choose",
+      "p.Choose",
+      "p.Snapshot",
+      "restored.Choose",
+      "restored.Snapshot",
+      "state",
+      "state",
+      "strconv.Atoi",
+      "strconv.Itoa",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "teachAll"
+    ]
+  },
+  {
+    "name": "TestIncompleteSourceNoPrematurePlanning",
+    "kind": "function",
+    "file": "research/native/itd02/r3/transitions_test.go",
+    "start": 180,
+    "end": 186,
+    "calls": [
+      "New",
+      "afterTestFixture",
+      "p.Observe",
+      "p.Plan",
+      "p.Predict",
+      "state",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "Schema",
+    "kind": "const",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 17,
+    "end": 17
+  },
+  {
+    "name": "MaxEpisodeSteps",
+    "kind": "const",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 18,
+    "end": 18
+  },
+  {
+    "name": "MaxEpisodeCells",
+    "kind": "const",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 19,
+    "end": 19
+  },
+  {
+    "name": "MaxEpisodePoses",
+    "kind": "const",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 20,
+    "end": 20
+  },
+  {
+    "name": "FrontierDepth",
+    "kind": "const",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 21,
+    "end": 21
+  },
+  {
+    "name": "FrontierNodes",
+    "kind": "const",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 22,
+    "end": 22
+  },
+  {
+    "name": "StallTrigger",
+    "kind": "const",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 23,
+    "end": 23
+  },
+  {
+    "name": "PoseEvidence",
+    "kind": "type",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 25,
+    "end": 28
+  },
+  {
+    "name": "Episode",
+    "kind": "type",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 29,
+    "end": 37
+  },
+  {
+    "name": "Policy",
+    "kind": "type",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 38,
+    "end": 41
+  },
+  {
+    "name": "New",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 42,
+    "end": 42,
+    "calls": [
+      "newEpisode",
+      "r3.New"
+    ]
+  },
+  {
+    "name": "newEpisode",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 43,
+    "end": 46,
+    "calls": [
+      "make",
+      "make"
+    ]
+  },
+  {
+    "name": "cellKey",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 47,
+    "end": 47,
+    "calls": [
+      "uint32"
+    ]
+  },
+  {
+    "name": "poseKey",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 48,
+    "end": 48,
+    "calls": [
+      "cellKey",
+      "uint32"
+    ]
+  },
+  {
+    "name": "legal",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 49,
+    "end": 53
+  },
+  {
+    "name": "valid",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 54,
+    "end": 75,
+    "calls": [
+      "legal",
+      "len",
+      "len",
+      "uint16",
+      "uint64",
+      "uint64",
+      "uint64",
+      "uint64"
+    ]
+  },
+  {
+    "name": "BeginEpisode",
+    "kind": "method",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 77,
+    "end": 81,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "newEpisode",
+      "valid"
+    ]
+  },
+  {
+    "name": "seenBlocked",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 82,
+    "end": 85,
+    "calls": [
+      "poseKey"
+    ]
+  },
+  {
+    "name": "predictEpisode",
+    "kind": "method",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 86,
+    "end": 96,
+    "receiver": "Policy",
+    "calls": [
+      "seenBlocked",
+      "seenBlocked"
+    ]
+  },
+  {
+    "name": "node",
+    "kind": "type",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 97,
+    "end": 97
+  },
+  {
+    "name": "manhattan",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 98,
+    "end": 102
+  },
+  {
+    "name": "frontier",
+    "kind": "method",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 105,
+    "end": 134,
+    "receiver": "Policy",
+    "calls": [
+      "append",
+      "cellKey",
+      "int",
+      "len",
+      "len",
+      "manhattan",
+      "p.predictEpisode",
+      "poseKey",
+      "poseKey"
+    ]
+  },
+  {
+    "name": "Choose",
+    "kind": "method",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 137,
+    "end": 154,
+    "receiver": "Policy",
+    "calls": [
+      "cellKey",
+      "errors.New",
+      "errors.New",
+      "legal",
+      "p.frontier",
+      "valid"
+    ]
+  },
+  {
+    "name": "Feedback",
+    "kind": "method",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 157,
+    "end": 188,
+    "receiver": "Policy",
+    "calls": [
+      "cellKey",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "legal",
+      "legal",
+      "len",
+      "len",
+      "make",
+      "make",
+      "poseKey",
+      "uint16",
+      "uint16",
+      "uint16",
+      "valid"
+    ]
+  },
+  {
+    "name": "ObserveFit",
+    "kind": "method",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 191,
+    "end": 196,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "valid"
+    ]
+  },
+  {
+    "name": "snapshotData",
+    "kind": "type",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 197,
+    "end": 200
+  },
+  {
+    "name": "envelope",
+    "kind": "type",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 201,
+    "end": 205
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 206,
+    "end": 213,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.Marshal",
+      "sha256.Sum256",
+      "valid"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier.go",
+    "start": 214,
+    "end": 231,
+    "calls": [
+      "bytes.NewReader",
+      "d.Decode",
+      "d.Decode",
+      "d.DisallowUnknownFields",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.NewDecoder",
+      "len",
+      "len",
+      "make",
+      "make",
+      "new",
+      "r3.Restore",
+      "sha256.Sum256",
+      "valid"
+    ]
+  },
+  {
+    "name": "sample",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier_test.go",
+    "start": 12,
+    "end": 14
+  },
+  {
+    "name": "trainingEffect",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier_test.go",
+    "start": 15,
+    "end": 25
+  },
+  {
+    "name": "teach",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier_test.go",
+    "start": 26,
+    "end": 40,
+    "calls": [
+      "p.ObserveFit",
+      "sample",
+      "t.Fatalf",
+      "t.Helper",
+      "trainingEffect"
+    ]
+  },
+  {
+    "name": "TestNoUnseenPhysicsOrEpisodeInterleaving",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier_test.go",
+    "start": 41,
+    "end": 54,
+    "calls": [
+      "New",
+      "p.BeginEpisode",
+      "p.Choose",
+      "p.Choose",
+      "p.Feedback",
+      "p.Feedback",
+      "p.ObserveFit",
+      "sample",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestStalledPublicWorldCanLookForUnseenFrontier",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier_test.go",
+    "start": 55,
+    "end": 79,
+    "calls": [
+      "New",
+      "p.Choose",
+      "p.Choose",
+      "p.Feedback",
+      "p.Feedback",
+      "p.frontier",
+      "sample",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "teach",
+      "trainingEffect",
+      "trainingEffect"
+    ]
+  },
+  {
+    "name": "TestSourceCorrectionAndResetNotOldTrainingWall",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier_test.go",
+    "start": 80,
+    "end": 99,
+    "calls": [
+      "New",
+      "bytes.Equal",
+      "len",
+      "len",
+      "p.BeginEpisode",
+      "p.Choose",
+      "p.Feedback",
+      "sample",
+      "seenBlocked",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "teach",
+      "trainingEffect"
+    ]
+  },
+  {
+    "name": "TestRejectedSessionEventsAtomic",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier_test.go",
+    "start": 100,
+    "end": 119,
+    "calls": [
+      "New",
+      "bytes.Equal",
+      "p.BeginEpisode",
+      "p.BeginEpisode",
+      "p.Choose",
+      "p.Feedback",
+      "p.Feedback",
+      "p.Snapshot",
+      "p.Snapshot",
+      "sample",
+      "sample",
+      "sample",
+      "sample",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "teach",
+      "trainingEffect"
+    ]
+  },
+  {
+    "name": "TestSourceLocalColdProcessAndCheckpointIntegrity",
+    "kind": "function",
+    "file": "research/native/itd02/r4/frontier_test.go",
+    "start": 120,
+    "end": 153,
+    "calls": [
+      "New",
+      "Restore",
+      "Restore",
+      "Restore",
+      "Restore",
+      "append",
+      "append",
+      "append",
+      "byte",
+      "bytes.Equal",
+      "cmd.CombinedOutput",
+      "exec.Command",
+      "json.Marshal",
+      "json.Unmarshal",
+      "len",
+      "os.Environ",
+      "os.Getenv",
+      "os.ReadFile",
+      "os.WriteFile",
+      "p.Choose",
+      "p.Choose",
+      "p.Feedback",
+      "p.Snapshot",
+      "restored.Snapshot",
+      "sample",
+      "sample",
+      "strconv.Itoa",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.TempDir",
+      "teach",
+      "trainingEffect"
+    ]
+  },
+  {
+    "name": "Schema",
+    "kind": "const",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 12,
+    "end": 12
+  },
+  {
+    "name": "MaxNodes",
+    "kind": "const",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 13,
+    "end": 13
+  },
+  {
+    "name": "MaxDepth",
+    "kind": "const",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 14,
+    "end": 14
+  },
+  {
+    "name": "StallTrigger",
+    "kind": "const",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 15,
+    "end": 15
+  },
+  {
+    "name": "travelStepWeight",
+    "kind": "const",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 20,
+    "end": 20
+  },
+  {
+    "name": "goalDistanceWeight",
+    "kind": "const",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 21,
+    "end": 21
+  },
+  {
+    "name": "cellVisitWeight",
+    "kind": "const",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 22,
+    "end": 22
+  },
+  {
+    "name": "turnStepWeight",
+    "kind": "const",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 23,
+    "end": 23
+  },
+  {
+    "name": "unvisitedBonus",
+    "kind": "const",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 24,
+    "end": 24
+  },
+  {
+    "name": "blockedForwardWeight",
+    "kind": "const",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 25,
+    "end": 25
+  },
+  {
+    "name": "Policy",
+    "kind": "type",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 27,
+    "end": 27
+  },
+  {
+    "name": "New",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 28,
+    "end": 28,
+    "calls": [
+      "r4.New"
+    ]
+  },
+  {
+    "name": "legal",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 29,
+    "end": 33
+  },
+  {
+    "name": "cellKey",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 34,
+    "end": 34,
+    "calls": [
+      "uint32"
+    ]
+  },
+  {
+    "name": "poseKey",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 35,
+    "end": 35,
+    "calls": [
+      "cellKey",
+      "uint32"
+    ]
+  },
+  {
+    "name": "md",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 36,
+    "end": 40
+  },
+  {
+    "name": "ObserveFit",
+    "kind": "method",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 41,
+    "end": 44,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New"
+    ]
+  },
+  {
+    "name": "BeginEpisode",
+    "kind": "method",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 45,
+    "end": 48,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New"
+    ]
+  },
+  {
+    "name": "Feedback",
+    "kind": "method",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 49,
+    "end": 52,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New"
+    ]
+  },
+  {
+    "name": "route",
+    "kind": "type",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 53,
+    "end": 58
+  },
+  {
+    "name": "predict",
+    "kind": "method",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 61,
+    "end": 69,
+    "receiver": "Policy",
+    "calls": [
+      "poseKey",
+      "poseKey"
+    ]
+  },
+  {
+    "name": "chooseFrontier",
+    "kind": "method",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 73,
+    "end": 106,
+    "receiver": "Policy",
+    "calls": [
+      "append",
+      "cellKey",
+      "cellKey",
+      "int",
+      "len",
+      "len",
+      "len",
+      "md",
+      "p.predict",
+      "poseKey",
+      "poseKey"
+    ]
+  },
+  {
+    "name": "Choose",
+    "kind": "method",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 109,
+    "end": 129,
+    "receiver": "Policy",
+    "calls": [
+      "cellKey",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "legal",
+      "p.chooseFrontier"
+    ]
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 130,
+    "end": 133,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier.go",
+    "start": 134,
+    "end": 138,
+    "calls": [
+      "r4.Restore"
+    ]
+  },
+  {
+    "name": "observation",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier_test.go",
+    "start": 10,
+    "end": 12
+  },
+  {
+    "name": "observedConsequence",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier_test.go",
+    "start": 13,
+    "end": 24
+  },
+  {
+    "name": "train",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier_test.go",
+    "start": 25,
+    "end": 37,
+    "calls": [
+      "observation",
+      "observedConsequence",
+      "p.ObserveFit",
+      "t.Fatal",
+      "t.Helper"
+    ]
+  },
+  {
+    "name": "TestUntrainedWorldCannotInventActionPhysics",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier_test.go",
+    "start": 38,
+    "end": 49,
+    "calls": [
+      "New",
+      "observation",
+      "observedConsequence",
+      "p.Choose",
+      "p.Choose",
+      "p.Feedback",
+      "p.Feedback",
+      "p.chooseFrontier",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestSourceOnlyCostFrontierIsBoundedAndDistinct",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier_test.go",
+    "start": 50,
+    "end": 70,
+    "calls": [
+      "New",
+      "bytes.Equal",
+      "len",
+      "observation",
+      "observedConsequence",
+      "observedConsequence",
+      "p.BeginEpisode",
+      "p.Choose",
+      "p.Choose",
+      "p.Feedback",
+      "p.Feedback",
+      "p.chooseFrontier",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "train"
+    ]
+  },
+  {
+    "name": "TestColdProcessPreservesTrainingAndActualEpisodicCustody",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier_test.go",
+    "start": 71,
+    "end": 99,
+    "calls": [
+      "New",
+      "Restore",
+      "Restore",
+      "Restore",
+      "append",
+      "append",
+      "append",
+      "byte",
+      "bytes.Equal",
+      "c.CombinedOutput",
+      "exec.Command",
+      "observation",
+      "observation",
+      "observedConsequence",
+      "os.Environ",
+      "os.Getenv",
+      "os.ReadFile",
+      "os.WriteFile",
+      "p.Choose",
+      "p.Choose",
+      "p.Feedback",
+      "p.Snapshot",
+      "q.Snapshot",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.TempDir",
+      "train"
+    ]
+  },
+  {
+    "name": "TestInvalidPublicObservationAndOriginalModelNoGo",
+    "kind": "function",
+    "file": "research/native/itd02/r5/cost_frontier_test.go",
+    "start": 100,
+    "end": 119,
+    "calls": [
+      "New",
+      "bytes.Equal",
+      "observation",
+      "observation",
+      "observation",
+      "observation",
+      "observedConsequence",
+      "observedConsequence",
+      "p.Choose",
+      "p.Choose",
+      "p.Feedback",
+      "p.ObserveFit",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "train"
+    ]
+  },
+  {
+    "name": "Schema",
+    "kind": "const",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 18,
+    "end": 18
+  },
+  {
+    "name": "MaxEvidence",
+    "kind": "const",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 19,
+    "end": 19
+  },
+  {
+    "name": "MinTurnSamples",
+    "kind": "const",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 20,
+    "end": 20
+  },
+  {
+    "name": "Bin",
+    "kind": "type",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 23,
+    "end": 26
+  },
+  {
+    "name": "count",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 27,
+    "end": 27,
+    "receiver": "Bin",
+    "calls": [
+      "uint64",
+      "uint64"
+    ]
+  },
+  {
+    "name": "risk",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 28,
+    "end": 30,
+    "receiver": "Bin",
+    "calls": [
+      "float64",
+      "float64",
+      "v.count"
+    ]
+  },
+  {
+    "name": "Policy",
+    "kind": "type",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 34,
+    "end": 45
+  },
+  {
+    "name": "New",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 46,
+    "end": 46,
+    "calls": [
+      "r5.New"
+    ]
+  },
+  {
+    "name": "validPublic",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 47,
+    "end": 51
+  },
+  {
+    "name": "ctx",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 52,
+    "end": 56
+  },
+  {
+    "name": "stateValid",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 57,
+    "end": 70,
+    "receiver": "Policy",
+    "calls": [
+      "v.count"
+    ]
+  },
+  {
+    "name": "Healthy",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 71,
+    "end": 75,
+    "receiver": "Policy",
+    "calls": [
+      "p.stateValid"
+    ]
+  },
+  {
+    "name": "canAdd",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 76,
+    "end": 82,
+    "receiver": "Policy"
+  },
+  {
+    "name": "record",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 83,
+    "end": 89,
+    "receiver": "Policy"
+  },
+  {
+    "name": "ObserveFit",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 93,
+    "end": 106,
+    "receiver": "Policy",
+    "calls": [
+      "ctx",
+      "errors.New",
+      "errors.New",
+      "p.canAdd",
+      "p.record",
+      "p.stateValid",
+      "uint8",
+      "validPublic",
+      "validPublic"
+    ]
+  },
+  {
+    "name": "BeginEpisode",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 108,
+    "end": 114,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "p.stateValid"
+    ]
+  },
+  {
+    "name": "EligiblePrediction",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 118,
+    "end": 124,
+    "receiver": "Policy",
+    "calls": [
+      "ctx",
+      "errors.New",
+      "left.count",
+      "left.risk",
+      "p.Healthy",
+      "right.count",
+      "right.risk",
+      "validPublic"
+    ]
+  },
+  {
+    "name": "Choose",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 125,
+    "end": 153,
+    "receiver": "Policy",
+    "calls": [
+      "ctx",
+      "errors.New",
+      "left.count",
+      "left.risk",
+      "p.Healthy",
+      "right.count",
+      "right.risk",
+      "validPublic"
+    ]
+  },
+  {
+    "name": "Feedback",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 154,
+    "end": 170,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "errors.New",
+      "p.canAdd",
+      "p.record",
+      "p.stateValid",
+      "uint8",
+      "validPublic",
+      "validPublic"
+    ]
+  },
+  {
+    "name": "state",
+    "kind": "type",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 172,
+    "end": 183
+  },
+  {
+    "name": "envelope",
+    "kind": "type",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 184,
+    "end": 188
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 189,
+    "end": 199,
+    "receiver": "Policy",
+    "calls": [
+      "errors.New",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.Marshal",
+      "p.stateValid",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs.go",
+    "start": 200,
+    "end": 221,
+    "calls": [
+      "bytes.Equal",
+      "bytes.NewReader",
+      "dec.Decode",
+      "dec.Decode",
+      "dec.DisallowUnknownFields",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.Marshal",
+      "json.NewDecoder",
+      "len",
+      "len",
+      "new",
+      "p.Healthy",
+      "r5.Restore",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "public",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs_test.go",
+    "start": 12,
+    "end": 14
+  },
+  {
+    "name": "actualTurn",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs_test.go",
+    "start": 15,
+    "end": 21
+  },
+  {
+    "name": "fitRealPublicAPI",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs_test.go",
+    "start": 22,
+    "end": 36,
+    "calls": [
+      "actualTurn",
+      "p.ObserveFit",
+      "public",
+      "t.Fatalf",
+      "t.Helper"
+    ]
+  },
+  {
+    "name": "TestNativeLearnerActuallyChangesSelectedAction",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs_test.go",
+    "start": 37,
+    "end": 54,
+    "calls": [
+      "New",
+      "actualTurn",
+      "baseline.Choose",
+      "fitRealPublicAPI",
+      "p.Choose",
+      "p.Choose",
+      "p.EligiblePrediction",
+      "p.Feedback",
+      "p.Healthy",
+      "p.Healthy",
+      "public",
+      "r5.Restore",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestLearningContradictoryReturnsRevisesNativeChoice",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs_test.go",
+    "start": 55,
+    "end": 67,
+    "calls": [
+      "New",
+      "fitRealPublicAPI",
+      "fitRealPublicAPI",
+      "p.Choose",
+      "p.EligiblePrediction",
+      "p.EligiblePrediction",
+      "public",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUntrainedContextDelegatesExactOriginalR5",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs_test.go",
+    "start": 68,
+    "end": 80,
+    "calls": [
+      "New",
+      "actualTurn",
+      "baseline.Choose",
+      "bytes.Equal",
+      "p.Choose",
+      "p.Feedback",
+      "p.Feedback",
+      "p.Snapshot",
+      "p.Snapshot",
+      "public",
+      "r5.Restore",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestRejectedFitCannotCorruptNativeR5OrBelief",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs_test.go",
+    "start": 81,
+    "end": 88,
+    "calls": [
+      "New",
+      "actualTurn",
+      "bytes.Equal",
+      "p.ObserveFit",
+      "p.Snapshot",
+      "p.Snapshot",
+      "public",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestConventionalEqualPublicPosteriorTies",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs_test.go",
+    "start": 89,
+    "end": 104,
+    "calls": [
+      "New",
+      "fitRealPublicAPI",
+      "float64",
+      "float64",
+      "float64",
+      "float64",
+      "p.EligiblePrediction",
+      "public",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestRealFreshProcessColdRestoreAndNativeSourceCompatibility",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs_test.go",
+    "start": 105,
+    "end": 129,
+    "calls": [
+      "New",
+      "Restore",
+      "Restore",
+      "Restore",
+      "append",
+      "append",
+      "append",
+      "byte",
+      "bytes.Equal",
+      "bytes.Equal",
+      "cmd.CombinedOutput",
+      "exec.Command",
+      "fitRealPublicAPI",
+      "os.Environ",
+      "os.Getenv",
+      "os.ReadFile",
+      "os.WriteFile",
+      "p.Choose",
+      "p.Healthy",
+      "p.Snapshot",
+      "public",
+      "q.Snapshot",
+      "r5.Restore",
+      "restoredR5.Snapshot",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.TempDir"
+    ]
+  },
+  {
+    "name": "TestExplicitEpisodeResetRetainsCausalLearning",
+    "kind": "function",
+    "file": "research/native/itd02/r8/online_beliefs_test.go",
+    "start": 130,
+    "end": 143,
+    "calls": [
+      "New",
+      "actualTurn",
+      "bytes.Equal",
+      "fitRealPublicAPI",
+      "p.BeginEpisode",
+      "p.Choose",
+      "p.Choose",
+      "p.Feedback",
+      "p.Healthy",
+      "public",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "maxWireRequest",
+    "kind": "const",
+    "file": "research/native/itd02/r8bridge/main.go",
+    "start": 20,
+    "end": 20
+  },
+  {
+    "name": "Request",
+    "kind": "type",
+    "file": "research/native/itd02/r8bridge/main.go",
+    "start": 22,
+    "end": 30
+  },
+  {
+    "name": "Reply",
+    "kind": "type",
+    "file": "research/native/itd02/r8bridge/main.go",
+    "start": 31,
+    "end": 38
+  },
+  {
+    "name": "decodePublic",
+    "kind": "function",
+    "file": "research/native/itd02/r8bridge/main.go",
+    "start": 39,
+    "end": 46,
+    "calls": [
+      "bytes.NewReader",
+      "dec.Decode",
+      "dec.Decode",
+      "dec.DisallowUnknownFields",
+      "errors.New",
+      "json.NewDecoder",
+      "new"
+    ]
+  },
+  {
+    "name": "process",
+    "kind": "function",
+    "file": "research/native/itd02/r8bridge/main.go",
+    "start": 50,
+    "end": 96,
+    "calls": [
+      "err.Error",
+      "errors.New",
+      "errors.New",
+      "r8.Restore",
+      "v.BeginEpisode",
+      "v.Choose",
+      "v.Feedback",
+      "v.ObserveFit",
+      "v.Snapshot"
+    ]
+  },
+  {
+    "name": "serve",
+    "kind": "function",
+    "file": "research/native/itd02/r8bridge/main.go",
+    "start": 98,
+    "end": 117,
+    "calls": [
+      "append",
+      "bufio.NewScanner",
+      "bufio.NewWriter",
+      "bw.Flush",
+      "bw.Write",
+      "decodePublic",
+      "err.Error",
+      "json.Marshal",
+      "make",
+      "process",
+      "r8.New",
+      "sc.Buffer",
+      "sc.Bytes",
+      "sc.Err",
+      "sc.Scan"
+    ]
+  },
+  {
+    "name": "main",
+    "kind": "function",
+    "file": "research/native/itd02/r8bridge/main.go",
+    "start": 118,
+    "end": 123,
+    "calls": [
+      "fmt.Fprintln",
+      "os.Exit",
+      "serve"
+    ]
+  },
+  {
+    "name": "wireTestPublic",
+    "kind": "function",
+    "file": "research/native/itd02/r8bridge/main_test.go",
+    "start": 15,
+    "end": 17
+  },
+  {
+    "name": "wireTurn",
+    "kind": "function",
+    "file": "research/native/itd02/r8bridge/main_test.go",
+    "start": 18,
+    "end": 24
+  },
+  {
+    "name": "TestWireMalformedQuitDoesNotTerminatePendingState",
+    "kind": "function",
+    "file": "research/native/itd02/r8bridge/main_test.go",
+    "start": 25,
+    "end": 44,
+    "calls": [
+      "json.Unmarshal",
+      "len",
+      "len",
+      "output.String",
+      "serve",
+      "strings.Join",
+      "strings.NewReader",
+      "strings.Split",
+      "strings.TrimSpace",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestNativeR8FitChangesActionAndRetainsAcrossRestart",
+    "kind": "function",
+    "file": "research/native/itd02/r8bridge/main_test.go",
+    "start": 45,
+    "end": 91,
+    "calls": [
+      "bytes.Equal",
+      "cold.Healthy",
+      "old.Choose",
+      "p.Healthy",
+      "p.Healthy",
+      "p.Snapshot",
+      "p.Snapshot",
+      "p.Snapshot",
+      "process",
+      "process",
+      "process",
+      "process",
+      "process",
+      "process",
+      "process",
+      "process",
+      "process",
+      "process",
+      "r5.Restore",
+      "r8.New",
+      "r8.New",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "wireTestPublic",
+      "wireTurn",
+      "wireTurn",
+      "wireTurn"
+    ]
+  },
+  {
+    "name": "TestPublicWireStrictness",
+    "kind": "function",
+    "file": "research/native/itd02/r8bridge/main_test.go",
+    "start": 92,
+    "end": 101,
+    "calls": [
+      "decodePublic",
+      "t.Fatalf"
     ]
   },
   {
