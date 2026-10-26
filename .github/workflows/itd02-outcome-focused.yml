@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - research/itd02-selected-outcome-learner-20261026
+  pull_request:
+    paths:
+      - 'research/native/itd02/outcome/**'
+      - '.github/workflows/itd02-outcome-focused.yml'
 permissions:
   contents: read
 jobs:
