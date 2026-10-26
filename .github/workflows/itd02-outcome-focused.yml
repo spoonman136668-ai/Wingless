@@ -1,0 +1,28 @@
+name: ITD-02 isolated outcome learner focused qualification
+on:
+  push:
+    branches:
+      - research/itd02-selected-outcome-learner-20261026
+permissions:
+  contents: read
+jobs:
+  outcome-focused:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Focused native outcome tests
+        run: go test -count=1 -v ./research/native/itd02/outcome
+      - name: Vet and build native outcome
+        run: |
+          go vet ./research/native/itd02/outcome
+          go build ./research/native/itd02/outcome
+      - name: Race safety on Linux
+        if: runner.os == 'Linux'
+        run: go test -race -count=1 ./research/native/itd02/outcome
