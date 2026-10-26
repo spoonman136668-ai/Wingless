@@ -1013,7 +1013,7 @@
     },
     {
       "path": "research/native/itd02/outcome/selected.go",
-      "sha256": "cd5919c2720fb9356810cba9c4dcccf3f4720b7192a0d5386d8c77bfbc9dd206",
+      "sha256": "857ea434718ea9cb2e3189a954b3f6b50db43d94f6290d7a9307929078888c80",
       "package": "outcome",
       "imports": [
         "errors",
@@ -1047,7 +1047,7 @@
     },
     {
       "path": "research/native/itd02/outcome/selected_test.go",
-      "sha256": "d191e4f73ea99d49d1b8099ec3957df295b3e623e304636a0faa9a6d86baab0d",
+      "sha256": "cddd43c8427ff89688695de144945cdd3ae59b4de9e06fda236cfec103239aa0",
       "package": "outcome",
       "imports": [
         "bytes",
@@ -6066,6 +6066,20 @@
       "receiver": "Selected"
     },
     {
+      "name": "RecommendRewardAction",
+      "kind": "method",
+      "file": "research/native/itd02/outcome/selected.go",
+      "start": 63,
+      "end": 79,
+      "receiver": "Selected",
+      "calls": [
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New"
+      ]
+    },
+    {
       "name": "SelectedSchema",
       "kind": "const",
       "file": "research/native/itd02/outcome/selected_checkpoint.go",
@@ -6254,6 +6268,26 @@
         "t.Fatal",
         "t.Fatal",
         "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestRewardRecommendationCustodyAndEvidence",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/selected_test.go",
+      "start": 46,
+      "end": 61,
+      "calls": [
+        "NewSelected",
+        "s.RecommendRewardAction",
+        "s.RecommendRewardAction",
+        "s.RecommendRewardAction",
+        "s.RecommendRewardAction",
+        "s.RecommendRewardAction",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf"
       ]
     },
     {
