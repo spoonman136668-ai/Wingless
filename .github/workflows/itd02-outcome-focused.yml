@@ -46,7 +46,11 @@ jobs:
           git diff --binary -- .ice > "$RUNNER_TEMP/itd02-ice-index.patch"
           git diff --stat -- .ice > "$RUNNER_TEMP/itd02-ice-index-stat.txt"
           git diff --name-only -- .ice > "$RUNNER_TEMP/itd02-ice-index-files.txt"
-          test -s "$RUNNER_TEMP/itd02-ice-index.patch"
+          if test -s "$RUNNER_TEMP/itd02-ice-index.patch"; then
+            echo "ICE_INDEX_DELTA_PRESENT=true"
+          else
+            echo "ICE_INDEX_ALREADY_FRESH=true"
+          fi
       - name: Package generated delta and index
         run: tar -czf "$RUNNER_TEMP/itd02-ice-index.tar.gz" .ice
       - uses: actions/upload-artifact@v4
