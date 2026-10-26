@@ -56,3 +56,24 @@ func (s *Selected) RewardEvidence(action int) (float64, bool) {
  if s == nil || s.Rewards == nil { return 0, false }
  return s.Rewards.Value(action)
 }
+
+ // RecommendRewardAction is advisory: R8 remains the only selected-action
+ // custodian. A recommendation requires comparable observations for every
+ // available action and cannot be made during pending or closed transitions.
+func (s *Selected) RecommendRewardAction(minCount uint32) (int,error) {
+ if s==nil||s.Policy==nil||s.Rewards==nil||!s.Rewards.Valid()||s.Policy.Armed||s.Rewards.Closed||minCount<2 {
+  return -1,errors.New("OUTCOME_RECOMMENDATION_UNAVAILABLE")
+ }
+ best:=-1
+ var bestValue float64
+ ties:=0
+ for a,b:=range s.Rewards.Bins {
+  if b.Count<minCount{return -1,errors.New("OUTCOME_INSUFFICIENT_EVIDENCE")}
+  v,ok:=s.Rewards.Value(a)
+  if !ok{return -1,errors.New("OUTCOME_INVALID_EVIDENCE")}
+  if best<0||v>bestValue{best=a;bestValue=v;ties=1
+  }else if v==bestValue{ties++}
+ }
+ if ties!=1{return -1,errors.New("OUTCOME_REWARD_TIE")}
+ return best,nil
+}
