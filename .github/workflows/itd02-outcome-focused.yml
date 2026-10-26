@@ -30,3 +30,24 @@ jobs:
       - name: Race safety on Linux
         if: runner.os == 'Linux'
         run: go test -race -count=1 ./research/native/itd02/outcome
+  ice-index-artifact:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Rebuild ICE in disposable checkout
+        run: |
+          go run ./cmd/ice build
+          go run ./cmd/ice validate
+      - name: Package only regenerated ICE index
+        run: |
+          test -d .ice
+          tar -czf "$RUNNER_TEMP/itd02-ice-index.tar.gz" .ice
+          git status --short -- .ice
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itd02-ice-index
+          path: ${{ runner.temp }}/itd02-ice-index.tar.gz
+          retention-days: 3
