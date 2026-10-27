@@ -47,3 +47,21 @@ func TestSelectedCheckpointRejectsCorruptionAndMismatchedCounts(t *testing.T){
 }
 
 func sha256Sum(raw []byte)[32]byte{return sha256.Sum256(raw)}
+
+func TestSelectedObservedRewardEvidenceSurvivesColdRestart(t *testing.T) {
+ s:=NewSelected()
+ before:=selectedFixture()
+ action,err:=s.Policy.Choose(before);if err!=nil{t.Fatal(err)}
+ after:=before
+ if action==0 {after.Direction=3} else if action==1 {after.Direction=1}
+ if err:=s.Feedback(before,action,after,Event{ID:1,Action:action,Reward:7,Terminal:true});err!=nil{t.Fatal(err)}
+ original,ok:=s.RewardEvidence(action)
+ if !ok||original!=7{t.Fatalf("unexpected original reward evidence %v %v",original,ok)}
+ raw,err:=s.SnapshotSelected();if err!=nil{t.Fatal(err)}
+ restored,err:=RestoreSelected(raw);if err!=nil{t.Fatal(err)}
+ got,ok:=restored.RewardEvidence(action)
+ if !ok||got!=original{t.Fatalf("cold restart changed selected reward evidence %v %v",got,ok)}
+ if _,err:=restored.RecommendRewardAction(2);err==nil {
+  t.Fatal("accepted unsupported reward recommendation after restart")
+ }
+}
