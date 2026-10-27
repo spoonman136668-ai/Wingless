@@ -1,0 +1,48 @@
+name: Isolated Wingless R8 ICE snapshot repair
+on:
+  push:
+    branches: [repair/itd02-r8-ice-snapshot-20261027]
+permissions:
+  contents: read
+jobs:
+  reindex:
+    if: github.event.head_commit.message == 'Arm isolated Wingless R8 ICE snapshot'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Rebuild only canonical ICE on isolated source
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=e9e358bbb600bf5a4e6ec98e71b2e36fa1b943e9
+          SOURCE="$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "$SOURCE"
+          test -z "$(git status --porcelain)"
+          git merge-base --is-ancestor "$BASE" "$SOURCE"
+          test "$(git rev-list --count "$BASE..$SOURCE")" = 1
+          test "$(git diff --name-only "$BASE" "$SOURCE")" = ".github/workflows/itd02-r8-ice-isolated-reanchor.yml"
+          test "$(git rev-parse "$BASE:ice/index.go")" = "$(git rev-parse HEAD:ice/index.go)"
+          go run ./cmd/ice build
+          go run ./cmd/ice validate
+          git add -- .ice
+          test -n "$(git diff --cached --name-only)"
+          if git diff --cached --name-only | grep -v '^\.ice/'; then echo 'OUT_OF_SCOPE_STAGED_CHANGE'; exit 1; fi
+          git diff --exit-code
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Rebuild canonical Wingless R8 ICE from $SOURCE"
+          go run ./cmd/ice validate
+          git diff --exit-code
+          git push origin HEAD:refs/heads/repair/itd02-r8-ice-snapshot-20261027
+          echo "ICE_SOURCE=$SOURCE"
+          echo "ICE_ARTIFACT_COMMIT=$(git rev-parse HEAD)"
