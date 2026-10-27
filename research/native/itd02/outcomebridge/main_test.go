@@ -111,3 +111,46 @@ func TestContextBridgeLineProtocolRoundTripAcrossFreshServer(t *testing.T) {
   t.Fatalf("fresh server failed exact checkpoint retention: %+v %+v",loaded,restored)
  }
 }
+
+func TestContextBridgeMalformedWireCannotConsumePendingSelection(t *testing.T){
+ before:=publicGrid()
+ native:=outcome.NewContextSelected()
+ action,err:=native.Choose(before,2)
+ if err!=nil{t.Fatal(err)}
+ after:=before
+ if action==0{after.Direction=3}else if action==1{after.Direction=1}
+ requests:=[]string{}
+ appendRequest:=func(req Request){
+  raw,err:=json.Marshal(req);if err!=nil{t.Fatal(err)}
+  requests=append(requests,string(raw))
+ }
+ appendRequest(Request{Op:"choose",Before:before,MinCount:2})
+ requests=append(requests,`{"op":"feedback","private_map":true}`)
+ requests=append(requests,`{"op":"feedback"} {"op":"quit"}`)
+ appendRequest(Request{Op:"feedback",Before:before,After:after,Action:(action+1)%3,EventID:1,Reward:99})
+ appendRequest(Request{Op:"feedback",Before:before,After:after,Action:action,EventID:1,Reward:7,Terminal:true})
+ appendRequest(Request{Op:"snapshot"})
+ appendRequest(Request{Op:"quit"})
+ var result bytes.Buffer
+ if err:=serve(strings.NewReader(strings.Join(requests,"\n")+"\n"),&result);err!=nil{t.Fatal(err)}
+ lines:=bytes.Split(bytes.TrimSpace(result.Bytes()),[]byte{10})
+ if len(lines)!=len(requests){t.Fatalf("expected %d responses, got %d",len(requests),len(lines))}
+ replies:=make([]Reply,len(lines))
+ for i,line:=range lines{
+  if err:=json.Unmarshal(line,&replies[i]);err!=nil{t.Fatalf("response %d: %v",i,err)}
+ }
+ if !replies[0].OK||replies[0].Action==nil||*replies[0].Action!=action{
+  t.Fatal("initial chosen action mismatch")
+ }
+ for i:=1;i<=3;i++{
+  if replies[i].OK||replies[i].Error==""{t.Fatalf("rejected wire %d accepted: %+v",i,replies[i])}
+ }
+ if !replies[4].OK||replies[4].Updates!=1||!replies[5].OK{
+  t.Fatal("valid feedback after rejected requests was not conserved")
+ }
+ raw,err:=base64.StdEncoding.DecodeString(replies[5].State);if err!=nil{t.Fatal(err)}
+ restored,err:=outcome.RestoreContextSelected(raw);if err!=nil{t.Fatal(err)}
+ if restored.Bins[1][action].Count!=1||restored.Bins[1][action].Sum!=7{
+  t.Fatal("rejected wire altered legitimate selected reward evidence")
+ }
+}
