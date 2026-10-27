@@ -120,3 +120,56 @@ func TestContextSelectedRevisesBlockedFrontRewardAfterContradictions(t *testing.
  a,err:=cold.Choose(before,2)
  if err!=nil||a!=1{t.Fatalf("cold restart failed revised blocked-front action: %d %v",a,err)}
 }
+
+func TestContextSelectedMatchedPublicInformationOppositeRewards(t *testing.T){
+ // Both learners encounter the same public observations and selected-action
+ // coverage. Only the reward assignments differ; this is an engineering
+ // discrimination control, not an authenticated source-world experiment.
+ learners:=[2]*ContextSelected{NewContextSelected(),NewContextSelected()}
+ base:=selectedFixture()
+ for i:=0;i<12;i++ {
+  observation:=base
+  observation.FrontBlocked=i%2==1
+  var observedAction int
+  for k,c:=range learners {
+   action,err:=c.Choose(observation,2)
+   if err!=nil{t.Fatalf("learner %d choose %d: %v",k,i,err)}
+   if k==0{observedAction=action}else if action!=observedAction{
+    t.Fatalf("matched public observations selected different exploration actions at %d",i)
+   }
+   after:=observation
+   if action==0{after.Direction=(observation.Direction+3)%4
+   }else if action==1{after.Direction=(observation.Direction+1)%4}
+   preferred:=contextIndex(observation)
+   if k==1{preferred=1-preferred}
+   reward:=float64(0)
+   if action==preferred{reward=10}
+   if err:=c.Feedback(observation,action,after,Event{ID:uint64(i+1),Action:action,Reward:reward,Terminal:true});err!=nil{
+    t.Fatalf("learner %d feedback %d: %v",k,i,err)
+   }
+   if err:=c.BeginEpisode();err!=nil{t.Fatal(err)}
+  }
+ }
+ for ctx:=0;ctx<2;ctx++{
+  fresh:=base
+  fresh.X=3+ctx
+  fresh.Y=17+ctx
+  fresh.GoalX=48
+  fresh.GoalY=50
+  fresh.Direction=2
+  fresh.FrontBlocked=ctx==1
+  for k,c:=range learners{
+   raw,err:=c.Snapshot();if err!=nil{t.Fatal(err)}
+   cold,err:=RestoreContextSelected(raw);if err!=nil{t.Fatal(err)}
+   action,err:=cold.Choose(fresh,2);if err!=nil{t.Fatal(err)}
+   expected:=ctx
+   if k==1{expected=1-ctx}
+   if action!=expected{
+    t.Fatalf("control learner %d context %d chose %d, want %d",k,ctx,action,expected)
+   }
+   if !cold.Base.Policy.Armed||cold.Base.Policy.Core.Core.Route.Before!=fresh{
+    t.Fatal("matched-control selected action bypassed native pending custody")
+   }
+  }
+ }
+}
