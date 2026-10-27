@@ -66,6 +66,9 @@ func TestNativeSelfTrainingEndToEndColdRestart(t *testing.T){
     for i,b:=range model.Rewards.Bins{
         if b.Count!=2{t.Fatalf("action %d selected %d times",i,b.Count)}
     }
+    // Reward recommendations require an open episode boundary. Source
+    // feedback above has legitimately sealed the sixth terminal event.
+    if err:=model.BeginEpisode();err!=nil{t.Fatal(err)}
     chosen,err:=model.RecommendRewardAction(2)
     if err!=nil||chosen!=preferred{t.Fatalf("did not learn reward advantage %d, want %d: %v",chosen,preferred,err)}
     last,_,err:=(&TrainingSession{Learner:model,MinimumSelectedSamples:2,
