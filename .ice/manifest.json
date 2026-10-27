@@ -1047,7 +1047,7 @@
     },
     {
       "path": "research/native/itd02/outcome/selected_test.go",
-      "sha256": "99b9f7d26ab429a3182292439e868e176afa2d84fc165d9352e713eb21c56c36",
+      "sha256": "76f9a9404c240f1987bfc52f7ac7c17f5ed09c21b5526841eb6fbb2b409a8af2",
       "package": "outcome",
       "imports": [
         "bytes",
@@ -6341,6 +6341,41 @@
       "calls": [
         "NewSelected",
         "s.SnapshotSelected",
+        "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestRewardAwareUntrainedChoiceUsesNativeCustody",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/selected_test.go",
+      "start": 72,
+      "end": 87,
+      "calls": [
+        "NewSelected",
+        "NewSelected",
+        "RestoreSelected",
+        "s.ChooseRewardAware",
+        "s.SnapshotSelected",
+        "selectedFixture",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf"
+      ]
+    },
+    {
+      "name": "TestRewardAwareRejectsUnownedEvidenceWithoutArming",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/selected_test.go",
+      "start": 89,
+      "end": 97,
+      "calls": [
+        "NewSelected",
+        "s.ChooseRewardAware",
+        "selectedFixture",
+        "t.Fatal",
         "t.Fatal"
       ]
     },
