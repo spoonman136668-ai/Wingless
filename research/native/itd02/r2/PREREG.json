@@ -1,0 +1,39 @@
+{
+  "schema": "itd02.r2.frozen-public-action-affordance-firstuse-v1",
+  "component": "Wingless",
+  "parent_commit": "cd108800054e7964af845137f0d9d37fae69f5a7",
+  "parent_r1_source_blob": "8d1845d82dd8578a709b00e8841bdc5edc8dbc10",
+  "origin": "K4X original PR #882, run #40102959097 public trajectories showed >95% native forward actions issued at blocked fronts in FourRooms",
+  "hypothesis": "Original R1 public Go policy plus source-learned Bernoulli outcome counts for forward at a visibly blocked front. Only after at least eight real blocked-forward source events may a probabilistic progress-failure penalty influence all three original action scores. No geometric rule hardcodes a selected turn.",
+  "public_input": {
+    "source": "real MiniGrid FullyObsWrapper initial and terminal observation transformed to original R1 PublicGrid x,y,goal x,y,direction,FrontBlocked",
+    "actions": [
+      0,
+      1,
+      2
+    ],
+    "outcome": "only selected real env.step action, exact before and after positions, observed reward and terminal"
+  },
+  "mechanism": "Separate learned blocked-forward conditional success frequencies; no avoidance prior. Posterior source success = (successes+1)/(attempts+2), only after >=8 blocked-source samples. Penalize forward original R1 score by 8*(1-posterior), capped at 8; all actual legal actions remain selectable, reject nonsense and authenticate learned durable snapshot.",
+  "qualification": [
+    "Native source returns valid 0,1,2 before and after FIT",
+    "Do not hardcode avoidance without source observation",
+    "After a bounded actual public no-motion FIT sequence, native candidate measurably lowers blocked-forward score/selection",
+    "Unblocked forward is not penalized merely because nearby contexts were blocked",
+    "Only action observed learns, failed invalid calls transactional",
+    "Independent cold OS process checkpoint restores action preferences",
+    "All new fields source-only, no retroactive use of consumed K4X DEV",
+    "No new MiniGrid physics for this phase; source-only candidate tests"
+  ],
+  "prospective_next": "In FORGE independently freeze new FIT/CHECK/DEV seeds not K4X 7300-9307; evaluate source-matched R1 ablation versus R2 actual native source, 2 families, learned dynamics+BFS, tabular Q, public expert, random, full traces, report blocked-forward and actual goal success, CPU/checkpoint, not merely motor preference. No K4X DEV tuning. Do not claim planning/credit breakthrough from avoidance alone.",
+  "governance": {
+    "source_only": true,
+    "scientific_first_use": false,
+    "scientific_accepted": false,
+    "do_not_change_F139_CKB_FSA": true,
+    "original_R1_immutable": true,
+    "no_paid_API": true,
+    "no_protected_merge": true,
+    "draft": true
+  }
+}
