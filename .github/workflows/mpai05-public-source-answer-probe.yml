@@ -1,0 +1,88 @@
+name: MP-AI05 public-source answer quality compression probe
+on:
+  push:
+    branches: [qualification/mpai05-nemotron-public-probe-20261027]
+    paths: ['.github/workflows/mpai05-public-source-answer-probe.yml']
+permissions:
+  contents: read
+jobs:
+  answer-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: spoonman136668-ai/FORGE
+          ref: ca373bbab0ab297b79c9073de7e78d96ddf26903
+          path: forge
+          persist-credentials: false
+      - name: Paired Nemotron answers from complete versus selected public documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib,re,time,urllib.request,urllib.error
+          key=os.environ.get('WINGLESS_REASONER_OPENROUTER_API_KEY','')
+          if not key: raise SystemExit('MPAI05_NO_EXISTING_NEMOTRON_KEY')
+          model='nvidia/nemotron-3-ultra-550b-a55b:free'
+          doc=pathlib.Path('forge/docs/MPAI05-ON-DEMAND-CONSUMER.md').read_text()
+          assert 'one-shot read-only consumer operating boundary' in doc
+          source='https://github.com/spoonman136668-ai/FORGE/blob/ca373bbab0ab297b79c9073de7e78d96ddf26903/docs/MPAI05-ON-DEMAND-CONSUMER.md'
+          blocks=[s.strip() for s in doc.split('\n\n') if s.strip()]
+          tasks=[
+           ('Which mode serves the original result while comparing a normalized candidate?','shadow'),
+           ('Does merging the CLI globally activate the eligible mode?','no'),
+           ('What is the exact 40-character Mind-Palace source commit for the pinned operational run?','7ad7230a82e3c748aa5336b7288ad2b45d42630c'),
+           ('How many matches did eligible mode produce in the operational test?','2')
+          ]
+          def select(question):
+            tokens={t for t in re.findall('[a-z0-9]+',question.lower()) if len(t)>3}
+            ranked=sorted(enumerate(blocks),key=lambda kv:(-len(tokens.intersection(re.findall('[a-z0-9]+',kv[1].lower()))),kv[0]))
+            return '\n\n'.join(blocks[i] for i,_ in ranked[:3])
+          rows=[]
+          for i,(question,expected) in enumerate(tasks):
+            for arm in (['full','selected'] if i%2==0 else ['selected','full']):
+              ctx=doc if arm=='full' else select(question)
+              prompt=('Answer using only this PUBLIC FORGE documentation. Reply as JSON with keys answer (string) '
+                'and source_url (exact document URL). If not supported say INSUFFICIENT. '
+                'QUESTION: '+question+'\nSOURCE_URL: '+source+'\nDOCUMENT: '+ctx)
+              data=json.dumps({'model':model,'messages':[{'role':'user','content':prompt}],
+                'temperature':0,'max_tokens':180,'reasoning':{'enabled':False}}).encode()
+              req=urllib.request.Request('https://openrouter.ai/api/v1/chat/completions',data=data,
+                headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'})
+              started=time.monotonic()
+              try:
+                with urllib.request.urlopen(req,timeout=90) as response: obj=json.load(response)
+              except urllib.error.HTTPError as ex:
+                print('MPAI05_PUBLIC_ANSWER_HTTP='+str(ex.code))
+                raise SystemExit(1)
+              raw=str(obj['choices'][0]['message'].get('content') or '').strip()
+              try:
+                parsed=json.loads(raw.removeprefix('```json').removeprefix('```').removesuffix('```').strip())
+                answer=str(parsed.get('answer','')).lower()
+                if i==1:
+                  accurate=any(w in answer for w in ('no','not','false','does not'))
+                else:
+                  accurate=expected.lower() in answer
+                grounded=parsed.get('source_url')==source
+              except (ValueError,TypeError,AttributeError):
+                accurate=False;grounded=False
+              usage=obj.get('usage') or {}
+              row={'task':i+1,'arm':arm,'accurate':bool(accurate),'source_grounded':bool(grounded),
+                'answer_pass':bool(accurate and grounded),'bytes':len(ctx.encode()),
+                'total_tokens':usage.get('total_tokens'),
+                'latency_ms':round(1000*(time.monotonic()-started))}
+              rows.append(row)
+              print('MPAI05_PUBLIC_DOC_ANSWER_RECEIPT='+json.dumps(row,sort_keys=True))
+          for arm in ('full','selected'):
+            a=[r for r in rows if r['arm']==arm]
+            print('MPAI05_PUBLIC_DOC_SUMMARY='+json.dumps({'arm':arm,'correct':sum(x['answer_pass'] for x in a),
+              'tasks':len(a),'bytes':sum(x['bytes'] for x in a),'tokens':sum(x['total_tokens'] or 0 for x in a)},sort_keys=True))
+          print('MPAI05_REAL_MODEL_CALLS='+str(len(rows)))
+          print('MPAI05_SOURCE=PUBLIC_FORGE_DOCUMENTATION')
+          print('MPAI05_PRIVATE_MP_DATA_SENT=FALSE')
+          print('MPAI05_ACTUAL_TIERED_RETRIEVAL_TESTED=FALSE')
+          print('MPAI05_SCIENTIFIC_ACCEPTANCE=NOT_TESTED')
+          PY
