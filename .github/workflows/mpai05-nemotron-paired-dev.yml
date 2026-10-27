@@ -1,0 +1,96 @@
+name: MP-AI05 Nemotron paired public-fixture development
+on:
+  push:
+    branches: [qualification/mpai05-nemotron-public-probe-20261027]
+    paths: ['.github/workflows/mpai05-nemotron-paired-dev.yml']
+permissions:
+  contents: read
+jobs:
+  paired-dev:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: spoonman136668-ai/FORGE
+          ref: ca373bbab0ab297b79c9073de7e78d96ddf26903
+          path: forge
+          persist-credentials: false
+      - name: Four Nemotron calls using actual FORGE opt-in retrieval adapter on synthetic fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, pathlib, sys, time, urllib.error, urllib.request
+          sys.path.insert(0,str(pathlib.Path('forge/tools').resolve()))
+          from mpai05_retrieval_consumer import recall_with_normalizer
+          key=os.environ.get('WINGLESS_REASONER_OPENROUTER_API_KEY','')
+          if not key: raise SystemExit('MPAI05_NO_EXISTING_SECRET')
+          model='nvidia/nemotron-3-ultra-550b-a55b:free'
+          assert model.endswith(':free')
+          # Completely synthetic, public evaluation facts; no private MP snapshot or holdout.
+          cases=[
+            {'topic':'Quartz build cutoff','question':'Can you find the saved memory related to Quartz build cutoff and explain the original evidence?',
+             'answer':'Thursday 14:00 UTC','ref':'public-fixture:quartz-17'},
+            {'topic':'Harbor test window','question':'I am trying to remember something from an earlier conversation about Harbor test window. Would you check the context and tell me whether any relevant notes were recorded?',
+             'answer':'Tuesday 09:30 UTC','ref':'public-fixture:harbor-23'},
+          ]
+          sha='0'*40
+          class FakeSnapshot:
+            def recall(self,source_sha,query,projects,profile):
+              if source_sha!=sha or projects!=['Mind-Palace']: raise ValueError('fixture boundary failed')
+              core=next((t for t in cases if query==t['topic']),None)
+              if core:
+                matches=[{'id':core['ref'],'source_refs':[core['ref']],
+                  'text':core['topic']+' is '+core['answer']+'. This is the recorded schedule.'}]
+              else:
+                matches=[{'id':'public-fixture:generic','source_refs':['public-fixture:generic'],
+                  'text':'The public synthetic planning index includes project notes but no timing evidence in this match.'}]
+              return {'source_sha':source_sha,'matches':matches}
+          rows=[]
+          for i,t in enumerate(cases):
+            for arm in (['off','eligible'] if i==0 else ['eligible','off']):
+              began=time.monotonic()
+              out=recall_with_normalizer(FakeSnapshot(),sha,t['question'],['Mind-Palace'],
+                                          'continuation',enabled=(arm=='eligible'))
+              docs=out['result']['matches']
+              prompt=('This is a PUBLIC SYNTHETIC TEST. Using ONLY the supplied records, answer the question. '
+                'If evidence is insufficient answer INSUFFICIENT. Give exactly JSON with fields '
+                'answer and source_refs (array of citation strings). Do not invent source references. '
+                'QUESTION: '+t['question']+' RECORDS: '+json.dumps(docs,sort_keys=True))
+              payload=json.dumps({'model':model,'messages':[{'role':'user','content':prompt}],
+                'temperature':0,'max_tokens':180,'reasoning':{'enabled':False}}).encode()
+              req=urllib.request.Request('https://openrouter.ai/api/v1/chat/completions',data=payload,
+                headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'})
+              try:
+                with urllib.request.urlopen(req,timeout=95) as response: obj=json.load(response)
+              except urllib.error.HTTPError as e:
+                print('MPAI05_PAIRED_DEV_BLOCKED_HTTP='+str(e.code))
+                raise SystemExit(1)
+              raw=str(obj['choices'][0]['message'].get('content') or '').strip()
+              clean=raw.removeprefix('```json').removeprefix('```').removesuffix('```').strip()
+              try:
+                parsed=json.loads(clean)
+                answer=str(parsed.get('answer',''))
+                refs=parsed.get('source_refs',[])
+                grounded=isinstance(refs,list) and all(isinstance(r,str) and r in
+                  {s for doc in docs for s in doc['source_refs']} for r in refs)
+                correct=t['answer'].lower() in answer.lower() and t['ref'] in refs and grounded
+              except (ValueError,TypeError,AttributeError):
+                correct=False; grounded=False
+              usage=obj.get('usage') or {}
+              row={'task':i+1,'arm':arm,'routing':out['routing'],'correct_grounded':correct,
+                'citations_grounded':grounded,'latency_ms':round((time.monotonic()-began)*1000),
+                'tokens':usage.get('total_tokens'),'record_count':len(docs)}
+              rows.append(row)
+              print('MPAI05_PUBLIC_DEV_RECEIPT='+json.dumps(row,sort_keys=True))
+          base=[r for r in rows if r['arm']=='off']; candidate=[r for r in rows if r['arm']=='eligible']
+          print('MPAI05_PUBLIC_DEV_REAL_MODEL_CALLS='+str(len(rows)))
+          print('MPAI05_PUBLIC_DEV_BASELINE_CORRECT='+str(sum(r['correct_grounded'] for r in base)))
+          print('MPAI05_PUBLIC_DEV_CANDIDATE_CORRECT='+str(sum(r['correct_grounded'] for r in candidate)))
+          print('MPAI05_PUBLIC_DEV_PAIRED_TASKS=2')
+          print('MPAI05_PRIVATE_MP_DATA_SENT=FALSE')
+          print('MPAI05_SCIENTIFIC_ACCEPTANCE=NOT_TESTED')
+          PY
