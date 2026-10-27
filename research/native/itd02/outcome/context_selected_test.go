@@ -43,6 +43,25 @@ func TestContextSelectedLearnsOppositePublicStatesAndRestores(t *testing.T){
   if !again.Base.Policy.Armed||again.Base.Policy.Core.Core.Route.Action!=chosen{
    t.Fatal("learned context action failed to arm native custody")
   }
+  // A distinct legal public pose and goal were never part of training.
+  // The only shared feature is the current source-public blocked flag.
+  fresh:=selectedFixture()
+  fresh.X=7+ctx
+  fresh.Y=13+ctx
+  fresh.GoalX=39
+  fresh.GoalY=41
+  fresh.Direction=2
+  fresh.FrontBlocked=ctx==1
+  transferred,err:=RestoreContextSelected(raw);if err!=nil{t.Fatal(err)}
+  selected,err:=transferred.Choose(fresh,2)
+  if err!=nil||selected!=ctx{
+   t.Fatalf("public-context generalization %d got %d: %v",ctx,selected,err)
+  }
+  if !transferred.Base.Policy.Armed||
+   transferred.Base.Policy.Core.Core.Route.Before!=fresh||
+   transferred.Base.Policy.Core.Core.Route.Action!=selected{
+   t.Fatal("generalized action bypassed original selected-action custody")
+  }
  }
  if !cold.valid(){t.Fatal("cold context learner invalid")}
 }
