@@ -68,6 +68,19 @@ class AdapterTests(unittest.TestCase):
         with self.assertRaises(source.SourceObservationError):
             source.decode_public(obs)
 
+    def test_indexable_nonbuiltin_integer_direction_only(self):
+        # Mimics a public NumPy scalar without importing optional MiniGrid.
+        class Scalar:
+            def __index__(self):
+                return 0
+        obs = public(direction=0)
+        obs["direction"] = Scalar()
+        self.assertEqual(source.decode_public(obs).direction, 0)
+        for value in (True, 0.0, "0"):
+            obs["direction"] = value
+            with self.assertRaises(source.SourceObservationError):
+                source.decode_public(obs)
+
     def test_goal_overlay_requires_prior_public_goal(self):
         obs = public(agent=(3, 3), goal=None)
         with self.assertRaises(source.SourceObservationError):
