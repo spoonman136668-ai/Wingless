@@ -1,7 +1,8 @@
 """Exploratory authentic-source discrimination: rewards vs zeroed rewards.
 
-NOT blinded held-out scientific evaluation: seed 19 is an already-observed
-successful seed. This gate measures whether real reward information changes
+Not blinded scientific evaluation: train seed 19 is already observed.
+Probe seeds 23/29/31/37 are newly predeclared but online probe feedback updates
+separate disposable instances; this is NOT a frozen-policy evaluation. This gate measures whether real reward information changes
 a native policy after cold restart, without making a transfer claim.
 """
 from __future__ import annotations
@@ -16,7 +17,7 @@ from minigrid_source import open_source_environment
 
 SOURCE = "MiniGrid-Empty-Random-5x5-v0"
 TRAIN_SEED = 19
-PROBE_SEEDS = (7, 11)
+PROBE_SEEDS = (23, 29, 31, 37)
 LIMIT = 64
 
 class MaskedOutcome(OutcomePolicy):
