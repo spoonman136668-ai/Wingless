@@ -82,7 +82,7 @@ func process(p **outcome.MotionSelected,r Request)(Reply,bool){
   raw,err=v.Snapshot()
   if err==nil{response.State=base64.StdEncoding.EncodeToString(raw)}
  case "load":
-  if v.Base!=nil&&v.Base.Policy!=nil&&v.Base.Base.Policy.Armed{
+  if v.Base!=nil&&v.Base.Base!=nil&&v.Base.Base.Policy!=nil&&v.Base.Base.Policy.Armed{
    err=errors.New("MOTION_LOAD_PENDING_SELECTED_ACTION")
    break
   }
@@ -94,7 +94,7 @@ func process(p **outcome.MotionSelected,r Request)(Reply,bool){
    if err==nil{*p=restored;v=restored}
   }
  case "quit":
-  if v.Base!=nil&&v.Base.Policy!=nil&&v.Base.Base.Policy.Armed{
+  if v.Base!=nil&&v.Base.Base!=nil&&v.Base.Base.Policy!=nil&&v.Base.Base.Policy.Armed{
    err=errors.New("MOTION_QUIT_PENDING_SELECTED_ACTION")
    break
   }
