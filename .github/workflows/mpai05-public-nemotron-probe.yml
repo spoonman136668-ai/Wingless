@@ -1,0 +1,45 @@
+name: MP-AI05 public Nemotron existing-secret probe
+on:
+  push:
+    branches: [qualification/mpai05-nemotron-public-probe-20261027]
+    paths: ['.github/workflows/mpai05-public-nemotron-probe.yml']
+permissions:
+  contents: read
+jobs:
+  public-free-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    steps:
+      - name: Invoke pre-existing free model with synthetic public text only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, urllib.request, urllib.error
+          key=os.environ.get('WINGLESS_REASONER_OPENROUTER_API_KEY','')
+          if not key:
+              print('MPAI05_NEMOTRON_REPO_SECRET=UNAVAILABLE')
+              raise SystemExit(0)
+          print('MPAI05_NEMOTRON_REPO_SECRET=PRESENT')
+          model='nvidia/nemotron-3-ultra-550b-a55b:free'
+          assert model.endswith(':free')
+          payload=json.dumps({'model':model,
+            'messages':[{'role':'user','content':'Public synthetic test. Reply only NEMOTRON_PROBE_OK.'}],
+            'max_tokens':32, 'temperature':0}).encode()
+          req=urllib.request.Request('https://openrouter.ai/api/v1/chat/completions',
+            data=payload,headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'})
+          try:
+              with urllib.request.urlopen(req,timeout=40) as res:
+                  obj=json.load(res)
+              answer=str(obj['choices'][0]['message'].get('content') or '').strip()
+              status='PASS' if answer=='NEMOTRON_PROBE_OK' else 'RESPONSE_NOT_EXACT'
+              print('MPAI05_NEMOTRON_PUBLIC_INFERENCE='+status)
+              print('MPAI05_NEMOTRON_PRIVATE_MP_DATA_SENT=FALSE')
+              print('MPAI05_NEMOTRON_REQUESTED_MODEL='+model)
+          except urllib.error.HTTPError as e:
+              print('MPAI05_NEMOTRON_PUBLIC_INFERENCE=HTTP_'+str(e.code))
+          except Exception as e:
+              print('MPAI05_NEMOTRON_PUBLIC_INFERENCE=CONNECTION_FAILED_'+type(e).__name__)
+          PY
