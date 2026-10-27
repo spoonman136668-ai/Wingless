@@ -41,7 +41,9 @@ class ControlsTests(unittest.TestCase):
         self.assertEqual(record["steps"], 2)
         self.assertEqual(env.calls, [0, 2])
         self.assertEqual(record["return"], 1.0)
-        self.assertTrue(record["completed"])\n        self.assertTrue(record["goal_reached"])\n        self.assertFalse(record["source_truncated"])
+        self.assertTrue(record["completed"])
+        self.assertTrue(record["goal_reached"])
+        self.assertFalse(record["source_truncated"])
         self.assertEqual(len(record["events_sha256"]), 64)
 
     def test_bound_exhaustion_not_false_terminal(self):
@@ -49,7 +51,8 @@ class ControlsTests(unittest.TestCase):
         policy = FixedPolicy()
         record = episode(env, policy, 7, 3)
         self.assertEqual(record["steps"], 3)
-        self.assertFalse(record["completed"])\n        self.assertFalse(record["goal_reached"])
+        self.assertFalse(record["completed"])
+        self.assertFalse(record["goal_reached"])
         self.assertFalse(record["events"][-1]["terminated"])
 
     def test_bad_selected_action_refused(self):
