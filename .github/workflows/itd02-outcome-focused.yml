@@ -74,6 +74,7 @@ jobs:
         run: |
           python -m unittest discover -s research/native/itd02/outcome -p 'test_minigrid_source.py' -v
           python -m unittest discover -s research/native/itd02/outcome -p 'test_ipc_source_runner.py' -v
+          python -m unittest discover -s research/native/itd02/outcome -p 'test_audit_source_evidence.py' -v
   source-minigrid-smoke:
     # Authentically executed one-seed engineering smoke only; not an experiment
     # claiming improved intelligence, held-out transfer, or scientific FSA.
@@ -93,6 +94,8 @@ jobs:
         run: go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
       - name: Execute bounded authentic source episode
         run: python research/native/itd02/outcome/ipc_source_runner.py --native-binary "$RUNNER_TEMP/itd02-outcomebridge" --environment MiniGrid-Empty-5x5-v0 --seeds 7 --max-steps 32 --output "$RUNNER_TEMP/itd02-source-smoke.json" --run-source
+      - name: Audit authentic source reward and completion evidence
+        run: python research/native/itd02/outcome/audit_source_evidence.py "$RUNNER_TEMP/itd02-source-smoke.json"
       - name: Check source evidence is explicitly engineering-only
         run: |
           python -c 'import json,os,pathlib; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-source-smoke.json"; e=json.loads(p.read_text()); assert e["science"]=="NOT_ACCEPTED" and e["status"]=="ENGINEERING_SOURCE_TRAINING_ONLY" and len(e["events"])>0 and e["events"][0]["event_id"]==1; print("SOURCE_SMOKE_EVIDENCE_PRESENT")'
