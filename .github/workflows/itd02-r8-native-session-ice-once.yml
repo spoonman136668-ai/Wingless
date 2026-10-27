@@ -1,0 +1,73 @@
+name: ITD-02 Wingless one-time native-session ICE rebuild
+on:
+  push:
+    branches:
+      - qualification/itd02-r8-native-session-ice-source-rebuild-20261027
+    paths:
+      - .github/workflows/itd02-r8-native-session-ice-once.yml
+permissions:
+  contents: write
+concurrency:
+  group: itd02-wingless-native-session-index-once
+  cancel-in-progress: false
+jobs:
+  source-index-rebuild:
+    if: ${{ github.actor == 'spoonman136668-ai' && github.run_attempt == 1 }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Verify original native session source and only additive workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          source='01ca1471b60616fe323dae2ecbc0f16d053b38f3'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor "$source" HEAD
+          test "$(git rev-list --count "$source"..HEAD)" = 1
+          test -z "$(git status --porcelain --untracked-files=all)"
+          actual="$(git diff --name-only "$source" HEAD)"
+          test "$actual" = '.github/workflows/itd02-r8-native-session-ice-once.yml'
+          echo 'WINGLESS_NATIVE_SESSION_EXACT_SOURCE_BOUND=PASS'
+      - name: Rebuild and independently inspect typed native source index
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/ice build
+          go run ./cmd/ice validate
+          go run ./cmd/ice relationships > "$RUNNER_TEMP/wingless-native-session-relationships.json"
+          python scripts/validate_code_atlas.py --root . --relationships "$RUNNER_TEMP/wingless-native-session-relationships.json"
+          go test -count=1 ./research/native/itd02/outcome ./research/native/itd02/r8
+          echo 'WINGLESS_NATIVE_SESSION_FOCUSED_INDEX=PASS'
+      - name: Commit only deterministic generated index files on isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = qualification/itd02-r8-native-session-ice-source-rebuild-20261027
+          git add -- .ice
+          test -n "$(git diff --cached --name-only)"
+          git diff --cached --name-only | while IFS= read -r path; do
+            case "$path" in
+              .ice/manifest.json|.ice/architecture-map.json|.ice/symbol-map.json|.ice/dependency-map.json|.ice/test-map.json|.ice/implementations.json|.ice/integration-seams.json|.ice/decisions.json) ;;
+              *) echo "UNEXPECTED_ICE_GENERATED_FILE=$path" >&2; exit 1 ;;
+            esac
+          done
+          test -z "$(git diff --name-only)"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'index(itd02): refresh native R8 selected-action learner ICE'
+          go run ./cmd/ice validate
+          test -z "$(git status --porcelain --untracked-files=all)"
+          git push origin HEAD:refs/heads/qualification/itd02-r8-native-session-ice-source-rebuild-20261027
+          echo 'WINGLESS_NATIVE_SESSION_ICE_REFRESH=PASS'
