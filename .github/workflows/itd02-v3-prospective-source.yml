@@ -1,0 +1,59 @@
+name: ITD-02 prospective v3 authentic exposure exploratory
+on:
+  push:
+    branches: [research/itd02-exact-exposure-v3-prespecified-seeds-20261027]
+    paths: ['.github/workflows/itd02-v3-prospective-source.yml']
+permissions:
+  contents: read
+jobs:
+  exact-authentic-exposure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+      - name: Verify no change to source beyond this dispatch workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=6b105a0e6eb2a06f2835001ebf24429363a2120d
+          git cat-file -e "$BASE^{commit}"
+          test "$(git diff --name-only "$BASE" HEAD)" = ".github/workflows/itd02-v3-prospective-source.yml"
+          git diff --exit-code
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install pinned authentic source dependencies
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Verify prospective seed protocol source-free
+        run: |
+          cd research/native/itd02/outcome
+          python -m unittest -v test_exact_exposure_v2 test_exact_exposure_v3
+      - name: Build original native learner bridge
+        run: go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Run exact genuine source training and frozen cross-family controls
+        run: python research/native/itd02/outcome/exact_exposure_v3.py --native-binary "$RUNNER_TEMP/itd02-outcomebridge" --output "$RUNNER_TEMP/itd02-exact-exposure-v3.json" --run-source
+      - name: Fail closed on exact counts and research authority
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-exact-exposure-v3.json").read_text())
+          assert r["science"]=="NOT_ACCEPTED"
+          assert r["training_interactions"]=={"reward_aware":256,"reward_blind":256,"linear_q":256}
+          assert r["train_seeds_allowed"]==list(range(1009,1520,2))
+          assert r["test_seeds"]==[229,233,239,241,251,257,263,269]
+          assert all(len(x)==8 for x in r["evaluation"].values())
+          print("V3_AUTHENTIC_EXACT_EXPOSURE_EXPLORATORY_ONLY")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: itd02-exact-exposure-v3-exploratory
+          path: ${{ runner.temp }}/itd02-exact-exposure-v3.json
+          if-no-files-found: warn
+          retention-days: 7

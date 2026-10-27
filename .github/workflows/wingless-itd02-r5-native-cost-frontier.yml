@@ -1,0 +1,57 @@
+name: Wingless ITD-02 R5 source-only cost-aware frontier qualification
+on:
+  push:
+    branches: [research/itd02-r5-cost-aware-frontier-20261025]
+permissions:
+  contents: read
+jobs:
+  native-r5-source-only:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 32
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Freeze before code, parent source pins
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor dd1e3b99334a977011e0d1fce8be5e156769b662 HEAD
+          test "$(git rev-parse 'dd1e3b99334a977011e0d1fce8be5e156769b662^')" = 1b1bea442027132df5acdf67b8353e9a5a3046f4
+          test "$(git hash-object research/native/itd02/r1/policy.go)" = 8d1845d82dd8578a709b00e8841bdc5edc8dbc10
+          test "$(git hash-object research/native/itd02/r2/affordance.go)" = e1564172079359ca4c450dcc87487a4733210584
+          test "$(git hash-object research/native/itd02/r3/transitions.go)" = 3c8a60a5037e6c0f04648ae53175ed1187b5f8ac
+          test "$(git hash-object research/native/itd02/r4/frontier.go)" = 61678ff1c95966151f1b1731fef62b804504cdf8
+          echo R5_ORIGINAL_R1_TO_R4_FROZEN_SOURCE=PASS
+      - name: Native R1 to R5 focused tests vet and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5
+          go vet ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5
+          go build ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5
+          echo R5_NATIVE_TEST_VET_BUILD=PASS
+      - name: Native source-only race
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -race -count=1 ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4 ./research/native/itd02/r5
+          echo R5_NATIVE_RACE=PASS
+      - name: Repository clean and source-only, no protected scientific evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo R5_ORIGINAL_WORLD_USE=NOT_PERFORMED
+          echo R5_SCIENTIFIC_ACCEPTANCE=NOT_CLAIMED
+          echo R5_REPO_CLEAN=PASS
