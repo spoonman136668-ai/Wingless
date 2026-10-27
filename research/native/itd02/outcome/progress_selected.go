@@ -15,7 +15,7 @@ import (
  r1 "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
 )
 
-const ProgressSchema="wingless.itd02.selected-goal-progress.v1"
+const ProgressSchema="wingless.itd02.selected-goal-progress.v2"
 type ProgressBin struct{
  Count uint32 `json:"count"`
  Sum int64 `json:"sum"`
@@ -72,22 +72,22 @@ func(p *ProgressSelected)Choose(before r1.PublicGrid,minCount uint32)(int,error)
  }
  context:=progressContext(before)
  row:=p.Bins[context]
+ // Sparse-context contract (V2): the native MotionSelected chooser owns
+ // exploration until authenticated POSITIVE goal-progress evidence exists
+ // in this very public context. Never require per-context turn coverage
+ // before allowing forward: that caused the v1 authentic turn-only failure.
  target:=-1
- for a,b:=range row {
-  if b.Count<minCount&&(target<0||b.Count<row[target].Count){target=a}
- }
- if target<0{
-  best:=-1
-  unique:=true
-  for a,b:=range row {
-   if best<0||b.Sum*int64(row[best].Count)>row[best].Sum*int64(b.Count){
-    best=a;unique=true
-   }else if b.Sum*int64(row[best].Count)==row[best].Sum*int64(b.Count){
-    unique=false
-   }
+ best:=-1
+ unique:=true
+ for a,b:=range row{
+  if b.Count<minCount||b.Sum<=0{continue}
+  if best<0||b.Sum*int64(row[best].Count)>row[best].Sum*int64(b.Count){
+   best=a;unique=true
+  }else if b.Sum*int64(row[best].Count)==row[best].Sum*int64(b.Count){
+   unique=false
   }
-  if unique&&best>=0 {target=best}
  }
+ if best>=0&&unique{target=best}
  // Preserve an unambiguous experienced external reward preference. Do not
  // replace learned reward evidence with engineered movement heuristics.
  prior:=p.Base.Base.Bins[contextIndex(before)]
