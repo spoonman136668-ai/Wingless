@@ -1007,6 +1007,15 @@
       ]
     },
     {
+      "path": "research/native/itd02/outcome/context_selected_test.go",
+      "sha256": "6eeb41dc737381c55bfe4954f80111712a5487fcb0be421fd1f6432f03ad1d9f",
+      "package": "outcome",
+      "imports": [
+        "bytes",
+        "testing"
+      ]
+    },
+    {
       "path": "research/native/itd02/outcome/ledger.go",
       "sha256": "6cf60d2ef1e6b5fcddd6bbc146183bf336bfb0e0f314d9fe480dfad8ffb882c0",
       "package": "outcome",
@@ -5957,6 +5966,65 @@
         "len",
         "new",
         "sha256.Sum256"
+      ]
+    },
+    {
+      "name": "TestContextSelectedLearnsOppositePublicStatesAndRestores",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/context_selected_test.go",
+      "start": 10,
+      "end": 48,
+      "calls": [
+        "NewContextSelected",
+        "RestoreContextSelected",
+        "RestoreContextSelected",
+        "again.Choose",
+        "c.BeginEpisode",
+        "c.Choose",
+        "c.Feedback",
+        "c.Snapshot",
+        "cold.valid",
+        "contextIndex",
+        "float64",
+        "selectedFixture",
+        "selectedFixture",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Fatalf",
+        "uint64"
+      ]
+    },
+    {
+      "name": "TestContextSelectedRejectedFeedbackAndCorruptionAreAtomic",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/context_selected_test.go",
+      "start": 50,
+      "end": 68,
+      "calls": [
+        "NewContextSelected",
+        "RestoreContextSelected",
+        "append",
+        "bytes.Equal",
+        "c.Choose",
+        "c.Feedback",
+        "c.Snapshot",
+        "c.Snapshot",
+        "len",
+        "selectedFixture",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal"
       ]
     },
     {
