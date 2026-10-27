@@ -149,7 +149,7 @@ def run_source_training(binary: str, environment_id: str, seeds: list[int],
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--native-binary", required=True)
-    parser.add_argument("--environment", choices=("MiniGrid-Empty-5x5-v0", "MiniGrid-Empty-8x8-v0"), required=True)
+    parser.add_argument("--environment", choices=("MiniGrid-Empty-5x5-v0", "MiniGrid-Empty-Random-5x5-v0", "MiniGrid-Empty-8x8-v0"), required=True)
     parser.add_argument("--seeds", type=int, nargs="+", required=True)
     parser.add_argument("--max-steps", type=int, default=100)
     parser.add_argument("--output", type=Path, required=True)
