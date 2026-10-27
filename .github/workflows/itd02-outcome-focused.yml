@@ -75,6 +75,7 @@ jobs:
           python -m unittest discover -s research/native/itd02/outcome -p 'test_minigrid_source.py' -v
           python -m unittest discover -s research/native/itd02/outcome -p 'test_ipc_source_runner.py' -v
           python -m unittest discover -s research/native/itd02/outcome -p 'test_audit_source_evidence.py' -v
+          python -m unittest discover -s research/native/itd02/outcome -p 'test_source_controls.py' -v
   source-minigrid-smoke:
     # Authentically executed one-seed engineering smoke only; not an experiment
     # claiming improved intelligence, held-out transfer, or scientific FSA.
@@ -104,5 +105,34 @@ jobs:
         with:
           name: itd02-source-smoke
           path: ${{ runner.temp }}/itd02-source-smoke.json
+          if-no-files-found: warn
+          retention-days: 7
+  source-controls-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install bounded public source environment
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Build both frozen R8 and outcome IPC executables
+        run: |
+          go build -o "$RUNNER_TEMP/itd02-r8bridge" ./research/native/itd02/r8bridge
+          go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Run authentic source-matched comparison without transfer claims
+        run: python research/native/itd02/outcome/source_controls.py --environment MiniGrid-Empty-5x5-v0 --seed 7 --max-steps 32 --outcome-binary "$RUNNER_TEMP/itd02-outcomebridge" --r8-binary "$RUNNER_TEMP/itd02-r8bridge" --output "$RUNNER_TEMP/itd02-source-controls.json" --run-source
+      - name: Verify bounded comparison evidence contains no acceptance claim
+        run: |
+          python -c 'import json,os,pathlib; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-source-controls.json"; r=json.loads(p.read_text()); assert r["scientific_acceptance"]=="NOT_ACCEPTED" and r["transfer"]=="NOT_TESTED" and set(r["controls"])=={"fixed","native_r8","contextual_outcome"}; assert all(0<v["steps"]<=32 for v in r["controls"].values()); print("MATCHED_SOURCE_CONTROLS_RECORDED")'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-source-controls
+          path: ${{ runner.temp }}/itd02-source-controls.json
           if-no-files-found: warn
           retention-days: 7
