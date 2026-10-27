@@ -1,0 +1,31 @@
+name: ITD-02 V2 sparse-context native regression
+on:
+  push:
+    branches: [research/itd02-goal-progress-sparse-repair-v2-20261027]
+    paths:
+      - 'research/native/itd02/outcome/progress_selected*'
+      - 'research/native/itd02/outcome/progress_sparse_v2_test.go'
+      - 'research/native/itd02/progressbridge/**'
+      - '.github/workflows/itd02-progress-v2-sourcefree.yml'
+permissions:
+  contents: read
+jobs:
+  native-progress:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Causal progress tests and original-custody regression
+        run: go test ./research/native/itd02/outcome ./research/native/itd02/motionbridge ./research/native/itd02/progressbridge -count=1 -v
+      - name: Vet source-public goal progress and native bridges
+        run: go vet ./research/native/itd02/outcome ./research/native/itd02/motionbridge ./research/native/itd02/progressbridge
+      - name: Build isolated new progress bridge
+        run: go build ./research/native/itd02/progressbridge
