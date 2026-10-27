@@ -66,3 +66,38 @@ func TestContextSelectedRejectedFeedbackAndCorruptionAreAtomic(t *testing.T){
   t.Fatal("corrupted context checkpoint accepted")
  }
 }
+
+func TestContextSelectedRevisesBlockedFrontRewardAfterContradictions(t *testing.T){
+ c:=NewContextSelected()
+ before:=selectedFixture()
+ for i:=0;i<80;i++{
+  action,err:=c.Choose(before,2)
+  if err!=nil{t.Fatalf("choose event %d: %v",i+1,err)}
+  after:=before
+  if action==0{after.Direction=(before.Direction+3)%4
+  }else if action==1{after.Direction=(before.Direction+1)%4}
+  reward:=float64(0)
+  if i<6{
+   if action==0{reward=9}
+  }else{
+   if action==0{reward= -9}
+   if action==1{reward=20}
+  }
+  if err:=c.Feedback(before,action,after,Event{ID:uint64(i+1),Action:action,Reward:reward,Terminal:true});err!=nil{
+   t.Fatalf("feedback event %d: %v",i+1,err)
+  }
+  if err:=c.BeginEpisode();err!=nil{t.Fatalf("reset %d: %v",i+1,err)}
+  if i==5 && c.Bins[1][0].Sum/float64(c.Bins[1][0].Count)!=9 {
+   t.Fatal("initial reward preference not learned")
+  }
+ }
+ if c.Bins[1][1].Count<=2{t.Fatal("context exploration stopped after initial coverage")}
+ if c.Bins[1][1].Sum/float64(c.Bins[1][1].Count)<=
+  c.Bins[1][0].Sum/float64(c.Bins[1][0].Count){
+  t.Fatal("contradictory selected feedback did not reverse reward preference")
+ }
+ raw,err:=c.Snapshot();if err!=nil{t.Fatal(err)}
+ cold,err:=RestoreContextSelected(raw);if err!=nil{t.Fatal(err)}
+ a,err:=cold.Choose(before,2)
+ if err!=nil||a!=1{t.Fatalf("cold restart failed revised blocked-front action: %d %v",a,err)}
+}
