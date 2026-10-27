@@ -185,3 +185,46 @@ func TestBalancedSelectedExplorationChangesRewardChoiceAfterEvidence(t *testing.
   t.Fatal("learned native choice failed to arm selected source custody")
  }
 }
+
+func TestSelectedRewardPreferenceRevisesAfterContradictoryOutcomes(t *testing.T) {
+ s:=NewSelected()
+ before:=selectedFixture()
+ native:=NewSelected()
+ nativeAction,err:=native.Policy.Choose(before);if err!=nil{t.Fatal(err)}
+ first:=(nativeAction+1)%3
+ revised:=(first+1)%3
+ observed:=[3]uint32{}
+ for i:=0;i<78;i++ {
+  action,err:=s.ChooseRewardExplore(before,2)
+  if err!=nil{t.Fatalf("exploration event %d: %v",i+1,err)}
+  observed[action]++
+  after:=before
+  if action==0{after.Direction=(before.Direction+3)%4
+  }else if action==1{after.Direction=(before.Direction+1)%4}
+  reward:=float64(0)
+  if i<6 {
+   if action==first{reward=9}
+  }else{
+   if action==first{reward= -9}
+   if action==revised{reward=20}
+  }
+  if err:=s.Feedback(before,action,after,Event{ID:uint64(i+1),Action:action,Reward:reward,Terminal:true});err!=nil{
+   t.Fatalf("selected contradictory feedback event %d: %v",i+1,err)
+  }
+  if err:=s.BeginEpisode();err!=nil{t.Fatal(err)}
+  if i==5{
+   a,e:=s.RecommendRewardAction(2)
+   if e!=nil||a!=first{t.Fatalf("initial learned action %d wanted %d: %v",a,first,e)}
+  }
+ }
+ for a,n:=range observed{if n<=2{t.Fatalf("no continuing selected exploration for action %d: %d",a,n)}}
+ a,err:=s.RecommendRewardAction(2)
+ if err!=nil||a!=revised{t.Fatalf("contradictory evidence not learned: got %d want %d: %v",a,revised,err)}
+ raw,err:=s.SnapshotSelected();if err!=nil{t.Fatal(err)}
+ cold,err:=RestoreSelected(raw);if err!=nil{t.Fatal(err)}
+ selected,err:=cold.ChooseRewardAware(before,2)
+ if err!=nil||selected!=revised{t.Fatalf("revised action not retained after cold restart: %d wanted %d: %v",selected,revised,err)}
+ if !cold.Policy.Armed||cold.Policy.Core.Core.Route.Action!=revised{
+  t.Fatal("revised action did not use native selected-action custody")
+ }
+}
