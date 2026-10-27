@@ -5319,6 +5319,96 @@
     ]
   },
   {
+    "name": "maxWireRequest",
+    "kind": "const",
+    "file": "research/native/itd02/outcomebridge/main.go",
+    "start": 19,
+    "end": 19
+  },
+  {
+    "name": "Request",
+    "kind": "type",
+    "file": "research/native/itd02/outcomebridge/main.go",
+    "start": 21,
+    "end": 32
+  },
+  {
+    "name": "Reply",
+    "kind": "type",
+    "file": "research/native/itd02/outcomebridge/main.go",
+    "start": 33,
+    "end": 39
+  },
+  {
+    "name": "decode",
+    "kind": "function",
+    "file": "research/native/itd02/outcomebridge/main.go",
+    "start": 40,
+    "end": 47,
+    "calls": [
+      "bytes.NewReader",
+      "d.Decode",
+      "d.Decode",
+      "d.DisallowUnknownFields",
+      "errors.New",
+      "json.NewDecoder",
+      "new"
+    ]
+  },
+  {
+    "name": "process",
+    "kind": "function",
+    "file": "research/native/itd02/outcomebridge/main.go",
+    "start": 48,
+    "end": 90,
+    "calls": [
+      "err.Error",
+      "errors.New",
+      "errors.New",
+      "outcome.RestoreContextSelected",
+      "v.BeginEpisode",
+      "v.Choose",
+      "v.Feedback",
+      "v.Snapshot"
+    ]
+  },
+  {
+    "name": "serve",
+    "kind": "function",
+    "file": "research/native/itd02/outcomebridge/main.go",
+    "start": 91,
+    "end": 110,
+    "calls": [
+      "append",
+      "bufio.NewScanner",
+      "bufio.NewWriter",
+      "bw.Flush",
+      "bw.Write",
+      "decode",
+      "err.Error",
+      "json.Marshal",
+      "make",
+      "outcome.NewContextSelected",
+      "process",
+      "scan.Buffer",
+      "scan.Bytes",
+      "scan.Err",
+      "scan.Scan"
+    ]
+  },
+  {
+    "name": "main",
+    "kind": "function",
+    "file": "research/native/itd02/outcomebridge/main.go",
+    "start": 111,
+    "end": 116,
+    "calls": [
+      "fmt.Fprintln",
+      "os.Exit",
+      "serve"
+    ]
+  },
+  {
     "name": "Schema",
     "kind": "const",
     "file": "research/native/itd02/r1/policy.go",
