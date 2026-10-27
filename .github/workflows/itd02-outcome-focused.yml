@@ -323,3 +323,42 @@ jobs:
           path: ${{ runner.temp }}/itd02-fourrooms-stateful.json
           if-no-files-found: warn
           retention-days: 7
+  source-conventional-linear-q:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source world
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Build native outcome learner
+        run: go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Execute preregistered conventional linear Q and native cross-family comparisons
+        run: python research/native/itd02/outcome/linear_q_crossfamily.py --native-binary "$RUNNER_TEMP/itd02-outcomebridge" --output "$RUNNER_TEMP/itd02-linear-q-crossfamily.json" --run-source
+      - name: Verify matched source and outcomes have no scientific approval
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-linear-q-crossfamily.json").read_text())
+          assert r["science"]=="NOT_ACCEPTED"
+          assert r["training_seeds"]==[101,103,107,109,113,127,131,137]
+          assert r["evaluation_seeds"]==[139,149,151,157,163,167,173,179]
+          assert set(r["evaluated"])=={"reward_aware","reward_blind","linear_q"}
+          for episodes in r["evaluated"].values():
+              assert len(episodes)==8
+              assert all(0<e["steps"]<=100 for e in episodes)
+              assert all(e["goal_reached"]==bool(e["events"][-1]["terminated"] and e["return"]>0) for e in episodes)
+          print("CONVENTIONAL_LEARNING_COMPARISON_RECORDED_NO_SCIENTIFIC_ACCEPTANCE")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-linear-q-crossfamily
+          path: ${{ runner.temp }}/itd02-linear-q-crossfamily.json
+          if-no-files-found: warn
+          retention-days: 7
