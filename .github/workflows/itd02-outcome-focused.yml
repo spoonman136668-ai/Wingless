@@ -280,3 +280,46 @@ jobs:
           path: ${{ runner.temp }}/itd02-unfamiliar-family.json
           if-no-files-found: warn
           retention-days: 7
+  source-fourrooms-stateful-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source world
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Compile independent native actors
+        run: |
+          go build -o "$RUNNER_TEMP/itd02-r8bridge" ./research/native/itd02/r8bridge
+          go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Diagnose full stateful native FourRooms navigation
+        run: python research/native/itd02/outcome/fourrooms_stateful_diagnostic.py --outcome-binary "$RUNNER_TEMP/itd02-outcomebridge" --r8-binary "$RUNNER_TEMP/itd02-r8bridge" --output "$RUNNER_TEMP/itd02-fourrooms-stateful.json" --run-source
+      - name: Validate per-action navigation evidence and no scientific claim
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-fourrooms-stateful.json").read_text())
+          assert r["science"]=="NOT_ACCEPTED"
+          assert r["target_family"]=="MiniGrid-FourRooms-v0" and r["target_seeds"]==[79,83,89,97]
+          assert set(r["results"])=={"reward_aware","reward_blind","native_r8","fixed","reactive"}
+          assert all(len(v)==4 for v in r["results"].values())
+          for outcomes in r["results"].values():
+              for e in outcomes:
+                  d=e["diagnostic"]
+                  assert 0 < e["steps"] <= 128
+                  assert sum(d["selected_action_counts"].values())==e["steps"]
+                  assert d["source_goal_reached"]==e["goal_reached"]
+          print("FULL_ACTOR_FOURROOMS_DIAGNOSTIC_RECORDED_NOT_ACCEPTED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-fourrooms-stateful-diagnostic
+          path: ${{ runner.temp }}/itd02-fourrooms-stateful.json
+          if-no-files-found: warn
+          retention-days: 7
