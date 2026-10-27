@@ -367,3 +367,41 @@ jobs:
           path: ${{ runner.temp }}/itd02-linear-q-crossfamily.json
           if-no-files-found: warn
           retention-days: 7
+  source-exact-exposure-frozen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned authentic source world
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Build native learner
+        run: go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Run equal genuine source interactions and frozen cross-family comparisons
+        run: python research/native/itd02/outcome/exact_exposure_gate.py --native-binary "$RUNNER_TEMP/itd02-outcomebridge" --output "$RUNNER_TEMP/itd02-exact-exposure.json" --run-source
+      - name: Fail closed on unequal interactions or changed source authority
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-exact-exposure.json"
+          r=json.loads(p.read_text())
+          assert r["science"]=="NOT_ACCEPTED"
+          assert r["training_interactions"]=={"reward_aware":256,"reward_blind":256,"linear_q":256}
+          assert r["test_seeds"]==[229,233,239,241,251,257,263,269]
+          assert set(r["evaluation"])=={"reward_aware","reward_blind","linear_q"}
+          assert all(len(v)==8 for v in r["evaluation"].values())
+          assert all(e["goal_reached"]==bool(e["events"][-1]["terminated"] and e["return"]>0) for v in r["evaluation"].values() for e in v)
+          print("EXACT_TRAIN_EXPOSURE_FROZEN_EVAL_RECORDED_NOT_ACCEPTED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-exact-exposure-frozen
+          path: ${{ runner.temp }}/itd02-exact-exposure.json
+          if-no-files-found: warn
+          retention-days: 7
