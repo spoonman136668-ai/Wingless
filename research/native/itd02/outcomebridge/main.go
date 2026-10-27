@@ -54,6 +54,22 @@ func process(p **outcome.ContextSelected,r Request)(Reply,bool){
   var a int
   a,err=v.Choose(r.Before,r.MinCount)
   if err==nil{response.Action=&a}
+ case "peek_frozen":
+  // Counterfactual action query against an isolated checkpoint clone.
+  // Never arms the live route, consumes feedback, or learns during probes.
+  if v.Base.Policy.Armed {
+   err=errors.New("OUTCOME_FROZEN_PEEK_PENDING_ACTION")
+   break
+  }
+  var snap []byte
+  snap,err=v.Snapshot()
+  if err!=nil{break}
+  var clone *outcome.ContextSelected
+  clone,err=outcome.RestoreContextSelected(snap)
+  if err!=nil{break}
+  var a int
+  a,err=clone.Choose(r.Before,r.MinCount)
+  if err==nil{response.Action=&a}
  case "feedback":
   err=v.Feedback(r.Before,r.Action,r.After,outcome.Event{
    ID:r.EventID,Action:r.Action,Reward:r.Reward,
