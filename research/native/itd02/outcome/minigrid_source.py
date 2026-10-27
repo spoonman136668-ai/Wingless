@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+import operator
 from typing import Any
 
 # MiniGrid's published OBJECT_TO_IDX encoding. Refuse incompatible versions
@@ -77,7 +78,16 @@ def decode_public(observation: dict[str, Any], prior_goal: tuple[int, int] | Non
     if direction not in (0, 1, 2, 3):
         raise SourceObservationError("invalid encoded direction")
     published_direction = observation.get("direction")
-    if type(published_direction) is not int or published_direction != direction:
+    # Random-start MiniGrid emits NumPy integer scalars for direction. Accept
+    # exact indexable integers, never float or bool, and cross-check against
+    # the independently encoded agent direction in the public image.
+    if isinstance(published_direction, bool):
+        raise SourceObservationError("invalid public direction type")
+    try:
+        numeric_direction = operator.index(published_direction)
+    except TypeError as exc:
+        raise SourceObservationError("invalid public direction type") from exc
+    if numeric_direction != direction:
         raise SourceObservationError("public direction mismatch")
     if len(goals) == 1:
         goal = goals[0]
