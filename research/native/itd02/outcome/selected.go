@@ -132,8 +132,20 @@ func (s *Selected) ChooseRewardExplore(before r1.PublicGrid, minCount uint32) (i
   }
  }
  if target<0 {
-  recommended,e:=s.RecommendRewardAction(minCount)
-  if e==nil { target=recommended }
+  // Retain bounded exploration after initial coverage. Without occasional
+  // new selected evidence an early reward preference can never be revised.
+  // Probe every fourth completed event, with a rotating least-sampled tie.
+  if (s.Rewards.NextID-1)%4==0 {
+   offset:=int((s.Rewards.NextID-1)/4%3)
+   target=offset
+   for j:=1;j<3;j++ {
+    a:=(offset+j)%3
+    if s.Rewards.Bins[a].Count<s.Rewards.Bins[target].Count {target=a}
+   }
+  }else{
+   recommended,e:=s.RecommendRewardAction(minCount)
+   if e==nil { target=recommended }
+  }
  }
  native,err:=candidate.Choose(before);if err!=nil{return 0,err}
  if target<0 {target=native}
