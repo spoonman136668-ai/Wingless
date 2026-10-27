@@ -143,7 +143,7 @@ class SourceEpisode:
 
 def open_source_environment(environment_id: str) -> SourceEpisode:
     """Fixed full-observation source; environment ID must be predeclared."""
-    if environment_id not in ("MiniGrid-Empty-5x5-v0", "MiniGrid-Empty-8x8-v0"):
+    if environment_id not in ("MiniGrid-Empty-5x5-v0", "MiniGrid-Empty-Random-5x5-v0", "MiniGrid-Empty-8x8-v0"):
         raise SourceObservationError("environment not on bounded allowlist")
     import gymnasium as gym
     import minigrid  # noqa: F401 - registers source environments
