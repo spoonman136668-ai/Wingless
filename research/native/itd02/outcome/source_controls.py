@@ -130,7 +130,11 @@ def episode(source: SourceEpisode, policy: Any, seed: int, max_steps: int) -> di
     return {
         "seed": seed, "steps": len(events),
         "return": sum(e["reward"] for e in events),
+        # "completed" is source episode closure, including truncation;
+        # goal success is a separate event-grounded fact.
         "completed": bool(events[-1]["terminated"] or events[-1]["truncated"]),
+        "goal_reached": bool(events[-1]["terminated"] and sum(e["reward"] for e in events)>0),
+        "source_truncated": bool(events[-1]["truncated"]),
         "events_sha256": hashlib.sha256(canonical(events)).hexdigest(),
         "events": events,
     }
