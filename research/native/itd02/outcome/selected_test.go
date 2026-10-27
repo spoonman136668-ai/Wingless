@@ -148,3 +148,40 @@ func TestRewardAwareSelectedFeedbackAndColdRestart(t *testing.T) {
   t.Fatalf("reward-aware next episode rejected: %v",err)
  }
 }
+
+func TestBalancedSelectedExplorationChangesRewardChoiceAfterEvidence(t *testing.T) {
+ before:=selectedFixture()
+ baseline:=NewSelected()
+ nativeAction,err:=baseline.Policy.Choose(before);if err!=nil{t.Fatal(err)}
+ preferred:=(nativeAction+1)%3
+ s:=NewSelected()
+ for i:=0;i<6;i++ {
+  action,err:=s.ChooseRewardExplore(before,2)
+  if err!=nil{t.Fatalf("selected exploration at event %d: %v",i+1,err)}
+  after:=before
+  if action==0{after.Direction=(before.Direction+3)%4
+  }else if action==1{after.Direction=(before.Direction+1)%4}
+  reward:=float64(1)
+  if action==preferred{reward=9}
+  if err:=s.Feedback(before,action,after,Event{
+   ID:uint64(i+1),Action:action,Reward:reward,Terminal:true,
+  });err!=nil{t.Fatalf("selected feedback at event %d: %v",i+1,err)}
+  if err:=s.BeginEpisode();err!=nil{t.Fatalf("episode reset %d: %v",i+1,err)}
+ }
+ for action,b:=range s.Rewards.Bins{
+  if b.Count!=2{t.Fatalf("action %d has %d rather than 2 selected samples",action,b.Count)}
+ }
+ recommended,err:=s.RecommendRewardAction(2)
+ if err!=nil||recommended!=preferred{
+  t.Fatalf("learned reward preference %d vs %d: %v",recommended,preferred,err)
+ }
+ raw,err:=s.SnapshotSelected();if err!=nil{t.Fatal(err)}
+ cold,err:=RestoreSelected(raw);if err!=nil{t.Fatal(err)}
+ learned,err:=cold.ChooseRewardExplore(before,2)
+ if err!=nil||learned!=preferred||learned==nativeAction{
+  t.Fatalf("learned native choice after cold restart: %d baseline %d preferred %d error %v",learned,nativeAction,preferred,err)
+ }
+ if !cold.Policy.Armed||cold.Policy.Core.Core.Route.Action!=learned{
+  t.Fatal("learned native choice failed to arm selected source custody")
+ }
+}
