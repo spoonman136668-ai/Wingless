@@ -64,6 +64,9 @@ jobs:
           retention-days: 3
   refresh-index-on-branch-push:
     if: github.event_name == 'push' || github.event_name == 'pull_request'
+    concurrency:
+      group: wingless-itd02-outcome-ice-index-single-writer
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
