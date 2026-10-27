@@ -68,3 +68,30 @@ func TestSelectedSnapshotRejectsUnownedRewardEvidence(t *testing.T) {
   t.Fatal("accepted reward evidence without matching native selected feedback")
  }
 }
+
+func TestRewardAwareUntrainedChoiceUsesNativeCustody(t *testing.T) {
+ before:=selectedFixture()
+ native:=NewSelected()
+ expected,err:=native.Policy.Choose(before)
+ if err!=nil{t.Fatal(err)}
+ s:=NewSelected()
+ chosen,err:=s.ChooseRewardAware(before,2)
+ if err!=nil||chosen!=expected{t.Fatalf("untrained native fallback %d vs %d: %v",chosen,expected,err)}
+ if !s.Policy.Armed||!s.Policy.Core.Core.Route.Pending||
+  s.Policy.Core.Core.Route.Action!=chosen {t.Fatal("native selected-action route not armed")}
+ saved,err:=s.SnapshotSelected();if err!=nil{t.Fatal(err)}
+ cold,err:=RestoreSelected(saved);if err!=nil{t.Fatal(err)}
+ if !cold.Policy.Armed||cold.Policy.Core.Core.Route.Action!=chosen {
+  t.Fatal("native selected-action route lost after restart")
+ }
+}
+
+func TestRewardAwareRejectsUnownedEvidenceWithoutArming(t *testing.T) {
+ s:=NewSelected()
+ s.Rewards.Bins=[3]Bin{{Count:2,Sum:2},{Count:2,Sum:8},{Count:2,Sum:4}}
+ s.Rewards.NextID=7
+ if _,err:=s.ChooseRewardAware(selectedFixture(),2);err==nil {
+  t.Fatal("accepted outcome evidence without matching native selected feedback")
+ }
+ if s.Policy.Armed {t.Fatal("rejected action armed native custodian")}
+}
