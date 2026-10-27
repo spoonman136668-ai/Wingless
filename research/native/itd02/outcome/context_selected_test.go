@@ -173,3 +173,43 @@ func TestContextSelectedMatchedPublicInformationOppositeRewards(t *testing.T){
   }
  }
 }
+
+func TestContextSelectedEqualRewardsFallbackToOriginalNativeR8(t *testing.T){
+ c:=NewContextSelected()
+ before:=selectedFixture()
+ for i:=0;i<12;i++{
+  before.FrontBlocked=i%2==1
+  action,err:=c.Choose(before,2)
+  if err!=nil{t.Fatalf("choose %d: %v",i,err)}
+  after:=before
+  if action==0{after.Direction=(before.Direction+3)%4
+  }else if action==1{after.Direction=(before.Direction+1)%4}
+  if err:=c.Feedback(before,action,after,Event{ID:uint64(i+1),Action:action,Reward:0,Terminal:true});err!=nil{
+   t.Fatalf("feedback %d: %v",i,err)
+  }
+  if err:=c.BeginEpisode();err!=nil{t.Fatal(err)}
+ }
+ saved,err:=c.Snapshot();if err!=nil{t.Fatal(err)}
+ for ctx:=0;ctx<2;ctx++{
+  fresh:=selectedFixture()
+  fresh.X=6+ctx
+  fresh.Y=9+ctx
+  fresh.Direction=2
+  fresh.GoalX=35
+  fresh.GoalY=41
+  fresh.FrontBlocked=ctx==1
+  control,err:=RestoreContextSelected(saved);if err!=nil{t.Fatal(err)}
+  original,err:=RestoreContextSelected(saved);if err!=nil{t.Fatal(err)}
+  nativeAction,err:=original.Base.Policy.Choose(fresh)
+  if err!=nil{t.Fatal(err)}
+  chosen,err:=control.Choose(fresh,2)
+  if err!=nil||chosen!=nativeAction{
+   t.Fatalf("context %d equal-reward tie chose %d; original R8 chose %d; err %v",ctx,chosen,nativeAction,err)
+  }
+  if !control.Base.Policy.Armed||
+   control.Base.Policy.Core.Core.Route.Before!=fresh||
+   control.Base.Policy.Core.Core.Route.Action!=chosen {
+   t.Fatal("equal-reward fallback bypassed native selected-action custody")
+  }
+ }
+}
