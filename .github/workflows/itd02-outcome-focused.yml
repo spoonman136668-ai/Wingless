@@ -348,7 +348,12 @@ jobs:
           assert r["science"]=="NOT_ACCEPTED"
           assert r["training_seeds"]==[101,103,107,109,113,127,131,137]
           assert r["evaluation_seeds"]==[139,149,151,157,163,167,173,179]
-          assert set(r["evaluated"])=={"reward_aware","reward_blind","linear_q"}
+          assert set(r["evaluated"])=={"reward_aware","reward_blind","linear_q","reward_aware_frozen","reward_blind_frozen"}
+          assert r["evaluation_update_authority"]["linear_q"]=="FROZEN_WEIGHTS"
+          assert r["evaluation_update_authority"]["reward_aware_frozen"]=="FROZEN_CHECKPOINT_CLONE_PER_STEP"
+          assert set(r["training_interactions"])=={"reward_aware","reward_blind","linear_q"}
+          if not r["training_interactions_matched"]:
+              print("SCIENTIFIC_LIMITATION_UNEQUAL_SOURCE_TRAINING_INTERACTIONS",r["training_interactions"])
           for episodes in r["evaluated"].values():
               assert len(episodes)==8
               assert all(0<e["steps"]<=100 for e in episodes)
