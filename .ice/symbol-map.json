@@ -4272,6 +4272,160 @@
     ]
   },
   {
+    "name": "ContextSelected",
+    "kind": "type",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 18,
+    "end": 21
+  },
+  {
+    "name": "NewContextSelected",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 22,
+    "end": 22,
+    "calls": [
+      "NewSelected"
+    ]
+  },
+  {
+    "name": "contextIndex",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 23,
+    "end": 23
+  },
+  {
+    "name": "valid",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 24,
+    "end": 46,
+    "receiver": "ContextSelected",
+    "calls": [
+      "float64",
+      "math.Abs",
+      "math.Abs",
+      "math.IsInf",
+      "math.IsNaN",
+      "uint64"
+    ]
+  },
+  {
+    "name": "Choose",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 51,
+    "end": 86,
+    "receiver": "ContextSelected",
+    "calls": [
+      "c.valid",
+      "candidate.Choose",
+      "candidate.Healthy",
+      "contextIndex",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "float64",
+      "r8.Restore"
+    ]
+  },
+  {
+    "name": "Feedback",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 90,
+    "end": 103,
+    "receiver": "ContextSelected",
+    "calls": [
+      "RestoreSelected",
+      "c.valid",
+      "candidate.Feedback",
+      "contextIndex",
+      "errors.New",
+      "errors.New",
+      "next.valid"
+    ]
+  },
+  {
+    "name": "BeginEpisode",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 104,
+    "end": 111,
+    "receiver": "ContextSelected",
+    "calls": [
+      "RestoreSelected",
+      "c.valid",
+      "candidate.BeginEpisode",
+      "errors.New"
+    ]
+  },
+  {
+    "name": "ContextSchema",
+    "kind": "const",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 113,
+    "end": 113
+  },
+  {
+    "name": "contextState",
+    "kind": "type",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 114,
+    "end": 117
+  },
+  {
+    "name": "contextEnvelope",
+    "kind": "type",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 118,
+    "end": 122
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 123,
+    "end": 129,
+    "receiver": "ContextSelected",
+    "calls": [
+      "c.valid",
+      "errors.New",
+      "json.Marshal",
+      "json.Marshal",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "RestoreContextSelected",
+    "kind": "function",
+    "file": "research/native/itd02/outcome/context_selected.go",
+    "start": 130,
+    "end": 146,
+    "calls": [
+      "RestoreSelected",
+      "bytes.Equal",
+      "bytes.NewReader",
+      "c.valid",
+      "dec.Decode",
+      "dec.Decode",
+      "dec.DisallowUnknownFields",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "errors.New",
+      "json.Marshal",
+      "json.Marshal",
+      "json.NewDecoder",
+      "len",
+      "len",
+      "new",
+      "sha256.Sum256"
+    ]
+  },
+  {
     "name": "Schema",
     "kind": "const",
     "file": "research/native/itd02/outcome/ledger.go",
