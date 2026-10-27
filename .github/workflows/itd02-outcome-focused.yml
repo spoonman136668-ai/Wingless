@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - 'research/native/itd02/outcome/**'
+      - 'research/native/itd02/outcomebridge/**'
       - '.github/workflows/itd02-outcome-focused.yml'
 permissions:
   contents: write
@@ -22,14 +23,14 @@ jobs:
         with:
           go-version: '1.25'
       - name: Focused native outcome tests
-        run: go test -count=1 -v ./research/native/itd02/outcome
+        run: go test -count=1 -v ./research/native/itd02/outcome ./research/native/itd02/outcomebridge
       - name: Vet and build native outcome
         run: |
-          go vet ./research/native/itd02/outcome
-          go build ./research/native/itd02/outcome
+          go vet ./research/native/itd02/outcome ./research/native/itd02/outcomebridge
+          go build ./research/native/itd02/outcome ./research/native/itd02/outcomebridge
       - name: Race safety on Linux
         if: runner.os == 'Linux'
-        run: go test -race -count=1 ./research/native/itd02/outcome
+        run: go test -race -count=1 ./research/native/itd02/outcome ./research/native/itd02/outcomebridge
   ice-index-artifact:
     runs-on: ubuntu-24.04
     steps:
