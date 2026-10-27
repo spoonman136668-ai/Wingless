@@ -233,3 +233,41 @@ jobs:
           path: ${{ runner.temp }}/itd02-frozen-source-probe.json
           if-no-files-found: warn
           retention-days: 7
+  source-unfamiliar-family-probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source environments
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Build native outcome learner
+        run: go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Run predeclared unfamiliar FourRooms source probes
+        run: python research/native/itd02/outcome/unfamiliar_family_probe.py --native-binary "$RUNNER_TEMP/itd02-outcomebridge" --output "$RUNNER_TEMP/itd02-unfamiliar-family.json" --run-source
+      - name: Verify unfamiliar source evidence remains restricted
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-unfamiliar-family.json").read_text())
+          assert r["scientific_acceptance"]=="NOT_ACCEPTED"
+          assert r["training_family"]=="MiniGrid-Empty-Random-5x5-v0"
+          assert r["target_family"]=="MiniGrid-FourRooms-v0"
+          assert r["target_seeds"]==[61,67,71,73]
+          assert r["frozen_checkpoint_verified_each_episode"]
+          assert set(r["results"])=={"reward_aware","reward_blind","fixed"}
+          assert all(len(v)==4 for v in r["results"].values())
+          print("UNFAMILIAR_SOURCE_EVIDENCE_RECORDED_NOT_ACCEPTED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-unfamiliar-family
+          path: ${{ runner.temp }}/itd02-unfamiliar-family.json
+          if-no-files-found: warn
+          retention-days: 7
