@@ -61,13 +61,13 @@ func TestProgressV3NoForcedTurnWithoutLateralGoalOrObstacle(t *testing.T){
   t.Fatalf("public aligned goal must not force turning: %d motion %d %v",chosen,expected,err)
  }
 }
-func TestProgressV3OldCheckpointSchemaIsNotSilentUpgrade(t *testing.T){
+func TestProgressV4OldCheckpointSchemaIsNotSilentUpgrade(t *testing.T){
  p:=NewProgressSelected()
  raw,err:=p.Snapshot();if err!=nil{t.Fatal(err)}
  cold,err:=RestoreProgressSelected(raw);if err!=nil||!cold.valid(){t.Fatal(err)}
  // Old artifact cannot silently acquire authority of the new learning rule.
- tampered:=bytes.Replace(raw,[]byte("selected-goal-progress.v3"),
-                              []byte("selected-goal-progress.v2"),1)
+ tampered:=bytes.Replace(raw,[]byte("selected-goal-progress.v4"),
+                              []byte("selected-goal-progress.v3"),1)
  if bytes.Equal(tampered,raw){t.Fatal("schema substitution test missing source marker")}
- if _,err=RestoreProgressSelected(tampered);err==nil{t.Fatal("v2 checkpoint accepted as v3")}
+ if _,err=RestoreProgressSelected(tampered);err==nil{t.Fatal("v3 checkpoint accepted as v4")}
 }
