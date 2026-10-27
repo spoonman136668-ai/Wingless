@@ -1,0 +1,103 @@
+name: MP-AI05 matched-context Nemotron negative control
+on:
+  push:
+    branches: [qualification/mpai05-nemotron-public-probe-20261027]
+    paths: ['.github/workflows/mpai05-nemotron-matched-context.yml']
+permissions:
+  contents: read
+jobs:
+  matched-context:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    env:
+      WINGLESS_REASONER_OPENROUTER_API_KEY: ${{ secrets.WINGLESS_REASONER_OPENROUTER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: spoonman136668-ai/FORGE
+          ref: ca373bbab0ab297b79c9073de7e78d96ddf26903
+          path: forge
+          persist-credentials: false
+      - name: Execute balanced real-model same-corpus negative control
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib,sys,time,urllib.error,urllib.request
+          sys.path.insert(0,str(pathlib.Path('forge/tools').resolve()))
+          from mpai05_retrieval_consumer import recall_with_normalizer
+          key=os.environ.get('WINGLESS_REASONER_OPENROUTER_API_KEY','')
+          if not key: raise SystemExit('MPAI05_BLOCKED_NO_EXISTING_CREDENTIAL')
+          model='nvidia/nemotron-3-ultra-550b-a55b:free'
+          # Entire corpus and questions are synthetic/public; same corpus in both arms.
+          corpus=[
+            {'id':'public:quartz-v2','source_refs':['public:quartz-v2'],'text':'Quartz release revised cutoff is Friday 16:00 UTC, superseding an earlier Thursday draft.'},
+            {'id':'public:quartz-draft','source_refs':['public:quartz-draft'],'text':'Quartz draft notes used Thursday 14:00 UTC; these are superseded by Quartz v2.'},
+            {'id':'public:harbor-final','source_refs':['public:harbor-final'],'text':'Harbor final maintenance window is Wednesday 11:15 UTC, not the prior Tuesday proposal.'},
+            {'id':'public:harbor-proposal','source_refs':['public:harbor-proposal'],'text':'Harbor proposed Tuesday 09:30 UTC before the final revision.'},
+            {'id':'public:maple','source_refs':['public:maple'],'text':'Maple deployment requires two green integration checks and signed operator approval.'},
+            {'id':'public:cedar','source_refs':['public:cedar'],'text':'Cedar rotation uses the 30-day cadence; Maple does not use this cadence.'}
+          ]
+          cases=[
+            {'q':'Can you find the saved memory related to Quartz release cutoff and explain the original evidence?',
+             'expected':'Friday 16:00 UTC','ref':'public:quartz-v2'},
+            {'q':'I am trying to remember something from an earlier conversation about Harbor maintenance window. Would you check the context and tell me whether any relevant notes were recorded?',
+             'expected':'Wednesday 11:15 UTC','ref':'public:harbor-final'},
+            {'q':'What are the prerequisites before Maple deployment?',
+             'expected':'two green integration checks and signed operator approval','ref':'public:maple'},
+            {'q':'Does Maple use a 30-day rotation cadence?',
+             'expected':'does not','ref':'public:cedar'}
+          ]
+          sha='0'*40
+          class EqualSnapshot:
+            def recall(self,source_sha,query,projects,profile):
+              if source_sha!=sha or projects!=['Mind-Palace']: raise ValueError('scope drift')
+              return {'source_sha':source_sha,'matches':corpus}
+          rows=[]
+          for i,case in enumerate(cases):
+            for arm in (['off','eligible'] if i%2==0 else ['eligible','off']):
+              started=time.monotonic()
+              out=recall_with_normalizer(EqualSnapshot(),sha,case['q'],['Mind-Palace'],
+                                         'continuation',enabled=(arm=='eligible'))
+              docs=out['result']['matches']
+              assert docs==corpus, 'EQUAL_CONTEXT_VIOLATED'
+              prompt=('PUBLIC SYNTHETIC NEGATIVE CONTROL. Answer ONLY from these records. '
+                      'Prefer latest final records over superseded drafts. Output exactly one JSON '
+                      'object with keys answer and source_refs, where source_refs is an array of '
+                      'verbatim source reference strings. No invented citations. '
+                      'QUESTION: '+case['q']+' RECORDS: '+json.dumps(docs,sort_keys=True))
+              data=json.dumps({'model':model,'messages':[{'role':'user','content':prompt}],
+                               'temperature':0,'max_tokens':180,'reasoning':{'enabled':False}}).encode()
+              req=urllib.request.Request('https://openrouter.ai/api/v1/chat/completions',
+                  data=data,headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'})
+              try:
+                with urllib.request.urlopen(req,timeout=95) as response: payload=json.load(response)
+              except urllib.error.HTTPError as ex:
+                print('MPAI05_CONTROL_PROVIDER_HTTP='+str(ex.code))
+                raise SystemExit(1)
+              raw=str(payload['choices'][0]['message'].get('content') or '').strip()
+              cleaned=raw.removeprefix('```json').removeprefix('```').removesuffix('```').strip()
+              valid=False; correct=False
+              try:
+                parsed=json.loads(cleaned); ans=parsed.get('answer',''); cites=parsed.get('source_refs',[])
+                refs={s for doc in docs for s in doc['source_refs']}
+                valid=isinstance(ans,str) and isinstance(cites,list) and len(cites)>0 and all(isinstance(x,str) and x in refs for x in cites)
+                correct=valid and case['expected'].lower() in ans.lower() and case['ref'] in cites
+              except (ValueError,TypeError,AttributeError): pass
+              row={'task':i+1,'arm':arm,'routing':out['routing'],
+                   'correct_grounded':bool(correct),'valid_citations':bool(valid),
+                   'tokens':(payload.get('usage') or {}).get('total_tokens'),
+                   'latency_ms':round(1000*(time.monotonic()-started)),
+                   'source_count':len(docs)}
+              rows.append(row)
+              print('MPAI05_MATCHED_CONTEXT_RECEIPT='+json.dumps(row,sort_keys=True))
+          baseline=[r for r in rows if r['arm']=='off']
+          candidate=[r for r in rows if r['arm']=='eligible']
+          print('MPAI05_MATCHED_CONTEXT_REAL_CALLS='+str(len(rows)))
+          print('MPAI05_MATCHED_CONTEXT_BASELINE_CORRECT='+str(sum(x['correct_grounded'] for x in baseline)))
+          print('MPAI05_MATCHED_CONTEXT_CANDIDATE_CORRECT='+str(sum(x['correct_grounded'] for x in candidate)))
+          print('MPAI05_MATCHED_CONTEXT_PAIR_COUNT='+str(len(cases)))
+          print('MPAI05_MATCHED_CONTEXT_DATA_IDENTICAL=TRUE')
+          print('MPAI05_PRIVATE_MP_DATA_SENT=FALSE')
+          print('MPAI05_SCIENTIFIC_ACCEPTANCE=NOT_TESTED')
+          PY
