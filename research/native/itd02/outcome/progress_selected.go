@@ -15,7 +15,7 @@ import (
  r1 "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
 )
 
-const ProgressSchema="wingless.itd02.selected-goal-progress.v2"
+const ProgressSchema="wingless.itd02.selected-goal-progress.v3"
 type ProgressBin struct{
  Count uint32 `json:"count"`
  Sum int64 `json:"sum"`
@@ -72,7 +72,7 @@ func(p *ProgressSelected)Choose(before r1.PublicGrid,minCount uint32)(int,error)
  }
  context:=progressContext(before)
  row:=p.Bins[context]
- // Sparse-context contract (V2): the native MotionSelected chooser owns
+ // Sparse-context contract (retained from V2): the native MotionSelected chooser owns
  // exploration until authenticated POSITIVE goal-progress evidence exists
  // in this very public context. Never require per-context turn coverage
  // before allowing forward: that caused the v1 authentic turn-only failure.
@@ -88,6 +88,23 @@ func(p *ProgressSelected)Choose(before r1.PublicGrid,minCount uint32)(int,error)
   }
  }
  if best>=0&&unique{target=best}
+ // V3 bounded active evidence: explore the less-observed turn every eighth
+ // accepted selected action only when a public lateral goal or obstacle makes
+ // orientation relevant. The choice is based on ACTUAL turn samples, never a
+ // hardcoded goal-side answer or unobserved counterfactual. The original
+ // motion-selected custodian still arms the final action and authenticates
+ // public feedback. Observed positive environmental reward can override below.
+ completed:=p.Base.Base.Base.Rewards.NextID-1
+ if completed>0 && completed%8==0 && (before.FrontBlocked||goalCross(before)!=0){
+  left:=p.Base.Base.Base.Rewards.Bins[0].Count
+  right:=p.Base.Base.Base.Rewards.Bins[1].Count
+  switch{
+  case left<right: target=0
+  case right<left: target=1
+  case (completed/8)%2==0: target=0
+  default: target=1
+  }
+ }
  // Preserve an unambiguous experienced external reward preference. Do not
  // replace learned reward evidence with engineered movement heuristics.
  prior:=p.Base.Base.Bins[contextIndex(before)]
