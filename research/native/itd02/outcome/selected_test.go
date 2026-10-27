@@ -123,3 +123,28 @@ func TestRewardAwarePendingActionDoesNotMutateState(t *testing.T) {
   t.Fatal("rejected pending choice changed checkpoint")
  }
 }
+
+func TestRewardAwareSelectedFeedbackAndColdRestart(t *testing.T) {
+ s:=NewSelected()
+ before:=selectedFixture()
+ action,err:=s.ChooseRewardAware(before,2)
+ if err!=nil{t.Fatal(err)}
+ after:=before
+ if action==0 {after.Direction=3} else if action==1 {after.Direction=1}
+ if err:=s.Feedback(before,action,after,Event{ID:1,Action:action,Reward:11,Terminal:true});err!=nil{
+  t.Fatalf("reward-aware selected feedback rejected: %v",err)
+ }
+ if s.Policy.Armed||s.Policy.LiveSeen!=1||s.Rewards.NextID!=2||!s.Rewards.Closed {
+  t.Fatal("reward-aware selected feedback was not jointly conserved")
+ }
+ saved,err:=s.SnapshotSelected();if err!=nil{t.Fatal(err)}
+ cold,err:=RestoreSelected(saved);if err!=nil{t.Fatal(err)}
+ value,ok:=cold.RewardEvidence(action)
+ if !ok||value!=11||cold.Policy.LiveSeen!=1||cold.Policy.Armed {
+  t.Fatal("cold restart lost selected outcome or native custody")
+ }
+ if err:=cold.BeginEpisode();err!=nil{t.Fatal(err)}
+ if _,err:=cold.ChooseRewardAware(before,2);err!=nil{
+  t.Fatalf("reward-aware next episode rejected: %v",err)
+ }
+}
