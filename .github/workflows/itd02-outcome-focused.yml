@@ -131,7 +131,7 @@ jobs:
           done
       - name: Verify bounded per-seed comparison evidence without acceptance claim
         run: |
-          python -c 'import json,os,pathlib; root=pathlib.Path(os.environ["RUNNER_TEMP"]); seeds=(7,11,19); records=[json.loads((root/f"itd02-source-controls-{seed}.json").read_text()) for seed in seeds]; assert all(r["scientific_acceptance"]=="NOT_ACCEPTED" and r["transfer"]=="NOT_TESTED" and r["seed"]==seed and set(r["controls"])=={"fixed","native_r8","contextual_outcome"} and all(0<v["steps"]<=32 for v in r["controls"].values()) for seed,r in zip(seeds,records)); print("THREE_SEED_SOURCE_CONTROLS_RECORDED")'
+          python -c 'import json,os,pathlib; root=pathlib.Path(os.environ["RUNNER_TEMP"]); seeds=(7,11,19); records=[json.loads((root/f"itd02-source-controls-{seed}.json").read_text()) for seed in seeds]; assert all(r["scientific_acceptance"]=="NOT_ACCEPTED" and r["transfer"]=="NOT_TESTED" and r["seed"]==seed and set(r["controls"])=={"fixed","native_r8","contextual_outcome"} and all(0<v["steps"]<=32 for v in r["controls"].values()) for seed,r in zip(seeds,records)); print("THREE_SEED_SOURCE_CONTROLS_RECORDED"); distinct={k:len({r["controls"][k]["events_sha256"] for r in records}) for k in ("fixed","native_r8","contextual_outcome")}; print("SOURCE_TRAJECTORY_DIVERSITY",distinct); print("MULTI_SOURCE_DIVERSITY_UNPROVEN" if min(distinct.values())<len(seeds) else "DISTINCT_SOURCE_TRAJECTORIES_OBSERVED")'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
