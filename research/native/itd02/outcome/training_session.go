@@ -27,6 +27,7 @@ type TrainingSession struct {
     Learner *Selected
     MinimumSelectedSamples uint32
     MaximumEpisodeSteps uint32
+    MinimumEpisodeSteps uint32
 }
 
 // EpisodeResult is a development-only observation, not an accepted scientific
@@ -53,6 +54,7 @@ func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []by
         s.Learner.Rewards == nil || env == nil ||
         s.MinimumSelectedSamples < 2 || s.MaximumEpisodeSteps < 1 ||
         s.MaximumEpisodeSteps > 4096 ||
+        s.MinimumEpisodeSteps > s.MaximumEpisodeSteps ||
         !s.Learner.Policy.Healthy() || !s.Learner.Rewards.Valid() ||
         s.Learner.Policy.Armed || s.Learner.Policy.EpisodeSteps != 0 &&
             !s.Learner.Rewards.Closed {
@@ -93,6 +95,9 @@ func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []by
         result.CumulativeReward += observed.Reward
         before = observed.After
         if observed.Terminal || observed.Truncated {
+            if result.Steps < s.MinimumEpisodeSteps {
+                return zero, nil, errors.New("OUTCOME_SELF_TRAINING_EPISODE_BELOW_MINIMUM_STEPS")
+            }
             result.Terminal = observed.Terminal
             result.Truncated = observed.Truncated
             result.NativeUpdates = s.Learner.Policy.LiveSeen
