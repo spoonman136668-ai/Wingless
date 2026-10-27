@@ -169,7 +169,7 @@ def compare(environment: str, seed: int, max_steps: int,
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--environment", choices=("MiniGrid-Empty-5x5-v0", "MiniGrid-Empty-8x8-v0"), required=True)
+    p.add_argument("--environment", choices=("MiniGrid-Empty-5x5-v0", "MiniGrid-Empty-Random-5x5-v0", "MiniGrid-Empty-8x8-v0"), required=True)
     p.add_argument("--seed", type=int, required=True)
     p.add_argument("--max-steps", type=int, default=32)
     p.add_argument("--outcome-binary", required=True)
