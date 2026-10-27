@@ -22,6 +22,7 @@ from ipc_source_runner import BridgeError
 from minigrid_source import open_source_environment
 from reward_ablation_restart import MaskedOutcome
 from source_controls import episode
+from frozen_source_probe import FrozenPolicy
 
 TRAIN_ENV = "MiniGrid-Empty-Random-5x5-v0"
 TEST_ENV = "MiniGrid-FourRooms-v0"
@@ -108,7 +109,7 @@ def train_native(binary,blind):
     finally:
         policy.close()
 
-def evaluate_native(binary,saved,trained_steps,blind):
+def evaluate_native(binary,saved,trained_steps,blind,frozen=False):
     results=[]
     for seed in TEST_SEEDS:
         policy=MaskedOutcome(binary,blind)
@@ -119,7 +120,11 @@ def evaluate_native(binary,saved,trained_steps,blind):
             if policy.bridge.request("snapshot")["state"]!=saved:
                 raise BridgeError("native checkpoint changed on restore")
             policy.next_id=trained_steps+1
-            results.append(run_episode(TEST_ENV,policy,seed,TEST_BUDGET))
+            before=policy.bridge.request("snapshot")["state"]
+            target=FrozenPolicy(policy.bridge) if frozen else policy
+            results.append(run_episode(TEST_ENV,target,seed,TEST_BUDGET))
+            if frozen and policy.bridge.request("snapshot")["state"]!=before:
+                raise BridgeError("frozen native policy mutated in evaluation")
         finally:
             policy.close()
     return results
@@ -164,7 +169,9 @@ def run(binary, output):
                 if record["events"][0]["before"]!=trained["reward_aware"]["episodes"][i]["events"][0]["before"]:
                     raise BridgeError("unequal training public starts")
         trained[name]={"episodes":episodes,"checkpoint_sha256":sha}
-        evaluated[name]=evaluate_native(binary,saved,sum(e["steps"] for e in episodes),blind)
+        trained_steps=sum(e["steps"] for e in episodes)
+        evaluated[name]=evaluate_native(binary,saved,trained_steps,blind,False)
+        evaluated[name+"_frozen"]=evaluate_native(binary,saved,trained_steps,blind,True)
     conventional_training,policy,weights=train_linear()
     trained["linear_q"]={"episodes":conventional_training,
                          "weight_sha256":hashlib.sha256(json.dumps(weights).encode()).hexdigest(),
@@ -188,12 +195,15 @@ def run(binary, output):
         "linear_q_hyperparameters":{"alpha":.10,"gamma":.90,"epsilon_train":.20,
                                     "seed":20261027,"weights":27},
         "trained":trained,"evaluated":evaluated,
+        "training_interactions":{k:sum(e["steps"] for e in v["episodes"]) for k,v in trained.items()},
+        "training_interactions_matched":len({sum(e["steps"] for e in v["episodes"]) for v in trained.values()})==1,
+        "evaluation_update_authority":{"reward_aware":"ONLINE","reward_blind":"ONLINE","reward_aware_frozen":"FROZEN_CHECKPOINT_CLONE_PER_STEP","reward_blind_frozen":"FROZEN_CHECKPOINT_CLONE_PER_STEP","linear_q":"FROZEN_WEIGHTS"},
         "resource":{"host":"GitHub-hosted Ubuntu, not consumer Windows",
                     "wall_seconds":time.perf_counter()-start,
                     "python_parent_maxrss_kib_linux":resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
                     "child_maxrss_kib_linux":resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
                     "limitations":"Linux maxima not combined peak; CPU/energy and retail hardware not fully measured"},
-        "comparison_limitations":"Linear Q is a legitimate unoptimized conventional learning control, not a strong optimized benchmark. Native probes keep learning during evaluation while linear Q remains frozen; no claims of matched update policy or scientific superiority.",
+        "comparison_limitations":"Linear Q is a legitimate unoptimized conventional learning control, not a strong optimized benchmark. Native online and frozen arms separately reported; frozen clone-per-step omits native route dynamics. Actual training source interactions may differ; no claims of matched training budget or scientific superiority.",
     }
     output.write_text(json.dumps(record,sort_keys=True,separators=(",",":"),allow_nan=False)+"\n",encoding="utf-8")
     print(json.dumps({k:{"goals":sum(e["goal_reached"] for e in v),
