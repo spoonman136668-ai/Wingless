@@ -186,3 +186,26 @@ func TestContextBridgeQuitRefusesToDiscardPendingSelectedFeedback(t *testing.T){
   t.Fatalf("quit discarded pending native custody: %+v",replies)
  }
 }
+
+
+func TestFrozenPeekDoesNotArmOrChangeNativeCheckpoint(t *testing.T) {
+ p:=outcome.NewContextSelected()
+ before:=publicGrid()
+ baseline,err:=p.Snapshot();if err!=nil{t.Fatal(err)}
+ for i:=0;i<5;i++ {
+  result,quit:=process(&p,Request{Op:"peek_frozen",Before:before,MinCount:2})
+  if quit||!result.OK||result.Action==nil||*result.Action<0||*result.Action>2 {
+   t.Fatalf("frozen peek %d invalid: %+v",i,result)
+  }
+  current,err:=p.Snapshot();if err!=nil{t.Fatal(err)}
+  if !bytes.Equal(current,baseline)||p.Base.Policy.Armed||p.Base.Policy.LiveSeen!=0 {
+   t.Fatal("frozen peek mutated live native state")
+  }
+ }
+ chosen,_:=process(&p,Request{Op:"choose",Before:before,MinCount:2})
+ if !chosen.OK{t.Fatal("unable to arm real action")}
+ rejected,_:=process(&p,Request{Op:"peek_frozen",Before:before,MinCount:2})
+ if rejected.OK||rejected.Error!="OUTCOME_FROZEN_PEEK_PENDING_ACTION" {
+  t.Fatalf("pending selection survived frozen peek incorrectly: %+v",rejected)
+ }
+}
