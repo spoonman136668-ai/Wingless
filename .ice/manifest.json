@@ -1047,7 +1047,7 @@
     },
     {
       "path": "research/native/itd02/outcome/selected_test.go",
-      "sha256": "76f9a9404c240f1987bfc52f7ac7c17f5ed09c21b5526841eb6fbb2b409a8af2",
+      "sha256": "6046c60718369321407098f10019fb5aa0846a2ebbc4db888487593d4713e005",
       "package": "outcome",
       "imports": [
         "bytes",
@@ -6375,6 +6375,46 @@
         "NewSelected",
         "s.ChooseRewardAware",
         "selectedFixture",
+        "t.Fatal",
+        "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestRewardAwareInvalidObservationDoesNotMutateSelectedCustody",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/selected_test.go",
+      "start": 99,
+      "end": 111,
+      "calls": [
+        "NewSelected",
+        "bytes.Equal",
+        "s.ChooseRewardAware",
+        "s.SnapshotSelected",
+        "s.SnapshotSelected",
+        "selectedFixture",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestRewardAwarePendingActionDoesNotMutateState",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/selected_test.go",
+      "start": 113,
+      "end": 125,
+      "calls": [
+        "NewSelected",
+        "bytes.Equal",
+        "s.ChooseRewardAware",
+        "s.ChooseRewardAware",
+        "s.SnapshotSelected",
+        "s.SnapshotSelected",
+        "selectedFixture",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
         "t.Fatal",
         "t.Fatal"
       ]
