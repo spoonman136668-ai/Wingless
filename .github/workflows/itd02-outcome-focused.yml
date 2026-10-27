@@ -63,3 +63,12 @@ jobs:
             ${{ runner.temp }}/itd02-ice-index-stat.txt
             ${{ runner.temp }}/itd02-ice-index-files.txt
           retention-days: 3
+  source-adapter-static:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test public-only source adapter without environment dependencies
+        run: python -m unittest discover -s research/native/itd02/outcome -p 'test_minigrid_source.py' -v
