@@ -72,7 +72,7 @@
     },
     {
       "path": ".github/workflows/itd02-outcome-focused.yml",
-      "sha256": "270a247939c389537cacab18c8aa136cfea488707022095d07a31a2450aeda43"
+      "sha256": "1e8c4ce40c4b065230ad535b133a0ea6bb17d77ecdfee44ace039e6b1ab2c418"
     },
     {
       "path": ".github/workflows/itd02-r1-native-policy.yml",
@@ -81,6 +81,10 @@
     {
       "path": ".github/workflows/itd02-r2-affordance.yml",
       "sha256": "387e095d5ca09ae89957b65d66d8499e054b26008089814c151ba4b2d4bcfaac"
+    },
+    {
+      "path": ".github/workflows/itd02-r8-ice-isolated-reanchor.yml",
+      "sha256": "4a0b0a7cc84787b0df15471af8064b9cfdfa1789820dc9af67efed94034dfc23"
     },
     {
       "path": ".github/workflows/mind-palace-cross-repo-probe.yml",
@@ -992,6 +996,42 @@
       "sha256": "7b7f1eec6fabeacb34206f253d37a91f129c44efe7cb1d4aff9ec98d34397937"
     },
     {
+      "path": "research/native/itd02/outcome/FOURROOMS_STATEFUL_DIAGNOSTIC_20261027.md",
+      "sha256": "7d6d96267024a0f6ec72cdd5c3333b0f76f4b39c1f4c657186a33ad4bac1a3f6"
+    },
+    {
+      "path": "research/native/itd02/outcome/FROZEN_PREFERENCE_RESULT_20261027.md",
+      "sha256": "df1d003d5e0f0464bfbba9cbfb78410dbb50a71327f2c5cfbe3f30f203d65161"
+    },
+    {
+      "path": "research/native/itd02/outcome/REWARD_ABLATION_FRESH_SEEDS_20261027.md",
+      "sha256": "ff049c206684b855be64628c84e200b5ef3acbc01492d7bfdb7a691bb67ecdec"
+    },
+    {
+      "path": "research/native/itd02/outcome/REWARD_ABLATION_RESULT_20261027.md",
+      "sha256": "07dd86b3d4b01737e8063aadec5bfb365dbb3dbe7283320732549e1d077c51f3"
+    },
+    {
+      "path": "research/native/itd02/outcome/SOURCE_NEGATIVE_20261027.md",
+      "sha256": "37a578c8ad622da522c868ab2aa1f43f7961373aadc5b7a7eab8f668a21faa84"
+    },
+    {
+      "path": "research/native/itd02/outcome/SOURCE_NEGATIVE_THREE_SEEDS_20261027.md",
+      "sha256": "4515d33b8726141474e16f25de64e64e64212a9cd02a847bbe7cb8f8d65e53a1"
+    },
+    {
+      "path": "research/native/itd02/outcome/SOURCE_RANDOMIZED_RESULTS_20261027.md",
+      "sha256": "72161240e66cc346ac347f264002008eac6d72fc4c0321d38616a18e3845da94"
+    },
+    {
+      "path": "research/native/itd02/outcome/SOURCE_WORLD_GATE.md",
+      "sha256": "36cbad4f45b6a8c61a7b15c669ecb3774d32b81d9fae629eabb52e98eefbd140"
+    },
+    {
+      "path": "research/native/itd02/outcome/UNFAMILIAR_FOURROOMS_NEGATIVE_20261027.md",
+      "sha256": "2619c905f10b2496152ba2ab885719e4f84e376f6ffc5ea222a4a49dfa9a2259"
+    },
+    {
       "path": "research/native/itd02/outcome/context_selected.go",
       "sha256": "bf4611ca589b8e41d4420ef2f5e189a33fad2411a4225f28a096c70a8bab324c",
       "package": "outcome",
@@ -1081,7 +1121,7 @@
     },
     {
       "path": "research/native/itd02/outcomebridge/main.go",
-      "sha256": "1efb5bbda29f1c01c739122c0e33ef19463a8e481993237f356e4991bcb10fbe",
+      "sha256": "3b58d23a6b1ea14a24a72d91874336cee49909a8e34ff899fcf2ef95791c83ee",
       "package": "main",
       "imports": [
         "bufio",
@@ -1098,7 +1138,7 @@
     },
     {
       "path": "research/native/itd02/outcomebridge/main_test.go",
-      "sha256": "31a983487405aac05c32d9a5c79314c3a3b82e4e2b34edee05d762fc0e929c85",
+      "sha256": "bb6740b925a1acd8d4fa96d66c2c2877128ec93bdb753dad19bc00fa82f2b0e5",
       "package": "main",
       "imports": [
         "bytes",
@@ -6934,16 +6974,20 @@
       "kind": "function",
       "file": "research/native/itd02/outcomebridge/main.go",
       "start": 48,
-      "end": 94,
+      "end": 110,
       "calls": [
+        "clone.Choose",
         "err.Error",
         "errors.New",
         "errors.New",
         "errors.New",
+        "errors.New",
+        "outcome.RestoreContextSelected",
         "outcome.RestoreContextSelected",
         "v.BeginEpisode",
         "v.Choose",
         "v.Feedback",
+        "v.Snapshot",
         "v.Snapshot"
       ]
     },
@@ -6951,8 +6995,8 @@
       "name": "serve",
       "kind": "function",
       "file": "research/native/itd02/outcomebridge/main.go",
-      "start": 95,
-      "end": 114,
+      "start": 111,
+      "end": 130,
       "calls": [
         "append",
         "bufio.NewScanner",
@@ -6975,8 +7019,8 @@
       "name": "main",
       "kind": "function",
       "file": "research/native/itd02/outcomebridge/main.go",
-      "start": 115,
-      "end": 120,
+      "start": 131,
+      "end": 136,
       "calls": [
         "fmt.Fprintln",
         "os.Exit",
@@ -7152,6 +7196,29 @@
         "publicGrid",
         "reference.Choose",
         "serve",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf",
+        "t.Fatalf"
+      ]
+    },
+    {
+      "name": "TestFrozenPeekDoesNotArmOrChangeNativeCheckpoint",
+      "kind": "function",
+      "file": "research/native/itd02/outcomebridge/main_test.go",
+      "start": 191,
+      "end": 211,
+      "calls": [
+        "bytes.Equal",
+        "outcome.NewContextSelected",
+        "p.Snapshot",
+        "p.Snapshot",
+        "process",
+        "process",
+        "process",
+        "publicGrid",
         "t.Fatal",
         "t.Fatal",
         "t.Fatal",
