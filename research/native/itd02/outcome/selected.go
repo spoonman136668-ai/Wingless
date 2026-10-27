@@ -110,3 +110,42 @@ func (s *Selected) ChooseRewardAware(before r1.PublicGrid, minCount uint32) (int
  s.Policy=candidate
  return chosen,nil
 }
+
+
+// ChooseRewardExplore is an explicitly opt-in balanced action-evidence
+// acquisition gate. It arms only the genuine R8/R5 selected-action route.
+// Every consequence must still pass Selected.Feedback; observations here
+// are engineering fixtures until authenticated source episodes are run.
+func (s *Selected) ChooseRewardExplore(before r1.PublicGrid, minCount uint32) (int,error) {
+ if s==nil||s.Policy==nil||s.Rewards==nil||!s.Policy.Healthy()||
+  !s.Rewards.Valid()||s.Policy.Armed||s.Rewards.Closed||
+  s.Rewards.NextID!=s.Policy.LiveSeen+1||minCount<2{
+  return 0,errors.New("OUTCOME_EXPLORATION_CUSTODY")
+ }
+ raw,err:=s.Policy.Snapshot();if err!=nil{return 0,err}
+ candidate,err:=r8.Restore(raw);if err!=nil{return 0,err}
+ target:=-1
+ // Deterministic balanced coverage; ties go to the smaller action.
+ for action,b:=range s.Rewards.Bins {
+  if b.Count<minCount && (target<0||b.Count<s.Rewards.Bins[target].Count) {
+   target=action
+  }
+ }
+ if target<0 {
+  recommended,e:=s.RecommendRewardAction(minCount)
+  if e==nil { target=recommended }
+ }
+ native,err:=candidate.Choose(before);if err!=nil{return 0,err}
+ if target<0 {target=native}
+ if target!=native{
+  if !candidate.Armed||!candidate.Core.Core.Route.Pending||
+   candidate.Core.Core.Route.Before!=before||
+   candidate.Core.Core.Route.Action!=native{
+   return 0,errors.New("OUTCOME_EXPLORATION_ROUTE")
+  }
+  candidate.Core.Core.Route.Action=target
+ }
+ if !candidate.Healthy(){return 0,errors.New("OUTCOME_EXPLORATION_INVALID")}
+ s.Policy=candidate
+ return target,nil
+}
