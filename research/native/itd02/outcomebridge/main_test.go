@@ -154,3 +154,35 @@ func TestContextBridgeMalformedWireCannotConsumePendingSelection(t *testing.T){
   t.Fatal("rejected wire altered legitimate selected reward evidence")
  }
 }
+
+func TestContextBridgeQuitRefusesToDiscardPendingSelectedFeedback(t *testing.T){
+ before:=publicGrid()
+ reference:=outcome.NewContextSelected()
+ action,err:=reference.Choose(before,2);if err!=nil{t.Fatal(err)}
+ after:=before
+ if action==0{after.Direction=3}else if action==1{after.Direction=1}
+ requests:=[]Request{
+  {Op:"choose",Before:before,MinCount:2},
+  {Op:"quit"},
+  {Op:"feedback",Before:before,After:after,Action:action,EventID:1,Reward:6,Terminal:true},
+  {Op:"quit"},
+ }
+ var input bytes.Buffer
+ for _,req:=range requests{
+  raw,err:=json.Marshal(req);if err!=nil{t.Fatal(err)}
+  input.Write(raw);input.WriteByte('\n')
+ }
+ var output bytes.Buffer
+ if err:=serve(&input,&output);err!=nil{t.Fatal(err)}
+ lines:=bytes.Split(bytes.TrimSpace(output.Bytes()),[]byte{10})
+ if len(lines)!=4{t.Fatalf("expected 4 replies, got %d",len(lines))}
+ var replies [4]Reply
+ for i,line:=range lines{
+  if err:=json.Unmarshal(line,&replies[i]);err!=nil{t.Fatal(err)}
+ }
+ if !replies[0].OK||replies[0].Action==nil||*replies[0].Action!=action||
+  replies[1].OK||replies[1].Error!="OUTCOME_QUIT_PENDING_SELECTED_ACTION"||
+  !replies[2].OK||replies[2].Updates!=1||!replies[3].OK{
+  t.Fatalf("quit discarded pending native custody: %+v",replies)
+ }
+}
