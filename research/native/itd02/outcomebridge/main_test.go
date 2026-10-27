@@ -60,3 +60,54 @@ func TestContextBridgeStrictProtocol(t *testing.T){
   t.Fatalf("expected exactly two response lines; got %d",n+1)
  }
 }
+
+func TestContextBridgeLineProtocolRoundTripAcrossFreshServer(t *testing.T) {
+ before:=publicGrid()
+ source:=outcome.NewContextSelected()
+ chosen,err:=source.Choose(before,2)
+ if err!=nil{t.Fatal(err)}
+ after:=before
+ if chosen==0{after.Direction=3}else if chosen==1{after.Direction=1}
+ requests:=[]Request{
+  {Op:"choose",Before:before,MinCount:2},
+  {Op:"feedback",Before:before,After:after,Action:chosen,EventID:1,Reward:13,Terminal:true},
+  {Op:"snapshot"},
+  {Op:"quit"},
+ }
+ var input bytes.Buffer
+ for _,req:=range requests {
+  raw,err:=json.Marshal(req);if err!=nil{t.Fatal(err)}
+  input.Write(raw);input.WriteByte('\n')
+ }
+ var output bytes.Buffer
+ if err:=serve(&input,&output);err!=nil{t.Fatal(err)}
+ var replies []Reply
+ for _,line:=range bytes.Split(bytes.TrimSpace(output.Bytes()),[]byte{10}){
+  var response Reply
+  if err:=json.Unmarshal(line,&response);err!=nil{t.Fatal(err)}
+  replies=append(replies,response)
+ }
+ if len(replies)!=4||!replies[0].OK||replies[0].Action==nil||
+  *replies[0].Action!=chosen||!replies[1].OK||
+  replies[1].Updates!=1||!replies[2].OK||replies[2].State==""||
+  !replies[3].OK {
+  t.Fatalf("invalid native wire roundtrip: %+v",replies)
+ }
+ // A distinct in-memory server must accept the authentic combined checkpoint.
+ var freshInput bytes.Buffer
+ for _,req:=range []Request{{Op:"load",State:replies[2].State},{Op:"snapshot"},{Op:"quit"}}{
+  raw,err:=json.Marshal(req);if err!=nil{t.Fatal(err)}
+  freshInput.Write(raw);freshInput.WriteByte('\n')
+ }
+ var freshOutput bytes.Buffer
+ if err:=serve(&freshInput,&freshOutput);err!=nil{t.Fatal(err)}
+ lines:=bytes.Split(bytes.TrimSpace(freshOutput.Bytes()),[]byte{10})
+ if len(lines)!=3{t.Fatalf("fresh server replied %d times",len(lines))}
+ var loaded,restored Reply
+ if err:=json.Unmarshal(lines[0],&loaded);err!=nil{t.Fatal(err)}
+ if err:=json.Unmarshal(lines[1],&restored);err!=nil{t.Fatal(err)}
+ if !loaded.OK||loaded.Updates!=1||!restored.OK||
+  restored.State!=replies[2].State {
+  t.Fatalf("fresh server failed exact checkpoint retention: %+v %+v",loaded,restored)
+ }
+}
