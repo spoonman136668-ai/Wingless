@@ -1,0 +1,58 @@
+name: Wingless ITD-02 R4 opt-in native public frontier source-only
+on:
+  push:
+    branches: [research/itd02-r4-frontier-native-20261025]
+permissions:
+  contents: read
+jobs:
+  native-r4-no-scientific-first-use:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 32
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Original learned-causal R1 R2 R3 source identity and prereg first
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5c61e7d0df1ce9fdbf7039be4a2a173764df28a5 HEAD
+          test "$(git rev-parse '5c61e7d0df1ce9fdbf7039be4a2a173764df28a5^')" = 3b11363b93e61311a8e96de2546b1a7f7f62d5db
+          test "$(git hash-object research/native/itd02/r1/policy.go)" = 8d1845d82dd8578a709b00e8841bdc5edc8dbc10
+          test "$(git hash-object research/native/itd02/r2/affordance.go)" = e1564172079359ca4c450dcc87487a4733210584
+          test "$(git hash-object research/native/itd02/r3/transitions.go)" = 3c8a60a5037e6c0f04648ae53175ed1187b5f8ac
+          test "$(git hash-object research/native/itd02/r3/transitions_test.go)" = 0da274847ea853a2167ce6e81612073202abee34
+          echo WINGLESS_R4_PARENT_AND_ORIGINAL_R3_SCIENCE_CUSTODY=PASS
+      - name: Native R1 R2 R3 R4 synthetic mechanism focused tests vet build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4
+          go vet ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4
+          go build ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4
+          echo WINGLESS_R4_GO_TEST_VET_BUILD=PASS
+      - name: Race check for native learning and episode memory
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -race ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3 ./research/native/itd02/r4
+          echo WINGLESS_R4_NATIVE_RACE=PASS
+      - name: Source untouched and scientific boundary explicit
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo WINGLESS_R4_ORIGINAL_ENVIRONMENT_EXECUTION=NOT_PERFORMED
+          echo WINGLESS_R4_PROTECTED_FIRST_USE=NOT_PERFORMED
+          echo WINGLESS_R4_UNFAMILIAR_WORLD_GOAL_GAIN=NOT_CLAIMED
+          echo WINGLESS_R4_CLEAN_SOURCE=PASS
