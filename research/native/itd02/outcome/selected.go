@@ -77,3 +77,36 @@ func (s *Selected) RecommendRewardAction(minCount uint32) (int,error) {
  if ties!=1{return -1,errors.New("OUTCOME_REWARD_TIE")}
  return best,nil
 }
+
+
+// ChooseRewardAware is an opt-in native selected-action gate. With sufficient
+// selected outcome evidence it prefers the unique highest mean-reward action.
+// The frozen R8 implementation remains unchanged. All mutations occur on a
+// restored R8 candidate; only a healthy, source-gated pending action commits.
+// This is global action preference, not state-conditioned causal learning.
+func (s *Selected) ChooseRewardAware(before r1.PublicGrid, minCount uint32) (int,error) {
+ if s==nil||s.Policy==nil||s.Rewards==nil||!s.Policy.Healthy()||
+  !s.Rewards.Valid()||s.Policy.Armed||s.Rewards.Closed||
+  s.Rewards.NextID!=s.Policy.LiveSeen+1 {
+  return 0,errors.New("OUTCOME_REWARD_CHOICE_CUSTODY")
+ }
+ raw,err:=s.Policy.Snapshot();if err!=nil{return 0,err}
+ candidate,err:=r8.Restore(raw);if err!=nil{return 0,err}
+ recommendation,recommendErr:=s.RecommendRewardAction(minCount)
+ chosen,err:=candidate.Choose(before);if err!=nil{return 0,err}
+ if recommendErr==nil && recommendation!=chosen {
+  // The original R8 chooser arms the original R5 selected-action custody.
+  // Change only the pending choice in the isolated opt-in candidate, so
+  // native R8 Feedback still authenticates the selected public transition.
+  if !candidate.Armed||!candidate.Core.Core.Route.Pending||
+   candidate.Core.Core.Route.Before!=before||
+   candidate.Core.Core.Route.Action!=chosen{
+   return 0,errors.New("OUTCOME_REWARD_CHOICE_ROUTE")
+  }
+  candidate.Core.Core.Route.Action=recommendation
+  chosen=recommendation
+ }
+ if !candidate.Healthy(){return 0,errors.New("OUTCOME_REWARD_CHOICE_INVALID")}
+ s.Policy=candidate
+ return chosen,nil
+}
