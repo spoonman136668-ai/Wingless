@@ -70,7 +70,7 @@ func TestContextSelectedRejectedFeedbackAndCorruptionAreAtomic(t *testing.T){
 func TestContextSelectedRevisesBlockedFrontRewardAfterContradictions(t *testing.T){
  c:=NewContextSelected()
  before:=selectedFixture()
- for i:=0;i<80;i++{
+ for i:=0;i<81;i++{
   action,err:=c.Choose(before,2)
   if err!=nil{t.Fatalf("choose event %d: %v",i+1,err)}
   after:=before
