@@ -15,7 +15,7 @@ import (
  r1 "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
 )
 
-const ProgressSchema="wingless.itd02.selected-goal-progress.v3"
+const ProgressSchema="wingless.itd02.selected-goal-progress.v4"
 type ProgressBin struct{
  Count uint32 `json:"count"`
  Sum int64 `json:"sum"`
@@ -23,6 +23,7 @@ type ProgressBin struct{
 type ProgressSelected struct{
  Base *MotionSelected
  Bins [6][3]ProgressBin
+ Stalled uint8 // capped consecutive authentic transitions without public goal-distance reduction
 }
 func NewProgressSelected()*ProgressSelected{return &ProgressSelected{Base:NewMotionSelected()}}
 func pAbs(x int)int{if x<0{return -x};return x}
@@ -50,7 +51,8 @@ func publicProgress(before,after r1.PublicGrid)int64{
  return int64(8*(d0-d1)+pSign(goalDot(after))-pSign(goalDot(before)))
 }
 func(p *ProgressSelected)valid()bool{
- if p==nil||p.Base==nil||!p.Base.valid(){return false}
+ if p==nil||p.Base==nil||!p.Base.valid()||p.Stalled>16{return false}
+ if p.Base.Base.Base.Policy.EpisodeSteps==0&&p.Stalled!=0{return false}
  for blocked:=0;blocked<2;blocked++ {
   for a:=0;a<3;a++{
    total:=uint64(0)
@@ -63,6 +65,13 @@ func(p *ProgressSelected)valid()bool{
   }
  }
  return true
+}
+// Bounded goal-stagnation evidence comes ONLY from consecutive selected
+// public outcomes, never from unseen actions or benchmark response labels.
+func goalDistance(g r1.PublicGrid)int{return pAbs(g.GoalX-g.X)+pAbs(g.GoalY-g.Y)}
+func(p *ProgressSelected)stalledProbe(before r1.PublicGrid,completed uint64)bool{
+ return p.Stalled>=4&&completed>0&&completed%8==0&&
+  (before.FrontBlocked||goalCross(before)!=0)
 }
 // Native route remains the sole pending-action custodian. Every preference
 // candidate must arm original R8/R5 choose first; no synthetic observations.
@@ -88,14 +97,15 @@ func(p *ProgressSelected)Choose(before r1.PublicGrid,minCount uint32)(int,error)
   }
  }
  if best>=0&&unique{target=best}
- // V3 bounded active evidence: explore the less-observed turn every eighth
- // accepted selected action only when a public lateral goal or obstacle makes
- // orientation relevant. The choice is based on ACTUAL turn samples, never a
- // hardcoded goal-side answer or unobserved counterfactual. The original
- // motion-selected custodian still arms the final action and authenticates
- // public feedback. Observed positive environmental reward can override below.
+ // V4 empirical stagnation-gated turn evidence, preserving V3 cadence:
+ // only when four genuine selected outcomes failed to reduce PUBLIC goal
+ // distance, and lateral goal or obstacle makes turn evidence relevant.
+ // Turn selection still compares ACTUAL left/right count and never guesses
+ // the correct turn from the visible target; the original native route
+ // authenticates all feedback. Global reward can override ONLY outside stall.
  completed:=p.Base.Base.Base.Rewards.NextID-1
- if completed>0 && completed%8==0 && (before.FrontBlocked||goalCross(before)!=0){
+ probing:=p.stalledProbe(before,completed)
+ if probing{
   left:=p.Base.Base.Base.Rewards.Bins[0].Count
   right:=p.Base.Base.Base.Rewards.Bins[1].Count
   switch{
@@ -108,7 +118,7 @@ func(p *ProgressSelected)Choose(before r1.PublicGrid,minCount uint32)(int,error)
  // Preserve an unambiguous experienced external reward preference. Do not
  // replace learned reward evidence with engineered movement heuristics.
  prior:=p.Base.Base.Bins[contextIndex(before)]
- if prior[0].Count>=minCount&&prior[1].Count>=minCount&&prior[2].Count>=minCount {
+ if !probing&&prior[0].Count>=minCount&&prior[1].Count>=minCount&&prior[2].Count>=minCount {
   top:=-1;unique:=true
   for a,b:=range prior {
    if top<0||b.Sum*float64(prior[top].Count)>prior[top].Sum*float64(b.Count){
@@ -142,9 +152,11 @@ func(p *ProgressSelected)Feedback(before r1.PublicGrid,action int,after r1.Publi
  if bin.Count>=MaxEvents{return errors.New("PROGRESS_EVENT_CAP")}
  bin.Count++
  bin.Sum+=publicProgress(before,after)
- candidate:=&ProgressSelected{Base:clone,Bins:bins}
+ stalled:=p.Stalled
+ if goalDistance(after)<goalDistance(before){stalled=0}else if stalled<16{stalled++}
+ candidate:=&ProgressSelected{Base:clone,Bins:bins,Stalled:stalled}
  if !candidate.valid(){return errors.New("PROGRESS_INVALID_FEEDBACK")}
- p.Base=clone;p.Bins=bins
+ p.Base=clone;p.Bins=bins;p.Stalled=stalled
  return nil
 }
 func(p *ProgressSelected)BeginEpisode()error{
@@ -152,11 +164,12 @@ func(p *ProgressSelected)BeginEpisode()error{
  raw,err:=p.Base.Snapshot();if err!=nil{return err}
  candidate,err:=RestoreMotionSelected(raw);if err!=nil{return err}
  if err=candidate.BeginEpisode();err!=nil{return err}
- p.Base=candidate;return nil
+ p.Base=candidate;p.Stalled=0;return nil
 }
 type progressState struct{
  Base []byte `json:"base"`
  Bins [6][3]ProgressBin `json:"progress_bins"`
+ Stalled uint8 `json:"stalled"`
 }
 type progressEnvelope struct{
  Schema string `json:"schema"`
@@ -166,7 +179,7 @@ type progressEnvelope struct{
 func(p *ProgressSelected)Snapshot()([]byte,error){
  if !p.valid(){return nil,errors.New("PROGRESS_SNAPSHOT_CUSTODY")}
  raw,err:=p.Base.Snapshot();if err!=nil{return nil,err}
- state:=progressState{Base:raw,Bins:p.Bins}
+ state:=progressState{Base:raw,Bins:p.Bins,Stalled:p.Stalled}
  body,err:=json.Marshal(state);if err!=nil{return nil,err}
  return json.Marshal(progressEnvelope{Schema:ProgressSchema,State:state,Digest:sha256.Sum256(body)})
 }
@@ -181,7 +194,7 @@ func RestoreProgressSelected(raw []byte)(*ProgressSelected,error){
  body,err:=json.Marshal(env.State);if err!=nil{return nil,err}
  if sha256.Sum256(body)!=env.Digest{return nil,errors.New("PROGRESS_CHECKPOINT_DIGEST")}
  base,err:=RestoreMotionSelected(env.State.Base);if err!=nil{return nil,err}
- p:=&ProgressSelected{Base:base,Bins:env.State.Bins}
+ p:=&ProgressSelected{Base:base,Bins:env.State.Bins,Stalled:env.State.Stalled}
  if !p.valid(){return nil,errors.New("PROGRESS_CHECKPOINT_COUNTS")}
  return p,nil
 }
