@@ -159,3 +159,40 @@ jobs:
           path: ${{ runner.temp }}/itd02-source-controls-*.json
           if-no-files-found: warn
           retention-days: 7
+  source-reward-ablation-restart:
+    # Exploratory known training seed; never a held-out scientific claim.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source world
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Build native outcome IPC
+        run: go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Run reward-aware versus reward-blind cold-restart source probes
+        run: python research/native/itd02/outcome/reward_ablation_restart.py --native-binary "$RUNNER_TEMP/itd02-outcomebridge" --output "$RUNNER_TEMP/itd02-reward-ablation.json" --run-source
+      - name: Verify reward-ablation custody without scientific acceptance
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-reward-ablation.json").read_text())
+          assert r["science"]=="NOT_ACCEPTED"
+          assert r["scope"]=="EXPLORATORY_KNOWN_SEED_NO_TRANSFER"
+          assert r["cold_restart_retained"]
+          assert r["train_seed"] not in r["probe_seeds"]
+          assert len(r["reward_aware"]["probes"])==len(r["reward_blind"]["probes"])==2
+          print("REWARD_ABLATION_COLD_RESTART_EVIDENCE_RECORDED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-reward-ablation-restart
+          path: ${{ runner.temp }}/itd02-reward-ablation.json
+          if-no-files-found: warn
+          retention-days: 7
