@@ -59,6 +59,17 @@ func(c *ContextSelected)Choose(before r1.PublicGrid,minCount uint32)(int,error){
  for a,b:=range row {
   if b.Count<minCount&&(target<0||b.Count<row[target].Count){target=a}
  }
+ if target<0 && c.Base.Rewards.NextID>1 && (c.Base.Rewards.NextID-1)%4==0 {
+  // Keep sampling each public context after initial coverage. Without
+  // ongoing selected outcomes a context's early preference cannot recover
+  // from a changing reward relationship.
+  offset:=int((c.Base.Rewards.NextID-1)/4%3)
+  target=offset
+  for j:=1;j<3;j++{
+   a:=(offset+j)%3
+   if row[a].Count<row[target].Count{target=a}
+  }
+ }
  if target<0{
   best:=-1
   var top float64
