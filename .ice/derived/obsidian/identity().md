@@ -1,0 +1,18 @@
+---
+source_file: "scripts/validate_code_atlas.py"
+type: "code"
+community: "Community 23"
+location: "L38"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/Community_23
+---
+
+# identity()
+
+## Connections
+- [[validate()]] - `calls` [EXTRACTED]
+- [[validate_code_atlas.py]] - `contains` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/Community_23
