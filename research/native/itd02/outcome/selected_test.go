@@ -95,3 +95,31 @@ func TestRewardAwareRejectsUnownedEvidenceWithoutArming(t *testing.T) {
  }
  if s.Policy.Armed {t.Fatal("rejected action armed native custodian")}
 }
+
+func TestRewardAwareInvalidObservationDoesNotMutateSelectedCustody(t *testing.T) {
+ s:=NewSelected()
+ before,err:=s.SnapshotSelected();if err!=nil{t.Fatal(err)}
+ bad:=selectedFixture()
+ bad.Direction=9
+ if _,err:=s.ChooseRewardAware(bad,2);err==nil {
+  t.Fatal("invalid public observation accepted")
+ }
+ after,err:=s.SnapshotSelected();if err!=nil{t.Fatal(err)}
+ if !bytes.Equal(before,after) {
+  t.Fatal("invalid reward-aware request mutated native or reward state")
+ }
+}
+
+func TestRewardAwarePendingActionDoesNotMutateState(t *testing.T) {
+ s:=NewSelected()
+ before:=selectedFixture()
+ if _,err:=s.ChooseRewardAware(before,2);err!=nil{t.Fatal(err)}
+ saved,err:=s.SnapshotSelected();if err!=nil{t.Fatal(err)}
+ if _,err:=s.ChooseRewardAware(before,2);err==nil {
+  t.Fatal("second choice bypassed pending selected action")
+ }
+ again,err:=s.SnapshotSelected();if err!=nil{t.Fatal(err)}
+ if !bytes.Equal(saved,again){
+  t.Fatal("rejected pending choice changed checkpoint")
+ }
+}
