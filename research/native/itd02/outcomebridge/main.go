@@ -78,6 +78,10 @@ func process(p **outcome.ContextSelected,r Request)(Reply,bool){
    if err==nil{*p=restored;v=restored}
   }
  case "quit":
+  if v.Base!=nil&&v.Base.Policy!=nil&&v.Base.Policy.Armed{
+   err=errors.New("OUTCOME_QUIT_PENDING_SELECTED_ACTION")
+   break
+  }
   response.OK=true
   return response,true
  default:
