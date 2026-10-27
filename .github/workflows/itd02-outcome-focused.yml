@@ -187,7 +187,7 @@ jobs:
           assert r["scope"]=="EXPLORATORY_KNOWN_SEED_NO_TRANSFER"
           assert r["cold_restart_retained"]
           assert r["train_seed"] not in r["probe_seeds"]
-          assert len(r["reward_aware"]["probes"])==len(r["reward_blind"]["probes"])==2
+          assert r["probe_seeds"]==[23,29,31,37] and len(r["reward_aware"]["probes"])==len(r["reward_blind"]["probes"])==4
           print("REWARD_ABLATION_COLD_RESTART_EVIDENCE_RECORDED")
           PY
       - uses: actions/upload-artifact@v4
