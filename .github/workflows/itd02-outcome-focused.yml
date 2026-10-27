@@ -262,6 +262,15 @@ jobs:
           assert r["frozen_checkpoint_verified_each_episode"]
           assert set(r["results"])=={"reward_aware","reward_blind","fixed"}
           assert all(len(v)==4 for v in r["results"].values())
+          for policy,episodes in r["results"].items():
+              for e in episodes:
+                  last=e["events"][-1]
+                  assert e["goal_reached"]==bool(last["terminated"] and e["return"]>0),policy
+                  assert e["source_truncated"]==last["truncated"],policy
+                  assert not (e["goal_reached"] and e["source_truncated"]),policy
+                  if e["completed"] and not e["goal_reached"]:
+                      print("SOURCE_EPISODE_ENDED_WITHOUT_GOAL",policy,e["seed"])
+          print("SOURCE_GOAL_VS_TRUNCATION_DISAMBIGUATED")
           print("UNFAMILIAR_SOURCE_EVIDENCE_RECORDED_NOT_ACCEPTED")
           PY
       - uses: actions/upload-artifact@v4
