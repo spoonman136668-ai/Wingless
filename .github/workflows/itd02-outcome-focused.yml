@@ -9,7 +9,7 @@ on:
       - 'research/native/itd02/outcomebridge/**'
       - '.github/workflows/itd02-outcome-focused.yml'
 permissions:
-  contents: write
+  contents: read
 jobs:
   outcome-focused:
     strategy:
@@ -63,35 +63,3 @@ jobs:
             ${{ runner.temp }}/itd02-ice-index-stat.txt
             ${{ runner.temp }}/itd02-ice-index-files.txt
           retention-days: 3
-  refresh-index-on-branch-push:
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
-    concurrency:
-      group: wingless-itd02-outcome-ice-index-single-writer
-      cancel-in-progress: false
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: research/itd02-selected-outcome-learner-20261026
-          persist-credentials: true
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.25'
-      - name: Rebuild and validate generated ICE
-        run: |
-          go run ./cmd/ice build
-          go run ./cmd/ice validate
-      - name: Commit only generated ICE delta
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- .ice
-          if git diff --cached --quiet; then
-            echo "ICE_INDEX_ALREADY_FRESH=true"
-            exit 0
-          fi
-          git diff --cached --name-only | awk '!/^\.ice\// { bad=1 } END { exit bad }'
-          git commit -m "ITD-02: refresh generated ICE indexes"
-          git fetch origin research/itd02-selected-outcome-learner-20261026
-          git rebase origin/research/itd02-selected-outcome-learner-20261026
-          git push origin HEAD:research/itd02-selected-outcome-learner-20261026
