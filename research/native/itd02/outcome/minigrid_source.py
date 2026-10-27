@@ -1,7 +1,7 @@
 """Fail-closed MiniGrid public observation/transition adapter for ITD-02.
 
 No learner IPC, training, private env attributes, or scientific acceptance here.
-Install explicitly: python -m pip install 'minigrid==2.3.1' 'gymnasium==1.0.0'
+Install explicitly: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
 The import is lazy so the decoder can be unit tested without those dependencies.
 """
 from __future__ import annotations
@@ -157,6 +157,6 @@ def open_source_environment(environment_id: str) -> SourceEpisode:
         raise SourceObservationError("MiniGrid source encoding drift")
     if getattr(minigrid, "__version__", None) != "2.3.1":
         raise SourceObservationError("unpinned MiniGrid version")
-    if getattr(gym, "__version__", None) != "1.0.0":
+    if getattr(gym, "__version__", None) != "0.29.1":
         raise SourceObservationError("unpinned Gymnasium version")
     return SourceEpisode(FullyObsWrapper(gym.make(environment_id)))
