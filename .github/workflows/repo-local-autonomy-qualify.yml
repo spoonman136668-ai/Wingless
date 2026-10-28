@@ -154,3 +154,26 @@ jobs:
           go test ./...
           if($LASTEXITCODE-ne0){throw "GO_TEST_FAILED exit=$LASTEXITCODE"}
           Write-Host 'WINGLESS_REPO_LOCAL_FULL_REGRESSION_PASS'
+
+      - name: Negative-test model-selected process execution
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Branch=([string](& git branch --show-current)).Trim()
+          if([string]::IsNullOrWhiteSpace($Branch)){
+            git switch -c ci-free-agent-no-process-probe
+            if($LASTEXITCODE-ne0){throw 'AGENT_SELFTEST_LOCAL_BRANCH_FAILED'}
+            $Branch='ci-free-agent-no-process-probe'
+          }
+          $Head=([string](& git rev-parse HEAD)).Trim()
+          if($Head -notmatch '^[a-f0-9]{40}$'){throw 'AGENT_SELFTEST_SHA_INVALID'}
+          $Probe=Join-Path $env:RUNNER_TEMP 'free-agent-guard-probe.txt'
+          [IO.File]::WriteAllText($Probe,'Local offline safety probe; no provider request.',(New-Object Text.UTF8Encoding($false)))
+          & '.\\scripts\\Invoke-NemotronRepoAgent.ps1' `
+            -RepoPath (Resolve-Path '.').Path `
+            -Program 'Wingless' -ActiveBranch $Branch -StartSha $Head `
+            -PromptPath $Probe `
+            -LastMessagePath (Join-Path $env:RUNNER_TEMP 'free-agent-last-message.txt') `
+            -SelfTest -NoProcessTools
+          if($LASTEXITCODE-ne0){throw 'AGENT_NO_PROCESS_SELFTEST_FAILED'}
+          Write-Host 'FREE_RESEARCH_MODEL_PROCESS_NEGATIVE_GATE=PASS'
