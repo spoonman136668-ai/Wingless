@@ -1,0 +1,93 @@
+# Isolated one-shot source preflight acceptance; no provider calls and no GitHub writes.
+name: Wingless isolated free-author token preflight negative
+on:
+  push:
+    branches:
+      - engineering/free-author-token-preflight-fix-20261028
+    paths:
+      - .github/workflows/free-author-token-preflight-negative.yml
+permissions:
+  contents: read
+jobs:
+  token-negative:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 3
+      - name: Verify source-only fix ancestry and tested execution boundary
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if($env:RUNNER_ENVIRONMENT -cne 'github-hosted'){throw 'NOT_EPHEMERAL'}
+          $Sha=(& git rev-parse HEAD^).Trim()
+          if($Sha -cne '9558079bc335873adf3c634536e0b72f160eae52'){throw 'TOKEN_PRECHECK_SOURCE_MOVED'}
+          $Base=(& git rev-parse HEAD^^).Trim()
+          if($Base -cne '82bed9a39edda8bf1a638ad92d3b6c5d5d986d78'){throw 'TOKEN_PRECHECK_PARENT_MOVED'}
+          $Expected='.github/workflows/free-author-token-preflight-negative.yml'
+          $OnlyWorkflow=@(& git diff --name-only HEAD^ HEAD)
+          $OnlySource=@(& git diff --name-only HEAD^^ HEAD^)
+          if($OnlyWorkflow.Count-ne1 -or $OnlyWorkflow[0] -cne $Expected){throw 'WORKFLOW_SCOPE_DRIFT'}
+          if($OnlySource.Count-ne1 -or $OnlySource[0] -cne 'scripts/Invoke-RepoLocalResearchCycle.ps1'){throw 'SOURCE_SCOPE_DRIFT'}
+          $C=Get-Content '.research-autonomy/config.json' -Raw|ConvertFrom-Json
+          if($C.research_executor -cne 'disabled' -or $C.program -cne 'Wingless'){
+            throw 'PRODUCTION_CONFIG_MUST_REMAIN_DISABLED'
+          }
+          Write-Host 'TOKEN_FIX_EXACT_SOURCE_AND_DISABLED_CONFIG=PASS'
+      - name: Negative-test token required except exact isolated free author
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version Latest
+          $Repo=(Resolve-Path '.').Path
+          $Branch='token-isolation-negative-'+$env:GITHUB_RUN_ID
+          & git switch -c $Branch
+          if($LASTEXITCODE-ne0){throw 'TEMP_BRANCH_CREATE_FAILED'}
+          $ConfigPath=Join-Path $Repo '.research-autonomy/config.json'
+          $Original=[IO.File]::ReadAllText($ConfigPath)
+          $Cycle=Join-Path $Repo 'scripts/Invoke-RepoLocalResearchCycle.ps1'
+          $env:GITHUB_TOKEN=''
+          $env:GH_TOKEN=''
+          $env:OPENROUTER_FREE_API_KEY=''
+          $env:RESEARCH_FREE_EXECUTOR_OWNER_ACK=''
+          $env:RESEARCH_FREE_BUNDLE_OUTPUT=''
+          $Program='Wingless'
+          function Assert-CycleThrows([string]$Expected){
+            $ErrorMessage=''
+            try{
+              & $Cycle -RepoPath $Repo -Repository "spoonman136668-ai/$Program" `
+                  -ActiveBranch $Branch -NorthStarPath '.research-autonomy/config.json' `
+                  -NorthStarSha256 ('0'*64) -Trigger 'manual'
+            }catch{
+              $ErrorMessage=[string]$_.Exception.Message
+            }
+            if($ErrorMessage -cnotmatch [Regex]::Escape($Expected)){
+              throw "TOKEN_GUARD_EXPECTATION_FAILED expected=$Expected actual=$ErrorMessage"
+            }
+          }
+          try {
+            # Existing production scheduler still cannot run without its token.
+            Assert-CycleThrows 'GITHUB_TOKEN_MISSING'
+            $C=($Original|ConvertFrom-Json)
+            $C.research_executor='free-nemotron-opt-in-v1'
+            $FreeJson=$C|ConvertTo-Json -Depth 15
+            [IO.File]::WriteAllText($ConfigPath,$FreeJson,(New-Object Text.UTF8Encoding($false)))
+            # Either missing explicit acknowledgment or wrong runner remains denied.
+            Assert-CycleThrows 'GITHUB_TOKEN_MISSING'
+            $env:RESEARCH_FREE_EXECUTOR_OWNER_ACK='1'
+            $OriginalRunner=$env:RUNNER_ENVIRONMENT
+            $env:RUNNER_ENVIRONMENT='self-hosted'
+            Assert-CycleThrows 'GITHUB_TOKEN_MISSING'
+            $env:RUNNER_ENVIRONMENT=$OriginalRunner
+            # Exact ephemeral+owner gate MUST pass old token check, then stop
+            # on intentionally mismatched North Star SHA before provider access.
+            Assert-CycleThrows 'NORTH_STAR_IDENTITY_DRIFT'
+            Write-Host 'LEGACY_TOKEN_REQUIRED_NO_ACK_DENIED_NON_EPHEMERAL_DENIED=PASS'
+            Write-Host 'FREE_AUTHOR_NO_GITHUB_TOKEN_REACHES_SOURCE_PREFLIGHT=PASS'
+            Write-Host 'PROVIDER_CALLS=ZERO'
+          }finally{
+            [IO.File]::WriteAllText($ConfigPath,$Original,(New-Object Text.UTF8Encoding($false)))
+          }
+          if(@(& git status --porcelain).Count-ne0){throw 'NEGATIVE_TEST_MUTATED_SOURCE'}
