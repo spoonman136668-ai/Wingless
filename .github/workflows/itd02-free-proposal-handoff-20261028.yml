@@ -29,7 +29,8 @@ jobs:
           $ErrorActionPreference='Stop'
           if($env:GITHUB_RUN_ATTEMPT -cne '1'){throw 'ITD02_AUTHOR_REPEAT_FORBIDDEN'}
           if($env:GITHUB_REF_NAME -cne 'research/itd02-free-proposal-handoff-20261028' -or
-             ((& git rev-parse HEAD^ | Out-String)).Trim() -cne 'e0a73f188a6fde56ceabf03cf4c52e80f1d60e98'){
+             (((& git rev-parse HEAD^ | Out-String)).Trim() -cne '845b0bbada456a816bc51c69dac3e241736ecd8c' -or
+             ((& git rev-parse HEAD~2 | Out-String)).Trim() -cne 'e0a73f188a6fde56ceabf03cf4c52e80f1d60e98')){
             throw 'ITD02_AUTHOR_EXACT_SOURCE_DRIFT'
           }
           $Changes=@(& git diff --name-only HEAD^ HEAD)
@@ -76,7 +77,7 @@ jobs:
           Wingless: self-organizing predictive causal state; learned entity bindings and compositional transfer.
           Yggdrasil: locally plastic interacting cells, distributed specialization and recoverable functional memory.
           Prefer retail CPU/RAM budgets and no global oracle. Distinguish learning from memorized routes. Require matched information and compute controls, cold retention and unfamiliar-family transfer.
-          Return strictly one JSON object and nothing else. Exactly:
+          Call the submit_development_design data submission function exactly once, with exactly these JSON argument keys:
           {"schema":"itd02.free-proposal.v1","proposals":[
             {"lane":"Wingless","mechanism":"plain text","intervention":"plain text","prediction":"plain text","falsifier":"plain text","matched_control":"plain text","cold_retention_probe":"plain text","unfamiliar_transfer_probe":"plain text","retail_resource_budget":"plain text"},
             {"lane":"Yggdrasil","mechanism":"plain text","intervention":"plain text","prediction":"plain text","falsifier":"plain text","matched_control":"plain text","cold_retention_probe":"plain text","unfamiliar_transfer_probe":"plain text","retail_resource_budget":"plain text"}
@@ -84,15 +85,50 @@ jobs:
           Every plain text value must be a distinct concrete sentence of 25 to 190 characters, using ASCII letters, numerals, spaces and common punctuation only.
           This is a development proposal, NOT an experimental result. Do not supply code, terminal instructions, URLs, keys, personal data, citations, tool calls, or claims that an experiment was performed.
           '@
+          $Fields=@('mechanism','intervention','prediction','falsifier','matched_control','cold_retention_probe','unfamiliar_transfer_probe','retail_resource_budget')
+          $StringProperties=@{}
+          foreach($Field in $Fields){
+            $StringProperties[$Field]=@{type='string';minLength=25;maxLength=230}
+          }
+          $LaneProperties=@{lane=@{type='string';enum=@('Wingless','Yggdrasil')}}
+          foreach($Field in $Fields){$LaneProperties[$Field]=$StringProperties[$Field]}
+          $ToolParameters=[ordered]@{
+            type='object'
+            additionalProperties=$false
+            required=@('schema','proposals')
+            properties=@{
+              schema=@{type='string';enum=@('itd02.free-proposal.v1')}
+              proposals=@{
+                type='array'
+                minItems=2
+                maxItems=2
+                items=@{
+                  type='object'
+                  properties=$LaneProperties
+                  required=@('lane')+$Fields
+                  additionalProperties=$false
+                }
+              }
+            }
+          }
+          $FunctionName='submit_development_design'
           $Request=[ordered]@{
             model=$Model
             temperature=0
-            max_tokens=2200
+            max_tokens=4200
             messages=@(
-              @{role='system';content='You are an experiment-design assistant. Output only valid JSON using the exact requested schema. Never claim a result or scientific acceptance.'},
+              @{role='system';content='Call submit_development_design once with two causal research designs. It only submits data, never executes code or experiments. No experimental outcomes or acceptance claims.'},
               @{role='user';content=$Prompt}
             )
-          }|ConvertTo-Json -Compress -Depth 12
+            tools=@(
+              @{type='function';function=@{
+                name=$FunctionName
+                description='Return exactly two experimental-development designs as structured untrusted data. This tool has no executable implementation.'
+                parameters=$ToolParameters
+              }}
+            )
+            tool_choice=@{type='function';function=@{name=$FunctionName}}
+          }|ConvertTo-Json -Compress -Depth 20
           $Headers=@{
             Authorization=('Bearer '+$Token)
             'Content-Type'='application/json'
@@ -100,23 +136,29 @@ jobs:
           $Token=$null
           $Status=0
           try{
-            # One network call. No retries and no paid/provider fallback.
+            # Exactly one remote request. Returned tool arguments are treated
+            # as untrusted data, and the named tool is NEVER executed.
             $Response=Invoke-RestMethod -Method Post -Uri 'https://openrouter.ai/api/v1/chat/completions' -Headers $Headers -Body $Request -ContentType 'application/json' -TimeoutSec 120
           }catch{
             try{$Status=[int]$_.Exception.Response.StatusCode}catch{}
-            throw ('ITD02_FREE_AUTHOR_PROVIDER_REQUEST_FAILED status='+$Status)
+            throw ('ITD02_FREE_AUTHOR_FUNCTION_RESPONSE_FAILED status='+$Status)
           }finally{$Headers=$null}
           if($null-eq$Response -or @($Response.choices).Count -ne 1 -or
              $null-eq$Response.choices[0].message -or
-             -not[string]::IsNullOrWhiteSpace([string]$Response.choices[0].message.tool_calls)){
-            throw 'ITD02_FREE_AUTHOR_UNEXPECTED_PROVIDER_SHAPE'
+             $null-eq$Response.choices[0].message.tool_calls){
+            throw 'ITD02_FREE_AUTHOR_EXPECTED_ONE_TOOL_RESULT'
           }
-          $Content=[string]$Response.choices[0].message.content
-          if($Content.Length -lt 400 -or $Content.Length -gt 6500){
-            throw 'ITD02_FREE_AUTHOR_RESPONSE_SIZE_OUT_OF_BOUNDS'
+          $Calls=@($Response.choices[0].message.tool_calls)
+          if($Calls.Count -ne 1 -or
+             [string]$Calls[0].function.name -cne $FunctionName){
+            throw 'ITD02_FREE_AUTHOR_UNEXPECTED_TOOL_OR_COUNT'
+          }
+          $Content=[string]$Calls[0].function.arguments
+          if($Content.Length -lt 400 -or $Content.Length -gt 8500){
+            throw 'ITD02_FREE_AUTHOR_ARGUMENT_SIZE_OUT_OF_BOUNDS'
           }
           try{$Parsed=$Content|ConvertFrom-Json -ErrorAction Stop}catch{
-            throw 'ITD02_FREE_AUTHOR_INVALID_JSON'
+            throw 'ITD02_FREE_AUTHOR_INVALID_TOOL_ARGUMENT_JSON'
           }
           if([string]$Parsed.schema -cne 'itd02.free-proposal.v1' -or
              @($Parsed.proposals).Count -ne 2){
