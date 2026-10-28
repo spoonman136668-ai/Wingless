@@ -27,6 +27,11 @@ type TrainingSession struct {
     Learner *Selected
     MinimumSelectedSamples uint32
     MaximumEpisodeSteps uint32
+    // SelectionControl is an optional fixed comparator for equal-information
+    // public source episodes. Empty keeps the existing balanced exploration.
+    // "reward-aware" uses the unchanged original native selected-action
+    // chooser with outcome-informed preference, without periodic probes.
+    SelectionControl string
 }
 
 // EpisodeResult is a development-only observation, not an accepted scientific
@@ -53,6 +58,7 @@ func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []by
         s.Learner.Rewards == nil || env == nil ||
         s.MinimumSelectedSamples < 2 || s.MaximumEpisodeSteps < 1 ||
         s.MaximumEpisodeSteps > 4096 ||
+        (s.SelectionControl != "" && s.SelectionControl != "reward-aware") ||
         !s.Learner.Policy.Healthy() || !s.Learner.Rewards.Valid() ||
         s.Learner.Policy.Armed || s.Learner.Policy.EpisodeSteps != 0 &&
             !s.Learner.Rewards.Closed {
@@ -71,8 +77,18 @@ func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []by
     }
     var result EpisodeResult
     for step := uint32(0); step < s.MaximumEpisodeSteps; step++ {
-        action, err := s.Learner.ChooseRewardExplore(
-            before, s.MinimumSelectedSamples)
+        // Both arms retain the same native R8 selected-action custody,
+        // public source feedback, reward ledger and checkpoint layout.
+        // Only the predeclared development control differs.
+        var action int
+        var err error
+        if s.SelectionControl == "reward-aware" {
+            action, err = s.Learner.ChooseRewardAware(
+                before, s.MinimumSelectedSamples)
+        } else {
+            action, err = s.Learner.ChooseRewardExplore(
+                before, s.MinimumSelectedSamples)
+        }
         if err != nil {
             return zero, nil, err
         }
