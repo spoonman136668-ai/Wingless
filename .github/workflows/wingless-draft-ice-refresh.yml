@@ -28,12 +28,13 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = 'engineering/optin-free-research-executor-20261028'
-          test "$(git rev-parse HEAD^)" = 'a0076a39ba3878dee093a7281710e5f65185623e'
+          test "$(git rev-parse HEAD^)" = '9569a02b61a2d1d65ffd357e4e194cbee770c268'
           test "$(git rev-parse origin/main)" = '48ba343b403bc9b4389ce1777130e546b3c446bd'
           python3 - <<'PY'
           import subprocess
           allowed={
             '.github/workflows/wingless-draft-ice-refresh.yml',
+            '.github/workflows/free-research-isolation-qualify.yml',
             '.github/workflows/repo-local-autonomy-qualify.yml',
             '.research-autonomy/config.json',
             'scripts/Invoke-NemotronRepoAgent.ps1',
