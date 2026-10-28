@@ -1,0 +1,224 @@
+# Single-use, public-context-only free research design candidate.
+# Native cognition is never trained or executed in the credential-bearing author job.
+name: ITD02 one-shot free author and credential-free design review
+on:
+  push:
+    branches:
+      - research/itd02-free-proposal-handoff-20261028
+    paths:
+      - .github/workflows/itd02-free-proposal-handoff-20261028.yml
+permissions:
+  contents: read
+jobs:
+  author-only:
+    if: github.repository == 'spoonman136668-ai/Wingless'
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 12
+    outputs:
+      proposal_sha256: ${{ steps.candidate.outputs.digest }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Source-pinned single free inference and data-only artifact
+        id: candidate
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          if($env:GITHUB_RUN_ATTEMPT -cne '1'){throw 'ITD02_AUTHOR_REPEAT_FORBIDDEN'}
+          if($env:GITHUB_REF_NAME -cne 'research/itd02-free-proposal-handoff-20261028' -or
+             ((& git rev-parse HEAD^ | Out-String)).Trim() -cne 'e0a73f188a6fde56ceabf03cf4c52e80f1d60e98'){
+            throw 'ITD02_AUTHOR_EXACT_SOURCE_DRIFT'
+          }
+          $Changes=@(& git diff --name-only HEAD^ HEAD)
+          if($Changes.Count -ne 1 -or $Changes[0] -cne '.github/workflows/itd02-free-proposal-handoff-20261028.yml'){
+            throw 'ITD02_AUTHOR_SCOPE_DRIFT'
+          }
+          $Config=Get-Content '.research-autonomy/config.json' -Raw|ConvertFrom-Json
+          if($Config.schema -cne 'research.autonomy.v2' -or
+             $Config.program -cne 'Wingless' -or
+             $Config.authority -cne 'research-only' -or
+             $Config.research_executor -cne 'disabled'){
+            throw 'ITD02_AUTHOR_PRODUCTION_POLICY_DRIFT'
+          }
+          $Paths=@(
+            'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
+            'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
+          )
+          $Token=$null
+          foreach($Path in $Paths){
+            if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){continue}
+            $Secure=$null; $Ptr=[IntPtr]::Zero
+            try{
+              $Secure=([IO.File]::ReadAllText($Path).Trim() | ConvertTo-SecureString -ErrorAction Stop)
+              $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+              $Possible=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
+              if(-not[string]::IsNullOrWhiteSpace($Possible)){
+                $Token=$Possible
+                break
+              }
+            }catch{
+              # An envelope bound to a different SID is not usable.
+            }finally{
+              if($Ptr -ne [IntPtr]::Zero){[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+              if($null-ne$Secure){$Secure.Dispose()}
+              $Possible=$null
+            }
+          }
+          if([string]::IsNullOrWhiteSpace($Token)){throw 'ITD02_AUTHOR_LOCAL_FREE_KEY_UNAVAILABLE'}
+          $Model='nvidia/nemotron-3-ultra-550b-a55b:free'
+          # Intentionally public generic context only: no repository content,
+          # private memory, source files, task IDs, account information or tools.
+          $Prompt=@'
+          Generate an original, falsifiable ITD-02 unfamiliar-world learning research design for two independent non-transformer and non-token cognitive systems.
+          Wingless: self-organizing predictive causal state; learned entity bindings and compositional transfer.
+          Yggdrasil: locally plastic interacting cells, distributed specialization and recoverable functional memory.
+          Prefer retail CPU/RAM budgets and no global oracle. Distinguish learning from memorized routes. Require matched information and compute controls, cold retention and unfamiliar-family transfer.
+          Return strictly one JSON object and nothing else. Exactly:
+          {"schema":"itd02.free-proposal.v1","proposals":[
+            {"lane":"Wingless","mechanism":"plain text","intervention":"plain text","prediction":"plain text","falsifier":"plain text","matched_control":"plain text","cold_retention_probe":"plain text","unfamiliar_transfer_probe":"plain text","retail_resource_budget":"plain text"},
+            {"lane":"Yggdrasil","mechanism":"plain text","intervention":"plain text","prediction":"plain text","falsifier":"plain text","matched_control":"plain text","cold_retention_probe":"plain text","unfamiliar_transfer_probe":"plain text","retail_resource_budget":"plain text"}
+          ]}
+          Every plain text value must be a distinct concrete sentence of 25 to 190 characters, using ASCII letters, numerals, spaces and common punctuation only.
+          This is a development proposal, NOT an experimental result. Do not supply code, terminal instructions, URLs, keys, personal data, citations, tool calls, or claims that an experiment was performed.
+          '@
+          $Request=[ordered]@{
+            model=$Model
+            temperature=0
+            max_tokens=2200
+            messages=@(
+              @{role='system';content='You are an experiment-design assistant. Output only valid JSON using the exact requested schema. Never claim a result or scientific acceptance.'},
+              @{role='user';content=$Prompt}
+            )
+          }|ConvertTo-Json -Compress -Depth 12
+          $Headers=@{
+            Authorization=('Bearer '+$Token)
+            'Content-Type'='application/json'
+          }
+          $Token=$null
+          $Status=0
+          try{
+            # One network call. No retries and no paid/provider fallback.
+            $Response=Invoke-RestMethod -Method Post -Uri 'https://openrouter.ai/api/v1/chat/completions' -Headers $Headers -Body $Request -ContentType 'application/json' -TimeoutSec 120
+          }catch{
+            try{$Status=[int]$_.Exception.Response.StatusCode}catch{}
+            throw ('ITD02_FREE_AUTHOR_PROVIDER_REQUEST_FAILED status='+$Status)
+          }finally{$Headers=$null}
+          if($null-eq$Response -or @($Response.choices).Count -ne 1 -or
+             $null-eq$Response.choices[0].message -or
+             -not[string]::IsNullOrWhiteSpace([string]$Response.choices[0].message.tool_calls)){
+            throw 'ITD02_FREE_AUTHOR_UNEXPECTED_PROVIDER_SHAPE'
+          }
+          $Content=[string]$Response.choices[0].message.content
+          if($Content.Length -lt 400 -or $Content.Length -gt 6500){
+            throw 'ITD02_FREE_AUTHOR_RESPONSE_SIZE_OUT_OF_BOUNDS'
+          }
+          try{$Parsed=$Content|ConvertFrom-Json -ErrorAction Stop}catch{
+            throw 'ITD02_FREE_AUTHOR_INVALID_JSON'
+          }
+          if([string]$Parsed.schema -cne 'itd02.free-proposal.v1' -or
+             @($Parsed.proposals).Count -ne 2){
+            throw 'ITD02_FREE_AUTHOR_WRONG_SCHEMA'
+          }
+          $Expected=@('Wingless','Yggdrasil')
+          $Fields=@('mechanism','intervention','prediction','falsifier','matched_control','cold_retention_probe','unfamiliar_transfer_probe','retail_resource_budget')
+          $OutputProposals=@()
+          for($I=0;$I-lt2;$I++){
+            $Source=$Parsed.proposals[$I]
+            if([string]$Source.lane -cne $Expected[$I]){
+              throw 'ITD02_FREE_AUTHOR_LANE_MISMATCH'
+            }
+            $Row=[ordered]@{lane=$Expected[$I]}
+            foreach($Field in $Fields){
+              $Value=([string]$Source.$Field).Trim()
+              if($Value.Length -lt 25 -or $Value.Length -gt 230 -or
+                 $Value -cnotmatch '^[A-Za-z0-9 .,:;!?()/%+=_-]+$' -or
+                 $Value -match '(?i)https?[:/]|openrouter|github|token|secret|powershell|python|curl'){
+                throw ('ITD02_FREE_AUTHOR_FIELD_REJECTED '+$Field)
+              }
+              $Row[$Field]=$Value
+            }
+            $OutputProposals+=,$Row
+          }
+          $OutDir=Join-Path $env:RUNNER_TEMP 'itd02-public-candidate'
+          New-Item -ItemType Directory -Force -Path $OutDir|Out-Null
+          $File=Join-Path $OutDir 'candidate.json'
+          $Document=[ordered]@{
+            schema='itd02.free-proposal-envelope.v1'
+            source_sha='e0a73f188a6fde56ceabf03cf4c52e80f1d60e98'
+            model=$Model
+            provider_requests=1
+            paid_model_calls=0
+            author_runner='credential-local-data-only'
+            native_code_executed=$false
+            accepted_ref_mutations=0
+            scientific_first_use=$false
+            proposals=$OutputProposals
+          }
+          [IO.File]::WriteAllText($File,($Document|ConvertTo-Json -Depth 16 -Compress),(New-Object Text.UTF8Encoding($false)))
+          $Digest=(Get-FileHash -LiteralPath $File -Algorithm SHA256).Hash.ToLowerInvariant()
+          ('digest='+$Digest)|Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host 'ITD02_FREE_AUTHOR_GENUINE_FREE_INFERENCE=PASS'
+          Write-Host 'ITD02_FREE_AUTHOR_TWO_LANE_PROPOSAL_ARTIFACT=PASS'
+          Write-Host 'ITD02_FREE_AUTHOR_NATIVE_CODE_EXECUTED=FALSE'
+          Write-Host 'ITD02_FREE_AUTHOR_ACCEPTED_SCIENCE=FALSE'
+      - name: Transfer only normalized untrusted proposal data
+        uses: actions/upload-artifact@v4
+        with:
+          name: itd02-data-only-free-proposal
+          path: ${{ runner.temp }}/itd02-public-candidate/candidate.json
+          retention-days: 7
+          if-no-files-found: error
+
+  independent-proposal-review:
+    needs: author-only
+    if: github.repository == 'spoonman136668-ai/Wingless'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+    steps:
+      - name: Download untrusted candidate data, no provider credential
+        uses: actions/download-artifact@v4
+        with:
+          name: itd02-data-only-free-proposal
+          path: ${{ runner.temp }}/review
+      - name: Verify immutable artifact, two lane science prerequisites, no execution
+        shell: bash
+        env:
+          EXPECTED_SHA256: ${{ needs.author-only.outputs.proposal_sha256 }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,json,hashlib,pathlib,re
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'review'/'candidate.json'
+          raw=p.read_bytes()
+          digest=hashlib.sha256(raw).hexdigest()
+          assert digest == os.environ['EXPECTED_SHA256'], 'COLD_PROPOSAL_DIGEST_MISMATCH'
+          assert len(raw) < 10000, 'COLD_PROPOSAL_OVERSIZE'
+          x=json.loads(raw)
+          assert set(x)=={'schema','source_sha','model','provider_requests','paid_model_calls','author_runner','native_code_executed','accepted_ref_mutations','scientific_first_use','proposals'}
+          assert x['schema']=='itd02.free-proposal-envelope.v1'
+          assert x['source_sha']=='e0a73f188a6fde56ceabf03cf4c52e80f1d60e98'
+          assert x['model']=='nvidia/nemotron-3-ultra-550b-a55b:free'
+          assert x['provider_requests']==1 and x['paid_model_calls']==0
+          assert x['native_code_executed'] is False and x['scientific_first_use'] is False
+          assert x['accepted_ref_mutations']==0
+          required={'lane','mechanism','intervention','prediction','falsifier','matched_control','cold_retention_probe','unfamiliar_transfer_probe','retail_resource_budget'}
+          assert len(x['proposals'])==2
+          for item,name in zip(x['proposals'],('Wingless','Yggdrasil')):
+              assert set(item)==required and item['lane']==name
+              for field in required-{'lane'}:
+                  val=item[field]
+                  assert isinstance(val,str) and 25<=len(val)<=230
+                  assert re.fullmatch(r'[A-Za-z0-9 .,:;!?()/%+=_-]+',val), field
+              print('ITD02_PUBLIC_DESIGN_LANE='+name)
+              for field in ('mechanism','intervention','prediction','falsifier','matched_control','cold_retention_probe','unfamiliar_transfer_probe','retail_resource_budget'):
+                  print(name.upper()+'_'+field.upper()+'='+item[field])
+          print('ITD02_COLD_ARTIFACT_DIGEST=PASS')
+          print('ITD02_INDEPENDENT_SOURCE_AND_SCHEMA=PASS')
+          print('ITD02_GENUINE_PROPOSAL_SCIENTIFICALLY_UNVERIFIED=TRUE')
+          print('ITD02_NATIVE_CODE_EXECUTED=ZERO')
+          PY
