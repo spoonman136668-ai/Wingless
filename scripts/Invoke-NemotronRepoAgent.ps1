@@ -329,16 +329,31 @@ if($Provider-ceq'nvidia'){
     if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_NVIDIA_SECRET_MISSING'}
     $Endpoint='https://integrate.api.nvidia.com/v1/chat/completions'
 }else{
-    $SecretCandidates=@(
-        'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
-        'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
-    )
-    $Secret=$SecretCandidates|Where-Object{Test-Path -LiteralPath $_ -PathType Leaf}|Select-Object -First 1
-    if([string]::IsNullOrWhiteSpace($Secret)){throw 'NEMOTRON_OPENROUTER_SECRET_MISSING'}
-    $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim()|ConvertTo-SecureString
-    $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
-    try{$Token=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
-    if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_OPENROUTER_SECRET_EMPTY'}
+    if($NoProcessTools){
+        # Only the ephemeral hosted authoring job may supply an environment
+        # secret. Never consult persistent owner DPAPI credentials in this mode.
+        if([string]$env:RUNNER_ENVIRONMENT -cne 'github-hosted'){
+            throw 'NEMOTRON_FREE_AUTH_REQUIRES_EPHEMERAL_HOST'
+        }
+        $Token=[string]$env:OPENROUTER_FREE_API_KEY
+        if([string]::IsNullOrWhiteSpace($Token)){
+            throw 'NEMOTRON_FREE_EPHEMERAL_KEY_MISSING'
+        }
+        if($Model -cne 'nvidia/nemotron-3-ultra-550b-a55b:free' -or $MaxRounds -gt 8){
+            throw 'NEMOTRON_FREE_ONLY_MODEL_OR_BUDGET_DRIFT'
+        }
+    }else{
+        $SecretCandidates=@(
+            'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
+            'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
+        )
+        $Secret=$SecretCandidates|Where-Object{Test-Path -LiteralPath $_ -PathType Leaf}|Select-Object -First 1
+        if([string]::IsNullOrWhiteSpace($Secret)){throw 'NEMOTRON_OPENROUTER_SECRET_MISSING'}
+        $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim()|ConvertTo-SecureString
+        $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+        try{$Token=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+        if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_OPENROUTER_SECRET_EMPTY'}
+    }
     $Endpoint='https://openrouter.ai/api/v1/chat/completions'
 }
 
