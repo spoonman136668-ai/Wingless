@@ -9,6 +9,7 @@ param(
     [string]$Model='',
     [int]$MaxRounds=48,
     [switch]$ProtocolProbe,
+    [switch]$NoProcessTools,
     [switch]$SelfTest
 )
 
@@ -229,6 +230,7 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             return Convert-ToolResult ([ordered]@{committed=$true;head=$Head.output.Trim();files=$Staged.output})
         }
         'run_repo_process' {
+            if($NoProcessTools){throw 'NEMOTRON_PROCESS_TOOLS_DENIED_IN_FREE_RESEARCH_PHASE'}
             $Kind=[string]$A.kind
             [string[]]$ProcessArgs=@($A.args|ForEach-Object{[string]$_})
             $Timeout=if($A.PSObject.Properties.Name -contains 'timeout_seconds'){[Math]::Min([Math]::Max([int]$A.timeout_seconds,1),600)}else{180}
