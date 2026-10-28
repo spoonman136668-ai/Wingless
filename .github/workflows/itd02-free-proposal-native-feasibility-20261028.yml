@@ -1,0 +1,137 @@
+name: ITD-02 Wingless causal role proposal versus original V4 native feasibility
+on:
+  push:
+    branches: [research/itd02-free-proposal-native-feasibility-20261028]
+    paths: [.github/workflows/itd02-free-proposal-native-feasibility-20261028.yml]
+permissions:
+  contents: read
+jobs:
+  original-native-source-integrity:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+          clean: true
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Freeze exact existing native learner and prereg ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = '4cfd9ebb88e824d958e39b5b154e510cb8473314'
+          test "$(git rev-parse HEAD^^)" = '21928da6e939b84cf71f70476215bfa348aecb85'
+          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/itd02-free-proposal-native-feasibility-20261028.yml'
+          test "$(git diff --name-only HEAD^^ HEAD^)" = 'research/itd02-free-proposal-native-feasibility-20261028.md'
+          test -z "$(git status --porcelain)"
+          echo ITD02_FREE_PROPOSAL_WINGLESS_ORIGINAL_NATIVE_UNMODIFIED=PASS
+      - name: Authentic native outcome custody and learned-progress source-free tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./research/native/itd02/outcome ./research/native/itd02/motionbridge ./research/native/itd02/progressbridge
+          go vet ./research/native/itd02/outcome ./research/native/itd02/motionbridge ./research/native/itd02/progressbridge
+          go build ./research/native/itd02/outcome ./research/native/itd02/motionbridge ./research/native/itd02/progressbridge
+          echo ITD02_WINGLESS_R8_V4_SOURCE_FREE_NATIVE_SAFETY=PASS
+  original-five-arm-real-source-retrospective:
+    needs: original-native-source-integrity
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+          clean: true
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Verify unchanged native source and published controlled exposure contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^^)" = '21928da6e939b84cf71f70476215bfa348aecb85'
+          test -z "$(git status --porcelain)"
+          (cd research/native/itd02/outcome && python -m unittest -v test_progress_stateful_eval_v4 test_progress_stateful_eval_v3 test_progress_stateful_eval_v2 test_progress_stateful_eval test_motion_stateful_eval)
+          echo ITD02_WINGLESS_FIVE_ARM_EXISTING_PROTOCOL_SOURCE_FREE=PASS
+      - name: Install public pinned MiniGrid environment
+        shell: bash
+        run: |
+          python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Build exact V4/V3/motion/native original binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          go build -o "$RUNNER_TEMP/itd02-original" ./research/native/itd02/outcomebridge
+          go build -o "$RUNNER_TEMP/itd02-motion" ./research/native/itd02/motionbridge
+          go build -o "$RUNNER_TEMP/itd02-progress" ./research/native/itd02/progressbridge
+          git worktree add --detach "$RUNNER_TEMP/itd02-v3-native-frozen" 0bd552d58b4b26f6189a6c62be67c30b7f22937f
+          (cd "$RUNNER_TEMP/itd02-v3-native-frozen" && go build -o "$RUNNER_TEMP/itd02-progress-v3" ./research/native/itd02/progressbridge)
+      - name: Re-execute already published original FiveRooms comparison (NOT new holdout)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python research/native/itd02/outcome/progress_stateful_eval_v4.py \
+            --original-binary "$RUNNER_TEMP/itd02-original" \
+            --motion-binary "$RUNNER_TEMP/itd02-motion" \
+            --progress-binary "$RUNNER_TEMP/itd02-progress" \
+            --predecessor-binary "$RUNNER_TEMP/itd02-progress-v3" \
+            --output "$RUNNER_TEMP/itd02-wingless-v4-retrospective.json" --run-source
+      - name: Cold source-bound comparison, strong control and honest limitations
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - "$RUNNER_TEMP/itd02-wingless-v4-retrospective.json" <<'PY'
+          import json,hashlib,sys
+          from pathlib import Path
+          p=Path(sys.argv[1]);d=json.loads(p.read_text(encoding='utf-8'))
+          assert d['schema']=='wingless.itd02.progress-online-eval.v4'
+          assert d['science']=='NOT_ACCEPTED'
+          assert d['train_source_interactions_per_arm']==256
+          assert d['train_seeds']==list(range(7101,7613,2))
+          assert d['heldout_eval_seeds']==[8101,8111,8123,8137,8147,8161,8171,8191]
+          assert d['evaluation_protocol']=='COLD_RESTORE_PER_SEED_WITH_ONLINE_SELECTED_FEEDBACK'
+          assert d['test_time_adaptation'] is True
+          assert set(d['arms'])=={'progress_native','progress_v3','motion_native','original_native','linear_q'}
+          for name,arm in d['arms'].items():
+              assert sum(x['steps'] for x in arm['training'])==256,name
+              assert len(arm['evaluation'])==8,name
+              for row in arm['evaluation']:
+                  assert row['online_updates']==row['episode']['steps']>0,name
+                  assert row['seed']==row['episode']['seed']
+                  if name!='linear_q':
+                      assert row['updates_before']==256
+                      assert row['updates_after']==256+row['online_updates']
+          for i in range(8):
+              starts=[x['evaluation'][i]['episode']['events'][0]['before'] for x in d['arms'].values()]
+              assert all(s==starts[0] for s in starts[1:])
+          for name,arm in d['arms'].items():
+              print('ITD02_WINGLESS_ARM_'+name.upper()+'='+json.dumps(arm['online_eval_diagnostic'],sort_keys=True,separators=(',',':')))
+          print('ITD02_WINGLESS_AUTHENTIC_5_ARM_RETROSPECTIVE_REPRODUCTION=PASS')
+          print('ITD02_WINGLESS_NOVEL_ENTITY_ROLE_BINDING_TRANSFER=NOT_TESTED')
+          print('ITD02_WINGLESS_TIMED_24H_RETENTION=NOT_TESTED')
+          print('ITD02_WINGLESS_RETAIL_MACHINE_COST=NOT_MEASURED')
+          print('ITD02_WINGLESS_SCIENTIFIC_ACCEPTANCE=FALSE')
+          print('ITD02_WINGLESS_REPORT_SHA256='+hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-wingless-existing-authentic-five-arm-retrospective
+          path: ${{ runner.temp }}/itd02-wingless-v4-retrospective.json
+          retention-days: 7
+          if-no-files-found: warn
