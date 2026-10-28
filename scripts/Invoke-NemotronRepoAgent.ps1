@@ -306,6 +306,19 @@ if($SelfTest){
     if([int]$Log.exit_code-ne0){throw "NEMOTRON_SELFTEST_GIT_LOG_FAILED output=$($Log.output)"}
     $Listing=Invoke-Tool 'list_files' '{"path":".","max_depth":1}'
     if([string]::IsNullOrWhiteSpace([string]$Listing)){throw 'NEMOTRON_SELFTEST_LIST_EMPTY'}
+    if($NoProcessTools){
+        $NegativeGuardCaught=$false
+        try{
+            [void](Invoke-Tool 'run_repo_process' '{"kind":"git_diff_check","args":[]}')
+        }catch{
+            $NegativeGuardCaught=([string]$_.Exception.Message -match
+                'NEMOTRON_PROCESS_TOOLS_DENIED_IN_FREE_RESEARCH_PHASE')
+        }
+        if(-not$NegativeGuardCaught){
+            throw 'NEMOTRON_NO_PROCESS_TOOLS_SELFTEST_FAILED'
+        }
+        Write-Host 'NEMOTRON_NO_PROCESS_TOOLS_SELFTEST=PASS'
+    }
     Write-Host 'NEMOTRON_AGENT_SELFTEST=PASS'
     return
 }
