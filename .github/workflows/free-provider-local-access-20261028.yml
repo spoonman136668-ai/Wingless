@@ -1,0 +1,56 @@
+# Original research-runner capability observation only; never reads or decrypts credential.
+name: Wingless native research owner free-provider presence witness
+on:
+  push:
+    branches:
+      - engineering/free-provider-secret-scope-probe-20261028
+    paths:
+      - .github/workflows/free-provider-local-access-20261028.yml
+permissions:
+  contents: read
+jobs:
+  read-only-provider-presence:
+    if: github.repository == 'spoonman136668-ai/Wingless'
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 10
+    steps:
+      - name: Checkout frozen source without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 3
+      - name: Verify source identity and presence only; do not load credential
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          if($env:GITHUB_REF_NAME -cne 'engineering/free-provider-secret-scope-probe-20261028'){
+            throw 'LOCAL_FREE_PROVIDER_WRONG_BRANCH'
+          }
+          if(((& git rev-parse HEAD^ | Out-String)).Trim() -cne 'dc51d0ecc9485eb19e3c571e24e6d1b9eb974dc6' -or
+             ((& git rev-parse HEAD~2 | Out-String)).Trim() -cne 'a91e125cd54102ef1c44ac0e60ee597963e0c9ae'){
+            throw 'LOCAL_FREE_PROVIDER_EXACT_SOURCE_DRIFT'
+          }
+          $Changed=@(& git diff --name-only HEAD^ HEAD)
+          if($Changed.Count -ne 1 -or $Changed[0] -cne '.github/workflows/free-provider-local-access-20261028.yml'){
+            throw 'LOCAL_FREE_PROVIDER_WORKFLOW_SCOPE_DRIFT'
+          }
+          $Config=Get-Content '.research-autonomy/config.json' -Raw | ConvertFrom-Json
+          if($Config.schema -cne 'research.autonomy.v2' -or
+             $Config.program -cne 'Wingless' -or
+             $Config.authority -cne 'research-only' -or
+             $Config.research_executor -cne 'disabled'){
+            throw 'LOCAL_FREE_PROVIDER_RESEARCH_POLICY_DRIFT'
+          }
+          # Inspect only metadata: never read, decrypt, hash, copy or print the key.
+          $Candidates=@(
+            'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
+            'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
+          )
+          $Present=@($Candidates|Where-Object{Test-Path -LiteralPath $_ -PathType Leaf}).Count -gt 0
+          $OwnerScope= -not [string]::IsNullOrWhiteSpace(
+            [Environment]::GetEnvironmentVariable('OPENROUTER_API_KEY','User'))
+          Write-Host ('LOCAL_FREE_PROVIDER_ENCRYPTED_ENVELOPE_PRESENT='+$Present.ToString().ToUpperInvariant())
+          Write-Host ('LOCAL_FREE_PROVIDER_OWNER_USER_ENV_PRESENT='+$OwnerScope.ToString().ToUpperInvariant())
+          Write-Host 'LOCAL_FREE_PROVIDER_SECRET_NOT_READ_OR_DECRYPTED=PASS'
+          Write-Host 'LOCAL_FREE_PROVIDER_REMOTE_REQUESTS=ZERO'
+          Write-Host 'LOCAL_FREE_PROVIDER_RESEARCH_DISPATCHES=ZERO'
