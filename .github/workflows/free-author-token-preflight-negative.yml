@@ -16,19 +16,21 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
-          fetch-depth: 3
+          fetch-depth: 0
       - name: Verify source-only fix ancestry and tested execution boundary
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
           if($env:RUNNER_ENVIRONMENT -cne 'github-hosted'){throw 'NOT_EPHEMERAL'}
-          $Sha=(& git rev-parse HEAD~2).Trim()
+          $Sha=(& git rev-parse '9558079bc335873adf3c634536e0b72f160eae52').Trim()
           if($Sha -cne '9558079bc335873adf3c634536e0b72f160eae52'){throw 'TOKEN_PRECHECK_SOURCE_MOVED'}
-          $Base=(& git rev-parse HEAD~3).Trim()
+          $Base=(& git rev-parse '9558079bc335873adf3c634536e0b72f160eae52^').Trim()
           if($Base -cne '82bed9a39edda8bf1a638ad92d3b6c5d5d986d78'){throw 'TOKEN_PRECHECK_PARENT_MOVED'}
+          & git merge-base --is-ancestor '9558079bc335873adf3c634536e0b72f160eae52' HEAD
+          if($LASTEXITCODE -ne 0){throw 'TOKEN_PRECHECK_SOURCE_NOT_ANCESTOR'}
           $Expected='.github/workflows/free-author-token-preflight-negative.yml'
-          $OnlyWorkflow=@(& git diff --name-only HEAD~2 HEAD)
-          $OnlySource=@(& git diff --name-only HEAD~3 HEAD~2)
+          $OnlyWorkflow=@(& git diff --name-only 9558079bc335873adf3c634536e0b72f160eae52 HEAD)
+          $OnlySource=@(& git diff --name-only 82bed9a39edda8bf1a638ad92d3b6c5d5d986d78 9558079bc335873adf3c634536e0b72f160eae52)
           if($OnlyWorkflow.Count-ne1 -or $OnlyWorkflow[0] -cne $Expected){throw 'WORKFLOW_SCOPE_DRIFT'}
           if($OnlySource.Count-ne1 -or $OnlySource[0] -cne 'scripts/Invoke-RepoLocalResearchCycle.ps1'){throw 'SOURCE_SCOPE_DRIFT'}
           $C=Get-Content '.research-autonomy/config.json' -Raw|ConvertFrom-Json
