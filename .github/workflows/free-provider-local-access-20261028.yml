@@ -18,16 +18,18 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
-          fetch-depth: 3
+          ref: ${{ github.sha }}
+          clean: true
+          fetch-depth: 4
       - name: Verify source identity and presence only; do not load credential
-        shell: powershell
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
           if($env:GITHUB_REF_NAME -cne 'engineering/free-provider-secret-scope-probe-20261028'){
             throw 'LOCAL_FREE_PROVIDER_WRONG_BRANCH'
           }
-          if(((& git rev-parse HEAD^ | Out-String)).Trim() -cne 'dc51d0ecc9485eb19e3c571e24e6d1b9eb974dc6' -or
-             ((& git rev-parse HEAD~2 | Out-String)).Trim() -cne 'a91e125cd54102ef1c44ac0e60ee597963e0c9ae'){
+          if(((& git rev-parse HEAD^ | Out-String)).Trim() -cne '7c7b9f2866b27265f8c3b5543f21e3cdb5408a31' -or
+             ((& git rev-parse HEAD~3 | Out-String)).Trim() -cne 'a91e125cd54102ef1c44ac0e60ee597963e0c9ae'){
             throw 'LOCAL_FREE_PROVIDER_EXACT_SOURCE_DRIFT'
           }
           $Changed=@(& git diff --name-only HEAD^ HEAD)
