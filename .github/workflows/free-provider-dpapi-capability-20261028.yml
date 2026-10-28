@@ -1,0 +1,67 @@
+# Verify only current-runner ability to open its existing DPAPI envelope.
+# No credential content, derived hash, decryption output, model call or repo write.
+name: Wingless native DPAPI free-provider accessibility witness
+on:
+  push:
+    branches:
+      - engineering/free-provider-secret-scope-probe-20261028
+    paths:
+      - .github/workflows/free-provider-dpapi-capability-20261028.yml
+permissions:
+  contents: read
+jobs:
+  current-identity:
+    if: github.repository == 'spoonman136668-ai/Wingless'
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+      - name: Exact identity and boolean DPAPI accessibility only
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          if(((& git rev-parse HEAD^ | Out-String)).Trim() -cne '95ebae2906e8aeaf6d84eb0dee6b0888cbc14db4'){
+            throw 'LOCAL_DPAPI_SOURCE_HEAD_DRIFT'
+          }
+          $Changed=@(& git diff --name-only HEAD^ HEAD)
+          if($Changed.Count -ne 1 -or $Changed[0] -cne '.github/workflows/free-provider-dpapi-capability-20261028.yml'){
+            throw 'LOCAL_DPAPI_CHANGED_SOURCE_UNEXPECTED'
+          }
+          $Config=Get-Content '.research-autonomy/config.json' -Raw | ConvertFrom-Json
+          if($Config.schema -cne 'research.autonomy.v2' -or
+             $Config.program -cne 'Wingless' -or
+             $Config.research_executor -cne 'disabled'){
+            throw 'LOCAL_DPAPI_RESEARCH_MODE_DRIFT'
+          }
+          $Paths=@(
+            'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
+            'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
+          )
+          $Present=0
+          $Decryptable=0
+          foreach($Path in $Paths){
+            if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){continue}
+            $Present++
+            $Cipher=$null
+            $Secure=$null
+            try{
+              $Cipher=[IO.File]::ReadAllText($Path).Trim()
+              $Secure=$Cipher|ConvertTo-SecureString -ErrorAction Stop
+              if($Secure.Length -gt 0){$Decryptable++}
+            }catch{
+              # DPAPI wrong SID or inaccessible envelope is an unavailable scope.
+            }finally{
+              if($null -ne $Secure){$Secure.Dispose()}
+              $Cipher=$null
+              $Secure=$null
+            }
+          }
+          Write-Host ('LOCAL_DPAPI_ENVELOPE_PRESENT='+($Present -gt 0).ToString().ToUpperInvariant())
+          Write-Host ('LOCAL_DPAPI_DECRYPTABLE_BY_RESEARCH_RUNNER='+($Decryptable -gt 0).ToString().ToUpperInvariant())
+          Write-Host 'LOCAL_DPAPI_SECRET_CONTENT_NOT_OUTPUT=PASS'
+          Write-Host 'LOCAL_DPAPI_REMOTE_MODEL_CALLS=ZERO'
+          Write-Host 'LOCAL_DPAPI_RESEARCH_DISPATCHES=ZERO'
