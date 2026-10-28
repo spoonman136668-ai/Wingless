@@ -1,0 +1,67 @@
+# One-shot, branch-scoped negative qualification. No provider token or AI request.
+# This does not enable research, create a scheduler, or grant scientific first-use.
+name: Wingless hosted free-agent negative gate
+on:
+  push:
+    branches:
+      - engineering/ephemeral-free-agent-isolation-negative-20261028
+    paths:
+      - .github/workflows/hosted-free-agent-negative-gate.yml
+permissions:
+  contents: read
+jobs:
+  ephemeral-no-secret:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Prove ephemeral runner, disabled configuration and exact parent
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version Latest
+          if($env:RUNNER_ENVIRONMENT -cne 'github-hosted'){
+            throw 'EPHEMERAL_RUNNER_REQUIRED'
+          }
+          $Parent=([string](& git rev-parse HEAD^)).Trim()
+          if($Parent -cne 'a2a5de7dfc3a6f9c672da12dcba6a3371180ea55'){throw 'EXACT_STAGED_PARENT_CHANGED'}
+          $Diff=@(& git diff --name-only HEAD^ HEAD)
+          if(@($Diff).Count -ne 1 -or $Diff[0] -cne '.github/workflows/hosted-free-agent-negative-gate.yml'){
+            throw 'EPHEMERAL_NEGATIVE_PROBE_DIFF_OUT_OF_SCOPE'
+          }
+          $C=Get-Content '.research-autonomy/config.json' -Raw | ConvertFrom-Json
+          if($C.research_executor -cne 'disabled' -or
+             $C.program -cne 'Wingless' -or $C.authority -cne 'research-only'){
+            throw 'EXTERNAL_RESEARCH_EXECUTION_NOT_DISABLED'
+          }
+          foreach($Key in @('OPENROUTER_API_KEY','GH_TOKEN','GITHUB_TOKEN',
+                             'RESEARCH_FREE_EXECUTOR_OWNER_ACK')){
+            if([Environment]::GetEnvironmentVariable($Key)){
+              throw 'UNEXPECTED_CREDENTIAL_OR_OWNER_ACK_IN_EPHEMERAL_TEST'
+            }
+          }
+          Write-Host 'EPHEMERAL_NO_CREDENTIAL_SOURCE_GATE=PASS'
+      - name: Deny agent-selected process commands without any provider call
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version Latest
+          $Program='Wingless'
+          $Branch='ci-negative-'+$env:GITHUB_RUN_ID
+          & git switch -c $Branch
+          if($LASTEXITCODE -ne 0){throw 'TEST_BRANCH_CREATE_FAILED'}
+          $Head=([string](& git rev-parse HEAD)).Trim()
+          $Prompt=Join-Path $env:RUNNER_TEMP 'negative-probe.txt'
+          [IO.File]::WriteAllText($Prompt,'No network/model invocation. Offline negative gate.',
+              (New-Object Text.UTF8Encoding($false)))
+          & '.\scripts\Invoke-NemotronRepoAgent.ps1' `
+            -RepoPath (Resolve-Path '.').Path -Program $Program -ActiveBranch $Branch `
+            -StartSha $Head -PromptPath $Prompt `
+            -LastMessagePath (Join-Path $env:RUNNER_TEMP 'negative-last-message.txt') `
+            -SelfTest -NoProcessTools
+          if($LASTEXITCODE -ne 0){throw 'NO_PROCESS_TOOL_SELFTEST_FAILED'}
+          if(@(& git status --porcelain).Count -ne 0){throw 'SELFTEST_MUTATED_SOURCE'}
+          Write-Host 'EPHEMERAL_FREE_AGENT_NO_PROCESS_GATE=PASS'
