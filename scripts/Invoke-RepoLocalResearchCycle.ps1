@@ -77,7 +77,24 @@ function Get-OptionalMindContext([int]$MaxChars=12000){
 }
 
 if(-not(Test-Path -LiteralPath $RepoPath -PathType Container)){throw "REPO_PATH_MISSING path=$RepoPath"}
-if([string]::IsNullOrWhiteSpace($env:GITHUB_TOKEN)){throw 'GITHUB_TOKEN_MISSING'}
+# Keep the original GitHub credential requirement for the normal scheduler,
+# but permit the *separately gated*, ephemeral, author-only free endpoint
+# to enter its credential-denial path. It must never inherit a GitHub token.
+if([string]::IsNullOrWhiteSpace($env:GITHUB_TOKEN)){
+    $EarlyConfigPath=Join-Path (Split-Path -Parent $PSScriptRoot) '.research-autonomy\config.json'
+    if(-not(Test-Path -LiteralPath $EarlyConfigPath -PathType Leaf)){
+        throw 'GITHUB_TOKEN_MISSING'
+    }
+    $EarlyConfig=Get-Content -LiteralPath $EarlyConfigPath -Raw|ConvertFrom-Json
+    if([string]$EarlyConfig.schema -cne 'research.autonomy.v2' -or
+       [string]$EarlyConfig.program -cne 'Wingless' -or
+       [string]$EarlyConfig.authority -cne 'research-only' -or
+       [string]$EarlyConfig.research_executor -cne 'free-nemotron-opt-in-v1' -or
+       [string]$env:RESEARCH_FREE_EXECUTOR_OWNER_ACK -cne '1' -or
+       [string]$env:RUNNER_ENVIRONMENT -cne 'github-hosted'){
+        throw 'GITHUB_TOKEN_MISSING'
+    }
+}
 
 Push-Location $RepoPath
 try{
