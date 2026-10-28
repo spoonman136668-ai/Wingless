@@ -159,7 +159,7 @@ jobs:
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $ErrorActionPreference='Stop'
-          $Branch=([string](& git branch --show-current)).Trim()
+          $Branch=((& git branch --show-current | Out-String)).Trim()
           if([string]::IsNullOrWhiteSpace($Branch)){
             git switch -c ci-free-agent-no-process-probe
             if($LASTEXITCODE-ne0){throw 'AGENT_SELFTEST_LOCAL_BRANCH_FAILED'}
