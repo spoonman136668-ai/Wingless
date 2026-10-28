@@ -222,6 +222,9 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             }
             $Commit=Invoke-GitRaw @('commit','-m',$Message)
             if($Commit.exit_code-ne0){throw "NEMOTRON_GIT_COMMIT_FAILED output=$($Commit.output)"}
+            # Agent-authored preregistrations become tracked only on commit.
+            # Refresh the source catalog so subsequent reads can validate them.
+            $script:PublicTrackedPaths=$null
             $Head=(Invoke-GitRaw @('rev-parse','HEAD'))
             return Convert-ToolResult ([ordered]@{committed=$true;head=$Head.output.Trim();files=$Staged.output})
         }
