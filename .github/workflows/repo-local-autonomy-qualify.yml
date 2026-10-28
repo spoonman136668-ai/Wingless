@@ -94,7 +94,8 @@ jobs:
             'RESEARCH_FREE_EXECUTOR_REQUIRES_EPHEMERAL_RUNNER',
             'RESEARCH_EXTERNAL_PRIVATE_CONTEXT=EXCLUDED',
             'nvidia/nemotron-3-ultra-550b-a55b:free',
-            '-MaxRounds 8'
+            '-MaxRounds 8',
+            '-NoProcessTools'
           )){
             if(-not$Text.Contains($Guard)){throw "FREE_RESEARCH_EXECUTOR_GUARD_MISSING $Guard"}
           }
@@ -108,7 +109,8 @@ jobs:
             'Test-PublicTrackedFile',
             'NEMOTRON_READ_REQUIRES_PUBLIC_TRACKED_SOURCE',
             'mind-palace-context',
-            'NEMOTRON_PUBLIC_TRACKED_CATALOG_FAILED'
+            'NEMOTRON_PUBLIC_TRACKED_CATALOG_FAILED',
+            'NEMOTRON_PROCESS_TOOLS_DENIED_IN_FREE_RESEARCH_PHASE'
           )){
             if(-not$AgentText.Contains($Guard)){throw "NEMOTRON_PUBLIC_SOURCE_GUARD_MISSING $Guard"}
           }
