@@ -123,3 +123,79 @@ jobs:
           Write-Host 'ISOLATION_SEPARATE_CREDENTIAL_FREE_NATIVE_TEST=PASS'
           Write-Host 'ISOLATION_PROVIDER_CALLS=ZERO'
           Write-Host 'ISOLATION_SCIENTIFIC_FIRST_USE=FALSE'
+
+  real-wrapper-no-provider-key-negative:
+    if: github.repository == 'spoonman136668-ai/Wingless'
+    runs-on: windows-2022
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout exact proposed controller without credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: controller
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout existing bounded research branch without credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: research/autonomy-wingless-active
+          path: research
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Exercise genuine controller up to missing free-only provider key
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          foreach($Name in @('GITHUB_TOKEN','GH_TOKEN','OPENROUTER_FREE_API_KEY','OPENAI_API_KEY','NVIDIA_API_KEY','AWS_ACCESS_KEY_ID')){
+            if(-not [string]::IsNullOrWhiteSpace([string][Environment]::GetEnvironmentVariable($Name))){
+              throw ('LIVE_AUTHOR_NEGATIVE_UNEXPECTED_CREDENTIAL '+$Name)
+            }
+          }
+          if($env:RUNNER_ENVIRONMENT -cne 'github-hosted'){
+            throw 'LIVE_AUTHOR_NEGATIVE_REQUIRES_HOSTED'
+          }
+          $Controller=(Resolve-Path 'controller').Path
+          $Research=(Resolve-Path 'research').Path
+          $ConfigPath=Join-Path $Controller '.research-autonomy/config.json'
+          $Config=Get-Content -LiteralPath $ConfigPath -Raw|ConvertFrom-Json
+          if($Config.schema -cne 'research.autonomy.v2' -or
+             $Config.program -cne 'Wingless' -or
+             $Config.authority -cne 'research-only' -or
+             $Config.research_executor -cne 'disabled'){
+            throw 'LIVE_AUTHOR_NEGATIVE_SOURCE_POLICY_DRIFT'
+          }
+          $Branch=((& git -C $Research branch --show-current | Out-String)).Trim()
+          $Start=((& git -C $Research rev-parse HEAD | Out-String)).Trim()
+          if($Branch -cne 'research/autonomy-wingless-active' -or $Start -notmatch '^[a-f0-9]{40}$'){
+            throw 'LIVE_AUTHOR_NEGATIVE_RESEARCH_REF_DRIFT'
+          }
+          $Config.research_executor='free-nemotron-opt-in-v1'
+          [IO.File]::WriteAllText($ConfigPath,($Config|ConvertTo-Json -Depth 20),(New-Object Text.UTF8Encoding($false)))
+          $env:GITHUB_TOKEN=''
+          $env:GH_TOKEN=''
+          $env:OPENROUTER_FREE_API_KEY=''
+          $env:RESEARCH_FREE_EXECUTOR_OWNER_ACK='1'
+          $env:RESEARCH_FREE_BUNDLE_OUTPUT=Join-Path $env:RUNNER_TEMP 'no-key-author.bundle'
+          $Observed=''
+          try {
+            & (Join-Path $Controller 'scripts/Invoke-RepoLocalResearchCycle.ps1') -RepoPath $Research -Repository 'spoonman136668-ai/Wingless' -ActiveBranch $Branch -NorthStarPath ([string]$Config.north_star_path) -NorthStarSha256 ([string]$Config.north_star_sha256) -Trigger manual
+          }catch{
+            $Observed=[string]$_.Exception.Message
+          }
+          if($Observed -cnotmatch 'NEMOTRON_FREE_EPHEMERAL_KEY_MISSING'){
+            throw ('LIVE_AUTHOR_NEGATIVE_WRONG_BOUNDARY observed='+$Observed)
+          }
+          if(Test-Path -LiteralPath $env:RESEARCH_FREE_BUNDLE_OUTPUT){
+            throw 'LIVE_AUTHOR_NEGATIVE_UNEXPECTED_BUNDLE'
+          }
+          $After=((& git -C $Research rev-parse HEAD | Out-String)).Trim()
+          if($After -cne $Start){throw 'LIVE_AUTHOR_NEGATIVE_SOURCE_HEAD_CHANGED'}
+          if(((& git -C $Research status --porcelain | Out-String)).Trim()){
+            throw 'LIVE_AUTHOR_NEGATIVE_RESEARCH_DIRTY'
+          }
+          Write-Host 'REAL_FREE_AUTHOR_NO_KEY_NO_REMOTE_REQUEST=PASS'
+          Write-Host 'REAL_FREE_AUTHOR_ZERO_NATIVE_EXECUTION=PASS'
+          Write-Host 'REAL_FREE_AUTHOR_ZERO_RESEARCH_COMMITS=PASS'
