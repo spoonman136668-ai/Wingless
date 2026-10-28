@@ -1,0 +1,106 @@
+# Single bounded, non-confidential access test of a published zero-token-cost :free model.
+# No research prompting, untrusted tools, secrets in logs, research writes or retries.
+name: Wingless one-shot local free Nemotron access acceptance
+on:
+  push:
+    branches:
+      - engineering/free-provider-secret-scope-probe-20261028
+    paths:
+      - .github/workflows/free-provider-one-shot-access-20261028.yml
+permissions:
+  contents: read
+jobs:
+  free-model-access:
+    if: github.repository == 'spoonman136668-ai/Wingless'
+    runs-on: [self-hosted, Windows, X64, wingless-up-c]
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Exact-source single free-only and non-confidential provider request
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          if($env:GITHUB_RUN_ATTEMPT -cne '1'){
+            throw 'FREE_PROVIDER_NO_RETRY'
+          }
+          if(((& git rev-parse HEAD^ | Out-String)).Trim() -cne '8a287d9364abf88c26c5141a00d5af1e849e0599'){
+            throw 'FREE_PROVIDER_ACCESS_SOURCE_DRIFT'
+          }
+          $Paths=@(& git diff --name-only HEAD^ HEAD)
+          if($Paths.Count -ne 1 -or $Paths[0] -cne '.github/workflows/free-provider-one-shot-access-20261028.yml'){
+            throw 'FREE_PROVIDER_ACCESS_CHANGE_SCOPE_DRIFT'
+          }
+          $Config=Get-Content '.research-autonomy/config.json' -Raw | ConvertFrom-Json
+          if($Config.program -cne 'Wingless' -or
+             $Config.schema -cne 'research.autonomy.v2' -or
+             $Config.authority -cne 'research-only' -or
+             $Config.research_executor -cne 'disabled'){
+            throw 'FREE_PROVIDER_ACCESS_POLICY_DRIFT'
+          }
+          $Model='nvidia/nemotron-3-ultra-550b-a55b:free'
+          $SecretPaths=@(
+            'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
+            'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
+          )
+          $Token=$null
+          foreach($Path in $SecretPaths){
+            if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){continue}
+            $Secure=$null
+            $Ptr=[IntPtr]::Zero
+            try{
+              $Secure=([IO.File]::ReadAllText($Path).Trim() | ConvertTo-SecureString -ErrorAction Stop)
+              $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+              $Candidate=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
+              if(-not [string]::IsNullOrWhiteSpace($Candidate)){
+                $Token=$Candidate
+                break
+              }
+            }catch{
+              # A ciphertext for another Windows identity is not usable here.
+            }finally{
+              if($Ptr -ne [IntPtr]::Zero){[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+              if($null-ne$Secure){$Secure.Dispose()}
+              $Candidate=$null
+            }
+          }
+          if([string]::IsNullOrWhiteSpace($Token)){
+            throw 'FREE_PROVIDER_DECRYPTABLE_KEY_NOT_FOUND'
+          }
+          $Headers=@{
+            Authorization=('Bearer '+$Token)
+            'Content-Type'='application/json'
+          }
+          $Token=$null
+          $Payload=[ordered]@{
+            model=$Model
+            max_tokens=32
+            temperature=0
+            messages=@(
+              @{role='system';content='This is a public non-confidential API availability check. Reply with OK.'},
+              @{role='user';content='Test free endpoint availability only. No private data, repository content or tools.'}
+            )
+          }|ConvertTo-Json -Depth 8 -Compress
+          $HttpCode=0
+          try{
+            # Exactly one POST to the explicit :free model. No paid fallback.
+            $Reply=Invoke-RestMethod -Method Post -Uri 'https://openrouter.ai/api/v1/chat/completions' -Headers $Headers -Body $Payload -ContentType 'application/json' -TimeoutSec 60
+          }catch{
+            try{$HttpCode=[int]$_.Exception.Response.StatusCode}catch{}
+            $Headers=$null
+            throw ('FREE_PROVIDER_ONE_SHOT_FAILED http_status='+$HttpCode)
+          }finally{
+            $Headers=$null
+          }
+          if($null-eq$Reply -or @($Reply.choices).Count -lt 1){
+            throw 'FREE_PROVIDER_RESPONSE_HAS_NO_CHOICES'
+          }
+          Write-Host 'FREE_PROVIDER_EXPLICIT_FREE_ONLY_MODEL=PASS'
+          Write-Host 'FREE_PROVIDER_AUTHENTICATED_RESPONSE=PASS'
+          Write-Host 'FREE_PROVIDER_TEST_PROMPT_NONCONFIDENTIAL=PASS'
+          Write-Host 'FREE_PROVIDER_REMOTE_REQUEST_COUNT=ONE'
+          Write-Host 'FREE_PROVIDER_CODE_EXECUTION=ZERO'
+          Write-Host 'FREE_PROVIDER_RESEARCH_DISPATCHES=ZERO'
