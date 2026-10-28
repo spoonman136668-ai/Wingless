@@ -199,12 +199,28 @@ $MindContext
     if([string]$env:RUNNER_ENVIRONMENT -cne 'github-hosted'){
         throw 'RESEARCH_FREE_EXECUTOR_REQUIRES_EPHEMERAL_RUNNER'
     }
+    # This authoring phase must never inherit GitHub write or workstation credentials.
+    # Public source metadata can be read without a GitHub bearer token.
+    foreach($SecretName in @('GITHUB_TOKEN','GH_TOKEN','NVIDIA_API_KEY','OPENAI_API_KEY','AWS_ACCESS_KEY_ID')){
+        if(-not [string]::IsNullOrWhiteSpace([string][Environment]::GetEnvironmentVariable($SecretName))){
+            throw 'RESEARCH_FREE_AUTHOR_HAS_UNEXPECTED_PRIVILEGED_CREDENTIAL'
+        }
+    }
+    if([string]::IsNullOrWhiteSpace([string]$env:RESEARCH_FREE_BUNDLE_OUTPUT)){
+        throw 'RESEARCH_FREE_AUTHOR_BUNDLE_OUTPUT_REQUIRED'
+    }
+    if([string]::IsNullOrWhiteSpace([string]$env:RUNNER_TEMP) -or
+       -not([IO.Path]::GetFullPath($env:RESEARCH_FREE_BUNDLE_OUTPUT).StartsWith(
+           [IO.Path]::GetFullPath($env:RUNNER_TEMP).TrimEnd('\')+'\',
+           [StringComparison]::OrdinalIgnoreCase))){
+        throw 'RESEARCH_FREE_AUTHOR_BUNDLE_MUST_BE_IN_EPHEMERAL_TEMP'
+    }
     if($Repository -cne 'spoonman136668-ai/Wingless'){
         throw 'RESEARCH_FREE_EXECUTOR_REPOSITORY_IDENTITY_DRIFT'
     }
     $Metadata=Invoke-RestMethod -Method Get -TimeoutSec 20 `
         -Uri ('https://api.github.com/repos/'+$Repository) `
-        -Headers @{ Authorization=('Bearer '+$env:GITHUB_TOKEN); Accept='application/vnd.github+json' }
+        -Headers @{ Accept='application/vnd.github+json' }
     if([string]$Metadata.full_name -cne $Repository -or $Metadata.private -ne $false -or
        $Metadata.archived -ne $false){
         throw 'RESEARCH_FREE_EXECUTOR_PUBLIC_SOURCE_REQUIRED'
@@ -237,6 +253,33 @@ $MindContext
 
     $FirstFiles=@(Get-CommitFiles $Commits[0])
     if($FirstFiles.Count-ne1 -or -not$FirstFiles[0].StartsWith('docs/experiments/')){throw "PREREG_NOT_FIRST_AND_ALONE files=$($FirstFiles -join ',')"}
+
+    if($ExecutorMode -ceq 'free-nemotron-opt-in-v1'){
+        # The remote author may create bounded local commits, never run its
+        # scripts, qualify a result, push a branch or claim native acceptance
+        # in the provider-credential job. The second independent job receives
+        # a Git bundle and must verify base/candidate identity before testing.
+        if($Commits.Count-eq1){
+            $Summary=[IO.File]::ReadAllText($LastMessagePath)
+            if($Summary -notmatch 'RESEARCH_TERMINAL=PREREG_BLOCKED'){
+                throw 'FREE_AUTHOR_PREREG_ONLY_WITHOUT_BLOCKED_MARKER'
+            }
+        }else{
+            $LastFiles=@(Get-CommitFiles $Commits[-1])
+        if($LastFiles-notcontains'.wingless/qualification-request.json'){throw 'FREE_AUTHOR_REQUEST_MISSING'}
+        }
+        $BundleOut=[IO.Path]::GetFullPath($env:RESEARCH_FREE_BUNDLE_OUTPUT)
+        if(Test-Path -LiteralPath $BundleOut){throw 'FREE_AUTHOR_BUNDLE_ALREADY_EXISTS'}
+        & git bundle create $BundleOut HEAD ("^"+$StartSha)
+        if($LASTEXITCODE-ne0){throw 'FREE_AUTHOR_BUNDLE_CREATE_FAILED'}
+        & git bundle verify $BundleOut
+        if($LASTEXITCODE-ne0){throw 'FREE_AUTHOR_BUNDLE_VERIFY_FAILED'}
+        Write-CycleResult -Advanced $false -Reason 'credential-free-qualification-required' -Head $StartSha
+        Write-Host 'RESEARCH_FREE_AUTHORING_ONLY_BUNDLE_READY'
+        Write-Host 'RESEARCH_FREE_AUTHORING_NATIVE_EXECUTION=ZERO'
+        Write-Host 'RESEARCH_FREE_AUTHORING_GITHUB_PUSH=ZERO'
+        return
+    }
 
     if($Commits.Count-eq1){
         if(-not(Test-Path -LiteralPath $LastMessagePath -PathType Leaf)){throw 'PREREG_BLOCKED_AGENT_SUMMARY_MISSING'}
