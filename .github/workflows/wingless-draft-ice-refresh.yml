@@ -1,0 +1,71 @@
+# One-shot exact-candidate advisory source index regeneration; no model calls.
+name: Wingless draft source ICE regeneration
+on:
+  push:
+    branches:
+      - engineering/optin-free-research-executor-20261028
+    paths:
+      - .github/workflows/wingless-draft-ice-refresh.yml
+permissions:
+  contents: write
+jobs:
+  regenerate:
+    if: github.repository == 'spoonman136668-ai/Wingless'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Attest original exact candidate and source delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'engineering/optin-free-research-executor-20261028'
+          test "$(git rev-parse HEAD^)" = 'ac50715a14bebc970b2f113d329b6af314695a05'
+          test "$(git rev-parse origin/main)" = '48ba343b403bc9b4389ce1777130e546b3c446bd'
+          python3 - <<'PY'
+          import subprocess
+          allowed={
+            '.github/workflows/wingless-draft-ice-refresh.yml',
+            '.github/workflows/repo-local-autonomy-qualify.yml',
+            '.research-autonomy/config.json',
+            'scripts/Invoke-NemotronRepoAgent.ps1',
+            'scripts/Invoke-RepoLocalResearchCycle.ps1',
+          }
+          actual=set(subprocess.check_output(
+              ['git','diff','--name-only','origin/main...HEAD'],text=True
+          ).splitlines())
+          if actual != allowed:
+              raise SystemExit('WINGLESS_ICE_SOURCE_SCOPE_MISMATCH '+repr(sorted(actual^allowed)))
+          print('WINGLESS_ICE_EXACT_SOURCE_SCOPE_PASS')
+          PY
+      - name: Regenerate and prove bounded advisory source maps
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/ice build
+          go run ./cmd/ice validate
+          go test ./ice
+          python3 - <<'PY'
+          import subprocess
+          paths=set(subprocess.check_output(
+              ['git','diff','--name-only'],text=True
+          ).splitlines())
+          if not paths or any(not path.startswith('.ice/') for path in paths):
+              raise SystemExit('WINGLESS_ICE_OUTPUT_SCOPE_MISMATCH '+repr(sorted(paths)))
+          print('WINGLESS_ICE_BOUNDED_OUTPUT_SCOPE_PASS files='+str(len(paths)))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .ice
+          git commit -m 'ICE: rederive advisory source index from exact executor draft'
+          go run ./cmd/ice validate
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:refs/heads/engineering/optin-free-research-executor-20261028
+          echo 'WINGLESS_DRAFT_ICE_REANCHOR=PASS'
