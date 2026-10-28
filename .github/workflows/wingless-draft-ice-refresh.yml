@@ -1,4 +1,5 @@
-# One-shot exact-candidate advisory source index regeneration; no model calls.
+# One-shot exact-candidate advisory ICE and semantic Atlas regeneration.
+# Preserves reviewed symbol evidence; no models, controllers or scientific claims.
 name: Wingless draft source ICE regeneration
 on:
   push:
@@ -22,12 +23,12 @@ jobs:
         with:
           go-version: '1.25.5'
           cache: false
-      - name: Attest original exact candidate and source delta
+      - name: Attest exact parent and known development and ICE delta
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = 'engineering/optin-free-research-executor-20261028'
-          test "$(git rev-parse HEAD^)" = 'ac50715a14bebc970b2f113d329b6af314695a05'
+          test "$(git rev-parse HEAD^)" = 'a0076a39ba3878dee093a7281710e5f65185623e'
           test "$(git rev-parse origin/main)" = '48ba343b403bc9b4389ce1777130e546b3c446bd'
           python3 - <<'PY'
           import subprocess
@@ -37,35 +38,49 @@ jobs:
             '.research-autonomy/config.json',
             'scripts/Invoke-NemotronRepoAgent.ps1',
             'scripts/Invoke-RepoLocalResearchCycle.ps1',
+            '.ice/architecture-map.json',
+            '.ice/manifest.json',
           }
           actual=set(subprocess.check_output(
               ['git','diff','--name-only','origin/main...HEAD'],text=True
           ).splitlines())
           if actual != allowed:
-              raise SystemExit('WINGLESS_ICE_SOURCE_SCOPE_MISMATCH '+repr(sorted(actual^allowed)))
-          print('WINGLESS_ICE_EXACT_SOURCE_SCOPE_PASS')
+              raise SystemExit('WINGLESS_SEMANTIC_ATLAS_SCOPE_MISMATCH '+repr(sorted(actual^allowed)))
+          print('WINGLESS_SEMANTIC_ATLAS_SOURCE_SCOPE_PASS')
           PY
-      - name: Regenerate and prove bounded advisory source maps
+      - name: Preserve reviews and rebind semantic Atlas to exact source
         shell: bash
         run: |
           set -euo pipefail
           go run ./cmd/ice build
           go run ./cmd/ice validate
-          go test ./ice
+          python3 -B scripts/maintain_code_atlas.py --root .
           python3 - <<'PY'
           import subprocess
-          paths=set(subprocess.check_output(
-              ['git','diff','--name-only'],text=True
-          ).splitlines())
-          if not paths or any(not path.startswith('.ice/') for path in paths):
-              raise SystemExit('WINGLESS_ICE_OUTPUT_SCOPE_MISMATCH '+repr(sorted(paths)))
-          print('WINGLESS_ICE_BOUNDED_OUTPUT_SCOPE_PASS files='+str(len(paths)))
+          changed=set(subprocess.check_output(['git','diff','--name-only'],text=True).splitlines())
+          allowed={
+            '.ice/architecture-map.json',
+            '.ice/manifest.json',
+            '.ice/code-intelligence.json',
+            '.ice/code-intelligence.html',
+            '.ice/code-intelligence.ice',
+          }
+          required={
+            '.ice/code-intelligence.json',
+            '.ice/code-intelligence.html',
+            '.ice/code-intelligence.ice',
+          }
+          if not changed.issubset(allowed) or not required.issubset(changed):
+              raise SystemExit('WINGLESS_SEMANTIC_ATLAS_OUTPUT_MISMATCH '+repr(sorted(changed)))
+          print('WINGLESS_SEMANTIC_ATLAS_BOUNDED_OUTPUT_PASS')
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .ice
-          git commit -m 'ICE: rederive advisory source index from exact executor draft'
+          git add .ice/architecture-map.json .ice/manifest.json .ice/code-intelligence.json .ice/code-intelligence.html .ice/code-intelligence.ice
+          git commit -m 'ICE: rebind semantic source Atlas preserving historical reviews'
           go run ./cmd/ice validate
+          go run ./cmd/ice relationships > "$RUNNER_TEMP/wingless-relationships.json"
+          python3 -B scripts/validate_code_atlas.py --root . --relationships "$RUNNER_TEMP/wingless-relationships.json"
           test -z "$(git status --porcelain)"
           git push origin HEAD:refs/heads/engineering/optin-free-research-executor-20261028
-          echo 'WINGLESS_DRAFT_ICE_REANCHOR=PASS'
+          echo 'WINGLESS_SEMANTIC_ATLAS_REANCHOR=PASS'
