@@ -157,15 +157,45 @@ $MindContext
 "@
     [IO.File]::WriteAllText($PromptPath,$Prompt,(New-Object Text.UTF8Encoding($false)))
 
-    # Model-authored research work is handled in ChatGPT/GitHub under frozen
-    # preregistration and qualification rules. A GitHub-hosted scheduled run
-    # is not itself a ChatGPT executor and must not consume any Codex quota.
-    # Preserve an exact-source, no-mutation watchdog observation. No hidden
-    # model, provider, retry, source commit, or scientific-result promotion.
-    Write-Host 'RESEARCH_AGENT_POLICY=GPT_CHAT_GITHUB_SOURCE_ONLY_NO_CODEX_NO_EXTERNAL_APIS'
-    Write-Host 'RESEARCH_EXECUTOR_UNATTENDED=NOT_CONFIGURED_NO_MODEL_INVOCATION'
-    Write-CycleResult -Advanced $false -Reason 'gpt-authored-research-required-no-unattended-model' -Head $StartSha
-    return
+    # The original schedule and qualification wrapper remain authoritative.
+    # An explicitly source-configured, second-gated free-only agent may author
+    # a frozen research proposal. Without both gates this stays a read-only
+    # watchdog; source promotion never silently enables remote inference.
+    $ExecutorConfig=Join-Path (Split-Path -Parent $PSScriptRoot) '.research-autonomy\config.json'
+    if(-not(Test-Path -LiteralPath $ExecutorConfig -PathType Leaf)){throw 'RESEARCH_EXECUTOR_CONFIG_MISSING'}
+    $ExecutorDocument=Get-Content -LiteralPath $ExecutorConfig -Raw | ConvertFrom-Json
+    if([string]$ExecutorDocument.schema -cne 'research.autonomy.v2' -or
+       [string]$ExecutorDocument.program -cne 'Wingless' -or
+       [string]$ExecutorDocument.authority -cne 'research-only'){
+        throw 'RESEARCH_EXECUTOR_SOURCE_POLICY_DRIFT'
+    }
+    $ExecutorMode='disabled'
+    if($ExecutorDocument.PSObject.Properties.Name -contains 'research_executor'){
+        $ExecutorMode=[string]$ExecutorDocument.research_executor
+    }
+    if($ExecutorMode -ceq 'disabled'){
+        Write-Host 'RESEARCH_AGENT_POLICY=GPT_CHAT_GITHUB_SOURCE_ONLY_NO_CODEX_NO_EXTERNAL_APIS'
+        Write-Host 'RESEARCH_EXECUTOR_UNATTENDED=NOT_CONFIGURED_NO_MODEL_INVOCATION'
+        Write-CycleResult -Advanced $false -Reason 'gpt-authored-research-required-no-unattended-model' -Head $StartSha
+        return
+    }
+    if($ExecutorMode -cne 'free-nemotron-opt-in-v1' -or
+       [string]$env:RESEARCH_FREE_EXECUTOR_OWNER_ACK -cne '1'){
+        throw 'RESEARCH_FREE_EXECUTOR_EXPLICIT_OWNER_GATE_REQUIRED'
+    }
+    # No paid provider/model fallback. DPAPI owner credentials and original
+    # bound agent tool policy remain unchanged. Neither this script nor CI
+    # claims a scientific first-use or automatically merges accepted refs.
+    $OnlyFreeModel='nvidia/nemotron-3-ultra-550b-a55b:free'
+    Write-Host 'RESEARCH_EXECUTOR_UNATTENDED=EXPLICIT_FREE_ONLY_OPT_IN'
+    & (Join-Path $PSScriptRoot 'Invoke-NemotronRepoAgent.ps1') `
+        -RepoPath $RepoPath -Program 'Wingless' -ActiveBranch $ActiveBranch `
+        -StartSha $StartSha -PromptPath $PromptPath `
+        -LastMessagePath $LastMessagePath -Provider 'openrouter' `
+        -Model $OnlyFreeModel -MaxRounds 8
+    if(-not(Test-Path -LiteralPath $LastMessagePath -PathType Leaf)){
+        throw 'RESEARCH_FREE_EXECUTOR_NO_TERMINAL_REPORT'
+    }
     if(((& git status --porcelain)-join'').Trim()){throw 'AGENT_LEFT_UNCOMMITTED_CHANGES'}
     $BranchAfter=((& git branch --show-current 2>$null|Select-Object -First 1)|Out-String).Trim()
     if($BranchAfter-cne$ActiveBranch){throw "AGENT_BRANCH_CHANGED expected=$ActiveBranch actual=$BranchAfter"}
