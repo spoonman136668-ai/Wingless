@@ -1,0 +1,175 @@
+name: ITD-02 PG8 fresh geometry source falsification (development only)
+on:
+  push:
+    branches: [research/itd02-prospective-empty8x8-falsification-20261028]
+    paths:
+      - research/itd02-pg8-prospective-geometry-prereg-20261028.md
+      - research/native/itd02/outcome/prospective_geometry_pg8.py
+      - research/native/itd02/outcome/test_prospective_geometry_pg8.py
+      - .github/workflows/itd02-pg8-prospective-geometry-20261028.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  one-frozen-prospective-source-run:
+    if: github.repository == 'spoonman136668-ai/Wingless'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+          clean: true
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Freeze source, exact first-preregistration chronology and changed-file scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git merge-base 4f547b79708c7f3249a6cf2afb96d0f6f5b39919 HEAD)" = '4f547b79708c7f3249a6cf2afb96d0f6f5b39919'
+          test "$(git rev-list --reverse 4f547b79708c7f3249a6cf2afb96d0f6f5b39919..HEAD | head -1)" = 'f24bab8352f365eaf099c5d33bdda6e2f5b2fd3b'
+          test "$(git diff-tree --no-commit-id --name-only -r f24bab8352f365eaf099c5d33bdda6e2f5b2fd3b)" = 'research/itd02-pg8-prospective-geometry-prereg-20261028.md'
+          python - <<'PY'
+          import subprocess
+          allowed={
+            'research/itd02-pg8-prospective-geometry-prereg-20261028.md',
+            'research/native/itd02/outcome/prospective_geometry_pg8.py',
+            'research/native/itd02/outcome/test_prospective_geometry_pg8.py',
+            '.github/workflows/itd02-pg8-prospective-geometry-20261028.yml',
+          }
+          found=set(subprocess.check_output(['git','diff','--name-only',
+            '4f547b79708c7f3249a6cf2afb96d0f6f5b39919','HEAD'],text=True).splitlines())
+          if found!=allowed: raise SystemExit('PG8_SCOPE_DRIFT '+repr(sorted(found^allowed)))
+          print('PG8_FROZEN_PARENT_NO_NATIVE_SOURCE_DELTA=PASS')
+          PY
+          test -z "$(git status --porcelain)"
+      - name: Cached-independent focused source protocols
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd research/native/itd02/outcome && python -B -m unittest -v test_prospective_geometry_pg8 test_progress_stateful_eval_v4)
+          go test -count=1 ./research/native/itd02/outcome ./research/native/itd02/motionbridge ./research/native/itd02/progressbridge
+      - name: Required one full integration regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+          go vet ./...
+          echo PG8_FINAL_FULL_REGRESSION_PASS
+      - name: Build original and trained native comparators from exact source
+        shell: bash
+        run: |
+          set -euo pipefail
+          go build -o "$RUNNER_TEMP/pg8-original" ./research/native/itd02/outcomebridge
+          go build -o "$RUNNER_TEMP/pg8-motion" ./research/native/itd02/motionbridge
+          go build -o "$RUNNER_TEMP/pg8-v4" ./research/native/itd02/progressbridge
+          git worktree add --detach "$RUNNER_TEMP/pg8-v3-worktree" 0bd552d58b4b26f6189a6c62be67c30b7f22937f
+          (cd "$RUNNER_TEMP/pg8-v3-worktree" && go build -o "$RUNNER_TEMP/pg8-v3" ./research/native/itd02/progressbridge)
+      - name: Run ONE predeclared new-geometry source evaluation, preserve negative evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+          mkdir -p "$RUNNER_TEMP/pg8"
+          python -B research/native/itd02/outcome/prospective_geometry_pg8.py \
+            --original-binary "$RUNNER_TEMP/pg8-original" \
+            --motion-binary "$RUNNER_TEMP/pg8-motion" \
+            --progress-binary "$RUNNER_TEMP/pg8-v4" \
+            --predecessor-binary "$RUNNER_TEMP/pg8-v3" \
+            --raw-output "$RUNNER_TEMP/pg8/native-raw.json" \
+            --report-output "$RUNNER_TEMP/pg8/classification.json" \
+            --source-sha "${{ github.sha }}" --run-source
+      - name: Read-only evidence schema and scientific boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - "$RUNNER_TEMP/pg8/classification.json" <<'PY'
+          import json,sys
+          from pathlib import Path
+          d=json.loads(Path(sys.argv[1]).read_text())
+          assert d['schema']=='wingless.itd02.pg8.prospective-geometry-source.v1'
+          assert d['source_sha']=='${{ github.sha }}'
+          assert d['target_seeds']==[18041,18047,18061,18077,18089,18101,18119,18133]
+          assert d['target_environment']=='MiniGrid-Empty-8x8-v0'
+          assert d['training_source_steps_per_learning_arm']==256
+          assert d['test_time_updates'] and d['reactive_training_steps']==0
+          assert d['science']=='NOT_ACCEPTED' and not d['scientific_first_use']
+          assert not d['entity_role_binding_tested'] and not d['retail_hardware_qualified']
+          assert d['classification'] in ('PG8_DEVELOPMENT_POSITIVE_NOT_SCIENCE','PG8_NATIVE_TRANSFER_NO_GO')
+          print('PG8_PREDECLARED_CLASSIFICATION='+d['classification'])
+          print('PG8_SCIENTIFIC_FIRST_USE=FALSE')
+          PY
+          test -z "$(git status --porcelain)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pg8-native-source-prospective-evidence
+          path: ${{ runner.temp }}/pg8/*.json
+          retention-days: 7
+          if-no-files-found: warn
+  independent-unprivileged-artifact-review:
+    needs: one-frozen-prospective-source-run
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: pg8-native-source-prospective-evidence
+          path: ${{ runner.temp }}/untrusted
+      - name: Cold verify report against complete raw arm event evidence without native code or provider
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - "${{ runner.temp }}/untrusted" <<'PY'
+          import json,hashlib,sys
+          from pathlib import Path
+          root=Path(sys.argv[1])
+          raw_path=root/'native-raw.json'
+          report_path=root/'classification.json'
+          raw=json.loads(raw_path.read_text())
+          report=json.loads(report_path.read_text())
+          assert hashlib.sha256(raw_path.read_bytes()).hexdigest()==report['underlying_v4_evidence_sha256']
+          assert raw['schema']=='wingless.itd02.progress-online-eval.v4'
+          assert raw['science']=='NOT_ACCEPTED' and raw['test_time_adaptation'] is True
+          assert raw['train_family']=='MiniGrid-Empty-Random-5x5-v0'
+          assert raw['eval_family']=='MiniGrid-Empty-8x8-v0'
+          assert raw['heldout_eval_seeds']==report['target_seeds']==[18041,18047,18061,18077,18089,18101,18119,18133]
+          assert report['schema']=='wingless.itd02.pg8.prospective-geometry-source.v1'
+          assert report['source_sha']=='${{ github.sha }}'
+          assert report['science']=='NOT_ACCEPTED' and report['scientific_first_use'] is False
+          names={'progress_native','progress_v3','motion_native','original_native','linear_q'}
+          assert set(raw['arms'])==names
+          assert set(report['goals_by_arm'])==names|{'public_reactive'}
+          assert set(report['per_seed'])==set(report['goals_by_arm'])
+          for name in names:
+              entries=raw['arms'][name]['evaluation']
+              assert sum(e['steps'] for e in raw['arms'][name]['training'])==256
+              assert len(entries)==8
+              for i,e in enumerate(entries):
+                  episode=e['episode']
+                  entry=report['per_seed'][name][i]
+                  assert episode['seed']==entry['seed']==report['target_seeds'][i]
+                  assert entry['goal'] is episode['goal_reached']
+                  assert entry['events_sha256']==episode['events_sha256']
+                  assert e['online_updates']==episode['steps'] and 0<episode['steps']<=100
+              assert report['goals_by_arm'][name]==sum(e['episode']['goal_reached'] is True for e in entries)
+          ref=report['per_seed']['public_reactive']
+          assert len(ref)==8 and report['goals_by_arm']['public_reactive']==sum(e['goal'] is True for e in ref)
+          control=max(v for k,v in report['goals_by_arm'].items() if k!='progress_native')
+          expected=('PG8_DEVELOPMENT_POSITIVE_NOT_SCIENCE' if report['goals_by_arm']['progress_native']>=1
+                    and report['goals_by_arm']['progress_native']>=control else 'PG8_NATIVE_TRANSFER_NO_GO')
+          assert report['classification']==expected
+          assert not report['entity_role_binding_tested'] and not report['cold_24h_retention_tested']
+          print('PG8_INDEPENDENT_RAW_SOURCE_AND_FROZEN_CLASSIFICATION=PASS')
+          print('PG8_OBSERVED_DISPOSITION='+expected)
+          print('PG8_SCIENCE_PROMOTION=DENIED')
+          PY
