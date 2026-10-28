@@ -1,0 +1,94 @@
+# One-shot, source-pinned real controller entry negative test. No provider key, no model call.
+name: Wingless free-provider actual entrypoint negative acceptance
+on:
+  push:
+    branches:
+      - engineering/free-provider-real-entry-preflight-20261028
+    paths:
+      - .github/workflows/free-provider-real-entry-negative.yml
+permissions:
+  contents: read
+jobs:
+  hosted-credential-absent:
+    runs-on: windows-2022
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prove exact parent and unchanged disabled policy
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if($env:RUNNER_ENVIRONMENT -cne 'github-hosted'){throw 'HOST_NOT_EPHEMERAL'}
+          if((& git rev-parse HEAD^).Trim() -cne 'f848f67dcd955134ed98d19299326bd9682f6a73'){throw 'FREE_PROVIDER_PARENT_SOURCE_CHANGED'}
+          $Files=@(& git diff --name-only HEAD^ HEAD)
+          if($Files.Count -ne 1 -or $Files[0] -cne '.github/workflows/free-provider-real-entry-negative.yml'){throw 'FREE_PROVIDER_SCOPE_DRIFT'}
+          $Policy=Get-Content '.research-autonomy/config.json' -Raw | ConvertFrom-Json
+          if($Policy.schema -cne 'research.autonomy.v2' -or $Policy.program -cne 'Wingless' -or
+             $Policy.authority -cne 'research-only' -or $Policy.research_executor -cne 'disabled'){
+            throw 'ORIGINAL_EXECUTOR_DISABLED_POLICY_DRIFT'
+          }
+          Write-Host 'ORIGINAL_DISABLED_POLICY_AND_SOURCE_PIN=PASS'
+      - name: Exercise REAL isolated author entrypoint without provider credential
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version Latest
+          $Controller=(Resolve-Path '.').Path
+          $Research=Join-Path $env:RUNNER_TEMP 'auth-negative-research'
+          & git clone --local --no-hardlinks $Controller $Research
+          if($LASTEXITCODE-ne0){throw 'ISOLATED_RESEARCH_CLONE_FAILED'}
+          $Branch='research/preflight-auth-negative-'+$env:GITHUB_RUN_ID
+          & git -C $Research switch -c $Branch
+          if($LASTEXITCODE-ne0){throw 'ISOLATED_RESEARCH_BRANCH_FAILED'}
+          $Source=(& git -C $Research rev-parse HEAD).Trim()
+          if($Source -cne (& git -C $Controller rev-parse HEAD).Trim()){
+            throw 'SOURCE_IDENTITY_NOT_EXACT'
+          }
+          $NSPath='.research-autonomy/config.json'
+          $NSText=[IO.File]::ReadAllText((Join-Path $Research $NSPath))
+          $NSNormalized=$NSText.Replace("`r`n","`n").Replace("`r","`n")
+          $ShaObj=[Security.Cryptography.SHA256]::Create()
+          try {
+            $NSHash=([BitConverter]::ToString($ShaObj.ComputeHash(
+              (New-Object Text.UTF8Encoding($false)).GetBytes($NSNormalized)))).Replace('-','').ToLowerInvariant()
+          } finally { $ShaObj.Dispose() }
+          $ConfigPath=Join-Path $Controller '.research-autonomy/config.json'
+          $Original=[IO.File]::ReadAllText($ConfigPath)
+          $C=$Original | ConvertFrom-Json
+          $C.research_executor='free-nemotron-opt-in-v1'
+          # This is an ephemeral in-process fixture only. It is not committed,
+          # dispatched, published, activated, or supplied with any provider key.
+          [IO.File]::WriteAllText($ConfigPath,($C|ConvertTo-Json -Depth 30),(New-Object Text.UTF8Encoding($false)))
+          $env:GITHUB_TOKEN=''
+          $env:GH_TOKEN=''
+          $env:NVIDIA_API_KEY=''
+          $env:OPENAI_API_KEY=''
+          $env:AWS_ACCESS_KEY_ID=''
+          $env:OPENROUTER_FREE_API_KEY=''
+          $env:MIND_PALACE_CONTEXT_PATH=''
+          $env:RESEARCH_FREE_EXECUTOR_OWNER_ACK='1'
+          $env:RESEARCH_FREE_BUNDLE_OUTPUT=Join-Path $env:RUNNER_TEMP 'uncreated-provider-origin.bundle'
+          $ErrorText=''
+          try {
+            & (Join-Path $Controller 'scripts/Invoke-RepoLocalResearchCycle.ps1') `
+                -RepoPath $Research -Repository 'spoonman136668-ai/Wingless' -ActiveBranch $Branch `
+                -NorthStarPath $NSPath -NorthStarSha256 $NSHash -Trigger 'manual' `
+                -ResultPath (Join-Path $env:RUNNER_TEMP 'preflight-cycle-result.json')
+          } catch {
+            $ErrorText=[string]$_.Exception.Message
+          } finally {
+            [IO.File]::WriteAllText($ConfigPath,$Original,(New-Object Text.UTF8Encoding($false)))
+          }
+          if($ErrorText -cnotmatch 'NEMOTRON_FREE_EPHEMERAL_KEY_MISSING'){
+            throw "REAL_FREE_AGENT_AUTH_NEGATIVE_NOT_REACHED actual=$ErrorText"
+          }
+          if(Test-Path -LiteralPath $env:RESEARCH_FREE_BUNDLE_OUTPUT){
+            throw 'PROVIDER_ORIGIN_BUNDLE_CREATED_WITHOUT_CREDENTIAL'
+          }
+          if(@(& git -C $Controller status --porcelain).Count-ne0){throw 'CONTROLLER_SOURCE_MUTATED'}
+          if(@(& git -C $Research status --porcelain).Count-ne0){throw 'RESEARCH_SOURCE_MUTATED'}
+          Write-Host 'REAL_FREE_ONLY_AGENT_REACHED_EPHEMERAL_AUTH_BOUNDARY=PASS'
+          Write-Host 'NO_PROVIDER_KEY_NO_MODEL_REQUEST_NO_BUNDLE_NO_MUTATION=PASS'
