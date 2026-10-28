@@ -118,6 +118,18 @@ try{
     if(Test-Path -LiteralPath $RunRoot){Remove-Item -LiteralPath $RunRoot -Recurse -Force}
     New-Item -ItemType Directory -Force -Path $RunRoot|Out-Null
 
+    $ExecutorConfig=Join-Path (Split-Path -Parent $PSScriptRoot) '.research-autonomy\config.json'
+    if(-not(Test-Path -LiteralPath $ExecutorConfig -PathType Leaf)){throw 'RESEARCH_EXECUTOR_CONFIG_MISSING'}
+    $ExecutorDocument=Get-Content -LiteralPath $ExecutorConfig -Raw | ConvertFrom-Json
+    if([string]$ExecutorDocument.schema -cne 'research.autonomy.v2' -or
+       [string]$ExecutorDocument.program -cne 'Wingless' -or
+       [string]$ExecutorDocument.authority -cne 'research-only'){
+        throw 'RESEARCH_EXECUTOR_SOURCE_POLICY_DRIFT'
+    }
+    $ExecutorMode='disabled'
+    if($ExecutorDocument.PSObject.Properties.Name -contains 'research_executor'){
+        $ExecutorMode=[string]$ExecutorDocument.research_executor
+    }
     # External free trials must not receive private machine-local Mind-Palace
     # context even if a public source checkout is configured for the agent.
     if($ExecutorMode -ceq 'free-nemotron-opt-in-v1'){
@@ -168,18 +180,6 @@ $MindContext
     # An explicitly source-configured, second-gated free-only agent may author
     # a frozen research proposal. Without both gates this stays a read-only
     # watchdog; source promotion never silently enables remote inference.
-    $ExecutorConfig=Join-Path (Split-Path -Parent $PSScriptRoot) '.research-autonomy\config.json'
-    if(-not(Test-Path -LiteralPath $ExecutorConfig -PathType Leaf)){throw 'RESEARCH_EXECUTOR_CONFIG_MISSING'}
-    $ExecutorDocument=Get-Content -LiteralPath $ExecutorConfig -Raw | ConvertFrom-Json
-    if([string]$ExecutorDocument.schema -cne 'research.autonomy.v2' -or
-       [string]$ExecutorDocument.program -cne 'Wingless' -or
-       [string]$ExecutorDocument.authority -cne 'research-only'){
-        throw 'RESEARCH_EXECUTOR_SOURCE_POLICY_DRIFT'
-    }
-    $ExecutorMode='disabled'
-    if($ExecutorDocument.PSObject.Properties.Name -contains 'research_executor'){
-        $ExecutorMode=[string]$ExecutorDocument.research_executor
-    }
     if($ExecutorMode -ceq 'disabled'){
         Write-Host 'RESEARCH_AGENT_POLICY=GPT_CHAT_GITHUB_SOURCE_ONLY_NO_CODEX_NO_EXTERNAL_APIS'
         Write-Host 'RESEARCH_EXECUTOR_UNATTENDED=NOT_CONFIGURED_NO_MODEL_INVOCATION'
