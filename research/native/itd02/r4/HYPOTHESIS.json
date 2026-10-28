@@ -1,0 +1,46 @@
+{
+  "schema": "wingless.itd02.r4.frontier-sourceonly-mechanism-freeze.v1",
+  "parent_R3_commit": "3b11363b93e61311a8e96de2546b1a7f7f62d5db",
+  "parent_R3_source_blob": "3c8a60a5037e6c0f04648ae53175ed1187b5f8ac",
+  "prior_K4T_F2_pr": 908,
+  "prior_K4T_F2_run": 40172545960,
+  "prior_public_DEV_used_seeds": [
+    43400,
+    43407
+  ],
+  "prior_result": "NO_REPEATABLE_R3_MODEL_NAVIGATION_ADVANCEMENT",
+  "mechanism": "bounded per-episode public state-action visit and blocked-edge memory; learned-R3-prediction frontier navigation only when stalled; preserve original R3 source and model weights",
+  "legal_actions": [
+    0,
+    1,
+    2
+  ],
+  "input_contract": "only public observation (x,y,heading,goal,front_blocked) before selected action and actually observed after-state, no whole maze, hidden coordinates or goal oracle",
+  "mechanism_falsifiers": [
+    "zero-public-evidence fallback to original R3",
+    "unobserved physics cannot be manufactured from episode trajectory",
+    "stale FIT wall locations never override fresh real public block observations",
+    "no modification of model weights in CHECK/DEV",
+    "loop breaker either finds unseen reachable local frontier or explicitly fails closed",
+    "terminal/session reset clears episodic visits not learned R3 weights",
+    "bounded node visits, counters, and checkpoint authentication",
+    "cold OS-process restore preserves learned R3 and bounded episode session only"
+  ],
+  "control_requirements": [
+    "unchanged R3 code and R3 own trained checkpoint",
+    "R4 identical model with frontier disabled",
+    "trained fitted dynamics+BFS and equal public-source tabular",
+    "trained model-free and recurrent variants where available"
+  ],
+  "public_development_only": true,
+  "protected_first_use": false,
+  "scientific_accepted": false,
+  "governance": {
+    "no_protected_merge": true,
+    "no_new_controller": true,
+    "no_original_R1_R2_R3_edits": true,
+    "all_old_negatives_preserved": true,
+    "no_paid_API": true
+  },
+  "future_evaluation": "not authorized by mechanism freeze; FORGE must freeze new cohorts and independently qualified controls before any original source episodes"
+}

@@ -1,0 +1,33 @@
+name: ITD-02 Wingless native self-training development qualification
+on:
+  push:
+    branches:
+      - research/itd02-native-self-training-session-20261027
+  pull_request:
+    paths:
+      - 'research/native/itd02/outcome/training_session*.go'
+      - '.github/workflows/itd02-native-self-training-dev.yml'
+permissions:
+  contents: read
+jobs:
+  native-self-training:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Test actual native selected-action and reward feedback integration
+        run: go test -count=1 -v ./research/native/itd02/outcome ./research/native/itd02/r8
+      - name: Vet and build native learner
+        run: |
+          go vet ./research/native/itd02/outcome ./research/native/itd02/r8
+          go build ./research/native/itd02/outcome ./research/native/itd02/r8
+      - name: Linux native race gate
+        if: runner.os == 'Linux'
+        run: go test -race -count=1 ./research/native/itd02/outcome
