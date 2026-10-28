@@ -21,7 +21,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 4
       - name: Source-pinned single free inference and data-only artifact
         id: candidate
         shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
@@ -29,8 +29,9 @@ jobs:
           $ErrorActionPreference='Stop'
           if($env:GITHUB_RUN_ATTEMPT -cne '1'){throw 'ITD02_AUTHOR_REPEAT_FORBIDDEN'}
           if($env:GITHUB_REF_NAME -cne 'research/itd02-free-proposal-handoff-20261028' -or
-             (((& git rev-parse HEAD^ | Out-String)).Trim() -cne '845b0bbada456a816bc51c69dac3e241736ecd8c' -or
-             ((& git rev-parse HEAD~2 | Out-String)).Trim() -cne 'e0a73f188a6fde56ceabf03cf4c52e80f1d60e98')){
+             (((& git rev-parse HEAD^ | Out-String)).Trim() -cne 'ad108d080666b740fddf3cbdbc716a027245aec4' -or
+             ((& git rev-parse HEAD~2 | Out-String)).Trim() -cne '845b0bbada456a816bc51c69dac3e241736ecd8c' -or
+             ((& git rev-parse HEAD~3 | Out-String)).Trim() -cne 'e0a73f188a6fde56ceabf03cf4c52e80f1d60e98')){
             throw 'ITD02_AUTHOR_EXACT_SOURCE_DRIFT'
           }
           $Changes=@(& git diff --name-only HEAD^ HEAD)
