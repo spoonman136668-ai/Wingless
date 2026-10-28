@@ -193,6 +193,12 @@ $MindContext
     # No paid provider/model fallback. DPAPI owner credentials and original
     # bound agent tool policy remain unchanged. Neither this script nor CI
     # claims a scientific first-use or automatically merges accepted refs.
+    # Model-generated code and tool-initiated native tests must never run on
+    # the privileged persistent Windows research machine with host secrets.
+    # An ephemeral credential-free execution design must be qualified first.
+    if([string]$env:RUNNER_ENVIRONMENT -cne 'github-hosted'){
+        throw 'RESEARCH_FREE_EXECUTOR_REQUIRES_EPHEMERAL_RUNNER'
+    }
     if($Repository -cne 'spoonman136668-ai/Wingless'){
         throw 'RESEARCH_FREE_EXECUTOR_REPOSITORY_IDENTITY_DRIFT'
     }
