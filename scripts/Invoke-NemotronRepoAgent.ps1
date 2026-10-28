@@ -37,6 +37,32 @@ function Get-Relative([string]$Full){
     return $F.Substring($Root.Length).Replace('\','/')
 }
 
+# The free provider may see only Git-tracked public source bytes. In
+# particular, never include checkout credentials, symlinks or machine-local
+# memory/secret files in a tool response sent to a third-party model.
+$script:PublicTrackedPaths=$null
+function Test-PublicTrackedFile([string]$Relative){
+    $P=$Relative.Replace('\','/')
+    while($P.StartsWith('./')){$P=$P.Substring(2)}
+    if([string]::IsNullOrWhiteSpace($P) -or
+       $P -match '(?i)(^|/)(\.git|\.ssh|\.aws|\.env(?:\.[^/]*)?|secrets?|credentials?|private|mind-palace-context\.txt|[^/]*\.dpapi)(/|$)'){
+        return $false
+    }
+    $Full=Resolve-RepoPath $P $false
+    if(-not(Test-Path -LiteralPath $Full -PathType Leaf)){return $false}
+    if(((Get-Item -LiteralPath $Full -Force).Attributes -band
+         [IO.FileAttributes]::ReparsePoint) -ne 0){return $false}
+    if($null-eq$script:PublicTrackedPaths){
+        $Names=@(& git -C $RepoPath ls-files --cached)
+        if($LASTEXITCODE-ne0){throw 'NEMOTRON_PUBLIC_TRACKED_CATALOG_FAILED'}
+        $script:PublicTrackedPaths=@{}
+        foreach($Name in $Names){
+            $script:PublicTrackedPaths[[string]$Name.Replace('\','/')]=$true
+        }
+    }
+    return $script:PublicTrackedPaths.ContainsKey($P)
+}
+
 function Test-WritablePath([string]$Relative){
     $P=$Relative.Replace('\','/')
     if($P.Contains('..')){return $false}
@@ -89,7 +115,11 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             if(-not(Test-Path -LiteralPath $Base -PathType Container)){throw "NEMOTRON_LIST_NOT_DIRECTORY path=$Rel"}
             $BaseDepth=($Base.TrimEnd('\').Split('\')).Count
             $Rows=Get-ChildItem -LiteralPath $Base -Force -Recurse -ErrorAction SilentlyContinue |
-                Where-Object {(($_.FullName.Split('\')).Count-$BaseDepth)-le$Depth} |
+                Where-Object {
+                    -not $_.PSIsContainer -and
+                    (($_.FullName.Split('\')).Count-$BaseDepth)-le$Depth -and
+                    (Test-PublicTrackedFile (Get-Relative $_.FullName))
+                } |
                 Select-Object -First 600 |
                 ForEach-Object {
                     [ordered]@{path=(Get-Relative $_.FullName);type=if($_.PSIsContainer){'dir'}else{'file'};bytes=if($_.PSIsContainer){0}else{$_.Length}}
@@ -100,6 +130,7 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             $Rel=[string]$A.path
             $Full=Resolve-RepoPath $Rel $true
             if(-not(Test-Path -LiteralPath $Full -PathType Leaf)){throw "NEMOTRON_READ_NOT_FILE path=$Rel"}
+            if(-not(Test-PublicTrackedFile $Rel)){throw 'NEMOTRON_READ_REQUIRES_PUBLIC_TRACKED_SOURCE'}
             $Lines=@(Get-Content -LiteralPath $Full)
             $Start=if($A.PSObject.Properties.Name -contains 'start_line'){[Math]::Max([int]$A.start_line,1)}else{1}
             $End=if($A.PSObject.Properties.Name -contains 'end_line'){[Math]::Min([int]$A.end_line,$Lines.Count)}else{[Math]::Min($Start+159,$Lines.Count)}
@@ -119,6 +150,7 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             }
             $Rows=New-Object Collections.Generic.List[object]
             foreach($F in $Files){
+                if(-not(Test-PublicTrackedFile (Get-Relative $F.FullName))){continue}
                 try{
                     foreach($M in @(Select-String -LiteralPath $F.FullName -SimpleMatch -Pattern $Query -ErrorAction Stop)){
                         $Rows.Add([ordered]@{path=(Get-Relative $F.FullName);line=$M.LineNumber;text=([string]$M.Line).Trim()})
