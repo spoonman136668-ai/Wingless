@@ -215,7 +215,7 @@ $MindContext
         -RepoPath $RepoPath -Program 'Wingless' -ActiveBranch $ActiveBranch `
         -StartSha $StartSha -PromptPath $PromptPath `
         -LastMessagePath $LastMessagePath -Provider 'openrouter' `
-        -Model $OnlyFreeModel -MaxRounds 8
+        -Model $OnlyFreeModel -MaxRounds 8 -NoProcessTools
     if(-not(Test-Path -LiteralPath $LastMessagePath -PathType Leaf)){
         throw 'RESEARCH_FREE_EXECUTOR_NO_TERMINAL_REPORT'
     }
