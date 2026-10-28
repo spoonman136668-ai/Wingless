@@ -118,7 +118,14 @@ try{
     if(Test-Path -LiteralPath $RunRoot){Remove-Item -LiteralPath $RunRoot -Recurse -Force}
     New-Item -ItemType Directory -Force -Path $RunRoot|Out-Null
 
-    $MindContext=Get-OptionalMindContext
+    # External free trials must not receive private machine-local Mind-Palace
+    # context even if a public source checkout is configured for the agent.
+    if($ExecutorMode -ceq 'free-nemotron-opt-in-v1'){
+        $MindContext=''
+        Write-Host 'RESEARCH_EXTERNAL_PRIVATE_CONTEXT=EXCLUDED'
+    }else{
+        $MindContext=Get-OptionalMindContext
+    }
     $PromptPath=Join-Path $RunRoot 'agent-prompt.txt'
     $LastMessagePath=Join-Path $RunRoot 'agent-last-message.txt'
     $Prompt=@"
@@ -186,6 +193,16 @@ $MindContext
     # No paid provider/model fallback. DPAPI owner credentials and original
     # bound agent tool policy remain unchanged. Neither this script nor CI
     # claims a scientific first-use or automatically merges accepted refs.
+    if($Repository -cne 'spoonman136668-ai/Wingless'){
+        throw 'RESEARCH_FREE_EXECUTOR_REPOSITORY_IDENTITY_DRIFT'
+    }
+    $Metadata=Invoke-RestMethod -Method Get -TimeoutSec 20 `
+        -Uri ('https://api.github.com/repos/'+$Repository) `
+        -Headers @{ Authorization=('Bearer '+$env:GITHUB_TOKEN); Accept='application/vnd.github+json' }
+    if([string]$Metadata.full_name -cne $Repository -or $Metadata.private -ne $false -or
+       $Metadata.archived -ne $false){
+        throw 'RESEARCH_FREE_EXECUTOR_PUBLIC_SOURCE_REQUIRED'
+    }
     $OnlyFreeModel='nvidia/nemotron-3-ultra-550b-a55b:free'
     Write-Host 'RESEARCH_EXECUTOR_UNATTENDED=EXPLICIT_FREE_ONLY_OPT_IN'
     & (Join-Path $PSScriptRoot 'Invoke-NemotronRepoAgent.ps1') `
