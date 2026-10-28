@@ -161,9 +161,9 @@ jobs:
           $ErrorActionPreference='Stop'
           $Branch=((& git branch --show-current | Out-String)).Trim()
           if([string]::IsNullOrWhiteSpace($Branch)){
-            git switch -c ci-free-agent-no-process-probe
+            $Branch='ci-free-agent-no-process-'+$env:GITHUB_RUN_ID
+            git switch -c $Branch
             if($LASTEXITCODE-ne0){throw 'AGENT_SELFTEST_LOCAL_BRANCH_FAILED'}
-            $Branch='ci-free-agent-no-process-probe'
           }
           $Head=([string](& git rev-parse HEAD)).Trim()
           if($Head -notmatch '^[a-f0-9]{40}$'){throw 'AGENT_SELFTEST_SHA_INVALID'}
