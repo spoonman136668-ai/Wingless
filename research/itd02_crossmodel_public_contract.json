@@ -1,0 +1,60 @@
+{
+  "schema": "itd02.crossmodel.public_environment_contract.v1",
+  "environment": {
+    "provider": "Farama MiniGrid",
+    "id": "MiniGrid-Empty-5x5-v0",
+    "minigrid_version": "3.0.0",
+    "gymnasium_version": "1.2.1",
+    "public_observation_fields": [
+      "image",
+      "direction",
+      "mission"
+    ],
+    "public_feedback_fields": [
+      "reward",
+      "terminated",
+      "truncated"
+    ],
+    "forbidden_access": [
+      "env.unwrapped",
+      "agent_pos",
+      "hidden world state",
+      "reward law",
+      "privileged info"
+    ]
+  },
+  "comparison": {
+    "same_environment_and_reset_seeds": true,
+    "same_public_observation_budget": true,
+    "same_max_steps": 24,
+    "seed_list": [
+      51,
+      52,
+      53
+    ],
+    "equal_training_feedback": true,
+    "matched_controls": [
+      "frozen-native",
+      "cycle",
+      "random"
+    ],
+    "action_semantics": [
+      "left",
+      "right",
+      "forward"
+    ],
+    "no_hidden_labels": true
+  },
+  "architecture": {
+    "Wingless": "native Go predictive and causal R8/R9 policies; native-owned public learner and selected-action custody",
+    "Yggdrasil": "native eight-cell LocalTaskRuntime plus local ring memory; public-only bounded local adaptation"
+  },
+  "restrictions": {
+    "do_not_copy_architectures": true,
+    "do_not_promote": true,
+    "reserved_q1_q2_q3_sealed": true,
+    "science_first_use": false,
+    "forge_controller_untouched": true
+  },
+  "stage": "cross-repo contract only; adapters must separately prove exact action/observation parity before efficacy trials"
+}
