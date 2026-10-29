@@ -1,0 +1,57 @@
+name: ITD-02 DK14 actual original mission native selected-source qualification
+on:
+  push:
+    branches: [research/itd02-dk14-original-mission-20261029]
+permissions:
+  contents: read
+jobs:
+  original-mission-boundary-and-source-feedback:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    timeout-minutes: 40
+    steps:
+      - name: Source line ending policy
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Exact native branch source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Native Go compiler
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Freeze source parent and prospectively registered native selected mission
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 2992a25e3fe05783bfa80ecf70d737bb2a21e281 "$GITHUB_SHA"
+          git merge-base --is-ancestor b427b8fb497a6b8ad718e143e3b6c1a32d6fe67c "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk14/PREREG.md)" = 0caee6a768f26769e1e01c08218d4c5a191777a9
+          test "$(git hash-object research/native/itd02/dk14/mission.go)" = 229600d22c36c3fc8a8abdf2eca555f9fe43ba1f
+          test "$(git hash-object research/native/itd02/dk14/mission_test.go)" = 9b2dd31e454d9dd42501a650bff64ff5bdd0844b
+          test "$(git hash-object research/native/itd02/dk13/successor.go)" = b4c0e029f45448117dbf9870b85f6551acf12822
+          echo DK14_FROZEN_SOURCE_PARENT_AND_REAL_MISSION_INTERFACE_PASS
+      - name: Native selected public mission tests and inherited DK13 regression
+        shell: bash
+        run: go test -count=1 -v ./research/native/itd02/dk13/... ./research/native/itd02/dk14/...
+      - name: Full original Go regression
+        if: matrix.os == 'ubuntu-24.04'
+        shell: bash
+        run: go test -count=1 ./...
+      - name: Native Go vet and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go vet ./research/native/itd02/dk14
+          go build ./research/native/itd02/dk14
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo DK14_GENUINE_MISSION_SELECTED_FEEDBACK_ENGINEERING_ONLY
