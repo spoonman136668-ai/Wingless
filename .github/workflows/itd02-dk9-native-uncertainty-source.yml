@@ -1,0 +1,47 @@
+name: ITD-02 DK9 native original Go public uncertainty selector
+on:
+  push:
+    branches: [research/itd02-dk9-native-uncertainty-20261028]
+permissions:
+  contents: read
+jobs:
+  original-native-go-source:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - name: Exact git LF source
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Pre-executable frozen prereg and unchanged original DK8 and R8
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 40fbec49fda33a04fea640535a8aaeaa29493cc7 "$GITHUB_SHA"
+          git merge-base --is-ancestor 1e95ee06f76e4e07457a0695a45192f2cf738359 "$GITHUB_SHA"
+          git merge-base --is-ancestor c2eaa1bb14834362242e37d2277f4c21ce4a4e80 "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk8/effect_policy.go)" = 01484d331e9df9035be045b31d0e015f1f8652e2
+          test "$(git hash-object research/native/itd02/r8/online_beliefs.go)" = 6857ecbef2d63f459a432a5d68c7edda2b5347c4
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Native Go DK9 tests and original DK8 regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/dk9/... ./research/native/itd02/dk8/...
+          go build -o "$RUNNER_TEMP/dk9bridge" ./research/native/itd02/dk9bridge
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo DK9_NATIVE_GO_UNCERTAINTY_SOURCE_ONLY_PASS_NOT_SCIENCE
