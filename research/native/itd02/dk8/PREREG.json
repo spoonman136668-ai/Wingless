@@ -1,0 +1,40 @@
+{
+  "schema": "wingless.itd02.dk8.selected-public-visible-effect-sourceonly.v1",
+  "pre_executable": true,
+  "parent_commit": "200c622367f9d748bf9107c941684a4cd92aef34",
+  "parent_pr": 417,
+  "new_candidate": "NEW opt-in native Go DK8, not R8 and not modification to original DK7",
+  "original_native_source_unchanged": true,
+  "public_input": [
+    "image 7x7x3",
+    "direction",
+    "mission"
+  ],
+  "actions": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "contexts": "Exactly R11 feature of public current front object/color/state and public carried object type/color + proposed selected action, no hidden pose, seed or global map; no direction in feature",
+  "objectives": [
+    "carrying_changed",
+    "visible_door_state_changed"
+  ],
+  "outcome_definition": {
+    "carrying_changed": "R11: public carried object before and after differ",
+    "visible_door_state_changed": "R11: public front object before and after are both door (kind=4) and their visible state codes differ"
+  },
+  "learning": "One actual selected public before/action/after/reward/terminal, update one action-context sample and 2 visible effect frequency counters; no counterfactual or injected success labels; preserve original public reward separately",
+  "action_rule": "At each context, for the externally declared objective, select highest observed success probability >0, tie lowest action id; otherwise explicit abstention",
+  "checkpoint": "separate strict SHA256 canonical schema; cap 150000 bytes; <=4096 events; <=512 contexts; no pending snapshots; no update after invalid feedback; independent cold restore",
+  "validation": "Linux and Windows native Go; source blob pins parent DK7 and original R8; exact public selected-action/cold checkpoint tests",
+  "classification": {
+    "pass": "DK8_NATIVE_GO_OBSERVABLE_EFFECT_SUPPORT_ENGINEERING_PASS__NO_SCIENCE",
+    "failure": "DK8_SELECTED_PUBLIC_EFFECT_ENGINEERING_BLOCKED__NO_SCIENCE"
+  },
+  "authority": "No accepted model, source old R8 or R12 replacement, science, controller or merge"
+}
