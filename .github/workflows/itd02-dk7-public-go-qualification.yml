@@ -1,0 +1,53 @@
+name: ITD-02 DK7 Wingless opt-in seven-action public native Go candidate
+on:
+  push:
+    branches:
+      - research/itd02-dk7-public-go-sourceonly-20261028
+permissions:
+  contents: read
+jobs:
+  original-wingless-dk7-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - name: Source newline controls
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout exact branch Git source without saved credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Native Go compiler
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Assert prereg before implementation and original R8/R5 code identical
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor d89bf3a0fe057ceb2dfc9cfab2e2c24921220cdc "$GITHUB_SHA"
+          git merge-base --is-ancestor a815005a53414be44d0a296e3944a28a8b7371b6 "$GITHUB_SHA"
+          git merge-base --is-ancestor ce98c93597f6953cafba43547213119cf27435d9 "$GITHUB_SHA"
+          git merge-base --is-ancestor aeda4ee8b9c28074e1082b487826d6acc5970c8a "$GITHUB_SHA"
+          git merge-base --is-ancestor b9d2300b8d636fb2dae0237e41a7dd6ee658f617 "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/r8/online_beliefs.go)" = 6857ecbef2d63f459a432a5d68c7edda2b5347c4
+          test "$(git hash-object research/native/itd02/r8bridge/main.go)" = e14301e4307424eadb46865d7c1ede51f8bbe011
+          test "$(git hash-object research/native/itd02/r5/cost_frontier.go)" = 239a5f2ab6d122b10cd5c7cc9388d154929b9888
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Test actual native Go seven-action selected effects and strict public schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/dk7/...
+          go build ./research/native/itd02/dk7bridge
+          echo DK7_SEVEN_ACTION_GO_NATIVE_PUBLIC_ENGINEERING_PASS_NOT_SCIENCE
+          test -z "$(git status --porcelain --untracked-files=all)"
