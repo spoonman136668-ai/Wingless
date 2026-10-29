@@ -1,0 +1,47 @@
+name: ITD-02 DK12 native source-selected public action exploration
+on:
+  push:
+    branches: [research/itd02-dk12-public-novelty-20261029]
+permissions:
+  contents: read
+jobs:
+  native-go-public-source:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Fix original Git source newline policy
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Prereg, original source DK11 and R8 remain pinned
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5b5cda4346e278f46874d2f9264b22a5cf5a01ba "$GITHUB_SHA"
+          git merge-base --is-ancestor 1223024060bc1170c83f05b73887ddf9c9da05d1 "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk12/public_novelty.go)" = 117bbcc6d23f99cf2f89ba74c77e0e981b95ca94
+          test "$(git hash-object research/native/itd02/dk12bridge/main.go)" = aa8ef4652e6911d1ba144e9ce0f9af1e03238f5d
+          test "$(git hash-object research/native/itd02/dk11/continuity.go)" = 228027db110c3924aebf63420ff2caed47fe8c73
+          test "$(git hash-object research/native/itd02/r8/online_beliefs.go)" = 6857ecbef2d63f459a432a5d68c7edda2b5347c4
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Native selected-public seven-action learning and original regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/dk12/... ./research/native/itd02/dk11/...
+          go build -trimpath -o "$RUNNER_TEMP/dk12bridge" ./research/native/itd02/dk12bridge
+          echo DK12_ORIGINAL_SELECTED_SOURCE_NOVELTY_QUALIFIED_NOT_SCIENCE
