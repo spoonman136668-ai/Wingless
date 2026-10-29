@@ -1,0 +1,57 @@
+name: ITD-02 DK13 selected successor persistence Go native qualification
+on:
+  push:
+    branches: [research/itd02-dk13-successor-persistence-20261029]
+permissions:
+  contents: read
+jobs:
+  original-native-selected-public-successors:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    timeout-minutes: 40
+    steps:
+      - name: Exact original LF policy
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout original candidate exactly
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Original Go compiler
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Check original native source prereg and unchanged parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor bdc02269856275399793d58892fbcfe4f5101623 "$GITHUB_SHA"
+          git merge-base --is-ancestor e2176fe3f1fb6d21f688c0c8559b0e089e0df90a "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk13/PREREG.md)" = 081683e078bad65a6951b94cccd7506ef31ee0d3
+          test "$(git hash-object research/native/itd02/dk13/successor.go)" = b4c0e029f45448117dbf9870b85f6551acf12822
+          test "$(git hash-object research/native/itd02/dk13/successor_test.go)" = 257d0732c82d7e54d84ccd0273f33081d7e11fcf
+          test "$(git hash-object research/native/itd02/dk12/motion.go)" = f3d233136c4725304e36287465c0e05f1cf87336
+          echo DK13_FROZEN_PUBLIC_SUCCESSOR_SOURCE_PASS
+      - name: Focused original parent and DK13 native selected-feedback tests
+        shell: bash
+        run: go test -count=1 -v ./research/native/itd02/dk12/... ./research/native/itd02/dk13/...
+      - name: Complete original Go regression
+        if: matrix.os == 'ubuntu-24.04'
+        shell: bash
+        run: go test -count=1 ./...
+      - name: Native vet and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go vet ./research/native/itd02/dk13
+          go build ./research/native/itd02/dk13
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo DK13_NATIVE_SUCCESSOR_PERSISTENCE_QUALIFIED_SOURCE_ONLY__NO_SCIENCE

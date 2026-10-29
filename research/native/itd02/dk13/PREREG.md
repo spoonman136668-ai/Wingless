@@ -1,0 +1,5 @@
+# MG12 original selected-public successor persistence preregistration
+
+FORGE frozen experiment: `5c3dd11324a298e84a53dd41ff8b003762eb9c47`, prior to this native implementation. Exact unchanged Wingless parent: `bdc02269856275399793d58892fbcfe4f5101623`.
+
+Use raw public before/action/after only, preserve authentic parent selected updates. Within each live episode count selected attempts by exact SHA256 public context, remember last observed selected successor digest, and count visited successor digests. Apply preregistered 3072 and 1024 local revisit penalties to existing regularized source-trained global motion-effect preference. Deterministic public-hash tie and legal actions; no hardcoded door/key/goal route or forward/toggle action ID, no privileged environment access, no collector action, no new original-world evaluation in this source gate. Bound at 192 live steps and contexts, SHA authenticated cold checkpoints. Validate source-only on Windows/Linux and preserve negative results. No science, main merge, G29/Atlas waiver, accepted model or autonomy controller change.
