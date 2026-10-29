@@ -1,0 +1,58 @@
+name: ITD-02 DK12 source-selected nonrotational motion qualification
+on:
+  push:
+    branches: [research/itd02-dk12-public-motion-evidence-20261029]
+permissions:
+  contents: read
+jobs:
+  native-original-public-motion:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    timeout-minutes: 45
+    steps:
+      - name: Original source line ending policy
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout exact candidate source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Native Go compiler
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Freeze original source and original-prereg before changed policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor e75cc1ac6d302f4926df9fd28f3aab02eded1de3 "$GITHUB_SHA"
+          git merge-base --is-ancestor 1480a6336bb46bd322f4c5d94c24690c4dfe23b1 "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk12/PREREG.md)" = 464c0ea39fd58d8717525ab2e912cd408073956c
+          test "$(git hash-object research/native/itd02/dk12/motion.go)" = f3d233136c4725304e36287465c0e05f1cf87336
+          test "$(git hash-object research/native/itd02/dk12/motion_test.go)" = 7fc009e37ef3a138482e36c8671e7b35a331e639
+          test "$(git hash-object research/native/itd02/dk11/continuity.go)" = 228027db110c3924aebf63420ff2caed47fe8c73
+          test "$(git hash-object research/native/itd02/dk10/temporal_policy.go)" = 3575ca351467ffd6200d277acf72b0d78dd54a52
+          echo DK12_ORIGINAL_PARENT_AND_PROSPECTIVE_PROTOCOL_PASS
+      - name: Selected-native feedback, anti-cycle, cold checkpoint
+        shell: bash
+        run: go test -count=1 -v ./research/native/itd02/dk10/... ./research/native/itd02/dk11/... ./research/native/itd02/dk12/...
+      - name: Full original Go tests
+        if: matrix.os == 'ubuntu-24.04'
+        shell: bash
+        run: go test -count=1 ./...
+      - name: Native Go vet and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go vet ./research/native/itd02/dk12
+          go build ./research/native/itd02/dk12
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo DK12_ORIGINAL_SOURCE_NATIVE_NONROTATIONAL_ENGINEERING_ONLY
