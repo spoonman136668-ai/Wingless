@@ -1,0 +1,53 @@
+name: ITD-02 DK8 Go original DoorKey selected carrying and door public effects
+on:
+  push:
+    branches:
+      - research/itd02-dk8-public-visible-effects-20261028
+permissions:
+  contents: read
+jobs:
+  native-seven-action-public-effects:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    steps:
+      - name: Original source newline policy
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Exact SHA source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Original Go toolchain
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Frozen prereg native source and true original R8 untouched
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 200c622367f9d748bf9107c941684a4cd92aef34 "$GITHUB_SHA"
+          git merge-base --is-ancestor f97bb10e16a7aaeee5e50a145b5302429bcbf37e "$GITHUB_SHA"
+          git merge-base --is-ancestor a790edb1792ac8b45e874c3875f3bcf4378e786f "$GITHUB_SHA"
+          git merge-base --is-ancestor c07725b8ad259fc703f8d844bf431f1930dcfba6 "$GITHUB_SHA"
+          git merge-base --is-ancestor 70f7fc6eee1e997b8962799315a4e47588abf380 "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk7/public_policy.go)" = b61ae9118dc1dae521f84ec44c72c891ce84df8c
+          test "$(git hash-object research/native/itd02/r8/online_beliefs.go)" = 6857ecbef2d63f459a432a5d68c7edda2b5347c4
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Go DK8 source-only safety and true selected public-effect unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/dk8/...
+          go test -count=1 ./research/native/itd02/dk7/...
+          go build -o "$RUNNER_TEMP/dk8-bridge" ./research/native/itd02/dk8bridge
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo DK8_NATIVE_GO_PUBLIC_CARRY_DOOR_SELECTED_EFFECT_PASS_NOT_SCIENCE
