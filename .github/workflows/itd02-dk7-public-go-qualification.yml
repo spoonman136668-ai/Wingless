@@ -48,6 +48,6 @@ jobs:
         run: |
           set -euo pipefail
           go test -count=1 -v ./research/native/itd02/dk7/...
-          go build ./research/native/itd02/dk7bridge
+          go build -o "$RUNNER_TEMP/dk7bridge" ./research/native/itd02/dk7bridge
           echo DK7_SEVEN_ACTION_GO_NATIVE_PUBLIC_ENGINEERING_PASS_NOT_SCIENCE
           test -z "$(git status --porcelain --untracked-files=all)"
