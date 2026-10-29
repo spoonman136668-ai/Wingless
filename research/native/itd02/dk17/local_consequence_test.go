@@ -66,3 +66,33 @@ func TestRotationAndNoEffectNeverProduceProgressCredit(t *testing.T){
  if e=m.Feedback(a,6,a,0,false);e==nil{t.Fatal("duplicate source accepted")}
  if m.Agent.Samples!=5{t.Fatal("selected source counted incorrectly")}
 }
+
+
+func TestLocalSourceTransferCanChangeChoiceOnUnseenFullView(t *testing.T){
+ mission:="use the key to open the door and then get to the goal"
+ // A different local configuration teaches the parent a global source-effect
+ // tendency. Real selected local evidence must overcome that in an unseen full
+ // observation, not simply count training samples.
+ model:=New()
+ other:=scene(mission,0,1,4);otherNext:=scene(mission,0,2,4)
+ for i:=0;i<12;i++{
+  if e:=model.ObserveFit(other,0,otherNext,0,false);e!=nil{t.Fatal(e)}
+ }
+ a:=scene(mission,0,1,1);after:=scene(mission,0,2,1)
+ for i:=0;i<2;i++{
+  if e:=model.ObserveFit(a,5,after,0,false);e!=nil{t.Fatal(e)}
+ }
+ unseen:=scene(mission,3,7,1)
+ original,_,e:=model.Policy.Choose(unseen)
+ if e!=nil||original==nil{t.Fatal(e)}
+ selected,reason,e:=model.Choose(unseen)
+ if e!=nil||selected==nil{t.Fatal(e)}
+ if *original!=5 {
+  if *selected!=5||reason!="SELECT_NATIVE_LOCAL_SELECTED_CAUSAL_EFFECT"{
+   t.Fatalf("local evidence did not change policy on unseen full view: original %d new %d reason %s",*original,*selected,reason)
+  }
+ }else{
+  t.Log("parent happens to select local supported action already; local evidence remains non-global")
+ }
+ if model.Agent.Samples!=14{t.Fatal("selected original source count drift")}
+}
