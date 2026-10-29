@@ -1,0 +1,61 @@
+name: ITD-02 DK11 original-public object-continuity native qualification
+on:
+  push:
+    branches:
+      - research/itd02-dk11-public-object-continuity-20261029
+permissions:
+  contents: read
+jobs:
+  source-exact-native-go:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    timeout-minutes: 45
+    steps:
+      - name: Force original git source LF
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout candidate exact native Git SHA
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Frozen Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify prospective prereg and original parent source unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor e8f6cf7bce6bf7580de9bb7ab861530d7fd1e220 "$GITHUB_SHA"
+          git merge-base --is-ancestor cddce58065aa2578877ea096af355a9bcdd7acdc "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk11/PREREG.md)" = db7f454a6bc04844bb796c59a20aa611a071cab3
+          test "$(git hash-object research/native/itd02/dk11/continuity.go)" = 228027db110c3924aebf63420ff2caed47fe8c73
+          test "$(git hash-object research/native/itd02/dk11/continuity_test.go)" = f606e6dd030a6556bdc23ea8b3976d343aa03343
+          test "$(git hash-object research/native/itd02/dk10/temporal_policy.go)" = 3575ca351467ffd6200d277acf72b0d78dd54a52
+          test "$(git hash-object research/native/itd02/r8/online_beliefs.go)" = 6857ecbef2d63f459a432a5d68c7edda2b5347c4
+          echo DK11_FROZEN_MG09_PREREG_AND_ORIGINAL_PARENT_PASS
+      - name: Source-only selected-feedback and cold native Go tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/dk9/... ./research/native/itd02/dk10/... ./research/native/itd02/dk11/...
+      - name: Full original Go regression
+        if: matrix.os == 'ubuntu-24.04'
+        shell: bash
+        run: go test -count=1 ./...
+      - name: Go vet, source build and unchanged tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          go vet ./research/native/itd02/dk11
+          go build ./research/native/itd02/dk11
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo DK11_NATIVE_PUBLIC_OBJECT_CONTINUITY_SOURCE_ONLY__NO_SCIENCE
