@@ -134,7 +134,7 @@ func (a *Actor) Feedback(action int,next Public,reward float64,term,trunc bool)e
   if !bytes.Equal(oldb,newb){
    stat.SameHeadingChanged++
    carried:=before.Image[3][6]
-   if carried[0]>=5&&carried[0]<=7&&bytes.Equal(oldb[0:0],newb[0:0]){
+   if carried[0]>=5&&carried[0]<=7{
     newcarry,_:=json.Marshal(next.Image[3][6])
     oldcarry,_:=json.Marshal(carried)
     if bytes.Equal(newcarry,oldcarry){stat.HeldRetainedChanged++}
