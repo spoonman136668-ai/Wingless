@@ -48,7 +48,7 @@ func(p *Policy) Choose(b Public)(*int,string,error){
  state,e:=publicHash(b);if e!=nil{return nil,"",e}
  if _,e=p.Agent.Snapshot();e!=nil{return nil,"",e}
  row:=p.State[state]
- shift:=int((sha256.Sum256([]byte(state)))[0])%7
+ start,_:=hex.DecodeString(state[:2]);shift:=int(start[0])%7
  for i:=0;i<7;i++{
   a:=(shift+i)%7
   if row.Count[a]==0{
