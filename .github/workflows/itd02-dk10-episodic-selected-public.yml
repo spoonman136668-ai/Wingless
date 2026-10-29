@@ -1,0 +1,60 @@
+name: ITD-02 DK10 selected-public episodic memory Go qualification
+on:
+  push:
+    branches:
+      - research/itd02-dk10-episodic-transition-source-20261028
+permissions:
+  contents: read
+jobs:
+  source-exact-episodic-go:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    timeout-minutes: 40
+    steps:
+      - name: Git source LF policy
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout isolated native source exact HEAD
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Native Go 1.25.5
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Check parent source and exact prereg before executable
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor d47291dc547fe3a23cc5f65df259b1dcf169fb2a "$GITHUB_SHA"
+          git merge-base --is-ancestor b556669cb696daedda2a596bb27a4e2fe2b7cbd8 "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk10/PREREG.md)" = a7b061bb70168be139f738de64c238fa6a80bd66
+          test "$(git hash-object research/native/itd02/dk7/public_policy.go)" = b61ae9118dc1dae521f84ec44c72c891ce84df8c
+          test "$(git hash-object research/native/itd02/dk8/explorer.go)" = 621d0d8b5bea7093c512903407a4a4bb812f4656
+          test "$(git hash-object research/native/itd02/r8/online_beliefs.go)" = 6857ecbef2d63f459a432a5d68c7edda2b5347c4
+          echo DK10_NATIVE_FOUNDATION_UNMODIFIED
+      - name: Test actual selected feedback, source loops and cold checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/dk7 ./research/native/itd02/dk8 ./research/native/itd02/dk10
+      - name: Full Go repo regression
+        if: matrix.os == 'ubuntu-24.04'
+        shell: bash
+        run: go test -count=1 ./...
+      - name: Native static vet and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          go vet ./research/native/itd02/dk10
+          go build ./research/native/itd02/dk10
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo DK10_EPISODIC_PUBLIC_TRANSITION_SOURCE_ONLY__NO_SCIENCE
