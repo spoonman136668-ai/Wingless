@@ -1,0 +1,54 @@
+{
+  "schema": "wingless.itd02.dk7.public-seven-action-native-go-sourceonly.v1",
+  "frozen_before_code": true,
+  "parent": {
+    "r8_bridge_head": "d89bf3a0fe057ceb2dfc9cfab2e2c24921220cdc",
+    "original_r8_source_blob": "6857ecbef2d63f459a432a5d68c7edda2b5347c4",
+    "original_r8_bridge_blob": "e14301e4307424eadb46865d7c1ede51f8bbe011"
+  },
+  "intent": "Provide an opt-in native Go seven-action public image consequence-learning candidate for same public DoorKey contract as Yggdrasil R12. This is NOT a restore or an upgrade of original Wingless R8 learned state, does not reuse its incompatible six-field state and MUST NOT be described as R8 operating at seven actions.",
+  "public": {
+    "fields": [
+      "image",
+      "direction",
+      "mission"
+    ],
+    "image_shape": [
+      7,
+      7,
+      3
+    ],
+    "mission": "use the key to open the door and then get to the goal",
+    "actions": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "no_global_pose_map_seed_or_private_carry": true
+  },
+  "mechanism": {
+    "context": "public front [3][5] object type/color/state and agent-local [3][6] carried-object type/color plus heading",
+    "selected_evidence": "one submitted real action 0..6 and actual before/after publicly visible image + original reward and terminal flag; no unselected labels",
+    "cells": "seven independent action-specific observed outcome counters per public feature context; count and positive reward occurrences, no truth table or privileged external planner",
+    "readout": "choose max empirical P(positive reward) only for supported action context with positive observed reward, with ties lower action ID; otherwise abstain (not a secretly chosen action)",
+    "learn": "increment exactly one selected-action native count and positive reward observation; retain all prior action data; cap 4096 samples, 512 contexts, 150k checkpoint bytes"
+  },
+  "source_roles": "Development transport/evidence candidate only. Matched truly selected original FIT transitions must be provided simultaneously to original Yggdrasil R11 learner. R12 objective is explicitly externally fixed as positive_reward for the primary equal-public comparison. Neither model learns a mission parser, and external neutral exploration on abstain must be transparently counted; do not promote an external fallback as a native choice.",
+  "guards": [
+    "reject missing/extra fields and malformed pixel/direction/mission with no native state mutation",
+    "reject bad action/reward/terminal and unselected alternative outcomes",
+    "no acceptance for reward outside [0,1]",
+    "strict canonical SHA256 checkpoint with source-only schema and stored counter consistency",
+    "never edit original r8/r5/r3/r1",
+    "no FORGE or CKB-plane controller mutation",
+    "separate draft PR/no merge/no science"
+  ],
+  "classification": {
+    "pass": "DK7_WINGLESS_GO_PUBLIC_SEVEN_ACTION_ENGINEERING_READY__NO_SCIENCE",
+    "fail": "DK7_WINGLESS_GO_PUBLIC_NATIVE_BOUNDARY_BLOCKED__NO_SCIENCE"
+  }
+}
