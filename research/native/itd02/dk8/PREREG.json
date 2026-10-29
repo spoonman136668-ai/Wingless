@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.itd02.dk8.sourceonly-native-uncertainty-proposal.v1",
+  "freeze": "BEFORE_NEW_DK8_EXECUTABLE_CODE",
+  "parent": {
+    "repo": "spoonman136668-ai/Wingless",
+    "pr": 417,
+    "commit": "200c622367f9d748bf9107c941684a4cd92aef34",
+    "original_dk7_policy_blob": "b61ae9118dc1dae521f84ec44c72c891ce84df8c",
+    "original_dk7_ipc_blob": "57bb90bdaeab3c31d0427b24945907ea18664db6"
+  },
+  "negative_anchor": {
+    "forge_pr": 1069,
+    "source_sha": "105f953b8536bde78688f0b618f75c9cd51b4696",
+    "run": 40796318964,
+    "original_trace_sha256": "4268e4ef94685eaa55d51200dafc50a15591df5f44cc3e8e9f7410fde19c7354",
+    "wingless_dk7_native_proposals": 0,
+    "wingless_dk7_fallbacks": 512,
+    "yggdrasil_r12_native_proposals": 0,
+    "yggdrasil_r12_fallbacks": 512,
+    "real_goals": 0,
+    "classification": "DEVELOPMENT_NEGATIVE__NO_SCIENCE"
+  },
+  "candidate": "New opt-in Go action selector around unchanged DK7 selected-outcome counter memory, no mutation of DK7 or original R8",
+  "policy": {
+    "observation": "Only original public image 7x7x3, direction 0..3 and exact DoorKey mission; feature definition remains original dk7.Context",
+    "preference": "When original learned positive-reward chooser has admissible evidence, keep its chosen native action. Otherwise propose one of 0..6 with the fewest *native observed* samples for the public context; tie break deterministically by a hash of the public context and mutable native count vector. No hidden state, hardcoded DoorKey task solution, external action selection, arbitrary environment metadata, or reward injection.",
+    "update": "Reuse unchanged original DK7 transactional Commit/Feedback and ObserveFit, only one selected real submitted action can change sample memory.",
+    "capacity": "Inherit unchanged DK7 4096 samples, 512 contexts, 150000-byte snapshot; no extra learnable memory.",
+    "checkpoint": "Use original DK7 native content-addressed snapshot, cold restore, identical next native selected action for identical public context and observation counts.",
+    "negative_controls": "Reject malformed public mission/shape, pending action re-proposal, wrong selected-action feedback, tampered checkpoint and no unselected feedback.",
+    "alternative": "Original unchanged DK7 reward-gated abstention; external public-only collector separately labelled; uniform-action exploration at matched budgets. These are *future* paired MG04 controls, not implicit proof from focused source tests."
+  },
+  "qualification": {
+    "allowed": "Focused native Go unit tests on Linux and Windows; source-exact identity of unchanged DK7/R8 sources; no original-world live DoorKey evaluation in this gate",
+    "required": [
+      "Before new evidence: frozen prereg checksum and parent/source identity",
+      "At previously unseen public context, propose a real legal 0..6 native action rather than abstain",
+      "After real selected feedback, next action responds to observed action-support counts",
+      "Original DK7 positive reward action takes precedence over novel uncertainty proposal",
+      "Tamper/wrong action/pending/malformed public rejected",
+      "Cold snapshot-and-restore yields identical native proposed action",
+      "Two-host focused tests are green, no skipped tests"
+    ],
+    "pass": "DK8_OPTIN_NATIVE_UNCERTAINTY_SOURCE_READY__NO_SCIENCE",
+    "fail": "DK8_NATIVE_UNCERTAINTY_OR_PROVENANCE_BLOCKED__NO_SCIENCE",
+    "scientific_first_use": false
+  },
+  "authority": {
+    "no_controller_execution": true,
+    "no_F139_or_CKB_plane_dispatch": true,
+    "no_model_promotion": true,
+    "no_accepted_ref_or_protected_main_mutation": true,
+    "no_code_merge": true,
+    "no_claim_of_solution_or_unfamiliar_transfer": true
+  }
+}

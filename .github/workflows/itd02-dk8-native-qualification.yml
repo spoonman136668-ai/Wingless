@@ -1,0 +1,66 @@
+name: ITD-02 DK8 opt-in native uncertainty proposal qualification
+on:
+  push:
+    branches:
+      - research/itd02-dk8-native-uncertainty-sourceonly-20261028
+permissions:
+  contents: read
+jobs:
+  source-exact-native-go:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    timeout-minutes: 50
+    steps:
+      - name: Original Git source newline policy
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout source exact candidate without persistent credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+          clean: true
+      - name: Set up frozen native Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify prospective prereg and immutable foundations
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 200c622367f9d748bf9107c941684a4cd92aef34 "$GITHUB_SHA"
+          git merge-base --is-ancestor e5308957eb9457bea22a6026571be04d6df671ad "$GITHUB_SHA"
+          test "$(git hash-object go.mod)" = 10b1d534f48e2a2723d22f4cb2c450a89d5658f3
+          test "$(git hash-object research/native/itd02/dk7/public_policy.go)" = b61ae9118dc1dae521f84ec44c72c891ce84df8c
+          test "$(git hash-object research/native/itd02/dk7bridge/main.go)" = 57bb90bdaeab3c31d0427b24945907ea18664db6
+          test "$(git hash-object research/native/itd02/r8/online_beliefs.go)" = 6857ecbef2d63f459a432a5d68c7edda2b5347c4
+          test "$(git hash-object research/native/itd02/dk8/PREREG.json)" = ea15bef0bad8a422822455a40fbdfbe116fbaafe
+          test "$(git hash-object research/native/itd02/dk8/explorer.go)" = 621d0d8b5bea7093c512903407a4a4bb812f4656
+          test "$(git hash-object research/native/itd02/dk8/explorer_test.go)" = 9ca36971c4ae9e9100089e5abef52380af27b97c
+          echo DK8_SOURCE_IDENTITY_AND_PREREG_FROZEN
+      - name: Focused native Go selected-feedback and cold restore tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/dk7 ./research/native/itd02/dk8
+      - name: One full source Go integration regression
+        if: matrix.os == 'ubuntu-24.04'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./...
+      - name: Vet native packages and build bounded candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          go vet ./research/native/itd02/dk7 ./research/native/itd02/dk8
+          go build ./research/native/itd02/dk8
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo DK8_OPTIN_NATIVE_UNCERTAINTY_SOURCE_ONLY_NO_SCIENCE
