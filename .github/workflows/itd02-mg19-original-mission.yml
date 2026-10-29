@@ -1,0 +1,51 @@
+name: ITD-02 MG19 Wingless genuine mission source-only
+on:
+  push:
+    branches: [research/itd02-mg19-genuine-mission-envelope-20261029]
+permissions:
+  contents: read
+jobs:
+  frozen-original-public-mission:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Canonical source line endings
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Exact independent source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Frozen prereg, existing original native source intact
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor e2ff8bcd4b9e84f4284e07a44034777238abcc9e "$GITHUB_SHA"
+          git merge-base --is-ancestor 673a3d3942b54231ad2493bf76e117c225f7db2c "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/mg19/PREREG.md)" = e45640efed5e0948117e280d4feb653744625e00
+          test "$(git hash-object research/native/itd02/mg19/genuine_mission.go)" = df6111abd421f601b976273abf61aaad6d0bf61a
+          test "$(git hash-object research/native/itd02/mg19/genuine_mission_test.go)" = c9e694ce019fc3b5a29c9ade7ee35072527a88bf
+          test "$(git hash-object research/native/itd02/dk16/state_credit.go)" = 4b1c7ce2ceb0f33580a014c33657f9f7a84e5d7b
+          test "$(git hash-object research/native/itd02/dk14/mission.go)" = 229600d22c36c3fc8a8abdf2eca555f9fe43ba1f
+          test "$(git diff --name-only e2ff8bcd4b9e84f4284e07a44034777238abcc9e "$GITHUB_SHA" | sort)" = "$(printf '%s\n' .github/workflows/itd02-mg19-original-mission.yml research/native/itd02/mg19/PREREG.md research/native/itd02/mg19/genuine_mission.go research/native/itd02/mg19/genuine_mission_test.go | sort)"
+      - name: Native Go pinned 1.25.5
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Focused native selected source tests and required inherited DK regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./research/native/itd02/mg19/... ./research/native/itd02/dk16/... ./research/native/itd02/dk14/... ./research/native/itd02/dk13/...
+          go vet ./research/native/itd02/mg19/...
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo MG19_WINGLESS_NATIVE_PUBLIC_MISSION_ENGINEERING_PASS_NO_SCIENCE
