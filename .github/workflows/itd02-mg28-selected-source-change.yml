@@ -1,0 +1,54 @@
+name: ITD-02 MG28 independent Go selected next-public source effect
+on:
+  push:
+    branches: [research/itd02-mg28-selected-public-change-signal-20261029]
+permissions:
+  contents: read
+jobs:
+  mg28-native-source-only:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - name: Source LFs
+        shell: pwsh
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Frozen exact MG23 native parent
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Bound only new MG28 native wrapper and tests
+        shell: pwsh
+        run: |
+          git merge-base --is-ancestor f4b29adfac260150e7ed83b37f69ee9f0371056f $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { throw 'MG28_NOT_FROZEN_MG23_PARENT' }
+          $allowed=@(
+            'research/native/itd02/mg28/selected_change.go'
+            'research/native/itd02/mg28/selected_change_test.go'
+            '.github/workflows/itd02-mg28-selected-source-change.yml'
+          )
+          $actual=@(git diff --name-only f4b29adfac260150e7ed83b37f69ee9f0371056f $env:GITHUB_SHA)
+          if (@(Compare-Object $allowed $actual).Count -ne 0) { throw 'MG28_PARENT_OR_UNRELATED_CODE_CHANGED' }
+          if (git status --porcelain --untracked-files=all) { throw 'MG28_SOURCE_WORKTREE_DIRTY' }
+          Write-Host 'MG28_NATIVE_GO_PARENT_FROZEN_AND_SCOPE_PASS'
+      - name: Go 1.25.5
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Original-public source-only native regressions
+        shell: pwsh
+        run: |
+          go test -count=1 -v ./research/native/itd02/mg28/... ./research/native/itd02/mg23/... ./research/native/itd02/mg19/... ./research/native/itd02/dk16/...
+          if ($LASTEXITCODE -ne 0) { throw 'MG28_GO_SELECTED_SOURCE_REGRESSION_FAILED' }
+          go vet ./research/native/itd02/mg28/... ./research/native/itd02/mg23/...
+          if ($LASTEXITCODE -ne 0) { throw 'MG28_GO_SOURCE_VET_FAILED' }
+          if (git status --porcelain --untracked-files=all) { throw 'MG28_GO_TEST_MUTATED_FROZEN_SOURCE' }
+          Write-Host 'MG28_GO_SELECTED_NONTERMINAL_SOURCE_CREDIT_PASS_NO_ORIGINAL_WORLD_STEPS_NO_SCIENCE'
