@@ -1,0 +1,14 @@
+{
+  "schema": "wingless.itd02.dk10.source-public-temporal-loop-memory.v1",
+  "parent_head": "f002936d7757af386143b748bbe4427214e5fd5b",
+  "parent_pr": 420,
+  "source_dk9_blob": "b2914104945ecc29ecc265dbc9ce03f78170dc7a",
+  "original_r8_unchanged": true,
+  "kind": "Source-public within-episode memory of full 7x7 image/direction/mission SHA. For each ACTUALLY SELECTED original env.step: record (before_sha, chosen action, after_sha), action visit counts for before SHA and seen count of after SHA; all based exclusively on selected public consequences. No privileged pose/global map, no unselected action outcomes, no mission oracle.",
+  "score": "For each original action a in 0..6: 4 if a equals the predecessor native R13/DK9 decision else 0, minus 3 times this episode's actual (before_sha,a) count, minus 2 if latest actual observed (before_sha,a) transition self-loops (after_sha==before_sha), minus min(2,observed_count_of_known_after_sha), last term zero for an unseen transition. Highest score; ties resolved rotating action order at byte0 of SHA256(current public original image/direction/mission), modulo 7. Score does NOT use reward, hidden map or evaluator seed.",
+  "training": "Retain untouched original source-selected FIT 1664 examples; new temporal memory does not record the hand-coded FIT navigation as self-chosen episodes. Each live episode starts a distinct reset memory while preserving original native FIT checkpoint and local selected consequence cells; cold restore full temporal memory after authentic episode. This is within-episode persistence across many steps, NOT cross-episode cumulative memory.",
+  "limits": "Three independently reset original development DoorKey seeds 67301, 67303, 67307; 192 actual env.step events per original native model/control per seed, zero external live actions. At most 192 transition records/episode; limited public image hashes; fail-closed on inconsistent action/cue/feedback.",
+  "interpretation": "Native policies are original Go DK9 and Ygg R13 selectors plus a shared preregistered loop-penalty mechanism, NOT discovered temporal planning. Neither original Wingless R8 nor original Ygg R10/R11/R12 altered. Compare against direct original DK9, direct original R13, and separately implemented equally informed conventional temporal count baseline; no claims of independent novelty, causal credit beyond one-step observed transition, mission comprehension or scientific generalization.",
+  "qualification": "Windows 2022 and Ubuntu 24.04 strict source test; selected history only, no false checkpoint; old Go DK9 preserved; draft no merge/model acceptance/controller change",
+  "pass": "DK10_PUBLIC_TEMPORAL_MEMORY_SOURCE_QUALIFIED__NO_SCIENCE"
+}
