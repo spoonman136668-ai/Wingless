@@ -1,0 +1,58 @@
+name: ITD-02 DK16 exact-public reward gate source qualification
+on:
+  push:
+    branches: [research/itd02-dk16-state-conditioned-credit-20261029]
+permissions:
+  contents: read
+jobs:
+  native-state-conditional-original-selected-credit:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    timeout-minutes: 40
+    steps:
+      - name: Original LF source policy
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Exact source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Native Go compiler
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Freeze correct qualified parent and prereg
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 4e7f76573a0a3d3978e85f98b256659f71bc44c4 "$GITHUB_SHA"
+          git merge-base --is-ancestor d1fd9fa28a0e6e59917fb156fecadea9254f4cd9 "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk16/PREREG.md)" = a0e9f0b426f3577ee540ffadd8158453c8d063a0
+          test "$(git hash-object research/native/itd02/dk16/state_credit.go)" = 4b1c7ce2ceb0f33580a014c33657f9f7a84e5d7b
+          test "$(git hash-object research/native/itd02/dk16/checkpoint.go)" = 30f758ff6ab120228e1c2fe7be05dd46e04e7a79
+          test "$(git hash-object research/native/itd02/dk16/state_credit_test.go)" = 8b96f8f39132422267b9534e48f85f375f6990bf
+          test "$(git hash-object research/native/itd02/dk14/mission.go)" = 229600d22c36c3fc8a8abdf2eca555f9fe43ba1f
+          echo MG16_GO_NATIVE_SOURCE_FREEZE_PASS
+      - name: DK13 DK14 and DK16 exact source tests
+        shell: bash
+        run: go test -count=1 -v ./research/native/itd02/dk13/... ./research/native/itd02/dk14/... ./research/native/itd02/dk16/...
+      - name: Entire original native Go regression
+        if: matrix.os == 'ubuntu-24.04'
+        shell: bash
+        run: go test -count=1 ./...
+      - name: Vet build and clean native source
+        shell: bash
+        run: |
+          set -euo pipefail
+          go vet ./research/native/itd02/dk16
+          go build ./research/native/itd02/dk16
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo MG16_GO_DK16_EXACT_PUBLIC_SOURCE_ENGINEERING_PASS_NO_SCIENCE
