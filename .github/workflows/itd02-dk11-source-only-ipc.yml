@@ -1,0 +1,47 @@
+name: ITD-02 MG10 original public-only DK11 IPC qualification
+on:
+  push:
+    branches: [research/itd02-dk11-public-ipc-20261029]
+permissions:
+  contents: read
+jobs:
+  source-only-dk11-original-public:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Exact original git LF
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify original candidate source and prereg chronology
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor e75cc1ac6d302f4926df9fd28f3aab02eded1de3 "$GITHUB_SHA"
+          git merge-base --is-ancestor 0806516eaff86802455ab940fdb804e53189e1dd "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk11/continuity.go)" = 228027db110c3924aebf63420ff2caed47fe8c73
+          test "$(git hash-object research/native/itd02/dk10/temporal_policy.go)" = 3575ca351467ffd6200d277acf72b0d78dd54a52
+          test "$(git hash-object research/native/itd02/r8/online_beliefs.go)" = 6857ecbef2d63f459a432a5d68c7edda2b5347c4
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Original native full stage-free source interface build and tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 ./research/native/itd02/dk11/... ./research/native/itd02/dk10/... ./research/native/itd02/dk9/...
+          go build -trimpath -o "$RUNNER_TEMP/dk11bridge" ./research/native/itd02/dk11bridge
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo MG10_STAGE_FREE_NATIVE_GO_IPC_ENGINEERING_PASS_NOT_SCIENCE
