@@ -1,0 +1,48 @@
+name: ITD-02 DK10 source-public native Go temporal memory
+on:
+  push:
+    branches: [research/itd02-dk10-public-temporal-loop-memory-20261028]
+permissions:
+  contents: read
+jobs:
+  original-native-go-dk10:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - name: Git original LF policy
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Frozen prereg before Go and original source preserved
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor f002936d7757af386143b748bbe4427214e5fd5b "$GITHUB_SHA"
+          git merge-base --is-ancestor 595046fc31cc980c28d9d6a559db818f89ae003d "$GITHUB_SHA"
+          git merge-base --is-ancestor 664dde5f8542f6b2603469ba431377911d9c4e20 "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk9/explore_policy.go)" = b2914104945ecc29ecc265dbc9ce03f78170dc7a
+          test "$(git hash-object research/native/itd02/dk8/effect_policy.go)" = 01484d331e9df9035be045b31d0e015f1f8652e2
+          test "$(git hash-object research/native/itd02/r8/online_beliefs.go)" = 6857ecbef2d63f459a432a5d68c7edda2b5347c4
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Test native source state transition memory and old original parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/dk10/... ./research/native/itd02/dk9/... ./research/native/itd02/dk8/...
+          go build -o "$RUNNER_TEMP/dk10bridge" ./research/native/itd02/dk10bridge
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo DK10_PUBLIC_NATIVE_TEMPORAL_SOURCE_TEST_PASS_NOT_SCIENCE
