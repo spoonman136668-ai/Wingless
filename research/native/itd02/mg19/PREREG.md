@@ -1,0 +1,7 @@
+# MG19 prospective Wingless true-original mission envelope
+
+Source prereg **FORGE** `9715598cd35001a184f8ef12d0f0360fa933313f` committed before this Wingless source; parent DK16 `e2ff8bcd4b9e84f4284e07a44034777238abcc9e`. The tested original MiniGrid MG18 native boundary is limited to DoorKey/goal-only; new independently authored MiniGrid families have original mission strings like `pick up the red box`.
+
+MG19 is an **opt-in Go source-only** wrapper. It admits bounded source-provided pickup mission strings without deriving an instruction plan, never rewords the mission before its own state/memory key, and maintains separate exact-full-original-public source reward credit. DK16/DK13 remains unchanged and sees an explicitly documented **internal DoorKey compatibility projection** for unsupported new missions; selecting an action defaults to the unchanged native DK13 contextual successor rather than DK14 global mission reward override. No new action semantics, hidden map, oracle, injected stage, answer label or externally controlled live step. Source-reward history is keyed by unmodified actual public image, heading, and mission.
+
+This engineering qualification is not an original-source new-family trial, trained semantic understanding, compositional transfer, or scientific first use. No accepted refs, FORGE autonomy/controller, CKB-plane, G29/Atlas, main or protected branch modification. Later original-world evaluation requires source-qualified independent adapter and historical seed/holdout first-use custody. All negatives must be preserved.
