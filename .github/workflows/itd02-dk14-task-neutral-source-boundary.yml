@@ -1,0 +1,35 @@
+name: DK14 original mission-preserving Go public source contract
+on:
+  pull_request:
+    paths:
+      - 'research/native/itd02/dk14/**'
+      - '.github/workflows/itd02-dk14-task-neutral-source-boundary.yml'
+permissions:
+  contents: read
+jobs:
+  public-native-only:
+    name: DK14 original Go public mission and selected source / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Source-free original DK13 legacy and opt-in new DK14 transport checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/dk14/... ./research/native/itd02/dk13/...
+          go vet ./research/native/itd02/dk14/...
+          go build ./research/native/itd02/dk14/...
+          echo DK14_ORIGINAL_MISSION_PUBLIC_BOUNDARY=PASS
+          echo DK14_EXTERNAL_SOURCE_EPISODES=ZERO
+          echo DK14_NATIVE_SCIENCE_ADMISSION=NO
