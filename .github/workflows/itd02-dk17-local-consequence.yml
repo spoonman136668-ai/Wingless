@@ -1,0 +1,57 @@
+name: ITD-02 DK17 native local selected-consequence regression
+on:
+  push:
+    branches: [research/itd02-dk17-local-consequence-20261029]
+permissions:
+  contents: read
+jobs:
+  original-source-native-local-consequence:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    timeout-minutes: 45
+    steps:
+      - name: Preserve original git LF
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout exact candidate
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Native Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Prospective source freeze and parent custody
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor e2ff8bcd4b9e84f4284e07a44034777238abcc9e "$GITHUB_SHA"
+          git merge-base --is-ancestor c42a37838cc92bb88002e26444142514859c0f90 "$GITHUB_SHA"
+          test "$(git hash-object research/native/itd02/dk17/PREREG.md)" = 2c2640c39e1dd0364980e09e878b553c9a318f50
+          test "$(git hash-object research/native/itd02/dk17/local_consequence.go)" = f1febbfd677e0da62d2a9a1689dbf2210f00e1c8
+          test "$(git hash-object research/native/itd02/dk17/local_consequence_test.go)" = a46191fc5c63cdab08c49932daea6aab714bd3ba
+          test "$(git hash-object research/native/itd02/dk16/state_credit.go)" = 4b1c7ce2ceb0f33580a014c33657f9f7a84e5d7b
+          echo MG17C_GO_PARENT_AND_LOCAL_SOURCE_FROZEN_PASS
+      - name: Native selected-source consequence qualification
+        shell: bash
+        run: go test -count=1 -v ./research/native/itd02/dk16/... ./research/native/itd02/dk17/...
+      - name: Full original Go regression
+        if: matrix.os == 'ubuntu-24.04'
+        shell: bash
+        run: go test -count=1 ./...
+      - name: Vet, build, and no changed files
+        shell: bash
+        run: |
+          set -euo pipefail
+          go vet ./research/native/itd02/dk17
+          go build ./research/native/itd02/dk17
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo MG17C_GO_LOCAL_SELECTED_SOURCE_ENGINEERING_PASS_NO_SCIENCE
