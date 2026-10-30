@@ -26,8 +26,7 @@ jobs:
       - name: Check native contract
         run: go vet ./research/native/itd02/mg40
       - name: Verify inherited cognition CLI dispatch and fail-closed operations
-        run: go test ./cmd/wingless -run '^TestOfflineCognition        run: git diff --exit-code
- -count=1 -v
+        run: go test ./cmd/wingless -run TestOfflineCognition -count=1 -v
       - name: Check inherited CLI and native task effect with Go vet
         run: go vet ./cmd/wingless ./research/native/itd02/mg40
       - name: Verify no generated source modifications
