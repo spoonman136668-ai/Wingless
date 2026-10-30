@@ -29,6 +29,15 @@ def main():
     target=git("rev-parse","HEAD").decode("ascii").strip()
     require(len(target)==40 and all(c in "0123456789abcdef" for c in target),"invalid source head")
     old=json.loads(Path(".ice/code-intelligence.json").read_text("utf8"))
+    # The reviewed source must be an ACTUAL immutable ancestor, not a
+    # fabricated review continuity or unrelated historical hash.
+    reviewed_source=old.get("source_commit","")
+    require(len(reviewed_source)==40 and
+            all(c in "0123456789abcdef" for c in reviewed_source),
+            "invalid previous reviewed source identity")
+    relation=subprocess.run(["git","merge-base","--is-ancestor",reviewed_source,target])
+    require(relation.returncode==0,
+            "previous reviewed source is NOT an ancestor of this exact head")
     original={key(s) for s in old["nodes"]}
     require(len(original)==len(old["nodes"]) and len(original)>=352,"lost historical reviewed nodes")
     symbols=json.loads(Path(".ice/symbol-map.json").read_text("utf8"))
