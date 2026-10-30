@@ -61,6 +61,10 @@ jobs:
         if: steps.current.outputs.refresh == 'true'
         run: go run ./cmd/ice build
 
+      - name: Show source-identity changes requiring independent historical review
+        if: steps.current.outputs.refresh == 'true'
+        run: python -B scripts/nr_m1s_review_delta.py --output "$RUNNER_TEMP/nr-m1s-source-review-delta.json"
+
       - name: Derive explicit unreviewed receipts for newly declared symbols
         if: steps.current.outputs.refresh == 'true'
         shell: bash
