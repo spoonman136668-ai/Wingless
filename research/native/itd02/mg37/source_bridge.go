@@ -27,7 +27,7 @@ func publicContext(p parent.Public)(string,error) {
  if len(p.Image)!=7 || p.Direction<0 || p.Direction>3 || len(p.Mission)==0 {return "",errors.New("MG43_BAD_PUBLIC")}
  for _,row:=range p.Image {if len(row)!=7{return "",errors.New("MG43_BAD_IMAGE")};for _,pixel:=range row {if len(pixel)!=3{return "",errors.New("MG43_BAD_PIXEL")}}}
  front:=p.Image[3][5]
- value:=struct{Mission string;Direction int;Front [3]int}{p.Mission,p.Direction,[3]int{front[0],front[1],front[2]}}
+ value:=struct { Mission string `json:"mission"`; Direction int `json:"direction"`; Front [3]int `json:"front"` }{p.Mission,p.Direction,[3]int{front[0],front[1],front[2]}}
  raw,err:=json.Marshal(value);if err!=nil{return "",err}
  sum:=sha256.Sum256(raw);return hex.EncodeToString(sum[:]),nil
 }
