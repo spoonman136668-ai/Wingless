@@ -11,7 +11,7 @@ func TestMG43ContextEvidenceDoesNotTransfer(t *testing.T) {
  row[1]=Evidence{Count:5,RewardSum:5}
  row[0]=Evidence{Count:5,RewardSum:0}
  a.Rewards[cr]=row
- if len(a.Rewards[cb])!=0{t.Fatal("unexpected foreign evidence")}
+ if _,ok:=a.Rewards[cb];ok{t.Fatal("unexpected foreign evidence")}
  d,err:=Choose(0,a.Rewards[cr]);if err!=nil||!d.Override||d.Action!=1{t.Fatal("rewardful original context ignored",d,err)}
  d,err=Choose(0,a.Rewards[cb]);if err!=nil||d.Override{t.Fatal("cross-context reward leakage",d,err)}
 }
