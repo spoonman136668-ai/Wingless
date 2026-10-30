@@ -18,6 +18,7 @@ func TestMG38SelectedFeedbackAndNoReplay(t *testing.T){
  proposed,_,err:=a.Choose(before);if err!=nil||proposed==nil {t.Fatal(err)}
  if err:=a.Commit(before,*proposed);err!=nil {t.Fatal(err)}
  if err:=a.Feedback(before,*proposed,after,1,false);err!=nil {t.Fatal(err)}
- if a.Rewards[*proposed].Count!=1 || a.Rewards[*proposed].RewardSum!=1 {t.Fatal("selected reward missing")}
+ key,err:=publicContext(before);if err!=nil {t.Fatal(err)}
+ if a.Rewards[key][*proposed].Count!=1 || a.Rewards[key][*proposed].RewardSum!=1 {t.Fatal("selected reward missing")}
  if err:=a.Feedback(before,*proposed,after,1,false);err==nil {t.Fatal("duplicate feedback accepted")}
 }
