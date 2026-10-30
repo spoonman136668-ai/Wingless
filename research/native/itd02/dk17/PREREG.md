@@ -1,0 +1,9 @@
+# MG17-C selected local consequence mechanism — pre-executable contract
+
+FORGE central prereg `de8d89586b537d3ca401c35d854aba062e97cea8` precedes this implementation. Unchanged source parent `e2ff8bcd4b9e84f4284e07a44034777238abcc9e` controls all actual selected FIT/live source custody.
+
+Test abstract context from **genuine source mission and only three 3-channel original egocentric image cells**: [3][4], [3][5], [3][6]. A source-selected public consequence counts as same-heading scene change only when original image changed but direction did not; a full no-effect transition is separately counted. Heading-only rotations are not credited. An action can override the prior native contextual policy ONLY after two or more observed same-heading image-change outcomes at an identical local context, and only if score 4096*(change-no_effect)/(selected_count+64), integer floor, exceeds that of the fallback action. Unknown context or mission, no-effect, heading-only and unsupported action must preserve exact prior action/status. This is public-effect prediction, **not proof of causal learning, navigation, goals or compositional language understanding**. No hardcoded action index, objective, private map, pose, policy director or scientific first use.
+
+Use selected-source update exactly once through the unchanged parent. Bound 4096 samples and local contexts, 4MB SHA nested canonical checkpoint, reject source event mismatch and tampering. Test distinct global observations with same local context, different mission/local cells, heading-only action, no effects, rejected/duplicate selected source, complete cold restore and inherited parent regression on both Ubuntu and Windows.
+
+Do not alter accepted native models, main, FORGE controller, CKB-plane, G29/Atlas, or parallel FORGE MG17 family-source PR #1122. Keep as draft.
