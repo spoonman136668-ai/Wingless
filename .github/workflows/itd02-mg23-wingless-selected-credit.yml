@@ -1,0 +1,49 @@
+name: ITD-02 MG23 Wingless native selected public target and delayed source credit
+on:
+  push:
+    branches: [research/itd02-mg23-native-target-delayed-selected-credit-20261029]
+permissions:
+  contents: read
+jobs:
+  exact-native-source:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Preserve original exact source blobs with LF
+        shell: pwsh
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Confirm parent native source not modified
+        shell: pwsh
+        run: |
+          git merge-base --is-ancestor ebbadd157cc1df6eabfa5a550c8876ca87dc91e9 $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { throw 'MG23_WRONG_ORIGINAL_WINGLESS_PARENT' }
+          $changed=@(git diff --name-only ebbadd157cc1df6eabfa5a550c8876ca87dc91e9 $env:GITHUB_SHA)
+          if (@($changed | Where-Object {$_ -notlike 'research/native/itd02/mg23/*' -and $_ -ne '.github/workflows/itd02-mg23-wingless-selected-credit.yml'}).Count -ne 0) {
+            throw 'MG23_CHANGED_ACCEPTED_NATIVE_SOURCE'
+          }
+          if ((git hash-object research/native/itd02/mg19/genuine_mission.go).Trim() -ne 'df6111abd421f601b976273abf61aaad6d0bf61a') { throw 'MG23_PARENT_SOURCE_DRIFT' }
+      - name: Native Go selected public source feedback and cold regression
+        shell: pwsh
+        run: |
+          go test -count=1 -v ./research/native/itd02/mg23/... ./research/native/itd02/mg19/...
+          if ($LASTEXITCODE -ne 0) { throw 'MG23_SELECTED_SOURCE_TESTS_FAILED' }
+          go vet ./research/native/itd02/mg23/...
+          if ($LASTEXITCODE -ne 0) { throw 'MG23_NATIVE_GO_VET_FAILED' }
+          go build ./research/native/itd02/mg23/...
+          if ($LASTEXITCODE -ne 0) { throw 'MG23_NATIVE_GO_BUILD_FAILED' }
+          if (git status --porcelain --untracked-files=all) { throw 'MG23_SOURCE_GIT_DIRTY' }
+          Write-Host 'MG23_WINGLESS_NATIVE_ONLY_SELECTED_TERMINAL_CREDIT_PASS_NO_SCIENCE'
