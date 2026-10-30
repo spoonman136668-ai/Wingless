@@ -66,7 +66,7 @@ def main():
     print(json.dumps({
         "gate": "NRM1U_INHERITED_CLI_SUBPROCESS_BOUNDARY",
         "result": "PASS",
-        "tests": 9,
+        "tests": 10,
         "original_world_actions": 0,
         "network_or_controller_actions": 0,
         "independent_source_review": False,
