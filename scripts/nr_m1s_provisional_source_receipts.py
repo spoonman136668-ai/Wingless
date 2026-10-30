@@ -51,8 +51,10 @@ def main():
         require(isinstance(start,int) and isinstance(end,int) and
                 1<=start<=end<=len(lines),"invalid symbol range: "+repr(k))
         decl=b"".join(lines[start-1:end])
-        token=next((w for w in ("func ", "type ", "var ", "const ", "import ")
+        token=next((w for w in ("func","type","const","import")
                     if w.encode() in decl),None)
+        if token is None and len(s["name"])>=4 and s["name"].encode() in decl:
+            token=s["name"]
         require(token is not None,"cannot derive lexical source witness: "+repr(k))
         receipts.append({
             "key":list(k),
