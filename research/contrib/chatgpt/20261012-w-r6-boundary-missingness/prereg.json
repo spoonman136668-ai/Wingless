@@ -1,0 +1,32 @@
+{
+  "id": "W-R6-BOUNDARY-MISSINGNESS",
+  "schema": "wingless.research-prereg.v1",
+  "parent": "8f911b51b0f27dad1d3a97b2c699753bdda47c8a",
+  "question": "Does partial loss of observable synthetic episode boundary cues break cross-family alias identity?",
+  "arms": {
+    "A0": "support only",
+    "A1": "full phase at first context",
+    "A2": "first context only family 0; absent otherwise",
+    "A3": "first context only family 1; absent otherwise"
+  },
+  "budget": {
+    "entities": 9,
+    "families": 3,
+    "contexts": 16,
+    "records": 432,
+    "arms": 4,
+    "external_model_calls": 0
+  },
+  "controls": [
+    "A0 reproduces 8 classes and 0/8 alias",
+    "A1 reproduces 9 three-family alias groups",
+    "source formula and training capacity unchanged",
+    "mask is defined before evaluation"
+  ],
+  "outcomes": {
+    "supported": "A2 and A3 each have fewer than 9 complete alias groups",
+    "negative": "A2 or A3 retains all 9",
+    "invalid": "Source control or determinism fails"
+  },
+  "authority": "readonly experimental replay; no accepted-ref or first-use operations"
+}
