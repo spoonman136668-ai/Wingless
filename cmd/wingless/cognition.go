@@ -13,7 +13,8 @@ import (
 
 // Offline source-free native cognition interface. No queue, tool or broker calls.
 func runCognition(in io.Reader,out io.Writer)error {
- scanner:=bufio.NewScanner(io.LimitReader(in,1<<20+1))
+ limited:=&io.LimitedReader{R:in,N:(1<<20)+1}
+ scanner:=bufio.NewScanner(limited)
  scanner.Buffer(make([]byte,4096),1<<16)
  enc:=json.NewEncoder(out)
  var s cognition.State
@@ -47,6 +48,8 @@ func runCognition(in io.Reader,out io.Writer)error {
    default:return fmt.Errorf("unknown cognition op %q",event.Op)
    }
  }
- return scanner.Err()
+ if err:=scanner.Err();err!=nil{return err}
+ if limited.N==0{return errors.New("cognition input exceeds 1 MiB")}
+ return nil
 }
 func cognitionCLI()error{return runCognition(os.Stdin,os.Stdout)}
