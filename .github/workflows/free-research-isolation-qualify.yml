@@ -21,6 +21,26 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
           fetch-depth: 0
+      - name: Run the real free-agent path/write policy self-test without provider credentials
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $Branch='ci-nemotron-selftest-'+$env:GITHUB_RUN_ID
+          & git switch -c $Branch
+          if($LASTEXITCODE-ne0){throw 'NEMOTRON_SELFTEST_BRANCH_CREATE_FAILED'}
+          $Head=(& git rev-parse HEAD).Trim()
+          $Temp=Join-Path $env:RUNNER_TEMP 'nemotron-selftest'
+          New-Item -ItemType Directory -Force -Path $Temp|Out-Null
+          $Prompt=Join-Path $Temp 'prompt.txt'
+          $Last=Join-Path $Temp 'last.txt'
+          [IO.File]::WriteAllText($Prompt,'Offline safety self-test only.',(New-Object Text.UTF8Encoding($false)))
+          & 'scripts/Invoke-NemotronRepoAgent.ps1' `
+            -RepoPath (Resolve-Path '.').Path -Program 'Wingless' `
+            -ActiveBranch $Branch -StartSha $Head -PromptPath $Prompt `
+            -LastMessagePath $Last -NoProcessTools -SelfTest
+          if($LASTEXITCODE-ne0){throw 'NEMOTRON_AGENT_SELFTEST_FAILED'}
+          if(((& git status --porcelain|Out-String).Trim())){throw 'NEMOTRON_AGENT_SELFTEST_DIRTY'}
+          Write-Host 'NEMOTRON_OFFLINE_AGENT_SCOPE_SELFTEST=PASS'
       - name: Generate synthetic fixture Git bundle without provider credentials
         shell: pwsh
         run: |
