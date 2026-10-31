@@ -63,10 +63,40 @@ def main():
             require(bad.returncode != 0,
                     title + " accepted; output=" + repr(bad.stdout[-300:]))
 
+        # Aggregate cap: individually valid JSON lines must not hide truncation.
+        line = b'{"op":"snapshot"}' + b" " * 60000 + b"\\n"
+        under = line * 17
+        accepted = execute(binary, ["cognition"], under)
+        require(accepted.returncode == 0 and
+                len(accepted.stdout.splitlines()) == 17,
+                "sub-limit legal records rejected")
+
+        overflow = execute(binary, ["cognition"], line * 18)
+        require(overflow.returncode != 0 and
+                b"exceeds 1 MiB" in overflow.stderr,
+                "multi-line aggregate overflow silently accepted")
+
+        head = b'{"op":"snapshot"}'
+        last_spaces = (1 << 20) - len(under) - len(head) - 1
+        exact = under + head + b" " * last_spaces + b"\\n"
+        require(len(exact) == 1 << 20, "boundary test mis-sized")
+        boundary = execute(binary, ["cognition"], exact)
+        require(boundary.returncode == 0 and
+                len(boundary.stdout.splitlines()) == 18,
+                "exact 1 MiB stream rejected")
+
+        one_extra = exact[:-1] + b" " + b"\\n"
+        require(len(one_extra) == (1 << 20) + 1,
+                "over-boundary test mis-sized")
+        rejected = execute(binary, ["cognition"], one_extra)
+        require(rejected.returncode != 0 and
+                b"exceeds 1 MiB" in rejected.stderr,
+                "1 MiB plus one byte silently accepted")
+
     print(json.dumps({
         "gate": "NRM1U_INHERITED_CLI_SUBPROCESS_BOUNDARY",
         "result": "PASS",
-        "tests": 10,
+        "tests": 14,
         "original_world_actions": 0,
         "network_or_controller_actions": 0,
         "independent_source_review": False,
