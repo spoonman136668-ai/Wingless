@@ -72,7 +72,8 @@ function Test-WritablePath([string]$Relative){
                $P.StartsWith('docs/experiments/') -or
                $P.StartsWith('unitary/') -or
                $P.StartsWith('cmd/') -or
-               ($P -match '^scripts/run-[A-Za-z0-9._-]+\.ps1
+               ($P.StartsWith('scripts/run-') -and $P.EndsWith('.ps1') -and
+                -not $P.Substring('scripts/'.Length).Contains('/'))
     }
     return $P-ceq'.yggdrasil/qualification-request.json' -or
            $P-ceq'.yggdrasil/isolated-run.json' -or
