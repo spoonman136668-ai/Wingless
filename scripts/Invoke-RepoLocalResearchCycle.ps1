@@ -264,7 +264,7 @@ $MindContext
     foreach($Commit in $Commits){foreach($File in (Get-CommitFiles $Commit)){$AllFiles.Add($File)}}
     foreach($File in $AllFiles){
         if($File-match'(?i)(^|/)(ckb|ckb-plane|ktrade)(/|$)' -or $File-match'(?i)(coinbase|broker|credential|accepted-ref)'){throw "FORBIDDEN_PATH_CHANGE path=$File"}
-        $Allowed=$File-eq'.wingless/qualification-request.json' -or $File.StartsWith('docs/experiments/') -or $File.StartsWith('unitary/') -or $File.StartsWith('cmd/') -or ($File -match '^scripts/run-[A-Za-z0-9._-]+\.ps1
+        $Allowed=$File-eq'.wingless/qualification-request.json' -or $File.StartsWith('docs/experiments/') -or $File.StartsWith('unitary/') -or $File.StartsWith('cmd/') -or ($File.StartsWith('scripts/run-') -and $File.EndsWith('.ps1') -and -not $File.Substring('scripts/'.Length).Contains('/'))
         if(-not$Allowed){throw "CHANGE_OUTSIDE_RESEARCH_POLICY path=$File"}
     }
 
@@ -359,7 +359,8 @@ $MindContext
     if([string]$Request.schema-cne'wingless.research-qualification-request.v1'){throw "QUALIFICATION_SCHEMA_MISMATCH schema=$($Request.schema)"}
     if([string]$Request.branch-cne$ActiveBranch){throw "QUALIFICATION_BRANCH_MISMATCH expected=$ActiveBranch actual=$($Request.branch)"}
     if([string]$Request.baseline_sha-cne$StartSha){throw "QUALIFICATION_BASELINE_MISMATCH expected=$StartSha actual=$($Request.baseline_sha)"}
-    if([string]$Request.test_script-notmatch'^scripts/run-[A-Za-z0-9._-]+\.ps1
+    $TestScript=[string]$Request.test_script
+    if(-not($TestScript.StartsWith('scripts/run-') -and $TestScript.EndsWith('.ps1') -and -not $TestScript.Substring('scripts/'.Length).Contains('/'))){throw "QUALIFICATION_TEST_SCRIPT_INVALID path=$($Request.test_script)"}
 
     $LastFiles=@(Get-CommitFiles $Commits[-1])
     if($LastFiles-notcontains'.wingless/qualification-request.json'){throw 'FINAL_IMPLEMENTATION_COMMIT_MISSING_QUALIFICATION_REQUEST'}
@@ -538,7 +539,8 @@ $MindContext
     if([string]$Request.schema-cne'wingless.research-qualification-request.v1'){throw "QUALIFICATION_SCHEMA_MISMATCH schema=$($Request.schema)"}
     if([string]$Request.branch-cne$ActiveBranch){throw "QUALIFICATION_BRANCH_MISMATCH expected=$ActiveBranch actual=$($Request.branch)"}
     if([string]$Request.baseline_sha-cne$StartSha){throw "QUALIFICATION_BASELINE_MISMATCH expected=$StartSha actual=$($Request.baseline_sha)"}
-    if([string]$Request.test_script-notmatch'^scripts/.+\.ps1$'){throw "QUALIFICATION_TEST_SCRIPT_INVALID path=$($Request.test_script)"}
+    $TestScript=[string]$Request.test_script
+    if(-not($TestScript.StartsWith('scripts/run-') -and $TestScript.EndsWith('.ps1') -and -not $TestScript.Substring('scripts/'.Length).Contains('/'))){throw "QUALIFICATION_TEST_SCRIPT_INVALID path=$($Request.test_script)"}
 
     $LastFiles=@(Get-CommitFiles $Commits[-1])
     if($LastFiles-notcontains'.wingless/qualification-request.json'){throw 'FINAL_IMPLEMENTATION_COMMIT_MISSING_QUALIFICATION_REQUEST'}
@@ -801,7 +803,8 @@ $MindContext
     if([string]$Request.schema-cne'wingless.research-qualification-request.v1'){throw "QUALIFICATION_SCHEMA_MISMATCH schema=$($Request.schema)"}
     if([string]$Request.branch-cne$ActiveBranch){throw "QUALIFICATION_BRANCH_MISMATCH expected=$ActiveBranch actual=$($Request.branch)"}
     if([string]$Request.baseline_sha-cne$StartSha){throw "QUALIFICATION_BASELINE_MISMATCH expected=$StartSha actual=$($Request.baseline_sha)"}
-    if([string]$Request.test_script-notmatch'^scripts/.+\.ps1$'){throw "QUALIFICATION_TEST_SCRIPT_INVALID path=$($Request.test_script)"}
+    $TestScript=[string]$Request.test_script
+    if(-not($TestScript.StartsWith('scripts/run-') -and $TestScript.EndsWith('.ps1') -and -not $TestScript.Substring('scripts/'.Length).Contains('/'))){throw "QUALIFICATION_TEST_SCRIPT_INVALID path=$($Request.test_script)"}
 
     $LastFiles=@(Get-CommitFiles $Commits[-1])
     if($LastFiles-notcontains'.wingless/qualification-request.json'){throw 'FINAL_IMPLEMENTATION_COMMIT_MISSING_QUALIFICATION_REQUEST'}
