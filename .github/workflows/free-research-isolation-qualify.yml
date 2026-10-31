@@ -1,0 +1,221 @@
+name: Wingless free-authoring credential isolation qualification
+on:
+  pull_request:
+    paths:
+      - scripts/Invoke-NemotronRepoAgent.ps1
+      - scripts/Invoke-RepoLocalResearchCycle.ps1
+      - .github/workflows/free-research-isolation-qualify.yml
+      - .research-autonomy/config.json
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-author-probe:
+    if: github.repository == 'spoonman136668-ai/Wingless'
+    runs-on: windows-2022
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact source without Git credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Run the real free-agent path/write policy self-test without provider credentials
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $Branch='ci-nemotron-selftest-'+$env:GITHUB_RUN_ID
+          & git switch -c $Branch
+          if($LASTEXITCODE-ne0){throw 'NEMOTRON_SELFTEST_BRANCH_CREATE_FAILED'}
+          $Head=(& git rev-parse HEAD).Trim()
+          $Temp=Join-Path $env:RUNNER_TEMP 'nemotron-selftest'
+          New-Item -ItemType Directory -Force -Path $Temp|Out-Null
+          $Prompt=Join-Path $Temp 'prompt.txt'
+          $Last=Join-Path $Temp 'last.txt'
+          [IO.File]::WriteAllText($Prompt,'Offline safety self-test only.',(New-Object Text.UTF8Encoding($false)))
+          & 'scripts/Invoke-NemotronRepoAgent.ps1' `
+            -RepoPath (Resolve-Path '.').Path -Program 'Wingless' `
+            -ActiveBranch $Branch -StartSha $Head -PromptPath $Prompt `
+            -LastMessagePath $Last -NoProcessTools -SelfTest
+          if($LASTEXITCODE-ne0){throw 'NEMOTRON_AGENT_SELFTEST_FAILED'}
+          if(((& git status --porcelain|Out-String).Trim())){throw 'NEMOTRON_AGENT_SELFTEST_DIRTY'}
+          Write-Host 'NEMOTRON_OFFLINE_AGENT_SCOPE_SELFTEST=PASS'
+      - name: Generate synthetic fixture Git bundle without provider credentials
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $Base=(& git rev-parse HEAD).Trim()
+          if($Base -cne '${{ github.event.pull_request.head.sha || github.sha }}'){throw 'ISOLATION_PROBE_SOURCE_SHA_MISMATCH'}
+          foreach($Var in @('GITHUB_TOKEN','GH_TOKEN','OPENROUTER_FREE_API_KEY','OPENAI_API_KEY','NVIDIA_API_KEY','AWS_ACCESS_KEY_ID')){
+            if(-not [string]::IsNullOrEmpty([string][Environment]::GetEnvironmentVariable($Var))){throw 'ISOLATION_PROBE_CREDENTIAL_PRESENT'}
+          }
+          New-Item -ItemType Directory -Path ci-isolation-fixture -Force | Out-Null
+          $Script=@'
+          $ErrorActionPreference='Stop'
+          foreach($Var in @('GITHUB_TOKEN','GH_TOKEN','OPENROUTER_FREE_API_KEY','OPENAI_API_KEY','NVIDIA_API_KEY','AWS_ACCESS_KEY_ID')){
+            if(-not [string]::IsNullOrEmpty([string][Environment]::GetEnvironmentVariable($Var))){throw 'CANDIDATE_TEST_HAS_PRIVILEGED_CREDENTIAL'}
+          }
+          Write-Host 'CANDIDATE_NATIVE_TEST_CREDENTIAL_FREE=PASS'
+          '@
+          [IO.File]::WriteAllText((Join-Path (Resolve-Path .).Path 'ci-isolation-fixture/verify-no-credentials.ps1'),$Script,(New-Object Text.UTF8Encoding($false)))
+          & git add -- ci-isolation-fixture/verify-no-credentials.ps1
+          if($LASTEXITCODE-ne0){throw 'ISOLATION_PROBE_GIT_ADD_FAILED'}
+          & git -c user.name='isolation-probe' -c user.email='isolation-probe@example.invalid' commit -m 'CI-only untrusted candidate fixture; never push'
+          if($LASTEXITCODE-ne0){throw 'ISOLATION_PROBE_GIT_COMMIT_FAILED'}
+          $Candidate=(& git rev-parse HEAD).Trim()
+          $Bundle=Join-Path $env:RUNNER_TEMP 'author-candidate.bundle'
+          & git bundle create $Bundle HEAD ('^'+$Base)
+          if($LASTEXITCODE-ne0){throw 'ISOLATION_PROBE_BUNDLE_CREATE_FAILED'}
+          & git bundle verify $Bundle
+          if($LASTEXITCODE-ne0){throw 'ISOLATION_PROBE_BUNDLE_VERIFY_FAILED'}
+          $Manifest=[ordered]@{
+            schema='free-research.credential-isolation-probe.v1'
+            repository='spoonman136668-ai/Wingless'
+            source_sha=$Base
+            candidate_sha=$Candidate
+            bundle_sha256=(Get-FileHash -LiteralPath $Bundle -Algorithm SHA256).Hash.ToLowerInvariant()
+            provider_calls=0
+            github_pushes=0
+            scientific_first_use=$false
+          }
+          $Manifest|ConvertTo-Json -Depth 6|Set-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'candidate-manifest.json') -Encoding UTF8
+          Write-Host 'ISOLATION_AUTHOR_NO_CREDENTIAL_NO_PROVIDER_NO_PUSH=PASS'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bounded-source-candidate
+          path: |
+            ${{ runner.temp }}/author-candidate.bundle
+            ${{ runner.temp }}/candidate-manifest.json
+          retention-days: 1
+          if-no-files-found: error
+
+  separate-credential-free-qualification:
+    needs: offline-author-probe
+    runs-on: windows-2022
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - name: Independent exact-source checkout without credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: bounded-source-candidate
+          path: ${{ runner.temp }}
+      - name: Verify untrusted bundle and run fixture with no provider credentials
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          foreach($Var in @('GITHUB_TOKEN','GH_TOKEN','OPENROUTER_FREE_API_KEY','OPENAI_API_KEY','NVIDIA_API_KEY','AWS_ACCESS_KEY_ID')){
+            if(-not [string]::IsNullOrEmpty([string][Environment]::GetEnvironmentVariable($Var))){throw 'ISOLATION_QUALIFIER_CREDENTIAL_PRESENT'}
+          }
+          $Base=(& git rev-parse HEAD).Trim()
+          $M=Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'candidate-manifest.json') -Raw|ConvertFrom-Json
+          $Bundle=Join-Path $env:RUNNER_TEMP 'author-candidate.bundle'
+          if([string]$M.schema -cne 'free-research.credential-isolation-probe.v1' -or
+             [string]$M.repository -cne 'spoonman136668-ai/Wingless' -or
+             [string]$M.source_sha -cne $Base -or
+             [int]$M.provider_calls -ne 0 -or [int]$M.github_pushes -ne 0 -or
+             [bool]$M.scientific_first_use){throw 'ISOLATION_QUALIFIER_MANIFEST_INVALID'}
+          if((Get-FileHash -LiteralPath $Bundle -Algorithm SHA256).Hash.ToLowerInvariant() -cne [string]$M.bundle_sha256){
+            throw 'ISOLATION_QUALIFIER_BUNDLE_HASH_MISMATCH'
+          }
+          & git bundle verify $Bundle
+          if($LASTEXITCODE-ne0){throw 'ISOLATION_QUALIFIER_BUNDLE_INVALID'}
+          & git fetch --no-tags $Bundle HEAD
+          if($LASTEXITCODE-ne0){throw 'ISOLATION_QUALIFIER_FETCH_FAILED'}
+          $Candidate=(& git rev-parse FETCH_HEAD).Trim()
+          if($Candidate -cne [string]$M.candidate_sha){throw 'ISOLATION_QUALIFIER_CANDIDATE_SHA_MISMATCH'}
+          $Files=@(& git diff --name-only $Base $Candidate)
+          if($Files.Count-ne1 -or $Files[0] -cne 'ci-isolation-fixture/verify-no-credentials.ps1'){
+            throw 'ISOLATION_QUALIFIER_FILE_SCOPE_MISMATCH'
+          }
+          & git switch --detach $Candidate
+          if($LASTEXITCODE-ne0){throw 'ISOLATION_QUALIFIER_CHECKOUT_FAILED'}
+          & ./ci-isolation-fixture/verify-no-credentials.ps1
+          if($LASTEXITCODE-ne0){throw 'ISOLATION_QUALIFIER_CANDIDATE_TEST_FAILED'}
+          if(@(& git status --porcelain).Count-ne0){throw 'ISOLATION_QUALIFIER_DIRTY_WORKTREE'}
+          Write-Host 'ISOLATION_SEPARATE_CREDENTIAL_FREE_NATIVE_TEST=PASS'
+          Write-Host 'ISOLATION_PROVIDER_CALLS=ZERO'
+          Write-Host 'ISOLATION_SCIENTIFIC_FIRST_USE=FALSE'
+
+  real-wrapper-no-provider-key-negative:
+    if: github.repository == 'spoonman136668-ai/Wingless'
+    runs-on: windows-2022
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout exact proposed controller without credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: controller
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout existing bounded research branch without credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: research/autonomy-wingless-active
+          path: research
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Exercise genuine controller up to missing free-only provider key
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          foreach($Name in @('GITHUB_TOKEN','GH_TOKEN','OPENROUTER_FREE_API_KEY','OPENAI_API_KEY','NVIDIA_API_KEY','AWS_ACCESS_KEY_ID')){
+            if(-not [string]::IsNullOrWhiteSpace([string][Environment]::GetEnvironmentVariable($Name))){
+              throw ('LIVE_AUTHOR_NEGATIVE_UNEXPECTED_CREDENTIAL '+$Name)
+            }
+          }
+          if($env:RUNNER_ENVIRONMENT -cne 'github-hosted'){
+            throw 'LIVE_AUTHOR_NEGATIVE_REQUIRES_HOSTED'
+          }
+          $Controller=(Resolve-Path 'controller').Path
+          $Research=(Resolve-Path 'research').Path
+          $ConfigPath=Join-Path $Controller '.research-autonomy/config.json'
+          $Config=Get-Content -LiteralPath $ConfigPath -Raw|ConvertFrom-Json
+          if($Config.schema -cne 'research.autonomy.v2' -or
+             $Config.program -cne 'Wingless' -or
+             $Config.authority -cne 'research-only' -or
+             $Config.research_executor -cne 'disabled'){
+            throw 'LIVE_AUTHOR_NEGATIVE_SOURCE_POLICY_DRIFT'
+          }
+          $Branch=((& git -C $Research branch --show-current | Out-String)).Trim()
+          $Start=((& git -C $Research rev-parse HEAD | Out-String)).Trim()
+          if($Branch -cne 'research/autonomy-wingless-active' -or $Start -notmatch '^[a-f0-9]{40}$'){
+            throw 'LIVE_AUTHOR_NEGATIVE_RESEARCH_REF_DRIFT'
+          }
+          $Config.research_executor='free-nemotron-opt-in-v1'
+          [IO.File]::WriteAllText($ConfigPath,($Config|ConvertTo-Json -Depth 20),(New-Object Text.UTF8Encoding($false)))
+          $env:GITHUB_TOKEN=''
+          $env:GH_TOKEN=''
+          $env:OPENROUTER_FREE_API_KEY=''
+          $env:RESEARCH_FREE_EXECUTOR_OWNER_ACK='1'
+          $env:RESEARCH_FREE_BUNDLE_OUTPUT=Join-Path $env:RUNNER_TEMP 'no-key-author.bundle'
+          $Observed=''
+          try {
+            & (Join-Path $Controller 'scripts/Invoke-RepoLocalResearchCycle.ps1') -RepoPath $Research -Repository 'spoonman136668-ai/Wingless' -ActiveBranch $Branch -NorthStarPath ([string]$Config.north_star_path) -NorthStarSha256 ([string]$Config.north_star_sha256) -Trigger manual
+          }catch{
+            $Observed=[string]$_.Exception.Message
+          }
+          if($Observed -cnotmatch 'NEMOTRON_FREE_EPHEMERAL_KEY_MISSING'){
+            throw ('LIVE_AUTHOR_NEGATIVE_WRONG_BOUNDARY observed='+$Observed)
+          }
+          if(Test-Path -LiteralPath $env:RESEARCH_FREE_BUNDLE_OUTPUT){
+            throw 'LIVE_AUTHOR_NEGATIVE_UNEXPECTED_BUNDLE'
+          }
+          $After=((& git -C $Research rev-parse HEAD | Out-String)).Trim()
+          if($After -cne $Start){throw 'LIVE_AUTHOR_NEGATIVE_SOURCE_HEAD_CHANGED'}
+          if(((& git -C $Research status --porcelain | Out-String)).Trim()){
+            throw 'LIVE_AUTHOR_NEGATIVE_RESEARCH_DIRTY'
+          }
+          Write-Host 'REAL_FREE_AUTHOR_NO_KEY_NO_REMOTE_REQUEST=PASS'
+          Write-Host 'REAL_FREE_AUTHOR_ZERO_NATIVE_EXECUTION=PASS'
+          Write-Host 'REAL_FREE_AUTHOR_ZERO_RESEARCH_COMMITS=PASS'

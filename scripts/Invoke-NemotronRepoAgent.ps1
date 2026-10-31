@@ -9,6 +9,7 @@ param(
     [string]$Model='',
     [int]$MaxRounds=48,
     [switch]$ProtocolProbe,
+    [switch]$NoProcessTools,
     [switch]$SelfTest
 )
 
@@ -37,6 +38,32 @@ function Get-Relative([string]$Full){
     return $F.Substring($Root.Length).Replace('\','/')
 }
 
+# The free provider may see only Git-tracked public source bytes. In
+# particular, never include checkout credentials, symlinks or machine-local
+# memory/secret files in a tool response sent to a third-party model.
+$script:PublicTrackedPaths=$null
+function Test-PublicTrackedFile([string]$Relative){
+    $P=$Relative.Replace('\','/')
+    while($P.StartsWith('./')){$P=$P.Substring(2)}
+    if([string]::IsNullOrWhiteSpace($P) -or
+       $P -match '(?i)(^|/)(\.git|\.ssh|\.aws|\.env(?:\.[^/]*)?|secrets?|credentials?|private|mind-palace-context\.txt|[^/]*\.dpapi)(/|$)'){
+        return $false
+    }
+    $Full=Resolve-RepoPath $P $false
+    if(-not(Test-Path -LiteralPath $Full -PathType Leaf)){return $false}
+    if(((Get-Item -LiteralPath $Full -Force).Attributes -band
+         [IO.FileAttributes]::ReparsePoint) -ne 0){return $false}
+    if($null-eq$script:PublicTrackedPaths){
+        $Names=@(& git -C $RepoPath ls-files --cached)
+        if($LASTEXITCODE-ne0){throw 'NEMOTRON_PUBLIC_TRACKED_CATALOG_FAILED'}
+        $script:PublicTrackedPaths=@{}
+        foreach($Name in $Names){
+            $script:PublicTrackedPaths[[string]$Name.Replace('\','/')]=$true
+        }
+    }
+    return $script:PublicTrackedPaths.ContainsKey($P)
+}
+
 function Test-WritablePath([string]$Relative){
     $P=$Relative.Replace('\','/')
     if($P.Contains('..')){return $false}
@@ -45,7 +72,8 @@ function Test-WritablePath([string]$Relative){
                $P.StartsWith('docs/experiments/') -or
                $P.StartsWith('unitary/') -or
                $P.StartsWith('cmd/') -or
-               $P.StartsWith('scripts/')
+               ($P.StartsWith('scripts/run-') -and $P.EndsWith('.ps1') -and
+                -not $P.Substring('scripts/'.Length).Contains('/'))
     }
     return $P-ceq'.yggdrasil/qualification-request.json' -or
            $P-ceq'.yggdrasil/isolated-run.json' -or
@@ -89,7 +117,11 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             if(-not(Test-Path -LiteralPath $Base -PathType Container)){throw "NEMOTRON_LIST_NOT_DIRECTORY path=$Rel"}
             $BaseDepth=($Base.TrimEnd('\').Split('\')).Count
             $Rows=Get-ChildItem -LiteralPath $Base -Force -Recurse -ErrorAction SilentlyContinue |
-                Where-Object {(($_.FullName.Split('\')).Count-$BaseDepth)-le$Depth} |
+                Where-Object {
+                    -not $_.PSIsContainer -and
+                    (($_.FullName.Split('\')).Count-$BaseDepth)-le$Depth -and
+                    (Test-PublicTrackedFile (Get-Relative $_.FullName))
+                } |
                 Select-Object -First 600 |
                 ForEach-Object {
                     [ordered]@{path=(Get-Relative $_.FullName);type=if($_.PSIsContainer){'dir'}else{'file'};bytes=if($_.PSIsContainer){0}else{$_.Length}}
@@ -100,6 +132,7 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             $Rel=[string]$A.path
             $Full=Resolve-RepoPath $Rel $true
             if(-not(Test-Path -LiteralPath $Full -PathType Leaf)){throw "NEMOTRON_READ_NOT_FILE path=$Rel"}
+            if(-not(Test-PublicTrackedFile $Rel)){throw 'NEMOTRON_READ_REQUIRES_PUBLIC_TRACKED_SOURCE'}
             $Lines=@(Get-Content -LiteralPath $Full)
             $Start=if($A.PSObject.Properties.Name -contains 'start_line'){[Math]::Max([int]$A.start_line,1)}else{1}
             $End=if($A.PSObject.Properties.Name -contains 'end_line'){[Math]::Min([int]$A.end_line,$Lines.Count)}else{[Math]::Min($Start+159,$Lines.Count)}
@@ -119,6 +152,7 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             }
             $Rows=New-Object Collections.Generic.List[object]
             foreach($F in $Files){
+                if(-not(Test-PublicTrackedFile (Get-Relative $F.FullName))){continue}
                 try{
                     foreach($M in @(Select-String -LiteralPath $F.FullName -SimpleMatch -Pattern $Query -ErrorAction Stop)){
                         $Rows.Add([ordered]@{path=(Get-Relative $F.FullName);line=$M.LineNumber;text=([string]$M.Line).Trim()})
@@ -190,10 +224,14 @@ function Invoke-Tool([string]$Name,[string]$ArgumentsJson){
             }
             $Commit=Invoke-GitRaw @('commit','-m',$Message)
             if($Commit.exit_code-ne0){throw "NEMOTRON_GIT_COMMIT_FAILED output=$($Commit.output)"}
+            # Agent-authored preregistrations become tracked only on commit.
+            # Refresh the source catalog so subsequent reads can validate them.
+            $script:PublicTrackedPaths=$null
             $Head=(Invoke-GitRaw @('rev-parse','HEAD'))
             return Convert-ToolResult ([ordered]@{committed=$true;head=$Head.output.Trim();files=$Staged.output})
         }
         'run_repo_process' {
+            if($NoProcessTools){throw 'NEMOTRON_PROCESS_TOOLS_DENIED_IN_FREE_RESEARCH_PHASE'}
             $Kind=[string]$A.kind
             [string[]]$ProcessArgs=@($A.args|ForEach-Object{[string]$_})
             $Timeout=if($A.PSObject.Properties.Name -contains 'timeout_seconds'){[Math]::Min([Math]::Max([int]$A.timeout_seconds,1),600)}else{180}
@@ -263,12 +301,41 @@ $CurrentHead=(& git -C $RepoPath rev-parse HEAD).Trim()
 if($CurrentHead-cne$StartSha){throw "NEMOTRON_START_SHA_MISMATCH expected=$StartSha actual=$CurrentHead"}
 
 if($SelfTest){
+    if($Program -ceq 'Wingless'){
+        if(-not(Test-WritablePath 'scripts/run-qualification-probe.ps1')){
+            throw 'NEMOTRON_SELFTEST_APPROVED_TEST_SCRIPT_WRITE_DENIED'
+        }
+        foreach($ProtectedPath in @(
+            'scripts/Invoke-RepoLocalResearchCycle.ps1',
+            'scripts/Invoke-NemotronRepoAgent.ps1',
+            'scripts/Invoke-OtherController.ps1',
+            'scripts/arbitrary.ps1'
+        )){
+            if(Test-WritablePath $ProtectedPath){
+                throw "NEMOTRON_SELFTEST_PROTECTED_SCRIPT_WRITE_ALLOWED path=$ProtectedPath"
+            }
+        }
+        Write-Host 'NEMOTRON_WINGLESS_SCRIPT_WRITE_ALLOWLIST=PASS'
+    }
     $Status=(Invoke-Tool 'git_status' '{}')|ConvertFrom-Json
     if([int]$Status.exit_code-ne0){throw "NEMOTRON_SELFTEST_GIT_STATUS_FAILED output=$($Status.output)"}
     $Log=(Invoke-Tool 'git_log' '{"max_count":2}')|ConvertFrom-Json
     if([int]$Log.exit_code-ne0){throw "NEMOTRON_SELFTEST_GIT_LOG_FAILED output=$($Log.output)"}
     $Listing=Invoke-Tool 'list_files' '{"path":".","max_depth":1}'
     if([string]::IsNullOrWhiteSpace([string]$Listing)){throw 'NEMOTRON_SELFTEST_LIST_EMPTY'}
+    if($NoProcessTools){
+        $NegativeGuardCaught=$false
+        try{
+            [void](Invoke-Tool 'run_repo_process' '{"kind":"git_diff_check","args":[]}')
+        }catch{
+            $NegativeGuardCaught=([string]$_.Exception.Message -match
+                'NEMOTRON_PROCESS_TOOLS_DENIED_IN_FREE_RESEARCH_PHASE')
+        }
+        if(-not$NegativeGuardCaught){
+            throw 'NEMOTRON_NO_PROCESS_TOOLS_SELFTEST_FAILED'
+        }
+        Write-Host 'NEMOTRON_NO_PROCESS_TOOLS_SELFTEST=PASS'
+    }
     Write-Host 'NEMOTRON_AGENT_SELFTEST=PASS'
     return
 }
@@ -279,16 +346,31 @@ if($Provider-ceq'nvidia'){
     if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_NVIDIA_SECRET_MISSING'}
     $Endpoint='https://integrate.api.nvidia.com/v1/chat/completions'
 }else{
-    $SecretCandidates=@(
-        'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
-        'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
-    )
-    $Secret=$SecretCandidates|Where-Object{Test-Path -LiteralPath $_ -PathType Leaf}|Select-Object -First 1
-    if([string]::IsNullOrWhiteSpace($Secret)){throw 'NEMOTRON_OPENROUTER_SECRET_MISSING'}
-    $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim()|ConvertTo-SecureString
-    $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
-    try{$Token=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
-    if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_OPENROUTER_SECRET_EMPTY'}
+    if($NoProcessTools){
+        # Only the ephemeral hosted authoring job may supply an environment
+        # secret. Never consult persistent owner DPAPI credentials in this mode.
+        if([string]$env:RUNNER_ENVIRONMENT -cne 'github-hosted'){
+            throw 'NEMOTRON_FREE_AUTH_REQUIRES_EPHEMERAL_HOST'
+        }
+        $Token=[string]$env:OPENROUTER_FREE_API_KEY
+        if([string]::IsNullOrWhiteSpace($Token)){
+            throw 'NEMOTRON_FREE_EPHEMERAL_KEY_MISSING'
+        }
+        if($Model -cne 'nvidia/nemotron-3-ultra-550b-a55b:free' -or $MaxRounds -gt 8){
+            throw 'NEMOTRON_FREE_ONLY_MODEL_OR_BUDGET_DRIFT'
+        }
+    }else{
+        $SecretCandidates=@(
+            'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
+            'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
+        )
+        $Secret=$SecretCandidates|Where-Object{Test-Path -LiteralPath $_ -PathType Leaf}|Select-Object -First 1
+        if([string]::IsNullOrWhiteSpace($Secret)){throw 'NEMOTRON_OPENROUTER_SECRET_MISSING'}
+        $Secure=(Get-Content -LiteralPath $Secret -Raw).Trim()|ConvertTo-SecureString
+        $Ptr=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+        try{$Token=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)}
+        if([string]::IsNullOrWhiteSpace($Token)){throw 'NEMOTRON_OPENROUTER_SECRET_EMPTY'}
+    }
     $Endpoint='https://openrouter.ai/api/v1/chat/completions'
 }
 

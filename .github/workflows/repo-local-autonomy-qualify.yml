@@ -73,6 +73,7 @@ jobs:
           if($C.ckb_plane_role -cne 'governance-only'){throw 'CONFIG_CKB_ROLE_FAILED'}
           if($C.active_branch -cne 'research/autonomy-wingless-active'){throw 'CONFIG_ACTIVE_BRANCH_FAILED'}
           if($C.north_star_sha256 -cne 'e9a7b9b7371d6636d791e47fb1fb166c143687d8d41013a8fb5826ef3a6ac465'){throw 'CONFIG_NORTH_STAR_IDENTITY_FAILED'}
+          if($C.research_executor -cne 'disabled'){throw 'STAGED_FREE_RESEARCH_EXECUTOR_MUST_REMAIN_DISABLED'}
           $Text=Get-Content -Raw $Path
           foreach($Needle in @(
             'CKB-plane is governance-only',
@@ -87,12 +88,105 @@ jobs:
           foreach($Needle in @('Resolve-Codex','RESEARCH_AGENT_ATTEMPT','Start-Process -FilePath $Codex','--approve-for-me','gpt-5.6-sol','gpt-5.6-luna')){
             if($Text.Contains($Needle)){throw "UNATTENDED_CODEX_INVOCATION_FORBIDDEN $Needle"}
           }
+          foreach($Guard in @(
+            'RESEARCH_FREE_EXECUTOR_EXPLICIT_OWNER_GATE_REQUIRED',
+            'RESEARCH_FREE_EXECUTOR_PUBLIC_SOURCE_REQUIRED',
+            'RESEARCH_FREE_EXECUTOR_REQUIRES_EPHEMERAL_RUNNER',
+            'RESEARCH_EXTERNAL_PRIVATE_CONTEXT=EXCLUDED',
+            'nvidia/nemotron-3-ultra-550b-a55b:free',
+            '-MaxRounds 8',
+            '-NoProcessTools'
+          )){
+            if(-not$Text.Contains($Guard)){throw "FREE_RESEARCH_EXECUTOR_GUARD_MISSING $Guard"}
+          }
           $RetiredText=Get-Content -Raw 'scripts\Invoke-RepoLocalResearchContinuation.ps1'
           if(-not$RetiredText.Contains('RESEARCH_CONTINUATION_NOT_DISPATCHED=NO_UNATTENDED_MODEL')){throw 'LEGACY_CODEX_ADAPTER_NOT_DISABLED'}
           foreach($Needle in @('Start-Process','CODEX_HOME','codex.exe')){
             if($RetiredText.Contains($Needle)){throw "LEGACY_CODEX_INVOCATION_FORBIDDEN $Needle"}
           }
           $AgentText=Get-Content -Raw $AgentPath
+          foreach($Guard in @(
+            'Test-PublicTrackedFile',
+            'NEMOTRON_READ_REQUIRES_PUBLIC_TRACKED_SOURCE',
+            'mind-palace-context',
+            'NEMOTRON_PUBLIC_TRACKED_CATALOG_FAILED',
+            'NEMOTRON_PROCESS_TOOLS_DENIED_IN_FREE_RESEARCH_PHASE',
+            'NEMOTRON_SELFTEST_PROTECTED_SCRIPT_WRITE_ALLOWED',
+            'NEMOTRON_WINGLESS_SCRIPT_WRITE_ALLOWLIST=PASS',
+            'scripts/run-'
+          )){
+            if(-not$AgentText.Contains($Guard)){throw "NEMOTRON_PUBLIC_SOURCE_GUARD_MISSING $Guard"}
+          }
+          foreach($Needle in @(
+            'z-ai/glm-5.3',
+            'integrate.api.nvidia.com/v1/chat/completions',
+            'NVIDIA_API_KEY',
+            'reasoning_content',
+            'IsTransientNvidia',
+            'nvidia/nemotron-3-ultra-550b-a55b:free',
+            'openrouter.ai/api/v1/chat/completions',
+            'openrouter.dpapi',
+            'NEMOTRON_PATH_ESCAPE',
+            'Test-WritablePath',
+            'git_commit',
+            'run_repo_process'
+          )){
+            if(-not$AgentText.Contains($Needle)){throw "NEMOTRON_AGENT_INVARIANT_MISSING $Needle"}
+          }
+          if($AgentText.Contains("`$P.StartsWith('scripts/')")){throw 'NEMOTRON_AGENT_BROAD_SCRIPT_WRITE_ALLOWLIST_FORBIDDEN'}
+          if($Text.Contains("`$File.StartsWith('scripts/')")){throw 'NEMOTRON_CONTROLLER_BROAD_SCRIPT_WRITE_ALLOWLIST_FORBIDDEN'}
+          if(-not$Text.Contains('scripts/run-')){throw 'NEMOTRON_CONTROLLER_EXPERIMENT_SCRIPT_SCOPE_MISSING'}
+          if($AgentText.Contains('Invoke-Expression')){throw 'NEMOTRON_AGENT_INVOKE_EXPRESSION_FORBIDDEN'}
+          $LauncherText=Get-Content -Raw '.github/workflows/research-auto-launch.yml'
+          if(-not$LauncherText.Contains("cron: '49 * * * *'")){throw 'RESEARCH_QUOTA_REFRESH_WAKE_DRIFT'}
+          $WorkflowText=Get-Content -Raw '.github/workflows/research-continuation-controller.yml'
+          if($WorkflowText.Contains('NVIDIA_API_KEY:')){throw 'EXTERNAL_API_KEY_BINDING_FORBIDDEN'}
+          if(-not$Text.Contains('RESEARCH_AGENT_POLICY=GPT_CHAT_GITHUB_SOURCE_ONLY_NO_CODEX_NO_EXTERNAL_APIS')){throw 'NO_CODEX_EXECUTION_POLICY_MISSING'}
+          if(-not$Text.Contains('gpt-authored-research-required-no-unattended-model')){throw 'NO_MODEL_WAIT_RECORD_MISSING'}
+          if($Text.Contains('-Provider nvidia') -or $Text.Contains('-Provider openrouter')){throw 'EXTERNAL_API_EXECUTION_FORBIDDEN'}
+          Write-Host 'WINGLESS_REPO_LOCAL_CONTROLLER_STATIC_PASS'
+
+      - name: Verify no subscription-backed research executor
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          Write-Host 'WINGLESS_RESEARCH_EXECUTOR=GPT_CHAT_GITHUB_ONLY_NO_CODEX'
+          Write-Host 'WINGLESS_UNATTENDED_MODEL_CALLS=ZERO'
+
+      - name: Full Wingless regression
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          go test ./...
+          if($LASTEXITCODE-ne0){throw "GO_TEST_FAILED exit=$LASTEXITCODE"}
+          Write-Host 'WINGLESS_REPO_LOCAL_FULL_REGRESSION_PASS'
+
+      - name: Negative-test model-selected process execution
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Branch=((& git branch --show-current | Out-String)).Trim()
+          if([string]::IsNullOrWhiteSpace($Branch)){
+            $Branch='ci-free-agent-no-process-'+$env:GITHUB_RUN_ID
+            git switch -c $Branch
+            if($LASTEXITCODE-ne0){throw 'AGENT_SELFTEST_LOCAL_BRANCH_FAILED'}
+          }
+          $Head=([string](& git rev-parse HEAD)).Trim()
+          if($Head -notmatch '^[a-f0-9]{40}$'){throw 'AGENT_SELFTEST_SHA_INVALID'}
+          $Probe=Join-Path $env:RUNNER_TEMP 'free-agent-guard-probe.txt'
+          [IO.File]::WriteAllText($Probe,'Local offline safety probe; no provider request.',(New-Object Text.UTF8Encoding($false)))
+          & '.\\scripts\\Invoke-NemotronRepoAgent.ps1' `
+            -RepoPath (Resolve-Path '.').Path `
+            -Program 'Wingless' -ActiveBranch $Branch -StartSha $Head `
+            -PromptPath $Probe `
+            -LastMessagePath (Join-Path $env:RUNNER_TEMP 'free-agent-last-message.txt') `
+            -SelfTest -NoProcessTools
+          if($LASTEXITCODE-ne0){throw 'AGENT_NO_PROCESS_SELFTEST_FAILED'}
+          Write-Host 'FREE_RESEARCH_MODEL_PROCESS_NEGATIVE_GATE=PASS'
+
+          )){
+            if(-not$AgentText.Contains($Guard)){throw "NEMOTRON_PUBLIC_SOURCE_GUARD_MISSING $Guard"}
+          }
           foreach($Needle in @(
             'z-ai/glm-5.3',
             'integrate.api.nvidia.com/v1/chat/completions',
@@ -133,3 +227,26 @@ jobs:
           go test ./...
           if($LASTEXITCODE-ne0){throw "GO_TEST_FAILED exit=$LASTEXITCODE"}
           Write-Host 'WINGLESS_REPO_LOCAL_FULL_REGRESSION_PASS'
+
+      - name: Negative-test model-selected process execution
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Branch=((& git branch --show-current | Out-String)).Trim()
+          if([string]::IsNullOrWhiteSpace($Branch)){
+            $Branch='ci-free-agent-no-process-'+$env:GITHUB_RUN_ID
+            git switch -c $Branch
+            if($LASTEXITCODE-ne0){throw 'AGENT_SELFTEST_LOCAL_BRANCH_FAILED'}
+          }
+          $Head=([string](& git rev-parse HEAD)).Trim()
+          if($Head -notmatch '^[a-f0-9]{40}$'){throw 'AGENT_SELFTEST_SHA_INVALID'}
+          $Probe=Join-Path $env:RUNNER_TEMP 'free-agent-guard-probe.txt'
+          [IO.File]::WriteAllText($Probe,'Local offline safety probe; no provider request.',(New-Object Text.UTF8Encoding($false)))
+          & '.\\scripts\\Invoke-NemotronRepoAgent.ps1' `
+            -RepoPath (Resolve-Path '.').Path `
+            -Program 'Wingless' -ActiveBranch $Branch -StartSha $Head `
+            -PromptPath $Probe `
+            -LastMessagePath (Join-Path $env:RUNNER_TEMP 'free-agent-last-message.txt') `
+            -SelfTest -NoProcessTools
+          if($LASTEXITCODE-ne0){throw 'AGENT_NO_PROCESS_SELFTEST_FAILED'}
+          Write-Host 'FREE_RESEARCH_MODEL_PROCESS_NEGATIVE_GATE=PASS'
