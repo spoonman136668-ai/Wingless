@@ -64,7 +64,7 @@ def main():
                     title + " accepted; output=" + repr(bad.stdout[-300:]))
 
         # Aggregate cap: individually valid JSON lines must not hide truncation.
-        line = b'{"op":"snapshot"}' + b" " * 60000 + b"\\n"
+        line = b'{"op":"snapshot"}' + b" " * 60000 + b"\n"
         under = line * 17
         accepted = execute(binary, ["cognition"], under)
         require(accepted.returncode == 0 and
@@ -78,14 +78,14 @@ def main():
 
         head = b'{"op":"snapshot"}'
         last_spaces = (1 << 20) - len(under) - len(head) - 1
-        exact = under + head + b" " * last_spaces + b"\\n"
+        exact = under + head + b" " * last_spaces + b"\n"
         require(len(exact) == 1 << 20, "boundary test mis-sized")
         boundary = execute(binary, ["cognition"], exact)
         require(boundary.returncode == 0 and
                 len(boundary.stdout.splitlines()) == 18,
                 "exact 1 MiB stream rejected")
 
-        one_extra = exact[:-1] + b" " + b"\\n"
+        one_extra = exact[:-1] + b" " + b"\n"
         require(len(one_extra) == (1 << 20) + 1,
                 "over-boundary test mis-sized")
         rejected = execute(binary, ["cognition"], one_extra)
