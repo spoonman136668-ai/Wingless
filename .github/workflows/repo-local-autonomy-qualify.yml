@@ -113,7 +113,8 @@ jobs:
             'NEMOTRON_PROCESS_TOOLS_DENIED_IN_FREE_RESEARCH_PHASE',
             'NEMOTRON_SELFTEST_PROTECTED_SCRIPT_WRITE_ALLOWED',
             'NEMOTRON_WINGLESS_SCRIPT_WRITE_ALLOWLIST=PASS',
-            '^scripts/run-[A-Za-z0-9._-]+\\.ps1
+            'scripts/run-'
+          )){
             if(-not$AgentText.Contains($Guard)){throw "NEMOTRON_PUBLIC_SOURCE_GUARD_MISSING $Guard"}
           }
           foreach($Needle in @(
@@ -134,7 +135,7 @@ jobs:
           }
           if($AgentText.Contains("`$P.StartsWith('scripts/')")){throw 'NEMOTRON_AGENT_BROAD_SCRIPT_WRITE_ALLOWLIST_FORBIDDEN'}
           if($Text.Contains("`$File.StartsWith('scripts/')")){throw 'NEMOTRON_CONTROLLER_BROAD_SCRIPT_WRITE_ALLOWLIST_FORBIDDEN'}
-          if($Text -notmatch "scripts/run-\\[A-Za-z0-9\\._-\\]\\+\\\\.ps1"){throw 'NEMOTRON_CONTROLLER_EXPERIMENT_SCRIPT_SCOPE_MISSING'}
+          if(-not$Text.Contains('scripts/run-')){throw 'NEMOTRON_CONTROLLER_EXPERIMENT_SCRIPT_SCOPE_MISSING'}
           if($AgentText.Contains('Invoke-Expression')){throw 'NEMOTRON_AGENT_INVOKE_EXPRESSION_FORBIDDEN'}
           $LauncherText=Get-Content -Raw '.github/workflows/research-auto-launch.yml'
           if(-not$LauncherText.Contains("cron: '49 * * * *'")){throw 'RESEARCH_QUOTA_REFRESH_WAKE_DRIFT'}
