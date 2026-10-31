@@ -624,7 +624,6 @@ $MindContext
 } finally {
     Pop-Location
 }
-){throw "QUALIFICATION_TEST_SCRIPT_INVALID path=$($Request.test_script)"}
 
     $LastFiles=@(Get-CommitFiles $Commits[-1])
     if($LastFiles-notcontains'.wingless/qualification-request.json'){throw 'FINAL_IMPLEMENTATION_COMMIT_MISSING_QUALIFICATION_REQUEST'}
