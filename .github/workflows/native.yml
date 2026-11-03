@@ -22,11 +22,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Record checked-out source identity
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force evidence | Out-Null
-          git rev-parse HEAD | Out-File -Encoding utf8 evidence/source-sha.txt
+          $expected = '${{ github.event.pull_request.head.sha || github.sha }}'
+          $actual = (git rev-parse HEAD).Trim()
+          if ($actual -ne $expected) { throw "Exact-head checkout mismatch" }
+          $actual | Out-File -Encoding utf8 evidence/source-sha.txt
           git status --porcelain | Out-File -Encoding utf8 evidence/source-status.txt
       - uses: actions/setup-go@v5
         with:
