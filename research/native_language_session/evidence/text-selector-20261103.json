@@ -1,0 +1,130 @@
+{
+  "schema": "research.native-whole-response-selector.engineering-receipt.v1",
+  "project": "Wingless",
+  "authority": "engineering-observation-only",
+  "evidence_basis": "Connected GitHub run/job metadata and decoded logs; agent-recorded, not owner-signed scientific evidence.",
+  "source": {
+    "commit": "32424095026849382a09f1904dba07b2ba70da68",
+    "tree": "d544d31a577607eee0055e05d486692b1274176b",
+    "parent_before_component": "a400bf5faaf027b886a19f4437ef401a489a7d2f",
+    "scope_commit": "5661a37e6662fe510ccfbcf3db70acb127f9bbd5",
+    "native_learner_git_blob": "f248fd6dec93d04571f7cb4c3ccd721017812bfd",
+    "native_learner_unchanged": true
+  },
+  "component": {
+    "input": "complete UTF-8 input/response pairs",
+    "output_mode": "closed-response-selection",
+    "novel_string_generation": false,
+    "response_bank_maximum": 8,
+    "example_count_maximum": 16,
+    "input_bytes_per_example_maximum": 256,
+    "total_training_input_bytes_maximum": 1024,
+    "from_scratch_training": true,
+    "inference_read_only": true,
+    "checkpoint": "complete native models, supplied response bank, encoding/source/schema pins, data and integrity digests",
+    "fixture_provenance": "invented engineering inputs, not a scientific corpus"
+  },
+  "qualification": {
+    "run": 41625883250,
+    "conclusion": "PASS_BOTH_OS",
+    "linux": {
+      "job": 125882986071,
+      "focused_native_session_tests": 3,
+      "focused_native_text_tests": 2,
+      "fresh_process_cli": "PASS",
+      "complete_race_regression": "PASS",
+      "vet": "PASS",
+      "full_build": "PASS",
+      "ice": "PASS"
+    },
+    "windows": {
+      "job": 125882984865,
+      "focused_native_session_tests": 3,
+      "focused_native_text_tests": 2,
+      "fresh_process_cli": "PASS",
+      "complete_race_regression": "PASS",
+      "vet": "PASS",
+      "full_build": "PASS",
+      "ice": "PASS"
+    },
+    "engineering_observation_linux": {
+      "scientific_language_evidence": false,
+      "training_pair_correct": 2,
+      "training_pair_count": 2,
+      "training_pair_predictions": [
+        {
+          "language_proof": false,
+          "native_scores": [
+            0.1116623488721461,
+            -0.006923610096757626
+          ],
+          "novel_string_generation": false,
+          "output_mode": "closed-response-selection",
+          "response": "amber",
+          "responses": [
+            "amber",
+            "violet"
+          ]
+        },
+        {
+          "language_proof": false,
+          "native_scores": [
+            -0.11370515994880898,
+            -0.01413739569164607
+          ],
+          "novel_string_generation": false,
+          "output_mode": "closed-response-selection",
+          "response": "violet",
+          "responses": [
+            "amber",
+            "violet"
+          ]
+        }
+      ]
+    },
+    "engineering_observation_windows": {
+      "scientific_language_evidence": false,
+      "training_pair_correct": 2,
+      "training_pair_count": 2,
+      "training_pair_predictions": [
+        {
+          "language_proof": false,
+          "native_scores": [
+            0.1116623488721461,
+            -0.006923610096757626
+          ],
+          "novel_string_generation": false,
+          "output_mode": "closed-response-selection",
+          "response": "amber",
+          "responses": [
+            "amber",
+            "violet"
+          ]
+        },
+        {
+          "language_proof": false,
+          "native_scores": [
+            -0.11370515994880898,
+            -0.01413739569164607
+          ],
+          "novel_string_generation": false,
+          "output_mode": "closed-response-selection",
+          "response": "violet",
+          "responses": [
+            "amber",
+            "violet"
+          ]
+        }
+      ]
+    }
+  },
+  "scientific_language_proof": "UNVERIFIED",
+  "learned_semantics_transfer_and_generation": "UNVERIFIED",
+  "strong_equally_informed_trained_controls": "NOT_RUN",
+  "protected_first_use": false,
+  "external_model_calls": 0,
+  "forge_takeover": false,
+  "accepted_main_mutation": false,
+  "promotion_authority": false,
+  "new_controller_queue_or_scheduler": false
+}
