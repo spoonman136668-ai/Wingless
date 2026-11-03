@@ -52,6 +52,26 @@ jobs:
           & go run -buildvcs=false ./cmd/ice validate
           if ($LASTEXITCODE -ne 0) { throw "Regenerated ICE still invalid" }
           Write-Output "ICE_DIAGNOSTIC_ONLY_NOT_QUALIFIED"
+          # Export only six reproducible generated ICE files for bounded repair.
+          # Diagnostic runs remain FAILED; these log records are not acceptance.
+          $paths = @(
+            '.ice/architecture-map.json',
+            '.ice/dependency-map.json',
+            '.ice/integration-seams.json',
+            '.ice/manifest.json',
+            '.ice/symbol-map.json',
+            '.ice/test-map.json'
+          )
+          foreach ($path in $paths) {
+            $bytes = [System.IO.File]::ReadAllBytes((Join-Path (Get-Location) $path))
+            $encoded = [Convert]::ToBase64String($bytes)
+            Write-Output "GCEN_ICE_EXPORT_BEGIN $path $($bytes.Length)"
+            for ($offset = 0; $offset -lt $encoded.Length; $offset += 512) {
+              $length = [Math]::Min(512, $encoded.Length - $offset)
+              Write-Output ("GCEN_ICE_EXPORT_DATA " + $encoded.Substring($offset, $length))
+            }
+            Write-Output "GCEN_ICE_EXPORT_END $path"
+          }
       - name: Set up GCEN Python
         if: ${{ hashFiles('research/nr1/gcen/run_focused.py') != '' }}
         uses: actions/setup-python@v5
