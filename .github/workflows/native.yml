@@ -98,8 +98,8 @@ jobs:
             throw 'upstream metadata retrieval failed; no scientific custody admitted'
           }
           'UPSTREAM_METADATA_ONLY_LOCAL_WEIGHTS_UNVERIFIED' | Out-File -Encoding utf8 evidence/gcen-upstream-status.txt
-      - name: GCEN one-shot real expert tensor extraction (bounded)
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-tensor-pilot]') && success() }}
+      - name: GCEN one-shot real expert tensor extraction (2D and packed 3D)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-tensor-2d]') && success() }}
         continue-on-error: true
         timeout-minutes: 12
         shell: bash
@@ -152,7 +152,7 @@ jobs:
                           dtype=description.get("dtype")
                           dims=description.get("shape")
                           offsets=description.get("data_offsets")
-                          if dtype not in ("BF16","F16","F32") or not isinstance(dims,list) or len(dims)!=3: continue
+                          if dtype not in ("BF16","F16","F32") or not isinstance(dims,list) or len(dims) not in (2,3): continue
                           if not isinstance(offsets,list) or len(offsets)!=2 or any(type(x)!=int for x in offsets): continue
                           if any(type(x)!=int or x<=0 for x in dims): continue
                           itemsize=4 if dtype=="F32" else 2
@@ -164,7 +164,8 @@ jobs:
                           receipt["status"]="VERIFIED_SHARD_NO_PACKED_EXPERT_TENSOR"
                       else:
                           tensor,dtype,dims,start,itemsize=sorted(candidates,key=lambda x:x[0])[0]
-                          e,m,n=dims
+                          e,m,n=dims if len(dims)==3 else (1,dims[0],dims[1])
+                          receipt["sample_layout"]="packed_3d" if len(dims)==3 else "individual_expert_2d"
                           tile=[]
                           dt={"BF16":"<u2","F16":"<f2","F32":"<f4"}[dtype]
                           for i in range(min(e,4)):
