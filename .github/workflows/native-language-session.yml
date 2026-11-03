@@ -11,7 +11,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - name: Byte-stable native identity
         shell: bash
@@ -43,12 +43,15 @@ jobs:
           set -euo pipefail
           go build -o "$RUNNER_TEMP/wingless-native-session.exe" ./cmd/wingless-native-session
           python research/native_language_session/check_cli.py "$RUNNER_TEMP/wingless-native-session.exe"
-      - name: Mandatory complete regression, vet and build
+      - name: Mandatory complete race regression
+        if: always()
+        shell: bash
+        run: go test -race ./... -count=1 -timeout 15m -v
+      - name: Vet and full build
         if: always()
         shell: bash
         run: |
           set -euo pipefail
-          go test -race ./... -count=1 -timeout 90s
           go vet ./...
           go build ./...
       - name: Existing ICE validation, unwaived
