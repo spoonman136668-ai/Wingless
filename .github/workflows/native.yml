@@ -41,6 +41,17 @@ jobs:
       - name: Native tests and evidence
         shell: pwsh
         run: ./scripts/Test-Native.ps1
+      - name: Diagnose stale ICE without accepting regenerated output
+        if: failure()
+        shell: pwsh
+        run: |
+          & go run -buildvcs=false ./cmd/ice build
+          if ($LASTEXITCODE -ne 0) { throw "ICE diagnostic regeneration failed" }
+          git status --short | Out-File -Encoding utf8 evidence/ice-regenerated-status.txt
+          git diff --binary -- .ice | Out-File -Encoding utf8 evidence/ice-regenerated.patch
+          & go run -buildvcs=false ./cmd/ice validate
+          if ($LASTEXITCODE -ne 0) { throw "Regenerated ICE still invalid" }
+          Write-Output "ICE_DIAGNOSTIC_ONLY_NOT_QUALIFIED"
       - name: Set up GCEN Python
         if: ${{ hashFiles('research/nr1/gcen/run_focused.py') != '' }}
         uses: actions/setup-python@v5
