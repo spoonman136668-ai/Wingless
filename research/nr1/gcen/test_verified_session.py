@@ -24,7 +24,7 @@ class VerifiedSessionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             session = VerifiedCheckpoint(root, self.fixture(root))
-            self.assertEqual(session._checked(REQUIRED[0]), root / REQUIRED[0])
+            self.assertEqual(session._checked(REQUIRED[0]), (root / REQUIRED[0]).resolve())
 
     def test_missing_manifest_entry_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
