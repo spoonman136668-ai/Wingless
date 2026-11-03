@@ -98,6 +98,54 @@ jobs:
             throw 'upstream metadata retrieval failed; no scientific custody admitted'
           }
           'UPSTREAM_METADATA_ONLY_LOCAL_WEIGHTS_UNVERIFIED' | Out-File -Encoding utf8 evidence/gcen-upstream-status.txt
+      - name: GCEN one-shot shard byte custody pilot (no local weight storage)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-shard-probe]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 15
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, time, urllib.request
+          root=pathlib.Path("evidence")
+          root.mkdir(exist_ok=True)
+          name="model-00001-of-00016.safetensors"
+          manifest=json.loads(pathlib.Path("research/nr1/gcen/upstream_full_manifest_unverified_weights.json").read_text())
+          revision="ad44e777bcd18fa416d9da3bd8f70d33ebb85d39"
+          assert manifest["revision"]==revision
+          assert manifest["model"]=="Qwen/Qwen3-30B-A3B"
+          expected=manifest["files"][name]
+          url="https://huggingface.co/Qwen/Qwen3-30B-A3B/resolve/"+revision+"/"+name
+          receipt={"status":"FAILED_NOT_ACCEPTED","source_revision":revision,"file":name,"expected_sha256":expected}
+          started=time.monotonic()
+          try:
+              req=urllib.request.Request(url,headers={"Accept-Encoding":"identity","User-Agent":"Wingless-GCEN-Custody-Pilot/1"})
+              hasher=hashlib.sha256()
+              n=0
+              with urllib.request.urlopen(req,timeout=90) as response:
+                  if response.status!=200 or response.headers.get("Content-Range"):
+                      raise ValueError("unexpected HTTP status or partial content")
+                  length=response.headers.get("Content-Length")
+                  length=int(length) if length is not None else None
+                  if length is not None and (length<=0 or length>6*1024**3):
+                      raise ValueError("invalid or excessive content length")
+                  while True:
+                      chunk=response.read(4*1024*1024)
+                      if not chunk: break
+                      n+=len(chunk)
+                      if n>6*1024**3: raise ValueError("shard exceeds transfer limit")
+                      hasher.update(chunk)
+                  if length is not None and length!=n:
+                      raise ValueError("unexpected transfer length")
+              digest=hasher.hexdigest()
+              receipt.update(bytes_streamed=n,observed_sha256=digest,elapsed_seconds=round(time.monotonic()-started,2))
+              if digest!=expected: raise ValueError("SHA256 mismatch")
+              receipt["status"]="ORIGINAL_SHARD_BYTES_MATCH_PINNED_UPSTREAM_SHA256"
+          except Exception as e:
+              receipt["error_type"]=type(e).__name__
+              raise
+          finally:
+              (root/"gcen-one-shard-custody-pilot.json").write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\\n")
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
