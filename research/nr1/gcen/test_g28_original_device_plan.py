@@ -69,6 +69,11 @@ class G28DevicePlanTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unexpectedly targets GPU"):
             resolve_assignment("model.layers.0.mlp.experts.0.down_proj.weight", {"": 0})
 
+    def test_nested_gpu_target_forbidden_on_cpu_host(self):
+        with self.assertRaisesRegex(ValueError, "unexpectedly targets GPU"):
+            resolve_assignment("model.layers.0.mlp.experts.0.down_proj.weight",
+                               {"": "disk", "model.layers.0": "cuda:0"})
+
     def test_non_meta_source_rejected(self):
         tensors = list(self.tensors)
         tensors[0] = (tensors[0][0], FakeMetaParameter(device="cpu"))
