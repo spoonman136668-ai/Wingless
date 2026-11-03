@@ -84,6 +84,15 @@ jobs:
           python -m pip install --disable-pip-version-check "numpy==2.2.6" "safetensors==0.5.3"
           python research/nr1/gcen/run_focused.py
           if ($LASTEXITCODE -ne 0) { throw "GCEN focused tests failed" }
+      - name: GCEN G23 one-shot memory census (no weights or inference)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && contains(github.event.head_commit.message, '[gcen-g23-capacity]') && success() }}
+        timeout-minutes: 2
+        shell: pwsh
+        run: |
+          python research/nr1/gcen/runtime_feasibility.py `
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json `
+            --output "evidence/gcen-g23-capacity-${{ matrix.os }}.json"
+          if ($LASTEXITCODE -ne 0) { throw "GCEN G23 capacity census failed" }
       - name: GCEN pinned upstream metadata custody probe (diagnostic only)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && success() }}
         continue-on-error: true
