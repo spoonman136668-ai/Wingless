@@ -5116,6 +5116,64 @@
   {
     "name": "request",
     "kind": "type",
+    "file": "cmd/wingless-native-generator/main.go",
+    "start": 13,
+    "end": 18
+  },
+  {
+    "name": "handle",
+    "kind": "function",
+    "file": "cmd/wingless-native-generator/main.go",
+    "start": 20,
+    "end": 73,
+    "calls": [
+      "bytes.NewReader",
+      "d.Decode",
+      "d.Decode",
+      "d.DisallowUnknownFields",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "json.NewDecoder",
+      "json.RawMessage",
+      "json.Unmarshal",
+      "len",
+      "len",
+      "new",
+      "unitary.RestoreNativeParallelGenerator",
+      "unitary.TrainNativeParallelGenerator",
+      "unitary.ValidateNativeGeneratorJSON"
+    ]
+  },
+  {
+    "name": "main",
+    "kind": "function",
+    "file": "cmd/wingless-native-generator/main.go",
+    "start": 74,
+    "end": 91,
+    "calls": [
+      "bufio.NewScanner",
+      "err.Error",
+      "fmt.Fprintln",
+      "handle",
+      "json.NewEncoder",
+      "make",
+      "os.Exit",
+      "out.Encode",
+      "out.Encode",
+      "scanner.Buffer",
+      "scanner.Bytes",
+      "scanner.Err",
+      "scanner.Scan"
+    ]
+  },
+  {
+    "name": "request",
+    "kind": "type",
     "file": "cmd/wingless-native-session/main.go",
     "start": 14,
     "end": 22
@@ -18608,6 +18666,367 @@
       "s.Checkpoint",
       "sha256.Sum256",
       "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "nativeGeneratorSchema",
+    "kind": "const",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 16,
+    "end": 16
+  },
+  {
+    "name": "nativeGeneratorSelector",
+    "kind": "const",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 17,
+    "end": 17
+  },
+  {
+    "name": "nativeGeneratorEncoding",
+    "kind": "const",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 18,
+    "end": 18
+  },
+  {
+    "name": "NativeGeneratorJSONCap",
+    "kind": "const",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 19,
+    "end": 19
+  },
+  {
+    "name": "nativeGeneratorField",
+    "kind": "type",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 21,
+    "end": 25
+  },
+  {
+    "name": "NativeParallelGenerator",
+    "kind": "type",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 26,
+    "end": 34
+  },
+  {
+    "name": "NativeGenerationResult",
+    "kind": "type",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 35,
+    "end": 49
+  },
+  {
+    "name": "nativeGeneratorPayload",
+    "kind": "type",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 50,
+    "end": 62
+  },
+  {
+    "name": "nativeGeneratorEnvelope",
+    "kind": "type",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 63,
+    "end": 66
+  },
+  {
+    "name": "generatorDigest",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 68,
+    "end": 68,
+    "calls": [
+      "hex.EncodeToString",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "generatorDigestValid",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 69,
+    "end": 75,
+    "calls": [
+      "hex.DecodeString",
+      "len"
+    ]
+  },
+  {
+    "name": "trainGeneratorField",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 76,
+    "end": 97,
+    "calls": [
+      "TrainNativeTextSelector",
+      "len",
+      "m.Checkpoint",
+      "make",
+      "strconv.Atoi"
+    ]
+  },
+  {
+    "name": "readGeneratorField",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 98,
+    "end": 112,
+    "calls": [
+      "RestoreNativeTextSelector",
+      "m.Predict",
+      "strconv.Atoi"
+    ]
+  },
+  {
+    "name": "TrainNativeParallelGenerator",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 113,
+    "end": 180,
+    "calls": [
+      "append",
+      "append",
+      "byte",
+      "generatorDigest",
+      "generatorDigest",
+      "int",
+      "json.Marshal",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "m.valid",
+      "make",
+      "make",
+      "make",
+      "max",
+      "nativeTextValid",
+      "nativeTextValid",
+      "sort.Strings",
+      "strconv.Itoa",
+      "strconv.Itoa",
+      "trainGeneratorField",
+      "trainGeneratorField",
+      "uint"
+    ]
+  },
+  {
+    "name": "valid",
+    "kind": "method",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 181,
+    "end": 235,
+    "receiver": "NativeParallelGenerator",
+    "calls": [
+      "RestoreNativeTextSelector",
+      "fieldValid",
+      "fieldValid",
+      "generatorDigestValid",
+      "generatorDigestValid",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "min",
+      "strconv.Atoi",
+      "strconv.Itoa"
+    ]
+  },
+  {
+    "name": "Generate",
+    "kind": "method",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 236,
+    "end": 274,
+    "receiver": "NativeParallelGenerator",
+    "calls": [
+      "byte",
+      "generatorDigest",
+      "hex.EncodeToString",
+      "len",
+      "m.valid",
+      "make",
+      "make",
+      "nativeTextValid",
+      "readGeneratorField",
+      "readGeneratorField",
+      "string",
+      "uint",
+      "utf8.Valid"
+    ]
+  },
+  {
+    "name": "Checkpoint",
+    "kind": "method",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 275,
+    "end": 289,
+    "receiver": "NativeParallelGenerator",
+    "calls": [
+      "generatorDigest",
+      "json.Marshal",
+      "json.Marshal",
+      "len",
+      "m.valid"
+    ]
+  },
+  {
+    "name": "ValidateNativeGeneratorJSON",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 293,
+    "end": 350,
+    "calls": [
+      "bytes.NewReader",
+      "d.More",
+      "d.More",
+      "d.Token",
+      "d.Token",
+      "d.Token",
+      "d.Token",
+      "d.Token",
+      "d.UseNumber",
+      "json.Delim",
+      "json.Delim",
+      "json.NewDecoder",
+      "len",
+      "len",
+      "visit",
+      "visit",
+      "visit"
+    ]
+  },
+  {
+    "name": "RestoreNativeParallelGenerator",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator.go",
+    "start": 351,
+    "end": 374,
+    "calls": [
+      "ValidateNativeGeneratorJSON",
+      "bytes.NewReader",
+      "d.Decode",
+      "d.Decode",
+      "d.DisallowUnknownFields",
+      "generatorDigest",
+      "json.Marshal",
+      "json.NewDecoder",
+      "m.valid",
+      "new"
+    ]
+  },
+  {
+    "name": "nativeGeneratorExamples",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator_test.go",
+    "start": 9,
+    "end": 11
+  },
+  {
+    "name": "TestNativeGeneratorVariableLengthUTF8",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator_test.go",
+    "start": 12,
+    "end": 32,
+    "calls": [
+      "RestoreNativeParallelGenerator",
+      "TrainNativeParallelGenerator",
+      "len",
+      "m.Checkpoint",
+      "r.Generate",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestNativeGeneratorFieldsFitAndCompleteState",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator_test.go",
+    "start": 33,
+    "end": 70,
+    "calls": [
+      "RestoreNativeParallelGenerator",
+      "TrainNativeParallelGenerator",
+      "bytes.Contains",
+      "bytes.Contains",
+      "bytes.Equal",
+      "bytes.Equal",
+      "bytes.Equal",
+      "json.Marshal",
+      "json.Marshal",
+      "m.Checkpoint",
+      "m.Checkpoint",
+      "m.Generate",
+      "m.Generate",
+      "nativeGeneratorExamples",
+      "nativeGeneratorExamples",
+      "r.Checkpoint",
+      "r.Generate",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestNativeGeneratorMechanicalCompositionNotTransfer",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator_test.go",
+    "start": 71,
+    "end": 89,
+    "calls": [
+      "TrainNativeParallelGenerator",
+      "m.Generate",
+      "m.Generate",
+      "nativeGeneratorExamples",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestNativeGeneratorBoundsAndCorruption",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator_test.go",
+    "start": 90,
+    "end": 118,
+    "calls": [
+      "RestoreNativeParallelGenerator",
+      "RestoreNativeParallelGenerator",
+      "TrainNativeParallelGenerator",
+      "TrainNativeParallelGenerator",
+      "append",
+      "bytes.Equal",
+      "generatorDigest",
+      "json.Marshal",
+      "json.Marshal",
+      "json.Unmarshal",
+      "m.Checkpoint",
+      "m.Checkpoint",
+      "m.Checkpoint",
+      "m.Generate",
+      "nativeGeneratorExamples",
       "t.Fatal",
       "t.Fatal",
       "t.Fatal",
