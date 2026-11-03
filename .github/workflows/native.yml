@@ -98,10 +98,10 @@ jobs:
             throw 'upstream metadata retrieval failed; no scientific custody admitted'
           }
           'UPSTREAM_METADATA_ONLY_LOCAL_WEIGHTS_UNVERIFIED' | Out-File -Encoding utf8 evidence/gcen-upstream-status.txt
-      - name: GCEN one-shot four-shard custody batch (2-5; no weight storage)
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-batch-2-5]') && success() }}
+      - name: GCEN one-shot remaining-shard custody batch (6-16; no weight storage)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-batch-6-16]') && success() }}
         continue-on-error: true
-        timeout-minutes: 13
+        timeout-minutes: 15
         shell: bash
         run: |
           python - <<'PY'
@@ -112,7 +112,7 @@ jobs:
           rev="ad44e777bcd18fa416d9da3bd8f70d33ebb85d39"
           manifest=json.loads(pathlib.Path("research/nr1/gcen/upstream_full_manifest_unverified_weights.json").read_text())
           assert manifest["revision"]==rev and manifest["model"]=="Qwen/Qwen3-30B-A3B"
-          names=[f"model-{i:05d}-of-00016.safetensors" for i in range(2,6)]
+          names=[f"model-{i:05d}-of-00016.safetensors" for i in range(6,17)]
           receipts=[]
           try:
               for name in names:
@@ -150,7 +150,7 @@ jobs:
                   receipts[-1]["error_type"]=type(e).__name__
               raise
           finally:
-              (root/"gcen-shards-2-5-custody.json").write_text(json.dumps({"source_revision":rev,"records":receipts},indent=2,sort_keys=True)+"\\n")
+              (root/"gcen-shards-6-16-custody.json").write_text(json.dumps({"source_revision":rev,"records":receipts},indent=2,sort_keys=True)+"\\n")
           PY
       - uses: actions/upload-artifact@v4
         if: always()
