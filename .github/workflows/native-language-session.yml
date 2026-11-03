@@ -13,6 +13,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 25
     steps:
+      - name: Byte-stable native identity
+        shell: bash
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
@@ -52,3 +55,23 @@ jobs:
         if: always()
         shell: bash
         run: go run ./cmd/ice validate
+      - name: Clean qualified source before derived output
+        if: always()
+        shell: bash
+        run: git diff --exit-code
+      - name: Export formatted session source and regenerated advisory ICE
+        if: always() && runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          gofmt -w unitary/native_language_session.go unitary/native_language_session_test.go cmd/wingless-native-session/main.go
+          go run ./cmd/ice build
+          python - <<'PY'
+          import base64,json
+          from pathlib import Path
+          paths=['unitary/native_language_session.go','unitary/native_language_session_test.go','cmd/wingless-native-session/main.go']
+          paths += ['.ice/'+n+'.json' for n in ['manifest','architecture-map','symbol-map','dependency-map','test-map','implementations','integration-seams','decisions']]
+          b=base64.b64encode(json.dumps({p:Path(p).read_text() for p in paths},ensure_ascii=True).encode()).decode()
+          for i in range(0,len(b),4000): print('SESSION_BUNDLE_B64:'+str(i//4000)+':'+b[i:i+4000])
+          print('SESSION_BUNDLE_CHUNKS:'+str((len(b)+3999)//4000))
+          PY
