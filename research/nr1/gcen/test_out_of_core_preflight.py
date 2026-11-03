@@ -95,6 +95,16 @@ class G24PreflightTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "checksum"):
             pinned_metadata("config.json", self.manifest, fetch)
 
+    def test_malformed_json_rejected_even_with_matching_sha(self):
+        raw = b"{invalid JSON"
+        self.manifest["files"]["config.json"] = hashlib.sha256(raw).hexdigest()
+        with self.assertRaises(json.JSONDecodeError):
+            pinned_metadata("config.json", self.manifest, lambda url, limit: raw)
+
+    def test_metadata_empty_bytes_rejected(self):
+        with self.assertRaisesRegex(ValueError, "invalid or oversized"):
+            pinned_metadata("config.json", self.manifest, lambda url, limit: b"")
+
     def test_weight_shard_metadata_fetch_rejected(self):
         with self.assertRaisesRegex(ValueError, "allowlisted"):
             pinned_metadata(SHARDS[0], self.manifest, lambda url, limit: b"x")
