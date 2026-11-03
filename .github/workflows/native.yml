@@ -98,8 +98,8 @@ jobs:
             throw 'upstream metadata retrieval failed; no scientific custody admitted'
           }
           'UPSTREAM_METADATA_ONLY_LOCAL_WEIGHTS_UNVERIFIED' | Out-File -Encoding utf8 evidence/gcen-upstream-status.txt
-      - name: GCEN one-shot original-weight four-expert reconstruction pilot
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-real-tile]') && success() }}
+      - name: GCEN one-shot larger-window real expert reconstruction pilot
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-real-window]') && success() }}
         continue-on-error: true
         timeout-minutes: 12
         shell: bash
@@ -183,19 +183,19 @@ jobs:
                           if not np.isfinite(x).all(): raise ValueError("nonfinite tensor tile")
                           receipt["sample"]={"tensor":tensor,"dtype":dtype,"original_shape":dims,"sample_shape":list(x.shape),"sample_l2":float(np.linalg.norm(x)),"mean_absolute_value":float(np.mean(np.abs(x)))}
                           receipt["status"]="VERIFIED_REAL_EXPERT_TENSOR_TILE"
-                          # Development-only, four authentic 2D experts. Freeze five seeds
-                          # before inspecting any reconstruction errors; no model inference.
+                          # Development-only: five fixed windows on four authentic 2D experts.
+                          # Strictly no full-model inference, protected first-use, or acceptance.
                           import sys
                           sys.path.insert(0,"research/nr1/gcen")
-                          from real_tile_comparison import compare_tile, SEEDS, EXPERTS, ROWS, COLS
+                          from real_window_comparison import compare_window, SEEDS, EXPERTS, ROWS, COLS
                           selected=[]
                           for expert_id in range(EXPERTS):
                               key=f"model.layers.0.mlp.experts.{expert_id}.down_proj.weight"
-                              descriptor=header.get(key)
-                              if not isinstance(descriptor,dict) or descriptor.get("shape")!=dims or descriptor.get("dtype")!=dtype: raise ValueError("missing or incompatible selected expert tensor")
-                              bounds=descriptor.get("data_offsets")
-                              if not isinstance(bounds,list) or len(bounds)!=2 or any(type(x)!=int for x in bounds): raise ValueError("invalid expert offsets")
-                              if not 0<=bounds[0]<bounds[1]<=count-8-header_size or bounds[1]-bounds[0]!=m*n*itemsize: raise ValueError("invalid expert byte range")
+                              desc=header.get(key)
+                              if not isinstance(desc,dict) or desc.get("shape")!=dims or desc.get("dtype")!=dtype: raise ValueError("missing or incompatible selected expert")
+                              bounds=desc.get("data_offsets")
+                              if not isinstance(bounds,list) or len(bounds)!=2 or any(type(x)!=int for x in bounds): raise ValueError("invalid offsets")
+                              if not 0<=bounds[0]<bounds[1]<=count-8-header_size or bounds[1]-bounds[0]!=m*n*itemsize: raise ValueError("invalid tensor byte range")
                               selected.append((key,bounds[0]))
                           readings=[]
                           for seed in SEEDS:
@@ -203,22 +203,22 @@ jobs:
                               row0=int(rng.integers(0,m-ROWS+1))
                               col0=int(rng.integers(0,n-COLS+1))
                               matrices=[]
-                              for key,base_offset in selected:
-                                  values=[]
+                              for key,base in selected:
+                                  rows=[]
                                   for row in range(row0,row0+ROWS):
-                                      stream.seek(8+header_size+base_offset+(row*n+col0)*itemsize)
+                                      stream.seek(8+header_size+base+(row*n+col0)*itemsize)
                                       raw=stream.read(COLS*itemsize)
-                                      if len(raw)!=COLS*itemsize: raise ValueError("short selected expert data")
-                                      v=np.frombuffer(raw,dtype=dt)
-                                      if dtype=="BF16": v=(v.astype(np.uint32)<<16).view(np.float32)
-                                      else: v=v.astype(np.float32)
-                                      values.append(v)
-                                  matrices.append(values)
-                              result=compare_tile(np.asarray(matrices,dtype=np.float32))
+                                      if len(raw)!=COLS*itemsize: raise ValueError("short read")
+                                      values=np.frombuffer(raw,dtype=dt)
+                                      if dtype=="BF16": values=(values.astype(np.uint32)<<16).view(np.float32)
+                                      else: values=values.astype(np.float32)
+                                      rows.append(values)
+                                  matrices.append(rows)
+                              result=compare_window(np.asarray(matrices,dtype=np.float32))
                               result.update(seed=seed,source_expert_names=[key for key,_ in selected],tile_start=[row0,col0])
                               readings.append(result)
-                          receipt["development_tile_comparison"]=readings
-                          receipt["status"]="VERIFIED_REAL_EXPERT_FOUR_ARM_TILE_SCREEN"
+                          receipt["development_window_comparison"]=readings
+                          receipt["status"]="VERIFIED_REAL_EXPERT_LARGER_WINDOW_SCREEN"
           except Exception as ex:
               receipt["error_type"]=type(ex).__name__
               receipt["error"]=str(ex)[:200]
