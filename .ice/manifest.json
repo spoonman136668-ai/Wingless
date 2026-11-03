@@ -32,7 +32,7 @@
     },
     {
       "path": ".github/workflows/native-language-session.yml",
-      "sha256": "6e3740a47d15eb270d6b010cd32cc64ef10ee1be690d82ea6b5b5d0aa73f2a93"
+      "sha256": "c8d4f2071088f3872f88a215577073288638dd3c24e2abf1f0bf2386eda09cae"
     },
     {
       "path": ".github/workflows/native.yml",
@@ -3379,6 +3379,20 @@
     {
       "path": "cmd/wingless-native-session/main.go",
       "sha256": "fe976089861b8df758e66c6ffb29882cc56176c2ad856ef0a0c16e58e996b9a9",
+      "package": "main",
+      "imports": [
+        "bufio",
+        "bytes",
+        "encoding/json",
+        "fmt",
+        "github.com/spoonman136668-ai/Wingless/unitary",
+        "io",
+        "os"
+      ]
+    },
+    {
+      "path": "cmd/wingless-native-text-selector/main.go",
+      "sha256": "b7398c4eb34f42296c2fe05cda1a1e2138e70a11811f5a47eb666cd3fab443ff",
       "package": "main",
       "imports": [
         "bufio",
@@ -6904,6 +6918,14 @@
       "sha256": "f72731ae58bd8b804b0aa64b66ddf0aef96538358939212a9cdc2259581b75b2"
     },
     {
+      "path": "research/native_language_session/TEXT_SELECTOR.md",
+      "sha256": "a3bad4c068e1f9d90fed7fee76bb10e8b082117d937aac2cf34efefa089b52ad"
+    },
+    {
+      "path": "research/native_language_session/TEXT_SELECTOR_SCOPE.md",
+      "sha256": "343add903c75c608e6b0e40b447c792b4d70afa99348640ef62189b220db60e8"
+    },
+    {
       "path": "resources/governor.go",
       "sha256": "4f25bd3d71c99ec333b6fbd01a2a74b2ee2236800bc0ee169069a1eff23ccf6e",
       "package": "resources",
@@ -8880,6 +8902,31 @@
         "bytes",
         "crypto/sha256",
         "encoding/hex",
+        "encoding/json",
+        "testing"
+      ]
+    },
+    {
+      "path": "unitary/native_text_selector.go",
+      "sha256": "afcd64e2b50b26d06fc6ea4fd894c706b795662c3a6580e4e8c704ce6a3d99d4",
+      "package": "unitary",
+      "imports": [
+        "bytes",
+        "crypto/sha256",
+        "encoding/hex",
+        "encoding/json",
+        "io",
+        "math",
+        "sort",
+        "unicode/utf8"
+      ]
+    },
+    {
+      "path": "unitary/native_text_selector_test.go",
+      "sha256": "8d9ffc5466c1b5851dc2cf2d60e6a1469704a96a2abc9e154047f34a03adc735",
+      "package": "unitary",
+      "imports": [
+        "bytes",
         "encoding/json",
         "testing"
       ]
@@ -16475,6 +16522,65 @@
       "file": "cmd/wingless-native-session/main.go",
       "start": 95,
       "end": 112,
+      "calls": [
+        "bufio.NewScanner",
+        "err.Error",
+        "fmt.Fprintln",
+        "handle",
+        "json.NewEncoder",
+        "make",
+        "os.Exit",
+        "out.Encode",
+        "out.Encode",
+        "scanner.Buffer",
+        "scanner.Bytes",
+        "scanner.Err",
+        "scanner.Scan"
+      ]
+    },
+    {
+      "name": "request",
+      "kind": "type",
+      "file": "cmd/wingless-native-text-selector/main.go",
+      "start": 13,
+      "end": 18
+    },
+    {
+      "name": "handle",
+      "kind": "function",
+      "file": "cmd/wingless-native-text-selector/main.go",
+      "start": 20,
+      "end": 77,
+      "calls": [
+        "bytes.NewReader",
+        "d.Decode",
+        "d.Decode",
+        "d.DisallowUnknownFields",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "fmt.Errorf",
+        "json.NewDecoder",
+        "json.RawMessage",
+        "json.Unmarshal",
+        "len",
+        "len",
+        "new",
+        "unitary.RestoreNativeTextSelector",
+        "unitary.TrainNativeTextSelector",
+        "unitary.ValidateNativeSessionJSON"
+      ]
+    },
+    {
+      "name": "main",
+      "kind": "function",
+      "file": "cmd/wingless-native-text-selector/main.go",
+      "start": 78,
+      "end": 95,
       "calls": [
         "bufio.NewScanner",
         "err.Error",
@@ -29868,6 +29974,260 @@
         "s.Checkpoint",
         "sha256.Sum256",
         "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal"
+      ]
+    },
+    {
+      "name": "nativeTextSchema",
+      "kind": "const",
+      "file": "unitary/native_text_selector.go",
+      "start": 16,
+      "end": 16
+    },
+    {
+      "name": "nativeTextEncoding",
+      "kind": "const",
+      "file": "unitary/native_text_selector.go",
+      "start": 17,
+      "end": 17
+    },
+    {
+      "name": "NativeTextExample",
+      "kind": "type",
+      "file": "unitary/native_text_selector.go",
+      "start": 19,
+      "end": 22
+    },
+    {
+      "name": "NativeTextPrediction",
+      "kind": "type",
+      "file": "unitary/native_text_selector.go",
+      "start": 23,
+      "end": 30
+    },
+    {
+      "name": "NativeTextSelector",
+      "kind": "type",
+      "file": "unitary/native_text_selector.go",
+      "start": 31,
+      "end": 35
+    },
+    {
+      "name": "nativeTextPayload",
+      "kind": "type",
+      "file": "unitary/native_text_selector.go",
+      "start": 36,
+      "end": 43
+    },
+    {
+      "name": "nativeTextEnvelope",
+      "kind": "type",
+      "file": "unitary/native_text_selector.go",
+      "start": 44,
+      "end": 47
+    },
+    {
+      "name": "nativeTextValid",
+      "kind": "function",
+      "file": "unitary/native_text_selector.go",
+      "start": 49,
+      "end": 51,
+      "calls": [
+        "len",
+        "len",
+        "utf8.ValidString"
+      ]
+    },
+    {
+      "name": "nativeTextPercepts",
+      "kind": "function",
+      "file": "unitary/native_text_selector.go",
+      "start": 52,
+      "end": 71,
+      "calls": [
+        "int",
+        "make",
+        "make",
+        "nativeTextValid"
+      ]
+    },
+    {
+      "name": "TrainNativeTextSelector",
+      "kind": "function",
+      "file": "unitary/native_text_selector.go",
+      "start": 73,
+      "end": 117,
+      "calls": [
+        "TrainNativeSession",
+        "append",
+        "append",
+        "copy",
+        "hex.EncodeToString",
+        "json.Marshal",
+        "len",
+        "len",
+        "len",
+        "len",
+        "len",
+        "len",
+        "len",
+        "make",
+        "make",
+        "nativeTextPercepts",
+        "nativeTextValid",
+        "sha256.Sum256",
+        "sort.Strings"
+      ]
+    },
+    {
+      "name": "valid",
+      "kind": "method",
+      "file": "unitary/native_text_selector.go",
+      "start": 119,
+      "end": 132,
+      "receiver": "NativeTextSelector",
+      "calls": [
+        "hex.DecodeString",
+        "len",
+        "len",
+        "len",
+        "len",
+        "len",
+        "nativeTextValid"
+      ]
+    },
+    {
+      "name": "Predict",
+      "kind": "method",
+      "file": "unitary/native_text_selector.go",
+      "start": 134,
+      "end": 160,
+      "receiver": "NativeTextSelector",
+      "calls": [
+        "append",
+        "len",
+        "m.valid",
+        "make",
+        "math.IsInf",
+        "math.IsNaN",
+        "nativeSessionEdges",
+        "nativeTextPercepts",
+        "nci11WBuild",
+        "nci11WLogit"
+      ]
+    },
+    {
+      "name": "Checkpoint",
+      "kind": "method",
+      "file": "unitary/native_text_selector.go",
+      "start": 162,
+      "end": 184,
+      "receiver": "NativeTextSelector",
+      "calls": [
+        "append",
+        "hex.EncodeToString",
+        "json.Marshal",
+        "json.Marshal",
+        "json.RawMessage",
+        "len",
+        "m.valid",
+        "s.Checkpoint",
+        "sha256.Sum256"
+      ]
+    },
+    {
+      "name": "RestoreNativeTextSelector",
+      "kind": "function",
+      "file": "unitary/native_text_selector.go",
+      "start": 186,
+      "end": 220,
+      "calls": [
+        "RestoreNativeSession",
+        "ValidateNativeSessionJSON",
+        "append",
+        "bytes.NewReader",
+        "d.Decode",
+        "d.Decode",
+        "d.DisallowUnknownFields",
+        "hex.EncodeToString",
+        "json.Marshal",
+        "json.NewDecoder",
+        "len",
+        "len",
+        "len",
+        "len",
+        "m.valid",
+        "new",
+        "sha256.Sum256"
+      ]
+    },
+    {
+      "name": "nativeTextExamples",
+      "kind": "function",
+      "file": "unitary/native_text_selector_test.go",
+      "start": 9,
+      "end": 11
+    },
+    {
+      "name": "TestNativeTextLearningAndCompleteState",
+      "kind": "function",
+      "file": "unitary/native_text_selector_test.go",
+      "start": 12,
+      "end": 73,
+      "calls": [
+        "RestoreNativeTextSelector",
+        "TrainNativeTextSelector",
+        "append",
+        "bytes.Equal",
+        "bytes.Equal",
+        "bytes.Equal",
+        "json.Marshal",
+        "json.Marshal",
+        "m.Checkpoint",
+        "m.Checkpoint",
+        "m.Predict",
+        "nativeTextExamples",
+        "nci11WInit",
+        "nci11WInit",
+        "restored.Checkpoint",
+        "restored.Predict",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "untrained.Predict"
+      ]
+    },
+    {
+      "name": "TestNativeTextInvalidTrainingAndCheckpoint",
+      "kind": "function",
+      "file": "unitary/native_text_selector_test.go",
+      "start": 74,
+      "end": 99,
+      "calls": [
+        "RestoreNativeTextSelector",
+        "RestoreNativeTextSelector",
+        "TrainNativeTextSelector",
+        "TrainNativeTextSelector",
+        "append",
+        "bytes.Equal",
+        "json.Marshal",
+        "json.Unmarshal",
+        "m.Checkpoint",
+        "m.Checkpoint",
+        "m.Predict",
+        "nativeTextExamples",
         "t.Fatal",
         "t.Fatal",
         "t.Fatal",

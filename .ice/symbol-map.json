@@ -5173,6 +5173,65 @@
     ]
   },
   {
+    "name": "request",
+    "kind": "type",
+    "file": "cmd/wingless-native-text-selector/main.go",
+    "start": 13,
+    "end": 18
+  },
+  {
+    "name": "handle",
+    "kind": "function",
+    "file": "cmd/wingless-native-text-selector/main.go",
+    "start": 20,
+    "end": 77,
+    "calls": [
+      "bytes.NewReader",
+      "d.Decode",
+      "d.Decode",
+      "d.DisallowUnknownFields",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "fmt.Errorf",
+      "json.NewDecoder",
+      "json.RawMessage",
+      "json.Unmarshal",
+      "len",
+      "len",
+      "new",
+      "unitary.RestoreNativeTextSelector",
+      "unitary.TrainNativeTextSelector",
+      "unitary.ValidateNativeSessionJSON"
+    ]
+  },
+  {
+    "name": "main",
+    "kind": "function",
+    "file": "cmd/wingless-native-text-selector/main.go",
+    "start": 78,
+    "end": 95,
+    "calls": [
+      "bufio.NewScanner",
+      "err.Error",
+      "fmt.Fprintln",
+      "handle",
+      "json.NewEncoder",
+      "make",
+      "os.Exit",
+      "out.Encode",
+      "out.Encode",
+      "scanner.Buffer",
+      "scanner.Bytes",
+      "scanner.Err",
+      "scanner.Scan"
+    ]
+  },
+  {
     "name": "main",
     "kind": "function",
     "file": "cmd/wlm-dlg-deficit-sweep-r1/main.go",
@@ -18549,6 +18608,260 @@
       "s.Checkpoint",
       "sha256.Sum256",
       "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "nativeTextSchema",
+    "kind": "const",
+    "file": "unitary/native_text_selector.go",
+    "start": 16,
+    "end": 16
+  },
+  {
+    "name": "nativeTextEncoding",
+    "kind": "const",
+    "file": "unitary/native_text_selector.go",
+    "start": 17,
+    "end": 17
+  },
+  {
+    "name": "NativeTextExample",
+    "kind": "type",
+    "file": "unitary/native_text_selector.go",
+    "start": 19,
+    "end": 22
+  },
+  {
+    "name": "NativeTextPrediction",
+    "kind": "type",
+    "file": "unitary/native_text_selector.go",
+    "start": 23,
+    "end": 30
+  },
+  {
+    "name": "NativeTextSelector",
+    "kind": "type",
+    "file": "unitary/native_text_selector.go",
+    "start": 31,
+    "end": 35
+  },
+  {
+    "name": "nativeTextPayload",
+    "kind": "type",
+    "file": "unitary/native_text_selector.go",
+    "start": 36,
+    "end": 43
+  },
+  {
+    "name": "nativeTextEnvelope",
+    "kind": "type",
+    "file": "unitary/native_text_selector.go",
+    "start": 44,
+    "end": 47
+  },
+  {
+    "name": "nativeTextValid",
+    "kind": "function",
+    "file": "unitary/native_text_selector.go",
+    "start": 49,
+    "end": 51,
+    "calls": [
+      "len",
+      "len",
+      "utf8.ValidString"
+    ]
+  },
+  {
+    "name": "nativeTextPercepts",
+    "kind": "function",
+    "file": "unitary/native_text_selector.go",
+    "start": 52,
+    "end": 71,
+    "calls": [
+      "int",
+      "make",
+      "make",
+      "nativeTextValid"
+    ]
+  },
+  {
+    "name": "TrainNativeTextSelector",
+    "kind": "function",
+    "file": "unitary/native_text_selector.go",
+    "start": 73,
+    "end": 117,
+    "calls": [
+      "TrainNativeSession",
+      "append",
+      "append",
+      "copy",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "make",
+      "make",
+      "nativeTextPercepts",
+      "nativeTextValid",
+      "sha256.Sum256",
+      "sort.Strings"
+    ]
+  },
+  {
+    "name": "valid",
+    "kind": "method",
+    "file": "unitary/native_text_selector.go",
+    "start": 119,
+    "end": 132,
+    "receiver": "NativeTextSelector",
+    "calls": [
+      "hex.DecodeString",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "nativeTextValid"
+    ]
+  },
+  {
+    "name": "Predict",
+    "kind": "method",
+    "file": "unitary/native_text_selector.go",
+    "start": 134,
+    "end": 160,
+    "receiver": "NativeTextSelector",
+    "calls": [
+      "append",
+      "len",
+      "m.valid",
+      "make",
+      "math.IsInf",
+      "math.IsNaN",
+      "nativeSessionEdges",
+      "nativeTextPercepts",
+      "nci11WBuild",
+      "nci11WLogit"
+    ]
+  },
+  {
+    "name": "Checkpoint",
+    "kind": "method",
+    "file": "unitary/native_text_selector.go",
+    "start": 162,
+    "end": 184,
+    "receiver": "NativeTextSelector",
+    "calls": [
+      "append",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.Marshal",
+      "json.RawMessage",
+      "len",
+      "m.valid",
+      "s.Checkpoint",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "RestoreNativeTextSelector",
+    "kind": "function",
+    "file": "unitary/native_text_selector.go",
+    "start": 186,
+    "end": 220,
+    "calls": [
+      "RestoreNativeSession",
+      "ValidateNativeSessionJSON",
+      "append",
+      "bytes.NewReader",
+      "d.Decode",
+      "d.Decode",
+      "d.DisallowUnknownFields",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.NewDecoder",
+      "len",
+      "len",
+      "len",
+      "len",
+      "m.valid",
+      "new",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "nativeTextExamples",
+    "kind": "function",
+    "file": "unitary/native_text_selector_test.go",
+    "start": 9,
+    "end": 11
+  },
+  {
+    "name": "TestNativeTextLearningAndCompleteState",
+    "kind": "function",
+    "file": "unitary/native_text_selector_test.go",
+    "start": 12,
+    "end": 73,
+    "calls": [
+      "RestoreNativeTextSelector",
+      "TrainNativeTextSelector",
+      "append",
+      "bytes.Equal",
+      "bytes.Equal",
+      "bytes.Equal",
+      "json.Marshal",
+      "json.Marshal",
+      "m.Checkpoint",
+      "m.Checkpoint",
+      "m.Predict",
+      "nativeTextExamples",
+      "nci11WInit",
+      "nci11WInit",
+      "restored.Checkpoint",
+      "restored.Predict",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "untrained.Predict"
+    ]
+  },
+  {
+    "name": "TestNativeTextInvalidTrainingAndCheckpoint",
+    "kind": "function",
+    "file": "unitary/native_text_selector_test.go",
+    "start": 74,
+    "end": 99,
+    "calls": [
+      "RestoreNativeTextSelector",
+      "RestoreNativeTextSelector",
+      "TrainNativeTextSelector",
+      "TrainNativeTextSelector",
+      "append",
+      "bytes.Equal",
+      "json.Marshal",
+      "json.Unmarshal",
+      "m.Checkpoint",
+      "m.Checkpoint",
+      "m.Predict",
+      "nativeTextExamples",
       "t.Fatal",
       "t.Fatal",
       "t.Fatal",
