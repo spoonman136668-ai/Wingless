@@ -8,7 +8,6 @@ import argparse
 import gc
 import json
 import pathlib
-import resource
 import time
 
 from out_of_core_preflight import pinned_metadata, analyze, SHARDS
@@ -49,10 +48,6 @@ def check_full_key_mapping(parameter_names, index_weight_map):
     count = 0
     for name in parameter_names:
         parts = name.split(".")
-        if len(parts) == 7 and parts[:3] == ["model", "layers", parts[2]] and parts[3:5] == ["mlp", "experts"] and parts[6] in ("gate_proj", "up_proj", "down_proj"):
-            # full parameter keys have an eighth ".weight" segment, so this
-            # block is intentionally unreachable for malformed inputs.
-            raise ValueError("unexpected incomplete expert parameter name")
         if (len(parts) == 8 and parts[0] == "model" and parts[1] == "layers"
             and parts[3:5] == ["mlp", "experts"] and parts[6] in ("gate_proj", "up_proj", "down_proj")
             and parts[7] == "weight" and parts[2].isdigit() and parts[5].isdigit()):
@@ -119,6 +114,7 @@ def main():
         raise ValueError("skeleton unexpectedly small for unquantized 30B checkpoint")
 
     # Peak RSS is an OS measurement, NOT total model runtime memory or peak VRAM.
+    import resource
     peak_rss_bytes = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
     elapsed_seconds = time.perf_counter() - start
     result = {
