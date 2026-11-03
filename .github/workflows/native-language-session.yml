@@ -1,0 +1,54 @@
+name: Native learned-state session engineering
+on:
+  push:
+    branches: [research/native-language-session-20261103]
+permissions:
+  contents: read
+jobs:
+  session:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Immutable native parent and scope before code
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5bfb70a91acfbb1745e6f3ab3575f70b41f8b942 HEAD
+          test "$(git hash-object unitary/nci11_trainable_associative_state.go)" = f248fd6dec93d04571f7cb4c3ccd721017812bfd
+          git diff --exit-code b820ea1ff76f17e350a914177ea823f6984a8e09 -- unitary/nci11_trainable_associative_state.go
+      - name: Session state and invalid-input checks
+        shell: bash
+        run: go test ./unitary -run '^TestNativeSession' -count=1 -v
+      - name: Build and fresh-process restore
+        shell: bash
+        run: |
+          set -euo pipefail
+          go build -o "$RUNNER_TEMP/wingless-native-session.exe" ./cmd/wingless-native-session
+          python research/native_language_session/check_cli.py "$RUNNER_TEMP/wingless-native-session.exe"
+      - name: Mandatory complete regression, vet and build
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -race ./... -count=1 -timeout 90s
+          go vet ./...
+          go build ./...
+      - name: Existing ICE validation, unwaived
+        if: always()
+        shell: bash
+        run: go run ./cmd/ice validate
