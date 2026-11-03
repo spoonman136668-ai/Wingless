@@ -93,6 +93,17 @@ jobs:
             --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json `
             --output "evidence/gcen-g23-capacity-${{ matrix.os }}.json"
           if ($LASTEXITCODE -ne 0) { throw "GCEN G23 capacity census failed" }
+      - name: GCEN G24 pinned-index and offload scratch preflight (no weights)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && contains(github.event.head_commit.message, '[gcen-g24-index]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 3
+        shell: pwsh
+        run: |
+          python research/nr1/gcen/out_of_core_preflight.py `
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json `
+            --scratch-root . `
+            --output "evidence/gcen-g24-preflight-${{ matrix.os }}.json"
+          if ($LASTEXITCODE -ne 0) { throw "GCEN G24 pinned-index preflight failed" }
       - name: GCEN pinned upstream metadata custody probe (diagnostic only)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && success() }}
         continue-on-error: true
