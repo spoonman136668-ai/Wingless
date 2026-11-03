@@ -105,7 +105,7 @@ jobs:
             --output "evidence/gcen-g24-preflight-${{ matrix.os }}.json"
           if ($LASTEXITCODE -ne 0) { throw "GCEN G24 pinned-index preflight failed" }
       - name: GCEN G25 pinned tiny Qwen3-MoE disk-offload and pre-hook smoke
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && (contains(github.event.head_commit.message, '[gcen-g25-offload]') || contains(github.event.head_commit.message, '[gcen-g26-shards]') || contains(github.event.head_commit.message, '[gcen-g27-meta]') || contains(github.event.head_commit.message, '[gcen-g28-placement]') || contains(github.event.head_commit.message, '[gcen-g29-one-shard]')) && success() }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && (contains(github.event.head_commit.message, '[gcen-g25-offload]') || contains(github.event.head_commit.message, '[gcen-g26-shards]') || contains(github.event.head_commit.message, '[gcen-g27-meta]') || contains(github.event.head_commit.message, '[gcen-g28-placement]') || contains(github.event.head_commit.message, '[gcen-g29-one-shard]') || contains(github.event.head_commit.message, '[gcen-g30-stream]')) && success() }}
         continue-on-error: true
         timeout-minutes: 16
         shell: bash
@@ -165,6 +165,16 @@ jobs:
             --scratch-root . \
             --output evidence/gcen-g29-one-shard-capacity.json
           printf '{"status":"PINNED_SINGLE_SHARD_STORAGE_HYPOTHESIS_CALCULATED","scope":"G29_METADATA_ONLY"}\n' > evidence/gcen-g29-status.json
+      - name: GCEN G30 sequential synthetic shard staging and dispatch parity
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g30-stream]') && success() }}
+        timeout-minutes: 4
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G30_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g30-status.json
+          python -c 'import json,pathlib; p=pathlib.Path("evidence/gcen-g25-status.json"); d=json.loads(p.read_text()) if p.is_file() else {}; assert d=={"status":"PINNED_TINY_OFFLOAD_HOOK_PASS","scope":"G25_SYNTHETIC_CPU_ONLY"}, "G30 requires G25 prerequisite PASS"'
+          python research/nr1/gcen/g30_sequential_staging.py --output evidence/gcen-g30-sequential-staging.json
+          printf '{"status":"SYNTHETIC_SEQUENTIAL_STAGE_PASS","scope":"G30_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g30-status.json
       - name: GCEN pinned upstream metadata custody probe (diagnostic only)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && success() }}
         continue-on-error: true
