@@ -175,19 +175,6 @@ jobs:
           python -c 'import json,pathlib; p=pathlib.Path("evidence/gcen-g25-status.json"); d=json.loads(p.read_text()) if p.is_file() else {}; assert d=={"status":"PINNED_TINY_OFFLOAD_HOOK_PASS","scope":"G25_SYNTHETIC_CPU_ONLY"}, "G30 requires G25 prerequisite PASS"'
           python research/nr1/gcen/g30_sequential_staging.py --output evidence/gcen-g30-sequential-staging.json
           printf '{"status":"SYNTHETIC_SEQUENTIAL_STAGE_PASS","scope":"G30_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g30-status.json
-      - name: GCEN G31 one original shard staged byte custody and resource audit
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g31-original-shard]') && success() }}
-        timeout-minutes: 18
-        shell: bash
-        run: |
-          set -euo pipefail
-          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G31_ONE_ORIGINAL_SHARD_NO_MODEL_FORWARD"}\n' > evidence/gcen-g31-status.json
-          python research/nr1/gcen/g31_original_shard_stage.py \
-            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
-            --scratch-root "$RUNNER_TEMP" \
-            --source-sha "$GITHUB_SHA" \
-            --output evidence/gcen-g31-original-shard.json
-          printf '{"status":"G31_ORIGINAL_SINGLE_SHARD_BYTES_VERIFIED","scope":"G31_ONE_ORIGINAL_SHARD_NO_MODEL_FORWARD"}\n' > evidence/gcen-g31-status.json
       - name: GCEN pinned upstream metadata custody probe (diagnostic only)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && success() }}
         continue-on-error: true
@@ -338,5 +325,46 @@ jobs:
         if: always()
         with:
           name: native-${{ matrix.os }}
+          path: evidence/
+          retention-days: 14
+  g31_one_original_shard:
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && contains(github.event.head_commit.message, '[gcen-g31-original-shard]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify G31 exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git rev-parse HEAD > evidence/source-sha.txt
+          git status --porcelain > evidence/source-status.txt
+          test ! -s evidence/source-status.txt
+      - name: G31 verified single original shard, no model forward
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G31_ONE_ORIGINAL_SHARD_NO_MODEL_FORWARD"}\n' > evidence/gcen-g31-status.json
+          python research/nr1/gcen/g31_original_shard_stage.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/gcen-g31-original-shard.json
+          printf '{"status":"G31_ORIGINAL_SINGLE_SHARD_BYTES_VERIFIED","scope":"G31_ONE_ORIGINAL_SHARD_NO_MODEL_FORWARD"}\n' > evidence/gcen-g31-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gcen-g31-single-original-shard
           path: evidence/
           retention-days: 14

@@ -149,6 +149,20 @@ class G31Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "mismatch"):
             check_upstream(a, b)
 
+
+    def test_original_shard_job_requires_entire_native_matrix(self):
+        workflow = (Path(__file__).resolve().parents[3] / ".github" / "workflows" /
+                    "native.yml").read_text(encoding="utf-8")
+        native, g31 = workflow.split("  g31_one_original_shard:", 1)
+        self.assertNotIn("GCEN G31 one original shard staged byte custody", native)
+        self.assertIn("    needs: native", g31)
+        self.assertIn("[gcen-g31-original-shard]", g31)
+        self.assertIn("runs-on: ubuntu-latest", g31)
+        self.assertNotIn("continue-on-error:", g31)
+        self.assertIn("test \"$(git rev-parse HEAD)\" = \"$GITHUB_SHA\"", g31)
+        self.assertIn("if: always()", g31)
+        self.assertIn("gcen-g31-original-shard.json", g31)
+
     def test_never_conflates_staged_shard_with_model_inference(self):
         code = Path(__file__).with_name("g31_original_shard_stage.py").read_text(encoding="utf-8")
         for prohibited in ("load_checkpoint_and_dispatch(", "from_pretrained(", ".generate(",
