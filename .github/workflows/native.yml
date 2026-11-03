@@ -98,8 +98,8 @@ jobs:
             throw 'upstream metadata retrieval failed; no scientific custody admitted'
           }
           'UPSTREAM_METADATA_ONLY_LOCAL_WEIGHTS_UNVERIFIED' | Out-File -Encoding utf8 evidence/gcen-upstream-status.txt
-      - name: GCEN one-shot larger-window real expert reconstruction pilot
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-real-window]') && success() }}
+      - name: GCEN one-shot 4-8-16 expert sharing scaling pilot
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-sharing-scale]') && success() }}
         continue-on-error: true
         timeout-minutes: 12
         shell: bash
@@ -183,19 +183,20 @@ jobs:
                           if not np.isfinite(x).all(): raise ValueError("nonfinite tensor tile")
                           receipt["sample"]={"tensor":tensor,"dtype":dtype,"original_shape":dims,"sample_shape":list(x.shape),"sample_l2":float(np.linalg.norm(x)),"mean_absolute_value":float(np.mean(np.abs(x)))}
                           receipt["status"]="VERIFIED_REAL_EXPERT_TENSOR_TILE"
-                          # Development-only: five fixed windows on four authentic 2D experts.
-                          # Strictly no full-model inference, protected first-use, or acceptance.
+                          # Frozen development control: 4/8/16 distinct, genuine experts,
+                          # five seeds, identical source windows at each expert count.
+                          # No protected evaluation, inference, or compression acceptance.
                           import sys
                           sys.path.insert(0,"research/nr1/gcen")
-                          from real_window_comparison import compare_window, SEEDS, EXPERTS, ROWS, COLS
+                          from expert_scaling_comparison import evaluate_group, SEEDS, COUNTS, ROWS, COLS
                           selected=[]
-                          for expert_id in range(EXPERTS):
+                          for expert_id in range(max(COUNTS)):
                               key=f"model.layers.0.mlp.experts.{expert_id}.down_proj.weight"
                               desc=header.get(key)
-                              if not isinstance(desc,dict) or desc.get("shape")!=dims or desc.get("dtype")!=dtype: raise ValueError("missing or incompatible selected expert")
+                              if not isinstance(desc,dict) or desc.get("shape")!=dims or desc.get("dtype")!=dtype: raise ValueError("missing or incompatible distinct expert "+key)
                               bounds=desc.get("data_offsets")
-                              if not isinstance(bounds,list) or len(bounds)!=2 or any(type(x)!=int for x in bounds): raise ValueError("invalid offsets")
-                              if not 0<=bounds[0]<bounds[1]<=count-8-header_size or bounds[1]-bounds[0]!=m*n*itemsize: raise ValueError("invalid tensor byte range")
+                              if not isinstance(bounds,list) or len(bounds)!=2 or any(type(x)!=int for x in bounds): raise ValueError("invalid expert byte offsets")
+                              if not 0<=bounds[0]<bounds[1]<=count-8-header_size or bounds[1]-bounds[0]!=m*n*itemsize: raise ValueError("invalid expert byte range")
                               selected.append((key,bounds[0]))
                           readings=[]
                           for seed in SEEDS:
@@ -208,17 +209,19 @@ jobs:
                                   for row in range(row0,row0+ROWS):
                                       stream.seek(8+header_size+base+(row*n+col0)*itemsize)
                                       raw=stream.read(COLS*itemsize)
-                                      if len(raw)!=COLS*itemsize: raise ValueError("short read")
+                                      if len(raw)!=COLS*itemsize: raise ValueError("short expert tensor read")
                                       values=np.frombuffer(raw,dtype=dt)
                                       if dtype=="BF16": values=(values.astype(np.uint32)<<16).view(np.float32)
                                       else: values=values.astype(np.float32)
                                       rows.append(values)
                                   matrices.append(rows)
-                              result=compare_window(np.asarray(matrices,dtype=np.float32))
-                              result.update(seed=seed,source_expert_names=[key for key,_ in selected],tile_start=[row0,col0])
-                              readings.append(result)
-                          receipt["development_window_comparison"]=readings
-                          receipt["status"]="VERIFIED_REAL_EXPERT_LARGER_WINDOW_SCREEN"
+                              source=np.asarray(matrices,dtype=np.float32)
+                              for experts in COUNTS:
+                                  result=evaluate_group(source[:experts])
+                                  result.update(seed=seed,source_expert_names=[key for key,_ in selected[:experts]],window_start=[row0,col0])
+                                  readings.append(result)
+                          receipt["expert_sharing_scaling_development"]=readings
+                          receipt["status"]="VERIFIED_REAL_EXPERT_SHARING_SCALING_SCREEN"
           except Exception as ex:
               receipt["error_type"]=type(ex).__name__
               receipt["error"]=str(ex)[:200]
