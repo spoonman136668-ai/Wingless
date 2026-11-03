@@ -7,9 +7,9 @@ import re
 
 from activation_replay import MODEL, REVISION
 
-SHA256 = re.compile(r"[a-f0-9]{64}\\Z")
-GIT_SHA = re.compile(r"[a-f0-9]{40}\\Z")
-EXPERT = re.compile(r"model\\.layers\\.\\d+\\.mlp\\.experts\\.\\d+\\.(?:down_proj|gate_proj|up_proj)\\.weight\\Z")
+SHA256 = re.compile(r"[a-f0-9]{64}\Z")
+GIT_SHA = re.compile(r"[a-f0-9]{40}\Z")
+EXPERT = re.compile(r"model\.layers\.\d+\.mlp\.experts\.\d+\.(?:down_proj|gate_proj|up_proj)\.weight\Z")
 
 
 def audit_route(proposal, pinned_manifest):
