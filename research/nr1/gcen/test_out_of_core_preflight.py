@@ -55,7 +55,7 @@ class G24PreflightTests(unittest.TestCase):
             analyze(self.config, self.index, self.manifest, 8 * 1024**3)
 
     def test_missing_shard_coverage_fails(self):
-        self.index["weight_map"]["model.layers.15.mlp.experts.0.down_proj.weight"] = SHARDS[0]
+        self.index["weight_map"]["model.layers.0.mlp.experts.0.down_proj.weight"] = SHARDS[1]
         with self.assertRaisesRegex(ValueError, "16 original"):
             analyze(self.config, self.index, self.manifest, 8 * 1024**3)
 
