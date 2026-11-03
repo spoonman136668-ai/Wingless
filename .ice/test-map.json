@@ -491,6 +491,563 @@
     ]
   },
   {
+    "name": "TestTranslateValidPlaneBinding",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 45,
+    "end": 60,
+    "calls": [
+      "Translate",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateTrustedRoutingAndResources",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 62,
+    "end": 82,
+    "calls": [
+      "Translate",
+      "len",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsStaleWorkspaceRevision",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 84,
+    "end": 90,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "strings.Repeat",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsWorkspaceIdentityMismatch",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 92,
+    "end": 98,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsMissingPlaneProtectionGate",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 100,
+    "end": 106,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsUntrustedBackendPolicy",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 108,
+    "end": 114,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestDecodeReplayEnvelopeRejectsUnknownField",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 116,
+    "end": 126,
+    "calls": [
+      "DecodeReplayEnvelope",
+      "json.Marshal",
+      "string",
+      "strings.TrimSuffix",
+      "t.Fatal",
+      "t.Fatal",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestCancelMapsPlaneAttemptToWinglessRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 138,
+    "end": 146,
+    "calls": [
+      "Cancel",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCandidateNeverClaimsPlaneAcceptance",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 148,
+    "end": 166,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCandidatePreservesBlockedBackendOutcomeWithoutAcceptance",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 168,
+    "end": 177,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCandidateRejectsAcceptanceClaim",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 179,
+    "end": 184,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestCandidateRejectsUnknownTerminalState",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 186,
+    "end": 191,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerAcceptsExactPlaneRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 102,
+    "end": 126,
+    "calls": [
+      "NewListener",
+      "atomic.AddInt32",
+      "atomic.LoadInt32",
+      "json.Unmarshal",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "requestRecorder",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "w.Header",
+      "w.Header"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerRejectsSessionMethodPathAndContentType",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 128,
+    "end": 151,
+    "calls": [
+      "NewListener",
+      "bytes.NewReader",
+      "httptest.NewRecorder",
+      "httptest.NewRequest",
+      "json.Marshal",
+      "listener.ServeHTTP",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "strings.Repeat",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerRejectsUnknownDuplicateAndTrailingJSON",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 153,
+    "end": 172,
+    "calls": [
+      "NewListener",
+      "append",
+      "append",
+      "bytes.NewReader",
+      "httptest.NewRecorder",
+      "httptest.NewRequest",
+      "json.Marshal",
+      "listener.ServeHTTP",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "string",
+      "string",
+      "strings.Replace",
+      "strings.Replace",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerConsumesAndClosesBodyBeforeInference",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 190,
+    "end": 210,
+    "calls": [
+      "NewListener",
+      "httptest.NewRecorder",
+      "httptest.NewRequest",
+      "int64",
+      "json.Marshal",
+      "len",
+      "listener.ServeHTTP",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "newTrackingBody",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerCancellationParentsInferenceToRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 212,
+    "end": 249,
+    "calls": [
+      "NewListener",
+      "bytes.NewReader",
+      "cancel",
+      "close",
+      "close",
+      "context.Background",
+      "context.WithCancel",
+      "ctx.Done",
+      "ctx.Err",
+      "http.NewRequestWithContext",
+      "httptest.NewServer",
+      "json.Marshal",
+      "listener.Handler",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "make",
+      "make",
+      "make",
+      "server.Close",
+      "t.Fatal",
+      "t.Fatal",
+      "time.After",
+      "time.After"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerRejectsAcceptanceClaimAndIdentityChange",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 251,
+    "end": 268,
+    "calls": [
+      "NewListener",
+      "bad.EditsCopy",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "mutate",
+      "requestRecorder",
+      "strings.Repeat",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerCallsIntelligenceExactlyOnce",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 280,
+    "end": 292,
+    "calls": [
+      "NewListener",
+      "atomic.AddInt32",
+      "atomic.LoadInt32",
+      "errors.New",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "requestRecorder",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerNoProcessListenQueueOrAcceptanceSurface",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 294,
+    "end": 315,
+    "calls": [
+      "filepath.Dir",
+      "filepath.Join",
+      "os.ReadFile",
+      "reflect.TypeOf",
+      "runtime.Caller",
+      "string",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "typ.MethodByName"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerFullRequestResponseReplayThroughBroker",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 377,
+    "end": 414,
+    "calls": [
+      "NewListener",
+      "bytes.NewReader",
+      "http.NewRequest",
+      "httptest.NewServer",
+      "io.ReadAll",
+      "json.Marshal",
+      "json.Unmarshal",
+      "len",
+      "listener.Handler",
+      "listenerFixture",
+      "reg.Register",
+      "server.Close",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerIsolatedProof",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 416,
+    "end": 424,
+    "calls": [
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofCandidateFlow",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 96,
+    "end": 124,
+    "calls": [
+      "CandidateFromOutcome",
+      "Translate",
+      "context.Background",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "runner.Run",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofAuthorizedDeepFallback",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 126,
+    "end": 155,
+    "calls": [
+      "Translate",
+      "context.Background",
+      "len",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "runner.Run",
+      "strings.Contains",
+      "strings.Join",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofBackendFailureNoDuplicateRetry",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 157,
+    "end": 184,
+    "calls": [
+      "CandidateFromOutcome",
+      "Translate",
+      "context.Background",
+      "errors.New",
+      "len",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "runner.Run",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofCancellationPropagation",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 186,
+    "end": 234,
+    "calls": [
+      "Cancel",
+      "Translate",
+      "context.Background",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "svc.Result",
+      "svc.Status",
+      "svc.SubmitWork",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "time.Now",
+      "time.Now",
+      "time.Sleep",
+      "worker.New"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceReadyContract",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 78,
+    "end": 99,
+    "calls": [
+      "bytes.NewReader",
+      "http.NewRequest",
+      "json.Marshal",
+      "startServiceFixture",
+      "stopServiceFixture",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceNumericIPv4Only",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 101,
+    "end": 113,
+    "calls": [
+      "ip.IsLoopback",
+      "ip.To4",
+      "net.ParseIP",
+      "startServiceFixture",
+      "stopServiceFixture",
+      "t.Fatal",
+      "t.Fatalf",
+      "u.Hostname",
+      "u.Port",
+      "url.Parse"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceCancellationStopsListener",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 115,
+    "end": 127,
+    "calls": [
+      "conn.Close",
+      "net.DialTimeout",
+      "startServiceFixture",
+      "stopServiceFixture",
+      "t.Fatal",
+      "t.Fatal",
+      "url.Parse"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceNoDefaultActivationSurface",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 129,
+    "end": 146,
+    "calls": [
+      "filepath.Clean",
+      "filepath.Dir",
+      "filepath.Join",
+      "filepath.Join",
+      "os.ReadFile",
+      "runtime.Caller",
+      "string",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
     "name": "TestMain",
     "kind": "function",
     "file": "modelhost/process_test.go",
@@ -715,6 +1272,3063 @@
       "t.Fatal",
       "t.TempDir",
       "t.TempDir"
+    ]
+  },
+  {
+    "name": "TestUP37GroupProbePreservesExistingFusion",
+    "kind": "function",
+    "file": "unitary/adaptive_continuous_fusion_test.go",
+    "start": 8,
+    "end": 32,
+    "calls": [
+      "adaptiveGroupProbeOffsets",
+      "math.Float64bits",
+      "math.Float64bits",
+      "math.Float64bits",
+      "math.Float64bits",
+      "newFusionUnion",
+      "normalizeContinuousOffsets",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "union.groups",
+      "union.union",
+      "union.union"
+    ]
+  },
+  {
+    "name": "TestUP37AdaptiveAdvancePreservesMeanRMSAndFusion",
+    "kind": "function",
+    "file": "unitary/adaptive_continuous_fusion_test.go",
+    "start": 34,
+    "end": 75,
+    "calls": [
+      "adaptiveFusionAdvance",
+      "doseOffsetRMS",
+      "doseOffsetRMS",
+      "float64",
+      "len",
+      "len",
+      "len",
+      "make",
+      "make",
+      "math.Abs",
+      "math.Abs",
+      "newFusionUnion",
+      "normalizeContinuousOffsets",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "union.find",
+      "union.find",
+      "union.find",
+      "union.find",
+      "union.groups",
+      "union.union",
+      "union.union"
+    ]
+  },
+  {
+    "name": "TestUP37ReestimationUsesCurrentGroups",
+    "kind": "function",
+    "file": "unitary/adaptive_continuous_fusion_test.go",
+    "start": 77,
+    "end": 88,
+    "calls": [
+      "len",
+      "len",
+      "len",
+      "len",
+      "newFusionUnion",
+      "t.Fatalf",
+      "t.Fatalf",
+      "union.groups",
+      "union.union"
+    ]
+  },
+  {
+    "name": "TestUP19AnonymousFeatureDimensions",
+    "kind": "function",
+    "file": "unitary/anonymous_gram_test.go",
+    "start": 8,
+    "end": 36,
+    "calls": [
+      "anonymousGramFeatures",
+      "anonymousQuadraticFeatures",
+      "blindMixedComposite",
+      "encodeMemory",
+      "len",
+      "len",
+      "len",
+      "len",
+      "math.IsInf",
+      "math.IsNaN",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP19AnonymousGramIgnoresCommonGlobalPhase",
+    "kind": "function",
+    "file": "unitary/anonymous_gram_test.go",
+    "start": 38,
+    "end": 67,
+    "calls": [
+      "anonymousQuadraticFeatures",
+      "anonymousQuadraticFeatures",
+      "blindMixedComposite",
+      "encodeMemory",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP19AnonymousGramUnitaryDepthInvariant",
+    "kind": "function",
+    "file": "unitary/anonymous_gram_test.go",
+    "start": 69,
+    "end": 77,
+    "calls": [
+      "anonymousFeatureDrift",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP17DenseMixerIsOrthogonalAndDense",
+    "kind": "function",
+    "file": "unitary/blind_channel_test.go",
+    "start": 8,
+    "end": 23,
+    "calls": [
+      "denseChannelMixer",
+      "math.Abs",
+      "mixerOrthogonalityError",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP17AnonymousMixingPreservesCompositeNorm",
+    "kind": "function",
+    "file": "unitary/blind_channel_test.go",
+    "start": 25,
+    "end": 41,
+    "calls": [
+      "NormSquared",
+      "blindMixedComposite",
+      "encodeMemory",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP17IdentityReadoutDoesNotUndoDenseMixer",
+    "kind": "function",
+    "file": "unitary/blind_channel_test.go",
+    "start": 43,
+    "end": 59,
+    "calls": [
+      "blindMeanMin",
+      "channelMatrixProduct",
+      "denseChannelMixer",
+      "denseChannelMixer",
+      "identityChannelMatrix",
+      "identityChannelMatrix",
+      "roleAlignments",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP9FrameFeatureIsGlobalPhaseInvariant",
+    "kind": "function",
+    "file": "unitary/coevolving_frame_test.go",
+    "start": 9,
+    "end": 32,
+    "calls": [
+      "encodeMemory",
+      "frameFeature",
+      "frameFeature",
+      "makeFrameBank",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP9UnitaryCoevolutionPreservesFrameFeature",
+    "kind": "function",
+    "file": "unitary/coevolving_frame_test.go",
+    "start": 34,
+    "end": 66,
+    "calls": [
+      "applyStressUnitary",
+      "encodeMemory",
+      "frameFeature",
+      "frameFeature",
+      "makeFrameBank",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "stressProgram",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "transportFrameBank"
+    ]
+  },
+  {
+    "name": "TestUP9FrameBankHasExpectedPhaseCode",
+    "kind": "function",
+    "file": "unitary/coevolving_frame_test.go",
+    "start": 68,
+    "end": 90,
+    "calls": [
+      "cmplx.Phase",
+      "complex",
+      "encodeMemory",
+      "float64",
+      "frameFeature",
+      "makeFrameBank",
+      "math.Abs",
+      "math.Atan2",
+      "math.Cos",
+      "math.Sin",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP33MatchedCapacityPairs",
+    "kind": "function",
+    "file": "unitary/commutant_capacity_test.go",
+    "start": 8,
+    "end": 21,
+    "calls": [
+      "commutantCapacityPartition",
+      "commutantCapacityPartition",
+      "commutantCapacityPartition",
+      "commutantCapacityPartition",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP33PartitionOffsetsMatchRMSAndMultiplicity",
+    "kind": "function",
+    "file": "unitary/commutant_capacity_test.go",
+    "start": 23,
+    "end": 59,
+    "calls": [
+      "commutantPartitionOffsets",
+      "doseMaxMultiplicity",
+      "doseOffsetRMS",
+      "math.Abs",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP33PermutationsAreBijective",
+    "kind": "function",
+    "file": "unitary/commutant_capacity_test.go",
+    "start": 61,
+    "end": 74,
+    "calls": [
+      "commutantCapacityPermutations",
+      "make",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP24WeylObservableCountAndFeatureDimensions",
+    "kind": "function",
+    "file": "unitary/commuting_weyl_test.go",
+    "start": 5,
+    "end": 26,
+    "calls": [
+      "encodeMemory",
+      "fullLatentEncode",
+      "fullLatentMixer",
+      "fullLatentWeylObservables",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "weylQuadraticFeatures",
+      "weylRawFeatures"
+    ]
+  },
+  {
+    "name": "TestUP24WeylObservablesCommuteWithFullLatentTransport",
+    "kind": "function",
+    "file": "unitary/commuting_weyl_test.go",
+    "start": 28,
+    "end": 39,
+    "calls": [
+      "conjugatedLatentStep",
+      "fullLatentMixer",
+      "fullLatentWeylObservables",
+      "maxWeylCommutatorEntry",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP24WeylFeaturesAreDepthInvariant",
+    "kind": "function",
+    "file": "unitary/commuting_weyl_test.go",
+    "start": 41,
+    "end": 54,
+    "calls": [
+      "conjugatedLatentStep",
+      "fullLatentMixer",
+      "fullLatentWeylObservables",
+      "latentMatrixPower",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "weylFeatureDrift"
+    ]
+  },
+  {
+    "name": "TestUP16CompositePackingHasOneUnitNormState",
+    "kind": "function",
+    "file": "unitary/composite_state_test.go",
+    "start": 8,
+    "end": 31,
+    "calls": [
+      "NormSquared",
+      "encodeMemory",
+      "len",
+      "len",
+      "math.Abs",
+      "packCompositeState",
+      "qualifiedLearnedFrameBank",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP16CompositeObservableMatchesSeparateFrame",
+    "kind": "function",
+    "file": "unitary/composite_state_test.go",
+    "start": 33,
+    "end": 46,
+    "calls": [
+      "compositeObservableEquivalence",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP16UnitaryCompositeRoundTrip",
+    "kind": "function",
+    "file": "unitary/composite_state_test.go",
+    "start": 58,
+    "end": 92,
+    "calls": [
+      "L2Distance",
+      "encodeMemory",
+      "evolveCompositeState",
+      "evolveCompositeState",
+      "inverseCompositeCouplings",
+      "packCompositeState",
+      "qualifiedLearnedFrameBank",
+      "stressProgram",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP10CompressedFrameEncodesEntityValues",
+    "kind": "function",
+    "file": "unitary/compressed_frame_test.go",
+    "start": 8,
+    "end": 35,
+    "calls": [
+      "compressedFrameFeature",
+      "encodeMemory",
+      "len",
+      "len",
+      "makeCompressedFrameBank",
+      "math.Inf",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP10CompressedFrameIsGlobalPhaseInvariant",
+    "kind": "function",
+    "file": "unitary/compressed_frame_test.go",
+    "start": 37,
+    "end": 60,
+    "calls": [
+      "compressedFrameFeature",
+      "compressedFrameFeature",
+      "encodeMemory",
+      "makeCompressedFrameBank",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP10UnitaryCoevolutionPreservesCompressedFeature",
+    "kind": "function",
+    "file": "unitary/compressed_frame_test.go",
+    "start": 62,
+    "end": 94,
+    "calls": [
+      "applyStressUnitary",
+      "compressedFrameFeature",
+      "compressedFrameFeature",
+      "encodeMemory",
+      "makeCompressedFrameBank",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "stressProgram",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "transportCompressedFrame"
+    ]
+  },
+  {
+    "name": "TestUP36InitialOffsetsAreIndependent",
+    "kind": "function",
+    "file": "unitary/continuous_fusion_test.go",
+    "start": 8,
+    "end": 19,
+    "calls": [
+      "continuousFusionInitialOffsets",
+      "doseMaxMultiplicity",
+      "doseOffsetRMS",
+      "doseOffsetRMS",
+      "len",
+      "len",
+      "math.Abs",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP36PairProbeIsContinuousNotMerged",
+    "kind": "function",
+    "file": "unitary/continuous_fusion_test.go",
+    "start": 21,
+    "end": 35,
+    "calls": [
+      "continuousFusionInitialOffsets",
+      "continuousPairProbeOffsets",
+      "doseMaxMultiplicity",
+      "math.Abs",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP36FusionFlowPreservesMeanAndRMS",
+    "kind": "function",
+    "file": "unitary/continuous_fusion_test.go",
+    "start": 37,
+    "end": 58,
+    "calls": [
+      "continuousFusionAdvance",
+      "continuousFusionInitialOffsets",
+      "doseOffsetRMS",
+      "doseOffsetRMS",
+      "float64",
+      "len",
+      "math.Abs",
+      "math.Abs",
+      "newFusionUnion",
+      "normalizeFusionWeights",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP36StickyFusionCreatesExactDegeneracy",
+    "kind": "function",
+    "file": "unitary/continuous_fusion_test.go",
+    "start": 60,
+    "end": 82,
+    "calls": [
+      "continuousFusionAdvance",
+      "math.Float64bits",
+      "math.Float64bits",
+      "newFusionUnion",
+      "normalizeContinuousOffsets",
+      "normalizeFusionWeights",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "union.find",
+      "union.find"
+    ]
+  },
+  {
+    "name": "TestUP47FrozenTrajectoryAuthority",
+    "kind": "function",
+    "file": "unitary/dense_checkpoint_replay_test.go",
+    "start": 5,
+    "end": 89,
+    "calls": [
+      "exactOffsetGroups",
+      "exactOffsetGroups",
+      "len",
+      "len",
+      "len",
+      "len",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP7DirectObserverHarness",
+    "kind": "function",
+    "file": "unitary/direct_observer_test.go",
+    "start": 9,
+    "end": 66,
+    "calls": [
+      "RunUP7",
+      "math.IsInf",
+      "math.IsNaN",
+      "reflect.DeepEqual",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP7TableSplitIsDisjoint",
+    "kind": "function",
+    "file": "unitary/direct_observer_test.go",
+    "start": 68,
+    "end": 75,
+    "calls": [
+      "allMemoryTables",
+      "directTrainTable",
+      "memoryTableIndex",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP38SoftCapacityMatchesExactLimits",
+    "kind": "function",
+    "file": "unitary/direct_offset_optimization_test.go",
+    "start": 8,
+    "end": 27,
+    "calls": [
+      "continuousFusionInitialOffsets",
+      "directSoftCapacity",
+      "directSoftCapacity",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP38DirectionPreservesFusedGroups",
+    "kind": "function",
+    "file": "unitary/direct_offset_optimization_test.go",
+    "start": 29,
+    "end": 44,
+    "calls": [
+      "deterministicSPSADirection",
+      "float64",
+      "len",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP38DirectObjectiveChargesSymmetry",
+    "kind": "function",
+    "file": "unitary/direct_offset_optimization_test.go",
+    "start": 46,
+    "end": 69,
+    "calls": [
+      "continuousFusionInitialOffsets",
+      "directObjective",
+      "directObjective",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP38GradientUpdateIsBounded",
+    "kind": "function",
+    "file": "unitary/direct_offset_optimization_test.go",
+    "start": 71,
+    "end": 89,
+    "calls": [
+      "applyDirectGradient",
+      "continuousFusionInitialOffsets",
+      "len",
+      "len",
+      "math.Abs",
+      "newFusionUnion",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP38DeterministicDirectionsSpanZeroMeanTangent",
+    "kind": "function",
+    "file": "unitary/direct_offset_optimization_test.go",
+    "start": 135,
+    "end": 153,
+    "calls": [
+      "append",
+      "deterministicSPSADirection",
+      "directDirectionRank",
+      "float64",
+      "initialSymmetryGroupsJSON",
+      "len",
+      "make",
+      "math.Abs",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP38ProjectedCentralDifferenceEstimator",
+    "kind": "function",
+    "file": "unitary/direct_offset_optimization_test.go",
+    "start": 156,
+    "end": 174,
+    "calls": [
+      "directGradientEstimate",
+      "math.Abs",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP25DiscoverySeedDoesNotNeedHiddenStructure",
+    "kind": "function",
+    "file": "unitary/discovered_commutant_test.go",
+    "start": 5,
+    "end": 16,
+    "calls": [
+      "discoverySeedMatrix",
+      "len",
+      "len",
+      "matrixFrobeniusNorm",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP25BinaryConjugationAverageReducesCommutator",
+    "kind": "function",
+    "file": "unitary/discovered_commutant_test.go",
+    "start": 18,
+    "end": 33,
+    "calls": [
+      "conjugatedLatentStep",
+      "discoverCommutingObservables",
+      "discoverySeedMatrix",
+      "fullLatentMixer",
+      "maxWeylCommutatorEntry",
+      "maxWeylCommutatorEntry",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP25DiscoveredFeatureDimensions",
+    "kind": "function",
+    "file": "unitary/discovered_commutant_test.go",
+    "start": 35,
+    "end": 55,
+    "calls": [
+      "conjugatedLatentStep",
+      "discoverCommutingObservables",
+      "discoveredQuadraticFeatures",
+      "discoveredRawFeatures",
+      "encodeMemory",
+      "fullLatentEncode",
+      "fullLatentMixer",
+      "len",
+      "len",
+      "len",
+      "len",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP26BreadthFeatureDimensions",
+    "kind": "function",
+    "file": "unitary/discovery_breadth_test.go",
+    "start": 8,
+    "end": 21,
+    "calls": [
+      "breadthQuadraticFeatureDim",
+      "breadthQuadraticFeatureDim",
+      "breadthRawFeatureDim",
+      "breadthRawFeatureDim",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP26First32DiscoveryIsPrefixInvariant",
+    "kind": "function",
+    "file": "unitary/discovery_breadth_test.go",
+    "start": 23,
+    "end": 57,
+    "calls": [
+      "conjugatedLatentStep",
+      "discoverCommutingObservables",
+      "discoverCommutingObservables",
+      "fullLatentMixer",
+      "imag",
+      "math.Abs",
+      "math.Abs",
+      "real",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP40OneHotSoftMemoryMatchesCanonicalWrite",
+    "kind": "function",
+    "file": "unitary/free_running_direct_objective_test.go",
+    "start": 5,
+    "end": 32,
+    "calls": [
+      "applyMemoryWrite",
+      "encodeMemory",
+      "len",
+      "len",
+      "len",
+      "len",
+      "softMemoryAfterCommandedWrite",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP40SoftMemoryPreservesUncertaintyAndExactWrite",
+    "kind": "function",
+    "file": "unitary/free_running_direct_objective_test.go",
+    "start": 34,
+    "end": 67,
+    "calls": [
+      "NormSquared",
+      "softMemoryAfterCommandedWrite",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP40SoftMemoryRejectsMalformedDistribution",
+    "kind": "function",
+    "file": "unitary/free_running_direct_objective_test.go",
+    "start": 69,
+    "end": 81,
+    "calls": [
+      "softMemoryAfterCommandedWrite",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestUP22FullLatentMixerIsUnitaryAndDistributed",
+    "kind": "function",
+    "file": "unitary/full_latent_test.go",
+    "start": 9,
+    "end": 46,
+    "calls": [
+      "cmplx.Abs",
+      "complex",
+      "fullLatentMixer",
+      "fullLatentMixerParticipation",
+      "latentAdjoint",
+      "latentMatrixMultiply",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP22HermitianFeaturesIgnoreGlobalPhase",
+    "kind": "function",
+    "file": "unitary/full_latent_test.go",
+    "start": 48,
+    "end": 78,
+    "calls": [
+      "encodeMemory",
+      "fullLatentEncode",
+      "fullLatentHermitianFeatures",
+      "fullLatentHermitianFeatures",
+      "fullLatentMixer",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP22ConjugatedTransportMatchesPackedTransport",
+    "kind": "function",
+    "file": "unitary/full_latent_test.go",
+    "start": 80,
+    "end": 106,
+    "calls": [
+      "conjugatedLatentStep",
+      "fullLatentMixer",
+      "fullLatentRecoveryError",
+      "latentDepthOperators",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP12FullBalancedPools",
+    "kind": "function",
+    "file": "unitary/fullrank_integration_test.go",
+    "start": 5,
+    "end": 28,
+    "calls": [
+      "fullObserverTablePool",
+      "fullObserverTablePool",
+      "len",
+      "len",
+      "len",
+      "len",
+      "memoryTableIndex",
+      "memoryTableIndex",
+      "observerMarginalMinimum",
+      "observerMarginalMinimum",
+      "observerMarginalMinimum",
+      "observerMarginalMinimum",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP12FullRankFeatureBudget",
+    "kind": "function",
+    "file": "unitary/fullrank_integration_test.go",
+    "start": 30,
+    "end": 49,
+    "calls": [
+      "encodeMemory",
+      "len",
+      "len",
+      "len",
+      "len",
+      "makePilotRankBank",
+      "pilotRankFeatures",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP35StartsFromSingletonCapacity",
+    "kind": "function",
+    "file": "unitary/greedy_symmetry_induction_test.go",
+    "start": 8,
+    "end": 23,
+    "calls": [
+      "doseMaxMultiplicity",
+      "doseOffsetRMS",
+      "initialSymmetryGroups",
+      "math.Abs",
+      "offsetsForSymmetryGroups",
+      "symmetryGroupCapacity",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP35PairMergeRaisesCapacityByTwiceProduct",
+    "kind": "function",
+    "file": "unitary/greedy_symmetry_induction_test.go",
+    "start": 25,
+    "end": 43,
+    "calls": [
+      "initialSymmetryGroups",
+      "mergeSymmetryGroups",
+      "mergeSymmetryGroups",
+      "symmetryGroupCapacity",
+      "symmetryGroupCapacity",
+      "symmetryGroupCapacity",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP35InnerSplitRemainsBalancedAndLeakFree",
+    "kind": "function",
+    "file": "unitary/greedy_symmetry_induction_test.go",
+    "start": 45,
+    "end": 67,
+    "calls": [
+      "fullObserverTablePool",
+      "fullObserverTablePool",
+      "make",
+      "memoryTableIndex",
+      "memoryTableIndex",
+      "memoryTableIndex",
+      "minimumTableMarginalCount",
+      "minimumTableMarginalCount",
+      "minimumTableMarginalCount",
+      "minimumTableMarginalCount",
+      "splitTaskAllocationTrainingPool",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP35FrozenGainRule",
+    "kind": "function",
+    "file": "unitary/greedy_symmetry_induction_test.go",
+    "start": 69,
+    "end": 77,
+    "calls": [
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestUP28PolynomialFeatureDotMatchesExplicitLift",
+    "kind": "function",
+    "file": "unitary/interaction_selected_test.go",
+    "start": 8,
+    "end": 26,
+    "calls": [
+      "len",
+      "len",
+      "math.Abs",
+      "polynomialFeatureDot",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP28InteractionSelectionDeterministic",
+    "kind": "function",
+    "file": "unitary/interaction_selected_test.go",
+    "start": 28,
+    "end": 46,
+    "calls": [
+      "conjugatedLatentStep",
+      "discoverCommutingObservables",
+      "fullLatentMixer",
+      "fullObserverTablePool",
+      "selectFirstMemoryTables",
+      "selectInteractionRelevantObservables",
+      "selectInteractionRelevantObservables",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "taskSelectedTrainingStates"
+    ]
+  },
+  {
+    "name": "TestUP31PerCopyConjugatorIsUnitaryPermutation",
+    "kind": "function",
+    "file": "unitary/isospectral_misalignment_test.go",
+    "start": 5,
+    "end": 18,
+    "calls": [
+      "identityLatentMatrix",
+      "latentAdjoint",
+      "latentMatrixMultiply",
+      "maxLatentMatrixEntryDifference",
+      "perCopyPermutationConjugator",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP31MisalignedTransportIsExactlyConjugate",
+    "kind": "function",
+    "file": "unitary/isospectral_misalignment_test.go",
+    "start": 20,
+    "end": 35,
+    "calls": [
+      "conjugatedLatentStep",
+      "conjugatedLatentStep",
+      "fullLatentMixer",
+      "isospectralEquivalenceError",
+      "isospectralMisalignedMixer",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP31BreaksNaiveButPreservesCorrectShiftIntertwiner",
+    "kind": "function",
+    "file": "unitary/isospectral_misalignment_test.go",
+    "start": 37,
+    "end": 59,
+    "calls": [
+      "conjugatedLatentStep",
+      "fullLatentCrossChannelShift",
+      "fullLatentCrossChannelShift",
+      "fullLatentMixer",
+      "isospectralMisalignedMixer",
+      "maxWeylCommutatorEntry",
+      "maxWeylCommutatorEntry",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP15InitialAnchorIsNormalizedAndIrregular",
+    "kind": "function",
+    "file": "unitary/learned_anchor_test.go",
+    "start": 8,
+    "end": 28,
+    "calls": [
+      "NormSquared",
+      "anchorPhaseConcentration",
+      "anchorStateFromParams",
+      "initialLearnedAnchorParams",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP15AnchorGaugeIsCanonical",
+    "kind": "function",
+    "file": "unitary/learned_anchor_test.go",
+    "start": 30,
+    "end": 42,
+    "calls": [
+      "anchorStateFromParams",
+      "imag",
+      "imag",
+      "initialLearnedAnchorParams",
+      "math.Abs",
+      "real",
+      "real",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP15LearnedAnchorBankRemainsGlobalPhaseInvariant",
+    "kind": "function",
+    "file": "unitary/learned_anchor_test.go",
+    "start": 44,
+    "end": 78,
+    "calls": [
+      "encodeMemory",
+      "frameFeature",
+      "frameFeature",
+      "initialLearnedAnchorParams",
+      "makeTaskLearnedAnchorBank",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP15UnitaryCoevolutionPreservesLearnedAnchorFeature",
+    "kind": "function",
+    "file": "unitary/learned_anchor_test.go",
+    "start": 80,
+    "end": 129,
+    "calls": [
+      "applyStressUnitary",
+      "encodeMemory",
+      "frameFeature",
+      "frameFeature",
+      "initialLearnedAnchorParams",
+      "makeTaskLearnedAnchorBank",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "stressProgram",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "transportFrameBank"
+    ]
+  },
+  {
+    "name": "TestUP13InitialPhaseAlphabetIsClustered",
+    "kind": "function",
+    "file": "unitary/learned_phase_frame_test.go",
+    "start": 8,
+    "end": 13,
+    "calls": [
+      "math.Abs",
+      "minPhaseSeparation",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP13PhaseBankIsGlobalPhaseInvariant",
+    "kind": "function",
+    "file": "unitary/learned_phase_frame_test.go",
+    "start": 15,
+    "end": 47,
+    "calls": [
+      "encodeMemory",
+      "frameFeature",
+      "frameFeature",
+      "makeLearnedPhaseBank",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP13UnitaryCoevolutionPreservesLearnedFrameFeature",
+    "kind": "function",
+    "file": "unitary/learned_phase_frame_test.go",
+    "start": 49,
+    "end": 95,
+    "calls": [
+      "applyStressUnitary",
+      "encodeMemory",
+      "frameFeature",
+      "frameFeature",
+      "makeLearnedPhaseBank",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "stressProgram",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "transportFrameBank"
+    ]
+  },
+  {
+    "name": "TestUP14InitialSupportIsDenseAndLowPurity",
+    "kind": "function",
+    "file": "unitary/learned_support_frame_test.go",
+    "start": 8,
+    "end": 27,
+    "calls": [
+      "initialSupportMatrix",
+      "math.Abs",
+      "normalizedSupportMatrix",
+      "supportPurities",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP14SupportBankIsGlobalPhaseInvariant",
+    "kind": "function",
+    "file": "unitary/learned_support_frame_test.go",
+    "start": 29,
+    "end": 68,
+    "calls": [
+      "encodeMemory",
+      "frameFeature",
+      "frameFeature",
+      "initialSupportMatrix",
+      "makeLearnedSupportBank",
+      "math.Abs",
+      "normalizedSupportMatrix",
+      "rotateGlobalPhase",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "up13LearnedPhases"
+    ]
+  },
+  {
+    "name": "TestUP14UnitaryCoevolutionPreservesMixedSupportFeature",
+    "kind": "function",
+    "file": "unitary/learned_support_frame_test.go",
+    "start": 70,
+    "end": 124,
+    "calls": [
+      "applyStressUnitary",
+      "encodeMemory",
+      "frameFeature",
+      "frameFeature",
+      "initialSupportMatrix",
+      "makeLearnedSupportBank",
+      "math.Abs",
+      "normalizedSupportMatrix",
+      "rotateGlobalPhase",
+      "stressProgram",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "transportFrameBank",
+      "up13LearnedPhases"
+    ]
+  },
+  {
+    "name": "TestUP5RelationalReadWriteMemory",
+    "kind": "function",
+    "file": "unitary/memory_test.go",
+    "start": 9,
+    "end": 57,
+    "calls": [
+      "RunUP5",
+      "math.IsInf",
+      "math.IsNaN",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP5OverwriteIsActuallyIrreversible",
+    "kind": "function",
+    "file": "unitary/memory_test.go",
+    "start": 59,
+    "end": 72,
+    "calls": [
+      "applyMemoryWrite",
+      "applyMemoryWrite",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP5IsDeterministic",
+    "kind": "function",
+    "file": "unitary/memory_test.go",
+    "start": 74,
+    "end": 86,
+    "calls": [
+      "RunUP5",
+      "RunUP5",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP2MultilayerPhaseRouting",
+    "kind": "function",
+    "file": "unitary/multilayer_test.go",
+    "start": 9,
+    "end": 49,
+    "calls": [
+      "RunUP2",
+      "finite",
+      "finite",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP2MatchedParameterCountAndOptimizerBudget",
+    "kind": "function",
+    "file": "unitary/multilayer_test.go",
+    "start": 51,
+    "end": 62,
+    "calls": [
+      "RunUP2",
+      "len",
+      "len",
+      "len",
+      "len",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP2IsDeterministic",
+    "kind": "function",
+    "file": "unitary/multilayer_test.go",
+    "start": 64,
+    "end": 76,
+    "calls": [
+      "RunUP2",
+      "RunUP2",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP2UnitaryLossFallsAtEveryCheckpoint",
+    "kind": "function",
+    "file": "unitary/multilayer_test.go",
+    "start": 78,
+    "end": 90,
+    "calls": [
+      "RunUP2",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP30SplitTransportRemainsOrthogonalEquivalent",
+    "kind": "function",
+    "file": "unitary/multiplicity_ablation_test.go",
+    "start": 5,
+    "end": 16,
+    "calls": [
+      "fullLatentMixer",
+      "maxRealOrthogonalityError",
+      "realifyMatrix",
+      "splitFullLatentStep",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP30SplitBreaksCrossChannelShiftSymmetry",
+    "kind": "function",
+    "file": "unitary/multiplicity_ablation_test.go",
+    "start": 18,
+    "end": 36,
+    "calls": [
+      "conjugatedLatentStep",
+      "fullLatentCrossChannelShift",
+      "fullLatentMixer",
+      "maxWeylCommutatorEntry",
+      "maxWeylCommutatorEntry",
+      "splitFullLatentStep",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP32DoseOffsetsHaveExpectedMultiplicityAndRMS",
+    "kind": "function",
+    "file": "unitary/multiplicity_dose_test.go",
+    "start": 8,
+    "end": 35,
+    "calls": [
+      "doseMaxMultiplicity",
+      "doseOffsetRMS",
+      "doseOffsetRMS",
+      "doseOffsetRMS",
+      "doseOffsetRMS",
+      "len",
+      "len",
+      "len",
+      "len",
+      "math.Abs",
+      "multiplicityDoseOffsets",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP32AnonymousSplitBasisIsOrthogonal",
+    "kind": "function",
+    "file": "unitary/multiplicity_dose_test.go",
+    "start": 37,
+    "end": 42,
+    "calls": [
+      "denseChannelMixer",
+      "mixerOrthogonalityError",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP32AllDoseTransportsRemainRealOrthogonallyEquivalent",
+    "kind": "function",
+    "file": "unitary/multiplicity_dose_test.go",
+    "start": 44,
+    "end": 57,
+    "calls": [
+      "fullLatentDoseStep",
+      "fullLatentMixer",
+      "maxRealOrthogonalityError",
+      "multiplicityDoseOffsets",
+      "realifyMatrix",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestNativeSessionPreservesModelAndMemory",
+    "kind": "function",
+    "file": "unitary/native_language_session_test.go",
+    "start": 19,
+    "end": 53,
+    "calls": [
+      "RestoreNativeSession",
+      "TrainNativeSession",
+      "bytes.Equal",
+      "nativeSessionTestCase",
+      "nativeSessionTestCase",
+      "nci11WInit",
+      "restored.Checkpoint",
+      "restored.Predict",
+      "s.Checkpoint",
+      "s.ObserveGraph",
+      "s.Predict",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "zero.Predict"
+    ]
+  },
+  {
+    "name": "TestNativeSessionInvalidInputsPreserveState",
+    "kind": "function",
+    "file": "unitary/native_language_session_test.go",
+    "start": 54,
+    "end": 75,
+    "calls": [
+      "TrainNativeSession",
+      "TrainNativeSession",
+      "bytes.Equal",
+      "nativeSessionTestCase",
+      "s.Checkpoint",
+      "s.Checkpoint",
+      "s.ObserveGraph",
+      "s.Predict",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestNativeSessionCorruptionAndForeignSourceDenied",
+    "kind": "function",
+    "file": "unitary/native_language_session_test.go",
+    "start": 76,
+    "end": 108,
+    "calls": [
+      "RestoreNativeSession",
+      "RestoreNativeSession",
+      "RestoreNativeSession",
+      "RestoreNativeSession",
+      "TrainNativeSession",
+      "ValidateNativeSessionJSON",
+      "ValidateNativeSessionJSON",
+      "append",
+      "hex.EncodeToString",
+      "json.Marshal",
+      "json.Marshal",
+      "json.Marshal",
+      "json.Unmarshal",
+      "json.Unmarshal",
+      "nativeSessionTestCase",
+      "s.Checkpoint",
+      "sha256.Sum256",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestNativeGeneratorVariableLengthUTF8",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator_test.go",
+    "start": 12,
+    "end": 32,
+    "calls": [
+      "RestoreNativeParallelGenerator",
+      "TrainNativeParallelGenerator",
+      "len",
+      "m.Checkpoint",
+      "r.Generate",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestNativeGeneratorFieldsFitAndCompleteState",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator_test.go",
+    "start": 33,
+    "end": 70,
+    "calls": [
+      "RestoreNativeParallelGenerator",
+      "TrainNativeParallelGenerator",
+      "bytes.Contains",
+      "bytes.Contains",
+      "bytes.Equal",
+      "bytes.Equal",
+      "bytes.Equal",
+      "json.Marshal",
+      "json.Marshal",
+      "m.Checkpoint",
+      "m.Checkpoint",
+      "m.Generate",
+      "m.Generate",
+      "nativeGeneratorExamples",
+      "nativeGeneratorExamples",
+      "r.Checkpoint",
+      "r.Generate",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestNativeGeneratorMechanicalCompositionNotTransfer",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator_test.go",
+    "start": 71,
+    "end": 89,
+    "calls": [
+      "TrainNativeParallelGenerator",
+      "m.Generate",
+      "m.Generate",
+      "nativeGeneratorExamples",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestNativeGeneratorBoundsAndCorruption",
+    "kind": "function",
+    "file": "unitary/native_parallel_generator_test.go",
+    "start": 90,
+    "end": 118,
+    "calls": [
+      "RestoreNativeParallelGenerator",
+      "RestoreNativeParallelGenerator",
+      "TrainNativeParallelGenerator",
+      "TrainNativeParallelGenerator",
+      "append",
+      "bytes.Equal",
+      "generatorDigest",
+      "json.Marshal",
+      "json.Marshal",
+      "json.Unmarshal",
+      "m.Checkpoint",
+      "m.Checkpoint",
+      "m.Checkpoint",
+      "m.Generate",
+      "nativeGeneratorExamples",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestNativeTextLearningAndCompleteState",
+    "kind": "function",
+    "file": "unitary/native_text_selector_test.go",
+    "start": 12,
+    "end": 73,
+    "calls": [
+      "RestoreNativeTextSelector",
+      "TrainNativeTextSelector",
+      "append",
+      "bytes.Equal",
+      "bytes.Equal",
+      "bytes.Equal",
+      "json.Marshal",
+      "json.Marshal",
+      "m.Checkpoint",
+      "m.Checkpoint",
+      "m.Predict",
+      "nativeTextExamples",
+      "nci11WInit",
+      "nci11WInit",
+      "restored.Checkpoint",
+      "restored.Predict",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "untrained.Predict"
+    ]
+  },
+  {
+    "name": "TestNativeTextInvalidTrainingAndCheckpoint",
+    "kind": "function",
+    "file": "unitary/native_text_selector_test.go",
+    "start": 74,
+    "end": 99,
+    "calls": [
+      "RestoreNativeTextSelector",
+      "RestoreNativeTextSelector",
+      "TrainNativeTextSelector",
+      "TrainNativeTextSelector",
+      "append",
+      "bytes.Equal",
+      "json.Marshal",
+      "json.Unmarshal",
+      "m.Checkpoint",
+      "m.Checkpoint",
+      "m.Predict",
+      "nativeTextExamples",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestUP46UsesFrozenUP45States",
+    "kind": "function",
+    "file": "unitary/objective_decomposition_audit_test.go",
+    "start": 5,
+    "end": 30,
+    "calls": [
+      "exactOffsetGroups",
+      "exactOffsetGroups",
+      "len",
+      "len",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP46DoesNotRunOptimizerOrChangeLambda",
+    "kind": "function",
+    "file": "unitary/objective_decomposition_audit_test.go",
+    "start": 32,
+    "end": 36,
+    "calls": [
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP8BalancedSplitMarginals",
+    "kind": "function",
+    "file": "unitary/observer_ablation_test.go",
+    "start": 9,
+    "end": 39,
+    "calls": [
+      "balancedObserverTrainTable",
+      "balancedObserverTrainTable",
+      "len",
+      "len",
+      "len",
+      "len",
+      "memoryTableIndex",
+      "memoryTableIndex",
+      "observerMarginalMinimum",
+      "observerMarginalMinimum",
+      "selectObserverTables",
+      "selectObserverTables",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP8CoherenceFeaturesPreserveGlobalPhase",
+    "kind": "function",
+    "file": "unitary/observer_ablation_test.go",
+    "start": 41,
+    "end": 76,
+    "calls": [
+      "Normalize",
+      "cmplx.Rect",
+      "complex",
+      "encodeMemory",
+      "float64",
+      "float64",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "make",
+      "math.Abs",
+      "observerCoherenceFeatures",
+      "observerCoherenceFeatures",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP8ProductionCoherenceFeatureLength",
+    "kind": "function",
+    "file": "unitary/observer_ablation_test.go",
+    "start": 78,
+    "end": 90,
+    "calls": [
+      "encodeMemory",
+      "len",
+      "len",
+      "observerCoherenceFeatures",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP41TargetReproducesAcceptedCapacity18Geometry",
+    "kind": "function",
+    "file": "unitary/optimizer_reachability_calibration_test.go",
+    "start": 8,
+    "end": 34,
+    "calls": [
+      "doseOffsetRMS",
+      "doseOffsetRMS",
+      "math.Abs",
+      "math.Abs",
+      "optimizerCalibrationTarget",
+      "symmetryGroupCapacity",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP41AnalyticCosineGradientIsTangent",
+    "kind": "function",
+    "file": "unitary/optimizer_reachability_calibration_test.go",
+    "start": 36,
+    "end": 58,
+    "calls": [
+      "analyticOffsetCosineGradient",
+      "continuousFusionInitialOffsets",
+      "float64",
+      "len",
+      "math.Abs",
+      "math.Abs",
+      "optimizerCalibrationTarget",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP41WrongFusionDetection",
+    "kind": "function",
+    "file": "unitary/optimizer_reachability_calibration_test.go",
+    "start": 60,
+    "end": 88,
+    "calls": [
+      "calibrationWrongCrossTargetFusion",
+      "calibrationWrongCrossTargetFusion",
+      "optimizerCalibrationTarget",
+      "symmetryGroupsJSON",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestUP41NoStickyUpdatePreservesSingletonGeometry",
+    "kind": "function",
+    "file": "unitary/optimizer_reachability_calibration_test.go",
+    "start": 90,
+    "end": 110,
+    "calls": [
+      "applyCalibrationGradientNoSticky",
+      "continuousFusionInitialOffsets",
+      "doseOffsetRMS",
+      "doseOffsetRMS",
+      "len",
+      "len",
+      "math.Abs",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP18OracleTransposeExactlyRecoversDenseMixer",
+    "kind": "function",
+    "file": "unitary/orthogonal_demixer_test.go",
+    "start": 8,
+    "end": 29,
+    "calls": [
+      "channelMatrixProduct",
+      "denseChannelMixer",
+      "math.Abs",
+      "t.Fatalf",
+      "transposeChannelMatrix"
+    ]
+  },
+  {
+    "name": "TestUP18StructuredDemixerRemainsOrthogonal",
+    "kind": "function",
+    "file": "unitary/orthogonal_demixer_test.go",
+    "start": 31,
+    "end": 40,
+    "calls": [
+      "float64",
+      "mixerOrthogonalityError",
+      "orthogonalDemixer",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP18OracleAngleFamilyContainsExactInverse",
+    "kind": "function",
+    "file": "unitary/orthogonal_demixer_test.go",
+    "start": 42,
+    "end": 48,
+    "calls": [
+      "channelMatrixL2",
+      "denseChannelMixer",
+      "oracleInverseAngles",
+      "orthogonalDemixer",
+      "t.Fatalf",
+      "transposeChannelMatrix"
+    ]
+  },
+  {
+    "name": "TestUP18OracleRecoversObservableFeatures",
+    "kind": "function",
+    "file": "unitary/orthogonal_demixer_test.go",
+    "start": 50,
+    "end": 58,
+    "calls": [
+      "oracleFeatureRecoveryError",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP21LearnedPhaseTargetsAreUnitCircle",
+    "kind": "function",
+    "file": "unitary/phase_code_test.go",
+    "start": 8,
+    "end": 19,
+    "calls": [
+      "learnedPhaseTarget",
+      "math.Abs",
+      "math.Hypot",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP21PhaseRegressorRuntimeIsPrimalOnly",
+    "kind": "function",
+    "file": "unitary/phase_code_test.go",
+    "start": 21,
+    "end": 51,
+    "calls": [
+      "allMemoryTables",
+      "buildRidgeAnonymousRows",
+      "len",
+      "len",
+      "selectFirstMemoryTables",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "trainPhaseCodeRegressors"
+    ]
+  },
+  {
+    "name": "TestUP11PilotRankFeatureBudget",
+    "kind": "function",
+    "file": "unitary/pilot_rank_test.go",
+    "start": 8,
+    "end": 29,
+    "calls": [
+      "encodeMemory",
+      "len",
+      "len",
+      "len",
+      "len",
+      "makePilotRankBank",
+      "pilotRankFeatures",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP11PilotRankFeaturesAreGlobalPhaseInvariant",
+    "kind": "function",
+    "file": "unitary/pilot_rank_test.go",
+    "start": 31,
+    "end": 53,
+    "calls": [
+      "encodeMemory",
+      "makePilotRankBank",
+      "math.Abs",
+      "pilotRankFeatures",
+      "pilotRankFeatures",
+      "rotateGlobalPhase",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP11UnitaryCoevolutionPreservesRankFeatures",
+    "kind": "function",
+    "file": "unitary/pilot_rank_test.go",
+    "start": 55,
+    "end": 87,
+    "calls": [
+      "applyStressUnitary",
+      "encodeMemory",
+      "makePilotRankBank",
+      "math.Abs",
+      "pilotRankFeatures",
+      "pilotRankFeatures",
+      "rotateGlobalPhase",
+      "stressProgram",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "transportPilotRankBank"
+    ]
+  },
+  {
+    "name": "TestUP11SelectedSplitKeepsAllMarginals",
+    "kind": "function",
+    "file": "unitary/pilot_rank_test.go",
+    "start": 89,
+    "end": 101,
+    "calls": [
+      "observerMarginalMinimum",
+      "observerMarginalMinimum",
+      "selectObserverTables",
+      "selectObserverTables",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestUP0InterferenceRouting",
+    "kind": "function",
+    "file": "unitary/propagator_test.go",
+    "start": 8,
+    "end": 28,
+    "calls": [
+      "RunUP0",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestPropagatePreservesNormAndInverts",
+    "kind": "function",
+    "file": "unitary/propagator_test.go",
+    "start": 30,
+    "end": 73,
+    "calls": [
+      "Invert",
+      "L2Distance",
+      "NormSquared",
+      "NormSquared",
+      "Normalize",
+      "Propagate",
+      "Propagate",
+      "complex",
+      "complex",
+      "complex",
+      "complex",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestPropagateFailsClosedOnInvalidCoupling",
+    "kind": "function",
+    "file": "unitary/propagator_test.go",
+    "start": 75,
+    "end": 88,
+    "calls": [
+      "Propagate",
+      "math.Inf",
+      "math.NaN",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestRelativePhaseAffectsMeasurementOnlyAfterPropagation",
+    "kind": "function",
+    "file": "unitary/propagator_test.go",
+    "start": 90,
+    "end": 129,
+    "calls": [
+      "ArgMax",
+      "ArgMax",
+      "Probabilities",
+      "Probabilities",
+      "Propagate",
+      "Propagate",
+      "complex",
+      "complex",
+      "complex",
+      "complex",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestProximalFusionLambdaDerivedFromFrozenConstants",
+    "kind": "function",
+    "file": "unitary/proximal_exact_fusion_test.go",
+    "start": 9,
+    "end": 17,
+    "calls": [
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCompleteGraphFusionProxCreatesExactPool",
+    "kind": "function",
+    "file": "unitary/proximal_exact_fusion_test.go",
+    "start": 19,
+    "end": 54,
+    "calls": [
+      "completeGraphFusionProx",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCompleteGraphFusionProxDoesNotNeedStickyState",
+    "kind": "function",
+    "file": "unitary/proximal_exact_fusion_test.go",
+    "start": 56,
+    "end": 80,
+    "calls": [
+      "append",
+      "completeGraphFusionProx",
+      "completeGraphFusionProx",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestCompleteGraphFusionProxDeterministic",
+    "kind": "function",
+    "file": "unitary/proximal_exact_fusion_test.go",
+    "start": 82,
+    "end": 104,
+    "calls": [
+      "completeGraphFusionProx",
+      "completeGraphFusionProx",
+      "continuousFusionInitialOffsets",
+      "doseOffsetRMS",
+      "math.Abs",
+      "reflect.DeepEqual",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP45FrozenControls",
+    "kind": "function",
+    "file": "unitary/proximal_task_bridge_test.go",
+    "start": 5,
+    "end": 25,
+    "calls": [
+      "len",
+      "len",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP6LearnedReadoutQuery",
+    "kind": "function",
+    "file": "unitary/readout_test.go",
+    "start": 9,
+    "end": 71,
+    "calls": [
+      "RunUP6",
+      "math.IsInf",
+      "math.IsNaN",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP6HeldOutEntityPairsAreReserved",
+    "kind": "function",
+    "file": "unitary/readout_test.go",
+    "start": 73,
+    "end": 82,
+    "calls": [
+      "RunUP6",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP6IsDeterministic",
+    "kind": "function",
+    "file": "unitary/readout_test.go",
+    "start": 84,
+    "end": 96,
+    "calls": [
+      "RunUP6",
+      "RunUP6",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP29RealificationPreservesMatrixVectorAction",
+    "kind": "function",
+    "file": "unitary/real_orthogonal_equivalence_test.go",
+    "start": 8,
+    "end": 33,
+    "calls": [
+      "L2Distance",
+      "complexifyRealState",
+      "conjugatedLatentStep",
+      "encodeMemory",
+      "fullLatentEncode",
+      "fullLatentMixer",
+      "latentMatrixVector",
+      "realMatrixVector",
+      "realifyMatrix",
+      "realifyState",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP29RealifiedUnitaryIsOrthogonal",
+    "kind": "function",
+    "file": "unitary/real_orthogonal_equivalence_test.go",
+    "start": 35,
+    "end": 46,
+    "calls": [
+      "conjugatedLatentStep",
+      "fullLatentMixer",
+      "maxRealOrthogonalityError",
+      "realifyMatrix",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP29RealObservableExpectationMatchesComplex",
+    "kind": "function",
+    "file": "unitary/real_orthogonal_equivalence_test.go",
+    "start": 48,
+    "end": 77,
+    "calls": [
+      "conjugatedLatentStep",
+      "encodeMemory",
+      "frozenUP28ObservableBank",
+      "fullLatentEncode",
+      "fullLatentMixer",
+      "imag",
+      "imag",
+      "latentMatrixVector",
+      "math.Abs",
+      "math.Abs",
+      "real",
+      "real",
+      "realObservableExpectation",
+      "realifyObservable",
+      "realifyState",
+      "stateInner",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP39HarmonicMeanPenalizesWeakestSignal",
+    "kind": "function",
+    "file": "unitary/rich_direct_objective_test.go",
+    "start": 8,
+    "end": 14,
+    "calls": [
+      "harmonicMean3",
+      "harmonicMean3",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP39HarmonicMeanEqualInputs",
+    "kind": "function",
+    "file": "unitary/rich_direct_objective_test.go",
+    "start": 16,
+    "end": 21,
+    "calls": [
+      "harmonicMean3",
+      "math.Abs",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP39UsesSameDirectOptimizerGeometry",
+    "kind": "function",
+    "file": "unitary/rich_direct_objective_test.go",
+    "start": 23,
+    "end": 32,
+    "calls": [
+      "append",
+      "deterministicSPSADirection",
+      "directDirectionRank",
+      "initialSymmetryGroupsJSON",
+      "make",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP39NoTrueHeldOutInInnerSplit",
+    "kind": "function",
+    "file": "unitary/rich_direct_objective_test.go",
+    "start": 34,
+    "end": 50,
+    "calls": [
+      "fullObserverTablePool",
+      "fullObserverTablePool",
+      "make",
+      "memoryTableIndex",
+      "memoryTableIndex",
+      "memoryTableIndex",
+      "splitTaskAllocationTrainingPool",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestUP20DenseMultipleSolve",
+    "kind": "function",
+    "file": "unitary/ridge_anonymous_test.go",
+    "start": 8,
+    "end": 35,
+    "calls": [
+      "math.Abs",
+      "solveDenseMultiple",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP20OracleNumeratorLivesInQuadraticAnonymousSpan",
+    "kind": "function",
+    "file": "unitary/ridge_anonymous_test.go",
+    "start": 37,
+    "end": 45,
+    "calls": [
+      "oracleNumeratorWitnessError",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP20RidgeRuntimeDoesNotNeedSupportVectors",
+    "kind": "function",
+    "file": "unitary/ridge_anonymous_test.go",
+    "start": 47,
+    "end": 72,
+    "calls": [
+      "allMemoryTables",
+      "buildRidgeAnonymousRows",
+      "len",
+      "len",
+      "len",
+      "len",
+      "selectFirstMemoryTables",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "trainRidgeAnonymousHeads"
+    ]
+  },
+  {
+    "name": "TestUP42RollingReconstructionRecoversKnownTangentGradient",
+    "kind": "function",
+    "file": "unitary/rolling_gradient_horizon_test.go",
+    "start": 8,
+    "end": 53,
+    "calls": [
+      "append",
+      "deterministicSPSADirection",
+      "make",
+      "math.Abs",
+      "newFusionUnion",
+      "rollingFullRankGradient",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "union.groups"
+    ]
+  },
+  {
+    "name": "TestUP42HorizonScheduleIsFrozenDoublingSequence",
+    "kind": "function",
+    "file": "unitary/rolling_gradient_horizon_test.go",
+    "start": 55,
+    "end": 70,
+    "calls": [
+      "len",
+      "len",
+      "len",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP42RollingBufferBound",
+    "kind": "function",
+    "file": "unitary/rolling_gradient_horizon_test.go",
+    "start": 72,
+    "end": 79,
+    "calls": [
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP43CheckpointScheduleFrozen",
+    "kind": "function",
+    "file": "unitary/rolling_task_bridge_test.go",
+    "start": 8,
+    "end": 26,
+    "calls": [
+      "len",
+      "len",
+      "len",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP43ProvisionalGeometryDoesNotMutateOffsets",
+    "kind": "function",
+    "file": "unitary/rolling_task_bridge_test.go",
+    "start": 28,
+    "end": 44,
+    "calls": [
+      "append",
+      "continuousFusionInitialOffsets",
+      "reversibleProvisionalGeometry",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP43ProvisionalGeometryDetectsNearFusion",
+    "kind": "function",
+    "file": "unitary/rolling_task_bridge_test.go",
+    "start": 46,
+    "end": 67,
+    "calls": [
+      "continuousFusionInitialOffsets",
+      "doseOffsetRMS",
+      "doseOffsetRMS",
+      "math.Abs",
+      "normalizeContinuousOffsets",
+      "reversibleProvisionalGeometry",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP4SequentialComposition",
+    "kind": "function",
+    "file": "unitary/sequential_test.go",
+    "start": 9,
+    "end": 66,
+    "calls": [
+      "RunUP4",
+      "math.Abs",
+      "math.IsInf",
+      "math.IsNaN",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP4TrainingLossFallsAtCheckpoints",
+    "kind": "function",
+    "file": "unitary/sequential_test.go",
+    "start": 68,
+    "end": 80,
+    "calls": [
+      "RunUP4",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP4IsDeterministic",
+    "kind": "function",
+    "file": "unitary/sequential_test.go",
+    "start": 82,
+    "end": 94,
+    "calls": [
+      "RunUP4",
+      "RunUP4",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP23SpectralMomentDimension",
+    "kind": "function",
+    "file": "unitary/spectral_invariants_test.go",
+    "start": 8,
+    "end": 21,
+    "calls": [
+      "conjugatedLatentStep",
+      "encodeMemory",
+      "fullLatentEncode",
+      "fullLatentMixer",
+      "len",
+      "len",
+      "spectralMomentFeatures",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP23UnitarySpectralMomentsAreDepthInvariant",
+    "kind": "function",
+    "file": "unitary/spectral_invariants_test.go",
+    "start": 23,
+    "end": 34,
+    "calls": [
+      "conjugatedLatentStep",
+      "fullLatentMixer",
+      "latentMatrixPower",
+      "spectralMomentDrift",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP23SpectralMomentsIgnoreGlobalPhase",
+    "kind": "function",
+    "file": "unitary/spectral_invariants_test.go",
+    "start": 36,
+    "end": 53,
+    "calls": [
+      "conjugatedLatentStep",
+      "encodeMemory",
+      "fullLatentEncode",
+      "fullLatentMixer",
+      "math.Abs",
+      "math.Abs",
+      "rotateGlobalPhase",
+      "spectralMomentFeatures",
+      "spectralMomentFeatures",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP44SqrtSoftMemoryOneHotMatchesCanonicalWrite",
+    "kind": "function",
+    "file": "unitary/sqrt_probability_task_bridge_test.go",
+    "start": 8,
+    "end": 36,
+    "calls": [
+      "encodeMemory",
+      "len",
+      "len",
+      "len",
+      "len",
+      "sqrtSoftMemoryAfterCommandedWrite",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP44SqrtSoftMemoryIsUnitNormWithoutGlobalNormalize",
+    "kind": "function",
+    "file": "unitary/sqrt_probability_task_bridge_test.go",
+    "start": 38,
+    "end": 58,
+    "calls": [
+      "NormSquared",
+      "math.Abs",
+      "sqrtSoftMemoryAfterCommandedWrite",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP44SqrtSoftMemoryPreservesUnwrittenProbabilities",
+    "kind": "function",
+    "file": "unitary/sqrt_probability_task_bridge_test.go",
+    "start": 60,
+    "end": 89,
+    "calls": [
+      "math.Abs",
+      "real",
+      "sqrtSoftMemoryAfterCommandedWrite",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP44KeepsUP43OptimizerAndHorizon",
+    "kind": "function",
+    "file": "unitary/sqrt_probability_task_bridge_test.go",
+    "start": 91,
+    "end": 121,
+    "calls": [
+      "len",
+      "len",
+      "len",
+      "len",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP3DepthRetention",
+    "kind": "function",
+    "file": "unitary/stress_test.go",
+    "start": 9,
+    "end": 60,
+    "calls": [
+      "RunUP3",
+      "len",
+      "len",
+      "math.Abs",
+      "math.IsInf",
+      "math.IsNaN",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP3IsDeterministic",
+    "kind": "function",
+    "file": "unitary/stress_test.go",
+    "start": 62,
+    "end": 74,
+    "calls": [
+      "RunUP3",
+      "RunUP3",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP3ControlIsMatchedAtDepthZero",
+    "kind": "function",
+    "file": "unitary/stress_test.go",
+    "start": 76,
+    "end": 89,
+    "calls": [
+      "RunUP3",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP34InnerSplitDoesNotUseTrueHeldOutPool",
+    "kind": "function",
+    "file": "unitary/task_allocated_symmetry_test.go",
+    "start": 8,
+    "end": 36,
+    "calls": [
+      "fullObserverTablePool",
+      "fullObserverTablePool",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "len",
+      "make",
+      "memoryTableIndex",
+      "memoryTableIndex",
+      "memoryTableIndex",
+      "splitTaskAllocationTrainingPool",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP34CandidateCapacities",
+    "kind": "function",
+    "file": "unitary/task_allocated_symmetry_test.go",
+    "start": 38,
+    "end": 55,
+    "calls": [
+      "commutantCapacityPartition",
+      "t.Fatalf",
+      "taskAllocationSpecs"
+    ]
+  },
+  {
+    "name": "TestUP34AllocationScorePaysForCapacity",
+    "kind": "function",
+    "file": "unitary/task_allocated_symmetry_test.go",
+    "start": 57,
+    "end": 66,
+    "calls": [
+      "math.Abs",
+      "t.Fatalf",
+      "t.Fatalf",
+      "taskAllocationScore",
+      "taskAllocationScore"
+    ]
+  },
+  {
+    "name": "TestUP27SelectionIsDeterministicAndBounded",
+    "kind": "function",
+    "file": "unitary/task_selected_commutant_test.go",
+    "start": 5,
+    "end": 34,
+    "calls": [
+      "conjugatedLatentStep",
+      "discoverCommutingObservables",
+      "fullLatentMixer",
+      "fullObserverTablePool",
+      "len",
+      "len",
+      "len",
+      "len",
+      "selectFirstMemoryTables",
+      "selectTaskRelevantObservables",
+      "selectTaskRelevantObservables",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "taskSelectedTrainingStates"
+    ]
+  },
+  {
+    "name": "TestUP27PhaseTargetMatrixHasEightComponents",
+    "kind": "function",
+    "file": "unitary/task_selected_commutant_test.go",
+    "start": 36,
+    "end": 43,
+    "calls": [
+      "len",
+      "len",
+      "len",
+      "phaseTargetMatrix",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP1LearnsUnitaryRouting",
+    "kind": "function",
+    "file": "unitary/training_test.go",
+    "start": 9,
+    "end": 44,
+    "calls": [
+      "RunUP1",
+      "math.Abs",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP1IsDeterministic",
+    "kind": "function",
+    "file": "unitary/training_test.go",
+    "start": 46,
+    "end": 58,
+    "calls": [
+      "RunUP1",
+      "RunUP1",
+      "reflect.DeepEqual",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestUP1LossFallsMonotonically",
+    "kind": "function",
+    "file": "unitary/training_test.go",
+    "start": 60,
+    "end": 72,
+    "calls": [
+      "RunUP1",
+      "t.Fatal",
+      "t.Fatalf"
     ]
   },
   {

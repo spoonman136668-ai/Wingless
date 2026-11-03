@@ -1,0 +1,87 @@
+name: Native learned-state session engineering
+on:
+  push:
+    branches: [research/native-language-session-20261103]
+permissions:
+  contents: read
+jobs:
+  session:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Byte-stable native identity
+        shell: bash
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Immutable native parent and scope before code
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5bfb70a91acfbb1745e6f3ab3575f70b41f8b942 HEAD
+          git merge-base --is-ancestor 5661a37e6662fe510ccfbcf3db70acb127f9bbd5 HEAD
+          git merge-base --is-ancestor 1d8f30a3c9a6aefa4ba19cc173e9542d7cdf5da9 HEAD
+          test "$(git hash-object unitary/native_text_selector.go)" = d1f7f462b889e93a9c26a4a619c6e14286b499f3
+          test "$(git hash-object unitary/nci11_trainable_associative_state.go)" = f248fd6dec93d04571f7cb4c3ccd721017812bfd
+          git diff --exit-code b820ea1ff76f17e350a914177ea823f6984a8e09 -- unitary/nci11_trainable_associative_state.go
+      - name: Session state and invalid-input checks
+        shell: bash
+        run: go test ./unitary -run '^TestNative(Session|Text|Generator)' -count=1 -v
+      - name: Build and fresh-process restore
+        shell: bash
+        run: |
+          set -euo pipefail
+          go build -o "$RUNNER_TEMP/wingless-native-session.exe" ./cmd/wingless-native-session
+          python research/native_language_session/check_cli.py "$RUNNER_TEMP/wingless-native-session.exe"
+          go build -o "$RUNNER_TEMP/wingless-native-text-selector.exe" ./cmd/wingless-native-text-selector
+          python research/native_language_session/check_text_cli.py "$RUNNER_TEMP/wingless-native-text-selector.exe"
+          go build -o "$RUNNER_TEMP/wingless-native-generator.exe" ./cmd/wingless-native-generator
+          python research/native_language_session/check_generator_cli.py "$RUNNER_TEMP/wingless-native-generator.exe"
+      - name: Existing ICE validation, unwaived
+        if: always()
+        shell: bash
+        run: go run ./cmd/ice validate
+      - name: Mandatory complete race regression
+        if: success()
+        shell: bash
+        run: go test -race ./... -count=1 -timeout 15m -v
+      - name: Vet and full build
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          go vet ./...
+          go build ./...
+      - name: Clean qualified source before derived output
+        if: always()
+        shell: bash
+        run: git diff --exit-code
+      - name: Export formatted session source and regenerated advisory ICE
+        if: always() && runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          gofmt -w unitary/native_language_session.go unitary/native_language_session_test.go cmd/wingless-native-session/main.go unitary/native_text_selector.go unitary/native_text_selector_test.go cmd/wingless-native-text-selector/main.go unitary/native_parallel_generator.go unitary/native_parallel_generator_test.go cmd/wingless-native-generator/main.go
+          go run ./cmd/ice build
+          python - <<'PY'
+          import base64,json
+          from pathlib import Path
+          paths=['unitary/native_language_session.go','unitary/native_language_session_test.go','cmd/wingless-native-session/main.go','unitary/native_text_selector.go','unitary/native_text_selector_test.go','cmd/wingless-native-text-selector/main.go','unitary/native_parallel_generator.go','unitary/native_parallel_generator_test.go','cmd/wingless-native-generator/main.go']
+          paths += ['.ice/'+n+'.json' for n in ['manifest','architecture-map','symbol-map','dependency-map','test-map','implementations','integration-seams','decisions']]
+          b=base64.b64encode(json.dumps({p:Path(p).read_text() for p in paths},ensure_ascii=True).encode()).decode()
+          for i in range(0,len(b),4000): print('SESSION_BUNDLE_B64:'+str(i//4000)+':'+b[i:i+4000])
+          print('SESSION_BUNDLE_CHUNKS:'+str((len(b)+3999)//4000))
+          PY
