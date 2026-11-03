@@ -105,7 +105,7 @@ jobs:
             --output "evidence/gcen-g24-preflight-${{ matrix.os }}.json"
           if ($LASTEXITCODE -ne 0) { throw "GCEN G24 pinned-index preflight failed" }
       - name: GCEN G25 pinned tiny Qwen3-MoE disk-offload and pre-hook smoke
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && (contains(github.event.head_commit.message, '[gcen-g25-offload]') || contains(github.event.head_commit.message, '[gcen-g26-shards]') || contains(github.event.head_commit.message, '[gcen-g27-meta]') || contains(github.event.head_commit.message, '[gcen-g28-placement]')) && success() }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && (contains(github.event.head_commit.message, '[gcen-g25-offload]') || contains(github.event.head_commit.message, '[gcen-g26-shards]') || contains(github.event.head_commit.message, '[gcen-g27-meta]') || contains(github.event.head_commit.message, '[gcen-g28-placement]') || contains(github.event.head_commit.message, '[gcen-g29-one-shard]')) && success() }}
         continue-on-error: true
         timeout-minutes: 16
         shell: bash
@@ -152,6 +152,19 @@ jobs:
             --scratch-root . \
             --output evidence/gcen-g28-meta-device-plan.json
           printf '{"status":"PINNED_ORIGINAL_META_CPU_DISK_DEVICE_PLAN_PASS","scope":"G28_STATIC_CPU_DISK_META_ONLY"}\n' > evidence/gcen-g28-status.json
+      - name: GCEN G29 original BF16 single-shard staging capacity proposal (metadata only)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g29-one-shard]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 12
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G29_METADATA_ONLY"}\n' > evidence/gcen-g29-status.json
+          python research/nr1/gcen/g29_one_shard_capacity.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root . \
+            --output evidence/gcen-g29-one-shard-capacity.json
+          printf '{"status":"PINNED_SINGLE_SHARD_STORAGE_HYPOTHESIS_CALCULATED","scope":"G29_METADATA_ONLY"}\n' > evidence/gcen-g29-status.json
       - name: GCEN pinned upstream metadata custody probe (diagnostic only)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && success() }}
         continue-on-error: true
