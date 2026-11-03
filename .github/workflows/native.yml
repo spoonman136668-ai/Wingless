@@ -84,6 +84,20 @@ jobs:
           python -m pip install --disable-pip-version-check "numpy==2.2.6" "safetensors==0.5.3"
           python research/nr1/gcen/run_focused.py
           if ($LASTEXITCODE -ne 0) { throw "GCEN focused tests failed" }
+      - name: GCEN pinned upstream metadata custody probe (diagnostic only)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && success() }}
+        continue-on-error: true
+        timeout-minutes: 3
+        shell: pwsh
+        run: |
+          # Read-only API and small metadata-file retrieval: NO model weights or inference.
+          # Network failure is a custody blocker, not a native regression failure.
+          python research/nr1/gcen/collect_upstream_manifest.py --output evidence/gcen-upstream-manifest.json
+          if ($LASTEXITCODE -ne 0) {
+            'UPSTREAM_CUSTODY_RETRIEVAL_FAILED_NOT_ACCEPTED' | Out-File -Encoding utf8 evidence/gcen-upstream-status.txt
+            throw 'upstream metadata retrieval failed; no scientific custody admitted'
+          }
+          'UPSTREAM_METADATA_ONLY_LOCAL_WEIGHTS_UNVERIFIED' | Out-File -Encoding utf8 evidence/gcen-upstream-status.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
