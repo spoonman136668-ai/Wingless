@@ -105,7 +105,7 @@ jobs:
             --output "evidence/gcen-g24-preflight-${{ matrix.os }}.json"
           if ($LASTEXITCODE -ne 0) { throw "GCEN G24 pinned-index preflight failed" }
       - name: GCEN G25 pinned tiny Qwen3-MoE disk-offload and pre-hook smoke
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && (contains(github.event.head_commit.message, '[gcen-g25-offload]') || contains(github.event.head_commit.message, '[gcen-g26-shards]')) && success() }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && (contains(github.event.head_commit.message, '[gcen-g25-offload]') || contains(github.event.head_commit.message, '[gcen-g26-shards]') || contains(github.event.head_commit.message, '[gcen-g27-meta]')) && success() }}
         continue-on-error: true
         timeout-minutes: 16
         shell: bash
@@ -127,6 +127,18 @@ jobs:
           printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G26_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g26-status.json
           python research/nr1/gcen/g26_sharded_checkpoint_smoke.py --output evidence/gcen-g26-sharded-smoke.json
           printf '{"status":"PINNED_TINY_SHARDED_CHECKPOINT_PASS","scope":"G26_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g26-status.json
+      - name: GCEN G27 pinned full 48-layer meta architecture and index-to-module audit
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g27-meta]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 12
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G27_META_NO_REAL_WEIGHTS"}\n' > evidence/gcen-g27-status.json
+          python research/nr1/gcen/g27_original_meta_mapping.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --output evidence/gcen-g27-meta-architecture.json
+          printf '{"status":"PINNED_ORIGINAL_ARCHITECTURE_META_KEY_MAPPING_PASS","scope":"G27_META_NO_REAL_WEIGHTS"}\n' > evidence/gcen-g27-status.json
       - name: GCEN pinned upstream metadata custody probe (diagnostic only)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && success() }}
         continue-on-error: true
