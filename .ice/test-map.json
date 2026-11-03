@@ -1,5 +1,35 @@
 [
   {
+    "name": "TestReplayVerificationCandidatesQwenShape",
+    "kind": "function",
+    "file": "benchmark/candidate_replay_test.go",
+    "start": 37,
+    "end": 60,
+    "calls": [
+      "ReplayVerificationCandidates",
+      "context.Background",
+      "qwenReplayFixtureReport",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestReplayVerificationCandidatesRejectsChangedFixtureOrder",
+    "kind": "function",
+    "file": "benchmark/candidate_replay_test.go",
+    "start": 62,
+    "end": 68,
+    "calls": [
+      "ReplayVerificationCandidates",
+      "context.Background",
+      "qwenReplayFixtureReport",
+      "t.Fatal"
+    ]
+  },
+  {
     "name": "TestCodeFixtureIsDeterministic",
     "kind": "function",
     "file": "benchmark/local_test.go",
@@ -66,6 +96,78 @@
     ]
   },
   {
+    "name": "TestMergePeakPreservesWorstObservedPressure",
+    "kind": "function",
+    "file": "benchmark/resource_peak_test.go",
+    "start": 11,
+    "end": 32,
+    "calls": [
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "mergePeak",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "u64",
+      "u64",
+      "u64",
+      "u64",
+      "u64",
+      "u64",
+      "u64",
+      "u64",
+      "u64",
+      "u64",
+      "u64",
+      "u64"
+    ]
+  },
+  {
+    "name": "TestRunLocalVerifiedPreservesRawAndVerifiesCandidates",
+    "kind": "function",
+    "file": "benchmark/verified_local_test.go",
+    "start": 59,
+    "end": 80,
+    "calls": [
+      "RunLocalVerified",
+      "context.Background",
+      "len",
+      "strings.HasPrefix",
+      "strings.HasPrefix",
+      "strings.TrimSpace",
+      "strings.TrimSpace",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestRoutineFastDoesNotRetryAsFallback",
+    "kind": "function",
+    "file": "broker/router_fallback_regression_test.go",
+    "start": 48,
+    "end": 88,
+    "calls": [
+      "Select",
+      "context.Background",
+      "reg.Register",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "time.Now"
+    ]
+  },
+  {
     "name": "TestRoutes",
     "kind": "function",
     "file": "broker/router_test.go",
@@ -115,15 +217,91 @@
     ]
   },
   {
-    "name": "TestPlanThenFast",
+    "name": "TestVerifiedCandidateNormalizesSingleFenceAndPreservesRaw",
     "kind": "function",
     "file": "broker/router_test.go",
     "start": 104,
-    "end": 110,
+    "end": 117,
+    "calls": [
+      "context.Background",
+      "fixture",
+      "len",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestUnverifiedResultPreservesRawFence",
+    "kind": "function",
+    "file": "broker/router_test.go",
+    "start": 118,
+    "end": 131,
+    "calls": [
+      "context.Background",
+      "fixture",
+      "len",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestPlanThenFast",
+    "kind": "function",
+    "file": "broker/router_test.go",
+    "start": 132,
+    "end": 138,
     "calls": [
       "context.Background",
       "fixture",
       "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestStage1LocalSelectionAllowsOnlyQualifiedEnvelope",
+    "kind": "function",
+    "file": "broker/stage1_local_selection_test.go",
+    "start": 18,
+    "end": 38,
+    "calls": [
+      "SelectStage1LocalModel",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validStage1LocalTask"
+    ]
+  },
+  {
+    "name": "TestStage1LocalSelectionRejectsAnythingOutsideEnvelope",
+    "kind": "function",
+    "file": "broker/stage1_local_selection_test.go",
+    "start": 40,
+    "end": 183,
+    "calls": [
+      "SelectStage1LocalModel",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Run",
+      "tc.mutate",
+      "validStage1LocalTask"
+    ]
+  },
+  {
+    "name": "TestStage1LocalSelectionZeroValueFailsClosed",
+    "kind": "function",
+    "file": "broker/stage1_local_selection_test.go",
+    "start": 185,
+    "end": 196,
+    "calls": [
+      "SelectStage1LocalModel",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
     ]
   },
   {
@@ -356,6 +534,110 @@
     ]
   },
   {
+    "name": "TestVerificationCandidateSingleFence",
+    "kind": "function",
+    "file": "inference/candidate_test.go",
+    "start": 5,
+    "end": 23,
+    "calls": [
+      "VerificationCandidate",
+      "t.Fatalf",
+      "t.Run"
+    ]
+  },
+  {
+    "name": "TestVerificationCandidateFailsClosed",
+    "kind": "function",
+    "file": "inference/candidate_test.go",
+    "start": 25,
+    "end": 40,
+    "calls": [
+      "VerificationCandidate",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestLocalHTTPJSONSchemaConstraint",
+    "kind": "function",
+    "file": "inference/output_constraint_local_test.go",
+    "start": 14,
+    "end": 73,
+    "calls": [
+      "NewLocalHTTP",
+      "backend.Invoke",
+      "context.Background",
+      "http.HandlerFunc",
+      "http.NotFound",
+      "httptest.NewServer",
+      "io.ReadAll",
+      "io.WriteString",
+      "json.RawMessage",
+      "json.Unmarshal",
+      "srv.Close",
+      "strings.Replace",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "time.Now",
+      "w.Header"
+    ]
+  },
+  {
+    "name": "TestLocalHTTPRejectsUnsupportedConstraintKind",
+    "kind": "function",
+    "file": "inference/output_constraint_local_test.go",
+    "start": 75,
+    "end": 96,
+    "calls": [
+      "NewLocalHTTP",
+      "backend.Invoke",
+      "context.Background",
+      "err.Error",
+      "json.RawMessage",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatalf",
+      "time.Now"
+    ]
+  },
+  {
+    "name": "TestLocalHTTPRejectsConstraintWithStreaming",
+    "kind": "function",
+    "file": "inference/output_constraint_streaming_test.go",
+    "start": 11,
+    "end": 33,
+    "calls": [
+      "NewLocalHTTP",
+      "backend.Invoke",
+      "context.Background",
+      "err.Error",
+      "json.RawMessage",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatalf",
+      "time.Now"
+    ]
+  },
+  {
+    "name": "TestLocalHTTPInferenceHasNoFixedResponseHeaderTimeout",
+    "kind": "function",
+    "file": "inference/response_header_timeout_test.go",
+    "start": 9,
+    "end": 25,
+    "calls": [
+      "NewLocalHTTP",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
     "name": "TestSSEFragmentationAndBounds",
     "kind": "function",
     "file": "inference/robustness_test.go",
@@ -422,8 +704,8 @@
     "name": "TestStreamingValidation",
     "kind": "function",
     "file": "inference/stream_test.go",
-    "start": 13,
-    "end": 56,
+    "start": 14,
+    "end": 57,
     "calls": [
       "NewStreamingLocalHTTP",
       "b.Close",
@@ -446,11 +728,41 @@
     ]
   },
   {
+    "name": "TestStreamingCapturesLlamaTimings",
+    "kind": "function",
+    "file": "inference/stream_test.go",
+    "start": 59,
+    "end": 88,
+    "calls": [
+      "NewStreamingLocalHTTP",
+      "b.Close",
+      "b.Invoke",
+      "context.Background",
+      "fmt.Fprint",
+      "fmt.Fprint",
+      "fmt.Fprint",
+      "http.HandlerFunc",
+      "httptest.NewServer",
+      "io.LimitReader",
+      "io.ReadAll",
+      "request",
+      "server.Close",
+      "string",
+      "strings.Contains",
+      "t.Errorf",
+      "t.Errorf",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "w.Header"
+    ]
+  },
+  {
     "name": "TestStreamingTimeoutAfterContent",
     "kind": "function",
     "file": "inference/stream_test.go",
-    "start": 58,
-    "end": 81,
+    "start": 90,
+    "end": 113,
     "calls": [
       "NewStreamingLocalHTTP",
       "b.Close",
@@ -488,6 +800,996 @@
       "strings.Contains",
       "t.Fatal",
       "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestTranslateValidPlaneBinding",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 45,
+    "end": 60,
+    "calls": [
+      "Translate",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateTrustedRoutingAndResources",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 62,
+    "end": 82,
+    "calls": [
+      "Translate",
+      "len",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsStaleWorkspaceRevision",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 84,
+    "end": 90,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "strings.Repeat",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsWorkspaceIdentityMismatch",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 92,
+    "end": 98,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsMissingPlaneProtectionGate",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 100,
+    "end": 106,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestTranslateRejectsUntrustedBackendPolicy",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 108,
+    "end": 114,
+    "calls": [
+      "Translate",
+      "err.Error",
+      "strings.Contains",
+      "t.Fatalf",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestDecodeReplayEnvelopeRejectsUnknownField",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 116,
+    "end": 126,
+    "calls": [
+      "DecodeReplayEnvelope",
+      "json.Marshal",
+      "string",
+      "strings.TrimSuffix",
+      "t.Fatal",
+      "t.Fatal",
+      "validEnvelope"
+    ]
+  },
+  {
+    "name": "TestCancelMapsPlaneAttemptToWinglessRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 138,
+    "end": 146,
+    "calls": [
+      "Cancel",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCandidateNeverClaimsPlaneAcceptance",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 148,
+    "end": 166,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCandidatePreservesBlockedBackendOutcomeWithoutAcceptance",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 168,
+    "end": 177,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCandidateRejectsAcceptanceClaim",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 179,
+    "end": 184,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestCandidateRejectsUnknownTerminalState",
+    "kind": "function",
+    "file": "integration/ckbplane/adapter_test.go",
+    "start": 186,
+    "end": 191,
+    "calls": [
+      "CandidateFromOutcome",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerAcceptsExactPlaneRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 102,
+    "end": 126,
+    "calls": [
+      "NewListener",
+      "atomic.AddInt32",
+      "atomic.LoadInt32",
+      "json.Unmarshal",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "requestRecorder",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "w.Header",
+      "w.Header"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerRejectsSessionMethodPathAndContentType",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 128,
+    "end": 151,
+    "calls": [
+      "NewListener",
+      "bytes.NewReader",
+      "httptest.NewRecorder",
+      "httptest.NewRequest",
+      "json.Marshal",
+      "listener.ServeHTTP",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "strings.Repeat",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerRejectsUnknownDuplicateAndTrailingJSON",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 153,
+    "end": 172,
+    "calls": [
+      "NewListener",
+      "append",
+      "append",
+      "bytes.NewReader",
+      "httptest.NewRecorder",
+      "httptest.NewRequest",
+      "json.Marshal",
+      "listener.ServeHTTP",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "string",
+      "string",
+      "strings.Replace",
+      "strings.Replace",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerConsumesAndClosesBodyBeforeInference",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 190,
+    "end": 210,
+    "calls": [
+      "NewListener",
+      "httptest.NewRecorder",
+      "httptest.NewRequest",
+      "int64",
+      "json.Marshal",
+      "len",
+      "listener.ServeHTTP",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "newTrackingBody",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerCancellationParentsInferenceToRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 212,
+    "end": 249,
+    "calls": [
+      "NewListener",
+      "bytes.NewReader",
+      "cancel",
+      "close",
+      "close",
+      "context.Background",
+      "context.WithCancel",
+      "ctx.Done",
+      "ctx.Err",
+      "http.NewRequestWithContext",
+      "httptest.NewServer",
+      "json.Marshal",
+      "listener.Handler",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "make",
+      "make",
+      "make",
+      "server.Close",
+      "t.Fatal",
+      "t.Fatal",
+      "time.After",
+      "time.After"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerRejectsAcceptanceClaimAndIdentityChange",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 251,
+    "end": 268,
+    "calls": [
+      "NewListener",
+      "bad.EditsCopy",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "mutate",
+      "requestRecorder",
+      "strings.Repeat",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerCallsIntelligenceExactlyOnce",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 280,
+    "end": 292,
+    "calls": [
+      "NewListener",
+      "atomic.AddInt32",
+      "atomic.LoadInt32",
+      "errors.New",
+      "listenerEngineFunc",
+      "listenerFixture",
+      "requestRecorder",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerNoProcessListenQueueOrAcceptanceSurface",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 294,
+    "end": 315,
+    "calls": [
+      "filepath.Dir",
+      "filepath.Join",
+      "os.ReadFile",
+      "reflect.TypeOf",
+      "runtime.Caller",
+      "string",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "typ.MethodByName"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerFullRequestResponseReplayThroughBroker",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 377,
+    "end": 414,
+    "calls": [
+      "NewListener",
+      "bytes.NewReader",
+      "http.NewRequest",
+      "httptest.NewServer",
+      "io.ReadAll",
+      "json.Marshal",
+      "json.Unmarshal",
+      "len",
+      "listener.Handler",
+      "listenerFixture",
+      "reg.Register",
+      "server.Close",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessListenerIsolatedProof",
+    "kind": "function",
+    "file": "integration/ckbplane/listener_test.go",
+    "start": 416,
+    "end": 424,
+    "calls": [
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run",
+      "t.Run"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofCandidateFlow",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 96,
+    "end": 124,
+    "calls": [
+      "CandidateFromOutcome",
+      "Translate",
+      "context.Background",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "runner.Run",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofAuthorizedDeepFallback",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 126,
+    "end": 155,
+    "calls": [
+      "Translate",
+      "context.Background",
+      "len",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "runner.Run",
+      "strings.Contains",
+      "strings.Join",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofBackendFailureNoDuplicateRetry",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 157,
+    "end": 184,
+    "calls": [
+      "CandidateFromOutcome",
+      "Translate",
+      "context.Background",
+      "errors.New",
+      "len",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "runner.Run",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestIsolatedProofCancellationPropagation",
+    "kind": "function",
+    "file": "integration/ckbplane/proof_test.go",
+    "start": 186,
+    "end": 234,
+    "calls": [
+      "Cancel",
+      "Translate",
+      "context.Background",
+      "len",
+      "proofProvider",
+      "proofRegistry",
+      "recordedPlaneEnvelope",
+      "svc.Result",
+      "svc.Status",
+      "svc.SubmitWork",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "time.Now",
+      "time.Now",
+      "time.Sleep",
+      "worker.New"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceReadyContract",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 78,
+    "end": 99,
+    "calls": [
+      "bytes.NewReader",
+      "http.NewRequest",
+      "json.Marshal",
+      "startServiceFixture",
+      "stopServiceFixture",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceNumericIPv4Only",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 101,
+    "end": 113,
+    "calls": [
+      "ip.IsLoopback",
+      "ip.To4",
+      "net.ParseIP",
+      "startServiceFixture",
+      "stopServiceFixture",
+      "t.Fatal",
+      "t.Fatalf",
+      "u.Hostname",
+      "u.Port",
+      "url.Parse"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceCancellationStopsListener",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 115,
+    "end": 127,
+    "calls": [
+      "conn.Close",
+      "net.DialTimeout",
+      "startServiceFixture",
+      "stopServiceFixture",
+      "t.Fatal",
+      "t.Fatal",
+      "url.Parse"
+    ]
+  },
+  {
+    "name": "TestWinglessLoopbackServiceNoDefaultActivationSurface",
+    "kind": "function",
+    "file": "integration/ckbplane/service_test.go",
+    "start": 129,
+    "end": 146,
+    "calls": [
+      "filepath.Clean",
+      "filepath.Dir",
+      "filepath.Join",
+      "filepath.Join",
+      "os.ReadFile",
+      "runtime.Caller",
+      "string",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestPlanStage1ExternalApplicationBindsPreimageAndPostimage",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_application_plan_test.go",
+    "start": 20,
+    "end": 54,
+    "calls": [
+      "PlanStage1ExternalApplication",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validStage1ApplicationPlanFixture"
+    ]
+  },
+  {
+    "name": "TestPlanStage1ExternalApplicationRejectsStaleSource",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_application_plan_test.go",
+    "start": 56,
+    "end": 63,
+    "calls": [
+      "PlanStage1ExternalApplication",
+      "t.Fatal",
+      "validStage1ApplicationPlanFixture"
+    ]
+  },
+  {
+    "name": "TestPlanStage1ExternalApplicationRejectsForgedValidatedCandidate",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_application_plan_test.go",
+    "start": 65,
+    "end": 134,
+    "calls": [
+      "PlanStage1ExternalApplication",
+      "exactSHA256",
+      "exactSHA256",
+      "exactSHA256",
+      "strings.Repeat",
+      "strings.Repeat",
+      "strings.Repeat",
+      "t.Fatalf",
+      "t.Run",
+      "tc.mutate",
+      "validStage1ApplicationPlanFixture"
+    ]
+  },
+  {
+    "name": "TestPlanStage1ExternalApplicationRejectsTamperedRequestBinding",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_application_plan_test.go",
+    "start": 136,
+    "end": 185,
+    "calls": [
+      "PlanStage1ExternalApplication",
+      "append",
+      "json.RawMessage",
+      "strings.Repeat",
+      "t.Fatalf",
+      "t.Run",
+      "tc.mutate",
+      "validStage1ApplicationPlanFixture"
+    ]
+  },
+  {
+    "name": "TestPlanStage1ExternalApplicationDoesNotMutateInputs",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_application_plan_test.go",
+    "start": 187,
+    "end": 203,
+    "calls": [
+      "PlanStage1ExternalApplication",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "validStage1ApplicationPlanFixture"
+    ]
+  },
+  {
+    "name": "TestDecodeStage1AuthorityEnvelopeRejectsUnknownFieldsAndTrailingJSON",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_authority_test.go",
+    "start": 41,
+    "end": 72,
+    "calls": [
+      "DecodeStage1AuthorityEnvelope",
+      "DecodeStage1AuthorityEnvelope",
+      "DecodeStage1AuthorityEnvelope",
+      "strings.TrimSuffix",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestProjectStage1LocalTaskAllowsBoundAuthorityEnvelope",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_authority_test.go",
+    "start": 74,
+    "end": 99,
+    "calls": [
+      "ProjectStage1LocalTask",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validStage1ProjectionFixture"
+    ]
+  },
+  {
+    "name": "TestProjectStage1LocalTaskFailsClosedOutsideAuthorityEnvelope",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_authority_test.go",
+    "start": 101,
+    "end": 180,
+    "calls": [
+      "ProjectStage1LocalTask",
+      "append",
+      "strings.Repeat",
+      "strings.Repeat",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Run",
+      "tc.mutate",
+      "validStage1ProjectionFixture"
+    ]
+  },
+  {
+    "name": "TestBuildStage1CandidateRequestBindsSchemaToAuthority",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_request_test.go",
+    "start": 31,
+    "end": 98,
+    "calls": [
+      "BuildStage1CandidateRequest",
+      "json.Unmarshal",
+      "len",
+      "len",
+      "len",
+      "len",
+      "strings.Contains",
+      "strings.Contains",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validStage1RequestFixture"
+    ]
+  },
+  {
+    "name": "TestBuildStage1CandidateRequestRejectsSourcePreimageMismatch",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_request_test.go",
+    "start": 100,
+    "end": 107,
+    "calls": [
+      "BuildStage1CandidateRequest",
+      "strings.Repeat",
+      "t.Fatal",
+      "validStage1RequestFixture"
+    ]
+  },
+  {
+    "name": "TestBuildStage1CandidateRequestRejectsNonTextSource",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_request_test.go",
+    "start": 109,
+    "end": 117,
+    "calls": [
+      "BuildStage1CandidateRequest",
+      "exactSHA256",
+      "string",
+      "t.Fatal",
+      "validStage1RequestFixture"
+    ]
+  },
+  {
+    "name": "TestBuildStage1CandidateRequestRejectsInvalidBounds",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_request_test.go",
+    "start": 119,
+    "end": 155,
+    "calls": [
+      "BuildStage1CandidateRequest",
+      "t.Fatal",
+      "t.Run",
+      "tc.mutate",
+      "time.Now",
+      "validStage1RequestFixture"
+    ]
+  },
+  {
+    "name": "TestBuildStage1CandidateRequestRevalidatesAuthority",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_request_test.go",
+    "start": 157,
+    "end": 164,
+    "calls": [
+      "BuildStage1CandidateRequest",
+      "t.Fatal",
+      "validStage1RequestFixture"
+    ]
+  },
+  {
+    "name": "TestStage1PromptTreatsInstructionsAsNonAuthoritativeContext",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_request_test.go",
+    "start": 166,
+    "end": 192,
+    "calls": [
+      "BuildStage1CandidateRequest",
+      "json.Unmarshal",
+      "len",
+      "strings.Contains",
+      "strings.Contains",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "validStage1RequestFixture"
+    ]
+  },
+  {
+    "name": "TestValidateStage1CandidateAcceptsExactBoundOperation",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_validator_test.go",
+    "start": 30,
+    "end": 45,
+    "calls": [
+      "ValidateStage1Candidate",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validStage1ValidatedCandidateFixture"
+    ]
+  },
+  {
+    "name": "TestValidateStage1CandidateRejectsAmbiguousOrWrappedOutput",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_validator_test.go",
+    "start": 47,
+    "end": 68,
+    "calls": [
+      "ValidateStage1Candidate",
+      "t.Fatalf",
+      "t.Run",
+      "validStage1ValidatedCandidateFixture"
+    ]
+  },
+  {
+    "name": "TestValidateStage1CandidateRejectsUnknownFields",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_validator_test.go",
+    "start": 70,
+    "end": 86,
+    "calls": [
+      "ValidateStage1Candidate",
+      "json.Marshal",
+      "json.Unmarshal",
+      "string",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "validStage1ValidatedCandidateFixture"
+    ]
+  },
+  {
+    "name": "TestValidateStage1CandidateRejectsBindingViolations",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_validator_test.go",
+    "start": 88,
+    "end": 121,
+    "calls": [
+      "ValidateStage1Candidate",
+      "json.Marshal",
+      "json.Unmarshal",
+      "string",
+      "strings.Repeat",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Run",
+      "tc.mutate",
+      "validStage1ValidatedCandidateFixture"
+    ]
+  },
+  {
+    "name": "TestValidateStage1CandidateRejectsStaleCurrentSource",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_validator_test.go",
+    "start": 123,
+    "end": 130,
+    "calls": [
+      "ValidateStage1Candidate",
+      "t.Fatal",
+      "validStage1ValidatedCandidateFixture"
+    ]
+  },
+  {
+    "name": "TestValidateStage1CandidateRejectsTamperedBuiltRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_validator_test.go",
+    "start": 132,
+    "end": 193,
+    "calls": [
+      "ValidateStage1Candidate",
+      "append",
+      "json.RawMessage",
+      "strings.Repeat",
+      "t.Fatalf",
+      "t.Run",
+      "tc.mutate",
+      "validStage1ValidatedCandidateFixture"
+    ]
+  },
+  {
+    "name": "TestValidateStage1CandidateDoesNotMutateInputs",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_candidate_validator_test.go",
+    "start": 195,
+    "end": 209,
+    "calls": [
+      "ValidateStage1Candidate",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "validStage1ValidatedCandidateFixture"
+    ]
+  },
+  {
+    "name": "TestVerifyStage1ExternalApplicationAcceptsExactObservedPostimage",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_postapplication_test.go",
+    "start": 19,
+    "end": 47,
+    "calls": [
+      "VerifyStage1ExternalApplication",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validStage1PostApplicationFixture"
+    ]
+  },
+  {
+    "name": "TestVerifyStage1ExternalApplicationRejectsWrongObservedBytes",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_postapplication_test.go",
+    "start": 49,
+    "end": 56,
+    "calls": [
+      "VerifyStage1ExternalApplication",
+      "t.Fatal",
+      "validStage1PostApplicationFixture"
+    ]
+  },
+  {
+    "name": "TestVerifyStage1ExternalApplicationRejectsNULObservedSource",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_postapplication_test.go",
+    "start": 58,
+    "end": 64,
+    "calls": [
+      "VerifyStage1ExternalApplication",
+      "t.Fatal",
+      "validStage1PostApplicationFixture"
+    ]
+  },
+  {
+    "name": "TestVerifyStage1ExternalApplicationRejectsTamperedPlan",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_postapplication_test.go",
+    "start": 66,
+    "end": 145,
+    "calls": [
+      "VerifyStage1ExternalApplication",
+      "strings.Repeat",
+      "strings.Repeat",
+      "t.Fatalf",
+      "t.Run",
+      "tc.mutate",
+      "validStage1PostApplicationFixture"
+    ]
+  },
+  {
+    "name": "TestVerifyStage1ExternalApplicationRejectsTamperedRequest",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_postapplication_test.go",
+    "start": 147,
+    "end": 154,
+    "calls": [
+      "VerifyStage1ExternalApplication",
+      "t.Fatal",
+      "validStage1PostApplicationFixture"
+    ]
+  },
+  {
+    "name": "TestVerifyStage1ExternalApplicationDoesNotGrantAcceptance",
+    "kind": "function",
+    "file": "integration/ckbplane/stage1_postapplication_test.go",
+    "start": 156,
+    "end": 169,
+    "calls": [
+      "VerifyStage1ExternalApplication",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "validStage1PostApplicationFixture"
     ]
   },
   {
@@ -589,11 +1891,29 @@
     ]
   },
   {
-    "name": "TestTailBound",
+    "name": "TestQualificationRequiresProvenanceAndBoundedContext",
     "kind": "function",
     "file": "modelhost/supervisor_test.go",
     "start": 43,
-    "end": 50,
+    "end": 58,
+    "calls": [
+      "New",
+      "New",
+      "New",
+      "filepath.Join",
+      "filepath.Join",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.TempDir"
+    ]
+  },
+  {
+    "name": "TestTailBound",
+    "kind": "function",
+    "file": "modelhost/supervisor_test.go",
+    "start": 59,
+    "end": 66,
     "calls": [
       "b.Write",
       "b.text",
@@ -601,6 +1921,224 @@
       "len",
       "make",
       "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestReadJSONLStrict",
+    "kind": "function",
+    "file": "research/nr1/nr1_test.go",
+    "start": 19,
+    "end": 46,
+    "calls": [
+      "ReadJSONL",
+      "ReadJSONL",
+      "ReadJSONL",
+      "ReadJSONL",
+      "len",
+      "strings.Join",
+      "strings.NewReader",
+      "strings.NewReader",
+      "strings.NewReader",
+      "strings.NewReader",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestAnalyzeLocality",
+    "kind": "function",
+    "file": "research/nr1/nr1_test.go",
+    "start": 48,
+    "end": 70,
+    "calls": [
+      "Analyze",
+      "len",
+      "len",
+      "syntheticTrace",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestResidencySimulation",
+    "kind": "function",
+    "file": "research/nr1/nr1_test.go",
+    "start": 72,
+    "end": 111,
+    "calls": [
+      "Simulate",
+      "len",
+      "syntheticTrace",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "uint64"
+    ]
+  },
+  {
+    "name": "TestSessionStaticIsOracleBound",
+    "kind": "function",
+    "file": "research/nr1/nr1_test.go",
+    "start": 113,
+    "end": 138,
+    "calls": [
+      "Simulate",
+      "syntheticTrace",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestQualifiedTopTrafficUsesLogicalExpertUniverse",
+    "kind": "function",
+    "file": "research/nr1/qualified_analyze_test.go",
+    "start": 8,
+    "end": 36,
+    "calls": [
+      "AnalyzeQualifiedQwen3Coder",
+      "float64",
+      "len",
+      "len",
+      "len",
+      "len",
+      "math.Abs",
+      "qualifiedTrace",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestValidateQualifiedQwen3CoderTrace",
+    "kind": "function",
+    "file": "research/nr1/topology_test.go",
+    "start": 29,
+    "end": 33,
+    "calls": [
+      "ValidateQualifiedQwen3CoderTrace",
+      "qualifiedTrace",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestValidateQualifiedQwen3CoderTraceRejectsIncompleteLayer",
+    "kind": "function",
+    "file": "research/nr1/topology_test.go",
+    "start": 35,
+    "end": 41,
+    "calls": [
+      "ValidateQualifiedQwen3CoderTrace",
+      "append",
+      "err.Error",
+      "qualifiedTrace",
+      "strings.Contains",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestValidateQualifiedQwen3CoderTraceRejectsDuplicateLayer",
+    "kind": "function",
+    "file": "research/nr1/topology_test.go",
+    "start": 43,
+    "end": 49,
+    "calls": [
+      "ValidateQualifiedQwen3CoderTrace",
+      "append",
+      "err.Error",
+      "qualifiedTrace",
+      "strings.Contains",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestValidateQualifiedQwen3CoderTraceRejectsWrongTopK",
+    "kind": "function",
+    "file": "research/nr1/topology_test.go",
+    "start": 51,
+    "end": 57,
+    "calls": [
+      "ValidateQualifiedQwen3CoderTrace",
+      "err.Error",
+      "qualifiedTrace",
+      "strings.Contains",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestValidateQualifiedQwen3CoderTraceRejectsExpertOutOfRange",
+    "kind": "function",
+    "file": "research/nr1/topology_test.go",
+    "start": 59,
+    "end": 65,
+    "calls": [
+      "ValidateQualifiedQwen3CoderTrace",
+      "err.Error",
+      "qualifiedTrace",
+      "strings.Contains",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestValidateQualifiedQwen3CoderTraceRejectsTokenGap",
+    "kind": "function",
+    "file": "research/nr1/topology_test.go",
+    "start": 67,
+    "end": 78,
+    "calls": [
+      "ValidateQualifiedQwen3CoderTrace",
+      "append",
+      "err.Error",
+      "qualifiedTrace",
+      "strings.Contains",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestNR1AWorkloadCorpusComplete",
+    "kind": "function",
+    "file": "research/nr1/workloads_test.go",
+    "start": 10,
+    "end": 43,
+    "calls": [
+      "filepath.Dir",
+      "filepath.Join",
+      "filepath.Join",
+      "filepath.Join",
+      "info.Mode",
+      "info.Mode",
+      "info.Size",
+      "info.Size",
+      "info.Size",
+      "os.Stat",
+      "os.Stat",
+      "runtime.Caller",
+      "system.Mode",
+      "system.Mode",
+      "system.Size",
+      "system.Size",
+      "system.Size",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
     ]
   },
   {
@@ -642,8 +2180,8 @@
     "name": "TestNVIDIAParsing",
     "kind": "function",
     "file": "resources/nvidia_test.go",
-    "start": 9,
-    "end": 23,
+    "start": 10,
+    "end": 24,
     "calls": [
       "parseGPU",
       "parseGPU",
@@ -654,11 +2192,31 @@
     ]
   },
   {
+    "name": "TestNVIDIAEnvironmentIsBounded",
+    "kind": "function",
+    "file": "resources/nvidia_test.go",
+    "start": 26,
+    "end": 46,
+    "calls": [
+      "nvidiaEnvironment",
+      "reflect.DeepEqual",
+      "t.Fatalf",
+      "t.Setenv",
+      "t.Setenv",
+      "t.Setenv",
+      "t.Setenv",
+      "t.Setenv",
+      "t.Setenv",
+      "t.Setenv",
+      "t.Setenv"
+    ]
+  },
+  {
     "name": "TestOptionalGPUStillDeniesRequiredVRAM",
     "kind": "function",
     "file": "resources/nvidia_test.go",
-    "start": 32,
-    "end": 37,
+    "start": 55,
+    "end": 60,
     "calls": [
       "Check",
       "t.Fatal"
