@@ -8,7 +8,10 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import resource
+if os.name == "posix":
+    import resource
+else:
+    resource = None
 import shutil
 import struct
 import tempfile
@@ -29,6 +32,13 @@ MAX_RSS_INCREASE = 1024**3
 DTYPE_BYTES = {"BF16": 2, "F16": 2, "F32": 4, "I64": 8, "I32": 4, "I16": 2, "I8": 1, "U8": 1}
 RESULT = "G31_ORIGINAL_SINGLE_SHARD_BYTES_VERIFIED"
 URL = f"https://huggingface.co/{MODEL}/resolve/{REVISION}/{SHARD}"
+
+
+def peak_rss_bytes():
+    """High-water RSS on Linux, unused by Windows runtime."""
+    if resource is None:
+        return 0
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
 
 
 def parse_unique_json(raw):
@@ -127,7 +137,7 @@ def stage_verified(response, dest, expected_sha, *, max_bytes=MAX_SHARD_BYTES,
     hasher = hashlib.sha256()
     total = 0
     staged_count_peak = 0
-    rss_peak_kb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    rss_peak_bytes = peak_rss_bytes()
     allocated_peak = 0
     try:
         with dest.open("xb") as sink:
@@ -143,7 +153,7 @@ def stage_verified(response, dest, expected_sha, *, max_bytes=MAX_SHARD_BYTES,
                     raise ValueError("upstream shard exceeded byte cap")
                 hasher.update(chunk)
                 sink.write(chunk)
-                rss_peak_kb = max(rss_peak_kb, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+                rss_peak_bytes = max(rss_peak_bytes, peak_rss_bytes())
                 allocated_peak = max(allocated_peak, dest.stat().st_blocks * 512)
         if not min_bytes <= total <= max_bytes:
             raise ValueError("source shard size invalid")
@@ -155,7 +165,7 @@ def stage_verified(response, dest, expected_sha, *, max_bytes=MAX_SHARD_BYTES,
         return {"bytes_verified": total, "observed_sha256": digest,
                 "physical_allocated_bytes_peak": max(allocated_peak, dest.stat().st_blocks * 512),
                 "observed_peak_staged_file_count": staged_count_peak,
-                "transfer_peak_process_rss_bytes": rss_peak_kb * 1024}
+                "transfer_peak_process_rss_bytes": rss_peak_bytes}
     except BaseException:
         dest.unlink(missing_ok=True)
         raise
@@ -173,7 +183,7 @@ def run(manifest_path, scratch_root, output, source_sha):
     upstream = build_manifest()  # independently retrieve pinned official LFS hashes
     check_upstream(manifest, upstream)
     index = pinned_metadata("model.safetensors.index.json", manifest)
-    before_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
+    before_rss = peak_rss_bytes()
     free_before = shutil.disk_usage(scratch_root).free
     started = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="gcen-g31-one-original-shard-", dir=scratch_root) as temporary:
@@ -188,7 +198,7 @@ def run(manifest_path, scratch_root, output, source_sha):
         details = inspect_header(stage, index)
         if metrics["observed_peak_staged_file_count"] != 1 or details["tensor_count"] <= 0:
             raise RuntimeError("original shard staging invariant failed")
-        peak_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
+        peak_rss = peak_rss_bytes()
         if peak_rss - before_rss > MAX_RSS_INCREASE:
             raise RuntimeError("unbounded memory growth during one-shard stage")
         receipt = {
