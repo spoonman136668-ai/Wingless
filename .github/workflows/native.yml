@@ -105,7 +105,7 @@ jobs:
             --output "evidence/gcen-g24-preflight-${{ matrix.os }}.json"
           if ($LASTEXITCODE -ne 0) { throw "GCEN G24 pinned-index preflight failed" }
       - name: GCEN G25 pinned tiny Qwen3-MoE disk-offload and pre-hook smoke
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g25-offload]') && success() }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && (contains(github.event.head_commit.message, '[gcen-g25-offload]') || contains(github.event.head_commit.message, '[gcen-g26-shards]')) && success() }}
         continue-on-error: true
         timeout-minutes: 16
         shell: bash
@@ -117,6 +117,16 @@ jobs:
           python -m pip install --disable-pip-version-check --quiet 'accelerate==1.10.1' 'transformers==4.57.3'
           python research/nr1/gcen/g25_disk_offload_smoke.py --output evidence/gcen-g25-disk-offload-smoke.json
           printf '{"status":"PINNED_TINY_OFFLOAD_HOOK_PASS","scope":"G25_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g25-status.json
+      - name: GCEN G26 tiny sharded CPU-disk checkpoint and expert hook smoke
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g26-shards]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G26_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g26-status.json
+          python research/nr1/gcen/g26_sharded_checkpoint_smoke.py --output evidence/gcen-g26-sharded-smoke.json
+          printf '{"status":"PINNED_TINY_SHARDED_CHECKPOINT_PASS","scope":"G26_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g26-status.json
       - name: GCEN pinned upstream metadata custody probe (diagnostic only)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && success() }}
         continue-on-error: true
