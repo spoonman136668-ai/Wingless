@@ -104,6 +104,19 @@ jobs:
             --scratch-root . `
             --output "evidence/gcen-g24-preflight-${{ matrix.os }}.json"
           if ($LASTEXITCODE -ne 0) { throw "GCEN G24 pinned-index preflight failed" }
+      - name: GCEN G25 pinned tiny Qwen3-MoE disk-offload and pre-hook smoke
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g25-offload]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 16
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G25_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g25-status.json
+          python -m pip install --disable-pip-version-check --quiet 'torch==2.10.0' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --disable-pip-version-check --quiet 'accelerate==1.10.1' 'transformers==4.57.3'
+          python research/nr1/gcen/g25_disk_offload_smoke.py --output evidence/gcen-g25-disk-offload-smoke.json
+          printf '{"status":"PINNED_TINY_OFFLOAD_HOOK_PASS","scope":"G25_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g25-status.json
       - name: GCEN pinned upstream metadata custody probe (diagnostic only)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && success() }}
         continue-on-error: true
