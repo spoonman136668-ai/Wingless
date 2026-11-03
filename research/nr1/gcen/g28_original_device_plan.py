@@ -41,8 +41,9 @@ def resolve_assignment(parameter_name, device_map):
         parent = parent.rsplit(".", 1)[0]
     if "" in device_map:
         target = device_map[""]
-        if target in ("cpu", "disk"):
-            return target
+        if target not in ("cpu", "disk"):
+            raise ValueError("G28 host-only plan unexpectedly targets GPU/other device")
+        return target
     raise ValueError("unmapped checkpoint tensor: " + parameter_name)
 
 
