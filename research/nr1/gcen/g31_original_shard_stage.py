@@ -118,6 +118,16 @@ def inspect_header(shard_path, index, *, header_limit=HEADER_LIMIT):
             "indexed_payload_bytes": cursor, "header_and_payload_reconciled": True}
 
 
+def staged_allocation_bytes(path):
+    """Physical allocation on Linux; logical bytes for Windows offline tests."""
+    stat = path.stat()
+    if hasattr(stat, "st_blocks"):
+        return stat.st_blocks * 512
+    if os.name != "posix":
+        return stat.st_size
+    raise RuntimeError("physical disk allocation unavailable")
+
+
 def stage_verified(response, dest, expected_sha, *, max_bytes=MAX_SHARD_BYTES,
                    min_bytes=MIN_SHARD_BYTES):
     """Consume a single verified response into one isolated stage file. No retries."""
@@ -154,7 +164,7 @@ def stage_verified(response, dest, expected_sha, *, max_bytes=MAX_SHARD_BYTES,
                 hasher.update(chunk)
                 sink.write(chunk)
                 rss_peak_bytes = max(rss_peak_bytes, peak_rss_bytes())
-                allocated_peak = max(allocated_peak, dest.stat().st_blocks * 512)
+                allocated_peak = max(allocated_peak, staged_allocation_bytes(dest))
         if not min_bytes <= total <= max_bytes:
             raise ValueError("source shard size invalid")
         if declared is not None and total != int(declared):
@@ -163,7 +173,7 @@ def stage_verified(response, dest, expected_sha, *, max_bytes=MAX_SHARD_BYTES,
         if digest != expected_sha:
             raise ValueError("pinned original shard SHA256 mismatch")
         return {"bytes_verified": total, "observed_sha256": digest,
-                "physical_allocated_bytes_peak": max(allocated_peak, dest.stat().st_blocks * 512),
+                "physical_allocated_bytes_peak": max(allocated_peak, staged_allocation_bytes(dest)),
                 "observed_peak_staged_file_count": staged_count_peak,
                 "transfer_peak_process_rss_bytes": rss_peak_bytes}
     except BaseException:

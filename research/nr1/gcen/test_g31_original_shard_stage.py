@@ -79,6 +79,17 @@ class G31Tests(unittest.TestCase):
             self.assertEqual(result["observed_peak_staged_file_count"], 1)
             self.assertEqual(p.read_bytes(), data)
 
+    def test_physical_allocation_guard(self):
+        from g31_original_shard_stage import staged_allocation_bytes
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "small"
+            p.write_bytes(b"abcd")
+            self.assertGreaterEqual(staged_allocation_bytes(p), 4)
+        code = Path(__file__).with_name("g31_original_shard_stage.py").read_text(encoding="utf-8")
+        self.assertIn('if hasattr(stat, "st_blocks"):', code)
+        self.assertIn('if os.name != "posix":', code)
+        self.assertIn('raise RuntimeError("physical disk allocation unavailable")', code)
+
     def test_corrupted_digest_removes_stage(self):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d) / SHARD
