@@ -10,7 +10,14 @@ class G9PFullExpertTests(unittest.TestCase):
 
     def test_matched_arms_and_exact_bf16_reference(self):
         r=compare_original_expert(self.w)
-        self.assertEqual(r["comparison_count"],8)
+        self.assertEqual(r["comparison_count"],14)
+        self.assertEqual(
+            sorted(set(x["arm"] for x in r["comparisons"] if "mixed_" in x["arm"])),
+            ["mixed_ranked_eighth_INT4","mixed_ranked_quarter_INT4","mixed_uniform_eighth_INT4"])
+        rows={a["arm"]:a for a in r["comparisons"] if a["seed"]==SEEDS[0]}
+        self.assertEqual(
+            rows["mixed_ranked_eighth_INT4"]["encoded_bytes_including_accounted_metadata"],
+            rows["mixed_uniform_eighth_INT4"]["encoded_bytes_including_accounted_metadata"])
         self.assertEqual(r["frozen_seeds"],list(SEEDS))
         self.assertEqual(r["probe_inputs"],"SYNTHETIC_GAUSSIAN_NOT_QWEN_ACTIVATIONS")
         for row in r["comparisons"]:
