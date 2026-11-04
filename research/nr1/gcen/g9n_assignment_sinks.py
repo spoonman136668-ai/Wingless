@@ -66,6 +66,7 @@ class HostAssignmentSinks:
         self._writer = writer or _write_safetensor
         self.cpu_tensors = {}
         self.disk_paths = {}
+        self._disk_digest = {}
         self._closed = False
 
     @property
@@ -102,6 +103,13 @@ class HostAssignmentSinks:
                 if temp.is_symlink() or not temp.is_file() or temp.stat().st_size <= 0:
                     raise RuntimeError("disk tensor writer did not produce a regular file")
                 os.replace(temp, dest)
+                # Establish a bounded, immutable-in-session identity for the disk
+                # representation. Rehash it before issuing a verified receipt.
+                digest = hashlib.sha256()
+                with dest.open("rb") as stream:
+                    for block in iter(lambda: stream.read(1024 * 1024), b""):
+                        digest.update(block)
+                self._disk_digest[key] = digest.hexdigest()
             finally:
                 temp.unlink(missing_ok=True)
             self.disk_paths[key] = dest
@@ -119,10 +127,44 @@ class HostAssignmentSinks:
                 "disk_tensors": len(self.disk_paths),
                 "cpu_bytes": self._used["cpu"],
                 "disk_bytes": self._used["disk"],
+                "disk_content_verified": False,
                 "original_model_forward_executed": False,
                 "accelerate_dispatch_verified": False,
                 "gpu_residency_verified": False,
                 "scientific_acceptance": "NOT_GRANTED"}
+
+    def verified_receipt(self):
+        """Authenticate the stored disk representation at this instant.
+
+        This proves integrity against the post-write digest, not the provenance
+        of the input tensor or future validity after session teardown.
+        """
+        receipt = self.receipt()
+        if set(self._disk_digest) != set(self.disk_paths):
+            raise RuntimeError("disk tensor digest inventory mismatch")
+        from safetensors import safe_open
+        for key, path in self.disk_paths.items():
+            if (path.is_symlink() or not path.is_file()
+                or path.parent != self._directory):
+                raise RuntimeError("disk tensor file missing, escaped or symlinked")
+            digest = hashlib.sha256()
+            with path.open("rb") as stream:
+                for block in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(block)
+            if digest.hexdigest() != self._disk_digest[key]:
+                raise RuntimeError("disk tensor integrity mismatch: " + key)
+            with safe_open(str(path), framework="pt", device="cpu") as reader:
+                if list(reader.keys()) != [key]:
+                    raise RuntimeError("disk tensor key mismatch: " + key)
+                view = reader.get_slice(key)
+                if tuple(view.get_shape()) != self._shapes[key]:
+                    raise RuntimeError("disk tensor shape mismatch: " + key)
+                value = reader.get_tensor(key)
+                if str(value.dtype) != "torch.bfloat16":
+                    raise RuntimeError("disk tensor dtype mismatch: " + key)
+        receipt["disk_content_verified"] = True
+        receipt["disk_verification_scope"] = "IN_SESSION_SHA256_AND_BF16_SAFETENSORS_ONLY"
+        return receipt
 
     def discard_partial(self):
         if self._closed:
@@ -130,6 +172,7 @@ class HostAssignmentSinks:
         self._closed = True
         self.cpu_tensors.clear()
         self.disk_paths.clear()
+        self._disk_digest.clear()
         shutil.rmtree(self._directory)
 
     def close(self):

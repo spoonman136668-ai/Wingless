@@ -82,6 +82,13 @@ class HostSinkTests(unittest.TestCase):
                 s.discard_partial()
                 self.assertFalse(s.directory.exists())
 
+    def test_unverified_receipt_must_not_claim_disk_content_validation(self):
+        with tempfile.TemporaryDirectory() as d:
+            with HostAssignmentSinks(plan(), d, writer=writer) as session:
+                session.assign("cpu.weight", FakeTensor())
+                session.assign("disk.weight", FakeTensor())
+                self.assertFalse(session.receipt()["disk_content_verified"])
+
     def test_incomplete_assignment_refuses_receipt(self):
         with tempfile.TemporaryDirectory() as d:
             with HostAssignmentSinks(plan(), d, writer=writer) as s:

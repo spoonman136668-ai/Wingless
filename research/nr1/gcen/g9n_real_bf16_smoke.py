@@ -45,7 +45,8 @@ def check_roundtrip():
         with HostAssignmentSinks(plan,scratch) as sinks:
             result=ingest(src,scratch,manifest,index,expected,sinks)
             assert (result["verified_shards"],result["verified_tensor_count"])==(16,16)
-            rec=sinks.receipt()
+            rec=sinks.verified_receipt()
+            assert rec["disk_content_verified"]
             assert (rec["cpu_tensors"],rec["disk_tensors"])==(2,14)
             for k,v in sinks.cpu_tensors.items():
                 assert torch.equal(v,expected[k])
@@ -54,6 +55,27 @@ def check_roundtrip():
                     assert list(f.keys())==[k] and torch.equal(f.get_tensor(k),expected[k])
             owned=sinks.directory
         assert not owned.exists()
+        assert not list(scratch.glob("g9n-*"))
+
+
+def check_corrupt_stored_disk_tensor():
+    with tempfile.TemporaryDirectory() as d:
+        src,scratch,manifest,index,expected,plan=fixture(Path(d))
+        with HostAssignmentSinks(plan,scratch) as sinks:
+            ingest(src,scratch,manifest,index,expected,sinks)
+            assert sinks.verified_receipt()["disk_content_verified"]
+            path=next(iter(sinks.disk_paths.values()))
+            mutated=bytearray(path.read_bytes())
+            mutated[-1]^=1
+            path.write_bytes(mutated)
+            try:
+                sinks.verified_receipt()
+            except RuntimeError as e:
+                assert "integrity mismatch" in str(e), str(e)
+            else:
+                raise AssertionError("corrupted sink disk tensor was accepted")
+            sinks.discard_partial()
+            assert not sinks.directory.exists()
         assert not list(scratch.glob("g9n-*"))
 
 
@@ -98,10 +120,11 @@ def check_writer_failure():
 
 if __name__=="__main__":
     check_roundtrip()
+    check_corrupt_stored_disk_tensor()
     check_corrupt_tail()
     check_writer_failure()
     print("G9N_SYNTHETIC_BF16_REAL_IO_PASS "+json.dumps({
         "verified_shards":16,"verified_tensors":16,
-        "negative_controls":["corrupt_last_shard","partial_disk_write"],
-        "source":"synthetic_only","model_forward":False,
+        "negative_controls":["corrupt_last_shard","partial_disk_write","corrupt_stored_disk_tensor"],
+        "source":"synthetic_only","disk_content_verified":True,"model_forward":False,
         "gpu_vram_measured":False,"scientific_acceptance":"NOT_GRANTED"},sort_keys=True))
