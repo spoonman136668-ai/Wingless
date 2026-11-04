@@ -49,7 +49,10 @@ jobs:
               command = list(command) if isinstance(command, (list,tuple)) else [command]
               command = [str(i) for i in command]
               is_maintainer = any(x.replace("\\","/").endswith("scripts/maintain_code_atlas.py") for x in command)
-              if is_maintainer:
+              # Profile only the known positive-control regeneration. All deliberately
+              # failing independent cases must retain their original exit semantics.
+              profile_this = is_maintainer and pathlib.Path(kwargs.get("cwd") or ".").name == "unchanged-declarations"
+              if profile_this:
                   n = len(profiles)+1
                   outfile = work/("wingless-g26-maint-"+str(n)+".pstats")
                   at = next(i for i,x in enumerate(command)
