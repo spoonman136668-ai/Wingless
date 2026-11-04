@@ -49,6 +49,9 @@ def benchmark_original(weight):
     if w.shape!=(2048,768) or not np.isfinite(w).all():
         raise ValueError("G9R requires frozen original expert shape and finite weights")
     data,scales=pack_companded_int2(w,block=256)
+    # Numba nopython cannot accept float16 array arguments. Preserve encoded
+    # FP16 storage; promote only the small runtime scale table to FP32.
+    jit_scales=scales.astype(np.float32)
     set_num_threads(THREADS)
     if get_num_threads()!=THREADS:
         raise RuntimeError("incorrect benchmark thread count")
@@ -58,7 +61,7 @@ def benchmark_original(weight):
     for seed in SEEDS:
         x=validate(np.random.default_rng(seed).standard_normal((BATCH,768)).astype(np.float32),data,scales)
         t0=time.perf_counter()
-        actual=direct(x,data,scales)
+        actual=direct(x,data,jit_scales)
         if seed==SEEDS[0]:
             compile_seconds=time.perf_counter()-t0
         expected=apply_companded_int2(x,data,scales,block=256)
@@ -66,7 +69,7 @@ def benchmark_original(weight):
             raise RuntimeError("G9R direct packed INT2 parity failure")
         timings={}
         for name,fn in (("numpy",lambda:apply_companded_int2(x,data,scales,block=256)),
-                        ("numba",lambda:direct(x,data,scales))):
+                        ("numba",lambda:direct(x,data,jit_scales))):
             measures=[]
             for _ in range(REPEATS):
                 start=time.perf_counter()
@@ -82,6 +85,7 @@ def benchmark_original(weight):
     return {"schema":"wingless.gcen.g9r.original-packed-int2-numba-cpu.v1",
             "seeds":list(SEEDS),"batch":BATCH,"threads":THREADS,"repeats":REPEATS,
             "jit_compile_and_first_call_seconds":compile_seconds,
+            "runtime_fp32_scale_bytes":int(jit_scales.nbytes),
             "comparisons":rows,"source_weights_authenticated_by_caller":True,
             "uses_original_activations":False,"uses_gpu":False,
             "scientific_acceptance":"NOT_GRANTED"}
