@@ -11,6 +11,7 @@ import math
 import os
 from pathlib import Path
 import statistics
+import subprocess
 import time
 
 SCHEMA = "wingless.nr1.residency.r4.cuda-transfer-development.v1"
@@ -48,6 +49,8 @@ def validate_receipt(receipt):
         raise ValueError("receipt schema/status mismatch")
     if receipt.get("original_weights_used") is not False or receipt.get("model_inference_executed") is not False:
         raise ValueError("invalid scope")
+    if receipt.get("source_custody", {}).get("source_identity_verified") is not True or receipt.get("source_custody", {}).get("checkout_clean") is not True or receipt.get("source_custody", {}).get("source_sha") != receipt.get("source_sha"):
+        raise ValueError("source provenance unverified")
     if receipt.get("scientific_acceptance") != "NOT_GRANTED":
         raise ValueError("scientific acceptance forbidden")
     expected = plan()
@@ -70,6 +73,30 @@ def validate_receipt(receipt):
     return True
 
 
+def verify_source_identity(source_sha, repository_root=None):
+    """Reject checkout drift and dirty/untracked source before GPU allocation."""
+    if not isinstance(source_sha, str) or len(source_sha) != 40 or any(
+            c not in "0123456789abcdef" for c in source_sha):
+        raise ValueError("invalid exact source SHA")
+    root = Path(repository_root) if repository_root is not None else Path(__file__).resolve().parents[3]
+    if not root.is_dir():
+        raise ValueError("repository root absent")
+    def git(*args):
+        try:
+            run = subprocess.run(
+                ["git", *args], cwd=str(root), text=True,
+                capture_output=True, timeout=15, check=True)
+        except (OSError, subprocess.SubprocessError) as exc:
+            raise RuntimeError("R4_SOURCE_CUSTODY_UNVERIFIED") from exc
+        return run.stdout.strip()
+    if git("rev-parse", "HEAD") != source_sha:
+        raise RuntimeError("R4_EXACT_SOURCE_SHA_MISMATCH")
+    if git("status", "--porcelain", "--untracked-files=all"):
+        raise RuntimeError("R4_DIRTY_OR_UNTRACKED_WORKSPACE")
+    return {"source_sha": source_sha, "checkout_clean": True,
+            "source_identity_verified": True}
+
+
 def require_cuda():
     try:
         import torch
@@ -84,6 +111,7 @@ def run(source_sha):
     if len(source_sha) != 40 or any(c not in "0123456789abcdef" for c in source_sha):
         raise ValueError("expected immutable 40-character source SHA")
     validate_plan(plan())
+    provenance = verify_source_identity(source_sha)
     torch = require_cuda()
     torch.manual_seed(SEED)
     torch.cuda.set_device(0)
@@ -143,6 +171,7 @@ def run(source_sha):
         receipt = {
             "schema": SCHEMA, "status": "R4_SYNTHETIC_CUDA_COPY_MEASURED",
             "source_sha": source_sha,
+            "source_custody": provenance,
             "torch_version": str(torch.__version__),
             "cuda_runtime_version": str(torch.version.cuda),
             "cuda_available": True,
