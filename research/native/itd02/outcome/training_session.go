@@ -27,6 +27,10 @@ type TrainingSession struct {
     Learner *Selected
     MinimumSelectedSamples uint32
     MaximumEpisodeSteps uint32
+    // Process-local fail-closed custody. Cross-process reconciliation belongs
+    // to the original source owner and is NOT implemented by these flags.
+    quarantined bool
+    checkpointUnconfirmed bool
 }
 
 // EpisodeResult is a development-only observation, not an accepted scientific
@@ -49,7 +53,11 @@ type EpisodeResult struct {
 // from an unobserved transition. The caller must reconcile source custody.
 func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []byte, error) {
     var zero EpisodeResult
-    if s == nil || s.Learner == nil || s.Learner.Policy == nil ||
+    if s == nil { return zero, nil, errors.New("OUTCOME_SELF_TRAINING_NIL_SESSION") }
+    if s.quarantined || s.checkpointUnconfirmed {
+        return zero, nil, errors.New("OUTCOME_SELF_TRAINING_SOURCE_CUSTODY_UNCONFIRMED")
+    }
+    if s.Learner == nil || s.Learner.Policy == nil ||
         s.Learner.Rewards == nil || env == nil ||
         s.MinimumSelectedSamples < 2 || s.MaximumEpisodeSteps < 1 ||
         s.MaximumEpisodeSteps > 4096 ||
@@ -62,10 +70,12 @@ func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []by
     // before the source agrees to begin this episode.
     before, err := env.ResetPublic()
     if err != nil {
+        s.quarantined = true
         return zero, nil, err
     }
     if s.Learner.Rewards.Closed {
         if err := s.Learner.BeginEpisode(); err != nil {
+            s.quarantined = true
             return zero, nil, err
         }
     }
@@ -79,6 +89,7 @@ func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []by
         observed, err := env.StepPublic(action)
         if err != nil {
             // Original pending selection remains armed. No retry.
+            s.quarantined = true
             return zero, nil, err
         }
         event := Event{
@@ -87,6 +98,7 @@ func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []by
             Truncated: observed.Truncated,
         }
         if err := s.Learner.Feedback(before, action, observed.After, event); err != nil {
+            s.quarantined = true
             return zero, nil, err
         }
         result.Steps++
@@ -98,12 +110,17 @@ func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []by
             result.NativeUpdates = s.Learner.Policy.LiveSeen
             checkpoint, err := s.Learner.SnapshotSelected()
             if err != nil {
+                s.quarantined = true
                 return zero, nil, err
             }
+            // A returned snapshot is not a durable owner-acknowledged save.
+            // Do not permit another RunEpisode on this session before custody.
+            s.checkpointUnconfirmed = true
             return result, checkpoint, nil
         }
     }
     // Never invent an environment termination to fit a training budget.
+    s.quarantined = true
     return zero, nil, errors.New("OUTCOME_SELF_TRAINING_SOURCE_EPISODE_NOT_TERMINATED")
 }
 
@@ -125,10 +142,13 @@ func (s *TrainingSession) TrainBounded(
             return results, err
         }
         if err := save(checkpoint); err != nil {
-            // Never silently continue once a completed transition is not
-            // durably acknowledged by its source-bound checkpoint sink.
+            // Ambiguous writes cannot be reconciled by retrying within the
+            // session. Even a later successful write would not prove identity.
+            s.quarantined = true
             return results, err
         }
+        // The owner-provided callback acknowledged exactly this checkpoint.
+        s.checkpointUnconfirmed = false
         results = append(results, result)
     }
     return results, nil
