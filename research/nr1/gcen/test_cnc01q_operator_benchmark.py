@@ -1,12 +1,14 @@
 """CNC-01Q focused benchmark contract, synthetic only."""
 import unittest
+import json
 
 from cnc01q_operator_benchmark import measure
 
 
 class CNC01QBenchmarkTests(unittest.TestCase):
     def test_bounded_operator_comparison(self):
-        receipt = measure(repeats=3, warmups=1)
+        receipt = measure(repeats=20, warmups=5)
+        print('CNC01Q_DIAGNOSTIC_JSON ' + json.dumps(receipt, sort_keys=True), flush=True)
         self.assertEqual(receipt["status"], "SYNTHETIC_DEVELOPMENT_DIAGNOSTIC_ONLY")
         self.assertEqual(receipt["runtime_peak_vram_bytes"], "UNMEASURED")
         self.assertLess(receipt["factor_fp16_storage_bytes"], receipt["dense_fp16_storage_bytes"] / 4)
