@@ -12,9 +12,9 @@ import statistics
 import tempfile
 import time
 
-from route_cache_r1 import traces
+from route_cache_r1 import EVAL, traces
 
-CORPUS = 32
+CORPUS = 128
 BYTES_PER_EXPERT = 64 * 1024
 CAPACITY = 8
 POLICIES = ("no_cache", "lru", "training_hotset")
@@ -103,6 +103,18 @@ def measure(directory, hashes, training, requests, policy, capacity=CAPACITY):
     }
 
 
+def frozen_requests(evaluation):
+    """Keep both halves of a routing phase shift; no future-driven policy tuning."""
+    if len(evaluation) != EVAL or SAMPLES % 2 or SAMPLES > len(evaluation):
+        raise ValueError("invalid frozen evaluation split")
+    half = len(evaluation) // 2
+    a = [expert for row in evaluation[:half] for expert in row][:SAMPLES // 2]
+    b = [expert for row in evaluation[half:] for expert in row][:SAMPLES // 2]
+    if len(a) != SAMPLES // 2 or len(b) != SAMPLES // 2:
+        raise ValueError("incomplete independent phase windows")
+    return a + b
+
+
 def experiment():
     observations = []
     with tempfile.TemporaryDirectory(prefix="wingless-residency-r2-") as root:
@@ -112,10 +124,13 @@ def experiment():
             for seed in SEEDS:
                 train, evaluation = traces(pattern, seed)
                 # Frozen 32-expert subset; retain original chronological order.
-                train = [i for row in train for i in row if i < CORPUS]
-                test = [i for row in evaluation for i in row if i < CORPUS][:SAMPLES]
-                if len(test) < 16:
-                    raise RuntimeError("too few source requests for controlled measurement")
+                train = [i for row in train for i in row]
+                test = frozen_requests(evaluation)
+                if pattern == "phase_shift":
+                    first, second = test[:SAMPLES // 2], test[SAMPLES // 2:]
+                    if not (all(0 <= i < 16 for i in first)
+                            and all(64 <= i < 80 for i in second)):
+                        raise RuntimeError("frozen phase-shift transition missing")
                 for policy in POLICIES:
                     result = measure(path, hashes, train, test, policy)
                     result.update(pattern=pattern, seed=seed)
@@ -125,6 +140,8 @@ def experiment():
         "status": "R2_SYNTHETIC_CPU_DISK_EXPERT_READS_COMPLETE",
         "source": "DETERMINISTIC_SYNTHETIC_FILE_CORPUS_ONLY",
         "expert_count": CORPUS, "expert_bytes": BYTES_PER_EXPERT,
+        "sampling": "FIRST_24_REQUESTS_PER_EVALUATION_HALF",
+        "phase_shift_later_experts_included": True,
         "frozen_patterns": list(PATTERNS), "frozen_seeds": list(SEEDS),
         "policy_set": list(POLICIES), "observations": observations,
         "source_files_cleaned": True,

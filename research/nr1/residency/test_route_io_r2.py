@@ -5,11 +5,26 @@ import tempfile
 import unittest
 
 from route_io_r2 import (
-    BYTES_PER_EXPERT, CORPUS, POLICIES, create_corpus, experiment, measure, payload
+    BYTES_PER_EXPERT, CORPUS, POLICIES, SAMPLES, create_corpus, experiment, frozen_requests, measure, payload
 )
 
 
 class R2Tests(unittest.TestCase):
+    def test_actual_phase_shift_preserved(self):
+        from route_cache_r1 import traces
+        _, evaluation = traces("phase_shift", 11)
+        requests = frozen_requests(evaluation)
+        self.assertEqual(len(requests), SAMPLES)
+        self.assertTrue(all(0 <= i < 16 for i in requests[:SAMPLES // 2]))
+        self.assertTrue(all(64 <= i < 80 for i in requests[SAMPLES // 2:]))
+        self.assertEqual(CORPUS, 128)
+
+    def test_rejects_partial_evaluation(self):
+        from route_cache_r1 import traces
+        _, evaluation = traces("phase_shift", 11)
+        with self.assertRaises(ValueError):
+            frozen_requests(evaluation[:24])
+
     def test_corpus_exact_content_and_distinct_hashes(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
