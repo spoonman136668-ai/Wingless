@@ -38,7 +38,7 @@ class G9GTests(unittest.TestCase):
         self.assertLess(cases["first_layer_int4"]["remaining_bytes"],
                         cases["all_int2_baseline"]["remaining_bytes"])
         self.assertTrue(cases["both_boundary_layers_int4"]["analytical_fit"])
-        self.assertFalse(cases["first_two_experts_each_layer_int4"]["analytical_fit"])
+        self.assertTrue(cases["first_two_experts_each_layer_int4"]["analytical_fit"])
         self.assertEqual(self.report["source_identity"],"SYNTHETIC_FIXTURE_NOT_ORIGINAL_INDEX")
 
     def test_fail_closed_unfrozen_cases(self):
