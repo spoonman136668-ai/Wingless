@@ -1,0 +1,79 @@
+name: Wingless isolated Atlas parallel critical-path experiment
+on:
+  push:
+    branches: [experiment/atlas-parallel-timing-20261104]
+    paths: ['.github/workflows/atlas-parallel-timing-probe.yml']
+permissions:
+  contents: read
+jobs:
+  browser:
+    name: Isolated genuine Chromium browser acceptance
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - name: Checkout frozen, already-qualified main source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 7f31b05cc274a1769c117567911d8a55030e5758
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact original source identity
+        shell: pwsh
+        run: |
+          if ((git rev-parse HEAD).Trim() -ne '7f31b05cc274a1769c117567911d8a55030e5758') { throw 'BASELINE_DRIFT' }
+          if (git status --porcelain) { throw 'BASELINE_DIRTY' }
+      - name: Set up Python for genuine Chromium acceptance
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install pinned Selenium (independently measured)
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check --quiet 'selenium==4.35.0'
+          if ($LASTEXITCODE -ne 0) { throw 'SELENIUM_INSTALL_FAILED' }
+      - name: Actual Chromium browser navigation acceptance
+        shell: pwsh
+        run: |
+          python -B scripts/test_atlas_browser.py --root .
+          if ($LASTEXITCODE -ne 0) { throw 'BROWSER_ACCEPTANCE_FAILED' }
+          if (git status --porcelain) { throw 'DIRTY_BASELINE_AFTER_BROWSER' }
+  tamper:
+    name: Isolated full Atlas tamper-negative acceptance
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - name: Checkout frozen, already-qualified main source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 7f31b05cc274a1769c117567911d8a55030e5758
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact original source identity
+        shell: pwsh
+        run: |
+          if ((git rev-parse HEAD).Trim() -ne '7f31b05cc274a1769c117567911d8a55030e5758') { throw 'BASELINE_DRIFT' }
+          if (git status --porcelain) { throw 'BASELINE_DIRTY' }
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Set up frozen Go 1.25.5
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify source index and extract authentic typed relationships
+        shell: pwsh
+        run: |
+          go run -buildvcs=false ./cmd/ice validate
+          if ($LASTEXITCODE -ne 0) { throw 'ICE_VALIDATE_FAILED' }
+          go run -buildvcs=false ./cmd/ice relationships > "$env:RUNNER_TEMP\wingless-type-relationships.json"
+          if ($LASTEXITCODE -ne 0) { throw 'RELATIONSHIPS_FAILED' }
+          python -B scripts/validate_code_atlas.py --root . --relationships "$env:RUNNER_TEMP\wingless-type-relationships.json"
+          if ($LASTEXITCODE -ne 0) { throw 'ATLAS_VALIDATE_FAILED' }
+      - name: Actual isolated tamper-negative acceptance
+        shell: pwsh
+        run: |
+          python -B scripts/test_code_atlas_tamper.py --root . --relationships "$env:RUNNER_TEMP\wingless-type-relationships.json" --scratch-parent "$env:RUNNER_TEMP"
+          if ($LASTEXITCODE -ne 0) { throw 'TAMPER_NEGATIVE_FAILED' }
+          if (git status --porcelain) { throw 'DIRTY_BASELINE_AFTER_TAMPER' }
