@@ -16,6 +16,7 @@ def fake_plan():
 class AdmissionDiskTests(unittest.TestCase):
     def test_sufficient_scratch_only_proves_disk_floor(self):
         with tempfile.TemporaryDirectory() as d:
+            (Path(d)/"source").mkdir()
             with patch("g9n_resource_admission.freeze_original_assignment",return_value=fake_plan()), \
                  patch("g9n_resource_admission.preflight",return_value=(Path(d)/"source",{"shard":4*GIB})):
                 rec=full_checkpoint_disk_preflight(manifest={},config={},index={},
@@ -29,6 +30,7 @@ class AdmissionDiskTests(unittest.TestCase):
 
     def test_exact_shortfall_rejected(self):
         with tempfile.TemporaryDirectory() as d:
+            (Path(d)/"source").mkdir()
             with patch("g9n_resource_admission.freeze_original_assignment",return_value=fake_plan()), \
                  patch("g9n_resource_admission.preflight",return_value=(Path(d)/"source",{"shard":4*GIB})):
                 with self.assertRaisesRegex(RuntimeError,"insufficient"):
