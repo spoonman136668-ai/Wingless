@@ -189,138 +189,6 @@ jobs:
             throw 'upstream metadata retrieval failed; no scientific custody admitted'
           }
           'UPSTREAM_METADATA_ONLY_LOCAL_WEIGHTS_UNVERIFIED' | Out-File -Encoding utf8 evidence/gcen-upstream-status.txt
-      - name: GCEN one-shot 4-8-16 expert sharing scaling pilot
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-sharing-scale]') && success() }}
-        continue-on-error: true
-        timeout-minutes: 12
-        shell: bash
-        run: |
-          python - <<'PY'
-          import hashlib,json,pathlib,struct,tempfile,time,urllib.request
-          import numpy as np
-          rev="ad44e777bcd18fa416d9da3bd8f70d33ebb85d39"
-          model="Qwen/Qwen3-30B-A3B"
-          name="model-00001-of-00016.safetensors"
-          manifest=json.loads(pathlib.Path("research/nr1/gcen/upstream_full_manifest_unverified_weights.json").read_text())
-          receipt={"status":"FAILED_NOT_ACCEPTED","shard":name,"revision":rev}
-          output=pathlib.Path("evidence/gcen-real-tensor-pilot.json")
-          t0=time.monotonic()
-          try:
-              if manifest.get("revision")!=rev or manifest.get("model")!=model or len(manifest.get("files",{}))!=18: raise ValueError("manifest identity mismatch")
-              expected=manifest["files"][name]
-              receipt["expected_sha256"]=expected
-              with tempfile.TemporaryDirectory(prefix="gcen-verified-shard-") as folder:
-                  location=pathlib.Path(folder)/name
-                  url=f"https://huggingface.co/{model}/resolve/{rev}/{name}"
-                  request=urllib.request.Request(url,headers={"Accept-Encoding":"identity","User-Agent":"Wingless-GCEN-Tensor-Pilot/1"})
-                  sha=hashlib.sha256()
-                  count=0
-                  with urllib.request.urlopen(request,timeout=90) as response, location.open("xb") as writer:
-                      if response.status!=200 or response.headers.get("Content-Range"): raise ValueError("partial or unexpected HTTP response")
-                      content_length=response.headers.get("Content-Length")
-                      content_length=int(content_length) if content_length else None
-                      if content_length is not None and not 0<content_length<=6*1024**3: raise ValueError("invalid source length")
-                      while True:
-                          chunk=response.read(4*1024*1024)
-                          if not chunk: break
-                          count+=len(chunk)
-                          if count>6*1024**3: raise ValueError("transfer exceeds cap")
-                          sha.update(chunk)
-                          writer.write(chunk)
-                      if content_length is not None and count!=content_length: raise ValueError("truncated transfer")
-                  digest=sha.hexdigest()
-                  receipt.update(bytes_verified=count,observed_sha256=digest)
-                  if digest!=expected: raise ValueError("full-shard SHA256 mismatch")
-                  receipt["status"]="ORIGINAL_SHARD_BYTES_VERIFIED"
-                  with location.open("rb") as stream:
-                      header_size=struct.unpack("<Q",stream.read(8))[0]
-                      if not 0<header_size<=16*1024*1024 or 8+header_size>count: raise ValueError("invalid safetensors header")
-                      header=json.loads(stream.read(header_size))
-                      candidates=[]
-                      for tensor,description in header.items():
-                          if tensor=="__metadata__" or ".experts." not in tensor: continue
-                          if not isinstance(description,dict): continue
-                          dtype=description.get("dtype")
-                          dims=description.get("shape")
-                          offsets=description.get("data_offsets")
-                          if dtype not in ("BF16","F16","F32") or not isinstance(dims,list) or len(dims) not in (2,3): continue
-                          if not isinstance(offsets,list) or len(offsets)!=2 or any(type(x)!=int for x in offsets): continue
-                          if any(type(x)!=int or x<=0 for x in dims): continue
-                          itemsize=4 if dtype=="F32" else 2
-                          start,stop=offsets
-                          if not 0<=start<stop<=count-8-header_size or stop-start!=int(np.prod(dims))*itemsize: raise ValueError("invalid expert tensor offsets")
-                          candidates.append((tensor,dtype,dims,start,itemsize))
-                      receipt["expert_tensor_candidates"]=len(candidates)
-                      if not candidates:
-                          receipt["status"]="VERIFIED_SHARD_NO_PACKED_EXPERT_TENSOR"
-                      else:
-                          tensor,dtype,dims,start,itemsize=sorted(candidates,key=lambda x:x[0])[0]
-                          e,m,n=dims if len(dims)==3 else (1,dims[0],dims[1])
-                          receipt["sample_layout"]="packed_3d" if len(dims)==3 else "individual_expert_2d"
-                          tile=[]
-                          dt={"BF16":"<u2","F16":"<f2","F32":"<f4"}[dtype]
-                          for i in range(min(e,4)):
-                              rows=[]
-                              for j in range(min(m,32)):
-                                  stream.seek(8+header_size+start+((i*m+j)*n)*itemsize)
-                                  raw=stream.read(min(n,64)*itemsize)
-                                  if len(raw)!=min(n,64)*itemsize: raise ValueError("short expert tensor tile")
-                                  values=np.frombuffer(raw,dtype=dt)
-                                  if dtype=="BF16": values=(values.astype(np.uint32)<<16).view(np.float32)
-                                  else: values=values.astype(np.float32)
-                                  rows.append(values)
-                              tile.append(rows)
-                          x=np.asarray(tile,dtype=np.float32)
-                          if not np.isfinite(x).all(): raise ValueError("nonfinite tensor tile")
-                          receipt["sample"]={"tensor":tensor,"dtype":dtype,"original_shape":dims,"sample_shape":list(x.shape),"sample_l2":float(np.linalg.norm(x)),"mean_absolute_value":float(np.mean(np.abs(x)))}
-                          receipt["status"]="VERIFIED_REAL_EXPERT_TENSOR_TILE"
-                          # Frozen development control: 4/8/16 distinct, genuine experts,
-                          # five seeds, identical source windows at each expert count.
-                          # No protected evaluation, inference, or compression acceptance.
-                          import sys
-                          sys.path.insert(0,"research/nr1/gcen")
-                          from expert_scaling_comparison import evaluate_group, SEEDS, COUNTS, ROWS, COLS
-                          selected=[]
-                          for expert_id in range(max(COUNTS)):
-                              key=f"model.layers.0.mlp.experts.{expert_id}.down_proj.weight"
-                              desc=header.get(key)
-                              if not isinstance(desc,dict) or desc.get("shape")!=dims or desc.get("dtype")!=dtype: raise ValueError("missing or incompatible distinct expert "+key)
-                              bounds=desc.get("data_offsets")
-                              if not isinstance(bounds,list) or len(bounds)!=2 or any(type(x)!=int for x in bounds): raise ValueError("invalid expert byte offsets")
-                              if not 0<=bounds[0]<bounds[1]<=count-8-header_size or bounds[1]-bounds[0]!=m*n*itemsize: raise ValueError("invalid expert byte range")
-                              selected.append((key,bounds[0]))
-                          readings=[]
-                          for seed in SEEDS:
-                              rng=np.random.default_rng(seed)
-                              row0=int(rng.integers(0,m-ROWS+1))
-                              col0=int(rng.integers(0,n-COLS+1))
-                              matrices=[]
-                              for key,base in selected:
-                                  rows=[]
-                                  for row in range(row0,row0+ROWS):
-                                      stream.seek(8+header_size+base+(row*n+col0)*itemsize)
-                                      raw=stream.read(COLS*itemsize)
-                                      if len(raw)!=COLS*itemsize: raise ValueError("short expert tensor read")
-                                      values=np.frombuffer(raw,dtype=dt)
-                                      if dtype=="BF16": values=(values.astype(np.uint32)<<16).view(np.float32)
-                                      else: values=values.astype(np.float32)
-                                      rows.append(values)
-                                  matrices.append(rows)
-                              source=np.asarray(matrices,dtype=np.float32)
-                              for experts in COUNTS:
-                                  result=evaluate_group(source[:experts])
-                                  result.update(seed=seed,source_expert_names=[key for key,_ in selected[:experts]],window_start=[row0,col0])
-                                  readings.append(result)
-                          receipt["expert_sharing_scaling_development"]=readings
-                          receipt["status"]="VERIFIED_REAL_EXPERT_SHARING_SCALING_SCREEN"
-          except Exception as ex:
-              receipt["error_type"]=type(ex).__name__
-              receipt["error"]=str(ex)[:200]
-              raise
-          finally:
-              receipt["elapsed_seconds"]=round(time.monotonic()-t0,2)
-              output.write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n")
-          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -366,5 +234,52 @@ jobs:
         if: always()
         with:
           name: gcen-g31-single-original-shard
+          path: evidence/
+          retention-days: 14
+  g32_real_expert_sharing:
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && contains(github.event.head_commit.message, '[gcen-sharing-scale]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify G32 checkout exact SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git rev-parse HEAD > evidence/source-sha.txt
+          git status --porcelain > evidence/source-status.txt
+          test ! -s evidence/source-status.txt
+      - name: G32 pinned NumPy development runtime
+        shell: bash
+        run: python -m pip install --disable-pip-version-check 'numpy==2.2.6'
+      - name: G32 original BF16 4-8-16 distinct expert sharing comparison
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G32_REAL_WEIGHT_WINDOWS_ONLY"}\n' > evidence/gcen-g32-status.json
+          python research/nr1/gcen/g32_real_expert_scaling.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/gcen-g32-real-expert-scaling.json
+          printf '{"status":"G32_REAL_BF16_EXPERT_WINDOW_SCALING_SCREEN_COMPLETE","scope":"G32_REAL_WEIGHT_WINDOWS_ONLY"}\n' > evidence/gcen-g32-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gcen-g32-real-expert-scaling
           path: evidence/
           retention-days: 14
