@@ -8,6 +8,7 @@ the receipt's reviewer identity is an assertion, NOT independent authentication.
 No automatic human/behavioral review is conferred by this generator.
 """
 import argparse
+import contextlib
 import copy
 import hashlib
 import json
@@ -51,10 +52,71 @@ def symbol_id(n):
             str(n["start_line"]))
 
 
-def source_bytes(root, source_sha, path):
+class ExactBlobBatch:
+    """Bounded per-generation Git blob transport; never a provenance cache.
+
+    Each source comparison still verifies the exact target/ancestor commits,
+    source-file bytes and canonical SHA256. On any mismatch, fail closed.
+    """
+
+    def __init__(self, root):
+        self.root = root
+        self.proc = None
+
+    def __enter__(self):
+        self.proc = subprocess.Popen(
+            ["git", "cat-file", "--batch"], cwd=self.root,
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL, bufsize=0)
+        return self
+
+    def __exit__(self, *_):
+        if self.proc is not None:
+            try:
+                if self.proc.stdin:
+                    self.proc.stdin.close()
+                self.proc.wait(timeout=15)
+                require(self.proc.returncode == 0, "GIT_BATCH_PROCESS_FAILED")
+            except subprocess.TimeoutExpired:
+                self.proc.kill()
+                self.proc.wait()
+                require(False, "GIT_BATCH_PROCESS_TIMEOUT")
+        return False
+
+    def read(self, source_sha, path):
+        require(re.fullmatch(r"[0-9a-f]{40}", source_sha) is not None,
+                "invalid exact source commit")
+        p = Path(path)
+        require(isinstance(path, str) and path
+                and not p.is_absolute() and ".." not in p.parts
+                and not any(c in path for c in ("\\\\", "\\x00", "\\n", "\\r", ":")),
+                "invalid historical source path")
+        require(self.proc is not None and self.proc.poll() is None,
+                "Git batch transport unavailable")
+        spec = (source_sha + ":" + path).encode("utf-8") + b"\\n"
+        self.proc.stdin.write(spec)
+        self.proc.stdin.flush()
+        header = self.proc.stdout.readline()
+        chunks = header.strip().split(b" ")
+        require(len(chunks) == 3 and chunks[1] == b"blob"
+                and re.fullmatch(rb"[0-9a-f]{40}", chunks[0]) is not None
+                and chunks[2].isdigit(), "GIT_BATCH_BLOB_NOT_FOUND")
+        size = int(chunks[2])
+        require(0 <= size <= 32 * 1024 * 1024, "GIT_BATCH_SIZE_OUT_OF_RANGE")
+        data = self.proc.stdout.read(size)
+        require(len(data) == size and self.proc.stdout.read(1) == b"\\n",
+                "GIT_BATCH_BINARY_FRAME_DRIFT")
+        digest = hashlib.sha1(b"blob " + str(size).encode("ascii")
+                              + b"\\x00" + data).hexdigest().encode("ascii")
+        require(digest == chunks[0], "GIT_BATCH_BLOB_IDENTITY_DRIFT")
+        return data
+
+
+def source_bytes(root, source_sha, path, batch=None):
     require(not Path(path).is_absolute() and ".." not in Path(path).parts,
             "invalid historical source path")
-    return git(root, "show", source_sha + ":" + path)
+    return batch.read(source_sha, path) if batch is not None else (
+        git(root, "show", source_sha + ":" + path))
 
 
 def span(data, start, end):
@@ -69,6 +131,11 @@ def load(root, filename):
 
 
 def generate(root, receipts_path=None):
+    with ExactBlobBatch(root.resolve()) as batch:
+        return _generate(root, receipts_path, batch)
+
+
+def _generate(root, receipts_path, batch):
     root = root.resolve()
     target = git(root, "rev-parse", "HEAD").decode("ascii").strip()
     require(re.fullmatch(r"[0-9a-f]{40}", target) is not None,
@@ -98,8 +165,8 @@ def generate(root, receipts_path=None):
     # Context-sensitive descriptions cannot inherit earlier review if module
     # resolution or text-conversion rules changed even when declarations did not.
     for context_path in ("go.mod", ".gitattributes"):
-        require(source_bytes(root, previous, context_path) ==
-                source_bytes(root, target, context_path),
+        require(source_bytes(root, previous, context_path, batch) ==
+                source_bytes(root, target, context_path, batch),
                 "G27_DEPENDENCY_CONTEXT_CHANGED: " + context_path)
     # All source-bearing files must exactly match the advertised target commit.
     # The canonical LF transform is safe for this repository's explicit
@@ -107,7 +174,7 @@ def generate(root, receipts_path=None):
     for item in idx["files"]:
         path = item["path"]
         raw = (root / path).read_bytes()
-        committed = source_bytes(root, target, path)
+        committed = source_bytes(root, target, path, batch)
         require(sha(raw) == item["sha256"],
                 "G27_STRUCTURAL_INDEX_MISMATCH: " + path)
         require(raw.replace(b"\r\n", b"\n") ==
@@ -218,7 +285,7 @@ def generate(root, receipts_path=None):
             provisional_added += 1
             continue
         if path not in historical_sources:
-            raw = source_bytes(root, previous, path)
+            raw = source_bytes(root, previous, path, batch)
             require(sha(raw) == oldnode["file_sha256"],
                     "historical source file hash mismatch: " + path)
             historical_sources[path] = raw
