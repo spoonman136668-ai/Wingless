@@ -61,7 +61,7 @@ def mixed_report(config, index, *, source_sha):
         if kind != "experts":
             continue
         parts = name.split(".")
-        if len(parts) != 7 or parts[0:2] != ["model", "layers"] or parts[3:5] != ["mlp", "experts"] or parts[6] not in {p+".weight" for p in PROJECTIONS}:
+        if len(parts) != 8 or parts[0:2] != ["model", "layers"] or parts[3:5] != ["mlp", "experts"] or parts[6] not in PROJECTIONS or parts[7] != "weight":
             raise ValueError("unexpected authentic expert key structure")
         layer, expert = int(parts[2]), int(parts[5])
         if not (0 <= layer < LAYERS and 0 <= expert < EXPERTS_PER_LAYER):
