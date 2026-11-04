@@ -712,3 +712,45 @@ jobs:
           name: cnc-g9l-original-lowrank-development
           path: evidence/
           retention-days: 14
+
+  g9n_synthetic_bf16_io:
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9n-real-io]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+      - name: Install frozen CPU-only BF16 dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet 'torch==2.10.0' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --disable-pip-version-check --quiet 'safetensors==0.5.3'
+      - name: Run real synthetic BF16 storage and rollback test
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python research/nr1/gcen/g9n_real_bf16_smoke.py | tee evidence/g9n-real-bf16-smoke.txt
+          grep -q '^G9N_SYNTHETIC_BF16_REAL_IO_PASS ' evidence/g9n-real-bf16-smoke.txt
+          printf '%s\n' "$GITHUB_SHA" > evidence/g9n-source-sha.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9n-synthetic-bf16
+          path: evidence/
+          retention-days: 14
