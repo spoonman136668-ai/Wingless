@@ -55,6 +55,11 @@ jobs:
         run: |
           python research/nr1/residency/route_io_r2.py --output evidence/residency-r2.json
           if ($LASTEXITCODE -ne 0) { throw 'R2 physical synthetic file-read pilot failed' }
+      - name: R3 counterbalanced measured synthetic file-read controls
+        shell: pwsh
+        run: |
+          python research/nr1/residency/route_counterbalance_r3.py --output evidence/residency-r3.json
+          if ($LASTEXITCODE -ne 0) { throw 'R3 counterbalanced physical file-read pilot failed' }
       - name: R1 ICE diagnostic only (not qualification)
         if: failure()
         shell: pwsh
