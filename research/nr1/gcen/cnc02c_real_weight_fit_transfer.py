@@ -15,6 +15,7 @@ from urllib.request import Request, urlopen
 
 import numpy as np
 from cnc02b_fit_transfer import compare_window, ROWS, COLS, STEPS
+from cnc02d_matched_controls import compare_controls
 from collect_upstream_manifest import build_manifest
 from expert_scaling_comparison import SEEDS
 from g31_original_shard_stage import (
@@ -29,25 +30,30 @@ EXPERT_COUNT = 4
 SCHEMA = "wingless.cnc02c.real-original-compressed-fit-transfer.v1"
 
 
-def evaluate_verified_windows(windows, *, seed):
+def evaluate_verified_windows(windows, *, seed, comparator=None):
     if type(seed) is not int or seed not in SEEDS:
         raise ValueError("unfrozen G32 seed")
     w = np.asarray(windows, dtype=np.float32)
     if w.shape != (EXPERT_COUNT, ROWS, COLS) or not np.isfinite(w).all():
         raise ValueError("invalid original BF16 windows")
+    evaluator = compare_window if comparator is None else comparator
+    if evaluator not in (compare_window, compare_controls):
+        raise ValueError("unfrozen experiment comparator")
     results = []
     for idx, weight in enumerate(w):
-        outcome = dict(compare_window(weight, steps=STEPS))
+        outcome = dict(evaluator(weight, steps=STEPS))
         outcome["original_expert_id"] = idx
         outcome["source_window_seed"] = seed
         results.append(outcome)
     return results
 
 
-def run(manifest_path, scratch_root, output, source_sha):
+def run(manifest_path, scratch_root, output, source_sha, *, comparison_mode="direct"):
     if (os.name != "posix" or type(source_sha) is not str or
             len(source_sha) != 40 or any(c not in "0123456789abcdef" for c in source_sha)):
         raise ValueError("exact source SHA and Linux custody required")
+    if comparison_mode not in ("direct", "three-arm"):
+        raise ValueError("unfrozen comparison mode")
     if not scratch_root.is_dir() or output.exists():
         raise ValueError("missing scratch or existing immutable output")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -82,7 +88,9 @@ def run(manifest_path, scratch_root, output, source_sha):
                                      selected["shape"], row0, col0)
                     for offset in selected["offsets"][:EXPERT_COUNT]
                 ])
-                for result in evaluate_verified_windows(windows, seed=seed):
+                for result in evaluate_verified_windows(
+                        windows, seed=seed,
+                        comparator=compare_controls if comparison_mode == "three-arm" else None):
                     result["original_expert_name"] = selected["names"][result["original_expert_id"]]
                     result["source_window_start"] = [row0, col0]
                     result["original_selected_layer"] = selected["layer"]
@@ -94,7 +102,8 @@ def run(manifest_path, scratch_root, output, source_sha):
             raise ValueError("original-shard staging violated")
         peak_rss = peak_rss_bytes()
     receipt = {
-        "schema": SCHEMA, "result": "REAL_ORIGINAL_WEIGHTS_COMPRESSED_FIT_TRANSFER_COMPLETE",
+        "schema": SCHEMA if comparison_mode == "direct" else "wingless.cnc02e.real-original-three-arm.v1",
+        "result": "REAL_ORIGINAL_WEIGHTS_COMPRESSED_FIT_TRANSFER_COMPLETE" if comparison_mode == "direct" else "REAL_ORIGINAL_WEIGHTS_THREE_ARM_COMPARISON_COMPLETE",
         "source_sha": source_sha, "model": MODEL, "revision": REVISION,
         "source_shard": SHARD, "source_shard_sha256": manifest["files"][SHARD],
         "source_custody": custody, "original_header": header_receipt,
@@ -108,6 +117,8 @@ def run(manifest_path, scratch_root, output, source_sha):
         "activation_kind": "SYNTHETIC_INDEPENDENT_GAUSSIAN_FIT_TRANSFER",
         "original_model_activations": "NOT_CAPTURED",
         "fp32_baseline_matched": False,
+        "equal_update_step_counts_only": comparison_mode == "three-arm",
+        "comparison_mode": comparison_mode,
         "full_model_forward": False, "gpu_execution": False,
         "scientific_acceptance": "NOT_GRANTED", "production_activation": False,
     }
@@ -124,5 +135,7 @@ if __name__ == "__main__":
     p.add_argument("--scratch-root", required=True, type=Path)
     p.add_argument("--output", required=True, type=Path)
     p.add_argument("--source-sha", required=True)
+    p.add_argument("--comparison-mode", choices=("direct", "three-arm"), default="direct")
     a = p.parse_args()
-    run(a.manifest, a.scratch_root, a.output, a.source_sha)
+    run(a.manifest, a.scratch_root, a.output, a.source_sha,
+        comparison_mode=a.comparison_mode)
