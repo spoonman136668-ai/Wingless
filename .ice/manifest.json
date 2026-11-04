@@ -71,6 +71,14 @@
       "sha256": "fcb685f14733881579d94fb337ab757abe3677cd58730c7601bcf4e84e0f834e"
     },
     {
+      "path": ".github/workflows/integrated-source-repair.yml",
+      "sha256": "5dfdcdd070826e350c6db181ec71ddb8ffddb5c4c724a674b3385ad52dad6ab6"
+    },
+    {
+      "path": ".github/workflows/itd02-native-self-training-dev.yml",
+      "sha256": "af21869b8a73cb401ff2a6d5457cb550b0ace3a6b606c2f4aaeef47bd2dcfd39"
+    },
+    {
       "path": ".github/workflows/itd02-outcome-focused.yml",
       "sha256": "ed97d83f0c42064b0329e22dc6966b3cd3269e1c35139ceb7996cc431a207d84"
     },
@@ -1119,6 +1127,26 @@
       "package": "outcome",
       "imports": [
         "bytes",
+        "testing",
+        "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
+      ]
+    },
+    {
+      "path": "research/native/itd02/outcome/training_session.go",
+      "sha256": "9f82bfabaf83222ae98114a2e06fa08cb43dff23dc89ec0fddc72f37e462306c",
+      "package": "outcome",
+      "imports": [
+        "errors",
+        "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
+      ]
+    },
+    {
+      "path": "research/native/itd02/outcome/training_session_test.go",
+      "sha256": "d11c5c0044e83ec5eca38bb466842a58882c428f777d00349c4a8646c94a1250",
+      "package": "outcome",
+      "imports": [
+        "bytes",
+        "errors",
         "testing",
         "github.com/spoonman136668-ai/Wingless/research/native/itd02/r1"
       ]
@@ -6931,6 +6959,238 @@
         "t.Fatalf",
         "t.Fatalf",
         "t.Fatalf",
+        "t.Fatalf",
+        "t.Fatalf",
+        "uint64"
+      ]
+    },
+    {
+      "name": "PublicConsequence",
+      "kind": "type",
+      "file": "research/native/itd02/outcome/training_session.go",
+      "start": 11,
+      "end": 16
+    },
+    {
+      "name": "PublicEnvironment",
+      "kind": "interface",
+      "file": "research/native/itd02/outcome/training_session.go",
+      "start": 21,
+      "end": 24
+    },
+    {
+      "name": "TrainingSession",
+      "kind": "type",
+      "file": "research/native/itd02/outcome/training_session.go",
+      "start": 26,
+      "end": 34
+    },
+    {
+      "name": "EpisodeResult",
+      "kind": "type",
+      "file": "research/native/itd02/outcome/training_session.go",
+      "start": 38,
+      "end": 44
+    },
+    {
+      "name": "RunEpisode",
+      "kind": "method",
+      "file": "research/native/itd02/outcome/training_session.go",
+      "start": 54,
+      "end": 125,
+      "receiver": "TrainingSession",
+      "calls": [
+        "env.ResetPublic",
+        "env.StepPublic",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "errors.New",
+        "uint32"
+      ]
+    },
+    {
+      "name": "TrainBounded",
+      "kind": "method",
+      "file": "research/native/itd02/outcome/training_session.go",
+      "start": 132,
+      "end": 155,
+      "receiver": "TrainingSession",
+      "calls": [
+        "append",
+        "errors.New",
+        "make",
+        "s.RunEpisode",
+        "save",
+        "uint32"
+      ]
+    },
+    {
+      "name": "sessionFixture",
+      "kind": "type",
+      "file": "research/native/itd02/outcome/training_session_test.go",
+      "start": 13,
+      "end": 21
+    },
+    {
+      "name": "ResetPublic",
+      "kind": "method",
+      "file": "research/native/itd02/outcome/training_session_test.go",
+      "start": 22,
+      "end": 26,
+      "receiver": "sessionFixture",
+      "calls": [
+        "errors.New"
+      ]
+    },
+    {
+      "name": "StepPublic",
+      "kind": "method",
+      "file": "research/native/itd02/outcome/training_session_test.go",
+      "start": 27,
+      "end": 40,
+      "receiver": "sessionFixture",
+      "calls": [
+        "append",
+        "errors.New",
+        "float64"
+      ]
+    },
+    {
+      "name": "TestNativeSelfTrainingEndToEndColdRestart",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/training_session_test.go",
+      "start": 42,
+      "end": 85,
+      "calls": [
+        "NewSelected",
+        "NewSelected",
+        "RestoreSelected",
+        "len",
+        "len",
+        "len",
+        "len",
+        "model.BeginEpisode",
+        "model.RecommendRewardAction",
+        "selectedFixture",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Fatalf",
+        "t.Fatalf",
+        "training.RunEpisode",
+        "uint64"
+      ]
+    },
+    {
+      "name": "TestNativeTrainingRejectsAmbiguousSourceStepWithoutFabrication",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/training_session_test.go",
+      "start": 87,
+      "end": 101,
+      "calls": [
+        "NewSelected",
+        "len",
+        "selectedFixture",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestNativeSessionQuarantinesAmbiguousSourceReset",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/training_session_test.go",
+      "start": 104,
+      "end": 115,
+      "calls": [
+        "NewSelected",
+        "len",
+        "selectedFixture",
+        "session.RunEpisode",
+        "session.RunEpisode",
+        "t.Fatal",
+        "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestNativeSessionQuarantinesAmbiguousCheckpointSave",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/training_session_test.go",
+      "start": 119,
+      "end": 135,
+      "calls": [
+        "NewSelected",
+        "errors.New",
+        "len",
+        "len",
+        "selectedFixture",
+        "session.TrainBounded",
+        "session.TrainBounded",
+        "t.Fatal",
+        "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestNativeSessionRequiresCheckpointCustodyAfterDirectRun",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/training_session_test.go",
+      "start": 137,
+      "end": 147,
+      "calls": [
+        "NewSelected",
+        "len",
+        "len",
+        "selectedFixture",
+        "session.RunEpisode",
+        "session.RunEpisode",
+        "t.Fatal",
+        "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestNativeTrainingNeverForgesTerminal",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/training_session_test.go",
+      "start": 149,
+      "end": 162,
+      "calls": [
+        "NewSelected",
+        "selectedFixture",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal"
+      ]
+    },
+    {
+      "name": "TestNativeTrainingCheckpointSinkIsBoundedAndFailClosed",
+      "kind": "function",
+      "file": "research/native/itd02/outcome/training_session_test.go",
+      "start": 164,
+      "end": 186,
+      "calls": [
+        "NewSelected",
+        "RestoreSelected",
+        "append",
+        "append",
+        "bytes.Equal",
+        "errors.New",
+        "len",
+        "len",
+        "s.TrainBounded",
+        "s.TrainBounded",
+        "s.TrainBounded",
+        "selectedFixture",
+        "t.Fatal",
+        "t.Fatal",
+        "t.Fatal",
         "t.Fatalf",
         "t.Fatalf",
         "uint64"
