@@ -22,8 +22,16 @@ jobs:
         with:
           go-version: '1.25.5'
           cache: false
+      - name: Restore exact-source pinned Go build cache
+        id: go-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/wingless-atlas-profile-gocache
+          key: wingless-atlas-prof-go1255-windows2022-v1-${{ hashFiles('**/*.go', 'go.mod', 'go.sum', 'scripts/test_code_atlas_tamper.py', 'scripts/test_source_aware_atlas.py', 'scripts/validate_code_atlas.py') }}
       - name: Pin exact source and produce genuine typed evidence
         shell: pwsh
+        env:
+          GOCACHE: ${{ runner.temp }}/wingless-atlas-profile-gocache
         run: |
           if ((git rev-parse HEAD).Trim() -ne '7f31b05cc274a1769c117567911d8a55030e5758') { throw 'SOURCE_DRIFT' }
           if (git status --porcelain) { throw 'DIRTY_CHECKOUT' }
@@ -33,22 +41,49 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'RELATIONSHIPS_FAILED' }
           python -B scripts/validate_code_atlas.py --root . --relationships "$env:RUNNER_TEMP\wingless-atlas-rel.json"
           if ($LASTEXITCODE -ne 0) { throw 'ATLAS_VALIDATE_FAILED' }
-      - name: Profile unchanged full tamper suite including nested G26 negative controls
+      - name: Measure unchanged tamper suite subprocess costs and cache state
         shell: pwsh
+        env:
+          GOCACHE: ${{ runner.temp }}/wingless-atlas-profile-gocache
+          CACHE_HIT: ${{ steps.go-cache.outputs.cache-hit }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $profile = Join-Path $env:RUNNER_TEMP 'wingless-atlas-tamper.pstats'
-          $watch = [Diagnostics.Stopwatch]::StartNew()
-          python -B -m cProfile -o "$profile" scripts/test_code_atlas_tamper.py --root . --relationships "$env:RUNNER_TEMP\wingless-atlas-rel.json" --scratch-parent "$env:RUNNER_TEMP"
-          $exit = $LASTEXITCODE
-          $watch.Stop()
-          Write-Host "COMPLETE_TAMPER_ELAPSED_SECONDS=$([math]::Round($watch.Elapsed.TotalSeconds,3))"
-          if ($exit -ne 0) { throw 'AUTHENTIC_TAMPER_NEGATIVE_FAILED' }
           @'
-          import pstats, sys
-          st=pstats.Stats(sys.argv[1])
-          st.sort_stats('cumulative').print_stats(35)
-          '@ | python - "$profile"
-          if ($LASTEXITCODE -ne 0) { throw 'PROFILE_INSPECT_FAILED' }
+          import json, os, runpy, subprocess, sys, time
+          _original = subprocess.run
+          measurements = []
+          def metered(*args, **kwargs):
+              command = args[0] if args else kwargs.get("args", ())
+              t0 = time.monotonic()
+              try:
+                  return _original(*args, **kwargs)
+              finally:
+                  elapsed = time.monotonic() - t0
+                  cmd = [str(x) for x in command] if isinstance(command, (tuple, list)) else [str(command)]
+                  label = cmd[0].split("\\")[-1].split("/")[-1] if cmd else "unknown"
+                  if label.lower() == "go":
+                      label += ":" + " ".join(cmd[1:4])
+                  elif label.lower().startswith("python"):
+                      label += ":" + (cmd[2] if len(cmd)>2 else "nested")
+                  elif label.lower() == "git":
+                      label += ":" + (cmd[1] if len(cmd)>1 else "git")
+                  measurements.append((label, round(elapsed, 3)))
+          subprocess.run = metered
+          sys.argv = ["scripts/test_code_atlas_tamper.py", "--root", ".", "--relationships",
+                      os.path.join(os.environ["RUNNER_TEMP"], "wingless-atlas-rel.json"),
+                      "--scratch-parent", os.environ["RUNNER_TEMP"]]
+          begin = time.monotonic()
+          try:
+              runpy.run_path("scripts/test_code_atlas_tamper.py", run_name="__main__")
+          finally:
+              total = round(time.monotonic()-begin,3)
+              print("AUTHENTIC_TAMPER_ELAPSED_SECONDS="+str(total),flush=True)
+              print("GOCACHE_HIT="+str(os.environ.get("CACHE_HIT", "")),flush=True)
+              print("SUBPROCESS_TIMINGS="+json.dumps(measurements, separators=(",",":")),flush=True)
+              print("SUBPROCESS_GROUP_TOTALS="+json.dumps(
+                  {k:round(sum(t for label,t in measurements if label.split(":")[0]==k),3)
+                   for k in sorted({label.split(":")[0] for label,t in measurements})},sort_keys=True),flush=True)
+          '@ | python -B -
+          if ($LASTEXITCODE -ne 0) { throw 'AUTHENTIC_TAMPER_NEGATIVE_FAILED' }
           if (git status --porcelain) { throw 'DIRTY_AFTER_TAMPER' }
-          Add-Content $env:GITHUB_STEP_SUMMARY "Full unchanged tamper negative suite PASS, elapsed seconds: $([math]::Round($watch.Elapsed.TotalSeconds,3))"
+          Add-Content $env:GITHUB_STEP_SUMMARY "Full unchanged tamper suite PASS; GOCACHE_HIT=$env:CACHE_HIT"
