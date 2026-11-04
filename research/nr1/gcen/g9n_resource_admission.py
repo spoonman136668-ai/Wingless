@@ -33,7 +33,7 @@ def full_checkpoint_disk_preflight(*, manifest, config, index, device_map,
     if scratch.is_symlink() or not scratch.is_dir():
         raise ValueError("scratch root absent or symlinked")
     scratch = scratch.resolve(strict=True)
-    if scratch == source:
+    if scratch == source.resolve(strict=True):
         raise ValueError("scratch root cannot be the original shard directory")
     usage = (disk_usage or shutil.disk_usage)(scratch)
     if type(usage.free) is not int or usage.free < 0:
