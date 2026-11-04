@@ -14,6 +14,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
+      - name: Start native qualification timing
+        shell: pwsh
+        run: |
+          [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() | Set-Content -Path "$env:RUNNER_TEMP/native_start_ms.txt"
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -21,9 +25,34 @@ jobs:
         with:
           go-version: '1.25.5'
           cache: false
+      - name: Capture setup completion
+        shell: pwsh
+        run: |
+          [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() | Set-Content -Path "$env:RUNNER_TEMP/native_setup_end_ms.txt"
       - name: Native tests and evidence
         shell: pwsh
         run: ./scripts/Test-Native.ps1
+      - name: Report native stage timings
+        if: always()
+        shell: pwsh
+        run: |
+          $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+          $startPath = Join-Path $env:RUNNER_TEMP 'native_start_ms.txt'
+          $setupPath = Join-Path $env:RUNNER_TEMP 'native_setup_end_ms.txt'
+          if (-not (Test-Path $startPath)) {
+            Add-Content $env:GITHUB_STEP_SUMMARY 'Native timing: unavailable (startup stage not reached).'
+            exit 0
+          }
+          $start = [long](Get-Content $startPath)
+          $total = [math]::Round(($now - $start) / 1000, 3)
+          Add-Content $env:GITHUB_STEP_SUMMARY "Native checkout/setup/test elapsed (s): $total"
+          if (Test-Path $setupPath) {
+            $setup = [long](Get-Content $setupPath)
+            $setupSeconds = [math]::Round(($setup - $start) / 1000, 3)
+            $testSeconds = [math]::Round(($now - $setup) / 1000, 3)
+            Add-Content $env:GITHUB_STEP_SUMMARY "Setup elapsed (s): $setupSeconds"
+            Add-Content $env:GITHUB_STEP_SUMMARY "Test elapsed (s): $testSeconds"
+          }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
