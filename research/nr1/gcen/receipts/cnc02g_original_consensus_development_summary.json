@@ -1,0 +1,52 @@
+{
+  "schema": "wingless.cnc02g.authentic-window-consensus-development-summary.v1",
+  "status": "AUTHENTIC_WEIGHT_EXPERIMENT_PASS_GENERALIZATION_NO_GO",
+  "source_sha": "d7e88bcf3276f966e305abfcb253c4550f44d882",
+  "run_id": 41808225085,
+  "artifact_id": 13311465874,
+  "artifact_name": "cnc02g-original-consensus",
+  "receipt_sha256": "800f36e707b8f87b8f33c500daca2831ee0515d2deb5f78a4d965ae75efe8a22",
+  "zip_sha256": "36fac3502641af5e9c387669b73e9bc486fd599d720327ef147bd1c6df53ff76",
+  "model": "Qwen/Qwen3-30B-A3B",
+  "revision": "ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+  "source_shard": "model-00001-of-00016.safetensors",
+  "verified_source_shard_sha256": "454e77b346a61bfb201d54df60e15158838cf930617ee135113556204f2802b5",
+  "verified_shard_bytes": 3999417504,
+  "staged_original_files_after_cleanup": 0,
+  "source_window_seeds": [
+    11,
+    23,
+    37,
+    53,
+    71
+  ],
+  "authentic_expert_windows": 20,
+  "activation_cohort_seeds": {
+    "fit_a": 26061,
+    "fit_b": 26087,
+    "transfer": 26111
+  },
+  "samples_per_cohort": 32,
+  "steps_per_window": 2,
+  "proposals": 40,
+  "accepted": 5,
+  "rejected": 35,
+  "mean_normalized_transfer_squared_error": {
+    "frozen_int4": 0.01247963335652381,
+    "consensus_int4": 0.01247951669022025,
+    "fp32_sgd": 0.012475615253669982
+  },
+  "transfer_improvement_windows_vs_frozen": 2,
+  "transfer_improvement_windows_vs_fp32": 2,
+  "process_peak_rss_bytes": 64327680,
+  "scope": "ORIGINAL_QWEN_WEIGHTS_WITH_SYNTHETIC_INPUTS_ONLY",
+  "actual_model_activations": false,
+  "full_model_forward": false,
+  "full_model_training": false,
+  "gpu_vram_measured": false,
+  "training_compute_equalized": false,
+  "protected_heldout_used": false,
+  "scientific_acceptance": "NOT_GRANTED",
+  "production_activation": false,
+  "decision": "NO_GO: two-FIT consensus does not confer meaningful transfer benefit; mean gain only 1.17e-7 vs frozen and FP32 remains better. No further seed-specific tuning on these disclosed development cohorts."
+}
