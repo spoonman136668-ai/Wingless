@@ -56,7 +56,19 @@ def compare(repeats=3):
                 y = x @ w.T
                 y_direct = apply_direct(x, a, b)
                 y_dense = x @ dense.T
-                np.testing.assert_allclose(y_direct, y_dense, rtol=3e-5, atol=3e-5)
+                # Independent float64 algebraic oracle separates associativity
+                # rounding from genuine factor/operator divergence.
+                x64, a64, b64 = x.astype(np.float64), a.astype(np.float64), b.astype(np.float64)
+                oracle_direct = (x64 @ b64.T) @ a64.T
+                oracle_reconstructed = x64 @ (a64 @ b64).T
+                np.testing.assert_allclose(oracle_direct, oracle_reconstructed, rtol=1e-12, atol=1e-11)
+                scale = float(np.linalg.norm(oracle_direct))
+                if scale <= 0:
+                    raise ValueError("zero energy factorized output")
+                f32_direct_error = float(np.linalg.norm(y_direct.astype(np.float64) - oracle_direct) / scale)
+                f32_dense_error = float(np.linalg.norm(y_dense.astype(np.float64) - oracle_direct) / scale)
+                if f32_direct_error > 1e-5 or f32_dense_error > 1e-5:
+                    raise AssertionError("float32 kernel diverges from float64 factorized oracle")
                 energy = float(np.sum(y.astype(np.float64)**2))
                 if energy <= 0:
                     raise ValueError("zero energy output")
