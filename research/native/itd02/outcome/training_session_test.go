@@ -16,10 +16,12 @@ type sessionFixture struct {
     resets int
     actions []int
     failStep bool
+    failReset bool
     terminal bool
 }
 func (f *sessionFixture) ResetPublic()(r1.PublicGrid,error){
     f.resets++
+    if f.failReset{return r1.PublicGrid{},errors.New("SOURCE_RESET_OUTCOME_AMBIGUOUS")}
     return f.initial,nil
 }
 func (f *sessionFixture) StepPublic(action int)(PublicConsequence,error){
@@ -96,6 +98,52 @@ func TestNativeTrainingRejectsAmbiguousSourceStepWithoutFabrication(t *testing.T
         t.Fatal("replayed ambiguous source action")
     }
     if len(source.actions)!=1{t.Fatal("ambiguous source was stepped twice")}
+}
+
+// Reset errors may have taken effect at the original source; never retry.
+func TestNativeSessionQuarantinesAmbiguousSourceReset(t *testing.T) {
+    source:=&sessionFixture{initial:selectedFixture(),failReset:true,terminal:true}
+    session:=&TrainingSession{Learner:NewSelected(),
+        MinimumSelectedSamples:2,MaximumEpisodeSteps:1}
+    _,_,err:=session.RunEpisode(source)
+    if err==nil||source.resets!=1{t.Fatal("ambiguous reset was not recorded")}
+    source.failReset=false
+    _,_,err=session.RunEpisode(source)
+    if err==nil||source.resets!=1||len(source.actions)!=0{
+        t.Fatal("repeated original source reset after ambiguous outcome")
+    }
+}
+
+// Returning a snapshot is not a durable save. An ambiguous sink must latch
+// the same process-local session and disallow a second external reset.
+func TestNativeSessionQuarantinesAmbiguousCheckpointSave(t *testing.T) {
+    source:=&sessionFixture{initial:selectedFixture(),terminal:true}
+    session:=&TrainingSession{Learner:NewSelected(),
+        MinimumSelectedSamples:2,MaximumEpisodeSteps:1}
+    saved:=0
+    _,err:=session.TrainBounded(source,2,func([]byte)error{
+        saved++
+        return errors.New("CHECKPOINT_SINK_RESULT_UNCERTAIN")
+    })
+    if err==nil||saved!=1||source.resets!=1||len(source.actions)!=1 {
+        t.Fatal("uncertain checkpoint not isolated")
+    }
+    _,err=session.TrainBounded(source,1,func([]byte)error{return nil})
+    if err==nil||source.resets!=1||len(source.actions)!=1 {
+        t.Fatal("external source reentered after ambiguous checkpoint")
+    }
+}
+
+func TestNativeSessionRequiresCheckpointCustodyAfterDirectRun(t *testing.T) {
+    source:=&sessionFixture{initial:selectedFixture(),terminal:true}
+    session:=&TrainingSession{Learner:NewSelected(),
+        MinimumSelectedSamples:2,MaximumEpisodeSteps:1}
+    _,snapshot,err:=session.RunEpisode(source)
+    if err!=nil||len(snapshot)==0||source.resets!=1{t.Fatal("first episode failed")}
+    _,_,err=session.RunEpisode(source)
+    if err==nil||source.resets!=1||len(source.actions)!=1 {
+        t.Fatal("unacknowledged direct snapshot allowed original source replay")
+    }
 }
 
 func TestNativeTrainingNeverForgesTerminal(t *testing.T){
