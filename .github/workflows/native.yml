@@ -2,6 +2,10 @@ name: Wingless native validation
 on:
   push:
     branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/native.yml'
   workflow_dispatch:
 permissions:
   contents: read
