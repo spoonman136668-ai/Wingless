@@ -807,7 +807,15 @@ jobs:
           assert j["disk_integrity_receipt"]["disk_content_verified"]
           c=j["original_full_expert_operator_comparison"]
           assert c["schema"]=="wingless.gcen.g9p.one-original-full-expert-comparison.v1"
-          assert c["comparison_count"]==8 and len(c["comparisons"])==8
+          assert c["comparison_count"]==14 and len(c["comparisons"])==14
+          assert {x["seed"] for x in c["comparisons"]}=={751,811}
+          arms={x["arm"] for x in c["comparisons"]}
+          assert len(arms)==7
+          assert {"mixed_uniform_eighth_INT4","mixed_ranked_eighth_INT4","mixed_ranked_quarter_INT4"} <= arms
+          for seed in (751,811):
+            rows={x["arm"]:x for x in c["comparisons"] if x["seed"]==seed}
+            assert len(rows)==7
+            assert rows["mixed_ranked_eighth_INT4"]["encoded_bytes_including_accounted_metadata"]==rows["mixed_uniform_eighth_INT4"]["encoded_bytes_including_accounted_metadata"]
           assert c["probe_inputs"]=="SYNTHETIC_GAUSSIAN_NOT_QWEN_ACTIVATIONS"
           assert not c["full_model_forward"] and not c["gpu_vram_measured"]
           assert j["source_and_sink_files_after_cleanup"]==0
