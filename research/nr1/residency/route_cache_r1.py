@@ -76,7 +76,7 @@ def simulate(training, evaluation, policy, capacity, bandwidth=BANDWIDTH_BPS):
             else:
                 misses += 1
                 faults += 1
-                if policy not in ("no_cache", "training_hotset") or e in hot:
+                if policy != "no_cache" and (policy != "training_hotset" or e in hot):
                     if len(resident) == capacity:
                         if policy == "lru":
                             victim = min(resident, key=lambda v: (last.get(v, -1), v))
