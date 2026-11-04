@@ -1,0 +1,63 @@
+{
+  "schema": "wingless.cnc02e.authenticated-three-arm-development-summary.v1",
+  "status": "EXPERIMENT_PASS_NO_GENERALIZATION_PROMOTION",
+  "source_sha": "6b3981d4352ee3af8588644d4f3909a305b599d6",
+  "workflow_run_id": 41805283931,
+  "artifact_id": 13310220172,
+  "original_receipt_sha256": "bac78e57ced5fe1093ed201907316d92722a31c44331e764ca780f55d5729f74",
+  "zip_sha256": "ff5d061cc1263b3aad226267d2a0fb2a3bb75f7605d7af3f4a56c005036a478a",
+  "source_model": "Qwen/Qwen3-30B-A3B",
+  "revision": "ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+  "source_shard": "model-00001-of-00016.safetensors",
+  "shard_sha256": "454e77b346a61bfb201d54df60e15158838cf930617ee135113556204f2802b5",
+  "shard_bytes_verified": 3999417504,
+  "staged_original_files_after_cleanup": 0,
+  "windows": 20,
+  "source_seeds": [
+    11,
+    23,
+    37,
+    53,
+    71
+  ],
+  "experts_per_seed": 4,
+  "activation_kind": "INDEPENDENT_SYNTHETIC_GAUSSIAN_NOT_QWEN_ACTIVATIONS",
+  "step_count_per_window": 2,
+  "step_budget": "EQUAL_STEP_COUNT_ONLY_NOT_EQUAL_COMPUTE_OR_PARAMETERS",
+  "mean_normalized_output_error": {
+    "frozen_int4": {
+      "fit": 0.01212447144731562,
+      "transfer": 0.0124730744986809
+    },
+    "direct_code": {
+      "fit": 0.012010153685417127,
+      "transfer": 0.012481774212820389
+    },
+    "fp32_sgd": {
+      "fit": 0.012090678035908927,
+      "transfer": 0.012469274377151025
+    },
+    "qat_ste": {
+      "fit": 0.01212447144731562,
+      "transfer": 0.0124730744986809
+    }
+  },
+  "transfer_improved_windows": {
+    "direct_code": 9,
+    "fp32_sgd": 20,
+    "qat_ste": 0
+  },
+  "persistent_weight_bytes_per_window": {
+    "direct_int4": 18456,
+    "fp32_sgd": 131072,
+    "qat_ste_master_plus_codes_and_scales": 149504
+  },
+  "transient_rss_comparison": "UNMEASURED",
+  "gpu_vram": "UNMEASURED",
+  "full_model_forward": false,
+  "original_qwen_activations": false,
+  "language_task_quality": "UNVERIFIED",
+  "scientific_acceptance": "NOT_GRANTED",
+  "production_activation": false,
+  "decision": "No generalization acceptance for direct INT4 code editing; small FP32 transfer benefit only under synthetic fit/transfer. Next independent regularization and parameter/FLOP normalized control before claims."
+}
