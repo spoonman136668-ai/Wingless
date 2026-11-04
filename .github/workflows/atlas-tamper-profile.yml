@@ -45,10 +45,10 @@ jobs:
           Write-Host "COMPLETE_TAMPER_ELAPSED_SECONDS=$([math]::Round($watch.Elapsed.TotalSeconds,3))"
           if ($exit -ne 0) { throw 'AUTHENTIC_TAMPER_NEGATIVE_FAILED' }
           @'
-import pstats, sys
-st=pstats.Stats(sys.argv[1])
-st.sort_stats('cumulative').print_stats(35)
-'@ | python - "$profile"
+          import pstats, sys
+          st=pstats.Stats(sys.argv[1])
+          st.sort_stats('cumulative').print_stats(35)
+          '@ | python - "$profile"
           if ($LASTEXITCODE -ne 0) { throw 'PROFILE_INSPECT_FAILED' }
           if (git status --porcelain) { throw 'DIRTY_AFTER_TAMPER' }
           Add-Content $env:GITHUB_STEP_SUMMARY "Full unchanged tamper negative suite PASS, elapsed seconds: $([math]::Round($watch.Elapsed.TotalSeconds,3))"
