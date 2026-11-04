@@ -1,0 +1,64 @@
+name: Wingless bounded native Go build cache experiment
+on:
+  push:
+    branches:
+      - experiment/native-go-cache-probe-20261104
+    paths:
+      - '.github/workflows/native-go-cache-probe.yml'
+permissions:
+  contents: read
+jobs:
+  go-cache-probe:
+    name: Focused cold/warm Go build cache
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Compare isolated cold and warm Go compilation, with real tests twice
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $env:GOCACHE = Join-Path $env:RUNNER_TEMP 'wingless-cache-probe'
+          New-Item -ItemType Directory -Force -Path $env:GOCACHE | Out-Null
+          $head = (git rev-parse HEAD).Trim()
+          if ($head -ne $env:GITHUB_SHA) { throw "SOURCE_IDENTITY_DRIFT $head != $env:GITHUB_SHA" }
+          $measure = @()
+          foreach ($phase in @('cold','warm')) {
+            $watch = [Diagnostics.Stopwatch]::StartNew()
+            & go test -buildvcs=false -race -count=1 -timeout 90s ./ice
+            $exit = $LASTEXITCODE
+            $watch.Stop()
+            if ($exit -ne 0) { throw "FOCUSED_TEST_FAILED phase=$phase exit=$exit" }
+            $measure += [pscustomobject]@{
+              phase = $phase
+              elapsed_seconds = [math]::Round($watch.Elapsed.TotalSeconds, 3)
+              sha = $head
+              os = "$env:RUNNER_OS"
+              go_version = (& go version)
+            }
+          }
+          $out = Join-Path $env:RUNNER_TEMP 'go-cache-probe.json'
+          $measure | ConvertTo-Json -Depth 4 | Set-Content -Encoding utf8 -Path $out
+          Add-Content $env:GITHUB_STEP_SUMMARY '## Focused Go compilation cache probe'
+          Add-Content $env:GITHUB_STEP_SUMMARY "SHA: $head"
+          foreach ($row in $measure) {
+            Add-Content $env:GITHUB_STEP_SUMMARY "$($row.phase): $($row.elapsed_seconds) seconds"
+          }
+          Add-Content $env:GITHUB_STEP_SUMMARY 'Both passes rerun real tests (-count=1); development-only, not final qualification.'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: go-cache-probe-${{ matrix.os }}
+          path: ${{ runner.temp }}/go-cache-probe.json
+          if-no-files-found: ignore
+          retention-days: 7
