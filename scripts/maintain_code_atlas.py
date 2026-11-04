@@ -103,8 +103,17 @@ class ExactBlobBatch:
                 and chunks[2].isdigit(), "GIT_BATCH_BLOB_NOT_FOUND")
         size = int(chunks[2])
         require(0 <= size <= 32 * 1024 * 1024, "GIT_BATCH_SIZE_OUT_OF_RANGE")
-        data = self.proc.stdout.read(size)
-        require(len(data) == size and self.proc.stdout.read(1) == bytes([10]),
+        # Windows anonymous pipes can return fewer bytes than requested
+        # even when more bytes remain; only EOF before size is a failure.
+        chunks_out = []
+        remaining = size
+        while remaining:
+            piece = self.proc.stdout.read(remaining)
+            require(bool(piece), "GIT_BATCH_BINARY_FRAME_DRIFT")
+            chunks_out.append(piece)
+            remaining -= len(piece)
+        data = b"".join(chunks_out)
+        require(self.proc.stdout.read(1) == bytes([10]),
                 "GIT_BATCH_BINARY_FRAME_DRIFT")
         digest = hashlib.sha1(b"blob " + str(size).encode("ascii")
                               + bytes([0]) + data).hexdigest().encode("ascii")
