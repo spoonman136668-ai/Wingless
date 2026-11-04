@@ -1,0 +1,44 @@
+name: Wingless integrated source repair qualification
+on:
+  push:
+    branches: [research/integrated-source-repair-20261104]
+permissions:
+  contents: read
+jobs:
+  source-only:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Source-free incomplete evidence regression
+        run: python -B -m unittest discover -s research/native/integrated_source_repair -v
+      - name: Regenerate and validate source index in disposable checkout
+        run: |
+          go run ./cmd/ice build
+          go run ./cmd/ice validate
+      - name: Mandatory full race regression
+        run: go test -race -count=1 ./...
+      - name: Vet and full build
+        run: |
+          go vet ./...
+          go build ./...
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wingless-generated-index-${{ matrix.os }}
+          path: .ice
+          include-hidden-files: true
+          retention-days: 7

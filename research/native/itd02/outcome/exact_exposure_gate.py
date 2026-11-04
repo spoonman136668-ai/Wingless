@@ -23,6 +23,13 @@ TEST_SEEDS=(229,233,239,241,251,257,263,269)
 TRAIN_STEPS=256
 TEST_STEPS=100
 
+class ExposureIncomplete(BridgeError):
+    def __init__(self, reason, records, remaining):
+        super().__init__(reason)
+        self.records = records
+        self.remaining = remaining
+
+
 def exact_train(policy):
     remaining=TRAIN_STEPS
     records=[]
@@ -36,9 +43,9 @@ def exact_train(policy):
         # never followed by another source reset. Only the final train cut
         # is permitted to leave the policy in an unfinished world episode.
         if not record["completed"] and remaining>0:
-            raise BridgeError("incomplete source episode before train boundary")
+            raise ExposureIncomplete("incomplete source episode before train boundary", records, remaining)
     if remaining!=0:
-        raise BridgeError("failed to reach exact authentic source training budget")
+        raise ExposureIncomplete("failed to reach exact authentic source training budget", records, remaining)
     return records
 
 def train_native(binary,blind):
@@ -91,7 +98,7 @@ def evaluate_q(weights):
         results.append(result)
     return results
 
-def execute(binary,output):
+def _execute(binary,output):
     if output.exists():
         raise FileExistsError("cannot overwrite evidence")
     start=time.perf_counter()
@@ -137,6 +144,31 @@ def execute(binary,output):
                        "returns":[e["return"] for e in results]}
                  for name,results in evaluated.items()}},sort_keys=True))
     return r
+
+def execute(binary, output):
+    try:
+        return _execute(binary, output)
+    except ExposureIncomplete as exc:
+        # Preserve only actually observed progress; never add seeds or
+        # continue evaluation after incomplete source exposure.
+        receipt = {
+            "schema": "wingless.itd02.exact-exposure-incomplete.v1",
+            "science": "NOT_ACCEPTED",
+            "status": "INCOMPLETE_SOURCE_EXPOSURE",
+            "reason": str(exc),
+            "required_interactions": TRAIN_STEPS,
+            "observed_interactions": TRAIN_STEPS - exc.remaining,
+            "remaining_interactions": exc.remaining,
+            "completed_episode_records": exc.records,
+            "comparison_complete": False,
+            "evaluation_authorized_by_receipt": False,
+        }
+        # Exclusive creation: a failed run must never replace old evidence.
+        with output.open("x", encoding="utf-8") as stream:
+            stream.write(json.dumps(receipt, sort_keys=True,
+                                   separators=(",", ":"), allow_nan=False) + "\\n")
+        raise
+
 
 if __name__=="__main__":
     p=argparse.ArgumentParser()
