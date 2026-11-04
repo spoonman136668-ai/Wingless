@@ -754,3 +754,61 @@ jobs:
           name: g9n-synthetic-bf16
           path: evidence/
           retention-days: 14
+
+  g9n_one_original_expert:
+    # One-shot, independently gated original-weight experiment; never routine CI.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9n-original-expert]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify isolated exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+      - name: Pin CPU BF16 runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet 'torch==2.10.0' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --disable-pip-version-check --quiet 'numpy==2.2.6' 'safetensors==0.5.3'
+      - name: Admit one authenticated original expert tensor
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          printf '{"status":"NOT_ACCEPTED","source":"ONE_ORIGINAL_SHARD_ONLY"}\n' > evidence/g9n-original-status.json
+          python research/nr1/gcen/g9n_one_original_tensor.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/g9n-original-expert.json
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          j=json.loads(Path("evidence/g9n-original-expert.json").read_text())
+          assert j["source_sha"]==os.environ["GITHUB_SHA"]
+          assert j["schema"]=="wingless.gcen.g9n.one-original-tensor-development.v1"
+          assert j["one_original_shard_authenticated"] and not j["all_16_shards_authenticated"]
+          assert j["disk_integrity_receipt"]["disk_content_verified"]
+          assert j["source_and_sink_files_after_cleanup"]==0
+          assert not j["full_model_forward"] and not j["gpu_vram_measured"]
+          PY
+          printf '{"status":"G9N_ONE_ORIGINAL_BF16_EXPERT_VERIFIED","scope":"ONE_SHARD_NO_FORWARD"}\n' > evidence/g9n-original-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9n-one-original-expert
+          path: evidence/
+          retention-days: 14
