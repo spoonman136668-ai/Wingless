@@ -1,0 +1,53 @@
+name: Wingless Windows Go 1.25.5 toolchain availability probe
+on:
+  push:
+    branches: [experiment/native-go-cache-probe-20261104]
+    paths: ['.github/workflows/windows-go-toolchain-probe.yml']
+permissions:
+  contents: read
+jobs:
+  image-toolchain:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, windows-2022]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Inventory preinstalled Go before setup
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $sha = (git rev-parse HEAD).Trim()
+          if ($sha -ne $env:GITHUB_SHA) { throw "SOURCE_IDENTITY_DRIFT $sha" }
+          $available = @(Get-Command go -All -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source)
+          $version = if ($available.Count -gt 0) { (& go version) } else { 'NOT_IN_PATH' }
+          $exact = $version -match '^go version go1\.25\.5 '
+          Add-Content $env:GITHUB_STEP_SUMMARY "Image: $env:ImageOS; preinstalled Go: $version; exact candidate: $exact"
+          Add-Content $env:GITHUB_STEP_SUMMARY "Pre-setup Go executable candidates: $($available -join ', ')"
+          Write-Host "BEFORE_SETUP_GO_VERSION=$version"
+          Write-Host "BEFORE_SETUP_EXACT=$exact"
+      - name: Start pinned setup-go measurement
+        shell: pwsh
+        run: |
+          [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() | Set-Content "$env:RUNNER_TEMP/go-setup-start-ms.txt"
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Validate pinned Go and report setup time
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $actual = (& go version)
+          if ($actual -notmatch '^go version go1\.25\.5 ') { throw "PINNED_GO_MISMATCH $actual" }
+          $started = [long](Get-Content "$env:RUNNER_TEMP/go-setup-start-ms.txt")
+          $elapsed = [math]::Round(([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() - $started)/1000, 3)
+          Add-Content $env:GITHUB_STEP_SUMMARY "Pinned setup-go elapsed seconds: $elapsed"
+          Write-Host "PINNED_SETUP_SECONDS=$elapsed"
+          & go test -buildvcs=false -race -count=1 -timeout 90s ./ice
+          if ($LASTEXITCODE -ne 0) { throw 'FOCUSED_ICE_FAILED' }
+          Add-Content $env:GITHUB_STEP_SUMMARY 'Focused ICE native race tests: PASS (fresh -count=1)'
