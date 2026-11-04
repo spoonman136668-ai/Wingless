@@ -53,23 +53,91 @@ def self_test(root):
             "pull_request not unconditional")
     require(re.search(r"(?m)^\s+paths(?:-ignore)?:", header) is None,
             "PR-level path filtering can strand required status")
-    require("    name: " + STATUS_JOB in workflow, "required job identity changed")
-    require("        id: scope\n" in workflow,
-            "atlas scope classification step absent")
-    for step in (
-        "Set up frozen Go toolchain",
-        "Validate source-index freshness and typed relationships",
-        "Tamper-resistance negative acceptance in disposable exact-head clone",
-        "Genuine Chromium browser navigation acceptance",
-        "Focused ICE regression",
-        "One complete integration regression",
-        "Vet, build, and verify clean checkout",
-    ):
-        marker = "      - name: " + step + "\n"
-        require(workflow.count(marker) == 1, "missing/duplicate step: " + step)
-        block = workflow.split(marker, 1)[1].split("\n      - name:", 1)[0]
-        require("if: steps.scope.outputs.atlas_relevant == 'true'" in block,
-                "full qualification can bypass scope: " + step)
+    # The always-on protected status is an aggregate: no independent lane may
+    # grant acceptance, and skipped/cancelled/failed lanes must fail closed.
+    def contract(w):
+        require(w.count("    name: " + STATUS_JOB + "\n") == 1,
+                "missing/duplicate required aggregate status")
+        require("        id: scope\n" in w, "atlas scope classifier absent")
+        job_parts = re.split(r"(?m)^  (scope|browser|tamper|integration|qualification):\\n", w)
+        jobs = {job_parts[i]: job_parts[i + 1]
+                for i in range(1, len(job_parts) - 1, 2)}
+        require(set(jobs) == {"scope", "browser", "tamper", "integration", "qualification"},
+                "atlas scope or parallel lanes missing")
+        require("      atlas_relevant: ${{ steps.scope.outputs.atlas_relevant }}" in jobs["scope"],
+                "scope result not forwarded")
+        require("scripts/atlas_ci_scope.py --root . --self-test" in jobs["scope"]
+                and "--expected-head" in jobs["scope"]
+                and "--output" in jobs["scope"],
+                "unconditional fail-closed source/scope classification missing")
+        per_lane = {
+            "browser": ["Genuine Chromium browser navigation acceptance"],
+            "tamper": ["Set up frozen Go toolchain",
+                       "Validate source-index freshness and typed relationships",
+                       "Tamper-resistance negative acceptance in disposable exact-head clone"],
+            "integration": ["Set up frozen Go toolchain", "Focused ICE regression",
+                            "One complete integration regression",
+                            "Vet, build, and verify clean checkout"],
+        }
+        for lane, steps in per_lane.items():
+            block = jobs[lane]
+            require("    needs: [scope]\n" in block
+                    and "    if: needs.scope.outputs.atlas_relevant == 'true'\n" in block,
+                    "lane bypasses positive source classification: " + lane)
+            require("ref: ${{ github.event.pull_request.head.sha || github.sha }}" in block
+                    and "persist-credentials: false" in block
+                    and "fetch-depth: 0" in block
+                    and "ATLAS_EXACT_HEAD_DRIFT" in block
+                    and "ATLAS_SOURCE_CHECKOUT_DIRTY" in block,
+                    "lane source checkout custody weakened: " + lane)
+            for step in steps:
+                require(block.count("      - name: " + step + "\n") == 1,
+                        "missing/duplicate native qualification step: " + step)
+        summary = jobs["qualification"]
+        require("    needs: [scope, browser, tamper, integration]\n" in summary
+                and "    if: always()\n" in summary,
+                "aggregate not fail-closed across every lane")
+        for field in ("SCOPE_RESULT", "ATLAS_RELEVANT", "BROWSER_RESULT",
+                      "TAMPER_RESULT", "INTEGRATION_RESULT"):
+            require(field + ":" in summary, "aggregate missing result: " + field)
+        for expected in ('test "$SCOPE_RESULT" = success',
+                         'test "$ATLAS_RELEVANT" = false',
+                         'test "$ATLAS_RELEVANT" = true',
+                         'test "$BROWSER_RESULT" = skipped',
+                         'test "$TAMPER_RESULT" = skipped',
+                         'test "$INTEGRATION_RESULT" = skipped',
+                         'test "$BROWSER_RESULT" = success',
+                         'test "$TAMPER_RESULT" = success',
+                         'test "$INTEGRATION_RESULT" = success',
+                         "ATLAS_SCOPE_INVALID"):
+            require(expected in summary, "aggregate condition removed: " + expected)
+
+    contract(workflow)
+    # Deterministic negative controls: never accept deletion of a required lane,
+    # conditional omission of the aggregate, or silent weakening of status gates.
+    negatives = (
+        ("    if: always()\n", "    if: false\n"),
+        ('test "$BROWSER_RESULT" = success', 'test "$BROWSER_RESULT" != failure'),
+        ("      - name: One complete integration regression\n",
+         "      - name: Optional integration regression\n"),
+        ("    if: needs.scope.outputs.atlas_relevant == 'true'\n",
+         "    if: always()\n"),
+        ("    needs: [scope, browser, tamper, integration]\n",
+         "    needs: [scope, browser, integration]\n"),
+        ("      atlas_relevant: ${{ steps.scope.outputs.atlas_relevant }}",
+         "      atlas_relevant: 'false'"),
+    )
+    rejected = 0
+    for before, after in negatives:
+        require(before in workflow, "negative mutation anchor absent")
+        mutated = workflow.replace(before, after, 1)
+        try:
+            contract(mutated)
+        except SystemExit:
+            rejected += 1
+        else:
+            require(False, "negative contract mutation accepted")
+    require(rejected == len(negatives), "not all negatives rejected")
     entries = json.loads((root / ".ice/manifest.json").read_text("utf-8"))["files"]
     representative = [
         "new_source.go", "src/new_source.go", "README.md", "src/new.md",
@@ -93,6 +161,7 @@ def self_test(root):
         "future_path_probes": len(representative),
         "always_on_status": STATUS_JOB,
         "unrelated_path_skips": 3,
+        "aggregate_negative_controls": rejected,
     }, sort_keys=True))
 
 
