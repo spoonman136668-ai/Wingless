@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.cnc02c.authenticated-adaptation-summary.v1",
+  "result": "TRAIN_IMPROVES_TRANSFER_UNVERIFIED_OR_NEGATIVE",
+  "source_commit": "b48603e93775fd0a6beb70f18dbb65680887e876",
+  "workflow_run_id": 41802075256,
+  "workflow_job_id": 126480747053,
+  "artifact_id": 13307588255,
+  "artifact_file": "cnc02c-real-original-fit-transfer.json",
+  "artifact_receipt_sha256": "78789b8a1344e006cc5efee723ee356d8d4c2136fc21a6f9897a9c8aca336669",
+  "source_model": "Qwen/Qwen3-30B-A3B",
+  "source_revision": "ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+  "source_shard": "model-00001-of-00016.safetensors",
+  "source_shard_sha256": "454e77b346a61bfb201d54df60e15158838cf930617ee135113556204f2802b5",
+  "source_window_seeds": [
+    11,
+    23,
+    37,
+    53,
+    71
+  ],
+  "expert_count_per_seed": 4,
+  "window_shape": [
+    128,
+    256
+  ],
+  "comparisons": 20,
+  "compressed_code_edits": 40,
+  "steps_per_expert": 2,
+  "fit_seed": 6011,
+  "transfer_seed": 17201,
+  "activation_kind": "SYNTHETIC_GAUSSIAN_NOT_NATIVE_QWEN_ACTIVATIONS",
+  "mean_normalized_error": {
+    "frozen_int4_fit": 0.012124471513643447,
+    "adapted_int4_fit": 0.012010153760190868,
+    "frozen_int4_transfer": 0.012473074640694692,
+    "adapted_int4_transfer": 0.012481774372883812
+  },
+  "improvement_windows": {
+    "fit": 20,
+    "transfer": 9
+  },
+  "process_rss_peak_bytes": 64172032,
+  "persistent_compressed_bytes_per_window": 18456,
+  "source_shard_removed_after_run": true,
+  "full_precision_training_control": "NOT_MATCHED",
+  "real_model_forward": false,
+  "actual_qwen_activations": false,
+  "gpu_memory_measured": false,
+  "language_task_quality_verified": false,
+  "scientific_acceptance": "NOT_GRANTED",
+  "production_activation": false,
+  "decision": "NO_GO for claim of generalized compressed learning on this development protocol. Advance to independently frozen regularization and matched FP32/quantization-aware controls, with genuinely separate evaluation cohorts; do not tune to this transfer set."
+}
