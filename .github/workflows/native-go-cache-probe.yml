@@ -24,6 +24,17 @@ jobs:
         with:
           go-version: '1.25.5'
           cache: false
+      # Cache only compiled Go build outputs; never skip test execution.
+      - name: Restore exact-input Go build cache
+        id: go-build-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/wingless-cache-probe
+          key: wingless-ice-race-go1255-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/*.go', 'go.mod') }}
+      - name: Confirm cross-run cache status
+        shell: pwsh
+        run: |
+          Add-Content $env:GITHUB_STEP_SUMMARY "External Go build cache hit: ${{ steps.go-build-cache.outputs.cache-hit }}"
       - name: Compare isolated cold and warm Go compilation, with real tests twice
         shell: pwsh
         run: |
