@@ -785,6 +785,9 @@ jobs:
           python -m pip install --disable-pip-version-check --quiet 'numpy==2.2.6' 'safetensors==0.5.3'
       - name: Admit one authenticated original expert tensor
         shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
         run: |
           set -euo pipefail
           mkdir -p evidence
@@ -802,6 +805,11 @@ jobs:
           assert j["schema"]=="wingless.gcen.g9n.one-original-tensor-development.v1"
           assert j["one_original_shard_authenticated"] and not j["all_16_shards_authenticated"]
           assert j["disk_integrity_receipt"]["disk_content_verified"]
+          c=j["original_full_expert_operator_comparison"]
+          assert c["schema"]=="wingless.gcen.g9p.one-original-full-expert-comparison.v1"
+          assert c["comparison_count"]==8 and len(c["comparisons"])==8
+          assert c["probe_inputs"]=="SYNTHETIC_GAUSSIAN_NOT_QWEN_ACTIVATIONS"
+          assert not c["full_model_forward"] and not c["gpu_vram_measured"]
           assert j["source_and_sink_files_after_cleanup"]==0
           assert not j["full_model_forward"] and not j["gpu_vram_measured"]
           PY

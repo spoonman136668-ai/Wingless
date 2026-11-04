@@ -92,6 +92,10 @@ def run(manifest_path, scratch_root, output, source_sha):
                 with safe_open(str(sinks.disk_paths[key]), framework="pt", device="cpu") as persisted:
                     if not torch.equal(tensor, persisted.get_tensor(key)):
                         raise RuntimeError("original BF16 tensor disk roundtrip mismatch")
+                # Compare the authenticated full expert once, after an exact
+                # disk round-trip. No model forward or original activation trace.
+                from g9p_original_expert_comparison import compare_original_expert
+                comparison=compare_original_expert(tensor.to(dtype=torch.float32).numpy())
                 del tensor
             owned = sinks.directory
         if owned.exists():
@@ -111,6 +115,7 @@ def run(manifest_path, scratch_root, output, source_sha):
             "selected_tensor":key, "selected_shape":list(shape),
             "selected_tensor_bytes":plan["disk_bytes"],
             "disk_integrity_receipt":receipt,
+            "original_full_expert_operator_comparison":comparison,
             "process_rss_baseline_bytes":rss0, "process_peak_rss_bytes":peak,
             "elapsed_seconds":time.monotonic()-started,
             "one_original_shard_authenticated":True,
