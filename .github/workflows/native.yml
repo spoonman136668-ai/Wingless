@@ -1,7 +1,14 @@
 name: Wingless native validation
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - research/nr1-gcen-g4c-development-20261102
+  pull_request:
+    paths:
+      - 'research/nr1/gcen/**'
+      - '.github/workflows/native.yml'
+      - 'scripts/Test-Native.ps1'
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,11 +19,21 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Record checked-out source identity
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force evidence | Out-Null
+          $expected = '${{ github.event.pull_request.head.sha || github.sha }}'
+          $actual = (git rev-parse HEAD).Trim()
+          if ($actual -ne $expected) { throw "Exact-head checkout mismatch" }
+          $actual | Out-File -Encoding utf8 evidence/source-sha.txt
+          git status --porcelain | Out-File -Encoding utf8 evidence/source-status.txt
       - uses: actions/setup-go@v5
         with:
           go-version: '1.25.5'
@@ -24,9 +41,245 @@ jobs:
       - name: Native tests and evidence
         shell: pwsh
         run: ./scripts/Test-Native.ps1
+      - name: Diagnose stale ICE without accepting regenerated output
+        if: failure()
+        shell: pwsh
+        run: |
+          & go run -buildvcs=false ./cmd/ice build
+          if ($LASTEXITCODE -ne 0) { throw "ICE diagnostic regeneration failed" }
+          git status --short | Out-File -Encoding utf8 evidence/ice-regenerated-status.txt
+          git diff --binary -- .ice | Out-File -Encoding utf8 evidence/ice-regenerated.patch
+          & go run -buildvcs=false ./cmd/ice validate
+          if ($LASTEXITCODE -ne 0) { throw "Regenerated ICE still invalid" }
+          Write-Output "ICE_DIAGNOSTIC_ONLY_NOT_QUALIFIED"
+          # Export only six reproducible generated ICE files for bounded repair.
+          # Diagnostic runs remain FAILED; these log records are not acceptance.
+          $paths = @(
+            '.ice/architecture-map.json',
+            '.ice/dependency-map.json',
+            '.ice/integration-seams.json',
+            '.ice/manifest.json',
+            '.ice/symbol-map.json',
+            '.ice/test-map.json'
+          )
+          foreach ($path in $paths) {
+            $bytes = [System.IO.File]::ReadAllBytes((Join-Path (Get-Location) $path))
+            $encoded = [Convert]::ToBase64String($bytes)
+            Write-Output "GCEN_ICE_EXPORT_BEGIN $path $($bytes.Length)"
+            for ($offset = 0; $offset -lt $encoded.Length; $offset += 512) {
+              $length = [Math]::Min(512, $encoded.Length - $offset)
+              Write-Output ("GCEN_ICE_EXPORT_DATA " + $encoded.Substring($offset, $length))
+            }
+            Write-Output "GCEN_ICE_EXPORT_END $path"
+          }
+      - name: Set up GCEN Python
+        if: ${{ hashFiles('research/nr1/gcen/run_focused.py') != '' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: GCEN development-only focused tests
+        if: ${{ hashFiles('research/nr1/gcen/run_focused.py') != '' }}
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check "numpy==2.2.6" "safetensors==0.5.3"
+          python research/nr1/gcen/run_focused.py
+          if ($LASTEXITCODE -ne 0) { throw "GCEN focused tests failed" }
+      - name: GCEN G23 one-shot memory census (no weights or inference)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && contains(github.event.head_commit.message, '[gcen-g23-capacity]') && success() }}
+        timeout-minutes: 2
+        shell: pwsh
+        run: |
+          python research/nr1/gcen/runtime_feasibility.py `
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json `
+            --output "evidence/gcen-g23-capacity-${{ matrix.os }}.json"
+          if ($LASTEXITCODE -ne 0) { throw "GCEN G23 capacity census failed" }
+      - name: GCEN G24 pinned-index and offload scratch preflight (no weights)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && contains(github.event.head_commit.message, '[gcen-g24-index]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 3
+        shell: pwsh
+        run: |
+          python research/nr1/gcen/out_of_core_preflight.py `
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json `
+            --scratch-root . `
+            --output "evidence/gcen-g24-preflight-${{ matrix.os }}.json"
+          if ($LASTEXITCODE -ne 0) { throw "GCEN G24 pinned-index preflight failed" }
+      - name: GCEN G25 pinned tiny Qwen3-MoE disk-offload and pre-hook smoke
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && (contains(github.event.head_commit.message, '[gcen-g25-offload]') || contains(github.event.head_commit.message, '[gcen-g26-shards]') || contains(github.event.head_commit.message, '[gcen-g27-meta]') || contains(github.event.head_commit.message, '[gcen-g28-placement]') || contains(github.event.head_commit.message, '[gcen-g29-one-shard]') || contains(github.event.head_commit.message, '[gcen-g30-stream]')) && success() }}
+        continue-on-error: true
+        timeout-minutes: 16
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G25_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g25-status.json
+          python -m pip install --disable-pip-version-check --quiet 'torch==2.10.0' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --disable-pip-version-check --quiet 'accelerate==1.10.1' 'transformers==4.57.3'
+          python research/nr1/gcen/g25_disk_offload_smoke.py --output evidence/gcen-g25-disk-offload-smoke.json
+          printf '{"status":"PINNED_TINY_OFFLOAD_HOOK_PASS","scope":"G25_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g25-status.json
+      - name: GCEN G26 tiny sharded CPU-disk checkpoint and expert hook smoke
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g26-shards]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G26_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g26-status.json
+          python research/nr1/gcen/g26_sharded_checkpoint_smoke.py --output evidence/gcen-g26-sharded-smoke.json
+          printf '{"status":"PINNED_TINY_SHARDED_CHECKPOINT_PASS","scope":"G26_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g26-status.json
+      - name: GCEN G27 pinned full 48-layer meta architecture and index-to-module audit
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g27-meta]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 12
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G27_META_NO_REAL_WEIGHTS"}\n' > evidence/gcen-g27-status.json
+          python research/nr1/gcen/g27_original_meta_mapping.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --output evidence/gcen-g27-meta-architecture.json
+          printf '{"status":"PINNED_ORIGINAL_ARCHITECTURE_META_KEY_MAPPING_PASS","scope":"G27_META_NO_REAL_WEIGHTS"}\n' > evidence/gcen-g27-status.json
+      - name: GCEN G28 full BF16 meta CPU-disk device mapping and scratch memory plan
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g28-placement]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 12
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G28_STATIC_CPU_DISK_META_ONLY"}\n' > evidence/gcen-g28-status.json
+          python research/nr1/gcen/g28_original_device_plan.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root . \
+            --output evidence/gcen-g28-meta-device-plan.json
+          printf '{"status":"PINNED_ORIGINAL_META_CPU_DISK_DEVICE_PLAN_PASS","scope":"G28_STATIC_CPU_DISK_META_ONLY"}\n' > evidence/gcen-g28-status.json
+      - name: GCEN G29 original BF16 single-shard staging capacity proposal (metadata only)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g29-one-shard]') && success() }}
+        continue-on-error: true
+        timeout-minutes: 12
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G29_METADATA_ONLY"}\n' > evidence/gcen-g29-status.json
+          python research/nr1/gcen/g29_one_shard_capacity.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root . \
+            --output evidence/gcen-g29-one-shard-capacity.json
+          printf '{"status":"PINNED_SINGLE_SHARD_STORAGE_HYPOTHESIS_CALCULATED","scope":"G29_METADATA_ONLY"}\n' > evidence/gcen-g29-status.json
+      - name: GCEN G30 sequential synthetic shard staging and dispatch parity
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[gcen-g30-stream]') && success() }}
+        timeout-minutes: 4
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G30_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g30-status.json
+          python -c 'import json,pathlib; p=pathlib.Path("evidence/gcen-g25-status.json"); d=json.loads(p.read_text()) if p.is_file() else {}; assert d=={"status":"PINNED_TINY_OFFLOAD_HOOK_PASS","scope":"G25_SYNTHETIC_CPU_ONLY"}, "G30 requires G25 prerequisite PASS"'
+          python research/nr1/gcen/g30_sequential_staging.py --output evidence/gcen-g30-sequential-staging.json
+          printf '{"status":"SYNTHETIC_SEQUENTIAL_STAGE_PASS","scope":"G30_SYNTHETIC_CPU_ONLY"}\n' > evidence/gcen-g30-status.json
+      - name: GCEN pinned upstream metadata custody probe (diagnostic only)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && matrix.os == 'ubuntu-latest' && success() }}
+        continue-on-error: true
+        timeout-minutes: 3
+        shell: pwsh
+        run: |
+          # Read-only API and small metadata-file retrieval: NO model weights or inference.
+          # Network failure is a custody blocker, not a native regression failure.
+          python research/nr1/gcen/collect_upstream_manifest.py --output evidence/gcen-upstream-manifest.json
+          if ($LASTEXITCODE -ne 0) {
+            'UPSTREAM_CUSTODY_RETRIEVAL_FAILED_NOT_ACCEPTED' | Out-File -Encoding utf8 evidence/gcen-upstream-status.txt
+            throw 'upstream metadata retrieval failed; no scientific custody admitted'
+          }
+          'UPSTREAM_METADATA_ONLY_LOCAL_WEIGHTS_UNVERIFIED' | Out-File -Encoding utf8 evidence/gcen-upstream-status.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: native-${{ matrix.os }}
+          path: evidence/
+          retention-days: 14
+  g31_one_original_shard:
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && contains(github.event.head_commit.message, '[gcen-g31-original-shard]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify G31 exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git rev-parse HEAD > evidence/source-sha.txt
+          git status --porcelain > evidence/source-status.txt
+          test ! -s evidence/source-status.txt
+      - name: G31 verified single original shard, no model forward
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G31_ONE_ORIGINAL_SHARD_NO_MODEL_FORWARD"}\n' > evidence/gcen-g31-status.json
+          python research/nr1/gcen/g31_original_shard_stage.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/gcen-g31-original-shard.json
+          printf '{"status":"G31_ORIGINAL_SINGLE_SHARD_BYTES_VERIFIED","scope":"G31_ONE_ORIGINAL_SHARD_NO_MODEL_FORWARD"}\n' > evidence/gcen-g31-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gcen-g31-single-original-shard
+          path: evidence/
+          retention-days: 14
+  g32_real_expert_sharing:
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/nr1-gcen-g4c-development-20261102' && contains(github.event.head_commit.message, '[gcen-sharing-scale]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify G32 checkout exact SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git rev-parse HEAD > evidence/source-sha.txt
+          git status --porcelain > evidence/source-status.txt
+          test ! -s evidence/source-status.txt
+      - name: G32 pinned NumPy development runtime
+        shell: bash
+        run: python -m pip install --disable-pip-version-check 'numpy==2.2.6'
+      - name: G32 original BF16 4-8-16 distinct expert sharing comparison
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G32_REAL_WEIGHT_WINDOWS_ONLY"}\n' > evidence/gcen-g32-status.json
+          python research/nr1/gcen/g32_real_expert_scaling.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/gcen-g32-real-expert-scaling.json
+          printf '{"status":"G32_REAL_BF16_EXPERT_WINDOW_SCALING_SCREEN_COMPLETE","scope":"G32_REAL_WEIGHT_WINDOWS_ONLY"}\n' > evidence/gcen-g32-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gcen-g32-real-expert-scaling
           path: evidence/
           retention-days: 14

@@ -1,4 +1,17 @@
 {
+  "benchmark/candidate_replay.go": [
+    "context",
+    "fmt",
+    "github.com/spoonman136668-ai/Wingless/broker",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "time"
+  ],
+  "benchmark/candidate_replay_test.go": [
+    "context",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "testing"
+  ],
   "benchmark/fixtures.go": [
     "encoding/json",
     "go/parser",
@@ -42,6 +55,33 @@
     "github.com/spoonman136668-ai/Wingless/resources",
     "testing"
   ],
+  "benchmark/resource_peak.go": [
+    "context",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "sync",
+    "time"
+  ],
+  "benchmark/resource_peak_test.go": [
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "testing"
+  ],
+  "benchmark/verified_local.go": [
+    "context",
+    "fmt",
+    "github.com/spoonman136668-ai/Wingless/broker",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "runtime",
+    "time"
+  ],
+  "benchmark/verified_local_test.go": [
+    "context",
+    "fmt",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "strings",
+    "testing"
+  ],
   "broker/router.go": [
     "context",
     "fmt",
@@ -49,6 +89,14 @@
     "github.com/spoonman136668-ai/Wingless/resources",
     "sort",
     "sync"
+  ],
+  "broker/router_fallback_regression_test.go": [
+    "context",
+    "fmt",
+    "testing",
+    "time",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources"
   ],
   "broker/router_test.go": [
     "context",
@@ -64,12 +112,29 @@
     "github.com/spoonman136668-ai/Wingless/inference",
     "github.com/spoonman136668-ai/Wingless/resources"
   ],
+  "broker/stage1_local_selection.go": [
+    "fmt"
+  ],
+  "broker/stage1_local_selection_test.go": [
+    "testing"
+  ],
   "cmd/ice/main.go": [
     "encoding/json",
     "fmt",
     "github.com/spoonman136668-ai/Wingless/ice",
     "os",
     "path/filepath"
+  ],
+  "cmd/nr1a/main.go": [
+    "encoding/json",
+    "errors",
+    "flag",
+    "fmt",
+    "math",
+    "os",
+    "strconv",
+    "strings",
+    "github.com/spoonman136668-ai/Wingless/research/nr1"
   ],
   "cmd/wingless/gpu.go": [
     "context",
@@ -103,6 +168,16 @@
     "github.com/spoonman136668-ai/Wingless/resources",
     "os",
     "time"
+  ],
+  "cmd/wingless/replay_report.go": [
+    "bytes",
+    "context",
+    "encoding/json",
+    "flag",
+    "fmt",
+    "github.com/spoonman136668-ai/Wingless/benchmark",
+    "io",
+    "os"
   ],
   "contextbroker/broker.go": [
     "fmt",
@@ -184,6 +259,12 @@
     "testing",
     "time"
   ],
+  "inference/candidate.go": [
+    "strings"
+  ],
+  "inference/candidate_test.go": [
+    "testing"
+  ],
   "inference/constraint.go": [
     "encoding/json",
     "fmt"
@@ -212,6 +293,28 @@
     "time",
     "unicode/utf8"
   ],
+  "inference/output_constraint_local_test.go": [
+    "context",
+    "encoding/json",
+    "io",
+    "net/http",
+    "net/http/httptest",
+    "strings",
+    "testing",
+    "time"
+  ],
+  "inference/output_constraint_streaming_test.go": [
+    "context",
+    "encoding/json",
+    "strings",
+    "testing",
+    "time"
+  ],
+  "inference/response_header_timeout_test.go": [
+    "net/http",
+    "testing",
+    "time"
+  ],
   "inference/robustness_test.go": [
     "context",
     "fmt",
@@ -236,11 +339,191 @@
     "io",
     "net/http",
     "net/http/httptest",
+    "strings",
     "testing",
     "time"
   ],
   "inference/telemetry_test.go": [
     "encoding/json",
+    "strings",
+    "testing"
+  ],
+  "integration/ckbplane/adapter.go": [
+    "bytes",
+    "encoding/json",
+    "errors",
+    "fmt",
+    "io",
+    "regexp",
+    "strings",
+    "time",
+    "github.com/spoonman136668-ai/Wingless/broker",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources"
+  ],
+  "integration/ckbplane/adapter_test.go": [
+    "encoding/json",
+    "strings",
+    "testing",
+    "time",
+    "github.com/spoonman136668-ai/Wingless/broker",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources"
+  ],
+  "integration/ckbplane/listener.go": [
+    "bytes",
+    "context",
+    "crypto/subtle",
+    "encoding/json",
+    "errors",
+    "fmt",
+    "io",
+    "mime",
+    "net/http",
+    "regexp",
+    "strings",
+    "time",
+    "unicode/utf8"
+  ],
+  "integration/ckbplane/listener_contract.go": null,
+  "integration/ckbplane/listener_test.go": [
+    "bytes",
+    "context",
+    "encoding/json",
+    "errors",
+    "io",
+    "net/http",
+    "net/http/httptest",
+    "os",
+    "path/filepath",
+    "reflect",
+    "runtime",
+    "strings",
+    "sync/atomic",
+    "testing",
+    "time",
+    "github.com/spoonman136668-ai/Wingless/broker",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources"
+  ],
+  "integration/ckbplane/proof_test.go": [
+    "context",
+    "errors",
+    "strings",
+    "testing",
+    "time",
+    "github.com/spoonman136668-ai/Wingless/broker",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources",
+    "github.com/spoonman136668-ai/Wingless/worker"
+  ],
+  "integration/ckbplane/proofservice/main.go": [
+    "context",
+    "fmt",
+    "os",
+    "path/filepath",
+    "strings",
+    "github.com/spoonman136668-ai/Wingless/integration/ckbplane"
+  ],
+  "integration/ckbplane/service.go": [
+    "context",
+    "encoding/json",
+    "errors",
+    "fmt",
+    "io",
+    "net",
+    "net/http",
+    "os",
+    "time"
+  ],
+  "integration/ckbplane/service_test.go": [
+    "bufio",
+    "bytes",
+    "context",
+    "encoding/json",
+    "errors",
+    "io",
+    "net",
+    "net/http",
+    "net/url",
+    "os",
+    "path/filepath",
+    "runtime",
+    "strings",
+    "testing",
+    "time"
+  ],
+  "integration/ckbplane/stage1_application_plan.go": [
+    "errors",
+    "fmt",
+    "strings",
+    "unicode/utf8"
+  ],
+  "integration/ckbplane/stage1_application_plan_test.go": [
+    "encoding/json",
+    "strings",
+    "testing"
+  ],
+  "integration/ckbplane/stage1_authority.go": [
+    "bytes",
+    "encoding/json",
+    "errors",
+    "fmt",
+    "io",
+    "path",
+    "regexp",
+    "strings",
+    "github.com/spoonman136668-ai/Wingless/broker"
+  ],
+  "integration/ckbplane/stage1_authority_test.go": [
+    "strings",
+    "testing",
+    "github.com/spoonman136668-ai/Wingless/broker"
+  ],
+  "integration/ckbplane/stage1_candidate_request.go": [
+    "crypto/sha256",
+    "encoding/hex",
+    "encoding/json",
+    "errors",
+    "fmt",
+    "strings",
+    "time",
+    "unicode/utf8",
+    "github.com/spoonman136668-ai/Wingless/broker",
+    "github.com/spoonman136668-ai/Wingless/inference",
+    "github.com/spoonman136668-ai/Wingless/resources"
+  ],
+  "integration/ckbplane/stage1_candidate_request_test.go": [
+    "encoding/json",
+    "strings",
+    "testing",
+    "time",
+    "github.com/spoonman136668-ai/Wingless/broker"
+  ],
+  "integration/ckbplane/stage1_candidate_validator.go": [
+    "bytes",
+    "encoding/json",
+    "errors",
+    "fmt",
+    "io",
+    "strings",
+    "unicode/utf8",
+    "github.com/spoonman136668-ai/Wingless/broker",
+    "github.com/spoonman136668-ai/Wingless/inference"
+  ],
+  "integration/ckbplane/stage1_candidate_validator_test.go": [
+    "encoding/json",
+    "strings",
+    "testing"
+  ],
+  "integration/ckbplane/stage1_postapplication.go": [
+    "errors",
+    "fmt",
+    "strings",
+    "unicode/utf8",
+    "github.com/spoonman136668-ai/Wingless/broker"
+  ],
+  "integration/ckbplane/stage1_postapplication_test.go": [
     "strings",
     "testing"
   ],
@@ -298,6 +581,51 @@
     "path/filepath",
     "testing"
   ],
+  "research/nr1/analyze.go": [
+    "fmt",
+    "sort"
+  ],
+  "research/nr1/nr1_test.go": [
+    "strings",
+    "testing"
+  ],
+  "research/nr1/qualified_analyze.go": [
+    "sort"
+  ],
+  "research/nr1/qualified_analyze_test.go": [
+    "math",
+    "testing"
+  ],
+  "research/nr1/simulate.go": [
+    "container/heap",
+    "container/list",
+    "errors",
+    "sort"
+  ],
+  "research/nr1/topology.go": [
+    "errors",
+    "fmt"
+  ],
+  "research/nr1/topology_test.go": [
+    "strings",
+    "testing"
+  ],
+  "research/nr1/trace.go": [
+    "bufio",
+    "bytes",
+    "encoding/json",
+    "errors",
+    "fmt",
+    "io",
+    "math",
+    "regexp"
+  ],
+  "research/nr1/workloads_test.go": [
+    "os",
+    "path/filepath",
+    "runtime",
+    "testing"
+  ],
   "resources/governor.go": [
     "fmt",
     "math"
@@ -345,6 +673,7 @@
   "resources/nvidia_test.go": [
     "context",
     "fmt",
+    "reflect",
     "testing"
   ],
   "resources/process.go": [
