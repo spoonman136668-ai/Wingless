@@ -1,0 +1,47 @@
+name: Wingless isolated native cache ICE regeneration
+on:
+  push:
+    branches: [engineering/native-go-cache-qualified-20261104]
+    paths:
+      - '.github/workflows/native.yml'
+      - '.github/workflows/native-cache-repair.yml'
+permissions:
+  contents: write
+concurrency:
+  group: wingless-native-cache-index-one-shot
+  cancel-in-progress: false
+jobs:
+  canonical-reindex:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Rebuild and verify only source-bound advisory ICE artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'engineering/native-go-cache-qualified-20261104'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          go run -buildvcs=false ./cmd/ice build
+          go run -buildvcs=false ./cmd/ice validate
+          python3 -B scripts/maintain_code_atlas.py --root .
+          go run -buildvcs=false ./cmd/ice relationships > "$RUNNER_TEMP/wingless-type-relationships.json"
+          python3 -B scripts/validate_code_atlas.py --root . --relationships "$RUNNER_TEMP/wingless-type-relationships.json"
+          git add -- .ice/manifest.json .ice/architecture-map.json .ice/symbol-map.json .ice/dependency-map.json .ice/test-map.json .ice/implementations.json .ice/code-intelligence.json .ice/code-intelligence.ice .ice/code-intelligence.html
+          test -n "$(git diff --cached --name-only)"
+          if git status --porcelain | grep -Ev '^([ MARCUD?!]{2}) \.ice/'; then echo 'NON_ICE_MUTATION_DENIED'; exit 1; fi
+          git diff --cached --name-only
+          git commit -m "ci: regenerate exact-source ICE and advisory atlas for native cache candidate"
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:refs/heads/engineering/native-go-cache-qualified-20261104
+          echo "SOURCE_REINDEX=PASS sha=$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
