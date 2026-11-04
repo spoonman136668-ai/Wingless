@@ -333,3 +333,62 @@ jobs:
           name: cnc-g8-real-int4-development
           path: evidence/
           retention-days: 14
+
+  cnc_g9b_pinned_metadata:
+    # One-shot source-custody gate. Never download weights or execute Qwen.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g9b-metadata]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify exact-head G9B source identity and clean checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git status --porcelain > evidence/g9b-source-status.txt
+          test ! -s evidence/g9b-source-status.txt
+          git rev-parse HEAD > evidence/g9b-source-sha.txt
+      - name: G9B SHA256-verified original metadata tensor budget (no weights)
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"UNVERIFIED_OR_FAILED","scope":"G9B_PINNED_METADATA_ONLY"}\n' > evidence/cnc-g9b-status.json
+          python research/nr1/gcen/g9b_tensor_budget.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc-g9b-original-index-budget.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path("evidence/cnc-g9b-original-index-budget.json")
+          r = json.loads(p.read_text(encoding="utf-8"))
+          assert r["schema"] == "wingless.cnc.g9b.pinned-index-analytical-budget.v1"
+          assert r["source_sha"] == os.environ["GITHUB_SHA"]
+          assert r["result"] == "EXACT_INDEX_RECONCILED_STORAGE_MODEL_ONLY"
+          assert r["indexed_tensor_count"] == 18867
+          assert r["indexed_bf16_tensor_bytes"] == 61064245248
+          assert r["parameter_total"] == 30532122624
+          assert len(r["scenarios"]) == 5
+          assert not r["full_model_forward"] and not r["actual_gpu_peak_vram_measured"]
+          assert not r["protected_heldout_used"] and not r["deployment_or_activation"]
+          print("G9B_ORIGINAL_METADATA_RECONCILIATION_VERIFIED", r["parameter_total"])
+          PY
+          sha256sum evidence/cnc-g9b-original-index-budget.json > evidence/cnc-g9b-original-index-budget.sha256
+          printf '{"status":"G9B_ORIGINAL_PINNED_METADATA_RECONCILED","scope":"NO_WEIGHTS_NO_MODEL_FORWARD"}\n' > evidence/cnc-g9b-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g9b-original-pinned-metadata
+          path: evidence/
+          retention-days: 14
