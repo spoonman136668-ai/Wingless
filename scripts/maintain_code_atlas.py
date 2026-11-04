@@ -89,11 +89,11 @@ class ExactBlobBatch:
         p = Path(path)
         require(isinstance(path, str) and path
                 and not p.is_absolute() and ".." not in p.parts
-                and not any(c in path for c in ("\\\\", "\\x00", "\\n", "\\r", ":")),
+                and not any(c in path for c in (chr(92), chr(0), chr(10), chr(13), ":")),
                 "invalid historical source path")
         require(self.proc is not None and self.proc.poll() is None,
                 "Git batch transport unavailable")
-        spec = (source_sha + ":" + path).encode("utf-8") + b"\\n"
+        spec = (source_sha + ":" + path).encode("utf-8") + bytes([10])
         self.proc.stdin.write(spec)
         self.proc.stdin.flush()
         header = self.proc.stdout.readline()
@@ -104,10 +104,10 @@ class ExactBlobBatch:
         size = int(chunks[2])
         require(0 <= size <= 32 * 1024 * 1024, "GIT_BATCH_SIZE_OUT_OF_RANGE")
         data = self.proc.stdout.read(size)
-        require(len(data) == size and self.proc.stdout.read(1) == b"\\n",
+        require(len(data) == size and self.proc.stdout.read(1) == bytes([10]),
                 "GIT_BATCH_BINARY_FRAME_DRIFT")
         digest = hashlib.sha1(b"blob " + str(size).encode("ascii")
-                              + b"\\x00" + data).hexdigest().encode("ascii")
+                              + bytes([0]) + data).hexdigest().encode("ascii")
         require(digest == chunks[0], "GIT_BATCH_BLOB_IDENTITY_DRIFT")
         return data
 
