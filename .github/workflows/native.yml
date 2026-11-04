@@ -392,3 +392,66 @@ jobs:
           name: cnc-g9b-original-pinned-metadata
           path: evidence/
           retention-days: 14
+
+  cnc_g9e_real_int2:
+    # Original weights, one-shot development-only, same G8 custody/frozen windows.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g9e-real]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify original-window experiment source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git status --porcelain > evidence/g9e-checkout-status.txt
+          test ! -s evidence/g9e-checkout-status.txt
+          git rev-parse HEAD > evidence/g9e-checkout-sha.txt
+      - name: Install frozen numerical dependency
+        shell: bash
+        run: python -m pip install --disable-pip-version-check "numpy==2.2.6"
+      - name: G9E verified original BF16 expert windows INT2 and INT4
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G9E_ORIGINAL_WEIGHTS_SYNTHETIC_PROBES_ONLY"}\n' > evidence/cnc-g9e-status.json
+          python research/nr1/gcen/g9e_original_int2_comparison.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc-g9e-original-int2.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads(Path("evidence/cnc-g9e-original-int2.json").read_text())
+          assert r["schema"]=="wingless.cnc.g9e.real-original-int2-development.v1"
+          assert r["source_sha"]==os.environ["GITHUB_SHA"]
+          assert r["comparison_count"]==15 and len(r["comparisons"])==15
+          assert r["staged_original_files_after_cleanup"]==0
+          assert r["authentic_model_activations"]=="NOT_CAPTURED"
+          assert not r["full_model_inference"] and not r["protected_heldout_used"]
+          assert all(len(row["int2_cases"])==2 for row in r["comparisons"])
+          print("G9E_ORIGINAL_INT2_RECEIPT_COMPLETE", r["comparison_count"])
+          PY
+          sha256sum evidence/cnc-g9e-original-int2.json > evidence/cnc-g9e-original-int2.sha256
+          printf '{"status":"G9E_ORIGINAL_INT2_DEVELOPMENT_COMPLETED","scope":"NO_FULL_MODEL_FORWARD"}\n' > evidence/cnc-g9e-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g9e-original-int2-development
+          path: evidence/
+          retention-days: 14
