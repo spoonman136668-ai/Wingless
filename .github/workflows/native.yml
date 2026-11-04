@@ -60,6 +60,11 @@ jobs:
         run: |
           python research/nr1/residency/route_counterbalance_r3.py --output evidence/residency-r3.json
           if ($LASTEXITCODE -ne 0) { throw 'R3 counterbalanced physical file-read pilot failed' }
+      - name: R5 frozen causal expert-admission development screen
+        shell: pwsh
+        run: |
+          python research/nr1/residency/route_admission_r5.py --output evidence/residency-r5.json
+          if ($LASTEXITCODE -ne 0) { throw 'R5 causal residency development screen failed' }
       - name: R1 ICE diagnostic only (not qualification)
         if: failure()
         shell: pwsh
