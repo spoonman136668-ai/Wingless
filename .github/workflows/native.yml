@@ -739,7 +739,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet 'torch==2.10.0' --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --disable-pip-version-check --quiet 'safetensors==0.5.3'
+          python -m pip install --disable-pip-version-check --quiet 'numpy==2.2.6' 'safetensors==0.5.3'
       - name: Run real synthetic BF16 storage and rollback test
         shell: bash
         run: |
