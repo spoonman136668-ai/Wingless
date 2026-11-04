@@ -49,11 +49,11 @@ def evaluate_verified_windows(windows, *, seed, comparator=None):
 
 
 def run(manifest_path, scratch_root, output, source_sha, *, comparison_mode="direct"):
+    if comparison_mode not in ("direct", "three-arm"):
+        raise ValueError("unfrozen comparison mode")
     if (os.name != "posix" or type(source_sha) is not str or
             len(source_sha) != 40 or any(c not in "0123456789abcdef" for c in source_sha)):
         raise ValueError("exact source SHA and Linux custody required")
-    if comparison_mode not in ("direct", "three-arm"):
-        raise ValueError("unfrozen comparison mode")
     if not scratch_root.is_dir() or output.exists():
         raise ValueError("missing scratch or existing immutable output")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
