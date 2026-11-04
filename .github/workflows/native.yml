@@ -758,7 +758,7 @@ jobs:
   g9n_one_original_expert:
     # One-shot, independently gated original-weight experiment; never routine CI.
     needs: native
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9n-original-expert]') }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && (contains(github.event.head_commit.message, '[g9n-original-expert]') || contains(github.event.head_commit.message, '[g9r-original-kernel]')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 35
     permissions:
@@ -783,20 +783,25 @@ jobs:
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet 'torch==2.10.0' --index-url https://download.pytorch.org/whl/cpu
           python -m pip install --disable-pip-version-check --quiet 'numpy==2.2.6' 'safetensors==0.5.3'
+          if [[ "$G9R" == "true" ]]; then python -m pip install --disable-pip-version-check --quiet 'numba==0.62.1'; fi
+        env:
+          G9R: ${{ contains(github.event.head_commit.message, '[g9r-original-kernel]') }}
       - name: Admit one authenticated original expert tensor
         shell: bash
         env:
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
+          G9R: ${{ contains(github.event.head_commit.message, '[g9r-original-kernel]') }}
         run: |
           set -euo pipefail
           mkdir -p evidence
           printf '{"status":"NOT_ACCEPTED","source":"ONE_ORIGINAL_SHARD_ONLY"}\n' > evidence/g9n-original-status.json
+          if [[ "$G9R" == "true" ]]; then KERNEL_FLAG="--g9r-kernel"; else KERNEL_FLAG=""; fi
           python research/nr1/gcen/g9n_one_original_tensor.py \
             --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
             --scratch-root "$RUNNER_TEMP" \
             --source-sha "$GITHUB_SHA" \
-            --output evidence/g9n-original-expert.json
+            --output evidence/g9n-original-expert.json $KERNEL_FLAG
           python - <<'PY'
           import json,os
           from pathlib import Path
@@ -816,6 +821,12 @@ jobs:
             rows={x["arm"]:x for x in c["comparisons"] if x["seed"]==seed}
             assert len(rows)==7
             assert rows["mixed_ranked_eighth_INT4"]["encoded_bytes_including_accounted_metadata"]==rows["mixed_uniform_eighth_INT4"]["encoded_bytes_including_accounted_metadata"]
+          if os.getenv("G9R")=="true":
+            receipt=j["g9r_packed_cpu_benchmark"]
+            assert receipt["schema"]=="wingless.gcen.g9r.original-packed-int2-numba-cpu.v1"
+            assert {v["seed"] for v in receipt["comparisons"]}=={751,811}
+            assert len(receipt["comparisons"])==2
+            assert not receipt["uses_original_activations"] and not receipt["uses_gpu"]
           assert c["probe_inputs"]=="SYNTHETIC_GAUSSIAN_NOT_QWEN_ACTIVATIONS"
           assert not c["full_model_forward"] and not c["gpu_vram_measured"]
           assert j["source_and_sink_files_after_cleanup"]==0

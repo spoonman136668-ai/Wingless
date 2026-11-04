@@ -44,7 +44,7 @@ def choose_target(header, weight_map):
     return key, tuple(shape), selected["layer"]
 
 
-def run(manifest_path, scratch_root, output, source_sha):
+def run(manifest_path, scratch_root, output, source_sha, *, g9r_kernel=False):
     if (os.name != "posix" or type(source_sha) is not str
         or len(source_sha) != 40
         or any(c not in "0123456789abcdef" for c in source_sha)):
@@ -96,6 +96,10 @@ def run(manifest_path, scratch_root, output, source_sha):
                 # disk round-trip. No model forward or original activation trace.
                 from g9p_original_expert_comparison import compare_original_expert
                 comparison=compare_original_expert(tensor.to(dtype=torch.float32).numpy())
+                kernel_receipt=None
+                if g9r_kernel:
+                    from g9r_numba_packed_int2 import benchmark_original
+                    kernel_receipt=benchmark_original(tensor.to(dtype=torch.float32).numpy())
                 del tensor
             owned = sinks.directory
         if owned.exists():
@@ -116,6 +120,7 @@ def run(manifest_path, scratch_root, output, source_sha):
             "selected_tensor_bytes":plan["disk_bytes"],
             "disk_integrity_receipt":receipt,
             "original_full_expert_operator_comparison":comparison,
+            "g9r_packed_cpu_benchmark":kernel_receipt,
             "process_rss_baseline_bytes":rss0, "process_peak_rss_bytes":peak,
             "elapsed_seconds":time.monotonic()-started,
             "one_original_shard_authenticated":True,
@@ -138,5 +143,6 @@ if __name__ == "__main__":
     p.add_argument("--scratch-root",type=Path,required=True)
     p.add_argument("--output",type=Path,required=True)
     p.add_argument("--source-sha",required=True)
+    p.add_argument("--g9r-kernel",action="store_true")
     a=p.parse_args()
-    run(a.manifest,a.scratch_root,a.output,a.source_sha)
+    run(a.manifest,a.scratch_root,a.output,a.source_sha,g9r_kernel=a.g9r_kernel)
