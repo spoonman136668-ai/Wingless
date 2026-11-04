@@ -166,7 +166,7 @@ def execute(binary, output):
         # Exclusive creation: a failed run must never replace old evidence.
         with output.open("x", encoding="utf-8") as stream:
             stream.write(json.dumps(receipt, sort_keys=True,
-                                   separators=(",", ":"), allow_nan=False) + "\\n")
+                                   separators=(",", ":"), allow_nan=False) + "\n")
         raise
 
 
