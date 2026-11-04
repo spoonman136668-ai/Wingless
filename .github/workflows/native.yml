@@ -3,6 +3,13 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/native.yml'
+      - '.github/workflows/native-cache-repair.yml'
+      - '.ice/**'
 permissions:
   contents: read
 jobs:
@@ -21,7 +28,15 @@ jobs:
         with:
           go-version: '1.25.5'
           cache: false
+      # Cache compiled objects only. The original full race/test/ICE/build command runs fresh.
+      - name: Restore content-bound Go build cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/wingless-native-gocache
+          key: wingless-native-go1255-race-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/*.go', 'go.mod', 'go.sum', 'scripts/Test-Native.ps1', '.github/workflows/native.yml') }}
       - name: Native tests and evidence
+        env:
+          GOCACHE: ${{ runner.temp }}/wingless-native-gocache
         shell: pwsh
         run: ./scripts/Test-Native.ps1
       - uses: actions/upload-artifact@v4
