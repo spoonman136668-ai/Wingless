@@ -518,3 +518,67 @@ jobs:
           name: cnc-g9f-original-companded-development
           path: evidence/
           retention-days: 14
+
+  cnc02c_real_weight_fit_transfer:
+    # Exactly one original source shard, development-only synthetic fit/transfer.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc02-compressed-expert-learning-20261104' && contains(github.event.head_commit.message, '[cnc02c-real]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify exact-head CNC-02C checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git status --porcelain > evidence/cnc02c-source-status.txt
+          test ! -s evidence/cnc02c-source-status.txt
+          git rev-parse HEAD > evidence/cnc02c-source-sha.txt
+      - name: Pinned CNC-02C numerical runtime
+        shell: bash
+        run: python -m pip install --disable-pip-version-check 'numpy==2.2.6'
+      - name: Original Qwen BF16 expert compressed FIT/TRANSFER development
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"ORIGINAL_WEIGHT_SYNTHETIC_FIT_TRANSFER"}\n' > evidence/cnc02c-status.json
+          python research/nr1/gcen/cnc02c_real_weight_fit_transfer.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc02c-real-original-fit-transfer.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          receipt=json.loads(Path("evidence/cnc02c-real-original-fit-transfer.json").read_text())
+          assert receipt["schema"]=="wingless.cnc02c.real-original-compressed-fit-transfer.v1"
+          assert receipt["source_sha"]==os.environ["GITHUB_SHA"]
+          assert receipt["result_count"]==20 and len(receipt["comparisons"])==20
+          assert receipt["staged_original_files_after_cleanup"]==0
+          assert receipt["original_model_activations"]=="NOT_CAPTURED"
+          assert receipt["fp32_baseline_matched"] is False
+          assert receipt["scientific_acceptance"]=="NOT_GRANTED"
+          assert not receipt["full_model_forward"] and not receipt["production_activation"]
+          print("CNC02C_REAL_WEIGHT_FIT_TRANSFER_RECEIPT_COMPLETE",receipt["result_count"])
+          PY
+          sha256sum evidence/cnc02c-real-original-fit-transfer.json > evidence/cnc02c-real-original-fit-transfer.sha256
+          printf '{"status":"REAL_ORIGINAL_WEIGHT_SYNTHETIC_ADAPTATION_COMPLETE","scope":"NO_QWEN_MODEL_FORWARD"}\n' > evidence/cnc02c-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc02c-real-weight-fit-transfer
+          path: evidence/
+          retention-days: 14
