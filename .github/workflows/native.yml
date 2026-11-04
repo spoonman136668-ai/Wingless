@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - research/nr1-gcen-g4c-development-20261102
+      - research/cnc01q-direct-expert-development-20261103
   pull_request:
     paths:
       - 'research/nr1/gcen/**'
@@ -281,5 +282,54 @@ jobs:
         if: always()
         with:
           name: gcen-g32-real-expert-scaling
+          path: evidence/
+          retention-days: 14
+
+  cnc_g8_real_weight_int4:
+    # Exact-head one-shot, isolated from the G32 frozen original experiment.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g8-real]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify G8 exact-source identity and clean checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git rev-parse HEAD > evidence/source-sha.txt
+          git status --porcelain > evidence/source-status.txt
+          test ! -s evidence/source-status.txt
+      - name: Install pinned G8 NumPy runtime
+        shell: bash
+        run: python -m pip install --disable-pip-version-check 'numpy==2.2.6'
+      - name: G8 one original BF16 shard INT4 and SVD development-only comparison
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G8_REAL_WEIGHT_WINDOWS_SYNTHETIC_ACTIVATIONS"}\n' > evidence/cnc-g8-status.json
+          python research/nr1/gcen/g33_original_int4_comparison.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc-g8-original-int4.json
+          printf '{"status":"G8_ORIGINAL_BF16_WINDOW_INT4_DEVELOPMENT_COMPLETED","scope":"G8_REAL_WEIGHT_WINDOWS_SYNTHETIC_ACTIVATIONS"}\n' > evidence/cnc-g8-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g8-real-int4-development
           path: evidence/
           retention-days: 14
