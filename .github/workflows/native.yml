@@ -649,3 +649,66 @@ jobs:
           name: cnc-g9i-original-sparse-development
           path: evidence/
           retention-days: 14
+
+  cnc_g9l_real_lowrank:
+    # Original weights, one-shot development-only, same G8 custody/frozen windows.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g9l-real]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify original-window experiment source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git status --porcelain > evidence/g9l-checkout-status.txt
+          test ! -s evidence/g9l-checkout-status.txt
+          git rev-parse HEAD > evidence/g9l-checkout-sha.txt
+      - name: Install frozen numerical dependency
+        shell: bash
+        run: python -m pip install --disable-pip-version-check "numpy==2.2.6"
+      - name: G9L verified original BF16 expert windows INT2 and INT4
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G9L_ORIGINAL_WEIGHTS_SYNTHETIC_PROBES_ONLY"}\n' > evidence/cnc-g9l-status.json
+          python research/nr1/gcen/g9l_original_lowrank_comparison.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc-g9l-original-lowrank.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads(Path("evidence/cnc-g9l-original-lowrank.json").read_text())
+          assert r["schema"]=="wingless.cnc.g9l.real-original-lowrank-development.v1"
+          assert r["source_sha"]==os.environ["GITHUB_SHA"]
+          assert r["comparison_count"]==15 and len(r["comparisons"])==15
+          assert r["staged_original_files_after_cleanup"]==0
+          assert r["authentic_model_activations"]=="NOT_CAPTURED"
+          assert not r["full_model_inference"] and not r["protected_heldout_used"]
+          assert all(len(row["lowrank_cases"])==3 and all("relative_output_squared_error" in c for c in row["lowrank_cases"]) for row in r["comparisons"])
+          print("G9L_ORIGINAL_INT2_RECEIPT_COMPLETE", r["comparison_count"])
+          PY
+          sha256sum evidence/cnc-g9l-original-lowrank.json > evidence/cnc-g9l-original-lowrank.sha256
+          printf '{"status":"G9L_ORIGINAL_INT2_DEVELOPMENT_COMPLETED","scope":"NO_FULL_MODEL_FORWARD"}\n' > evidence/cnc-g9l-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g9l-original-lowrank-development
+          path: evidence/
+          retention-days: 14
