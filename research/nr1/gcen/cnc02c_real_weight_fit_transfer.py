@@ -37,7 +37,7 @@ def evaluate_verified_windows(windows, *, seed):
         raise ValueError("invalid original BF16 windows")
     results = []
     for idx, weight in enumerate(w):
-        outcome = compare_window(weight, steps=STEPS)
+        outcome = dict(compare_window(weight, steps=STEPS))
         outcome["original_expert_id"] = idx
         outcome["source_window_seed"] = seed
         results.append(outcome)
