@@ -1,0 +1,51 @@
+name: Wingless isolated G26 batch candidate canonical qualification
+on:
+  push:
+    branches: [engineering/atlas-git-batch-g26-20261104]
+    paths: ['.github/workflows/atlas-git-batch-windows-reindex-once.yml']
+permissions:
+  contents: write
+concurrency:
+  group: wingless-g26-batch-win-reindex-20261104
+  cancel-in-progress: false
+jobs:
+  canonical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Qualify bounded batch source and regenerate immutable canonical evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = engineering/atlas-git-batch-g26-20261104
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -- .github/workflows/atlas-git-batch-windows-reindex-once.yml
+          git commit -m 'ci: self-retire Windows G26 batch repair regeneration gate'
+          target="$(git rev-parse HEAD)"
+          go run -buildvcs=false ./cmd/ice build
+          go run -buildvcs=false ./cmd/ice validate
+          python3 -B scripts/maintain_code_atlas.py --root .
+          go run -buildvcs=false ./cmd/ice relationships > "$RUNNER_TEMP/g26-batch-typed.json"
+          python3 -B scripts/validate_code_atlas.py --root . --relationships "$RUNNER_TEMP/g26-batch-typed.json"
+          git add -- .ice/manifest.json .ice/architecture-map.json .ice/symbol-map.json .ice/dependency-map.json .ice/test-map.json .ice/implementations.json .ice/code-intelligence.json .ice/code-intelligence.ice .ice/code-intelligence.html
+          test -n "$(git diff --cached --name-only)"
+          if git status --porcelain | grep -Ev '^([ MARCUD?!]{2}) \.ice/'; then echo 'NON_ICE_MODIFICATION_DENIED'; exit 1; fi
+          git commit -m 'ci: source-bind ICE and Atlas after G26 Git batch candidate'
+          test -z "$(git status --porcelain)"
+          python3 -B scripts/atlas_ci_scope.py --root . --self-test
+          python3 -B scripts/test_source_aware_atlas.py --root . --scratch-parent "$RUNNER_TEMP"
+          python3 -B scripts/test_code_atlas_tamper.py --root . --relationships "$RUNNER_TEMP/g26-batch-typed.json" --scratch-parent "$RUNNER_TEMP"
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:refs/heads/engineering/atlas-git-batch-g26-20261104
+          echo "CANONICAL_G26_BATCH=PASS source=$target head=$(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
