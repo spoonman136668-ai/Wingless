@@ -1,0 +1,117 @@
+name: Wingless isolated exact-source Git batch blob parity probe
+on:
+  push:
+    branches: [experiment/atlas-parallel-timing-20261104]
+    paths: ['.github/workflows/atlas-git-batch-parity.yml']
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: windows-2022
+    timeout-minutes: 12
+    steps:
+      - name: Checkout frozen, already-qualified Wingless source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 7f31b05cc274a1769c117567911d8a55030e5758
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Python 3.12
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Compare authentic git show bytes with one persistent Git batch process, including negative cases
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          @'
+          import hashlib, json, pathlib, re, subprocess, time
+          root=pathlib.Path(".").resolve()
+          sha="7f31b05cc274a1769c117567911d8a55030e5758"
+          def require(ok,reason):
+              if not ok: raise SystemExit("GIT_BATCH_PROBE_FAILED: "+reason)
+          def git(*args):
+              p=subprocess.run(["git",*args],cwd=root,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+              require(p.returncode==0,"git "+repr(args)+" "+p.stderr.decode(errors="replace")[-200:])
+              return p.stdout
+          require(git("rev-parse","HEAD").decode().strip()==sha,"source checkout drift")
+          require(not git("status","--porcelain").strip(),"dirty source checkout")
+          atlas=json.loads((root/".ice/code-intelligence.json").read_text("utf-8-sig"))
+          historical=atlas["source_commit"]
+          require(re.fullmatch("[0-9a-f]{40}",historical) is not None,"bad historical commit")
+          require(git("cat-file","-t",historical).strip()==b"commit","historical commit unavailable")
+          require(git("merge-base",historical,sha).strip()==historical.encode(),"nonancestor source")
+          manifest=json.loads((root/".ice/manifest.json").read_text("utf-8-sig"))
+          paths=sorted({n["file"] for n in atlas["nodes"]})
+          manifest_paths={p["path"] for p in manifest["files"]}
+          require(paths and set(paths)<=manifest_paths,"historical source set not in manifest")
+          def valid_path(path):
+              p=pathlib.PurePosixPath(path)
+              return (isinstance(path,str) and len(path)>0 and not p.is_absolute() and
+                      ".." not in p.parts and "\x00" not in path and
+                      "\n" not in path and "\r" not in path and "\\" not in path)
+          def validate_input(commit,path):
+              require(re.fullmatch("[0-9a-f]{40}",commit) is not None,"invalid commit ref")
+              require(valid_path(path),"invalid path")
+              return (commit+":"+path).encode("utf-8")+b"\n"
+          def read_batch(proc,commit,path):
+              proc.stdin.write(validate_input(commit,path))
+              proc.stdin.flush()
+              header=proc.stdout.readline()
+              require(header.endswith(b"\n"),"missing batch header")
+              parts=header[:-1].split(b" ")
+              require(len(parts)==3 and parts[1]==b"blob" and
+                      re.fullmatch(rb"[0-9a-f]{40}",parts[0]) is not None and
+                      parts[2].isdigit(),"expected immutable blob header "+repr(header[:100]))
+              size=int(parts[2])
+              require(size<=32*1024*1024,"blob too large")
+              data=proc.stdout.read(size)
+              require(len(data)==size and proc.stdout.read(1)==b"\n","batch framing mismatch")
+              oid=hashlib.sha1(b"blob "+str(size).encode()+b"\x00"+data).hexdigest().encode()
+              require(oid==parts[0],"object identity mismatch")
+              return data
+          # Reproduce G26's historical source lookups; do not substitute generated semantic evidence.
+          shown={}
+          t=time.perf_counter()
+          for path in paths:
+              validate_input(historical,path)
+              shown[path]=git("show",historical+":"+path)
+          show_sec=time.perf_counter()-t
+          p=subprocess.Popen(["git","cat-file","--batch"],cwd=root,
+                             stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,bufsize=0)
+          try:
+              t=time.perf_counter()
+              for path in paths:
+                  require(read_batch(p,historical,path)==shown[path],
+                          "git show / batch byte mismatch: "+path)
+              batch_sec=time.perf_counter()-t
+              # Identity and failure controls: missing file, malformed path/ref, data tampering.
+              for bad in ("../go.mod","/go.mod","dir/../../go.mod","line\nfeed.go","a\\b.go"):
+                  try: validate_input(historical,bad)
+                  except SystemExit: pass
+                  else: require(False,"accepted bad historical source path: "+repr(bad))
+              try: validate_input("0"*39,"go.mod")
+              except SystemExit: pass
+              else: require(False,"accepted malformed source SHA")
+              p.stdin.write(validate_input(historical,"nonexistent-wingless-batch-control-000.go"))
+              p.stdin.flush()
+              missing=p.stdout.readline()
+              require(missing.endswith(b" missing\n"),"missing historical blob accepted")
+              original=shown[paths[0]]
+              corrupted=original+b"\nTAMPER_BATCH_CONTROL\n"
+              require(hashlib.sha256(original).digest()!=hashlib.sha256(corrupted).digest(),
+                      "tamper hash mismatch was accepted")
+              print("GIT_BATCH_NEGATIVE_CONTROLS_PASS=malformed-ref,unsafe-path,missing-blob,content-tamper")
+          finally:
+              p.stdin.close()
+              p.wait(timeout=15)
+              require(p.returncode==0,"batch process failed")
+          require(not git("status","--porcelain").strip(),"checkout modified")
+          print("GIT_BATCH_SOURCE="+historical)
+          print("GIT_BATCH_FILES="+str(len(paths)))
+          print("GIT_SHOW_SECONDS="+str(round(show_sec,3)))
+          print("GIT_BATCH_SECONDS="+str(round(batch_sec,3)))
+          print("GIT_BATCH_RATIO="+str(round(show_sec/batch_sec,3)))
+          print("GIT_BATCH_BYTES_AND_OIDS_PASS=true")
+          '@ | python -B -
+          if ($LASTEXITCODE -ne 0) { throw 'GIT_BATCH_PROBE_FAILED' }
