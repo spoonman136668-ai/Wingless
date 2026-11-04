@@ -9,6 +9,7 @@ import json
 import os
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 
 from selenium import webdriver
@@ -34,6 +35,16 @@ def git(root, *args):
 
 
 def main():
+    started = time.perf_counter()
+    last_mark = started
+    timings = {}
+
+    def mark(stage):
+        nonlocal last_mark
+        now = time.perf_counter()
+        timings[stage] = round(now - last_mark, 6)
+        last_mark = now
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", type=Path, required=True)
     opts = ap.parse_args()
@@ -73,6 +84,7 @@ def main():
     require(os.name == "nt" and binary is not None,
             "Google Chrome missing from hosted Windows environment")
 
+    mark("source_custody_and_preflight")
     total_symbols = len(atlas["nodes"])
     recorded = ["frozen_baseline_preserved_and_source_bound_candidate_identity"]
     with tempfile.TemporaryDirectory(prefix="wingless-atlas-chrome-") as profile:
@@ -85,6 +97,7 @@ def main():
             chrome_options.add_argument(flag)
 
         with webdriver.Chrome(options=chrome_options) as browser:
+            mark("chrome_session_startup")
             browser.set_page_load_timeout(25)
             wait = WebDriverWait(browser, 18)
             browser.get(atlas_file.as_uri())
@@ -94,6 +107,7 @@ def main():
             require(f"{total_symbols} of {total_symbols}" in browser.find_element(By.ID, "shown").text,
                     "initial unfiltered list not rendered")
             recorded.append("headless_chromium_offline_boot_and_full_index")
+            mark("offline_page_boot_and_full_index")
 
             q = browser.find_element(By.ID, "q")
             q.click()
@@ -103,6 +117,7 @@ def main():
             require(any("Admit and start one bounded inference job" in b.text
                         for b in matches), "typed search failed to find SubmitWork")
             recorded.append("keyboard_search_and_matching_results")
+            mark("keyboard_search")
 
             Select(browser.find_element(By.ID, "basis")).select_by_value("source-reviewed")
             Select(browser.find_element(By.ID, "kind")).select_by_value("method")
@@ -112,6 +127,7 @@ def main():
                     "Admit and start one bounded inference job" in matching[0].text,
                     "evidence/kind combined filter is not selective")
             recorded.append("two_combined_ui_filters")
+            mark("combined_filters")
 
             matching[0].click()
             wait.until(lambda d: "Admit and start one bounded inference job" ==
@@ -120,6 +136,7 @@ def main():
             require(f"/blob/{source_commit}/worker/service.go#L57-L95" in worker_link,
                     "selected symbol has a different source definition link")
             recorded.append("actual_symbol_selection_and_source_anchor")
+            mark("symbol_selection_and_source_anchor")
 
             related = browser.find_elements(By.CSS_SELECTOR, "#detail .related button")
             target = next((x for x in related
@@ -133,6 +150,7 @@ def main():
             require(f"/blob/{source_commit}/broker/runner.go#L33-L112" in expected_link,
                     "cross-file graph traversal led to wrong pinned source")
             recorded.append("actual_click_cross_file_relationship")
+            mark("cross_file_relationship")
 
             current_windows = set(browser.window_handles)
             source.click()
@@ -143,16 +161,22 @@ def main():
             require(browser.current_url.startswith("https://github.com/"),
                     "source link did not actually open GitHub in a second tab")
             recorded.append("actual_click_source_link_new_tab")
+            mark("external_source_link_tab")
 
             browser.switch_to.window(next(iter(current_windows)))
             if os.getenv("RUNNER_TEMP"):
                 browser.save_screenshot(
                     str(Path(os.environ["RUNNER_TEMP"]) / "wingless-atlas-chrome.png"))
 
+    mark("browser_shutdown_and_screenshot")
     require(git(root, "status", "--porcelain") == "",
             "browser tests changed the repository checkout")
+    mark("postcondition_clean_checkout")
     print(json.dumps({
         "result": "WINGLESS_ATLAS_CHROMIUM_BROWSER_ACCEPTANCE_PASS",
+        "timing_schema": "wingless.atlas.browser-diagnostic.v1",
+        "timings_seconds": timings,
+        "total_elapsed_seconds": round(time.perf_counter() - started, 6),
         "merged_main": MERGED_MAIN,
         "browser_test_commit": head,
         "source_commit": source_commit,
