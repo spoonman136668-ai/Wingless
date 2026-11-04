@@ -18,13 +18,16 @@ class G9IOriginalTests(unittest.TestCase):
         x=rng.standard_normal((32,COLS)).astype(np.float32)
         result=compare_expert(w,x)
         comp=result["companded"]["256"]
-        errors=[]
+        weight_errors=[]
         for k in BUDGET_K:
             case=result["sparse"][str(k)]
             self.assertGreater(case["bytes"],comp["bytes"])
             self.assertLess(case["output_squared_error"],comp["output_squared_error"])
-            errors.append(case["output_squared_error"])
-        self.assertEqual(errors,sorted(errors,reverse=True))
+            self.assertLess(case["weight_squared_error"],comp["weight_squared_error"])
+            weight_errors.append(case["weight_squared_error"])
+        # Squared WEIGHT residual is monotone for top-absolute-error selection.
+        # Output error need not be monotone because output terms can cancel.
+        self.assertEqual(weight_errors,sorted(weight_errors,reverse=True))
     def test_frozen_original_custody_and_nonheldout(self):
         w=np.random.default_rng(507).standard_normal((16,ROWS,COLS)).astype(np.float32)
         sample=compare_expert(w[0],np.ones((32,COLS),dtype=np.float32))
