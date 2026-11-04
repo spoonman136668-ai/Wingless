@@ -65,7 +65,7 @@ class PackedInt2Tests(unittest.TestCase):
         with self.assertRaises(ValueError):
             apply_packed_int2(np.ones((3, 255)), packed, scales)
         with self.assertRaises(ValueError):
-            apply_packed_int2(np.ones((3, 256)), packed, np.zeros_like(scales))
+            apply_packed_int2(np.ones((3, 256)), packed, -np.ones_like(scales))
         with self.assertRaises(ValueError):
             stored_bytes(packed, scales, 256, block=256)
 
