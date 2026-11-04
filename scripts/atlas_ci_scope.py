@@ -59,7 +59,7 @@ def self_test(root):
         require(w.count("    name: " + STATUS_JOB + "\n") == 1,
                 "missing/duplicate required aggregate status")
         require("        id: scope\n" in w, "atlas scope classifier absent")
-        job_parts = re.split(r"(?m)^  (scope|browser|tamper|integration|qualification):\\n", w)
+        job_parts = re.split(r"(?m)^  (scope|browser|tamper|integration|qualification):\n", w)
         jobs = {job_parts[i]: job_parts[i + 1]
                 for i in range(1, len(job_parts) - 1, 2)}
         require(set(jobs) == {"scope", "browser", "tamper", "integration", "qualification"},
