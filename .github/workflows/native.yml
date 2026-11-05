@@ -855,11 +855,65 @@ jobs:
           path: evidence/
           retention-days: 14
 
-  g9t_existing_wingless_gpu_preflight:
-    # Native Ubuntu/Windows qualification must pass first. One preflight per
-    # branch push; preserve explicit opt-in dispatch. Hardware checks only.
+  g9w_runtime_provision:
+    # One-shot authorized host environment provisioning; never on routine pushes.
     needs: native
-    if: ${{ (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.g9t_gpu_preflight == true)) && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' }}
+    if: ${{ github.event_name == 'push' && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9w-provision]') }}
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 55
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - name: Verify authorized runner, source, and isolated toolcache
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:RUNNER_NAME -ne 'WINGLESS-UP-B' -or $env:RUNNER_ENVIRONMENT -ne 'self-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'Wrong GPU runner' }
+          if ($env:GITHUB_REPOSITORY -ne 'spoonman136668-ai/Wingless' -or $env:GITHUB_REF -ne 'refs/heads/research/cnc01q-direct-expert-development-20261103') { throw 'Wrong source scope' }
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'Source SHA mismatch' }
+          $dirty = @(git status --porcelain --untracked-files=all)
+          if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw 'Dirty checkout or failed git status' }
+          if (-not $env:RUNNER_TOOL_CACHE -or -not (Test-Path -LiteralPath $env:RUNNER_TOOL_CACHE -PathType Container)) { throw 'Persistent runner tool cache unavailable' }
+          if (-not (Get-Command nvidia-smi -ErrorAction SilentlyContinue)) { throw 'GPU telemetry unavailable' }
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+          architecture: x64
+          cache: ''
+      - name: Provision pinned CUDA Torch in dedicated persistent venv
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $venv = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9w-py3127-torch210-cu128'
+          $exe = Join-Path $venv 'Scripts\python.exe'
+          if (-not (Test-Path -LiteralPath $exe -PathType Leaf)) {
+            & python -m venv $venv
+            if ($LASTEXITCODE -ne 0) { throw 'Isolated venv creation failed' }
+          }
+          & $exe -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: --index-url https://download.pytorch.org/whl/cu128 'torch==2.10.0'
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned CUDA wheel installation failed' }
+          & $exe -c 'import sys,torch; assert sys.version_info[:3] == (3,12,7); assert torch.__version__.startswith("2.10.0+cu128"); assert torch.version.cuda is not None and torch.version.cuda.startswith("12.8"); print("G9W_PINNED_CUDA_TORCH_IMPORT_PASS")'
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned CUDA wheel provenance or import verification failed' }
+          # Installation verifies import and CUDA build metadata only; no GPU kernels.
+          New-Item -ItemType Directory -Force evidence | Out-Null
+          & $exe -m pip freeze --all | Out-File -Encoding utf8 evidence/g9w-pip-freeze.txt
+          @{schema='wingless.gcen.g9w.runtime-provision.v1'; source_sha=$env:GITHUB_SHA; status='PYTHON312_CUDA_TORCH_IMPORT_PASS'; cuda_kernel_executed=$false; model_forward=$false; model_weights_downloaded=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9w-runtime-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9w-isolated-runtime-provision
+          path: evidence/g9w-*
+          retention-days: 14
+
+  g9t_existing_wingless_gpu_preflight:
+    # Existing automatic preflight waits for native qualification and, only on
+    # the one-shot provisioning commit, the isolated runtime installation.
+    needs: [native, g9w_runtime_provision]
+    if: ${{ always() && needs.native.result == 'success' && (needs.g9w_runtime_provision.result == 'success' || needs.g9w_runtime_provision.result == 'skipped') && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.g9t_gpu_preflight == true)) && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' }}
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
     timeout-minutes: 5
     permissions:
@@ -886,6 +940,7 @@ jobs:
           $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
           # Discover only pre-existing Python 3 commands. Never install, download or alter PATH.
           $candidates = @(
+            @{name=(Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9w-py3127-torch210-cu128\Scripts\python.exe'); flag=''},
             @{name='python'; flag=''},
             @{name='python3'; flag=''},
             @{name='py'; flag='-3'}
