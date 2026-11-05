@@ -1086,7 +1086,7 @@ jobs:
   g9u_authorized_expert_gpu:
     # Single authorized GPU experiment, never routine CI or a new controller.
     needs: [native, g9t_existing_wingless_gpu_preflight]
-    if: \${{ github.event_name == 'push' && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9u-original-gpu]') }}
+    if: ${{ github.event_name == 'push' && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9u-original-gpu]') }}
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
     timeout-minutes: 35
     permissions:
@@ -1095,7 +1095,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-          ref: \${{ github.sha }}
+          ref: ${{ github.sha }}
       - name: Gate original shard availability and source
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         run: |
@@ -1125,7 +1125,7 @@ jobs:
           $status.status = 'SHARD_PRESENT_PENDING_IN_PROCESS_AUTHENTICATION'
           $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9u-status.json
       - name: Run original BF16 authenticated CUDA benchmark
-        if: \${{ env.G9U_SHARD_AVAILABLE == 'true' }}
+        if: ${{ env.G9U_SHARD_AVAILABLE == 'true' }}
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         env:
           OPENBLAS_NUM_THREADS: '1'
