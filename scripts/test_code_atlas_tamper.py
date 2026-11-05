@@ -97,6 +97,12 @@ def mutate_viewer(raw):
     return (src[:start] + encoded + src[end:]).encode("utf-8")
 
 
+def mutate_native_autorun(raw):
+    require(raw.count(b"scripts/*atlas*.py") == 1,
+            "reviewed native workflow trigger anchor missing")
+    return raw.replace(b"scripts/*atlas*.py", b"scripts/*.py", 1)
+
+
 def mutate_typed(raw):
     doc = json.loads(raw.decode("utf-8-sig"))
     require(doc.get("relationships"), "no relationships to remove")
@@ -173,6 +179,9 @@ def main():
                      validation, PROOF_MARKER + " symbol lines mismatch")
         run_negative("embedded-viewer-divergence", work, HTML,
                      mutate_viewer, validation, PROOF_MARKER + " offline browser differs from machine index")
+        run_negative("native-workflow-trigger-forgery", work, Path(".github/workflows/native.yml"),
+                     mutate_native_autorun, validation,
+                     PROOF_MARKER + " native workflow differs from exact reviewed auto-trigger extension")
         mark("six_semantic_negative_controls")
 
         # The independent type report is stored outside the scratch checkout.
@@ -209,7 +218,7 @@ def main():
             "timings_seconds": timings,
             "total_elapsed_seconds": round(time.perf_counter() - started, 6),
             "head": current_commit,
-            "expected_rejections": 8,
+            "expected_rejections": 9,
             "positive_control": "PASS",
             "source_checkout_changed": False,
             "scratch_cleanup": "automatic",

@@ -68,6 +68,16 @@ jobs:
           python scripts/test_code_atlas_tamper.py --root . --relationships "$env:RUNNER_TEMP\wingless-type-relationships.json" --scratch-parent "$env:RUNNER_TEMP"
           if ($LASTEXITCODE -ne 0) { throw 'ATLAS_TAMPER_NEGATIVE_ACCEPTANCE_FAILED' }
 
+      # Temporary PR #456-only development diagnostic. Remove before integration.
+      - name: G456 exact-source ABBA original-fixture worker comparison
+        if: steps.scope.outputs.atlas_relevant == 'true' && github.event_name == 'pull_request' && github.event.pull_request.number == 456
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python -B scripts/test_source_aware_atlas.py --root . --scratch-parent "$env:RUNNER_TEMP" --compare-workers
+          if ($LASTEXITCODE -ne 0) { throw 'G456_COMPARATOR_FAILED' }
+          if (git status --porcelain) { throw 'G456_COMPARATOR_SOURCE_DIRTY' }
+
       - name: Genuine Chromium browser navigation acceptance
         if: steps.scope.outputs.atlas_relevant == 'true'
         shell: pwsh
