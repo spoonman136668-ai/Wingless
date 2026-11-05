@@ -5,6 +5,8 @@ All modifications happen in disposable exact-head clones, never in checkout.
 """
 import argparse
 import hashlib
+import os
+from concurrent.futures import ThreadPoolExecutor
 import json
 import subprocess
 import sys
@@ -61,9 +63,9 @@ def make_commit(folder, old, new):
     return good(folder, "git", "rev-parse", "HEAD").strip()
 
 
-def run(root, scratch_parent):
-    started = time.perf_counter()
-    last_mark = started
+def fixture_unchanged(root, t, baseline):
+    """Run unchanged, fail-closed provenance controls in an isolated clone."""
+    last_mark = time.perf_counter()
     timings = {}
 
     def mark(stage):
@@ -72,228 +74,291 @@ def run(root, scratch_parent):
         timings[stage] = round(now - last_mark, 6)
         last_mark = now
 
+    first = Path(t) / "unchanged-declarations"
+    clone(root, first, baseline)
+    original = (first / SOURCE).read_text("utf-8")
+    comment = original + "\n// G26 synthetic file-only delta; declaration bytes unchanged.\n"
+    comment_head = make_commit(first, original, comment)
+    reject(first, "ICE_STALE", "go", "run", "./cmd/ice", "validate")
+    good(first, "go", "run", "./cmd/ice", "build")
+    good(first, "go", "run", "./cmd/ice", "validate")
+    report = good(first, sys.executable, "-B",
+                  "scripts/maintain_code_atlas.py", "--root", ".")
+    q = json.loads(report.strip().splitlines()[-1])
+    require(q["reused_declarations"] == 352 and
+            q["fresh_review_receipts"] == 0 and
+            q["target_source_commit"] == comment_head,
+            "source-identical declarations did not preserve exact witnesses")
+    derived = json.loads((first / ATLAS).read_text("utf-8"))
+    require(derived["source_commit"] == comment_head, "new source identity missing")
+    node = next(n for n in derived["nodes"]
+                if n["file"] == str(SOURCE).replace("\\", "/"))
+    require(node["provenance_lineage"]["mode"] ==
+            "canonical-LF-declaration-byte-reuse" and
+            node["review_evidence"]["source_commit"] == comment_head,
+            "body-identical proof was not rebound")
+    rels = Path(t) / "types-one.json"
+    with rels.open("w", encoding="utf-8") as out:
+        p = subprocess.run(["go", "run", "./cmd/ice", "relationships"],
+                           cwd=first, stdout=out, stderr=subprocess.PIPE,
+                           text=True, timeout=240)
+        require(p.returncode == 0, "typed extraction failed: " + p.stderr)
+    good(first, sys.executable, "-B", "scripts/validate_code_atlas.py",
+         "--root", ".", "--relationships", rels)
+    print("G26_EXACT_DECLARATION_REUSE=PASS", comment_head)
+    mark("unchanged_declaration_reuse")
+
+    return timings
+
+
+def fixture_guardrails(root, t, baseline):
+    """Run unchanged, fail-closed provenance controls in an isolated clone."""
+    last_mark = time.perf_counter()
+    timings = {}
+
+    def mark(stage):
+        nonlocal last_mark
+        now = time.perf_counter()
+        timings[stage] = round(now - last_mark, 6)
+        last_mark = now
+
+    # An uncommitted Go change plus a rebuilt canonical ICE index must
+    # never masquerade as the frozen target commit.
+    dirty = Path(t) / "dirty-source-checkout"
+    clone(root, dirty, baseline)
+    unchanged = (dirty / SOURCE).read_text("utf-8")
+    (dirty / SOURCE).write_text(
+        unchanged + "\n// G27 uncommitted source delta.\n", "utf-8")
+    good(dirty, "go", "run", "./cmd/ice", "build")
+    reject(dirty, "G27_DIRTY_NON_ICE_WORKTREE",
+           sys.executable, "-B", "scripts/maintain_code_atlas.py",
+           "--root", ".")
+    mark("dirty_worktree_rejection")
+    # Even if local Git status is deliberately blinded, independent
+    # HEAD-blob verification must reject a modified worktree file.
+    hidden = Path(t) / "hidden-working-tree-change"
+    clone(root, hidden, baseline)
+    hidden_old = (hidden / SOURCE).read_text("utf-8")
+    good(hidden, "git", "update-index", "--assume-unchanged",
+         SOURCE.as_posix())
+    (hidden / SOURCE).write_text(
+        hidden_old + "\n// G27 hidden source blob divergence.\n",
+        "utf-8")
+    good(hidden, "go", "run", "./cmd/ice", "build")
+    reject(hidden, "G27_TARGET_SOURCE_CONTENT_MISMATCH",
+           sys.executable, "-B", "scripts/maintain_code_atlas.py",
+           "--root", ".")
+    mark("hidden_source_blob_rejection")
+    # A committed module context change must not inherit 352 behavioral
+    # descriptions solely because Go declaration bodies match.
+    module = Path(t) / "module-context-change"
+    clone(root, module, baseline)
+    modfile = Path("go.mod")
+    mod_before = (module / modfile).read_text("utf-8")
+    (module / modfile).write_text(
+        mod_before + "\n// G27 synthetic module context drift\n", "utf-8")
+    good(module, "git", "add", "go.mod")
+    good(module, "git", "-c", "user.name=Wingless G27 Synthetic",
+         "-c", "user.email=g27-fixture@example.invalid",
+         "commit", "-qm", "G27 synthetic module-context fixture")
+    good(module, "go", "run", "./cmd/ice", "build")
+    reject(module, "G27_DEPENDENCY_CONTEXT_CHANGED",
+           sys.executable, "-B", "scripts/maintain_code_atlas.py",
+           "--root", ".")
+    print("G27_GIT_SOURCE_IDENTITY_AND_MODULE_CONTEXT_NEGATIVES_PASS")
+    mark("module_context_rejection")
+    return timings
+
+
+def fixture_changed(root, t, baseline):
+    """Run unchanged, fail-closed provenance controls in an isolated clone."""
+    last_mark = time.perf_counter()
+    timings = {}
+
+    def mark(stage):
+        nonlocal last_mark
+        now = time.perf_counter()
+        timings[stage] = round(now - last_mark, 6)
+        last_mark = now
+
+    second = Path(t) / "changed-declaration"
+    clone(root, second, baseline)
+    old = (second / SOURCE).read_text("utf-8")
+    before = "invalid lifecycle transition %s -> %s"
+    after = "invalid G26 lifecycle transition %s -> %s"
+    require(old.count(before) == 1, "fixture declaration anchor changed")
+    new_head = make_commit(second, old, old.replace(before, after))
+    good(second, "go", "run", "./cmd/ice", "build")
+    reject(second, "G26_REVIEW_REQUIRED", sys.executable, "-B",
+           "scripts/maintain_code_atlas.py", "--root", ".")
+    require(json.loads((second / ATLAS).read_text("utf-8"))["source_commit"]
+            != new_head, "failed generation unexpectedly published atlas")
+    manifest = json.loads((second / ".ice/manifest.json").read_text("utf-8"))
+    old_atlas = json.loads((second / ATLAS).read_text("utf-8"))
+    entry = next(f for f in manifest["files"] if f["path"] == SOURCE.as_posix())
+    item = next(n for n in old_atlas["nodes"]
+                if n["file"] == SOURCE.as_posix() and n["name"] == "Move")
+    new_source = (second / SOURCE).read_bytes()
+    lines = new_source.splitlines(keepends=True)
+    text = b"".join(lines[item["start_line"]-1:item["end_line"]])
+    # Comment/body fixture preserves original declaration positions.
+    fixture = [{
+        "key": [item["file"], item["kind"], item["name"],
+                item.get("receiver", "")],
+        "target_source_commit": new_head,
+        "file_sha256": entry["sha256"],
+        "declaration_sha256": hashlib.sha256(text).hexdigest(),
+        "start_line": item["start_line"],
+        "end_line": item["end_line"],
+        "reviewer": "G26 SYNTHETIC FIXTURE ONLY",
+        "label": "Review new lifecycle transition rejection path",
+        "description": "Rejects transitions missing from the existing explicit lifecycle allowlist; synthetic review fixture only.",
+        "literal_tokens": [after],
+    }]
+    receipt = Path(t) / "review-fixture.json"
+    receipt.write_text(json.dumps(fixture), "utf-8")
+    fixture[0]["declaration_sha256"] = "0" * 64
+    invalid = Path(t) / "invalid-review.json"
+    invalid.write_text(json.dumps(fixture), "utf-8")
+    reject(second, "fresh-review receipt source identity drift",
+           sys.executable, "-B", "scripts/maintain_code_atlas.py",
+           "--root", ".", "--receipts", invalid)
+    positive = good(second, sys.executable, "-B",
+                    "scripts/maintain_code_atlas.py",
+                    "--root", ".", "--receipts", receipt)
+    out = json.loads(positive.strip().splitlines()[-1])
+    require(out["fresh_review_receipts"] == 1 and
+            out["reused_declarations"] == 351 and
+            out["independent_approval"] is False,
+            "changed declaration incorrectly reused or approved")
+    report = Path(t) / "types-two.json"
+    with report.open("w", encoding="utf-8") as out:
+        p = subprocess.run(["go", "run", "./cmd/ice", "relationships"],
+                           cwd=second, stdout=out, stderr=subprocess.PIPE,
+                           text=True, timeout=240)
+        require(p.returncode == 0, "typed extraction failed: " + p.stderr)
+    reject(second, "G26_UNAPPROVED_FRESH_REVIEW",
+           sys.executable, "-B", "scripts/validate_code_atlas.py",
+           "--root", ".", "--relationships", report)
+    print("G26_CHANGED_DECLARATION_FRESH_RECEIPT_REQUIRES_INDEPENDENT_APPROVAL=PASS", new_head)
+    mark("changed_declaration_fresh_review")
+
+    return timings
+
+
+def fixture_new_symbol(root, t, baseline):
+    """Run unchanged, fail-closed provenance controls in an isolated clone."""
+    last_mark = time.perf_counter()
+    timings = {}
+
+    def mark(stage):
+        nonlocal last_mark
+        now = time.perf_counter()
+        timings[stage] = round(now - last_mark, 6)
+        last_mark = now
+
+    # G28: an additional Go declaration must be source-witnessed,
+    # remain explicitly unreviewed, and never inherit the 352 old reviews.
+    added = Path(t) / "provisional-new-symbol"
+    clone(root, added, baseline)
+    existing = (added / SOURCE).read_text("utf-8")
+    with_new = (existing +
+                "\nfunc G28AtlasSourceWitnessFixture() int { return 1 }\n")
+    added_head = make_commit(added, existing, with_new)
+    good(added, "go", "run", "./cmd/ice", "build")
+    reject(added, "G28_NEW_SYMBOL_SOURCE_RECEIPTS_REQUIRED",
+           sys.executable, "-B", "scripts/maintain_code_atlas.py",
+           "--root", ".")
+    idx = json.loads((added / ".ice/symbol-map.json").read_text("utf-8"))
+    fresh_node = next(n for n in idx
+                      if n["file"] == SOURCE.as_posix()
+                      and n["name"] == "G28AtlasSourceWitnessFixture")
+    raw = (added / SOURCE).read_bytes()
+    decl = b"".join(raw.splitlines(keepends=True)[
+        fresh_node["start"]-1:fresh_node["end"]])
+    review = [{
+        "key": [SOURCE.as_posix(), fresh_node["kind"], fresh_node["name"], ""],
+        "target_source_commit": added_head,
+        "file_sha256": hashlib.sha256(raw).hexdigest(),
+        "declaration_sha256": hashlib.sha256(decl).hexdigest(),
+        "start_line": fresh_node["start"], "end_line": fresh_node["end"],
+        "reviewer": "G28 SYNTHETIC UNVERIFIED",
+        "label": "Synthetic source-witnessed new symbol",
+        "description": "Synthetic test-only lexical definition with no independently verified behavior",
+        "literal_tokens": ["G28AtlasSourceWitnessFixture"],
+    }]
+    review_file = Path(t) / "g28-added.json"
+    review_file.write_text(json.dumps(review), "utf-8")
+    review[0]["file_sha256"] = "0" * 64
+    forged_file = Path(t) / "g28-forged.json"
+    forged_file.write_text(json.dumps(review), "utf-8")
+    reject(added, "G28_NEW_SYMBOL_RECEIPT_IDENTITY_DRIFT",
+           sys.executable, "-B", "scripts/maintain_code_atlas.py",
+           "--root", ".", "--receipts", forged_file)
+    accepted = good(added, sys.executable, "-B",
+                    "scripts/maintain_code_atlas.py",
+                    "--root", ".", "--receipts", review_file)
+    result = json.loads(accepted.strip().splitlines()[-1])
+    require(result["new_source_bound_provisional"] == 1
+            and result["reused_declarations"] == 352,
+            "G28 new source-bound symbol result incorrect")
+    expanded = json.loads((added / ATLAS).read_text("utf-8"))
+    marker = next(n for n in expanded["nodes"]
+                  if n["name"] == "G28AtlasSourceWitnessFixture")
+    require(len(expanded["nodes"]) == 353
+            and marker["evidence_basis"] == "lexical-provisional"
+            and marker["review_evidence"] is None
+            and marker["provenance_lineage"]["independent_approval"] is False,
+            "G28 provisional additions were silently promoted to reviewed")
+    g28_types = Path(t) / "types-g28.json"
+    with g28_types.open("w", encoding="utf-8") as out:
+        p = subprocess.run(["go", "run", "./cmd/ice", "relationships"],
+                           cwd=added, stdout=out, stderr=subprocess.PIPE,
+                           text=True, timeout=240)
+        require(p.returncode == 0, "G28 typed extraction failed: " + p.stderr)
+    good(added, sys.executable, "-B", "scripts/validate_code_atlas.py",
+         "--root", ".", "--relationships", g28_types)
+    print("G28_NEW_SOURCE_BOUND_PROVISIONAL=PASS", added_head)
+    marker["evidence_basis"] = "source-reviewed"
+    (added / ATLAS).write_text(json.dumps(expanded), "utf-8")
+    reject(added, "source-reviewed symbol has no explicit proof",
+           sys.executable, "-B", "scripts/validate_code_atlas.py",
+           "--root", ".", "--relationships", g28_types)
+    print("G28_UNAUTHENTICATED_REVIEW_PROMOTION_REJECTED=PASS")
+    mark("new_symbol_provisional_and_promotion_negative")
+
+    return timings
+
+
+def run(root, scratch_parent):
+    started = time.perf_counter()
+    timings = {}
     root = root.resolve()
     baseline = good(root, "git", "rev-parse", "HEAD").strip()
     require(not good(root, "git", "status", "--porcelain").strip(),
             "real checkout dirty before testing")
+    # Only independent disposable exact-head clones run concurrently.
+    # Cap Go subprocess contention; all futures must succeed before acceptance.
+    max_workers = min(2, os.cpu_count() or 1)
     with tempfile.TemporaryDirectory(prefix="g26-atlas-", dir=scratch_parent) as t:
-        first = Path(t) / "unchanged-declarations"
-        clone(root, first, baseline)
-        original = (first / SOURCE).read_text("utf-8")
-        comment = original + "\n// G26 synthetic file-only delta; declaration bytes unchanged.\n"
-        comment_head = make_commit(first, original, comment)
-        reject(first, "ICE_STALE", "go", "run", "./cmd/ice", "validate")
-        good(first, "go", "run", "./cmd/ice", "build")
-        good(first, "go", "run", "./cmd/ice", "validate")
-        report = good(first, sys.executable, "-B",
-                      "scripts/maintain_code_atlas.py", "--root", ".")
-        q = json.loads(report.strip().splitlines()[-1])
-        require(q["reused_declarations"] == 352 and
-                q["fresh_review_receipts"] == 0 and
-                q["target_source_commit"] == comment_head,
-                "source-identical declarations did not preserve exact witnesses")
-        derived = json.loads((first / ATLAS).read_text("utf-8"))
-        require(derived["source_commit"] == comment_head, "new source identity missing")
-        node = next(n for n in derived["nodes"]
-                    if n["file"] == str(SOURCE).replace("\\", "/"))
-        require(node["provenance_lineage"]["mode"] ==
-                "canonical-LF-declaration-byte-reuse" and
-                node["review_evidence"]["source_commit"] == comment_head,
-                "body-identical proof was not rebound")
-        rels = Path(t) / "types-one.json"
-        with rels.open("w", encoding="utf-8") as out:
-            p = subprocess.run(["go", "run", "./cmd/ice", "relationships"],
-                               cwd=first, stdout=out, stderr=subprocess.PIPE,
-                               text=True, timeout=240)
-            require(p.returncode == 0, "typed extraction failed: " + p.stderr)
-        good(first, sys.executable, "-B", "scripts/validate_code_atlas.py",
-             "--root", ".", "--relationships", rels)
-        print("G26_EXACT_DECLARATION_REUSE=PASS", comment_head)
-        mark("unchanged_declaration_reuse")
-
-        # An uncommitted Go change plus a rebuilt canonical ICE index must
-        # never masquerade as the frozen target commit.
-        dirty = Path(t) / "dirty-source-checkout"
-        clone(root, dirty, baseline)
-        unchanged = (dirty / SOURCE).read_text("utf-8")
-        (dirty / SOURCE).write_text(
-            unchanged + "\n// G27 uncommitted source delta.\n", "utf-8")
-        good(dirty, "go", "run", "./cmd/ice", "build")
-        reject(dirty, "G27_DIRTY_NON_ICE_WORKTREE",
-               sys.executable, "-B", "scripts/maintain_code_atlas.py",
-               "--root", ".")
-        mark("dirty_worktree_rejection")
-        # Even if local Git status is deliberately blinded, independent
-        # HEAD-blob verification must reject a modified worktree file.
-        hidden = Path(t) / "hidden-working-tree-change"
-        clone(root, hidden, baseline)
-        hidden_old = (hidden / SOURCE).read_text("utf-8")
-        good(hidden, "git", "update-index", "--assume-unchanged",
-             SOURCE.as_posix())
-        (hidden / SOURCE).write_text(
-            hidden_old + "\n// G27 hidden source blob divergence.\n",
-            "utf-8")
-        good(hidden, "go", "run", "./cmd/ice", "build")
-        reject(hidden, "G27_TARGET_SOURCE_CONTENT_MISMATCH",
-               sys.executable, "-B", "scripts/maintain_code_atlas.py",
-               "--root", ".")
-        mark("hidden_source_blob_rejection")
-        # A committed module context change must not inherit 352 behavioral
-        # descriptions solely because Go declaration bodies match.
-        module = Path(t) / "module-context-change"
-        clone(root, module, baseline)
-        modfile = Path("go.mod")
-        mod_before = (module / modfile).read_text("utf-8")
-        (module / modfile).write_text(
-            mod_before + "\n// G27 synthetic module context drift\n", "utf-8")
-        good(module, "git", "add", "go.mod")
-        good(module, "git", "-c", "user.name=Wingless G27 Synthetic",
-             "-c", "user.email=g27-fixture@example.invalid",
-             "commit", "-qm", "G27 synthetic module-context fixture")
-        good(module, "go", "run", "./cmd/ice", "build")
-        reject(module, "G27_DEPENDENCY_CONTEXT_CHANGED",
-               sys.executable, "-B", "scripts/maintain_code_atlas.py",
-               "--root", ".")
-        print("G27_GIT_SOURCE_IDENTITY_AND_MODULE_CONTEXT_NEGATIVES_PASS")
-        mark("module_context_rejection")
-        second = Path(t) / "changed-declaration"
-        clone(root, second, baseline)
-        old = (second / SOURCE).read_text("utf-8")
-        before = "invalid lifecycle transition %s -> %s"
-        after = "invalid G26 lifecycle transition %s -> %s"
-        require(old.count(before) == 1, "fixture declaration anchor changed")
-        new_head = make_commit(second, old, old.replace(before, after))
-        good(second, "go", "run", "./cmd/ice", "build")
-        reject(second, "G26_REVIEW_REQUIRED", sys.executable, "-B",
-               "scripts/maintain_code_atlas.py", "--root", ".")
-        require(json.loads((second / ATLAS).read_text("utf-8"))["source_commit"]
-                != new_head, "failed generation unexpectedly published atlas")
-        manifest = json.loads((second / ".ice/manifest.json").read_text("utf-8"))
-        old_atlas = json.loads((second / ATLAS).read_text("utf-8"))
-        entry = next(f for f in manifest["files"] if f["path"] == SOURCE.as_posix())
-        item = next(n for n in old_atlas["nodes"]
-                    if n["file"] == SOURCE.as_posix() and n["name"] == "Move")
-        new_source = (second / SOURCE).read_bytes()
-        lines = new_source.splitlines(keepends=True)
-        text = b"".join(lines[item["start_line"]-1:item["end_line"]])
-        # Comment/body fixture preserves original declaration positions.
-        fixture = [{
-            "key": [item["file"], item["kind"], item["name"],
-                    item.get("receiver", "")],
-            "target_source_commit": new_head,
-            "file_sha256": entry["sha256"],
-            "declaration_sha256": hashlib.sha256(text).hexdigest(),
-            "start_line": item["start_line"],
-            "end_line": item["end_line"],
-            "reviewer": "G26 SYNTHETIC FIXTURE ONLY",
-            "label": "Review new lifecycle transition rejection path",
-            "description": "Rejects transitions missing from the existing explicit lifecycle allowlist; synthetic review fixture only.",
-            "literal_tokens": [after],
-        }]
-        receipt = Path(t) / "review-fixture.json"
-        receipt.write_text(json.dumps(fixture), "utf-8")
-        fixture[0]["declaration_sha256"] = "0" * 64
-        invalid = Path(t) / "invalid-review.json"
-        invalid.write_text(json.dumps(fixture), "utf-8")
-        reject(second, "fresh-review receipt source identity drift",
-               sys.executable, "-B", "scripts/maintain_code_atlas.py",
-               "--root", ".", "--receipts", invalid)
-        positive = good(second, sys.executable, "-B",
-                        "scripts/maintain_code_atlas.py",
-                        "--root", ".", "--receipts", receipt)
-        out = json.loads(positive.strip().splitlines()[-1])
-        require(out["fresh_review_receipts"] == 1 and
-                out["reused_declarations"] == 351 and
-                out["independent_approval"] is False,
-                "changed declaration incorrectly reused or approved")
-        report = Path(t) / "types-two.json"
-        with report.open("w", encoding="utf-8") as out:
-            p = subprocess.run(["go", "run", "./cmd/ice", "relationships"],
-                               cwd=second, stdout=out, stderr=subprocess.PIPE,
-                               text=True, timeout=240)
-            require(p.returncode == 0, "typed extraction failed: " + p.stderr)
-        reject(second, "G26_UNAPPROVED_FRESH_REVIEW",
-               sys.executable, "-B", "scripts/validate_code_atlas.py",
-               "--root", ".", "--relationships", report)
-        print("G26_CHANGED_DECLARATION_FRESH_RECEIPT_REQUIRES_INDEPENDENT_APPROVAL=PASS", new_head)
-        mark("changed_declaration_fresh_review")
-
-        # G28: an additional Go declaration must be source-witnessed,
-        # remain explicitly unreviewed, and never inherit the 352 old reviews.
-        added = Path(t) / "provisional-new-symbol"
-        clone(root, added, baseline)
-        existing = (added / SOURCE).read_text("utf-8")
-        with_new = (existing +
-                    "\nfunc G28AtlasSourceWitnessFixture() int { return 1 }\n")
-        added_head = make_commit(added, existing, with_new)
-        good(added, "go", "run", "./cmd/ice", "build")
-        reject(added, "G28_NEW_SYMBOL_SOURCE_RECEIPTS_REQUIRED",
-               sys.executable, "-B", "scripts/maintain_code_atlas.py",
-               "--root", ".")
-        idx = json.loads((added / ".ice/symbol-map.json").read_text("utf-8"))
-        fresh_node = next(n for n in idx
-                          if n["file"] == SOURCE.as_posix()
-                          and n["name"] == "G28AtlasSourceWitnessFixture")
-        raw = (added / SOURCE).read_bytes()
-        decl = b"".join(raw.splitlines(keepends=True)[
-            fresh_node["start"]-1:fresh_node["end"]])
-        review = [{
-            "key": [SOURCE.as_posix(), fresh_node["kind"], fresh_node["name"], ""],
-            "target_source_commit": added_head,
-            "file_sha256": hashlib.sha256(raw).hexdigest(),
-            "declaration_sha256": hashlib.sha256(decl).hexdigest(),
-            "start_line": fresh_node["start"], "end_line": fresh_node["end"],
-            "reviewer": "G28 SYNTHETIC UNVERIFIED",
-            "label": "Synthetic source-witnessed new symbol",
-            "description": "Synthetic test-only lexical definition with no independently verified behavior",
-            "literal_tokens": ["G28AtlasSourceWitnessFixture"],
-        }]
-        review_file = Path(t) / "g28-added.json"
-        review_file.write_text(json.dumps(review), "utf-8")
-        review[0]["file_sha256"] = "0" * 64
-        forged_file = Path(t) / "g28-forged.json"
-        forged_file.write_text(json.dumps(review), "utf-8")
-        reject(added, "G28_NEW_SYMBOL_RECEIPT_IDENTITY_DRIFT",
-               sys.executable, "-B", "scripts/maintain_code_atlas.py",
-               "--root", ".", "--receipts", forged_file)
-        accepted = good(added, sys.executable, "-B",
-                        "scripts/maintain_code_atlas.py",
-                        "--root", ".", "--receipts", review_file)
-        result = json.loads(accepted.strip().splitlines()[-1])
-        require(result["new_source_bound_provisional"] == 1
-                and result["reused_declarations"] == 352,
-                "G28 new source-bound symbol result incorrect")
-        expanded = json.loads((added / ATLAS).read_text("utf-8"))
-        marker = next(n for n in expanded["nodes"]
-                      if n["name"] == "G28AtlasSourceWitnessFixture")
-        require(len(expanded["nodes"]) == 353
-                and marker["evidence_basis"] == "lexical-provisional"
-                and marker["review_evidence"] is None
-                and marker["provenance_lineage"]["independent_approval"] is False,
-                "G28 provisional additions were silently promoted to reviewed")
-        g28_types = Path(t) / "types-g28.json"
-        with g28_types.open("w", encoding="utf-8") as out:
-            p = subprocess.run(["go", "run", "./cmd/ice", "relationships"],
-                               cwd=added, stdout=out, stderr=subprocess.PIPE,
-                               text=True, timeout=240)
-            require(p.returncode == 0, "G28 typed extraction failed: " + p.stderr)
-        good(added, sys.executable, "-B", "scripts/validate_code_atlas.py",
-             "--root", ".", "--relationships", g28_types)
-        print("G28_NEW_SOURCE_BOUND_PROVISIONAL=PASS", added_head)
-        marker["evidence_basis"] = "source-reviewed"
-        (added / ATLAS).write_text(json.dumps(expanded), "utf-8")
-        reject(added, "source-reviewed symbol has no explicit proof",
-               sys.executable, "-B", "scripts/validate_code_atlas.py",
-               "--root", ".", "--relationships", g28_types)
-        print("G28_UNAUTHENTICATED_REVIEW_PROMOTION_REJECTED=PASS")
-        mark("new_symbol_provisional_and_promotion_negative")
-
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {
+                name: executor.submit(globals()["fixture_" + name], root, Path(t), baseline)
+                for name in ("new_symbol", "unchanged", "changed", "guardrails")
+            }
+            # Propagate every exception; no lane is optional or silently skipped.
+            for name in ("unchanged", "guardrails", "changed", "new_symbol"):
+                timings.update(futures[name].result())
+        clean_started = time.perf_counter()
         require(not good(root, "git", "status", "--porcelain").strip(),
                 "original checkout modified")
-        mark("final_source_checkout_cleanliness")
+        timings["final_source_checkout_cleanliness"] = round(
+            time.perf_counter() - clean_started, 6)
     print(json.dumps({
         "timing_schema": "wingless.atlas.g26-source-aware-diagnostic.v1",
         "timings_seconds": timings,
+        "parallel_execution": True,
+        "max_workers": max_workers,
         "total_elapsed_seconds": round(time.perf_counter() - started, 6),
         "result": "G26_ISOLATED_MAINTENANCE_QUALIFICATION_PASS",
         "reused_unchanged": 352,
@@ -305,6 +370,7 @@ def run(root, scratch_parent):
         "module_context_drift": "REJECTED",
         "original_checkout_changed": False,
     }, sort_keys=True))
+
 
 
 if __name__ == "__main__":
