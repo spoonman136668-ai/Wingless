@@ -1,0 +1,93 @@
+name: ITD-02 isolated outcome learner focused qualification
+on:
+  push:
+    branches:
+      - research/itd02-selected-outcome-learner-20261026
+  pull_request:
+    paths:
+      - 'research/native/itd02/outcome/**'
+      - '.github/workflows/itd02-outcome-focused.yml'
+permissions:
+  contents: write
+jobs:
+  outcome-focused:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Focused native outcome tests
+        run: go test -count=1 -v ./research/native/itd02/outcome
+      - name: Vet and build native outcome
+        run: |
+          go vet ./research/native/itd02/outcome
+          go build ./research/native/itd02/outcome
+      - name: Race safety on Linux
+        if: runner.os == 'Linux'
+        run: go test -race -count=1 ./research/native/itd02/outcome
+  ice-index-artifact:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Rebuild ICE in disposable checkout
+        run: |
+          go run ./cmd/ice build
+          go run ./cmd/ice validate
+      - name: Record exact generated delta
+        run: |
+          git diff --binary -- .ice > "$RUNNER_TEMP/itd02-ice-index.patch"
+          git diff --stat -- .ice > "$RUNNER_TEMP/itd02-ice-index-stat.txt"
+          git diff --name-only -- .ice > "$RUNNER_TEMP/itd02-ice-index-files.txt"
+          if test -s "$RUNNER_TEMP/itd02-ice-index.patch"; then
+            echo "ICE_INDEX_DELTA_PRESENT=true"
+          else
+            echo "ICE_INDEX_ALREADY_FRESH=true"
+          fi
+      - name: Package generated delta and index
+        run: tar -czf "$RUNNER_TEMP/itd02-ice-index.tar.gz" .ice
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itd02-ice-index
+          path: |
+            ${{ runner.temp }}/itd02-ice-index.tar.gz
+            ${{ runner.temp }}/itd02-ice-index.patch
+            ${{ runner.temp }}/itd02-ice-index-stat.txt
+            ${{ runner.temp }}/itd02-ice-index-files.txt
+          retention-days: 3
+  refresh-index-on-branch-push:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/itd02-selected-outcome-learner-20261026
+          persist-credentials: true
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Rebuild and validate generated ICE
+        run: |
+          go run ./cmd/ice build
+          go run ./cmd/ice validate
+      - name: Commit only generated ICE delta
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- .ice
+          if git diff --cached --quiet; then
+            echo "ICE_INDEX_ALREADY_FRESH=true"
+            exit 0
+          fi
+          git diff --cached --name-only | awk '!/^\.ice\// { bad=1 } END { exit bad }'
+          git commit -m "ITD-02: refresh generated ICE indexes"
+          git fetch origin research/itd02-selected-outcome-learner-20261026
+          git rebase origin/research/itd02-selected-outcome-learner-20261026
+          git push origin HEAD:research/itd02-selected-outcome-learner-20261026

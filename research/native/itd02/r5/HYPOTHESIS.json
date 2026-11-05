@@ -1,0 +1,36 @@
+{
+  "schema": "wingless.itd02.r5.cost-aware-frontier-hypothesis.v1",
+  "parent_R4_head": "1b1bea442027132df5acdf67b8353e9a5a3046f4",
+  "parent_R4_original_source_blob": "61678ff1c95966151f1b1731fef62b804504cdf8",
+  "parent_R3_original_source_blob": "3c8a60a5037e6c0f04648ae53175ed1187b5f8ac",
+  "prior_F3_original_frozen_no_go": "NO_REPEATABLE_R4_FRONTIER_UNFAMILIAR_NAVIGATION_ADVANCEMENT",
+  "prior_F3_dev_seeds": [
+    53400,
+    53407
+  ],
+  "hypothesis": "R4 over-prioritizes unvisited cells with a visit penalty 1000 dominating actual route length or distance to goal, causing needless detours. Retain actual observed public blocked and per-episode visit memory and original R3 empirically trained model; select bounded action paths balancing traversal cost, goal proximity and repeated state risk on unknown-world frontier, without handcoding source dynamics.",
+  "mechanism_policy": "Choose action by original R3 unless stalling or repeated public cell; on stall enumerate learned reachable pose graph capped to 2048 nodes and depth 36, score unseen and seen positions with finite step cost, manhattan to publicly observed goal and source-history cell visit count; do not fabricate world occupancy; use original R4 route memory and valid source Feedback once per actual selected action.",
+  "candidate_scoring_frozen": {
+    "travel_step_weight": 18,
+    "goal_manhattan_weight": 6,
+    "cell_visit_penalty": 32,
+    "turn_action_weight": 6,
+    "forward_action_weight": 0,
+    "unseen_bonus": 24,
+    "blocked_forward_penalty": 40,
+    "stall_trigger": 4,
+    "search_nodes": 2048,
+    "search_depth": 36
+  },
+  "pre_world_falsifiers": [
+    "no learned original R3 source physics -> no fabricated safe route",
+    "pre-feedback choice has no learning effect",
+    "actual action feedback custody exactly one pending action per real source step",
+    "reset clears episode search but preserves original trained R3 bytes",
+    "cold OS restart with authentic checkpoint preserves search and model",
+    "all source-only fixture outcomes explicitly non-scientific",
+    "no fresh original worlds until FORGE freezes independent source and conventional controls"
+  ],
+  "authority": "source-only, draft, no semantic ICE promotion, no protected first use, FORGE research owner",
+  "reference": "https://github.com/spoonman136668-ai/FORGE/pull/911"
+}
