@@ -1185,13 +1185,14 @@ jobs:
         env:
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
+          PYTHONDONTWRITEBYTECODE: '1'
         run: |
           $ErrorActionPreference = 'Stop'
           $python = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'
           & $python -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: 'numpy==2.3.5' 'safetensors==0.7.0'
           if ($LASTEXITCODE -ne 0) { throw 'G9U scientific dependencies failed' }
           & $python -m pip freeze --all | Out-File -Encoding utf8 (Join-Path $env:RUNNER_TEMP 'g9u-dependencies.txt')
-          & $python research/nr1/gcen/g9u_run_authenticated.py --repository-root . --source-sha $env:GITHUB_SHA --shard-path $env:G9U_SHARD_PATH --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json --output (Join-Path $env:RUNNER_TEMP 'g9u-original-gpu-comparison.json')
+          & $python -B research/nr1/gcen/g9u_run_authenticated.py --repository-root . --source-sha $env:GITHUB_SHA --shard-path $env:G9U_SHARD_PATH --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json --output (Join-Path $env:RUNNER_TEMP 'g9u-original-gpu-comparison.json')
           if ($LASTEXITCODE -ne 0) { throw 'G9U authenticated operator benchmark failed' }
           $receipt = Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'g9u-original-gpu-comparison.json') -Raw | ConvertFrom-Json
           if ($receipt.source_sha -ne $env:GITHUB_SHA -or $receipt.benchmark.exact_source_sha -ne $env:GITHUB_SHA -or $receipt.benchmark.original_shard_authenticated_in_process -ne $true -or $receipt.benchmark.hardware_admission.exact_source_sha -ne $env:GITHUB_SHA -or @($receipt.benchmark.measurements).Count -ne 2 -or $receipt.full_model_forward -ne $false) { throw 'G9U authenticated receipt failed exact source or scope checks' }
