@@ -43,7 +43,7 @@ class G9UCheckoutIdentityTests(unittest.TestCase):
 
     def test_accepts_clean_exact_checkout(self):
         root=str(Path(g9u.__file__).resolve().parents[3])
-        observed,calls=self.check(root+"\\n",SHA+"\\n","")
+        observed,calls=self.check(root+"\n",SHA+"\n","")
         self.assertEqual(observed,SHA)
         self.assertEqual(len(calls),3)
 
