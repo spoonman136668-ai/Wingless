@@ -50,6 +50,8 @@ jobs:
       - name: Development-only checksum-pinned direct Go extraction
         if: steps.scope.outputs.atlas_relevant == 'true' && github.event_name == 'pull_request' && github.head_ref == 'engineering/atlas-go-toolchain-direct-extract-20261105'
         timeout-minutes: 4
+        env:
+          ATLAS_EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
