@@ -889,9 +889,30 @@ jobs:
             @{name='python3'; flag=''},
             @{name='py'; flag='-3'}
           )
+          # Also inspect standard machine-wide installations and HKLM PythonCore.
+          # This avoids assuming service PATH matches an interactive user's PATH.
+          $roots = @('C:\Program Files', 'C:\Program Files (x86)', 'C:\')
+          foreach ($root in $roots) {
+            $pattern = if ($root -eq 'C:\') { 'Python3*' } else { 'Python*' }
+            foreach ($dir in @(Get-ChildItem -LiteralPath $root -Directory -Filter $pattern -ErrorAction SilentlyContinue)) {
+              $exe = Join-Path $dir.FullName 'python.exe'
+              if (Test-Path -LiteralPath $exe -PathType Leaf) { $candidates += @{name=$exe; flag=''} }
+            }
+          }
+          foreach ($registry in @('HKLM:\SOFTWARE\Python\PythonCore', 'HKLM:\SOFTWARE\WOW6432Node\Python\PythonCore')) {
+            foreach ($version in @(Get-ChildItem -LiteralPath $registry -ErrorAction SilentlyContinue)) {
+              $install = Join-Path $version.PSPath 'InstallPath'
+              $exe = (Get-ItemProperty -LiteralPath $install -Name ExecutablePath -ErrorAction SilentlyContinue).ExecutablePath
+              if ($exe -and (Test-Path -LiteralPath $exe -PathType Leaf)) { $candidates += @{name=$exe; flag=''} }
+            }
+          }
           $selected = $null
           foreach ($candidate in $candidates) {
-            $cmd = Get-Command $candidate.name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+            $cmd = if (Test-Path -LiteralPath $candidate.name -PathType Leaf -ErrorAction SilentlyContinue) {
+              Get-Command -Name $candidate.name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+            } else {
+              Get-Command -Name $candidate.name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+            }
             if ($null -eq $cmd) { continue }
             $python = $cmd.Source
             $args = @()
@@ -902,6 +923,7 @@ jobs:
             break
           }
           if ($null -eq $selected) {
+            $status.discovery = 'PATH_AND_SYSTEM_WIDE'
             $status.status = 'PYTHON_RUNTIME_UNAVAILABLE'
             $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
             throw 'PYTHON_RUNTIME_UNAVAILABLE: no working existing Python 3 command for the runner service account'
