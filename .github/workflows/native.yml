@@ -1082,3 +1082,68 @@ jobs:
           name: g9t-wingless-existing-runner-preflight
           path: evidence/
           retention-days: 14
+
+  g9u_authorized_expert_gpu:
+    # Single authorized GPU experiment, never routine CI or a new controller.
+    needs: [native, g9t_existing_wingless_gpu_preflight]
+    if: \${{ github.event_name == 'push' && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9u-original-gpu]') }}
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: \${{ github.sha }}
+      - name: Gate original shard availability and source
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:GITHUB_REPOSITORY -ne 'spoonman136668-ai/Wingless' -or $env:GITHUB_REF -ne 'refs/heads/research/cnc01q-direct-expert-development-20261103') { throw 'Wrong G9U source scope' }
+          if ($env:RUNNER_NAME -ne 'WINGLESS-UP-B' -or $env:RUNNER_ENVIRONMENT -ne 'self-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'Wrong G9U runner' }
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'G9U SHA mismatch' }
+          $dirty = @(git status --porcelain --untracked-files=all)
+          if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw 'G9U checkout dirty' }
+          New-Item -ItemType Directory -Force evidence | Out-Null
+          $status = @{schema='wingless.gcen.g9u.authorized-gpu-gate.v1';source_sha=$env:GITHUB_SHA;status='NOT_ADMITTED';original_weight_authenticated=$false;gpu_kernel_executed=$false;full_model_forward=$false;scientific_acceptance='NOT_GRANTED'}
+          $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9u-status.json
+          $python = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'
+          if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw 'Qualified G9X Python unavailable' }
+          $shard = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9u-original\model-00001-of-00016.safetensors'
+          if (-not (Test-Path -LiteralPath $shard -PathType Leaf)) {
+            $status.status = 'BLOCKED_ORIGINAL_SHARD_NOT_STAGED'
+            $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9u-status.json
+            'G9U_SHARD_AVAILABLE=false' | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+            Write-Output 'G9U original shard not staged; zero kernels executed'
+            exit 0
+          }
+          $item = Get-Item -LiteralPath $shard
+          if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or $item.Length -le 8 -or $item.Length -gt 6442450944) { throw 'Unsafe G9U shard path or size' }
+          'G9U_SHARD_AVAILABLE=true' | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "G9U_SHARD_PATH=$shard" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          $status.status = 'SHARD_PRESENT_PENDING_IN_PROCESS_AUTHENTICATION'
+          $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9u-status.json
+      - name: Run original BF16 authenticated CUDA benchmark
+        if: \${{ env.G9U_SHARD_AVAILABLE == 'true' }}
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $python = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'
+          & $python -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: 'numpy==2.3.5' 'safetensors==0.7.0'
+          if ($LASTEXITCODE -ne 0) { throw 'G9U scientific dependencies failed' }
+          & $python -m pip freeze --all | Out-File -Encoding utf8 evidence/g9u-dependencies.txt
+          & $python research/nr1/gcen/g9u_run_authenticated.py --repository-root . --source-sha $env:GITHUB_SHA --shard-path $env:G9U_SHARD_PATH --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json --output evidence/g9u-original-gpu-comparison.json
+          if ($LASTEXITCODE -ne 0) { throw 'G9U authenticated operator benchmark failed' }
+          & $python -c 'import json,sys; r=json.load(open(sys.argv[1])); b=r["benchmark"]; assert r["source_sha"]==sys.argv[2] and b["original_shard_authenticated_in_process"] and b["hardware_admission"]["exact_source_sha"]==sys.argv[2] and len(b["measurements"])==2 and not r["full_model_forward"]' evidence/g9u-original-gpu-comparison.json $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { throw 'G9U receipt failed authentication' }
+          @{schema='wingless.gcen.g9u.authorized-gpu-gate.v1';source_sha=$env:GITHUB_SHA;status='GPU_OPERATOR_COMPARISON_RECORDED';original_weight_authenticated=$true;gpu_kernel_executed=$true;full_model_forward=$false;scientific_acceptance='NOT_GRANTED'} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9u-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9u-original-gpu-operator
+          path: evidence/g9u-*
+          retention-days: 14
