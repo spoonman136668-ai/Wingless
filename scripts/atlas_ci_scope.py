@@ -56,6 +56,30 @@ def self_test(root):
     require("    name: " + STATUS_JOB in workflow, "required job identity changed")
     require("        id: scope\n" in workflow,
             "atlas scope classification step absent")
+    require("  push:\\n    branches: [main]\\n" in workflow,
+            "main-only cache producer trigger missing")
+    require(workflow.count("runs-on: windows-2022") == 2,
+            "Atlas producer and original qualification must both run on Windows 2022")
+    require("  qualify:\\n    if: github.event_name != 'push'" in workflow,
+            "required PR qualification separated from main cache seed")
+    require("  seed_cache:\\n    if: github.event_name == 'push'" in workflow,
+            "cache producer may run on an untrusted PR")
+    require(workflow.count("id: cache_identity") == 2,
+            "compiler identity must be checked in producer and consumer")
+    require(workflow.count("ATLAS_CACHE_IMAGE_IDENTITY_MISSING") == 2,
+            "image identity verification missing")
+    require(workflow.count("ATLAS_CACHE_TOOLCHAIN_MISMATCH") == 2,
+            "toolchain identity verification missing")
+    require(workflow.count("wingless-atlas-win2022-go1255-") == 2,
+            "exact cache keys not bound in both jobs")
+    require(workflow.count("actions/cache/restore@v4") == 1
+            and workflow.count("actions/cache@v4") == 1,
+            "PR must restore only; main must seed")
+    require("restore-keys:" not in workflow,
+            "inexact cache fallback prohibited")
+    require("      - name: One complete integration regression\\n" in workflow
+            and "          go test ./..." in workflow,
+            "full original Go regression changed")
     for step in (
         "Set up frozen Go toolchain",
         "Validate source-index freshness and typed relationships",
