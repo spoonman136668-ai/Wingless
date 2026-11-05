@@ -82,9 +82,14 @@ def self_test(root):
             "toolchain identity verification missing")
     require(workflow.count("wingless-atlas-win2022-go1255-") == 2,
             "exact cache keys not bound in both jobs")
-    require(workflow.count("actions/cache/restore@v4") == 1
+    require(workflow.count("actions/cache/restore@v4") == 2
             and workflow.count("actions/cache@v4") == 1,
-            "PR must restore only; main must seed")
+            "PR must restore only; main must seed; isolated development probe may restore")
+    dev_probe_block = workflow.split("  backend_probe:\n", 1)[1].split("\n  seed_cache:", 1)[0]
+    require(dev_probe_block.count("actions/cache/save@v4") == 1
+            and dev_probe_block.count("actions/cache/restore@v4") == 1
+            and "if: github.event_name == 'push' && github.ref == 'refs/heads/engineering/atlas-win2022-sourcebound-main-cache-20261105'" in dev_probe_block,
+            "development cache write must remain branch-isolated")
     require("restore-keys:" not in workflow,
             "inexact cache fallback prohibited")
     require("      - name: One complete integration regression\n" in workflow
