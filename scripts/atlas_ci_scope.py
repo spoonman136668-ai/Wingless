@@ -59,8 +59,7 @@ def self_test(root):
     for step in (
         "Set up frozen Go toolchain",
         "Validate source-index freshness and typed relationships",
-        "Tamper-resistance negative acceptance in disposable exact-head clone",
-        "Genuine Chromium browser navigation acceptance",
+        "Bounded parallel tamper-negative and genuine Chromium acceptance",
         "Focused ICE regression",
         "One complete integration regression",
         "Vet, build, and verify clean checkout",
@@ -70,6 +69,27 @@ def self_test(root):
         block = workflow.split(marker, 1)[1].split("\n      - name:", 1)[0]
         require("if: steps.scope.outputs.atlas_relevant == 'true'" in block,
                 "full qualification can bypass scope: " + step)
+    parallel_marker = "      - name: Bounded parallel tamper-negative and genuine Chromium acceptance\n"
+    parallel_block = workflow.split(parallel_marker, 1)[1].split("\n      - name:", 1)[0]
+    require(parallel_block.count("$jobs += Start-ThreadJob") == 2,
+            "both mandatory acceptance jobs must start exactly once")
+    for required in (
+        "python scripts/test_code_atlas_tamper.py",
+        "python -B scripts/test_atlas_browser.py",
+        "PINNED_SELENIUM_INSTALL_FAILED",
+        "ATLAS_TAMPER_NEGATIVE_ACCEPTANCE_FAILED",
+        "ATLAS_CHROMIUM_BROWSER_ACCEPTANCE_FAILED",
+        "ATLAS_TAMPER_PASS_RECEIPT_MISSING",
+        "ATLAS_CHROMIUM_PASS_RECEIPT_MISSING",
+        "WINGLESS_ATLAS_NEGATIVE_QUALIFICATION_PASS",
+        "WINGLESS_ATLAS_CHROMIUM_BROWSER_ACCEPTANCE_PASS",
+        "$jobs | Wait-Job",
+        "Receive-Job -Job $job -ErrorAction Stop",
+        "if ($job.State -ne 'Completed')",
+        "ATLAS_PARALLEL_ACCEPTANCE_FAILED",
+        "ATLAS_BOUNDED_PARALLEL_ACCEPTANCE_PASS",
+    ):
+        require(required in parallel_block, "parallel acceptance contract changed: " + required)
     entries = json.loads((root / ".ice/manifest.json").read_text("utf-8"))["files"]
     representative = [
         "new_source.go", "src/new_source.go", "README.md", "src/new.md",
