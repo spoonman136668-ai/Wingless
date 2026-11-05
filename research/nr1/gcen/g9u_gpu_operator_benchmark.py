@@ -42,8 +42,10 @@ def validate_packed(data, scales):
     return d,s
 
 
-def run_authenticated_expert(weight, *, source_sha, torch_module=None):
-    w=validate_source(weight,source_sha)
+def run_authenticated_expert(*, shard_path, manifest_path, source_sha, torch_module=None):
+    from g9u_verified_loader import load_verified_original_expert
+    original_weight, source_custody = load_verified_original_expert(shard_path, manifest_path)
+    w=validate_source(original_weight,source_sha)
     from packed_companded_int2 import pack_companded_int2
     d,s=validate_packed(*pack_companded_int2(w,block=BLOCK))
     if torch_module is None:
@@ -118,7 +120,8 @@ def run_authenticated_expert(weight, *, source_sha, torch_module=None):
         "gpu_resident_baseline_bytes":int(resident_before),
         "gpu_joint_residency_peak_allocated_bytes":int(peak),
         "measurements":measurements,
-        "original_shard_authenticated_by_caller":True,
+        "original_shard_authenticated_in_process":True,
+        "original_shard_custody":source_custody,
         "original_activation_traces":False,"full_model_forward":False,
         "scientific_acceptance":"NOT_GRANTED",
     }
