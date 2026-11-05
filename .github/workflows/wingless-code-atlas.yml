@@ -42,11 +42,71 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'ATLAS_SCOPE_CLASSIFICATION_FAILED' }
 
       - name: Set up frozen Go toolchain
-        if: steps.scope.outputs.atlas_relevant == 'true'
+        if: steps.scope.outputs.atlas_relevant == 'true' && github.head_ref != 'engineering/atlas-go-toolchain-direct-extract-20261105'
         uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
         with:
           go-version: '1.25.5'
           cache: false
+      - name: Development-only checksum-pinned direct Go extraction
+        if: steps.scope.outputs.atlas_relevant == 'true' && github.event_name == 'pull_request' && github.head_ref == 'engineering/atlas-go-toolchain-direct-extract-20261105'
+        timeout-minutes: 4
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $expectedHead = $env:ATLAS_EXPECTED_HEAD
+          if ([string]::IsNullOrWhiteSpace($expectedHead)) { throw 'ATLAS_FASTGO_EXPECTED_HEAD_MISSING' }
+          if ((git rev-parse HEAD).Trim() -ne $expectedHead) { throw 'ATLAS_FASTGO_SOURCE_SHA_MISMATCH' }
+          if ([string]::IsNullOrWhiteSpace($env:ImageVersion)) { throw 'ATLAS_FASTGO_IMAGE_UNVERIFIED' }
+          $url = 'https://github.com/actions/go-versions/releases/download/1.25.5-19880500865/go-1.25.5-win32-x64.zip'
+          $expectedSHA256 = 'fd31baa4dd7038bcc281db1a841fa451e7a7c931cc3c61b93389cdc6d0c50631'
+          $archive = Join-Path $env:RUNNER_TEMP 'atlas-go1255-direct-release.zip'
+          $install = Join-Path $env:RUNNER_TEMP 'atlas-go1255-direct-extraction'
+          if ((Test-Path -LiteralPath $archive) -or (Test-Path -LiteralPath $install)) { throw 'ATLAS_FASTGO_SCRATCH_NOT_FRESH' }
+          $total = [Diagnostics.Stopwatch]::StartNew()
+          $download = [Diagnostics.Stopwatch]::StartNew()
+          & curl.exe --location --fail --silent --show-error --max-time 120 --output $archive $url
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $archive)) { throw 'ATLAS_FASTGO_DOWNLOAD_FAILED' }
+          $download.Stop()
+          $actualHash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actualHash -ne $expectedSHA256) { throw 'ATLAS_FASTGO_ARCHIVE_SHA256_MISMATCH' }
+          $extraction = [Diagnostics.Stopwatch]::StartNew()
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::ExtractToDirectory($archive, $install)
+          $extraction.Stop()
+          $matches = @(Get-ChildItem -LiteralPath $install -Recurse -File -Filter 'go.exe' |
+            Where-Object { $_.Directory.Name -eq 'bin' })
+          if ($matches.Count -ne 1) { throw 'ATLAS_FASTGO_TOOLCHAIN_LAYOUT_AMBIGUOUS' }
+          $bin = $matches[0].Directory.FullName
+          $toolchainRoot = Split-Path -Parent $bin
+          $expectedVersion = 'go version go1.25.5 windows/amd64'
+          $reported = (& $matches[0].FullName version).Trim()
+          if ($LASTEXITCODE -ne 0 -or $reported -ne $expectedVersion) { throw 'ATLAS_FASTGO_TOOLCHAIN_VERSION_OR_ARCH_MISMATCH' }
+          $reportedGoRoot = (& $matches[0].FullName env GOROOT).Trim()
+          if ($LASTEXITCODE -ne 0 -or
+              [IO.Path]::GetFullPath($reportedGoRoot).TrimEnd('\') -ne [IO.Path]::GetFullPath($toolchainRoot).TrimEnd('\')) {
+            throw 'ATLAS_FASTGO_GOROOT_IDENTITY_MISMATCH'
+          }
+          $env:PATH = "$bin;$env:PATH"
+          if ((go version).Trim() -ne $expectedVersion) { throw 'ATLAS_FASTGO_PATH_ACTIVATION_FAILED' }
+          "$bin" >> $env:GITHUB_PATH
+          $total.Stop()
+          if (@(git status --porcelain).Count -ne 0) { throw 'ATLAS_FASTGO_CHECKOUT_DIRTY' }
+          $receipt = @{
+            result = 'ATLAS_FASTGO_DIRECT_TOOLCHAIN_DIAGNOSTIC'
+            candidate_sha = (git rev-parse HEAD).Trim()
+            image_version = $env:ImageVersion
+            archive_sha256 = $actualHash
+            archive_bytes = (Get-Item -LiteralPath $archive).Length
+            go_version = $reported
+            download_seconds = [math]::Round($download.Elapsed.TotalSeconds, 6)
+            extraction_seconds = [math]::Round($extraction.Elapsed.TotalSeconds, 6)
+            total_install_seconds = [math]::Round($total.Elapsed.TotalSeconds, 6)
+            acceptance = 'DEVELOPMENT_DIAGNOSTIC_ONLY; complete original Atlas CI remains mandatory'
+            original_checkout_dirty = $false
+          } | ConvertTo-Json -Compress
+          $receipt | Write-Output
+          '### Development-only direct Go 1.25.5 toolchain installation' >> $env:GITHUB_STEP_SUMMARY
+          $receipt >> $env:GITHUB_STEP_SUMMARY
 
       - name: Validate source-index freshness and typed relationships
         if: steps.scope.outputs.atlas_relevant == 'true'
