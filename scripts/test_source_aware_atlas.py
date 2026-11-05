@@ -8,6 +8,9 @@ import hashlib
 import os
 from concurrent.futures import ThreadPoolExecutor
 import json
+import math
+import platform
+import statistics
 import subprocess
 import sys
 import tempfile
@@ -330,7 +333,7 @@ def fixture_new_symbol(root, t, baseline):
     return timings
 
 
-def run(root, scratch_parent):
+def run(root, scratch_parent, *, workers_override=None):
     started = time.perf_counter()
     timings = {}
     root = root.resolve()
@@ -339,7 +342,8 @@ def run(root, scratch_parent):
             "real checkout dirty before testing")
     # Only independent disposable exact-head clones run concurrently.
     # Cap Go subprocess contention; all futures must succeed before acceptance.
-    max_workers = min(2, os.cpu_count() or 1)
+    max_workers = min(2, os.cpu_count() or 1) if workers_override is None else workers_override
+    require(max_workers in (1, 2), "fixture worker limit must be 1 or 2")
     with tempfile.TemporaryDirectory(prefix="g26-atlas-", dir=scratch_parent) as t:
         groups = (
             ("new_symbol", fixture_new_symbol),
@@ -372,10 +376,10 @@ def run(root, scratch_parent):
                 "original checkout modified")
         timings["final_source_checkout_cleanliness"] = round(
             time.perf_counter() - clean_started, 6)
-    print(json.dumps({
+    receipt = {
         "timing_schema": "wingless.atlas.g26-source-aware-diagnostic.v1",
         "timings_seconds": timings,
-        "parallel_execution": True,
+        "parallel_execution": max_workers > 1,
         "max_workers": max_workers,
         "total_elapsed_seconds": round(time.perf_counter() - started, 6),
         "result": "G26_ISOLATED_MAINTENANCE_QUALIFICATION_PASS",
@@ -387,13 +391,81 @@ def run(root, scratch_parent):
         "hidden_source_blob_divergence": "REJECTED",
         "module_context_drift": "REJECTED",
         "original_checkout_changed": False,
-    }, sort_keys=True))
+    }
+    print(json.dumps(receipt, sort_keys=True))
+    return receipt
 
+
+def compare_workers(root, scratch_parent):
+    """Optional development-only counterbalanced, same-root 1-vs-2 worker probe.
+
+    Run *all* original provenance fixtures on every arm. This is not an
+    acceptance-speedup claim: OS page cache and Go build caches can still vary.
+    """
+    root = root.resolve()
+    baseline = good(root, "git", "rev-parse", "HEAD").strip()
+    require(not good(root, "git", "status", "--porcelain").strip(),
+            "original checkout dirty before worker comparison")
+    require((os.cpu_count() or 1) >= 2,
+            "comparison requires two logical CPUs; do not oversubscribe")
+    expected_stages = {
+        "unchanged_declaration_reuse", "dirty_worktree_rejection",
+        "hidden_source_blob_rejection", "module_context_rejection",
+        "changed_declaration_fresh_review",
+        "new_symbol_provisional_and_promotion_negative",
+        "final_source_checkout_cleanliness",
+    }
+    order = (1, 2, 2, 1)
+    samples = {1: [], 2: []}
+    for workers in order:
+        require(good(root, "git", "rev-parse", "HEAD").strip() == baseline,
+                "source HEAD changed during worker comparison")
+        receipt = run(root, scratch_parent, workers_override=workers)
+        require(receipt["result"] == "G26_ISOLATED_MAINTENANCE_QUALIFICATION_PASS"
+                and receipt["max_workers"] == workers
+                and receipt["parallel_execution"] == (workers == 2)
+                and set(receipt["timings_seconds"]) == expected_stages,
+                "incomplete or inconsistent worker comparison fixture receipt")
+        seconds = receipt["total_elapsed_seconds"]
+        require(math.isfinite(seconds) and seconds > 0,
+                "invalid worker elapsed time")
+        samples[workers].append(seconds)
+        require(not good(root, "git", "status", "--porcelain").strip(),
+                "worker comparison modified original source checkout")
+    serial_median = statistics.median(samples[1])
+    parallel_median = statistics.median(samples[2])
+    print(json.dumps({
+        "result": "G26_WORKER_COMPARISON_DIAGNOSTIC_PASS",
+        "schema": "wingless.atlas.worker-comparison.v1",
+        "source_head": baseline,
+        "platform": platform.platform(),
+        "python_version": platform.python_version(),
+        "go_version": good(root, "go", "version").strip(),
+        "logical_cpu_count": os.cpu_count(),
+        "worker_order": order,
+        "serial_seconds": samples[1],
+        "parallel_seconds": samples[2],
+        "serial_median_seconds": serial_median,
+        "parallel_median_seconds": parallel_median,
+        "observed_median_speedup_ratio": round(serial_median / parallel_median, 6),
+        "qualification": "DEVELOPMENT_DIAGNOSTIC_ONLY",
+        "limitations": "OS/page caches, Go compile caches and runner contention may vary",
+        "original_checkout_changed": False,
+    }, sort_keys=True))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--scratch-parent", type=Path, default=None)
+    parser.add_argument("--workers", type=int, choices=(1, 2), default=None,
+                        help="Optional 1/2-worker development probe; default retains qualified 2-worker cap")
+    parser.add_argument("--compare-workers", action="store_true",
+                        help="Opt-in ABBA same-source original G26/G27/G28 full-suite comparison")
     args = parser.parse_args()
-    run(args.root, args.scratch_parent)
+    require(not (args.compare_workers and args.workers is not None),
+            "comparison defines its own 1/2-worker schedule")
+    if args.compare_workers:
+        compare_workers(args.root, args.scratch_parent)
+    else:
+        run(args.root, args.scratch_parent, workers_override=args.workers)
