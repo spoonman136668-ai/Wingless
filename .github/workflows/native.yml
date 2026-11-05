@@ -869,7 +869,7 @@ jobs:
           persist-credentials: false
           ref: ${{ github.sha }}
       - name: Assert exact self-hosted runner identity and clean checkout
-        shell: powershell
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         run: |
           $ErrorActionPreference = 'Stop'
           if ($env:GITHUB_REPOSITORY -ne 'spoonman136668-ai/Wingless') { throw 'Wrong repository' }
@@ -882,7 +882,7 @@ jobs:
           New-Item -ItemType Directory -Force evidence | Out-Null
           @{'schema'='wingless.gcen.g9t.optional-preflight.v1';'status'='NOT_ADMITTED';'source_sha'=$env:GITHUB_SHA;'gpu_kernel_executed'=$false;'model_forward'=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
       - name: Current G9T CUDA admission on existing runtime only
-        shell: powershell
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         run: |
           $ErrorActionPreference = 'Stop'
           # No software installation, weight download, or benchmark execution.
