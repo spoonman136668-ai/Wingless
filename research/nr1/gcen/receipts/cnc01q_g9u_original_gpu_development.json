@@ -1,0 +1,84 @@
+{
+  "schema": "wingless.gcen.g9u.scientific-development-analysis.v1",
+  "status": "ENGINEERING_PASS_SCIENTIFIC_NO_GO_CURRENT_PACKED_GPU_SPEEDUP",
+  "source_repository": "spoonman136668-ai/Wingless",
+  "source_sha": "e5ee6de7ef7bfb09947753d631358815c99e74ce",
+  "source_pr": 443,
+  "github_actions_run_id": 42092133021,
+  "github_actions_attempt": 2,
+  "artifact_id": 13456072646,
+  "artifact_zip_sha256": "c954a6223f25922a0bced0933060c4396e03ece3b795d6298d112f9e43582a01",
+  "basis": "Read-only derivation from immutable authenticated original-weight GPU artifact; no added CUDA execution",
+  "original_checkpoint_model": "Qwen/Qwen3-30B-A3B",
+  "original_checkpoint_revision": "ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+  "original_shard_sha256": "454e77b346a61bfb201d54df60e15158838cf930617ee135113556204f2802b5",
+  "original_tensor_name": "model.layers.0.mlp.experts.0.down_proj.weight",
+  "source_custody": "IN_PROCESS_SHA256_PINNED_INDEX_BF16",
+  "gpu_name": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+  "torch": "2.10.0+cu128",
+  "cuda": "12.8",
+  "experiment": {
+    "input_type": "FROZEN_SYNTHETIC_GAUSSIAN",
+    "shape": [
+      2048,
+      768
+    ],
+    "batch": 8,
+    "seeds": [
+      751,
+      811
+    ],
+    "warmup": 3,
+    "repeats": 7,
+    "dense": "FP32_CUDA_GEMM",
+    "packed": "INT2_GPU_TILED_DECODE_PLUS_FP32_GEMM_NOT_FUSED"
+  },
+  "measurements": [
+    {
+      "seed": 751,
+      "dense_fp32_median_gpu_ms": 1.9396480321884155,
+      "packed_int2_median_gpu_ms": 6.83132791519165,
+      "packed_speedup_vs_dense": 0.2839342593809595,
+      "relative_output_squared_error_vs_dense": 0.11919270696895383,
+      "independent_cpu_packed_parity": {
+        "maximum_absolute_difference": 0.0000013113021850585938,
+        "reference_max_absolute_value": 2.828134059906006,
+        "relative_squared_error": 9.756927615908824e-14
+      }
+    },
+    {
+      "seed": 811,
+      "dense_fp32_median_gpu_ms": 1.8650879859924316,
+      "packed_int2_median_gpu_ms": 1.2384320497512817,
+      "packed_speedup_vs_dense": 1.506007524891659,
+      "relative_output_squared_error_vs_dense": 0.11809226499786526,
+      "independent_cpu_packed_parity": {
+        "maximum_absolute_difference": 0.0000012516975402832031,
+        "reference_max_absolute_value": 2.511636972427368,
+        "relative_squared_error": 1.0115815855569241e-13
+      }
+    }
+  ],
+  "aggregate_development": {
+    "dense_mean_of_seed_medians_ms": 1.9023680090904236,
+    "packed_mean_of_seed_medians_ms": 4.034879982471466,
+    "relative_squared_output_error_mean": 0.11864248598340954,
+    "original_bf16_storage_bytes": 3145728,
+    "packed_storage_bytes": 405504,
+    "gpu_joint_residency_peak_allocated_bytes": 24429056,
+    "packed_to_dense_latency_ratio": 2.1209776253547585,
+    "dense_to_packed_speed_ratio": 0.47148069269836745,
+    "storage_reduction_ratio": 7.757575757575758
+  },
+  "interpretation": {
+    "engineering": "PASS",
+    "scientific": "NO_GO_FOR_CURRENT_TILED_INT2_GPU_SPEEDUP",
+    "deployment": "NOT_AUTHORIZED",
+    "full_model_forward": false,
+    "original_activation_quality_demonstrated": false,
+    "full_model_fit_demonstrated": false,
+    "peak_is_joint_allocation_not_full_model_vram": true,
+    "seeds_insufficient_for_generalized_performance_claim": true,
+    "stable_acceleration_demonstrated": false
+  }
+}
