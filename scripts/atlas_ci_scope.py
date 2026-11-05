@@ -56,6 +56,24 @@ def self_test(root):
     require("    name: " + STATUS_JOB in workflow, "required job identity changed")
     require("        id: scope\n" in workflow,
             "atlas scope classification step absent")
+    original_setup = workflow.split("      - name: Set up frozen Go toolchain\n", 1)[1].split("\n      - name:", 1)[0]
+    require("uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5" in original_setup
+            and "go-version: '1.25.5'" in original_setup
+            and "github.head_ref != 'engineering/atlas-go-toolchain-direct-extract-20261105'" in original_setup,
+            "original exact Go toolchain path not protected")
+    fast_setup = workflow.split("      - name: Development-only checksum-pinned direct Go extraction\n", 1)[1].split("\n      - name:", 1)[0]
+    require("github.event_name == 'pull_request'" in fast_setup
+            and "github.head_ref == 'engineering/atlas-go-toolchain-direct-extract-20261105'" in fast_setup
+            and "steps.scope.outputs.atlas_relevant == 'true'" in fast_setup,
+            "direct Go toolchain experiment not branch scoped")
+    for guard in ("ATLAS_FASTGO_ARCHIVE_SHA256_MISMATCH",
+                  "ATLAS_FASTGO_TOOLCHAIN_VERSION_OR_ARCH_MISMATCH",
+                  "ATLAS_FASTGO_GOROOT_IDENTITY_MISMATCH",
+                  "ATLAS_FASTGO_CHECKOUT_DIRTY",
+                  "fd31baa4dd7038bcc281db1a841fa451e7a7c931cc3c61b93389cdc6d0c50631",
+                  "ATLAS_FASTGO_DIRECT_TOOLCHAIN_DIAGNOSTIC"):
+        require(guard in fast_setup, "direct toolchain proof missing: " + guard)
+
     for step in (
         "Set up frozen Go toolchain",
         "Validate source-index freshness and typed relationships",
