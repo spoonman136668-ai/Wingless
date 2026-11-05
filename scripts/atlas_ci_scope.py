@@ -51,7 +51,7 @@ def self_test(root):
     header = workflow.split("\npermissions:", 1)[0]
     require(re.search(r"(?m)^on:\n  pull_request:\s*\n  workflow_dispatch:", header) is not None,
             "pull_request not unconditional")
-    pr_trigger = header.split("  pull_request:\n", 1)[1].split("\n  workflow_dispatch:", 1)[0]
+    pr_trigger = header.split("  pull_request:\n", 1)[1].split("  workflow_dispatch:", 1)[0]
     require(re.search(r"(?m)^\s+paths(?:-ignore)?:", pr_trigger) is None,
             "PR-level path filtering can strand required status")
     require("    name: " + STATUS_JOB in workflow, "required job identity changed")
