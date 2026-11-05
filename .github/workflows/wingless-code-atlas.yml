@@ -29,8 +29,6 @@ jobs:
     name: Windows 2022 Go compiler cache seed (not qualification)
     runs-on: windows-2022
     timeout-minutes: 8
-    env:
-      GOCACHE: ${{ runner.temp }}/wingless-atlas-win2022-gocache
     steps:
       - name: Check out exact protected-main source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -42,6 +40,11 @@ jobs:
         with:
           go-version: '1.25.5'
           cache: false
+      - name: Configure runner-local Go compilation cache directory
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          "GOCACHE=$env:RUNNER_TEMP\wingless-atlas-win2022-gocache" >> $env:GITHUB_ENV
       - name: Bind frozen Windows 2022 compiler identity
         id: cache_identity
         shell: pwsh
@@ -75,8 +78,6 @@ jobs:
     if: github.event_name != 'push'
     name: Read-only Windows Atlas Qualification
     runs-on: windows-2022
-    env:
-      GOCACHE: ${{ runner.temp }}/wingless-atlas-win2022-gocache
     timeout-minutes: 35
     steps:
       - name: Check out exact proposed Wingless source
@@ -110,6 +111,12 @@ jobs:
         with:
           go-version: '1.25.5'
           cache: false
+      - name: Configure runner-local Go compilation cache directory
+        if: steps.scope.outputs.atlas_relevant == 'true'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          "GOCACHE=$env:RUNNER_TEMP\wingless-atlas-win2022-gocache" >> $env:GITHUB_ENV
 
       - name: Bind frozen Windows 2022 compiler identity
         if: steps.scope.outputs.atlas_relevant == 'true'
