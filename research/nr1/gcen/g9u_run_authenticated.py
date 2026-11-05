@@ -23,7 +23,7 @@ def check_checkout(repository_root, source_sha):
         result=subprocess.run(["git","-C",str(root),*args],
                               capture_output=True,text=True,check=True,timeout=15)
         return result.stdout.strip()
-    if git("rev-parse","--show-toplevel") != str(root):
+    if Path(git("rev-parse","--show-toplevel")).resolve()!=root:
         raise ValueError("repository root mismatch")
     if git("rev-parse","HEAD") != source_sha:
         raise ValueError("checked-out source SHA mismatch")

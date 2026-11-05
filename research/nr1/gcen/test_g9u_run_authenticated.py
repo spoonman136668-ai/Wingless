@@ -24,6 +24,23 @@ class RunnerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"source SHA"):
             run.check_checkout(self.root,"invalid")
 
+    def test_accepts_git_style_root_separators(self):
+        # Git for Windows can return forward slashes for the same checkout.
+        git_root=str(self.root.resolve()).replace("\\","/")
+        with patch.object(run.subprocess,"run") as proc:
+            proc.side_effect=[
+                type("R",(),{"stdout":git_root+"\n"})(),
+                type("R",(),{"stdout":SHA+"\n"})(),
+                type("R",(),{"stdout":""})(),
+            ]
+            self.assertEqual(run.check_checkout(self.root,SHA),self.root.resolve())
+
+    def test_rejects_unrelated_repository_root(self):
+        with patch.object(run.subprocess,"run") as proc:
+            proc.side_effect=[type("R",(),{"stdout":str(self.root.parent)+"\n"})()]
+            with self.assertRaisesRegex(ValueError,"repository root mismatch"):
+                run.check_checkout(self.root,SHA)
+
     def test_rejects_wrong_head(self):
         with patch.object(run.subprocess,"run") as proc:
             proc.return_value.stdout=str(self.root)+"\n" if not hasattr(self,"step") else ""
