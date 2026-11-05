@@ -244,3 +244,52 @@ jobs:
           if ($dirty.Count -gt 0) { throw "QUALIFICATION_CHECKOUT_DIRTY: $($dirty -join ', ')" }
           "WINGLESS_ATLAS_QUALIFIED_HEAD=$(git rev-parse HEAD)" >> $env:GITHUB_STEP_SUMMARY
           'Code intelligence validation, focused tests, full regression, vet, build, and clean checkout passed.' >> $env:GITHUB_STEP_SUMMARY
+
+      # Diagnostic only. Does not replace acceptance or publish scientific/CI speedup claims.
+      - name: Development-only cold and warm compiler comparison
+        if: github.event_name == 'pull_request' && github.head_ref == 'engineering/atlas-win2022-sourcebound-main-cache-20261105'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $head = (git rev-parse HEAD).Trim()
+          if ($head -notmatch '^[0-9a-f]{40}$') { throw 'ATLAS_DEV_CACHE_SOURCE_SHA_INVALID' }
+          if ((go version).Trim() -ne 'go version go1.25.5 windows/amd64') { throw 'ATLAS_DEV_CACHE_GO_VERSION_DRIFT' }
+          if ((go env GOCACHEPROG).Trim() -ne '') { throw 'ATLAS_DEV_CACHE_EXTERNAL_HELPER_UNEXPECTED' }
+          $scratch = Join-Path $env:RUNNER_TEMP "wingless-atlas-dev-cache-$head"
+          if (Test-Path $scratch) { throw 'ATLAS_DEV_CACHE_SCRATCH_NOT_FRESH' }
+          New-Item -ItemType Directory -Force $scratch | Out-Null
+          $oldGoCache = $env:GOCACHE
+          $env:GOCACHE = Join-Path $scratch 'gocache'
+          $output = Join-Path $scratch 'ice-benchmark.exe'
+          $clock = [Diagnostics.Stopwatch]::StartNew()
+          & go build -o $output ./cmd/ice
+          if ($LASTEXITCODE -ne 0) { throw 'ATLAS_DEV_CACHE_COLD_BUILD_FAILED' }
+          $clock.Stop()
+          $coldSeconds = $clock.Elapsed.TotalSeconds
+          if (-not (Test-Path $output)) { throw 'ATLAS_DEV_CACHE_COLD_BINARY_MISSING' }
+          Remove-Item -LiteralPath $output -Force
+          $clock.Restart()
+          & go build -o $output ./cmd/ice
+          if ($LASTEXITCODE -ne 0) { throw 'ATLAS_DEV_CACHE_WARM_BUILD_FAILED' }
+          $clock.Stop()
+          $warmSeconds = $clock.Elapsed.TotalSeconds
+          if (-not (Test-Path $output)) { throw 'ATLAS_DEV_CACHE_WARM_BINARY_MISSING' }
+          $env:GOCACHE = $oldGoCache
+          if (@(git status --porcelain).Count -ne 0) { throw 'ATLAS_DEV_CACHE_CHECKOUT_DIRTY' }
+          $receipt = @{
+            result = 'ATLAS_GO_CACHE_DEVELOPMENT_DIAGNOSTIC'
+            source_sha = $head
+            runner_image = $env:ImageVersion
+            go_version = 'go1.25.5 windows/amd64'
+            case = 'fresh Go object cache versus same-cache repeated build'
+            cold_seconds = [math]::Round($coldSeconds, 6)
+            warm_seconds = [math]::Round($warmSeconds, 6)
+            saved_compiler_seconds = [math]::Round($coldSeconds - $warmSeconds, 6)
+            diagnostic_threshold_seconds = 8
+            exceeds_diagnostic_threshold = (($coldSeconds - $warmSeconds) -ge 8)
+            acceptance = 'UNVERIFIED: does not include backend cache transfer or full CI time'
+            original_checkout_dirty = $false
+          } | ConvertTo-Json -Compress
+          $receipt | Write-Output
+          '### Development-only Go cache compilation diagnostic' >> $env:GITHUB_STEP_SUMMARY
+          $receipt >> $env:GITHUB_STEP_SUMMARY
