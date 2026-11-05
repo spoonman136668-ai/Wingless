@@ -900,6 +900,17 @@ jobs:
               if (Test-Path -LiteralPath $exe -PathType Leaf) { $candidates += @{name=$exe; flag=''} }
             }
           }
+          # Read-only scan of existing versions in the machine-managed CI Python root.
+          # Do not modify PATH, install packages, or search user profiles.
+          $machinePythonRoot = 'C:\ckb-ci-tools\python'
+          if (Test-Path -LiteralPath $machinePythonRoot -PathType Container) {
+            foreach ($dir in @(Get-ChildItem -LiteralPath $machinePythonRoot -Directory -ErrorAction SilentlyContinue)) {
+              $exe = Join-Path $dir.FullName 'python.exe'
+              if (Test-Path -LiteralPath $exe -PathType Leaf) {
+                $candidates += @{name=$exe; flag=''}
+              }
+            }
+          }
           foreach ($registry in @('HKLM:\SOFTWARE\Python\PythonCore', 'HKLM:\SOFTWARE\WOW6432Node\Python\PythonCore')) {
             foreach ($version in @(Get-ChildItem -LiteralPath $registry -ErrorAction SilentlyContinue)) {
               $install = Join-Path $version.PSPath 'InstallPath'
