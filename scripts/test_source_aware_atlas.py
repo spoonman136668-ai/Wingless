@@ -6,6 +6,7 @@ All modifications happen in disposable exact-head clones, never in checkout.
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -48,6 +49,18 @@ def clone(root, folder, commit):
             "scratch checkout dirty at start")
 
 
+def fixture_ice(folder, output_root, label):
+    """Compile the ICE tool against each disposable fixture's own exact inputs.
+
+    Binaries are stored outside fixture Git trees to preserve negative controls.
+    """
+    suffix = ".exe" if os.name == "nt" else ""
+    executable = Path(output_root) / ("ice-" + label + suffix)
+    good(folder, "go", "build", "-o", executable, "./cmd/ice")
+    require(executable.is_file(), "fixture ICE build unavailable: " + label)
+    return str(executable)
+
+
 def make_commit(folder, old, new):
     require(old != new, "no fixture mutation")
     SOURCE_PATH = folder / SOURCE
@@ -71,9 +84,10 @@ def run(root, scratch_parent):
         original = (first / SOURCE).read_text("utf-8")
         comment = original + "\n// G26 synthetic file-only delta; declaration bytes unchanged.\n"
         comment_head = make_commit(first, original, comment)
-        reject(first, "ICE_STALE", "go", "run", "./cmd/ice", "validate")
-        good(first, "go", "run", "./cmd/ice", "build")
-        good(first, "go", "run", "./cmd/ice", "validate")
+        first_ice = fixture_ice(first, t, "first")
+        reject(first, "ICE_STALE", first_ice, "validate")
+        good(first, first_ice, "build")
+        good(first, first_ice, "validate")
         report = good(first, sys.executable, "-B",
                       "scripts/maintain_code_atlas.py", "--root", ".")
         q = json.loads(report.strip().splitlines()[-1])
@@ -91,7 +105,7 @@ def run(root, scratch_parent):
                 "body-identical proof was not rebound")
         rels = Path(t) / "types-one.json"
         with rels.open("w", encoding="utf-8") as out:
-            p = subprocess.run(["go", "run", "./cmd/ice", "relationships"],
+            p = subprocess.run([first_ice, "relationships"],
                                cwd=first, stdout=out, stderr=subprocess.PIPE,
                                text=True, timeout=240)
             require(p.returncode == 0, "typed extraction failed: " + p.stderr)
@@ -106,7 +120,8 @@ def run(root, scratch_parent):
         unchanged = (dirty / SOURCE).read_text("utf-8")
         (dirty / SOURCE).write_text(
             unchanged + "\n// G27 uncommitted source delta.\n", "utf-8")
-        good(dirty, "go", "run", "./cmd/ice", "build")
+        dirty_ice = fixture_ice(dirty, t, "dirty")
+        good(dirty, dirty_ice, "build")
         reject(dirty, "G27_DIRTY_NON_ICE_WORKTREE",
                sys.executable, "-B", "scripts/maintain_code_atlas.py",
                "--root", ".")
@@ -120,7 +135,8 @@ def run(root, scratch_parent):
         (hidden / SOURCE).write_text(
             hidden_old + "\n// G27 hidden source blob divergence.\n",
             "utf-8")
-        good(hidden, "go", "run", "./cmd/ice", "build")
+        hidden_ice = fixture_ice(hidden, t, "hidden")
+        good(hidden, hidden_ice, "build")
         reject(hidden, "G27_TARGET_SOURCE_CONTENT_MISMATCH",
                sys.executable, "-B", "scripts/maintain_code_atlas.py",
                "--root", ".")
@@ -136,7 +152,8 @@ def run(root, scratch_parent):
         good(module, "git", "-c", "user.name=Wingless G27 Synthetic",
              "-c", "user.email=g27-fixture@example.invalid",
              "commit", "-qm", "G27 synthetic module-context fixture")
-        good(module, "go", "run", "./cmd/ice", "build")
+        module_ice = fixture_ice(module, t, "module")
+        good(module, module_ice, "build")
         reject(module, "G27_DEPENDENCY_CONTEXT_CHANGED",
                sys.executable, "-B", "scripts/maintain_code_atlas.py",
                "--root", ".")
@@ -148,7 +165,8 @@ def run(root, scratch_parent):
         after = "invalid G26 lifecycle transition %s -> %s"
         require(old.count(before) == 1, "fixture declaration anchor changed")
         new_head = make_commit(second, old, old.replace(before, after))
-        good(second, "go", "run", "./cmd/ice", "build")
+        second_ice = fixture_ice(second, t, "second")
+        good(second, second_ice, "build")
         reject(second, "G26_REVIEW_REQUIRED", sys.executable, "-B",
                "scripts/maintain_code_atlas.py", "--root", ".")
         require(json.loads((second / ATLAS).read_text("utf-8"))["source_commit"]
@@ -193,7 +211,7 @@ def run(root, scratch_parent):
                 "changed declaration incorrectly reused or approved")
         report = Path(t) / "types-two.json"
         with report.open("w", encoding="utf-8") as out:
-            p = subprocess.run(["go", "run", "./cmd/ice", "relationships"],
+            p = subprocess.run([second_ice, "relationships"],
                                cwd=second, stdout=out, stderr=subprocess.PIPE,
                                text=True, timeout=240)
             require(p.returncode == 0, "typed extraction failed: " + p.stderr)
@@ -210,7 +228,8 @@ def run(root, scratch_parent):
         with_new = (existing +
                     "\nfunc G28AtlasSourceWitnessFixture() int { return 1 }\n")
         added_head = make_commit(added, existing, with_new)
-        good(added, "go", "run", "./cmd/ice", "build")
+        added_ice = fixture_ice(added, t, "added")
+        good(added, added_ice, "build")
         reject(added, "G28_NEW_SYMBOL_SOURCE_RECEIPTS_REQUIRED",
                sys.executable, "-B", "scripts/maintain_code_atlas.py",
                "--root", ".")
@@ -257,7 +276,7 @@ def run(root, scratch_parent):
                 "G28 provisional additions were silently promoted to reviewed")
         g28_types = Path(t) / "types-g28.json"
         with g28_types.open("w", encoding="utf-8") as out:
-            p = subprocess.run(["go", "run", "./cmd/ice", "relationships"],
+            p = subprocess.run([added_ice, "relationships"],
                                cwd=added, stdout=out, stderr=subprocess.PIPE,
                                text=True, timeout=240)
             require(p.returncode == 0, "G28 typed extraction failed: " + p.stderr)
