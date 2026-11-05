@@ -758,7 +758,7 @@ jobs:
   g9n_one_original_expert:
     # One-shot, independently gated original-weight experiment; never routine CI.
     needs: native
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && (contains(github.event.head_commit.message, '[g9n-original-expert]') || contains(github.event.head_commit.message, '[g9r-original-kernel]')) }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && (contains(github.event.head_commit.message, '[g9n-original-expert]') || contains(github.event.head_commit.message, '[g9r-original-kernel]') || contains(github.event.head_commit.message, '[g9u-original-custody]')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 35
     permissions:
@@ -792,16 +792,18 @@ jobs:
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
           G9R: ${{ contains(github.event.head_commit.message, '[g9r-original-kernel]') }}
+          G9U: ${{ contains(github.event.head_commit.message, '[g9u-original-custody]') }}
         run: |
           set -euo pipefail
           mkdir -p evidence
           printf '{"status":"NOT_ACCEPTED","source":"ONE_ORIGINAL_SHARD_ONLY"}\n' > evidence/g9n-original-status.json
           if [[ "$G9R" == "true" ]]; then KERNEL_FLAG="--g9r-kernel"; else KERNEL_FLAG=""; fi
+          if [[ "$G9U" == "true" ]]; then G9U_FLAG="--g9u-custody"; else G9U_FLAG=""; fi
           python research/nr1/gcen/g9n_one_original_tensor.py \
             --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
             --scratch-root "$RUNNER_TEMP" \
             --source-sha "$GITHUB_SHA" \
-            --output evidence/g9n-original-expert.json $KERNEL_FLAG
+            --output evidence/g9n-original-expert.json $KERNEL_FLAG $G9U_FLAG
           python - <<'PY'
           import json,os
           from pathlib import Path
@@ -821,6 +823,13 @@ jobs:
             rows={x["arm"]:x for x in c["comparisons"] if x["seed"]==seed}
             assert len(rows)==7
             assert rows["mixed_ranked_eighth_INT4"]["encoded_bytes_including_accounted_metadata"]==rows["mixed_uniform_eighth_INT4"]["encoded_bytes_including_accounted_metadata"]
+          if os.getenv("G9U")=="true":
+            bridge=j["g9u_independent_original_loader_custody"]
+            assert bridge["result"]=="G9U_ORIGINAL_BF16_CPU_LOADER_PARITY_VERIFIED"
+            assert bridge["original_shard_authenticated"]
+            assert bridge["tensor_name"]==j["selected_tensor"]
+            assert bridge["shard_sha256"]==j["original_shard_sha256"]
+            assert not bridge["cuda_executed"] and not bridge["model_forward"]
           if os.getenv("G9R")=="true":
             receipt=j["g9r_packed_cpu_benchmark"]
             assert receipt["schema"]=="wingless.gcen.g9r.original-packed-int2-numba-cpu.v1"

@@ -44,7 +44,35 @@ def choose_target(header, weight_map):
     return key, tuple(shape), selected["layer"]
 
 
-def run(manifest_path, scratch_root, output, source_sha, *, g9r_kernel=False):
+def verify_g9u_original_custody(shard_path, manifest_path, tensor_name, original_bf16_tensor):
+    """Cross-check G9U's independent authenticated loader against G9N source.
+
+    This is an original-weight CPU-only bridge, not a GPU result or model forward.
+    """
+    from g9u_verified_loader import load_verified_original_expert
+    import numpy as np
+    import torch
+    actual, custody = load_verified_original_expert(shard_path, manifest_path)
+    if (custody.get("tensor_name") != tensor_name or
+        not custody.get("original_shard_authenticated") or
+        custody.get("tensor_original_dtype") != "BF16"):
+        raise RuntimeError("G9U original loader custody and G9N tensor identity disagree")
+    expected = original_bf16_tensor.to(dtype=torch.float32).numpy()
+    if (actual.shape != expected.shape or
+        not np.array_equal(actual, expected)):
+        raise RuntimeError("G9U original loader tensor bytes disagree with G9N")
+    return {
+        "result": "G9U_ORIGINAL_BF16_CPU_LOADER_PARITY_VERIFIED",
+        "tensor_name": tensor_name,
+        "tensor_shape": list(actual.shape),
+        "shard_sha256": custody["shard_sha256"],
+        "original_shard_authenticated": True,
+        "cuda_executed": False,
+        "model_forward": False,
+    }
+
+
+def run(manifest_path, scratch_root, output, source_sha, *, g9r_kernel=False, g9u_custody=False):
     if (os.name != "posix" or type(source_sha) is not str
         or len(source_sha) != 40
         or any(c not in "0123456789abcdef" for c in source_sha)):
@@ -96,6 +124,7 @@ def run(manifest_path, scratch_root, output, source_sha, *, g9r_kernel=False):
                 # disk round-trip. No model forward or original activation trace.
                 from g9p_original_expert_comparison import compare_original_expert
                 comparison=compare_original_expert(tensor.to(dtype=torch.float32).numpy())
+                g9u_receipt = verify_g9u_original_custody(original, manifest_path, key, tensor) if g9u_custody else None
                 kernel_receipt=None
                 if g9r_kernel:
                     from g9r_numba_packed_int2 import benchmark_original
@@ -121,6 +150,7 @@ def run(manifest_path, scratch_root, output, source_sha, *, g9r_kernel=False):
             "disk_integrity_receipt":receipt,
             "original_full_expert_operator_comparison":comparison,
             "g9r_packed_cpu_benchmark":kernel_receipt,
+            "g9u_independent_original_loader_custody":g9u_receipt,
             "process_rss_baseline_bytes":rss0, "process_peak_rss_bytes":peak,
             "elapsed_seconds":time.monotonic()-started,
             "one_original_shard_authenticated":True,
@@ -144,5 +174,6 @@ if __name__ == "__main__":
     p.add_argument("--output",type=Path,required=True)
     p.add_argument("--source-sha",required=True)
     p.add_argument("--g9r-kernel",action="store_true")
+    p.add_argument("--g9u-custody",action="store_true")
     a=p.parse_args()
-    run(a.manifest,a.scratch_root,a.output,a.source_sha,g9r_kernel=a.g9r_kernel)
+    run(a.manifest,a.scratch_root,a.output,a.source_sha,g9r_kernel=a.g9r_kernel,g9u_custody=a.g9u_custody)
