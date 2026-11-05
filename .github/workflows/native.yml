@@ -934,8 +934,24 @@ jobs:
               $ErrorActionPreference = $previousPreference
             }
             if ($probeExit -ne 0 -or $probe -ne '3') { continue }
-            $selected = @{path=$python; flag=$candidate.flag}
-            break
+            # Prefer an already-installed CUDA-built Torch, without installing anything.
+            # Keep the first valid Python as a diagnostic fallback if none is available.
+            if ($null -eq $selected) { $selected = @{path=$python; flag=$candidate.flag} }
+            $torchProbe = $null
+            $torchExit = 1
+            try {
+              $ErrorActionPreference = 'Continue'
+              $torchProbe = & $python @args -c 'import torch; print(int(torch.version.cuda is not None))' 2>$null
+              $torchExit = $LASTEXITCODE
+            } catch {
+              $torchExit = 1
+            } finally {
+              $ErrorActionPreference = $previousPreference
+            }
+            if ($torchExit -eq 0 -and $torchProbe -eq '1') {
+              $selected = @{path=$python; flag=$candidate.flag}
+              break
+            }
           }
           if ($null -eq $selected) {
             $status.discovery = 'PATH_AND_SYSTEM_WIDE'
@@ -953,8 +969,22 @@ jobs:
           if (-not $env:G9T_PYTHON_EXE -or -not (Test-Path -LiteralPath $env:G9T_PYTHON_EXE -PathType Leaf)) { throw 'G9T selected Python runtime missing' }
           $pythonArgs = @()
           if ($env:G9T_PYTHON_FLAG) { $pythonArgs += $env:G9T_PYTHON_FLAG }
-          & $env:G9T_PYTHON_EXE @pythonArgs research/nr1/gcen/g9t_gpu_admission.py --source-sha $env:GITHUB_SHA 2>&1 | Tee-Object -FilePath evidence/g9t-stdout.txt
-          if ($LASTEXITCODE -ne 0) { throw 'G9T CUDA admission failed' }
+          # A child process captures the full error without PowerShell 5.1 turning
+          # stderr into a terminating NativeCommandError before classification.
+          $pythonArgs += @('research/nr1/gcen/g9t_gpu_admission.py', '--source-sha', $env:GITHUB_SHA)
+          $stderrPath = Join-Path $env:RUNNER_TEMP 'g9t-python-stderr.txt'
+          $proc = Start-Process -FilePath $env:G9T_PYTHON_EXE -ArgumentList $pythonArgs -Wait -PassThru -NoNewWindow -RedirectStandardOutput 'evidence/g9t-stdout.txt' -RedirectStandardError $stderrPath
+          $stderrText = if (Test-Path -LiteralPath $stderrPath -PathType Leaf) { Get-Content -LiteralPath $stderrPath -Raw } else { '' }
+          Remove-Item -LiteralPath $stderrPath -Force -ErrorAction SilentlyContinue
+          if ($proc.ExitCode -ne 0) {
+            $reason = 'PYTHON_OR_CUDA_PROBE_FAILED'
+            if ($stderrText -match 'No module named [\x27\x22]torch[\x27\x22]') { $reason = 'TORCH_MODULE_UNAVAILABLE' }
+            elseif ($stderrText -match 'DLL load failed') { $reason = 'TORCH_DLL_LOAD_FAILED' }
+            elseif ($stderrText -match 'CPU-only or incomplete Torch CUDA build') { $reason = 'TORCH_CUDA_BUILD_UNAVAILABLE' }
+            elseif ($stderrText -match 'CUDA unavailable') { $reason = 'CUDA_DEVICE_UNAVAILABLE' }
+            @{'schema'='wingless.gcen.g9t.optional-preflight.v1';'status'=$reason;'source_sha'=$env:GITHUB_SHA;'gpu_kernel_executed'=$false;'model_forward'=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
+            throw "G9T CUDA admission failed: $reason (exit $($proc.ExitCode)); no model executed"
+          }
           $matches = @(Get-Content evidence/g9t-stdout.txt | Where-Object { $_ -match '^G9T_CURRENT_GPU_ADMISSION ' })
           if ($matches.Count -ne 1) { throw 'Missing unique admission receipt' }
           $r = ($matches[0] -replace '^G9T_CURRENT_GPU_ADMISSION ', '') | ConvertFrom-Json
