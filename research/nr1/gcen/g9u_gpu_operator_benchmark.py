@@ -7,6 +7,8 @@ No model launch, actual activations, or automatic runner dispatch.
 """
 import json
 import time
+import subprocess
+from pathlib import Path
 import numpy as np
 from g9t_gpu_admission import inspect_current_cuda
 
@@ -20,6 +22,33 @@ REPEATS=7
 LEVELS=(-1.5104,-0.4528,0.4528,1.5104)
 SCHEMA="wingless.gcen.g9u.authenticated-original-expert-gpu-operator.v1"
 
+
+def verify_executing_checkout(source_sha):
+    """Bind experiment identity to this module's actual clean Git checkout.
+
+    This check runs before original weight loading or CUDA allocation. A supplied
+    SHA string or a matching source receipt alone is not execution provenance.
+    """
+    if (not isinstance(source_sha,str) or len(source_sha)!=40
+        or any(c not in "0123456789abcdef" for c in source_sha)):
+        raise ValueError("invalid exact source SHA")
+    root=Path(__file__).resolve().parents[3]
+    def git(*args):
+        try:
+            result=subprocess.run(
+                ["git","-C",str(root),*args],check=True,capture_output=True,
+                text=True,timeout=10)
+        except (OSError,subprocess.CalledProcessError,subprocess.TimeoutExpired) as exc:
+            raise RuntimeError("G9U executing Git checkout identity unavailable") from exc
+        return result.stdout.strip()
+    if Path(git("rev-parse","--show-toplevel")).resolve()!=root:
+        raise RuntimeError("G9U executing Git checkout root mismatch")
+    actual=git("rev-parse","HEAD")
+    if actual!=source_sha:
+        raise RuntimeError("G9U executing Git checkout SHA mismatch")
+    if git("status","--porcelain","--untracked-files=no"):
+        raise RuntimeError("G9U executing Git checkout has dirty tracked files")
+    return actual
 
 def validate_source(weight, source_sha):
     w=np.asarray(weight)
@@ -67,6 +96,7 @@ def verify_packed_operator_parity(cpu_expected, gpu_observed):
 
 
 def run_authenticated_expert(*, shard_path, manifest_path, source_sha, torch_module=None):
+    verified_source_sha=verify_executing_checkout(source_sha)
     from g9u_verified_loader import load_verified_original_expert
     original_weight, source_custody = load_verified_original_expert(shard_path, manifest_path)
     w=validate_source(original_weight,source_sha)
@@ -76,7 +106,7 @@ def run_authenticated_expert(*, shard_path, manifest_path, source_sha, torch_mod
         import torch
     else:
         torch=torch_module
-    admission=inspect_current_cuda(torch,expected_source_sha=source_sha)
+    admission=inspect_current_cuda(torch,expected_source_sha=verified_source_sha)
     device="cuda:0"
     # Only a tiny authenticated expert, never a full checkpoint.
     original=torch.as_tensor(w,device=device,dtype=torch.float32)
@@ -137,7 +167,7 @@ def run_authenticated_expert(*, shard_path, manifest_path, source_sha, torch_mod
     torch.cuda.synchronize()
     peak=torch.cuda.max_memory_allocated()
     return {
-        "schema":SCHEMA,"exact_source_sha":source_sha,
+        "schema":SCHEMA,"exact_source_sha":verified_source_sha,
         "hardware_admission":admission,"input_type":"FROZEN_SYNTHETIC_GAUSSIAN",
         "seeds":list(SEEDS),"shape":[ROWS,COLUMNS],"batch":BATCH,
         "warmup":WARMUP,"repeats":REPEATS,
