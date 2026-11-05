@@ -926,14 +926,14 @@ jobs:
             $previousPreference = $ErrorActionPreference
             try {
               $ErrorActionPreference = 'Continue'
-              $probe = & $python @args -c 'import sys; print("G9T_PYTHON3" if sys.version_info.major == 3 else "G9T_WRONG_PYTHON")' 2>$null
+              $probe = & $python @args -c 'import sys; print(sys.version_info.major)' 2>$null
               $probeExit = $LASTEXITCODE
             } catch {
               $probeExit = 1
             } finally {
               $ErrorActionPreference = $previousPreference
             }
-            if ($probeExit -ne 0 -or $probe -ne 'G9T_PYTHON3') { continue }
+            if ($probeExit -ne 0 -or $probe -ne '3') { continue }
             $selected = @{path=$python; flag=$candidate.flag}
             break
           }
