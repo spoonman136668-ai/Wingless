@@ -75,20 +75,41 @@ jobs:
           $jobs += Start-ThreadJob -Name atlas-tamper -ArgumentList @($root, $relationships, $env:RUNNER_TEMP) -ScriptBlock {
             param($root, $relationships, $scratch)
             Set-Location $root
+            $expectedHead = (git rev-parse HEAD).Trim()
             $output = & python scripts/test_code_atlas_tamper.py --root . --relationships $relationships --scratch-parent $scratch
             if ($LASTEXITCODE -ne 0) { throw 'ATLAS_TAMPER_NEGATIVE_ACCEPTANCE_FAILED' }
-            if ([string]::Join([Environment]::NewLine, $output) -notmatch '"result": "WINGLESS_ATLAS_NEGATIVE_QUALIFICATION_PASS"') {
-              throw 'ATLAS_TAMPER_PASS_RECEIPT_MISSING'
+            $receipts = @($output | ForEach-Object {
+              try { [string]$_ | ConvertFrom-Json -ErrorAction Stop }
+              catch { $null }
+            } | Where-Object { $_.result -eq 'WINGLESS_ATLAS_NEGATIVE_QUALIFICATION_PASS' })
+            if ($receipts.Count -ne 1) { throw 'ATLAS_TAMPER_PASS_RECEIPT_MISSING' }
+            $receipt = $receipts[0]
+            if ($receipt.head -ne $expectedHead -or
+                $receipt.expected_rejections -ne 9 -or
+                $receipt.positive_control -ne 'PASS' -or
+                $receipt.source_checkout_changed -ne $false) {
+              throw 'ATLAS_TAMPER_PASS_RECEIPT_IDENTITY_MISMATCH'
             }
             $output | Write-Output
           }
           $jobs += Start-ThreadJob -Name atlas-browser -ArgumentList @($root) -ScriptBlock {
             param($root)
             Set-Location $root
+            $expectedHead = (git rev-parse HEAD).Trim()
             $output = & python -B scripts/test_atlas_browser.py --root .
             if ($LASTEXITCODE -ne 0) { throw 'ATLAS_CHROMIUM_BROWSER_ACCEPTANCE_FAILED' }
-            if ([string]::Join([Environment]::NewLine, $output) -notmatch '"result": "WINGLESS_ATLAS_CHROMIUM_BROWSER_ACCEPTANCE_PASS"') {
-              throw 'ATLAS_CHROMIUM_PASS_RECEIPT_MISSING'
+            $receipts = @($output | ForEach-Object {
+              try { [string]$_ | ConvertFrom-Json -ErrorAction Stop }
+              catch { $null }
+            } | Where-Object { $_.result -eq 'WINGLESS_ATLAS_CHROMIUM_BROWSER_ACCEPTANCE_PASS' })
+            if ($receipts.Count -ne 1) { throw 'ATLAS_CHROMIUM_PASS_RECEIPT_MISSING' }
+            $receipt = $receipts[0]
+            if ($receipt.browser_test_commit -ne $expectedHead -or
+                $receipt.original_checkout_dirty -ne $false -or
+                $receipt.steps -notcontains 'actual_click_cross_file_relationship' -or
+                $receipt.steps -notcontains 'actual_click_source_link_new_tab' -or
+                $receipt.browser -notlike '*real Selenium UI*') {
+              throw 'ATLAS_CHROMIUM_PASS_RECEIPT_IDENTITY_MISMATCH'
             }
             $output | Write-Output
           }
