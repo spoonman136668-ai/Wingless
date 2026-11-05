@@ -150,3 +150,37 @@ jobs:
           if ($dirty.Count -gt 0) { throw "QUALIFICATION_CHECKOUT_DIRTY: $($dirty -join ', ')" }
           "WINGLESS_ATLAS_QUALIFIED_HEAD=$(git rev-parse HEAD)" >> $env:GITHUB_STEP_SUMMARY
           'Code intelligence validation, focused tests, full regression, vet, build, and clean checkout passed.' >> $env:GITHUB_STEP_SUMMARY
+
+      # Development only: original mandatory qualification remains unchanged.
+      - name: Compare exact-head G26 fixture execution with 2 and 3 workers
+        if: github.event_name == 'pull_request' && github.head_ref == 'engineering/atlas-g26-worker-2v3-20261105' && steps.scope.outputs.atlas_relevant == 'true'
+        timeout-minutes: 8
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $expectedHead = (git rev-parse HEAD).Trim()
+          if ([Environment]::ProcessorCount -lt 3) {
+            'G26_2V3_DEVELOPMENT_SKIPPED: fewer than three logical CPUs' | Write-Output
+            exit 0
+          }
+          $output = & python -B scripts/test_source_aware_atlas.py --root . --compare-2vs3
+          if ($LASTEXITCODE -ne 0) { throw 'G26_2V3_DEVELOPMENT_COMPARISON_FAILED' }
+          $receipts = @($output | ForEach-Object {
+            try { [string]$_ | ConvertFrom-Json -ErrorAction Stop }
+            catch { $null }
+          } | Where-Object { $_.result -eq 'G26_2V3_WORKER_COMPARISON_DIAGNOSTIC_PASS' })
+          if ($receipts.Count -ne 1) { throw 'G26_2V3_RECEIPT_MISSING' }
+          $receipt = $receipts[0]
+          if ($receipt.source_head -ne $expectedHead -or
+              $receipt.original_checkout_changed -ne $false -or
+              @($receipt.worker_order).Count -ne 4 -or
+              (@($receipt.worker_order) -join ',') -ne '2,3,3,2' -or
+              @($receipt.two_worker_seconds).Count -ne 2 -or
+              @($receipt.three_worker_seconds).Count -ne 2 -or
+              $receipt.qualification -ne 'DEVELOPMENT_DIAGNOSTIC_ONLY') {
+            throw 'G26_2V3_RECEIPT_SOURCE_OR_PROTOCOL_MISMATCH'
+          }
+          if (@(git status --porcelain).Count -ne 0) { throw 'G26_2V3_SOURCE_CHECKOUT_DIRTY' }
+          $output | Select-Object -Last 10 | Write-Output
+          '### G26 2v3 development comparator (not full CI acceleration)' >> $env:GITHUB_STEP_SUMMARY
+          ($receipt | ConvertTo-Json -Compress) >> $env:GITHUB_STEP_SUMMARY
