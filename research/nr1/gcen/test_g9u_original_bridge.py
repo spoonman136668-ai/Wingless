@@ -1,5 +1,7 @@
 """CPU-only negative controls for original G9U/G9N source bridge."""
 import unittest
+import sys
+import types
 from unittest.mock import patch
 import numpy as np
 import g9n_one_original_tensor as g9n
@@ -14,6 +16,13 @@ class Tensor:
 
 class BridgeTests(unittest.TestCase):
     def setUp(self):
+        # Routine native CI has NumPy but intentionally does not install Torch.
+        # Inject only the dtype marker used by the bridge; real BF16 custody
+        # remains exclusively exercised in the isolated original-weight job.
+        mock_torch=types.SimpleNamespace(float32="mock-fp32-dtype")
+        patcher=patch.dict(sys.modules,{"torch":mock_torch})
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.w=np.ones((2048,768),dtype=np.float32)
         self.receipt={
             "tensor_name":NAME,
