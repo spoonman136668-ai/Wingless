@@ -11,6 +11,12 @@ on:
       - '.github/workflows/native.yml'
       - 'scripts/Test-Native.ps1'
   workflow_dispatch:
+    inputs:
+      g9t_gpu_preflight:
+        description: 'Opt-in G9T hardware probe on existing Wingless runner only, no original weights'
+        required: false
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -846,5 +852,50 @@ jobs:
         if: always()
         with:
           name: g9n-one-original-expert
+          path: evidence/
+          retention-days: 14
+
+  g9t_existing_wingless_gpu_preflight:
+    # Dormant on push/PR. Explicit dispatch only, no runner setup or model weights.
+    needs: native
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.g9t_gpu_preflight == true && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' }}
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - name: Assert exact self-hosted runner identity and clean checkout
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:GITHUB_REPOSITORY -ne 'spoonman136668-ai/Wingless') { throw 'Wrong repository' }
+          if ($env:RUNNER_NAME -ne 'WINGLESS-UP-B' -or $env:RUNNER_ENVIRONMENT -ne 'self-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'Unverified Wingless runner' }
+          if ($env:GITHUB_REF -ne 'refs/heads/research/cnc01q-direct-expert-development-20261103') { throw 'Wrong branch' }
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'Wrong exact source SHA' }
+          if ((git status --porcelain --untracked-files=all).Trim()) { throw 'Dirty source checkout' }
+          if (-not (Get-Command nvidia-smi -ErrorAction SilentlyContinue)) { throw 'No NVIDIA telemetry' }
+          if (-not (Get-Command python -ErrorAction SilentlyContinue)) { throw 'No existing Python' }
+          New-Item -ItemType Directory -Force evidence | Out-Null
+          @{'schema'='wingless.gcen.g9t.optional-preflight.v1';'status'='NOT_ADMITTED';'source_sha'=$env:GITHUB_SHA;'gpu_kernel_executed'=$false;'model_forward'=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
+      - name: Current G9T CUDA admission on existing runtime only
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # No software installation, weight download, or benchmark execution.
+          & python research/nr1/gcen/g9t_gpu_admission.py --source-sha $env:GITHUB_SHA 2>&1 | Tee-Object -FilePath evidence/g9t-stdout.txt
+          if ($LASTEXITCODE -ne 0) { throw 'G9T CUDA admission failed' }
+          $matches = @(Get-Content evidence/g9t-stdout.txt | Where-Object { $_ -match '^G9T_CURRENT_GPU_ADMISSION ' })
+          if ($matches.Count -ne 1) { throw 'Missing unique admission receipt' }
+          $r = ($matches[0] -replace '^G9T_CURRENT_GPU_ADMISSION ', '') | ConvertFrom-Json
+          if ($r.schema -ne 'wingless.gcen.g9t.current-gpu-admission.v1' -or $r.source_repo -ne 'spoonman136668-ai/Wingless' -or $r.exact_source_sha -ne $env:GITHUB_SHA -or $r.device_index -ne 0 -or $r.currently_free_vram_bytes -lt 1073741824 -or $r.historical_gpu_receipt_used_for_current_admission -ne $false -or $r.cuda_kernel_executed -ne $false -or $r.runner_use_authorized_by_probe -ne $false) { throw 'Admission receipt identity or safety mismatch' }
+          @{'schema'='wingless.gcen.g9t.optional-preflight.v1';'status'='CURRENT_CUDA_CAPACITY_ADMITTED_ONLY';'source_sha'=$env:GITHUB_SHA;'gpu_kernel_executed'=$false;'model_forward'=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9t-wingless-existing-runner-preflight
           path: evidence/
           retention-days: 14
