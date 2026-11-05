@@ -1,0 +1,71 @@
+{
+  "schema": "wingless.gcen.g9q.authentic-original-expert-reanalysis.v1",
+  "result": "NO_GO_WEIGHT_ONLY_ROW_RANKED_MIXED_INT4_INT2",
+  "original_source_sha": "b2956f2aa35fa04ca04079d963326990420fe071",
+  "original_workflow_run": 41927892073,
+  "original_artifact_id": 13370003471,
+  "original_artifact_zip_sha256": "80e6f7b332c0c2cf9f6faa9655a92a3419579bea0b2127c9b4d1bf4f89f7c95b",
+  "original_json_sha256": "5cc746e62cac844e901c97c1463d3cac4c81d124fd03187ca2cac6b68b5ce578",
+  "model": "Qwen/Qwen3-30B-A3B",
+  "checkpoint_revision": "ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+  "original_shard_sha256": "454e77b346a61bfb201d54df60e15158838cf930617ee135113556204f2802b5",
+  "source_shard_bytes": 3999417504,
+  "expert_shape": [
+    2048,
+    768
+  ],
+  "inputs": "SYNTHETIC_GAUSSIAN_NOT_ORIGINAL_ACTIVATIONS",
+  "seeds": [
+    751,
+    811
+  ],
+  "batch": 8,
+  "measurement": "CPU_NUMPY_FP32_NO_GPU",
+  "arms": [
+    {
+      "name": "packed_int4_block64",
+      "bytes": 884760,
+      "error_by_seed": [
+        0.011775653060826943,
+        0.012250363435433466
+      ]
+    },
+    {
+      "name": "companded_int2_block256",
+      "bytes": 405528,
+      "error_by_seed": [
+        0.11818686607898397,
+        0.11975563714396999
+      ]
+    },
+    {
+      "name": "mixed_uniform_eighth_INT4",
+      "bytes": 469576,
+      "error_by_seed": [
+        0.10480463328619814,
+        0.10625340304206905
+      ]
+    },
+    {
+      "name": "mixed_ranked_eighth_INT4",
+      "bytes": 469576,
+      "error_by_seed": [
+        0.1018642273091138,
+        0.10364398435901849
+      ]
+    },
+    {
+      "name": "mixed_ranked_quarter_INT4",
+      "bytes": 529480,
+      "error_by_seed": [
+        0.08725270812229534,
+        0.08780489110424519
+      ]
+    }
+  ],
+  "original_expert_authenticated": true,
+  "real_model_activations": false,
+  "full_model_forward": false,
+  "scientific_acceptance": "NOT_GRANTED",
+  "deployment": false
+}

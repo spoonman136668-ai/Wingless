@@ -4,12 +4,19 @@ on:
     branches:
       - main
       - research/nr1-gcen-g4c-development-20261102
+      - research/cnc01q-direct-expert-development-20261103
   pull_request:
     paths:
       - 'research/nr1/gcen/**'
       - '.github/workflows/native.yml'
       - 'scripts/Test-Native.ps1'
   workflow_dispatch:
+    inputs:
+      g9t_gpu_preflight:
+        description: 'Opt-in G9T hardware probe on existing Wingless runner only, no original weights'
+        required: false
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -282,4 +289,945 @@ jobs:
         with:
           name: gcen-g32-real-expert-scaling
           path: evidence/
+          retention-days: 14
+
+  cnc_g8_real_weight_int4:
+    # Exact-head one-shot, isolated from the G32 frozen original experiment.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g8-real]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify G8 exact-source identity and clean checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git rev-parse HEAD > evidence/source-sha.txt
+          git status --porcelain > evidence/source-status.txt
+          test ! -s evidence/source-status.txt
+      - name: Install pinned G8 NumPy runtime
+        shell: bash
+        run: python -m pip install --disable-pip-version-check 'numpy==2.2.6'
+      - name: G8 one original BF16 shard INT4 and SVD development-only comparison
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G8_REAL_WEIGHT_WINDOWS_SYNTHETIC_ACTIVATIONS"}\n' > evidence/cnc-g8-status.json
+          python research/nr1/gcen/g33_original_int4_comparison.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc-g8-original-int4.json
+          printf '{"status":"G8_ORIGINAL_BF16_WINDOW_INT4_DEVELOPMENT_COMPLETED","scope":"G8_REAL_WEIGHT_WINDOWS_SYNTHETIC_ACTIVATIONS"}\n' > evidence/cnc-g8-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g8-real-int4-development
+          path: evidence/
+          retention-days: 14
+
+  cnc_g9b_pinned_metadata:
+    # One-shot source-custody gate. Never download weights or execute Qwen.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g9b-metadata]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify exact-head G9B source identity and clean checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git status --porcelain > evidence/g9b-source-status.txt
+          test ! -s evidence/g9b-source-status.txt
+          git rev-parse HEAD > evidence/g9b-source-sha.txt
+      - name: G9B SHA256-verified original metadata tensor budget (no weights)
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '{"status":"UNVERIFIED_OR_FAILED","scope":"G9B_PINNED_METADATA_ONLY"}\n' > evidence/cnc-g9b-status.json
+          python research/nr1/gcen/g9b_tensor_budget.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc-g9b-original-index-budget.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path("evidence/cnc-g9b-original-index-budget.json")
+          r = json.loads(p.read_text(encoding="utf-8"))
+          assert r["schema"] == "wingless.cnc.g9b.pinned-index-analytical-budget.v1"
+          assert r["source_sha"] == os.environ["GITHUB_SHA"]
+          assert r["result"] == "EXACT_INDEX_RECONCILED_STORAGE_MODEL_ONLY"
+          assert r["indexed_tensor_count"] == 18867
+          assert r["indexed_bf16_tensor_bytes"] == 61064245248
+          assert r["parameter_total"] == 30532122624
+          assert len(r["scenarios"]) == 5
+          assert not r["full_model_forward"] and not r["actual_gpu_peak_vram_measured"]
+          assert not r["protected_heldout_used"] and not r["deployment_or_activation"]
+          print("G9B_ORIGINAL_METADATA_RECONCILIATION_VERIFIED", r["parameter_total"])
+          PY
+          sha256sum evidence/cnc-g9b-original-index-budget.json > evidence/cnc-g9b-original-index-budget.sha256
+          printf '{"status":"G9B_ORIGINAL_PINNED_METADATA_RECONCILED","scope":"NO_WEIGHTS_NO_MODEL_FORWARD"}\n' > evidence/cnc-g9b-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g9b-original-pinned-metadata
+          path: evidence/
+          retention-days: 14
+
+  cnc_g9e_real_int2:
+    # Original weights, one-shot development-only, same G8 custody/frozen windows.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g9e-real]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify original-window experiment source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git status --porcelain > evidence/g9e-checkout-status.txt
+          test ! -s evidence/g9e-checkout-status.txt
+          git rev-parse HEAD > evidence/g9e-checkout-sha.txt
+      - name: Install frozen numerical dependency
+        shell: bash
+        run: python -m pip install --disable-pip-version-check "numpy==2.2.6"
+      - name: G9E verified original BF16 expert windows INT2 and INT4
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G9E_ORIGINAL_WEIGHTS_SYNTHETIC_PROBES_ONLY"}\n' > evidence/cnc-g9e-status.json
+          python research/nr1/gcen/g9e_original_int2_comparison.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc-g9e-original-int2.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads(Path("evidence/cnc-g9e-original-int2.json").read_text())
+          assert r["schema"]=="wingless.cnc.g9e.real-original-int2-development.v1"
+          assert r["source_sha"]==os.environ["GITHUB_SHA"]
+          assert r["comparison_count"]==15 and len(r["comparisons"])==15
+          assert r["staged_original_files_after_cleanup"]==0
+          assert r["authentic_model_activations"]=="NOT_CAPTURED"
+          assert not r["full_model_inference"] and not r["protected_heldout_used"]
+          assert all(len(row["int2_cases"])==2 for row in r["comparisons"])
+          print("G9E_ORIGINAL_INT2_RECEIPT_COMPLETE", r["comparison_count"])
+          PY
+          sha256sum evidence/cnc-g9e-original-int2.json > evidence/cnc-g9e-original-int2.sha256
+          printf '{"status":"G9E_ORIGINAL_INT2_DEVELOPMENT_COMPLETED","scope":"NO_FULL_MODEL_FORWARD"}\n' > evidence/cnc-g9e-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g9e-original-int2-development
+          path: evidence/
+          retention-days: 14
+
+  cnc_g9f_real_companded:
+    # Original weights, one-shot development-only, same G8 custody/frozen windows.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g9f-real]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify original-window experiment source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git status --porcelain > evidence/g9f-checkout-status.txt
+          test ! -s evidence/g9f-checkout-status.txt
+          git rev-parse HEAD > evidence/g9f-checkout-sha.txt
+      - name: Install frozen numerical dependency
+        shell: bash
+        run: python -m pip install --disable-pip-version-check "numpy==2.2.6"
+      - name: G9F verified original BF16 expert windows INT2 and INT4
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G9F_ORIGINAL_WEIGHTS_SYNTHETIC_PROBES_ONLY"}\n' > evidence/cnc-g9f-status.json
+          python research/nr1/gcen/g9f_original_companded_comparison.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc-g9f-original-companded.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads(Path("evidence/cnc-g9f-original-companded.json").read_text())
+          assert r["schema"]=="wingless.cnc.g9f.real-original-companded-development.v1"
+          assert r["source_sha"]==os.environ["GITHUB_SHA"]
+          assert r["comparison_count"]==15 and len(r["comparisons"])==15
+          assert r["staged_original_files_after_cleanup"]==0
+          assert r["authentic_model_activations"]=="NOT_CAPTURED"
+          assert not r["full_model_inference"] and not r["protected_heldout_used"]
+          assert all(len(row["int2_cases"])==2 and all("companded_relative_output_squared_error" in c for c in row["int2_cases"]) for row in r["comparisons"])
+          print("G9F_ORIGINAL_INT2_RECEIPT_COMPLETE", r["comparison_count"])
+          PY
+          sha256sum evidence/cnc-g9f-original-companded.json > evidence/cnc-g9f-original-companded.sha256
+          printf '{"status":"G9F_ORIGINAL_INT2_DEVELOPMENT_COMPLETED","scope":"NO_FULL_MODEL_FORWARD"}\n' > evidence/cnc-g9f-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g9f-original-companded-development
+          path: evidence/
+          retention-days: 14
+
+  cnc_g9g_robustness:
+    # One-shot synthetic-only numerical diagnostic after exact-head full native qualification.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g9g-stress]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify exact-source synthetic diagnostics
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git status --porcelain > evidence/g9g-checkout-status.txt
+          test ! -s evidence/g9g-checkout-status.txt
+          git rev-parse HEAD > evidence/g9g-source-sha.txt
+      - name: Install pinned G9G NumPy runtime
+        shell: bash
+        run: python -m pip install --disable-pip-version-check 'numpy==2.2.6'
+      - name: Original-Qwen-free G9G outlier-stress and fixed-mask budget report
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"SYNTHETIC_STRESS_ONLY"}\n' > evidence/cnc-g9g-status.json
+          python research/nr1/gcen/g9g_robustness_screen.py > evidence/g9g-stdout.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          content=Path("evidence/g9g-stdout.txt").read_text(encoding="utf-8")
+          prefix="CNC_G9G_SYNTHETIC_SCREEN "
+          assert content.startswith(prefix)
+          result=json.loads(content[len(prefix):])
+          assert result["schema"]=="wingless.cnc.g9g.synthetic-stress-mixed-capacity.v1"
+          assert result["case_count"]==18 and len(result["cases"])==18
+          assert len(result["family_metrics"])==6
+          assert len(result["mixed_precision_capacity"])==6
+          assert not result["original_qwen_weights"]
+          assert not result["authentic_qwen_activations"]
+          assert not result["model_forward"]
+          assert result["gpu_residency"]=="UNVERIFIED"
+          assert result["scientific_acceptance"]=="NOT_GRANTED"
+          assert all(r["uniform_int2_bytes"]==r["companded_int2_bytes"]
+                     for r in result["cases"])
+          Path("evidence/cnc-g9g-synthetic-report.json").write_text(
+              json.dumps(result,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+          print("CNC_G9G_SYNTHETIC_STRESS_RECEIPT_VERIFIED",result["case_count"])
+          PY
+          sha256sum evidence/cnc-g9g-synthetic-report.json > evidence/cnc-g9g-synthetic-report.sha256
+          printf '{"status":"G9G_SYNTHETIC_STRESS_REPORT_COMPLETED","scope":"NO_ORIGINAL_WEIGHTS_NO_MODEL_FORWARD"}\n' > evidence/cnc-g9g-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g9g-synthetic-stress
+          path: evidence/
+          retention-days: 14
+
+  cnc_g9i_real_sparse:
+    # Original weights, one-shot development-only, same G8 custody/frozen windows.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g9i-real]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify original-window experiment source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git status --porcelain > evidence/g9i-checkout-status.txt
+          test ! -s evidence/g9i-checkout-status.txt
+          git rev-parse HEAD > evidence/g9i-checkout-sha.txt
+      - name: Install frozen numerical dependency
+        shell: bash
+        run: python -m pip install --disable-pip-version-check "numpy==2.2.6"
+      - name: G9I verified original BF16 expert windows INT2 and INT4
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G9I_ORIGINAL_WEIGHTS_SYNTHETIC_PROBES_ONLY"}\n' > evidence/cnc-g9i-status.json
+          python research/nr1/gcen/g9i_original_sparse_comparison.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc-g9i-original-sparse.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads(Path("evidence/cnc-g9i-original-sparse.json").read_text())
+          assert r["schema"]=="wingless.cnc.g9i.real-original-sparse-development.v1"
+          assert r["source_sha"]==os.environ["GITHUB_SHA"]
+          assert r["comparison_count"]==15 and len(r["comparisons"])==15
+          assert r["staged_original_files_after_cleanup"]==0
+          assert r["authentic_model_activations"]=="NOT_CAPTURED"
+          assert not r["full_model_inference"] and not r["protected_heldout_used"]
+          assert all(len(row["sparse_cases_block256"])==3 and all("relative_output_squared_error" in c for c in row["sparse_cases_block256"]) for row in r["comparisons"])
+          print("G9I_ORIGINAL_INT2_RECEIPT_COMPLETE", r["comparison_count"])
+          PY
+          sha256sum evidence/cnc-g9i-original-sparse.json > evidence/cnc-g9i-original-sparse.sha256
+          printf '{"status":"G9I_ORIGINAL_INT2_DEVELOPMENT_COMPLETED","scope":"NO_FULL_MODEL_FORWARD"}\n' > evidence/cnc-g9i-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g9i-original-sparse-development
+          path: evidence/
+          retention-days: 14
+
+  cnc_g9l_real_lowrank:
+    # Original weights, one-shot development-only, same G8 custody/frozen windows.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[cnc-g9l-real]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify original-window experiment source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git status --porcelain > evidence/g9l-checkout-status.txt
+          test ! -s evidence/g9l-checkout-status.txt
+          git rev-parse HEAD > evidence/g9l-checkout-sha.txt
+      - name: Install frozen numerical dependency
+        shell: bash
+        run: python -m pip install --disable-pip-version-check "numpy==2.2.6"
+      - name: G9L verified original BF16 expert windows INT2 and INT4
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          set -euo pipefail
+          printf '{"status":"FAILED_NOT_ACCEPTED","scope":"G9L_ORIGINAL_WEIGHTS_SYNTHETIC_PROBES_ONLY"}\n' > evidence/cnc-g9l-status.json
+          python research/nr1/gcen/g9l_original_lowrank_comparison.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/cnc-g9l-original-lowrank.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads(Path("evidence/cnc-g9l-original-lowrank.json").read_text())
+          assert r["schema"]=="wingless.cnc.g9l.real-original-lowrank-development.v1"
+          assert r["source_sha"]==os.environ["GITHUB_SHA"]
+          assert r["comparison_count"]==15 and len(r["comparisons"])==15
+          assert r["staged_original_files_after_cleanup"]==0
+          assert r["authentic_model_activations"]=="NOT_CAPTURED"
+          assert not r["full_model_inference"] and not r["protected_heldout_used"]
+          assert all(len(row["lowrank_cases"])==3 and all("relative_output_squared_error" in c for c in row["lowrank_cases"]) for row in r["comparisons"])
+          print("G9L_ORIGINAL_INT2_RECEIPT_COMPLETE", r["comparison_count"])
+          PY
+          sha256sum evidence/cnc-g9l-original-lowrank.json > evidence/cnc-g9l-original-lowrank.sha256
+          printf '{"status":"G9L_ORIGINAL_INT2_DEVELOPMENT_COMPLETED","scope":"NO_FULL_MODEL_FORWARD"}\n' > evidence/cnc-g9l-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnc-g9l-original-lowrank-development
+          path: evidence/
+          retention-days: 14
+
+  g9n_synthetic_bf16_io:
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9n-real-io]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+      - name: Install frozen CPU-only BF16 dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet 'torch==2.10.0' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --disable-pip-version-check --quiet 'numpy==2.2.6' 'safetensors==0.5.3'
+      - name: Run real synthetic BF16 storage and rollback test
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python research/nr1/gcen/g9n_real_bf16_smoke.py | tee evidence/g9n-real-bf16-smoke.txt
+          grep -q '^G9N_SYNTHETIC_BF16_REAL_IO_PASS ' evidence/g9n-real-bf16-smoke.txt
+          printf '%s\n' "$GITHUB_SHA" > evidence/g9n-source-sha.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9n-synthetic-bf16
+          path: evidence/
+          retention-days: 14
+
+  g9n_one_original_expert:
+    # One-shot, independently gated original-weight experiment; never routine CI.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && (contains(github.event.head_commit.message, '[g9n-original-expert]') || contains(github.event.head_commit.message, '[g9r-original-kernel]') || contains(github.event.head_commit.message, '[g9u-original-custody]')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify isolated exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+      - name: Pin CPU BF16 runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet 'torch==2.10.0' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --disable-pip-version-check --quiet 'numpy==2.2.6' 'safetensors==0.5.3'
+          if [[ "$G9R" == "true" ]]; then python -m pip install --disable-pip-version-check --quiet 'numba==0.62.1'; fi
+        env:
+          G9R: ${{ contains(github.event.head_commit.message, '[g9r-original-kernel]') }}
+      - name: Admit one authenticated original expert tensor
+        shell: bash
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+          G9R: ${{ contains(github.event.head_commit.message, '[g9r-original-kernel]') }}
+          G9U: ${{ contains(github.event.head_commit.message, '[g9u-original-custody]') }}
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          printf '{"status":"NOT_ACCEPTED","source":"ONE_ORIGINAL_SHARD_ONLY"}\n' > evidence/g9n-original-status.json
+          if [[ "$G9R" == "true" ]]; then KERNEL_FLAG="--g9r-kernel"; else KERNEL_FLAG=""; fi
+          if [[ "$G9U" == "true" ]]; then G9U_FLAG="--g9u-custody"; else G9U_FLAG=""; fi
+          python research/nr1/gcen/g9n_one_original_tensor.py \
+            --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json \
+            --scratch-root "$RUNNER_TEMP" \
+            --source-sha "$GITHUB_SHA" \
+            --output evidence/g9n-original-expert.json $KERNEL_FLAG $G9U_FLAG
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          j=json.loads(Path("evidence/g9n-original-expert.json").read_text())
+          assert j["source_sha"]==os.environ["GITHUB_SHA"]
+          assert j["schema"]=="wingless.gcen.g9n.one-original-tensor-development.v1"
+          assert j["one_original_shard_authenticated"] and not j["all_16_shards_authenticated"]
+          assert j["disk_integrity_receipt"]["disk_content_verified"]
+          c=j["original_full_expert_operator_comparison"]
+          assert c["schema"]=="wingless.gcen.g9p.one-original-full-expert-comparison.v1"
+          assert c["comparison_count"]==14 and len(c["comparisons"])==14
+          assert {x["seed"] for x in c["comparisons"]}=={751,811}
+          arms={x["arm"] for x in c["comparisons"]}
+          assert len(arms)==7
+          assert {"mixed_uniform_eighth_INT4","mixed_ranked_eighth_INT4","mixed_ranked_quarter_INT4"} <= arms
+          for seed in (751,811):
+            rows={x["arm"]:x for x in c["comparisons"] if x["seed"]==seed}
+            assert len(rows)==7
+            assert rows["mixed_ranked_eighth_INT4"]["encoded_bytes_including_accounted_metadata"]==rows["mixed_uniform_eighth_INT4"]["encoded_bytes_including_accounted_metadata"]
+          if os.getenv("G9U")=="true":
+            bridge=j["g9u_independent_original_loader_custody"]
+            assert bridge["result"]=="G9U_ORIGINAL_BF16_CPU_LOADER_PARITY_VERIFIED"
+            assert bridge["original_shard_authenticated"]
+            assert bridge["tensor_name"]==j["selected_tensor"]
+            assert bridge["shard_sha256"]==j["original_shard_sha256"]
+            assert not bridge["cuda_executed"] and not bridge["model_forward"]
+          if os.getenv("G9R")=="true":
+            receipt=j["g9r_packed_cpu_benchmark"]
+            assert receipt["schema"]=="wingless.gcen.g9r.original-packed-int2-numba-cpu.v1"
+            assert {v["seed"] for v in receipt["comparisons"]}=={751,811}
+            assert len(receipt["comparisons"])==2
+            assert not receipt["uses_original_activations"] and not receipt["uses_gpu"]
+          assert c["probe_inputs"]=="SYNTHETIC_GAUSSIAN_NOT_QWEN_ACTIVATIONS"
+          assert not c["full_model_forward"] and not c["gpu_vram_measured"]
+          assert j["source_and_sink_files_after_cleanup"]==0
+          assert not j["full_model_forward"] and not j["gpu_vram_measured"]
+          PY
+          printf '{"status":"G9N_ONE_ORIGINAL_BF16_EXPERT_VERIFIED","scope":"ONE_SHARD_NO_FORWARD"}\n' > evidence/g9n-original-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9n-one-original-expert
+          path: evidence/
+          retention-days: 14
+
+  g9w_runtime_provision:
+    # One-shot authorized host environment provisioning; never on routine pushes.
+    needs: native
+    if: ${{ github.event_name == 'push' && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9w-provision]') }}
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 55
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - name: Verify authorized runner, source, and isolated toolcache
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:RUNNER_NAME -ne 'WINGLESS-UP-B' -or $env:RUNNER_ENVIRONMENT -ne 'self-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'Wrong GPU runner' }
+          if ($env:GITHUB_REPOSITORY -ne 'spoonman136668-ai/Wingless' -or $env:GITHUB_REF -ne 'refs/heads/research/cnc01q-direct-expert-development-20261103') { throw 'Wrong source scope' }
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'Source SHA mismatch' }
+          $dirty = @(git status --porcelain --untracked-files=all)
+          if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw 'Dirty checkout or failed git status' }
+          if (-not $env:RUNNER_TOOL_CACHE -or -not (Test-Path -LiteralPath $env:RUNNER_TOOL_CACHE -PathType Container)) { throw 'Persistent runner tool cache unavailable' }
+          if (-not (Get-Command nvidia-smi -ErrorAction SilentlyContinue)) { throw 'GPU telemetry unavailable' }
+          # If policy is imposed by Group Policy, do not circumvent it.
+          $policy = Get-ExecutionPolicy -List
+          if (@($policy | Where-Object { $_.Scope -in @('MachinePolicy','UserPolicy') -and $_.ExecutionPolicy -notin @('Undefined','Bypass','Unrestricted') }).Count -gt 0) { throw 'G9W_GROUP_POLICY_RESTRICTED: provisioning not authorized to override Group Policy' }
+      - name: Provision pinned CUDA Torch in dedicated persistent venv
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # Use the existing machine-managed Python; no installer, registry edits or host PATH changes.
+          $basePython = 'C:\ckb-ci-tools\python\3.14.7\python.exe'
+          if (-not (Test-Path -LiteralPath $basePython -PathType Leaf)) { throw 'G9X_BASE_PYTHON_UNAVAILABLE' }
+          & $basePython -c 'import sys; assert sys.version_info[:3] == (3,14,7)'
+          if ($LASTEXITCODE -ne 0) { throw 'G9X_BASE_PYTHON_WRONG_VERSION' }
+          $venv = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128'
+          $exe = Join-Path $venv 'Scripts\python.exe'
+          if (-not (Test-Path -LiteralPath $exe -PathType Leaf)) {
+            if (Test-Path -LiteralPath $venv) { throw 'G9X_PARTIAL_VENV_REQUIRES_INSPECTION' }
+            & $basePython -m venv $venv
+            if ($LASTEXITCODE -ne 0) { throw 'G9X_ISOLATED_VENV_FAILED' }
+          }
+          & $exe -c 'import sys; assert sys.version_info[:3] == (3,14,7); assert sys.prefix != sys.base_prefix'
+          if ($LASTEXITCODE -ne 0) { throw 'G9X_ISOLATED_RUNTIME_IDENTITY_FAILED' }
+          # Check the exact preexisting isolated environment first. Avoid downloading
+          # the 2.8 GB CUDA wheel a second time when the prior install succeeded.
+          # Do not use nested Python string literals in the legacy Windows shell.
+          $probe = & $exe -c 'import sys,torch; print(sys.version_info.major,sys.version_info.minor,sys.version_info.micro,torch.__version__,torch.version.cuda)' 2>&1
+          $probeExit = $LASTEXITCODE
+          if ($probeExit -ne 0 -or $probe -ne '3 14 7 2.10.0+cu128 12.8') {
+            & $exe -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: --index-url https://download.pytorch.org/whl/cu128 'torch==2.10.0+cu128'
+            if ($LASTEXITCODE -ne 0) { throw 'Pinned CUDA wheel installation failed' }
+            $probe = & $exe -c 'import sys,torch; print(sys.version_info.major,sys.version_info.minor,sys.version_info.micro,torch.__version__,torch.version.cuda)' 2>&1
+            $probeExit = $LASTEXITCODE
+          }
+          if ($probeExit -ne 0 -or $probe -ne '3 14 7 2.10.0+cu128 12.8') { throw 'Pinned CUDA wheel provenance or import verification failed' }
+          Write-Output 'G9W_PINNED_CUDA_TORCH_IMPORT_PASS'
+          # Installation verifies import and CUDA build metadata only; no GPU kernels.
+          New-Item -ItemType Directory -Force evidence | Out-Null
+          & $exe -m pip freeze --all | Out-File -Encoding utf8 evidence/g9w-pip-freeze.txt
+          @{schema='wingless.gcen.g9w.runtime-provision.v1'; source_sha=$env:GITHUB_SHA; status='PYTHON314_CUDA_TORCH_IMPORT_PASS'; cuda_kernel_executed=$false; model_forward=$false; model_weights_downloaded=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9w-runtime-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9w-isolated-runtime-provision
+          path: evidence/g9w-*
+          retention-days: 14
+
+  g9t_existing_wingless_gpu_preflight:
+    # Existing automatic preflight waits for native qualification and, only on
+    # the one-shot provisioning commit, the isolated runtime installation.
+    needs: [native, g9w_runtime_provision]
+    if: ${{ always() && needs.native.result == 'success' && (needs.g9w_runtime_provision.result == 'success' || needs.g9w_runtime_provision.result == 'skipped') && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.g9t_gpu_preflight == true)) && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' }}
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - name: Assert exact self-hosted runner identity and clean checkout
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:GITHUB_REPOSITORY -ne 'spoonman136668-ai/Wingless') { throw 'Wrong repository' }
+          if ($env:RUNNER_NAME -ne 'WINGLESS-UP-B' -or $env:RUNNER_ENVIRONMENT -ne 'self-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'Unverified Wingless runner' }
+          if ($env:GITHUB_REF -ne 'refs/heads/research/cnc01q-direct-expert-development-20261103') { throw 'Wrong branch' }
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'Wrong exact source SHA' }
+          $dirty = @(git status --porcelain --untracked-files=all)
+          if ($LASTEXITCODE -ne 0) { throw 'Git status failed' }
+          if ($dirty.Count -ne 0) { throw 'Dirty source checkout' }
+          if (-not (Get-Command nvidia-smi -ErrorAction SilentlyContinue)) { throw 'No NVIDIA telemetry' }
+          New-Item -ItemType Directory -Force evidence | Out-Null
+          $status = @{'schema'='wingless.gcen.g9t.optional-preflight.v1';'status'='NOT_ADMITTED';'source_sha'=$env:GITHUB_SHA;'gpu_kernel_executed'=$false;'model_forward'=$false}
+          $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
+          # Discover only pre-existing Python 3 commands. Never install, download or alter PATH.
+          $candidates = @(
+            @{name=(Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'); flag=''},
+            @{name='python'; flag=''},
+            @{name='python3'; flag=''},
+            @{name='py'; flag='-3'}
+          )
+          # Also inspect standard machine-wide installations and HKLM PythonCore.
+          # This avoids assuming service PATH matches an interactive user's PATH.
+          $roots = @('C:\Program Files', 'C:\Program Files (x86)', 'C:\')
+          foreach ($root in $roots) {
+            $pattern = if ($root -eq 'C:\') { 'Python3*' } else { 'Python*' }
+            foreach ($dir in @(Get-ChildItem -LiteralPath $root -Directory -Filter $pattern -ErrorAction SilentlyContinue)) {
+              $exe = Join-Path $dir.FullName 'python.exe'
+              if (Test-Path -LiteralPath $exe -PathType Leaf) { $candidates += @{name=$exe; flag=''} }
+            }
+          }
+          # Read-only scan of existing versions in the machine-managed CI Python root.
+          # Do not modify PATH, install packages, or search user profiles.
+          $machinePythonRoot = 'C:\ckb-ci-tools\python'
+          if (Test-Path -LiteralPath $machinePythonRoot -PathType Container) {
+            foreach ($dir in @(Get-ChildItem -LiteralPath $machinePythonRoot -Directory -ErrorAction SilentlyContinue)) {
+              $exe = Join-Path $dir.FullName 'python.exe'
+              if (Test-Path -LiteralPath $exe -PathType Leaf) {
+                $candidates += @{name=$exe; flag=''}
+              }
+            }
+          }
+          foreach ($registry in @('HKLM:\SOFTWARE\Python\PythonCore', 'HKLM:\SOFTWARE\WOW6432Node\Python\PythonCore')) {
+            foreach ($version in @(Get-ChildItem -LiteralPath $registry -ErrorAction SilentlyContinue)) {
+              $install = Join-Path $version.PSPath 'InstallPath'
+              $exe = (Get-ItemProperty -LiteralPath $install -Name ExecutablePath -ErrorAction SilentlyContinue).ExecutablePath
+              if ($exe -and (Test-Path -LiteralPath $exe -PathType Leaf)) { $candidates += @{name=$exe; flag=''} }
+            }
+          }
+          $selected = $null
+          foreach ($candidate in $candidates) {
+            $cmd = if (Test-Path -LiteralPath $candidate.name -PathType Leaf -ErrorAction SilentlyContinue) {
+              Get-Command -Name $candidate.name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+            } else {
+              Get-Command -Name $candidate.name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+            }
+            if ($null -eq $cmd) { continue }
+            $python = $cmd.Source
+            $args = @()
+            if ($candidate.flag) { $args += $candidate.flag }
+            # Broken interpreters may write to stderr. Under ErrorActionPreference
+            # Stop, PowerShell 5.1 turns that into a terminating NativeCommandError.
+            # Treat a failed candidate as an ordinary negative probe and continue.
+            $probe = $null
+            $probeExit = 1
+            $previousPreference = $ErrorActionPreference
+            try {
+              $ErrorActionPreference = 'Continue'
+              $probe = & $python @args -c 'import sys; print(sys.version_info.major)' 2>$null
+              $probeExit = $LASTEXITCODE
+            } catch {
+              $probeExit = 1
+            } finally {
+              $ErrorActionPreference = $previousPreference
+            }
+            if ($probeExit -ne 0 -or $probe -ne '3') { continue }
+            # Prefer an already-installed CUDA-built Torch, without installing anything.
+            # Keep the first valid Python as a diagnostic fallback if none is available.
+            if ($null -eq $selected) { $selected = @{path=$python; flag=$candidate.flag} }
+            $torchProbe = $null
+            $torchExit = 1
+            try {
+              $ErrorActionPreference = 'Continue'
+              $torchProbe = & $python @args -c 'import torch; print(int(torch.version.cuda is not None))' 2>$null
+              $torchExit = $LASTEXITCODE
+            } catch {
+              $torchExit = 1
+            } finally {
+              $ErrorActionPreference = $previousPreference
+            }
+            if ($torchExit -eq 0 -and $torchProbe -eq '1') {
+              $selected = @{path=$python; flag=$candidate.flag}
+              break
+            }
+          }
+          if ($null -eq $selected) {
+            $status.discovery = 'PATH_AND_SYSTEM_WIDE'
+            $status.status = 'PYTHON_RUNTIME_UNAVAILABLE'
+            $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
+            throw 'PYTHON_RUNTIME_UNAVAILABLE: no working existing Python 3 command for the runner service account'
+          }
+          "G9T_PYTHON_EXE=$($selected.path)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "G9T_PYTHON_FLAG=$($selected.flag)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          # The optional Torch capability probes may legitimately exit nonzero.
+          # GitHub's Windows PowerShell wrapper exits using LASTEXITCODE even after
+          # a successful Out-File. Reset it only after the required identity,
+          # version, and selected-interpreter checks succeeded.
+          $global:LASTEXITCODE = 0
+      - name: Current G9T CUDA admission on existing runtime only
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # No software installation, weight download, or benchmark execution.
+          if (-not $env:G9T_PYTHON_EXE -or -not (Test-Path -LiteralPath $env:G9T_PYTHON_EXE -PathType Leaf)) { throw 'G9T selected Python runtime missing' }
+          $pythonArgs = @()
+          if ($env:G9T_PYTHON_FLAG) { $pythonArgs += $env:G9T_PYTHON_FLAG }
+          # A child process captures the full error without PowerShell 5.1 turning
+          # stderr into a terminating NativeCommandError before classification.
+          $pythonArgs += @('research/nr1/gcen/g9t_gpu_admission.py', '--source-sha', $env:GITHUB_SHA)
+          $stderrPath = Join-Path $env:RUNNER_TEMP 'g9t-python-stderr.txt'
+          $proc = Start-Process -FilePath $env:G9T_PYTHON_EXE -ArgumentList $pythonArgs -Wait -PassThru -NoNewWindow -RedirectStandardOutput 'evidence/g9t-stdout.txt' -RedirectStandardError $stderrPath
+          $stderrText = if (Test-Path -LiteralPath $stderrPath -PathType Leaf) { Get-Content -LiteralPath $stderrPath -Raw } else { '' }
+          Remove-Item -LiteralPath $stderrPath -Force -ErrorAction SilentlyContinue
+          if ($proc.ExitCode -ne 0) {
+            $reason = 'PYTHON_OR_CUDA_PROBE_FAILED'
+            if ($stderrText -match 'No module named [\x27\x22]torch[\x27\x22]') { $reason = 'TORCH_MODULE_UNAVAILABLE' }
+            elseif ($stderrText -match 'DLL load failed') { $reason = 'TORCH_DLL_LOAD_FAILED' }
+            elseif ($stderrText -match 'CPU-only or incomplete Torch CUDA build') { $reason = 'TORCH_CUDA_BUILD_UNAVAILABLE' }
+            elseif ($stderrText -match 'CUDA unavailable') { $reason = 'CUDA_DEVICE_UNAVAILABLE' }
+            @{'schema'='wingless.gcen.g9t.optional-preflight.v1';'status'=$reason;'source_sha'=$env:GITHUB_SHA;'gpu_kernel_executed'=$false;'model_forward'=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
+            throw "G9T CUDA admission failed: $reason (exit $($proc.ExitCode)); no model executed"
+          }
+          $matches = @(Get-Content evidence/g9t-stdout.txt | Where-Object { $_ -match '^G9T_CURRENT_GPU_ADMISSION ' })
+          if ($matches.Count -ne 1) { throw 'Missing unique admission receipt' }
+          $r = ($matches[0] -replace '^G9T_CURRENT_GPU_ADMISSION ', '') | ConvertFrom-Json
+          if ($r.schema -ne 'wingless.gcen.g9t.current-gpu-admission.v1' -or $r.source_repo -ne 'spoonman136668-ai/Wingless' -or $r.exact_source_sha -ne $env:GITHUB_SHA -or $r.device_index -ne 0 -or $r.currently_free_vram_bytes -lt 1073741824 -or $r.historical_gpu_receipt_used_for_current_admission -ne $false -or $r.cuda_kernel_executed -ne $false -or $r.runner_use_authorized_by_probe -ne $false) { throw 'Admission receipt identity or safety mismatch' }
+          @{'schema'='wingless.gcen.g9t.optional-preflight.v1';'status'='CURRENT_CUDA_CAPACITY_ADMITTED_ONLY';'source_sha'=$env:GITHUB_SHA;'gpu_kernel_executed'=$false;'model_forward'=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9t-wingless-existing-runner-preflight
+          path: evidence/
+          retention-days: 14
+
+  g9u_authorized_expert_gpu:
+    # Single authorized GPU experiment, never routine CI or a new controller.
+    needs: [native, g9t_existing_wingless_gpu_preflight]
+    if: ${{ always() && needs.native.result == 'success' && needs.g9t_existing_wingless_gpu_preflight.result == 'success' && github.event_name == 'push' && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9u-original-gpu]') }}
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - name: One-shot authorized original Qwen shard stage (no GPU kernels)
+        if: ${{ contains(github.event.head_commit.message, '[g9u-stage-original]') }}
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:GITHUB_REPOSITORY -ne 'spoonman136668-ai/Wingless' -or $env:GITHUB_REF -ne 'refs/heads/research/cnc01q-direct-expert-development-20261103') { throw 'G9U shard stage wrong source' }
+          if ($env:RUNNER_NAME -ne 'WINGLESS-UP-B' -or $env:RUNNER_ENVIRONMENT -ne 'self-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'G9U shard stage wrong runner' }
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'G9U shard stage wrong SHA' }
+          $dirty = @(git status --porcelain --untracked-files=all)
+          if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw 'G9U shard stage dirty checkout' }
+          $python = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'
+          if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw 'G9U pinned isolated Python unavailable' }
+          & $python research/nr1/gcen/g9u_stage_pinned_shard.py --toolcache-root $env:RUNNER_TOOL_CACHE --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json --output (Join-Path $env:RUNNER_TEMP 'g9u-original-stage.json') --source-sha $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { throw 'G9U shard stage failed, no GPU kernels executed' }
+      - name: Gate original shard availability and source
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:GITHUB_REPOSITORY -ne 'spoonman136668-ai/Wingless' -or $env:GITHUB_REF -ne 'refs/heads/research/cnc01q-direct-expert-development-20261103') { throw 'Wrong G9U source scope' }
+          if ($env:RUNNER_NAME -ne 'WINGLESS-UP-B' -or $env:RUNNER_ENVIRONMENT -ne 'self-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'Wrong G9U runner' }
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'G9U SHA mismatch' }
+          $dirty = @(git status --porcelain --untracked-files=all)
+          if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw 'G9U checkout dirty' }
+          $statusPath = Join-Path $env:RUNNER_TEMP 'g9u-status.json'
+          $status = @{schema='wingless.gcen.g9u.authorized-gpu-gate.v1';source_sha=$env:GITHUB_SHA;status='NOT_ADMITTED';original_weight_authenticated=$false;gpu_kernel_executed=$false;full_model_forward=$false;scientific_acceptance='NOT_GRANTED'}
+          $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 $statusPath
+          $python = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'
+          if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw 'Qualified G9X Python unavailable' }
+          # Look only in known Wingless-owned roots. No profile, machine-wide,
+          # other-project or network search and no checkpoint download.
+          $filename = 'model-00001-of-00016.safetensors'
+          $digestPin = '454e77b346a61bfb201d54df60e15158838cf930617ee135113556204f2802b5'
+          $expectedBytes = [int64]3999417504
+          $roots = @(
+            (Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9u-original'),
+            (Join-Path $env:RUNNER_TOOL_CACHE 'wingless-gcen-original'),
+            (Join-Path $env:RUNNER_TOOL_CACHE 'wingless-original'),
+            'C:\ckb-ci-tools\wingless\gcen',
+            'C:\ckb-ci-tools\wingless\original'
+          )
+          # Inspect immediate Wingless-named toolcache directories only.
+          $projectRoots = @(Get-ChildItem -LiteralPath $env:RUNNER_TOOL_CACHE -Directory -Filter 'wingless-*' -ErrorAction SilentlyContinue | Select-Object -First 32)
+          foreach ($entry in $projectRoots) {
+            if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0) { $roots += $entry.FullName }
+          }
+          $checked = 0
+          $shard = $null
+          foreach ($root in ($roots | Select-Object -Unique)) {
+            if (-not (Test-Path -LiteralPath $root -PathType Container)) { continue }
+            $dir = Get-Item -LiteralPath $root -ErrorAction Stop
+            if (($dir.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
+            $candidate = Join-Path $root $filename
+            $checked += 1
+            if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { continue }
+            $item = Get-Item -LiteralPath $candidate -ErrorAction Stop
+            if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or $item.Length -ne $expectedBytes) {
+              $status.status = 'BLOCKED_LOCAL_SHARD_SIZE_OR_LINK_MISMATCH'
+              $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 $statusPath
+              throw 'G9U candidate shard has invalid size or is a reparse point; no GPU kernel executed'
+            }
+            $observed = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256 -ErrorAction Stop).Hash.ToLowerInvariant()
+            if ($observed -ne $digestPin) {
+              $status.status = 'BLOCKED_LOCAL_SHARD_SHA256_MISMATCH'
+              $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 $statusPath
+              throw 'G9U candidate shard differs from frozen SHA-256; no GPU kernel executed'
+            }
+            $shard = $candidate
+            break
+          }
+          $status.project_scoped_root_count = $checked
+          if (-not $shard) {
+            $status.status = 'BLOCKED_ORIGINAL_SHARD_NOT_FOUND_IN_PROJECT_SCOPED_ROOTS'
+            $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 $statusPath
+            'G9U_SHARD_AVAILABLE=false' | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+            Write-Output 'G9U original shard absent from bounded Wingless-owned roots; no download or GPU kernels'
+            exit 0
+          }
+          'G9U_SHARD_AVAILABLE=true' | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "G9U_SHARD_PATH=$shard" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          $status.status = 'LOCAL_SHARD_SHA256_VERIFIED_PENDING_BF16_AUTHENTICATION'
+          $status.local_shard_sha256 = $digestPin
+          $status.local_shard_bytes = $expectedBytes
+          $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 $statusPath
+      - name: Run original BF16 authenticated CUDA benchmark
+        if: ${{ env.G9U_SHARD_AVAILABLE == 'true' && !contains(github.event.head_commit.message, '[g9v-phase-diagnostic]') }}
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $python = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'
+          & $python -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: 'numpy==2.3.5' 'safetensors==0.7.0'
+          if ($LASTEXITCODE -ne 0) { throw 'G9U scientific dependencies failed' }
+          & $python -m pip freeze --all | Out-File -Encoding utf8 (Join-Path $env:RUNNER_TEMP 'g9u-dependencies.txt')
+          & $python -B research/nr1/gcen/g9u_run_authenticated.py --repository-root . --source-sha $env:GITHUB_SHA --shard-path $env:G9U_SHARD_PATH --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json --output (Join-Path $env:RUNNER_TEMP 'g9u-original-gpu-comparison.json')
+          if ($LASTEXITCODE -ne 0) { throw 'G9U authenticated operator benchmark failed' }
+          $receipt = Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'g9u-original-gpu-comparison.json') -Raw | ConvertFrom-Json
+          if ($receipt.source_sha -ne $env:GITHUB_SHA -or $receipt.benchmark.exact_source_sha -ne $env:GITHUB_SHA -or $receipt.benchmark.original_shard_authenticated_in_process -ne $true -or $receipt.benchmark.hardware_admission.exact_source_sha -ne $env:GITHUB_SHA -or @($receipt.benchmark.measurements).Count -ne 2 -or $receipt.full_model_forward -ne $false) { throw 'G9U authenticated receipt failed exact source or scope checks' }
+          $statusPath = Join-Path $env:RUNNER_TEMP 'g9u-status.json'
+          @{schema='wingless.gcen.g9u.authorized-gpu-gate.v1';source_sha=$env:GITHUB_SHA;status='GPU_OPERATOR_COMPARISON_RECORDED';original_weight_authenticated=$true;gpu_kernel_executed=$true;full_model_forward=$false;scientific_acceptance='NOT_GRANTED'} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 $statusPath
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9u-original-gpu-operator
+          path: ${{ runner.temp }}/g9u-*
+          retention-days: 14
+      - name: Run one bounded G9V original-expert phase diagnostic
+        if: ${{ env.G9U_SHARD_AVAILABLE == 'true' && contains(github.event.head_commit.message, '[g9v-phase-diagnostic]') }}
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:RUNNER_NAME -ne 'WINGLESS-UP-B' -or $env:RUNNER_ENVIRONMENT -ne 'self-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'G9V wrong isolated Wingless runner' }
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'G9V exact checkout mismatch' }
+          $dirty = @(git status --porcelain --untracked-files=all)
+          if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw 'G9V dirty checkout' }
+          $python = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'
+          if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw 'G9V isolated Python absent' }
+          & $python -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: 'numpy==2.3.5' 'safetensors==0.7.0'
+          if ($LASTEXITCODE -ne 0) { throw 'G9V pinned isolated scientific dependencies failed' }
+          & $python -B research/nr1/gcen/g9v_phase_diagnostic.py --root . --source-sha $env:GITHUB_SHA --shard $env:G9U_SHARD_PATH --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json --output (Join-Path $env:RUNNER_TEMP 'g9v-phase-diagnostic.json')
+          if ($LASTEXITCODE -ne 0) { throw 'G9V diagnostic source/custody/operator failed' }
+          $result = Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'g9v-phase-diagnostic.json') -Raw | ConvertFrom-Json
+          if ($result.schema -ne 'wingless.gcen.g9v.authenticated-gpu-phase-diagnostic.v1' -or $result.source_sha -ne $env:GITHUB_SHA -or $result.source_custody.original_shard_authenticated -ne $true -or @($result.measurements).Count -ne 2 -or $result.full_model_forward -ne $false -or $result.scientific_acceptance -ne 'NOT_GRANTED') { throw 'G9V bounded receipt authentication failed' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9v-original-expert-phase-diagnostic
+          path: ${{ runner.temp }}/g9v-*
           retention-days: 14

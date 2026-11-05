@@ -1,0 +1,61 @@
+{
+  "schema": "wingless.cnc01q.g9e.authentic-window-result-summary.v1",
+  "status": "REAL_ORIGINAL_WEIGHTS_EXPERIMENT_PASS_NUMERICAL_FIDELITY_NO_GO_FOR_CURRENT_INT2",
+  "source_commit": "c7eab82ca6a609e6ffdf4c61b90d6ceccf09a4d6",
+  "workflow_run": 41762008661,
+  "artifact_id": 13291171054,
+  "artifact_name": "cnc-g9e-original-int2-development",
+  "original_result_sha256": "6271f809ebd4747a92e23de06b2cfb74e19d438d1b6a4dbfb04ea8d544350cc0",
+  "checkpoint": "Qwen/Qwen3-30B-A3B",
+  "checkpoint_revision": "ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+  "original_shard": "model-00001-of-00016.safetensors",
+  "original_shard_sha256": "454e77b346a61bfb201d54df60e15158838cf930617ee135113556204f2802b5",
+  "shard_bytes_verified": 3999417504,
+  "original_shard_removed_after_run": true,
+  "window_shape": [
+    128,
+    256
+  ],
+  "seeds": [
+    11,
+    23,
+    37,
+    53,
+    71
+  ],
+  "expert_groups": [
+    4,
+    8,
+    16
+  ],
+  "comparisons": 15,
+  "inputs": "SYNTHETIC_GAUSSIAN_NOT_AUTHENTIC_QWEN_ACTIVATIONS",
+  "mean_normalized_squared_output_error_by_expert_group": [
+    {
+      "experts": 4,
+      "int4_block64": 0.012467477712456335,
+      "int2_block128": 0.34954925320753616,
+      "int2_block256": 0.4156918550459602
+    },
+    {
+      "experts": 8,
+      "int4_block64": 0.012529416872343085,
+      "int2_block128": 0.35439302920403826,
+      "int2_block256": 0.42290994600921633
+    },
+    {
+      "experts": 16,
+      "int4_block64": 0.01237560510120039,
+      "int2_block128": 0.35651202594407055,
+      "int2_block256": 0.4264655201320073
+    }
+  ],
+  "decision": "NO_GO on current uniform symmetric INT2 codebook as a Qwen inference candidate; investigate precision allocation or error-rescue methods with authentic activations before any GPU kernel implementation",
+  "full_model_forward": false,
+  "real_activation_custody": "UNVERIFIED",
+  "gpu_vram": "UNVERIFIED",
+  "task_quality": "UNVERIFIED",
+  "protected_heldout_used": false,
+  "scientific_acceptance": "NOT_GRANTED",
+  "production_activation": false
+}
