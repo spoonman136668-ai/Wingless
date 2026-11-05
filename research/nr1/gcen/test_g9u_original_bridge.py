@@ -6,6 +6,8 @@ from unittest.mock import patch
 import numpy as np
 import g9n_one_original_tensor as g9n
 import g9u_verified_loader as g9u
+from runtime_feasibility import MODEL, REVISION
+from g31_original_shard_stage import SHARD
 
 NAME="model.layers.0.mlp.experts.0.down_proj.weight"
 
@@ -28,7 +30,12 @@ class BridgeTests(unittest.TestCase):
             "tensor_name":NAME,
             "tensor_original_dtype":"BF16",
             "original_shard_authenticated":True,
-            "shard_sha256":"a"*64,
+            "shard_sha256":g9u.PINNED_SHARD_SHA256,
+            "shard":SHARD,
+            "model":MODEL,
+            "revision":REVISION,
+            "tensor_shape":[2048,768],
+            "source_authentication_method":"IN_PROCESS_SHA256_PINNED_INDEX_BF16",
         }
 
     def run_bridge(self):
@@ -52,6 +59,32 @@ class BridgeTests(unittest.TestCase):
     def test_rejects_wrong_dtype_receipt(self):
         self.receipt["tensor_original_dtype"]="FP32"
         with self.assertRaisesRegex(RuntimeError,"identity"): self.run_bridge()
+
+    def test_rejects_wrong_pinned_shard_digest(self):
+        self.receipt["shard_sha256"]="b"*64
+        with self.assertRaisesRegex(RuntimeError,"identity"): self.run_bridge()
+
+    def test_rejects_wrong_model_revision(self):
+        self.receipt["revision"]="f"*40
+        with self.assertRaisesRegex(RuntimeError,"identity"): self.run_bridge()
+
+    def test_rejects_wrong_shard_name(self):
+        self.receipt["shard"]="model-00002-of-00016.safetensors"
+        with self.assertRaisesRegex(RuntimeError,"identity"): self.run_bridge()
+
+    def test_rejects_wrong_tensor_shape_receipt(self):
+        self.receipt["tensor_shape"]=[768,2048]
+        with self.assertRaisesRegex(RuntimeError,"identity"): self.run_bridge()
+
+    def test_rejects_unverifiable_method(self):
+        self.receipt["source_authentication_method"]="SELF_DECLARED"
+        with self.assertRaisesRegex(RuntimeError,"identity"): self.run_bridge()
+
+    def test_rejects_non_mapping_custody(self):
+        with patch.object(g9u,"load_verified_original_expert",
+                          return_value=(self.w,True)):
+            with self.assertRaisesRegex(RuntimeError,"identity"):
+                g9n.verify_g9u_original_custody("shard","manifest",NAME,Tensor(self.w.copy()))
 
     def test_rejects_modified_tensor(self):
         original=self.w.copy()

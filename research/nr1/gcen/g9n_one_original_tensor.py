@@ -49,12 +49,21 @@ def verify_g9u_original_custody(shard_path, manifest_path, tensor_name, original
 
     This is an original-weight CPU-only bridge, not a GPU result or model forward.
     """
-    from g9u_verified_loader import load_verified_original_expert
+    from g9u_verified_loader import (
+        load_verified_original_expert, PINNED_SHARD_SHA256, EXPECTED_SHAPE
+    )
     import numpy as np
     import torch
     actual, custody = load_verified_original_expert(shard_path, manifest_path)
-    if (custody.get("tensor_name") != tensor_name or
+    if (not isinstance(custody, dict) or
+        custody.get("model") != MODEL or
+        custody.get("revision") != REVISION or
+        custody.get("shard") != SHARD or
+        custody.get("shard_sha256") != PINNED_SHARD_SHA256 or
+        custody.get("tensor_name") != tensor_name or
+        custody.get("tensor_shape") != list(EXPECTED_SHAPE) or
         not custody.get("original_shard_authenticated") or
+        custody.get("source_authentication_method") != "IN_PROCESS_SHA256_PINNED_INDEX_BF16" or
         custody.get("tensor_original_dtype") != "BF16"):
         raise RuntimeError("G9U original loader custody and G9N tensor identity disagree")
     expected = original_bf16_tensor.to(dtype=torch.float32).numpy()
