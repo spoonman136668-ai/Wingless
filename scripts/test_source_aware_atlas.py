@@ -341,14 +341,32 @@ def run(root, scratch_parent):
     # Cap Go subprocess contention; all futures must succeed before acceptance.
     max_workers = min(2, os.cpu_count() or 1)
     with tempfile.TemporaryDirectory(prefix="g26-atlas-", dir=scratch_parent) as t:
+        groups = (
+            ("new_symbol", fixture_new_symbol),
+            ("unchanged", fixture_unchanged),
+            ("changed", fixture_changed),
+            ("guardrails", fixture_guardrails),
+        )
+        required_stages = {
+            "unchanged": {"unchanged_declaration_reuse"},
+            "guardrails": {"dirty_worktree_rejection",
+                           "hidden_source_blob_rejection", "module_context_rejection"},
+            "changed": {"changed_declaration_fresh_review"},
+            "new_symbol": {"new_symbol_provisional_and_promotion_negative"},
+        }
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {
-                name: executor.submit(globals()["fixture_" + name], root, Path(t), baseline)
-                for name in ("new_symbol", "unchanged", "changed", "guardrails")
+                name: executor.submit(task, root, Path(t), baseline)
+                for name, task in groups
             }
-            # Propagate every exception; no lane is optional or silently skipped.
+            # Join every lane; one missing result or exception fails qualification.
             for name in ("unchanged", "guardrails", "changed", "new_symbol"):
-                timings.update(futures[name].result())
+                stage_timings = futures[name].result()
+                require(set(stage_timings) == required_stages[name],
+                        "missing/duplicate fixture evidence: " + name)
+                require(not set(timings).intersection(stage_timings),
+                        "duplicate fixture timing evidence: " + name)
+                timings.update(stage_timings)
         clean_started = time.perf_counter()
         require(not good(root, "git", "status", "--porcelain").strip(),
                 "original checkout modified")
