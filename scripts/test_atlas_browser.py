@@ -7,6 +7,7 @@ No application process, inference model, science files, or service is started.
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 import time
@@ -15,6 +16,7 @@ from pathlib import Path
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
@@ -96,7 +98,14 @@ def main():
                      "--user-data-dir=" + profile):
             chrome_options.add_argument(flag)
 
-        with webdriver.Chrome(options=chrome_options) as browser:
+        # Hosted runners may supply ChromeDriver on PATH. In that case bypass
+        # Selenium Manager's driver lookup; keep its original resolver as the
+        # exact fallback when the image supplies no ChromeDriver binary.
+        # Genuine browser acceptance and all assertions remain unchanged.
+        hosted_driver = shutil.which("chromedriver")
+        driver_resolution = "hosted-path" if hosted_driver else "selenium-manager"
+        service = Service(executable_path=hosted_driver) if hosted_driver else None
+        with webdriver.Chrome(service=service, options=chrome_options) as browser:
             mark("chrome_session_startup")
             browser.set_page_load_timeout(25)
             wait = WebDriverWait(browser, 18)
@@ -175,6 +184,7 @@ def main():
     print(json.dumps({
         "result": "WINGLESS_ATLAS_CHROMIUM_BROWSER_ACCEPTANCE_PASS",
         "timing_schema": "wingless.atlas.browser-diagnostic.v1",
+        "driver_resolution": driver_resolution,
         "timings_seconds": timings,
         "total_elapsed_seconds": round(time.perf_counter() - started, 6),
         "merged_main": MERGED_MAIN,
