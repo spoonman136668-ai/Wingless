@@ -1,0 +1,137 @@
+{
+  "schema": "wingless.gcen.g9v.archived-original-gpu-phase-negative-development.v1",
+  "decision": "STOP_INT2_FIDELITY_SCREEN",
+  "engineering": "PASS",
+  "scientific": "NO_GO_FOR_CURRENT_GPU_INT2_OPTIMIZATION",
+  "deployment": "NOT_AUTHORIZED",
+  "source_repo": "spoonman136668-ai/Wingless",
+  "experiment_sha": "d2a458f9b89c5b7511ad08bb73195220dd68b847",
+  "github_actions_run": 42122916246,
+  "run_attempt": 1,
+  "artifact_id": 13459562694,
+  "artifact_zip_sha256": "212c0c3576f11dff283f9a2ea7112a6bd5d40f1d6bf8723e603390083a64476a",
+  "model": "Qwen/Qwen3-30B-A3B",
+  "model_revision": "ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+  "original_shard_sha256": "454e77b346a61bfb201d54df60e15158838cf930617ee135113556204f2802b5",
+  "original_shard_bytes": 3999417504,
+  "original_bf16_authenticated_in_process": true,
+  "protocol": {
+    "seeds": [
+      751,
+      811
+    ],
+    "input": "FROZEN_SYNTHETIC_GAUSSIAN_NOT_ORIGINAL_ACTIVATIONS",
+    "shape": [
+      2048,
+      768
+    ],
+    "batch": 8,
+    "warmup": 3,
+    "repeats": 7,
+    "phases": [
+      "allocate",
+      "unpack",
+      "decode",
+      "gemm",
+      "scale_accumulate"
+    ],
+    "stop_thresholds": {
+      "max_synthetic_error": 0.02,
+      "min_decode_fraction": 0.6,
+      "max_trace_inflation": 1.5,
+      "max_seed_latency_ratio": 1.2
+    }
+  },
+  "measurements": [
+    {
+      "seed": 751,
+      "dense_median_ms": 0.1117120012640953,
+      "packed_median_ms": 0.7445120215415955,
+      "trace_median_ms": 1.165503978729248,
+      "relative_squared_error": 0.11919270696895383,
+      "unpack_decode_fraction": 0.5566191335314655,
+      "event_only_median_ms": 0.009727999567985535,
+      "phase_median_gpu_ms": {
+        "allocate": 0.16300800442695618,
+        "unpack": 0.3960000053048134,
+        "decode": 0.15107200294733047,
+        "gemm": 0.1404160000383854,
+        "scale_accumulate": 0.13235199823975563
+      },
+      "cpu_packed_relative_squared_error": 9.756927615908824e-14,
+      "packed_samples_gpu_ms": [
+        0.7651519775390625,
+        0.7442240118980408,
+        0.7964159846305847,
+        0.7101119756698608,
+        0.7445120215415955,
+        0.7788479924201965,
+        0.7190080285072327
+      ],
+      "dense_samples_gpu_ms": [
+        0.05843200162053108,
+        0.21113599836826324,
+        0.1045759990811348,
+        0.11027199774980545,
+        0.1117120012640953,
+        0.2284799963235855,
+        0.26611199975013733
+      ]
+    },
+    {
+      "seed": 811,
+      "dense_median_ms": 0.1881600022315979,
+      "packed_median_ms": 0.7384960055351257,
+      "trace_median_ms": 1.136512041091919,
+      "relative_squared_error": 0.11809226499786526,
+      "unpack_decode_fraction": 0.5730724632043617,
+      "event_only_median_ms": 0.0019839999731630087,
+      "phase_median_gpu_ms": {
+        "allocate": 0.14822399616241455,
+        "unpack": 0.3999040052294731,
+        "decode": 0.15308799967169762,
+        "gemm": 0.134527999907732,
+        "scale_accumulate": 0.1292160004377365
+      },
+      "cpu_packed_relative_squared_error": 1.0115815855569241e-13,
+      "packed_samples_gpu_ms": [
+        0.6916800141334534,
+        0.7799040079116821,
+        0.6812480092048645,
+        0.7384960055351257,
+        0.7566720247268677,
+        0.7514240145683287,
+        0.7358719706535339
+      ],
+      "dense_samples_gpu_ms": [
+        0.04505600035190582,
+        0.2033279985189438,
+        0.04854400083422661,
+        0.10847999900579453,
+        0.1881600022315979,
+        0.21984000504016876,
+        0.21942399442195892
+      ]
+    }
+  ],
+  "aggregate": {
+    "mean_dense_median_ms": 0.1499360017478466,
+    "mean_packed_median_ms": 0.7415040135383606,
+    "packed_over_dense_ratio": 4.945470099872195,
+    "peak_joint_allocator_bytes": 24494592,
+    "packed_storage_ratio_from_prior_g9u": 7.7576
+  },
+  "finding": {
+    "fidelity_fail": true,
+    "unpack_decode_below_60_percent_both_seeds": true,
+    "instrumented_trace_inflation_exceeds_1_5_both": true,
+    "task_quality_unknown": true,
+    "full_model_fit_unknown": true,
+    "current_gpu_speedup_unproven": true,
+    "phase_timing_instrumentation_effects_are_not_equivalent_to_uninstrumented_walltime": true
+  },
+  "authentic_activations": false,
+  "full_model_forward": false,
+  "science_acceptance": "NOT_GRANTED",
+  "new_gpu_kernel_authorized": false
+}
