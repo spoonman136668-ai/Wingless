@@ -59,8 +59,8 @@ def self_test(root):
             "atlas scope classification step absent")
     require("  push:\n    branches:\n      - main\n      - engineering/atlas-win2022-sourcebound-main-cache-20261105\n" in workflow,
             "bounded main/development push triggers missing")
-    require(workflow.count("runs-on: windows-2022") == 2,
-            "Atlas producer and original qualification must both run on Windows 2022")
+    require(workflow.count("runs-on: windows-2022") == 3,
+            "Original Atlas, protected seed, and branch-isolated probe must all run on Windows 2022")
     require("  qualify:\n    if: github.event_name != 'push'" in workflow,
             "required PR qualification separated from main cache seed")
     require("  seed_cache:\n    if: github.event_name == 'push' && github.ref == 'refs/heads/main'" in workflow,
