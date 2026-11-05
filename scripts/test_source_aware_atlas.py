@@ -343,7 +343,8 @@ def run(root, scratch_parent, *, workers_override=None):
     # Only independent disposable exact-head clones run concurrently.
     # Cap Go subprocess contention; all futures must succeed before acceptance.
     max_workers = min(2, os.cpu_count() or 1) if workers_override is None else workers_override
-    require(max_workers in (1, 2), "fixture worker limit must be 1 or 2")
+    require(max_workers in (1, 2, 3) and max_workers <= (os.cpu_count() or 1),
+            "fixture worker count invalid or oversubscribed")
     with tempfile.TemporaryDirectory(prefix="g26-atlas-", dir=scratch_parent) as t:
         groups = (
             ("new_symbol", fixture_new_symbol),
@@ -454,6 +455,68 @@ def compare_workers(root, scratch_parent):
     }, sort_keys=True))
 
 
+
+def compare_2vs3_workers(root, scratch_parent):
+    """Development-only ABBA comparison of two versus three genuine fixture workers.
+
+    Preserve each original exact-head disposable clone, Go commands, provenance
+    checks, required negative controls, and end-of-run source-cleanliness check.
+    """
+    root = root.resolve()
+    baseline = good(root, "git", "rev-parse", "HEAD").strip()
+    require(not good(root, "git", "status", "--porcelain").strip(),
+            "real checkout dirty before 2v3 worker comparison")
+    require((os.cpu_count() or 1) >= 3,
+            "2v3 comparison requires three logical CPUs; do not oversubscribe")
+    expected_stages = {
+        "unchanged_declaration_reuse", "dirty_worktree_rejection",
+        "hidden_source_blob_rejection", "module_context_rejection",
+        "changed_declaration_fresh_review",
+        "new_symbol_provisional_and_promotion_negative",
+        "final_source_checkout_cleanliness",
+    }
+    order = (2, 3, 3, 2)
+    samples = {2: [], 3: []}
+    for workers in order:
+        require(good(root, "git", "rev-parse", "HEAD").strip() == baseline,
+                "source HEAD changed during 2v3 comparison")
+        receipt = run(root, scratch_parent, workers_override=workers)
+        require(receipt["result"] == "G26_ISOLATED_MAINTENANCE_QUALIFICATION_PASS"
+                and receipt["max_workers"] == workers
+                and receipt["parallel_execution"] is True
+                and receipt["original_checkout_changed"] is False
+                and set(receipt["timings_seconds"]) == expected_stages,
+                "missing exact-source provenance receipt in 2v3 comparison")
+        seconds = receipt["total_elapsed_seconds"]
+        require(math.isfinite(seconds) and seconds > 0,
+                "invalid 2v3 elapsed time")
+        samples[workers].append(seconds)
+        require(not good(root, "git", "status", "--porcelain").strip(),
+                "2v3 worker comparison modified original source checkout")
+    two_median = statistics.median(samples[2])
+    three_median = statistics.median(samples[3])
+    ratio = two_median / three_median
+    print(json.dumps({
+        "result": "G26_2V3_WORKER_COMPARISON_DIAGNOSTIC_PASS",
+        "schema": "wingless.atlas.worker-2v3-comparison.v1",
+        "source_head": baseline,
+        "platform": platform.platform(),
+        "python_version": platform.python_version(),
+        "go_version": good(root, "go", "version").strip(),
+        "logical_cpu_count": os.cpu_count(),
+        "worker_order": order,
+        "two_worker_seconds": samples[2],
+        "three_worker_seconds": samples[3],
+        "two_worker_median_seconds": two_median,
+        "three_worker_median_seconds": three_median,
+        "observed_median_speedup_ratio": round(ratio, 6),
+        "development_threshold_ratio": 1.15,
+        "exceeds_development_threshold": ratio >= 1.15,
+        "qualification": "DEVELOPMENT_DIAGNOSTIC_ONLY",
+        "limitations": "Same-host ABBA; caches and runner contention not fully controlled; no full CI speedup inference",
+        "original_checkout_changed": False,
+    }, sort_keys=True))
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, required=True)
@@ -462,10 +525,16 @@ if __name__ == "__main__":
                         help="Optional 1/2-worker development probe; default retains qualified 2-worker cap")
     parser.add_argument("--compare-workers", action="store_true",
                         help="Opt-in ABBA same-source original G26/G27/G28 full-suite comparison")
+    parser.add_argument("--compare-2vs3", action="store_true",
+                        help="Bounded 2/3-worker ABBA development comparison; default unchanged")
     args = parser.parse_args()
-    require(not (args.compare_workers and args.workers is not None),
-            "comparison defines its own 1/2-worker schedule")
+    require(not (args.compare_workers and args.compare_2vs3),
+            "only one comparison protocol can run")
+    require(not ((args.compare_workers or args.compare_2vs3) and args.workers is not None),
+            "comparison defines its own worker schedule")
     if args.compare_workers:
         compare_workers(args.root, args.scratch_parent)
+    elif args.compare_2vs3:
+        compare_2vs3_workers(args.root, args.scratch_parent)
     else:
         run(args.root, args.scratch_parent, workers_override=args.workers)
