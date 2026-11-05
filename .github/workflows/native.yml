@@ -961,6 +961,11 @@ jobs:
           }
           "G9T_PYTHON_EXE=$($selected.path)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
           "G9T_PYTHON_FLAG=$($selected.flag)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          # The optional Torch capability probes may legitimately exit nonzero.
+          # GitHub's Windows PowerShell wrapper exits using LASTEXITCODE even after
+          # a successful Out-File. Reset it only after the required identity,
+          # version, and selected-interpreter checks succeeded.
+          $global:LASTEXITCODE = 0
       - name: Current G9T CUDA admission on existing runtime only
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         run: |
