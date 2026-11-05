@@ -1096,6 +1096,21 @@ jobs:
         with:
           persist-credentials: false
           ref: ${{ github.sha }}
+      - name: One-shot authorized original Qwen shard stage (no GPU kernels)
+        if: ${{ contains(github.event.head_commit.message, '[g9u-stage-original]') }}
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:GITHUB_REPOSITORY -ne 'spoonman136668-ai/Wingless' -or $env:GITHUB_REF -ne 'refs/heads/research/cnc01q-direct-expert-development-20261103') { throw 'G9U shard stage wrong source' }
+          if ($env:RUNNER_NAME -ne 'WINGLESS-UP-B' -or $env:RUNNER_ENVIRONMENT -ne 'self-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'G9U shard stage wrong runner' }
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'G9U shard stage wrong SHA' }
+          $dirty = @(git status --porcelain --untracked-files=all)
+          if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw 'G9U shard stage dirty checkout' }
+          New-Item -ItemType Directory -Force evidence | Out-Null
+          $python = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'
+          if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw 'G9U pinned isolated Python unavailable' }
+          & $python research/nr1/gcen/g9u_stage_pinned_shard.py --toolcache-root $env:RUNNER_TOOL_CACHE --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json --output evidence/g9u-original-stage.json --source-sha $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { throw 'G9U shard stage failed, no GPU kernels executed' }
       - name: Gate original shard availability and source
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         run: |
