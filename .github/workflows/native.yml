@@ -880,15 +880,43 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Git status failed' }
           if ($dirty.Count -ne 0) { throw 'Dirty source checkout' }
           if (-not (Get-Command nvidia-smi -ErrorAction SilentlyContinue)) { throw 'No NVIDIA telemetry' }
-          if (-not (Get-Command python -ErrorAction SilentlyContinue)) { throw 'No existing Python' }
           New-Item -ItemType Directory -Force evidence | Out-Null
-          @{'schema'='wingless.gcen.g9t.optional-preflight.v1';'status'='NOT_ADMITTED';'source_sha'=$env:GITHUB_SHA;'gpu_kernel_executed'=$false;'model_forward'=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
+          $status = @{'schema'='wingless.gcen.g9t.optional-preflight.v1';'status'='NOT_ADMITTED';'source_sha'=$env:GITHUB_SHA;'gpu_kernel_executed'=$false;'model_forward'=$false}
+          $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
+          # Discover only pre-existing Python 3 commands. Never install, download or alter PATH.
+          $candidates = @(
+            @{name='python'; flag=''},
+            @{name='python3'; flag=''},
+            @{name='py'; flag='-3'}
+          )
+          $selected = $null
+          foreach ($candidate in $candidates) {
+            $cmd = Get-Command $candidate.name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($null -eq $cmd) { continue }
+            $python = $cmd.Source
+            $args = @()
+            if ($candidate.flag) { $args += $candidate.flag }
+            $probe = & $python @args -c 'import sys; print("G9T_PYTHON3" if sys.version_info.major == 3 else "G9T_WRONG_PYTHON")' 2>$null
+            if ($LASTEXITCODE -ne 0 -or $probe -ne 'G9T_PYTHON3') { continue }
+            $selected = @{path=$python; flag=$candidate.flag}
+            break
+          }
+          if ($null -eq $selected) {
+            $status.status = 'PYTHON_RUNTIME_UNAVAILABLE'
+            $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
+            throw 'PYTHON_RUNTIME_UNAVAILABLE: no working existing Python 3 command for the runner service account'
+          }
+          "G9T_PYTHON_EXE=$($selected.path)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "G9T_PYTHON_FLAG=$($selected.flag)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
       - name: Current G9T CUDA admission on existing runtime only
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         run: |
           $ErrorActionPreference = 'Stop'
           # No software installation, weight download, or benchmark execution.
-          & python research/nr1/gcen/g9t_gpu_admission.py --source-sha $env:GITHUB_SHA 2>&1 | Tee-Object -FilePath evidence/g9t-stdout.txt
+          if (-not $env:G9T_PYTHON_EXE -or -not (Test-Path -LiteralPath $env:G9T_PYTHON_EXE -PathType Leaf)) { throw 'G9T selected Python runtime missing' }
+          $pythonArgs = @()
+          if ($env:G9T_PYTHON_FLAG) { $pythonArgs += $env:G9T_PYTHON_FLAG }
+          & $env:G9T_PYTHON_EXE @pythonArgs research/nr1/gcen/g9t_gpu_admission.py --source-sha $env:GITHUB_SHA 2>&1 | Tee-Object -FilePath evidence/g9t-stdout.txt
           if ($LASTEXITCODE -ne 0) { throw 'G9T CUDA admission failed' }
           $matches = @(Get-Content evidence/g9t-stdout.txt | Where-Object { $_ -match '^G9T_CURRENT_GPU_ADMISSION ' })
           if ($matches.Count -ne 1) { throw 'Missing unique admission receipt' }
