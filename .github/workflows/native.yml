@@ -1180,7 +1180,7 @@ jobs:
           $status.local_shard_bytes = $expectedBytes
           $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 $statusPath
       - name: Run original BF16 authenticated CUDA benchmark
-        if: ${{ env.G9U_SHARD_AVAILABLE == 'true' }}
+        if: ${{ env.G9U_SHARD_AVAILABLE == 'true' && !contains(github.event.head_commit.message, '[g9v-phase-diagnostic]') }}
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         env:
           OPENBLAS_NUM_THREADS: '1'
@@ -1203,4 +1203,31 @@ jobs:
         with:
           name: g9u-original-gpu-operator
           path: ${{ runner.temp }}/g9u-*
+          retention-days: 14
+      - name: Run one bounded G9V original-expert phase diagnostic
+        if: ${{ env.G9U_SHARD_AVAILABLE == 'true' && contains(github.event.head_commit.message, '[g9v-phase-diagnostic]') }}
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:RUNNER_NAME -ne 'WINGLESS-UP-B' -or $env:RUNNER_ENVIRONMENT -ne 'self-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'G9V wrong isolated Wingless runner' }
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) { throw 'G9V exact checkout mismatch' }
+          $dirty = @(git status --porcelain --untracked-files=all)
+          if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw 'G9V dirty checkout' }
+          $python = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'
+          if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw 'G9V isolated Python absent' }
+          & $python -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: 'numpy==2.3.5' 'safetensors==0.7.0'
+          if ($LASTEXITCODE -ne 0) { throw 'G9V pinned isolated scientific dependencies failed' }
+          & $python -B research/nr1/gcen/g9v_phase_diagnostic.py --root . --source-sha $env:GITHUB_SHA --shard $env:G9U_SHARD_PATH --manifest research/nr1/gcen/upstream_full_manifest_unverified_weights.json --output (Join-Path $env:RUNNER_TEMP 'g9v-phase-diagnostic.json')
+          if ($LASTEXITCODE -ne 0) { throw 'G9V diagnostic source/custody/operator failed' }
+          $result = Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'g9v-phase-diagnostic.json') -Raw | ConvertFrom-Json
+          if ($result.schema -ne 'wingless.gcen.g9v.authenticated-gpu-phase-diagnostic.v1' -or $result.source_sha -ne $env:GITHUB_SHA -or $result.source_custody.original_shard_authenticated -ne $true -or @($result.measurements).Count -ne 2 -or $result.full_model_forward -ne $false -or $result.scientific_acceptance -ne 'NOT_GRANTED') { throw 'G9V bounded receipt authentication failed' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9v-original-expert-phase-diagnostic
+          path: ${{ runner.temp }}/g9v-*
           retention-days: 14
