@@ -861,10 +861,6 @@ jobs:
     if: ${{ github.event_name == 'push' && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9w-provision]') }}
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
     timeout-minutes: 55
-    # Scope PowerShell policy to this authorized provisioning job and descendants.
-    # No CurrentUser/LocalMachine policy, service, or runner configuration mutation.
-    env:
-      PSExecutionPolicyPreference: Bypass
     permissions:
       contents: read
     steps:
@@ -886,29 +882,32 @@ jobs:
           # If policy is imposed by Group Policy, do not circumvent it.
           $policy = Get-ExecutionPolicy -List
           if (@($policy | Where-Object { $_.Scope -in @('MachinePolicy','UserPolicy') -and $_.ExecutionPolicy -notin @('Undefined','Bypass','Unrestricted') }).Count -gt 0) { throw 'G9W_GROUP_POLICY_RESTRICTED: provisioning not authorized to override Group Policy' }
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12.7'
-          architecture: x64
-          cache: ''
       - name: Provision pinned CUDA Torch in dedicated persistent venv
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
         run: |
           $ErrorActionPreference = 'Stop'
-          $venv = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9w-py3127-torch210-cu128'
+          # Use the existing machine-managed Python; no installer, registry edits or host PATH changes.
+          $basePython = 'C:\ckb-ci-tools\python\3.14.7\python.exe'
+          if (-not (Test-Path -LiteralPath $basePython -PathType Leaf)) { throw 'G9X_BASE_PYTHON_UNAVAILABLE' }
+          & $basePython -c 'import sys; assert sys.version_info[:3] == (3,14,7)'
+          if ($LASTEXITCODE -ne 0) { throw 'G9X_BASE_PYTHON_WRONG_VERSION' }
+          $venv = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128'
           $exe = Join-Path $venv 'Scripts\python.exe'
           if (-not (Test-Path -LiteralPath $exe -PathType Leaf)) {
-            & python -m venv $venv
-            if ($LASTEXITCODE -ne 0) { throw 'Isolated venv creation failed' }
+            if (Test-Path -LiteralPath $venv) { throw 'G9X_PARTIAL_VENV_REQUIRES_INSPECTION' }
+            & $basePython -m venv $venv
+            if ($LASTEXITCODE -ne 0) { throw 'G9X_ISOLATED_VENV_FAILED' }
           }
-          & $exe -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: --index-url https://download.pytorch.org/whl/cu128 'torch==2.10.0'
+          & $exe -c 'import sys; assert sys.version_info[:3] == (3,14,7); assert sys.prefix != sys.base_prefix'
+          if ($LASTEXITCODE -ne 0) { throw 'G9X_ISOLATED_RUNTIME_IDENTITY_FAILED' }
+          & $exe -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: --index-url https://download.pytorch.org/whl/cu128 'torch==2.10.0+cu128'
           if ($LASTEXITCODE -ne 0) { throw 'Pinned CUDA wheel installation failed' }
-          & $exe -c 'import sys,torch; assert sys.version_info[:3] == (3,12,7); assert torch.__version__.startswith("2.10.0+cu128"); assert torch.version.cuda is not None and torch.version.cuda.startswith("12.8"); print("G9W_PINNED_CUDA_TORCH_IMPORT_PASS")'
+          & $exe -c 'import sys,torch; assert sys.version_info[:3] == (3,14,7); assert torch.__version__.startswith("2.10.0+cu128"); assert torch.version.cuda is not None and torch.version.cuda.startswith("12.8"); print("G9W_PINNED_CUDA_TORCH_IMPORT_PASS")'
           if ($LASTEXITCODE -ne 0) { throw 'Pinned CUDA wheel provenance or import verification failed' }
           # Installation verifies import and CUDA build metadata only; no GPU kernels.
           New-Item -ItemType Directory -Force evidence | Out-Null
           & $exe -m pip freeze --all | Out-File -Encoding utf8 evidence/g9w-pip-freeze.txt
-          @{schema='wingless.gcen.g9w.runtime-provision.v1'; source_sha=$env:GITHUB_SHA; status='PYTHON312_CUDA_TORCH_IMPORT_PASS'; cuda_kernel_executed=$false; model_forward=$false; model_weights_downloaded=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9w-runtime-status.json
+          @{schema='wingless.gcen.g9w.runtime-provision.v1'; source_sha=$env:GITHUB_SHA; status='PYTHON314_CUDA_TORCH_IMPORT_PASS'; cuda_kernel_executed=$false; model_forward=$false; model_weights_downloaded=$false} | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9w-runtime-status.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -947,7 +946,7 @@ jobs:
           $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9t-status.json
           # Discover only pre-existing Python 3 commands. Never install, download or alter PATH.
           $candidates = @(
-            @{name=(Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9w-py3127-torch210-cu128\Scripts\python.exe'); flag=''},
+            @{name=(Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'); flag=''},
             @{name='python'; flag=''},
             @{name='python3'; flag=''},
             @{name='py'; flag='-3'}
