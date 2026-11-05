@@ -1110,19 +1110,60 @@ jobs:
           $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9u-status.json
           $python = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9x-py3147-torch210-cu128\Scripts\python.exe'
           if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw 'Qualified G9X Python unavailable' }
-          $shard = Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9u-original\model-00001-of-00016.safetensors'
-          if (-not (Test-Path -LiteralPath $shard -PathType Leaf)) {
-            $status.status = 'BLOCKED_ORIGINAL_SHARD_NOT_STAGED'
+          # Look only in known Wingless-owned roots. No profile, machine-wide,
+          # other-project or network search and no checkpoint download.
+          $filename = 'model-00001-of-00016.safetensors'
+          $digestPin = '454e77b346a61bfb201d54df60e15158838cf930617ee135113556204f2802b5'
+          $expectedBytes = [int64]3999417504
+          $roots = @(
+            (Join-Path $env:RUNNER_TOOL_CACHE 'wingless-g9u-original'),
+            (Join-Path $env:RUNNER_TOOL_CACHE 'wingless-gcen-original'),
+            (Join-Path $env:RUNNER_TOOL_CACHE 'wingless-original'),
+            'C:\ckb-ci-tools\wingless\gcen',
+            'C:\ckb-ci-tools\wingless\original'
+          )
+          # Inspect immediate Wingless-named toolcache directories only.
+          $projectRoots = @(Get-ChildItem -LiteralPath $env:RUNNER_TOOL_CACHE -Directory -Filter 'wingless-*' -ErrorAction SilentlyContinue | Select-Object -First 32)
+          foreach ($entry in $projectRoots) {
+            if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0) { $roots += $entry.FullName }
+          }
+          $checked = 0
+          $shard = $null
+          foreach ($root in ($roots | Select-Object -Unique)) {
+            if (-not (Test-Path -LiteralPath $root -PathType Container)) { continue }
+            $dir = Get-Item -LiteralPath $root -ErrorAction Stop
+            if (($dir.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
+            $candidate = Join-Path $root $filename
+            $checked += 1
+            if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { continue }
+            $item = Get-Item -LiteralPath $candidate -ErrorAction Stop
+            if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or $item.Length -ne $expectedBytes) {
+              $status.status = 'BLOCKED_LOCAL_SHARD_SIZE_OR_LINK_MISMATCH'
+              $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9u-status.json
+              throw 'G9U candidate shard has invalid size or is a reparse point; no GPU kernel executed'
+            }
+            $observed = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256 -ErrorAction Stop).Hash.ToLowerInvariant()
+            if ($observed -ne $digestPin) {
+              $status.status = 'BLOCKED_LOCAL_SHARD_SHA256_MISMATCH'
+              $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9u-status.json
+              throw 'G9U candidate shard differs from frozen SHA-256; no GPU kernel executed'
+            }
+            $shard = $candidate
+            break
+          }
+          $status.project_scoped_root_count = $checked
+          if (-not $shard) {
+            $status.status = 'BLOCKED_ORIGINAL_SHARD_NOT_FOUND_IN_PROJECT_SCOPED_ROOTS'
             $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9u-status.json
             'G9U_SHARD_AVAILABLE=false' | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
-            Write-Output 'G9U original shard not staged; zero kernels executed'
+            Write-Output 'G9U original shard absent from bounded Wingless-owned roots; no download or GPU kernels'
             exit 0
           }
-          $item = Get-Item -LiteralPath $shard
-          if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or $item.Length -le 8 -or $item.Length -gt 6442450944) { throw 'Unsafe G9U shard path or size' }
           'G9U_SHARD_AVAILABLE=true' | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
           "G9U_SHARD_PATH=$shard" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
-          $status.status = 'SHARD_PRESENT_PENDING_IN_PROCESS_AUTHENTICATION'
+          $status.status = 'LOCAL_SHARD_SHA256_VERIFIED_PENDING_BF16_AUTHENTICATION'
+          $status.local_shard_sha256 = $digestPin
+          $status.local_shard_bytes = $expectedBytes
           $status | ConvertTo-Json -Compress | Set-Content -Encoding utf8 evidence/g9u-status.json
       - name: Run original BF16 authenticated CUDA benchmark
         if: ${{ env.G9U_SHARD_AVAILABLE == 'true' }}
