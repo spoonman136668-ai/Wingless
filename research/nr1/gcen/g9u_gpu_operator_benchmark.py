@@ -42,6 +42,30 @@ def validate_packed(data, scales):
     return d,s
 
 
+def verify_packed_operator_parity(cpu_expected, gpu_observed):
+    """Fail closed on GPU packed decoding drift from the independent CPU codec.
+
+    This is operator equivalence, not a test of compression quality versus BF16.
+    Inputs are output matrices, never model activations or an authenticity token.
+    """
+    expected=np.asarray(cpu_expected,dtype=np.float64)
+    observed=np.asarray(gpu_observed,dtype=np.float64)
+    if (expected.ndim!=2 or expected.shape!=(BATCH,ROWS)
+        or observed.shape!=expected.shape or not np.isfinite(expected).all()
+        or not np.isfinite(observed).all()):
+        raise ValueError("invalid independent packed operator parity inputs")
+    diff=observed-expected
+    denominator=max(float(np.sum(expected*expected)),1.0)
+    relative_squared_error=float(np.sum(diff*diff)/denominator)
+    max_absolute_difference=float(np.max(np.abs(diff)))
+    max_reference_magnitude=max(float(np.max(np.abs(expected))),1.0)
+    if relative_squared_error>1e-8 or max_absolute_difference>2e-4*max_reference_magnitude:
+        raise RuntimeError("GPU packed operator disagrees with independent CPU packed codec")
+    return {"relative_squared_error":relative_squared_error,
+            "maximum_absolute_difference":max_absolute_difference,
+            "reference_max_absolute_value":max_reference_magnitude}
+
+
 def run_authenticated_expert(*, shard_path, manifest_path, source_sha, torch_module=None):
     from g9u_verified_loader import load_verified_original_expert
     original_weight, source_custody = load_verified_original_expert(shard_path, manifest_path)
@@ -79,6 +103,9 @@ def run_authenticated_expert(*, shard_path, manifest_path, source_sha, torch_mod
         x=torch.randn((BATCH,COLUMNS),generator=generator,dtype=torch.float32).to(device)
         ref=dense(x)
         observed=packed_tiled(x)
+        from packed_companded_int2 import apply_companded_int2
+        independent_cpu=apply_companded_int2(x.cpu().numpy(),d,s,block=BLOCK)
+        parity=verify_packed_operator_parity(independent_cpu,observed.detach().cpu().numpy())
         numerator=torch.sum((observed.to(torch.float64)-ref.to(torch.float64))**2).item()
         denominator=torch.sum(ref.to(torch.float64)**2).item()
         if not denominator>0 or not np.isfinite(numerator/denominator):
@@ -105,6 +132,7 @@ def run_authenticated_expert(*, shard_path, manifest_path, source_sha, torch_mod
             "packed_int2_median_gpu_ms":times["packed_int2_tiled_decode"],
             "packed_speedup_vs_dense":times["dense_fp32"]/times["packed_int2_tiled_decode"],
             "relative_output_squared_error_vs_dense":numerator/denominator,
+            "independent_cpu_packed_parity":parity,
         })
     torch.cuda.synchronize()
     peak=torch.cuda.max_memory_allocated()
