@@ -9,6 +9,7 @@ import json
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 SOURCE = Path("inference/lifecycle.go")
@@ -61,6 +62,16 @@ def make_commit(folder, old, new):
 
 
 def run(root, scratch_parent):
+    started = time.perf_counter()
+    last_mark = started
+    timings = {}
+
+    def mark(stage):
+        nonlocal last_mark
+        now = time.perf_counter()
+        timings[stage] = round(now - last_mark, 6)
+        last_mark = now
+
     root = root.resolve()
     baseline = good(root, "git", "rev-parse", "HEAD").strip()
     require(not good(root, "git", "status", "--porcelain").strip(),
@@ -98,6 +109,7 @@ def run(root, scratch_parent):
         good(first, sys.executable, "-B", "scripts/validate_code_atlas.py",
              "--root", ".", "--relationships", rels)
         print("G26_EXACT_DECLARATION_REUSE=PASS", comment_head)
+        mark("unchanged_declaration_reuse")
 
         # An uncommitted Go change plus a rebuilt canonical ICE index must
         # never masquerade as the frozen target commit.
@@ -110,6 +122,7 @@ def run(root, scratch_parent):
         reject(dirty, "G27_DIRTY_NON_ICE_WORKTREE",
                sys.executable, "-B", "scripts/maintain_code_atlas.py",
                "--root", ".")
+        mark("dirty_worktree_rejection")
         # Even if local Git status is deliberately blinded, independent
         # HEAD-blob verification must reject a modified worktree file.
         hidden = Path(t) / "hidden-working-tree-change"
@@ -124,6 +137,7 @@ def run(root, scratch_parent):
         reject(hidden, "G27_TARGET_SOURCE_CONTENT_MISMATCH",
                sys.executable, "-B", "scripts/maintain_code_atlas.py",
                "--root", ".")
+        mark("hidden_source_blob_rejection")
         # A committed module context change must not inherit 352 behavioral
         # descriptions solely because Go declaration bodies match.
         module = Path(t) / "module-context-change"
@@ -141,6 +155,7 @@ def run(root, scratch_parent):
                sys.executable, "-B", "scripts/maintain_code_atlas.py",
                "--root", ".")
         print("G27_GIT_SOURCE_IDENTITY_AND_MODULE_CONTEXT_NEGATIVES_PASS")
+        mark("module_context_rejection")
         second = Path(t) / "changed-declaration"
         clone(root, second, baseline)
         old = (second / SOURCE).read_text("utf-8")
@@ -201,6 +216,7 @@ def run(root, scratch_parent):
                sys.executable, "-B", "scripts/validate_code_atlas.py",
                "--root", ".", "--relationships", report)
         print("G26_CHANGED_DECLARATION_FRESH_RECEIPT_REQUIRES_INDEPENDENT_APPROVAL=PASS", new_head)
+        mark("changed_declaration_fresh_review")
 
         # G28: an additional Go declaration must be source-witnessed,
         # remain explicitly unreviewed, and never inherit the 352 old reviews.
@@ -270,10 +286,15 @@ def run(root, scratch_parent):
                sys.executable, "-B", "scripts/validate_code_atlas.py",
                "--root", ".", "--relationships", g28_types)
         print("G28_UNAUTHENTICATED_REVIEW_PROMOTION_REJECTED=PASS")
+        mark("new_symbol_provisional_and_promotion_negative")
 
         require(not good(root, "git", "status", "--porcelain").strip(),
                 "original checkout modified")
+        mark("final_source_checkout_cleanliness")
     print(json.dumps({
+        "timing_schema": "wingless.atlas.g26-source-aware-diagnostic.v1",
+        "timings_seconds": timings,
+        "total_elapsed_seconds": round(time.perf_counter() - started, 6),
         "result": "G26_ISOLATED_MAINTENANCE_QUALIFICATION_PASS",
         "reused_unchanged": 352,
         "changed_declaration_without_receipt": "REJECTED",
