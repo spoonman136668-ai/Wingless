@@ -53,12 +53,25 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          go run ./cmd/ice validate
+          # One exact-head CLI build reused for both original source and typed checks.
+          $ice = Join-Path $env:RUNNER_TEMP "wingless-atlas-validation.exe"
+          $clock = [System.Diagnostics.Stopwatch]::StartNew()
+          go build -o "$ice" ./cmd/ice
+          if ($LASTEXITCODE -ne 0) { throw 'ICE_VALIDATION_BINARY_BUILD_FAILED' }
+          $buildSeconds = [math]::Round($clock.Elapsed.TotalSeconds, 6)
+          $clock.Restart()
+          & "$ice" validate
           if ($LASTEXITCODE -ne 0) { throw 'ICE_SOURCE_VALIDATION_FAILED' }
-          go run ./cmd/ice relationships > "$env:RUNNER_TEMP\wingless-type-relationships.json"
+          $validateSeconds = [math]::Round($clock.Elapsed.TotalSeconds, 6)
+          $clock.Restart()
+          & "$ice" relationships > "$env:RUNNER_TEMP\wingless-type-relationships.json"
           if ($LASTEXITCODE -ne 0) { throw 'TYPE_RELATIONSHIP_EXTRACTION_FAILED' }
+          $relationshipSeconds = [math]::Round($clock.Elapsed.TotalSeconds, 6)
+          $clock.Restart()
           python scripts/validate_code_atlas.py --root . --relationships "$env:RUNNER_TEMP\wingless-type-relationships.json"
           if ($LASTEXITCODE -ne 0) { throw 'SEMANTIC_ATLAS_VALIDATION_FAILED' }
+          $semanticSeconds = [math]::Round($clock.Elapsed.TotalSeconds, 6)
+          @{ result = 'ATLAS_EXACT_HEAD_ICE_BINARY_REUSE_PASS'; head = (git rev-parse HEAD).Trim(); build_seconds = $buildSeconds; validate_seconds = $validateSeconds; relationships_seconds = $relationshipSeconds; semantic_seconds = $semanticSeconds } | ConvertTo-Json -Compress
 
       - name: Tamper-resistance negative acceptance in disposable exact-head clone
         if: steps.scope.outputs.atlas_relevant == 'true'
