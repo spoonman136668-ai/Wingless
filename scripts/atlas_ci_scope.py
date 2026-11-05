@@ -90,6 +90,23 @@ def self_test(root):
         "ATLAS_BOUNDED_PARALLEL_ACCEPTANCE_PASS",
     ):
         require(required in parallel_block, "parallel acceptance contract changed: " + required)
+    require(parallel_block.count("ConvertFrom-Json -ErrorAction Stop") == 2,
+            "both workers must parse structured original receipts")
+    for required in (
+        "ATLAS_TAMPER_PASS_RECEIPT_IDENTITY_MISMATCH",
+        "ATLAS_CHROMIUM_PASS_RECEIPT_IDENTITY_MISMATCH",
+        "$receipt.head -ne $expectedHead",
+        "$receipt.expected_rejections -ne 9",
+        "$receipt.positive_control -ne 'PASS'",
+        "$receipt.source_checkout_changed -ne $false",
+        "$receipt.browser_test_commit -ne $expectedHead",
+        "$receipt.original_checkout_dirty -ne $false",
+        "$receipt.steps -notcontains 'actual_click_cross_file_relationship'",
+        "$receipt.steps -notcontains 'actual_click_source_link_new_tab'",
+        "$receipt.browser -notlike '*real Selenium UI*'",
+        "$receipts.Count -ne 1",
+    ):
+        require(required in parallel_block, "parallel receipt identity contract changed: " + required)
     entries = json.loads((root / ".ice/manifest.json").read_text("utf-8"))["files"]
     representative = [
         "new_source.go", "src/new_source.go", "README.md", "src/new.md",
