@@ -9,6 +9,9 @@ on:
     paths:
       - '.github/workflows/native.yml'
       - '.github/workflows/native-cache-repair.yml'
+      # The exact-SHA Windows/Linux qualification is also required when
+      # genuine Atlas browser acceptance changes, not only for .ice outputs.
+      - 'scripts/test_atlas_browser.py'
       - '.ice/**'
 permissions:
   contents: read
