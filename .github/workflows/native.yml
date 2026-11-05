@@ -902,9 +902,17 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'G9X_ISOLATED_RUNTIME_IDENTITY_FAILED' }
           # Check the exact preexisting isolated environment first. Avoid downloading
           # the 2.8 GB CUDA wheel a second time when the prior install succeeded.
+          # Do not use nested Python string literals in the legacy Windows shell.
           $probe = & $exe -c 'import sys,torch; print(sys.version_info.major,sys.version_info.minor,sys.version_info.micro,torch.__version__,torch.version.cuda)' 2>&1
           $probeExit = $LASTEXITCODE
-          if ($probeExit -ne 0 -or $probe -notmatch '^3 14 7 2[.]10[.]0\+cu128 12[.]8
+          if ($probeExit -ne 0 -or $probe -ne '3 14 7 2.10.0+cu128 12.8') {
+            & $exe -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: --index-url https://download.pytorch.org/whl/cu128 'torch==2.10.0+cu128'
+            if ($LASTEXITCODE -ne 0) { throw 'Pinned CUDA wheel installation failed' }
+            $probe = & $exe -c 'import sys,torch; print(sys.version_info.major,sys.version_info.minor,sys.version_info.micro,torch.__version__,torch.version.cuda)' 2>&1
+            $probeExit = $LASTEXITCODE
+          }
+          if ($probeExit -ne 0 -or $probe -ne '3 14 7 2.10.0+cu128 12.8') { throw 'Pinned CUDA wheel provenance or import verification failed' }
+          Write-Output 'G9W_PINNED_CUDA_TORCH_IMPORT_PASS'
           # Installation verifies import and CUDA build metadata only; no GPU kernels.
           New-Item -ItemType Directory -Force evidence | Out-Null
           & $exe -m pip freeze --all | Out-File -Encoding utf8 evidence/g9w-pip-freeze.txt
