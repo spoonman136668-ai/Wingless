@@ -10,6 +10,11 @@ on:
       - '.github/workflows/native.yml'
       - '.github/workflows/native-cache-repair.yml'
       - '.ice/**'
+      # Automatically qualify original native Windows/Linux when Atlas harnesses change.
+      - 'scripts/*atlas*.py'
+      - 'scripts/Test-Native.ps1'
+      - 'go.mod'
+      - 'go.sum'
 permissions:
   contents: read
 jobs:
