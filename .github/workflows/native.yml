@@ -1086,7 +1086,7 @@ jobs:
   g9u_authorized_expert_gpu:
     # Single authorized GPU experiment, never routine CI or a new controller.
     needs: [native, g9t_existing_wingless_gpu_preflight]
-    if: ${{ github.event_name == 'push' && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9u-original-gpu]') }}
+    if: ${{ always() && needs.native.result == 'success' && needs.g9t_existing_wingless_gpu_preflight.result == 'success' && github.event_name == 'push' && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' && contains(github.event.head_commit.message, '[g9u-original-gpu]') }}
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
     timeout-minutes: 35
     permissions:
