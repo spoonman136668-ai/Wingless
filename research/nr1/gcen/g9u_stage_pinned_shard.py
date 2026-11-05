@@ -13,7 +13,9 @@ import tempfile
 from urllib.request import Request, urlopen
 
 from g31_original_shard_stage import URL, SHARD, RESERVE_BYTES, stage_verified
-from g9u_verified_loader import PINNED_SHARD_SHA256
+# Keep the staging interpreter dependency-free. The G9U BF16 loader independently
+# checks this same frozen checksum after installing its pinned scientific deps.
+PINNED_SHARD_SHA256 = "454e77b346a61bfb201d54df60e15158838cf930617ee135113556204f2802b5"
 from runtime_feasibility import MODEL, REVISION, check_manifest
 
 EXPECTED_BYTES = 3999417504
