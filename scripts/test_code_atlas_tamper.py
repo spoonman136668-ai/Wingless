@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 ATLAS = Path(".ice/code-intelligence.json")
@@ -114,6 +115,16 @@ def verify_indexed_path_triggers(work):
     print(result.stdout.strip())
 
 def main():
+    started = time.perf_counter()
+    last_mark = started
+    timings = {}
+
+    def mark(stage):
+        nonlocal last_mark
+        now = time.perf_counter()
+        timings[stage] = round(now - last_mark, 6)
+        last_mark = now
+
     p = argparse.ArgumentParser()
     p.add_argument("--root", type=Path, required=True)
     p.add_argument("--relationships", type=Path, required=True)
@@ -136,6 +147,7 @@ def main():
         require(checkout.returncode == 0, "failed exact-head scratch checkout: " + checkout.stdout[-1200:])
         require(not execute(["git", "status", "--porcelain"], cwd=work).stdout.strip(), "scratch not clean")
         verify_indexed_path_triggers(work)
+        mark("scratch_clone_checkout_and_scope")
 
         validation = [sys.executable, str(work / "scripts/validate_code_atlas.py"),
                       "--root", str(work), "--relationships", str(report)]
@@ -143,6 +155,7 @@ def main():
         require(positive.returncode == 0 and "ATLAS_SEMANTIC_QUALIFICATION_PASS" in positive.stdout,
                 "positive control failed on exact head: " + positive.stdout[-1600:])
         print("POSITIVE_CONTROL_PASS: " + current_commit)
+        mark("semantic_positive_control")
         run_negative("source-hash-mutation", work, SOURCE,
                      lambda b: b + b"\n// negative qualification source drift only\n",
                      validation, PROOF_MARKER + " source hash mismatch")
@@ -160,6 +173,7 @@ def main():
                      validation, PROOF_MARKER + " symbol lines mismatch")
         run_negative("embedded-viewer-divergence", work, HTML,
                      mutate_viewer, validation, PROOF_MARKER + " offline browser differs from machine index")
+        mark("six_semantic_negative_controls")
 
         # The independent type report is stored outside the scratch checkout.
         # A forged report must not satisfy any of the source-reviewed Go call edges.
@@ -169,12 +183,14 @@ def main():
                             "--root", str(work), "--relationships", str(relation_copy)]
         run_negative("type-resolved-edge-forgery", work, Path("../typed-forgery.json"),
                      mutate_typed, typed_validation, PROOF_MARKER + " type-unverified reviewed relationship")
+        mark("type_resolved_edge_negative")
 
         # The original source-derived ICE gate must independently detect file drift.
         go_validation = ["go", "run", "./cmd/ice", "validate"]
         run_negative("canonical-ice-source-staleness", work, SOURCE,
                      lambda b: b + b"\n// negative qualification index staleness only\n",
                      go_validation, "ICE_STALE:")
+        mark("canonical_ice_stale_negative")
         # G26 maintenance must be qualified in separate exact-head clones.
         g26 = execute([sys.executable, "-B", "scripts/test_source_aware_atlas.py",
                        "--root", str(root), "--scratch-parent", str(args.scratch_parent or Path(tmp))],
@@ -183,10 +199,15 @@ def main():
                 "G26_ISOLATED_MAINTENANCE_QUALIFICATION_PASS" in g26.stdout,
                 "G26 source-aware regeneration qualification failed: " + g26.stdout[-2400:])
         print(g26.stdout)
+        mark("g26_g27_g28_source_aware_fixtures")
         require(not execute(["git", "status", "--porcelain"], cwd=root).stdout.strip(),
                 "original checkout was modified")
+        mark("final_source_checkout_cleanliness")
         print(json.dumps({
             "result": "WINGLESS_ATLAS_NEGATIVE_QUALIFICATION_PASS",
+            "timing_schema": "wingless.atlas.tamper-diagnostic.v1",
+            "timings_seconds": timings,
+            "total_elapsed_seconds": round(time.perf_counter() - started, 6),
             "head": current_commit,
             "expected_rejections": 8,
             "positive_control": "PASS",
