@@ -856,9 +856,10 @@ jobs:
           retention-days: 14
 
   g9t_existing_wingless_gpu_preflight:
-    # Dormant on push/PR. Explicit dispatch only, no runner setup or model weights.
+    # Native Ubuntu/Windows qualification must pass first. One preflight per
+    # branch push; preserve explicit opt-in dispatch. Hardware checks only.
     needs: native
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.g9t_gpu_preflight == true && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' }}
+    if: ${{ (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.g9t_gpu_preflight == true)) && github.repository == 'spoonman136668-ai/Wingless' && github.ref == 'refs/heads/research/cnc01q-direct-expert-development-20261103' }}
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
     timeout-minutes: 5
     permissions:
