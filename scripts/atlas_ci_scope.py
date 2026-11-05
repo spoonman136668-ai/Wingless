@@ -57,14 +57,23 @@ def self_test(root):
     require("    name: " + STATUS_JOB in workflow, "required job identity changed")
     require("        id: scope\n" in workflow,
             "atlas scope classification step absent")
-    require("  push:\n    branches: [main]\n" in workflow,
-            "main-only cache producer trigger missing")
+    require("  push:\n    branches:\n      - main\n      - engineering/atlas-win2022-sourcebound-main-cache-20261105\n" in workflow,
+            "bounded main/development push triggers missing")
     require(workflow.count("runs-on: windows-2022") == 2,
             "Atlas producer and original qualification must both run on Windows 2022")
     require("  qualify:\n    if: github.event_name != 'push'" in workflow,
             "required PR qualification separated from main cache seed")
-    require("  seed_cache:\n    if: github.event_name == 'push'" in workflow,
-            "cache producer may run on an untrusted PR")
+    require("  seed_cache:\n    if: github.event_name == 'push' && github.ref == 'refs/heads/main'" in workflow,
+            "protected main cache seed isolation changed")
+    require("  backend_probe:\n    if: github.event_name == 'push' && github.ref == 'refs/heads/engineering/atlas-win2022-sourcebound-main-cache-20261105'" in workflow,
+            "development cache probe not isolated to its branch")
+    require(workflow.count("wingless-atlas-dev-pr462-go1255-") == 2
+            and workflow.count("actions/cache/save@v4") == 1
+            and workflow.count("fail-on-cache-miss: true") == 1,
+            "development backend cache transfer contract modified")
+    require("ATLAS_BACKEND_PROBE_EXACT_HIT_MISSING" in workflow
+            and "ATLAS_BACKEND_PROBE_DIRTY_AFTER_RESTORE" in workflow,
+            "development cache integrity check removed")
     require(workflow.count("id: cache_identity") == 2,
             "compiler identity must be checked in producer and consumer")
     require(workflow.count("ATLAS_CACHE_IMAGE_IDENTITY_MISSING") == 2,
