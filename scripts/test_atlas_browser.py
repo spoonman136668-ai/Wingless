@@ -91,6 +91,10 @@ def main():
     recorded = ["frozen_baseline_preserved_and_source_bound_candidate_identity"]
     with tempfile.TemporaryDirectory(prefix="wingless-atlas-chrome-") as profile:
         chrome_options = Options()
+        # Page readiness is asserted by explicit WebDriverWait checks below.
+        # Do not block on unrelated GitHub network resources after source-link click.
+        # Genuine Chrome navigation, target URL and all UI assertions remain mandatory.
+        chrome_options.page_load_strategy = "none"
         chrome_options.binary_location = str(binary)
         for flag in ("--headless=new", "--disable-gpu", "--no-first-run",
                      "--no-default-browser-check", "--disable-extensions",
