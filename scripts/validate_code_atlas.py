@@ -23,10 +23,35 @@ ALLOWED_DIFF = {
     "scripts/test_source_aware_atlas.py",
     ".github/workflows/wingless-code-atlas.yml",
 }
+NATIVE_WORKFLOW = ".github/workflows/native.yml"
+NATIVE_AUTORUN_INSERT = (
+    b"      # Automatically qualify original native Windows/Linux when Atlas harnesses change.\n"
+    b"      - 'scripts/*atlas*.py'\n"
+    b"      - 'scripts/Test-Native.ps1'\n"
+    b"      - 'go.mod'\n"
+    b"      - 'go.sum'\n"
+)
 
 def require(condition, message):
     if not condition:
         raise SystemExit("ATLAS_FAIL_CLOSED: " + message)
+
+def verify_reviewed_native_autorun(root, source_commit):
+    """Permit only the exact reviewed native PR-trigger extension.
+
+    Everything outside the path filter stays byte-identical to the immutable
+    original Atlas source commit. This is not a general workflow allowlist.
+    """
+    path = root / NATIVE_WORKFLOW
+    original = subprocess.check_output(
+        ["git", "show", source_commit + ":" + NATIVE_WORKFLOW], cwd=root)
+    anchor = b"      - '.ice/**'\n"
+    require(original.count(anchor) == 1,
+            "historical native workflow anchor is not unique")
+    expected = original.replace(anchor, anchor + NATIVE_AUTORUN_INSERT, 1)
+    require(path.read_bytes() == expected,
+            "native workflow differs from exact reviewed auto-trigger extension")
+
 
 def read_json(p):
     return json.loads(p.read_text(encoding="utf-8-sig"))
@@ -72,7 +97,10 @@ def validate(root, relationship_file):
     require(re.fullmatch(r"[0-9a-f]{40}", source_commit or "") is not None, "invalid source SHA")
     require(git(root, "cat-file", "-t", source_commit) == "commit", "source commit unavailable")
     changed = set(git(root, "diff", "--name-only", source_commit, "HEAD").splitlines())
-    require(changed.issubset(ALLOWED_DIFF), "unexpected changed paths: " + repr(sorted(changed - ALLOWED_DIFF)))
+    if NATIVE_WORKFLOW in changed:
+        verify_reviewed_native_autorun(root, source_commit)
+    require(changed.issubset(ALLOWED_DIFF | {NATIVE_WORKFLOW}),
+            "unexpected changed paths: " + repr(sorted(changed - ALLOWED_DIFF - {NATIVE_WORKFLOW})))
     require(architecture == manifest.get("files"), "original ICE file coverage diverged")
     indexed_files = {f["path"]: f for f in architecture}
     require(len(indexed_files) == len(architecture), "duplicated file path")
