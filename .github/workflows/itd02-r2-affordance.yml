@@ -1,0 +1,34 @@
+name: ITD-02 R2 Wingless original causal affordance qualification
+on:
+  push:
+    branches: [research/itd02-r2-observed-affordance-20261024]
+permissions:
+  contents: read
+jobs:
+  source-only-native-learned-action-outcomes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 12
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify frozen prereg and original immutable native R1
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse '9159f56f0c7573a9b3f6258c9717d6b71da70c21^')" = 'cd108800054e7964af845137f0d9d37fae69f5a7'
+          git merge-base --is-ancestor 9159f56f0c7573a9b3f6258c9717d6b71da70c21 HEAD
+          test "$(git hash-object research/native/itd02/r2/PREREG.json)" = 'e6f710ebb1b5c5d38825fcb36ef1882d0402a9b0'
+          echo 'ITD02_R2_PRE_SCIENCE_FREEZE=PASS'
+      - name: Native original learned-only affordance tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./research/native/itd02/r2 -count=1 -v
+          echo 'ITD02_R2_NATIVE_SOURCE_ONLY=PASS'
+          echo 'ITD02_R2_FRESH_MINIGRID_EPISODES=0'
