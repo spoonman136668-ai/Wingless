@@ -37,3 +37,8 @@ jobs:
           path: ${{ runner.temp }}/wingless-nci04l5b-state/
           if-no-files-found: error
           retention-days: 30
+      - name: Stage existing G28 provisional ICE source index without commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -B scripts/nci04d2_emit_atlas.py
