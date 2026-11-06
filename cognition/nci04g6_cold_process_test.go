@@ -1,6 +1,7 @@
 package cognition
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -18,6 +19,8 @@ const coldModeEnv = "NCI04L5A_COLD_MODE"
 const coldRootEnv = "NCI04L5A_COLD_ROOT"
 const coldSnapshotEnv = "NCI04L5A_COLD_SNAPSHOT"
 const coldReportMarker = "NCI04L5A_COLD_REPORT="
+const coldArtifactRootEnv = "NCI04L5A_ARTIFACT_ROOT"
+const coldSourceSHAEnv = "NCI04L5A_SOURCE_SHA"
 
 type coldReport struct {
 	SnapshotSHA256 string  `json:"snapshot_sha256"`
@@ -109,6 +112,11 @@ func TestNCI04G6ColdProcessHelper(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if mode == "full" || mode == "resume" {
+		if err := os.WriteFile(filepath.Join(root, "final.snapshot"), snapshot, 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
 	digest := sha256.Sum256(snapshot)
 	report := coldReport{SnapshotSHA256: hex.EncodeToString(digest[:]), SourceSHA256: probeHash(b), Prediction: p, Observations: session.State.Observations, Sequence: source.sequence}
 	encoded, err := json.Marshal(report)
@@ -131,6 +139,11 @@ func TestNCI04G6ColdProcessRestart(t *testing.T) {
 		t.Fatal(err)
 	}
 	tmp := t.TempDir()
+	if supplied := os.Getenv(coldArtifactRootEnv); supplied != "" {
+		if !filepath.IsAbs(supplied) { t.Fatal("artifact root must be absolute") }
+		if err := os.Mkdir(supplied, 0700); err != nil { t.Fatal("artifact root must be newly created", err) }
+		tmp = supplied
+	}
 	snap := filepath.Join(tmp, "prefix.snapshot")
 	fullRoot := filepath.Join(tmp, "full")
 	resumedRoot := filepath.Join(tmp, "resumed")
@@ -169,6 +182,45 @@ func TestNCI04G6ColdProcessRestart(t *testing.T) {
 	stale := run("stale", resumedRoot)
 	if !stale.RejectedStale || stale.Sequence != 2 {
 		t.Fatal("stale checkpoint replay was not rejected")
+	}
+	if os.Getenv(coldArtifactRootEnv) != "" {
+		prefixBytes, err := os.ReadFile(snap)
+		if err != nil { t.Fatal(err) }
+		fullBytes, err := os.ReadFile(filepath.Join(fullRoot, "final.snapshot"))
+		if err != nil { t.Fatal(err) }
+		resumedBytes, err := os.ReadFile(filepath.Join(resumedRoot, "final.snapshot"))
+		if err != nil { t.Fatal(err) }
+		parentHash := sha256.Sum256(prefixBytes)
+		childHash := sha256.Sum256(resumedBytes)
+		if hex.EncodeToString(parentHash[:]) != prefix.SnapshotSHA256 || hex.EncodeToString(childHash[:]) != resumed.SnapshotSHA256 || !bytes.Equal(fullBytes, resumedBytes) {
+			t.Fatal("durable checkpoint artifact or uninterrupted native state mismatched")
+		}
+		sourceSHA := os.Getenv(coldSourceSHAEnv)
+		if len(sourceSHA) != 40 || strings.Trim(sourceSHA, "0123456789abcdef") != "" {
+			t.Fatal("exact checked-out source SHA missing")
+		}
+		manifest := map[string]any{
+			"schema": "wingless.nci04l5a.native-cold-state-sourcefree.dev.v1",
+			"source_commit_sha": sourceSHA,
+			"project": "Wingless",
+			"parent_snapshot_sha256": prefix.SnapshotSHA256,
+			"child_snapshot_sha256": resumed.SnapshotSHA256,
+			"uninterrupted_snapshot_sha256": uninterrupted.SnapshotSHA256,
+			"source_probe_sha256": resumed.SourceSHA256,
+			"observations": resumed.Observations,
+			"action_sequence": resumed.Sequence,
+			"checkpoint_bytes_equal_after_cold_process": true,
+			"rejected_stale_checkpoint": stale.RejectedStale,
+			"independent_source_first_use": false,
+			"source_free_generated_fixture": true,
+			"matched_control_superiority": "UNVERIFIED",
+			"unfamiliar_transfer": "UNVERIFIED",
+			"scientific_accepted": false,
+			"promotion_authority": false,
+		}
+		raw, err := json.MarshalIndent(manifest, "", "  ")
+		if err != nil { t.Fatal(err) }
+		if err := os.WriteFile(filepath.Join(tmp, "evidence.json"), append(raw, '\n'), 0600); err != nil { t.Fatal(err) }
 	}
 	t.Logf("NCI04L5A_WING_FIXTURE_COLD_PROCESS_PASS snapshot_sha256=%s sequence=%d observations=%d scientific_first_use=false", resumed.SnapshotSHA256, resumed.Sequence, resumed.Observations)
 }
