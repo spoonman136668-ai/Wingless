@@ -1,11 +1,11 @@
 TITLE: Wingless Human/Machine Symbol and Relationship Atlas
 STATUS: ADVISORY SOURCE-BOUND NAVIGATION
 REPOSITORY: spoonman136668-ai/Wingless
-SOURCE_COMMIT: 4fe696c9a4db53459a6fe2e72ef6e216753212e1
+SOURCE_COMMIT: cd76524b18b798590cd33411bdbe3324e687ce5d
 SCHEMA: wingless.ice.semantic-code-atlas.v1
-EVIDENCE: .ice/code-intelligence.json (443 source-indexed symbols; 91 provisional)
+EVIDENCE: .ice/code-intelligence.json (445 source-indexed symbols; 93 provisional)
 AUTHORITY: Source code and qualified tests outrank these descriptions; never grant runtime or acceptance authority.
-COVERAGE: 443 symbols in 158 indexed files; 352 source-reviewed labels; 91 unreviewed provisional labels.
+COVERAGE: 445 symbols in 159 indexed files; 352 source-reviewed labels; 93 unreviewed provisional labels.
 RELATIONSHIPS: 9 inspected relationships, 51 local package imports, 95 unresolved syntax-only call candidates.
 
 HOW TO USE
@@ -156,6 +156,15 @@ G26 SOURCE-AWARE ATLAS MAINTENANCE
 TARGET_SOURCE_COMMIT: 4fe696c9a4db53459a6fe2e72ef6e216753212e1
 PREVIOUS_SOURCE_COMMIT: 4dc8342a54f9b5dddba0ce8939eed877133db62a
 EXACT_DECLARATION_REUSE_COUNT: 436
+FRESH_RECEIPT_COUNT: 0
+FRESH_RECEIPTS_ARE_SELF_ASSERTED: TRUE
+INDEPENDENT_HUMAN_REVIEW_REQUIRED_FOR_PROMOTION: TRUE
+Historical evidence is retained as lineage, never silently renewed for changed declarations. Syntax-only edges remain provisional.
+
+G26 SOURCE-AWARE ATLAS MAINTENANCE
+TARGET_SOURCE_COMMIT: cd76524b18b798590cd33411bdbe3324e687ce5d
+PREVIOUS_SOURCE_COMMIT: 4fe696c9a4db53459a6fe2e72ef6e216753212e1
+EXACT_DECLARATION_REUSE_COUNT: 443
 FRESH_RECEIPT_COUNT: 0
 FRESH_RECEIPTS_ARE_SELF_ASSERTED: TRUE
 INDEPENDENT_HUMAN_REVIEW_REQUIRED_FOR_PROMOTION: TRUE
