@@ -22,9 +22,9 @@ jobs:
           cache: false
       - name: Native learning, source and equal-information controls
         env:
-          NCI04L5A_ARTIFACT_ROOT: ${{ runner.temp }}/wingless-nci04l5a-state
-          NCI04L5A_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: go test ./cognition -run '^TestNCI04G[56]' -count=1 -v
+          NCI04L5B_ARTIFACT_ROOT: ${{ runner.temp }}/wingless-nci04l5b-state
+          NCI04L5B_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: go test ./cognition -run '^TestNCI04(G[56]|L5B)' -count=1 -v
       - name: Verify clean exact source
         run: |
           test -z "$(git status --porcelain)"
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: wingless-nci04l5a-sourcefree-checkpoint
-          path: ${{ runner.temp }}/wingless-nci04l5a-state/
+          name: wingless-nci04l5b-sourcefree-checkpoint
+          path: ${{ runner.temp }}/wingless-nci04l5b-state/
           if-no-files-found: error
           retention-days: 30
