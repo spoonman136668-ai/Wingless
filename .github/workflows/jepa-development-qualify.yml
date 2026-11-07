@@ -1,0 +1,35 @@
+name: Wingless source-only JEPA development qualification
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/jepa/**'
+      - '.github/workflows/jepa-development-qualify.yml'
+permissions:
+  contents: read
+jobs:
+  development:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Focused development tests
+        run: go test ./research/jepa -count=1 -v
+      - name: Full Go regression
+        run: go test ./... -count=1
+      - name: Vet and build
+        shell: bash
+        run: |
+          go vet ./...
+          go build ./...
