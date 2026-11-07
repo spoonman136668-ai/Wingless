@@ -267,6 +267,7 @@ def _generate(root, receipts_path, batch):
                     "receiver": receiver, "start_line": current["start"]}),
                 "file": path, "file_sha256": sha(new_file),
                 "kind": current["kind"], "name": current["name"],
+                "receiver": receiver,
                 "start_line": current["start"], "end_line": current["end"],
                 "label": "PROVISIONAL: " + receipt["label"],
                 "description": (receipt["description"]
