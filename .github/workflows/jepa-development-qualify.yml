@@ -20,6 +20,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-go@v5
         with:
           go-version: '1.25.5'
@@ -33,3 +34,28 @@ jobs:
         run: |
           go vet ./...
           go build ./...
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare bounded source atlas companion (read-only artifact; no ref writes)
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          if go run ./cmd/ice validate; then
+            echo "WINGLESS_ATLAS_ALREADY_CURRENT"
+          else
+            go run ./cmd/ice build
+            python -B scripts/maintain_code_atlas.py --root .
+            go run ./cmd/ice validate
+            echo "WINGLESS_SOURCE_ATLAS_COMPANION_GENERATED_ONLY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wingless-jepa-atlas-${{ matrix.os }}
+          path: .ice/
+          include-hidden-files: true
+          retention-days: 5
