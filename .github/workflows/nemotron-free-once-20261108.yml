@@ -23,7 +23,7 @@ jobs:
       github.event_name == 'push' &&
       github.actor == 'spoonman136668-ai' &&
       github.run_attempt == 1 &&
-      contains(github.event.head_commit.added, '.github/workflows/nemotron-free-once-20261108.yml')
+      github.ref == 'refs/heads/diagnostic/nemotron-free-once-20261108'
     runs-on: [self-hosted, Windows, X64, wingless-up-b]
     timeout-minutes: 5
     steps:
