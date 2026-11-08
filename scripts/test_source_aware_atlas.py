@@ -333,10 +333,38 @@ def fixture_new_symbol(root, t, baseline):
     return timings
 
 
+
+def verify_canonical_derived_diff_contract():
+    """Allow only the derived Go-index paths; forbid unrelated mutations.
+
+    The independent go run ./cmd/ice validate compares each derived file
+    byte-for-byte with canonical source. This test protects the narrow
+    filename allowlist, not a claim of independent semantic approval.
+    """
+    from validate_code_atlas import ALLOWED_DIFF
+    derived = {
+        ".ice/dependency-map.json",
+        ".ice/symbol-map.json",
+        ".ice/test-map.json",
+    }
+    require(derived.issubset(ALLOWED_DIFF),
+            "G26_CANONICAL_DERIVED_SOURCE_INDEX_NOT_ADMITTED")
+    forbidden = {
+        "research/jepa/stream.go",
+        ".github/workflows/native.yml",
+        ".ice/unknown-generated.json",
+        "go.mod",
+        "research/status/accepted-science.json",
+    }
+    require(not (forbidden & ALLOWED_DIFF),
+            "G26_UNRELATED_SOURCE_OR_RESEARCH_SCOPE_ADMITTED")
+
+
 def run(root, scratch_parent, *, workers_override=None):
     started = time.perf_counter()
     timings = {}
     root = root.resolve()
+    verify_canonical_derived_diff_contract()
     baseline = good(root, "git", "rev-parse", "HEAD").strip()
     require(not good(root, "git", "status", "--porcelain").strip(),
             "real checkout dirty before testing")
