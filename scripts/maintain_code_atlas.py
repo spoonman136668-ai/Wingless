@@ -227,6 +227,7 @@ def _generate(root, receipts_path, batch):
     reused = 0
     fresh = 0
     provisional_added = 0
+    provisional_carried = 0
     for key, current in current_by_key.items():
         oldnode = old_by_key.get(key)
         path = key[0]
@@ -267,6 +268,7 @@ def _generate(root, receipts_path, batch):
                     "receiver": receiver, "start_line": current["start"]}),
                 "file": path, "file_sha256": sha(new_file),
                 "kind": current["kind"], "name": current["name"],
+                "receiver": receiver,
                 "start_line": current["start"], "end_line": current["end"],
                 "label": "PROVISIONAL: " + receipt["label"],
                 "description": (receipt["description"]
@@ -309,6 +311,61 @@ def _generate(root, receipts_path, batch):
         new_file = current_sources[path]
         old_decl = span(old_file, oldnode["start_line"], oldnode["end_line"])
         new_decl = span(new_file, current["start"], current["end"])
+        # G28: an earlier SOURCE-BOUND UNREVIEWED declaration remains
+        # provisional when its exact bytes recur in a descendant. Neither
+        # its own reviewer assertion nor a matching syntax tree promotes it.
+        if oldnode.get("evidence_basis") == "lexical-provisional":
+            prior = oldnode.get("provenance_lineage")
+            before = old_decl.replace(b"\r\n", b"\n")
+            after = new_decl.replace(b"\r\n", b"\n")
+            require(isinstance(prior, dict) and
+                    prior.get("mode") == "new-symbol-source-bound-provisional"
+                    and prior.get("target_source_commit") == previous
+                    and prior.get("file_sha256") == sha(old_file)
+                    and prior.get("current_declaration_sha256") == sha(before)
+                    and prior.get("independent_approval") is False
+                    and oldnode.get("review_evidence") is None
+                    and oldnode.get("file_level_local_package_dependencies") is None
+                    and oldnode.get("source_url", "").find("/blob/" + previous + "/") >= 0
+                    and oldnode.get("label", "").startswith("PROVISIONAL: ")
+                    and "not a verified behavioral description" in
+                    oldnode.get("description", ""),
+                    "G28_PRIOR_PROVISIONAL_WITNESS_DRIFT: " + repr(key))
+            tokens = prior.get("literal_tokens")
+            require(isinstance(tokens, list) and 1 <= len(tokens) <= 12
+                    and all(isinstance(v, str) and len(v) >= 4
+                            and v.strip() == v and v.encode("utf-8") in before
+                            and v.encode("utf-8") in after for v in tokens)
+                    and isinstance(prior.get("reviewer_assertion"), str)
+                    and len(prior["reviewer_assertion"].strip()) >= 3,
+                    "G28_PRIOR_PROVISIONAL_LITERAL_WITNESS_DRIFT")
+            require(key not in receipt_by_key,
+                    "G28_UNEXPECTED_REVIEW_FOR_UNCHANGED_PROVISIONAL")
+            require(before == after,
+                    "G28_PROVISIONAL_DECLARATION_CHANGED_NO_REVIEW")
+            node = copy.deepcopy(oldnode)
+            node["start_line"] = current["start"]
+            node["end_line"] = current["end"]
+            node["id"] = symbol_id(node)
+            node["file_sha256"] = sha(new_file)
+            node["source_url"] = (
+                "https://github.com/" + REPO + "/blob/" + target +
+                "/" + path + "#L" + str(current["start"]) +
+                "-L" + str(current["end"]))
+            node["syntax_calls"] = sorted(set(current.get("calls") or []))
+            node["provenance_lineage"] = {
+                "mode": "new-symbol-source-bound-provisional",
+                "target_source_commit": target,
+                "file_sha256": sha(new_file),
+                "current_declaration_sha256": sha(after),
+                "literal_tokens": tokens,
+                "reviewer_assertion": prior["reviewer_assertion"],
+                "independent_approval": False,
+            }
+            id_mapping[oldnode["id"]] = node["id"]
+            new_nodes.append(node)
+            provisional_carried += 1
+            continue
         oldproof = oldnode.get("review_evidence")
         require(oldnode.get("evidence_basis") == "source-reviewed"
                 and isinstance(oldproof, dict)
@@ -415,13 +472,16 @@ def _generate(root, receipts_path, batch):
     revised["nodes"] = new_nodes
     revised["coverage"]["symbols"] = len(new_nodes)
     revised["coverage"]["source_files"] = len(files)
-    reviewed_count = len(new_nodes) - provisional_added
-    require(reviewed_count >= 352, "G28_HISTORICAL_REVIEW_LOST")
+    reviewed_count = sum(n["evidence_basis"] == "source-reviewed" for n in new_nodes)
+    all_provisional = len(new_nodes) - reviewed_count
+    require(reviewed_count >= 352 and all_provisional ==
+            provisional_carried + provisional_added,
+            "G28_REVIEW_AND_PROVISIONAL_ACCOUNTING_DRIFT")
     revised["coverage"]["source_reviewed_labels"] = reviewed_count
     revised["coverage"]["source_evidenced_new_labels"] = reviewed_count
     revised["coverage"]["source_dependency_bound_labels"] = reviewed_count
     revised["coverage"]["all_reviewed_source_evidenced_labels"] = reviewed_count
-    revised["coverage"]["lexical_provisional_labels"] = provisional_added
+    revised["coverage"]["lexical_provisional_labels"] = all_provisional
     for edge in revised.get("relationships", []):
         if edge.get("kind") != "imports_local_package":
             require(edge["from"] in id_mapping and edge["to"] in id_mapping,
@@ -452,12 +512,12 @@ def _generate(root, receipts_path, batch):
         narrative = re.sub(r"(?m)^EVIDENCE: .*?$",
                            "EVIDENCE: .ice/code-intelligence.json ("
                            + str(len(new_nodes)) + " source-indexed symbols; "
-                           + str(provisional_added) + " provisional)", narrative)
+                           + str(all_provisional) + " provisional)", narrative)
         narrative = re.sub(r"(?m)^COVERAGE: .*?$",
                            "COVERAGE: " + str(len(new_nodes)) + " symbols in "
                            + str(len(files)) + " indexed files; "
                            + str(reviewed_count) + " source-reviewed labels; "
-                           + str(provisional_added) + " unreviewed provisional labels.",
+                           + str(all_provisional) + " unreviewed provisional labels.",
                            narrative)
     narrative += (
         "\nG26 SOURCE-AWARE ATLAS MAINTENANCE\n"
@@ -482,6 +542,7 @@ def _generate(root, receipts_path, batch):
         "reused_declarations": reused,
         "fresh_review_receipts": fresh,
         "new_source_bound_provisional": provisional_added,
+        "reused_source_bound_provisional": provisional_carried,
         "total_declarations": len(new_nodes),
         "independent_approval": False,
         "outputs": [ATLAS, HTML, ICE],

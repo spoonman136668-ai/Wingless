@@ -1,0 +1,105 @@
+name: Wingless source-only JEPA development qualification
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/jepa/**'
+      - '.github/workflows/jepa-development-qualify.yml'
+permissions:
+  contents: read
+jobs:
+  development:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Focused development tests
+        run: go test ./research/jepa -count=1 -v
+      - name: Full Go regression
+        run: go test ./... -count=1
+      - name: Vet and build
+        shell: bash
+        run: |
+          go vet ./...
+          go build ./...
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare bounded source atlas companion (read-only artifact; no ref writes)
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          if go run ./cmd/ice validate; then
+            echo "WINGLESS_ATLAS_ALREADY_CURRENT"
+          else
+            go run ./cmd/ice build
+            # Only syntax-backed provisional source locators are generated.
+            # These receipts are self-asserted and NEVER claim human review.
+            python -B - <<'PY'
+          import hashlib, json, re, subprocess
+          from pathlib import Path
+          old = json.loads(Path(".ice/code-intelligence.json").read_text("utf-8"))
+          current = json.loads(Path(".ice/symbol-map.json").read_text("utf-8"))
+          key = lambda n: (n["file"], n["kind"], n["name"], n.get("receiver", ""))
+          old_keys = {key(n) for n in old["nodes"]}
+          target = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          require_files = {"research/jepa/stream.go", "research/jepa/stream_test.go"}
+          receipts = []
+          for n in current:
+              ident = key(n)
+              if ident in old_keys:
+                  continue
+              if n["file"] not in require_files:
+                  raise SystemExit("JEPA_ATLAS_UNEXPECTED_NEW_SYMBOL_SCOPE")
+              source = Path(n["file"]).read_bytes()
+              lines = source.splitlines(keepends=True)
+              declaration = b"".join(lines[n["start"] - 1:n["end"]])
+              token = re.search(rb"[A-Za-z_][A-Za-z0-9_]{3,}", declaration)
+              if token is None:
+                  raise SystemExit("JEPA_ATLAS_LITERAL_EVIDENCE_MISSING")
+              receipts.append({
+                  "key": list(ident), "target_source_commit": target,
+                  "file_sha256": hashlib.sha256(source).hexdigest(),
+                  "declaration_sha256": hashlib.sha256(declaration).hexdigest(),
+                  "start_line": n["start"], "end_line": n["end"],
+                  "reviewer": "automated source-only provenance assertion",
+                  "description": "Syntax-backed development symbol; no accepted behavioral evidence or independent review.",
+                  "label": "Unreviewed JEPA declaration " + n["name"],
+                  "literal_tokens": [token.group(0).decode("ascii")]
+              })
+          if not (1 <= len(receipts) <= 32):
+              raise SystemExit("JEPA_ATLAS_NEW_SYMBOL_COUNT_OUTSIDE_BUDGET")
+          Path(".ice/jepa-provisional-receipts.json").write_text(
+              json.dumps(receipts, sort_keys=True), encoding="utf-8")
+          print("JEPA_PROVISIONAL_DECLARATIONS=" + str(len(receipts)))
+          PY
+            python -B scripts/maintain_code_atlas.py --root . --receipts .ice/jepa-provisional-receipts.json
+            rm .ice/jepa-provisional-receipts.json
+            go run ./cmd/ice validate
+            go run ./cmd/ice relationships > .ice/jepa-local-relations.json
+            python -B scripts/validate_code_atlas.py --root . --relationships .ice/jepa-local-relations.json
+            rm .ice/jepa-local-relations.json
+            echo "WINGLESS_SOURCE_ATLAS_COMPANION_GENERATED_ONLY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wingless-jepa-atlas-${{ matrix.os }}
+          path: .ice/
+          include-hidden-files: true
+          retention-days: 5

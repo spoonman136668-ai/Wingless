@@ -3977,6 +3977,288 @@
     ]
   },
   {
+    "name": "MaxSteps",
+    "kind": "const",
+    "file": "research/jepa/stream.go",
+    "start": 16,
+    "end": 16
+  },
+  {
+    "name": "MaxEpochs",
+    "kind": "const",
+    "file": "research/jepa/stream.go",
+    "start": 17,
+    "end": 17
+  },
+  {
+    "name": "SnapshotSize",
+    "kind": "const",
+    "file": "research/jepa/stream.go",
+    "start": 18,
+    "end": 18
+  },
+  {
+    "name": "invalid",
+    "kind": "var",
+    "file": "research/jepa/stream.go",
+    "start": 20,
+    "end": 20
+  },
+  {
+    "name": "Pair",
+    "kind": "type",
+    "file": "research/jepa/stream.go",
+    "start": 23,
+    "end": 26
+  },
+  {
+    "name": "Recurrent",
+    "kind": "type",
+    "file": "research/jepa/stream.go",
+    "start": 30,
+    "end": 33
+  },
+  {
+    "name": "New",
+    "kind": "function",
+    "file": "research/jepa/stream.go",
+    "start": 35,
+    "end": 35
+  },
+  {
+    "name": "valid",
+    "kind": "function",
+    "file": "research/jepa/stream.go",
+    "start": 37,
+    "end": 57,
+    "calls": [
+      "float64",
+      "float64",
+      "len",
+      "len",
+      "len",
+      "len",
+      "math.Abs",
+      "math.Abs",
+      "math.IsInf",
+      "math.IsInf",
+      "math.IsNaN",
+      "math.IsNaN"
+    ]
+  },
+  {
+    "name": "DevelopmentSequence",
+    "kind": "function",
+    "file": "research/jepa/stream.go",
+    "start": 61,
+    "end": 74,
+    "calls": [
+      "float64",
+      "make"
+    ]
+  },
+  {
+    "name": "Loss",
+    "kind": "method",
+    "file": "research/jepa/stream.go",
+    "start": 78,
+    "end": 90,
+    "receiver": "Recurrent",
+    "calls": [
+      "float64",
+      "len",
+      "math.IsNaN",
+      "math.IsNaN",
+      "valid"
+    ]
+  },
+  {
+    "name": "Fit",
+    "kind": "method",
+    "file": "research/jepa/stream.go",
+    "start": 96,
+    "end": 137,
+    "receiver": "Recurrent",
+    "calls": [
+      "float64",
+      "len",
+      "len",
+      "math.IsInf",
+      "math.IsNaN",
+      "math.IsNaN",
+      "math.IsNaN",
+      "math.IsNaN",
+      "math.IsNaN",
+      "math.Max",
+      "math.Max",
+      "math.Min",
+      "math.Min",
+      "valid"
+    ]
+  },
+  {
+    "name": "Snapshot",
+    "kind": "method",
+    "file": "research/jepa/stream.go",
+    "start": 140,
+    "end": 153,
+    "receiver": "Recurrent",
+    "calls": [
+      "copy",
+      "copy",
+      "make",
+      "math.Float64bits",
+      "math.Float64bits",
+      "math.IsInf",
+      "math.IsInf",
+      "math.IsNaN",
+      "math.IsNaN",
+      "sha256.Sum256"
+    ]
+  },
+  {
+    "name": "Restore",
+    "kind": "function",
+    "file": "research/jepa/stream.go",
+    "start": 155,
+    "end": 169,
+    "calls": [
+      "len",
+      "m.Snapshot",
+      "math.Float64frombits",
+      "math.Float64frombits",
+      "sha256.Sum256",
+      "string",
+      "string",
+      "string"
+    ]
+  },
+  {
+    "name": "dataset",
+    "kind": "function",
+    "file": "research/jepa/stream_test.go",
+    "start": 8,
+    "end": 18,
+    "calls": [
+      "DevelopmentSequence",
+      "make",
+      "panic",
+      "uint64"
+    ]
+  },
+  {
+    "name": "mse",
+    "kind": "function",
+    "file": "research/jepa/stream_test.go",
+    "start": 20,
+    "end": 30,
+    "calls": [
+      "float64",
+      "len",
+      "model.Loss",
+      "panic"
+    ]
+  },
+  {
+    "name": "TestGoodViewsLearnTemporalStateBeyondMemorylessControl",
+    "kind": "function",
+    "file": "research/jepa/stream_test.go",
+    "start": 32,
+    "end": 48,
+    "calls": [
+      "New",
+      "New",
+      "dataset",
+      "dataset",
+      "fixed.Fit",
+      "learned.Fit",
+      "mse",
+      "mse",
+      "mse",
+      "mse",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestMispairedNegativeControl",
+    "kind": "function",
+    "file": "research/jepa/stream_test.go",
+    "start": 50,
+    "end": 70,
+    "calls": [
+      "New",
+      "New",
+      "bad.Fit",
+      "dataset",
+      "dataset",
+      "good.Fit",
+      "len",
+      "len",
+      "len",
+      "len",
+      "make",
+      "make",
+      "mse",
+      "mse",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
+    "name": "TestColdRetentionCheckpointIsExactAndBounded",
+    "kind": "function",
+    "file": "research/jepa/stream_test.go",
+    "start": 72,
+    "end": 96,
+    "calls": [
+      "New",
+      "Restore",
+      "Restore",
+      "dataset",
+      "dataset",
+      "dataset",
+      "learned.Fit",
+      "learned.Snapshot",
+      "len",
+      "len",
+      "mse",
+      "mse",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestInvalidViewsAndTrainingBudgetFailClosed",
+    "kind": "function",
+    "file": "research/jepa/stream_test.go",
+    "start": 98,
+    "end": 117,
+    "calls": [
+      "DevelopmentSequence",
+      "New",
+      "Restore",
+      "dataset",
+      "m.Fit",
+      "m.Fit",
+      "m.Fit",
+      "math.Inf",
+      "math.NaN",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal",
+      "t.Fatal"
+    ]
+  },
+  {
     "name": "Metrics",
     "kind": "type",
     "file": "resources/governor.go",

@@ -1,11 +1,11 @@
 TITLE: Wingless Human/Machine Symbol and Relationship Atlas
 STATUS: ADVISORY SOURCE-BOUND NAVIGATION
 REPOSITORY: spoonman136668-ai/Wingless
-SOURCE_COMMIT: f87fa798050124d5275874c7b623ab897f19324e
+SOURCE_COMMIT: 291bd7bce4a764c5ea3fceb41404f34370145f30
 SCHEMA: wingless.ice.semantic-code-atlas.v1
-EVIDENCE: .ice/code-intelligence.json (complete machine-readable 352-symbol index)
+EVIDENCE: .ice/code-intelligence.json (371 source-indexed symbols; 19 provisional)
 AUTHORITY: Source code and qualified tests outrank these descriptions; never grant runtime or acceptance authority.
-COVERAGE: 352 symbols in 138 indexed source/configuration files; 352 inspected semantic labels; 0 explicitly provisional lexical labels.
+COVERAGE: 371 symbols in 142 indexed files; 352 source-reviewed labels; 19 unreviewed provisional labels.
 RELATIONSHIPS: 9 inspected relationships, 51 local package imports, 95 unresolved syntax-only call candidates.
 
 HOW TO USE
@@ -187,3 +187,12 @@ FRESH_RECEIPT_COUNT: 0
 FRESH_RECEIPTS_ARE_SELF_ASSERTED: TRUE
 INDEPENDENT_HUMAN_REVIEW_REQUIRED_FOR_PROMOTION: TRUE
 Rebase integration changed source ancestry. Indexed Go blobs and module context were unchanged across the protected-main comparison; the original review and its history are retained, not independently renewed. No scientific acceptance is implied.
+
+G26 SOURCE-AWARE ATLAS MAINTENANCE
+TARGET_SOURCE_COMMIT: 291bd7bce4a764c5ea3fceb41404f34370145f30
+PREVIOUS_SOURCE_COMMIT: f87fa798050124d5275874c7b623ab897f19324e
+EXACT_DECLARATION_REUSE_COUNT: 352
+FRESH_RECEIPT_COUNT: 0
+FRESH_RECEIPTS_ARE_SELF_ASSERTED: TRUE
+INDEPENDENT_HUMAN_REVIEW_REQUIRED_FOR_PROMOTION: TRUE
+Historical evidence is retained as lineage, never silently renewed for changed declarations. Syntax-only edges remain provisional.

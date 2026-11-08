@@ -90,7 +90,9 @@ def fixture_unchanged(root, t, baseline):
     q = json.loads(report.strip().splitlines()[-1])
     require(q["reused_declarations"] == 352 and
             q["fresh_review_receipts"] == 0 and
-            q["target_source_commit"] == comment_head,
+            q["target_source_commit"] == comment_head and
+            q["reused_source_bound_provisional"] ==
+            json.loads((root / ATLAS).read_text("utf-8"))["coverage"]["lexical_provisional_labels"],
             "source-identical declarations did not preserve exact witnesses")
     derived = json.loads((first / ATLAS).read_text("utf-8"))
     require(derived["source_commit"] == comment_head, "new source identity missing")
@@ -302,13 +304,18 @@ def fixture_new_symbol(root, t, baseline):
                     "scripts/maintain_code_atlas.py",
                     "--root", ".", "--receipts", review_file)
     result = json.loads(accepted.strip().splitlines()[-1])
+    existing_atlas = json.loads((root / ATLAS).read_text("utf-8"))
+    inherited_provisional = existing_atlas["coverage"]["lexical_provisional_labels"]
     require(result["new_source_bound_provisional"] == 1
-            and result["reused_declarations"] == 352,
+            and result["reused_declarations"] == 352
+            and result["reused_source_bound_provisional"] == inherited_provisional,
             "G28 new source-bound symbol result incorrect")
     expanded = json.loads((added / ATLAS).read_text("utf-8"))
     marker = next(n for n in expanded["nodes"]
                   if n["name"] == "G28AtlasSourceWitnessFixture")
-    require(len(expanded["nodes"]) == 353
+    require(len(expanded["nodes"]) == len(existing_atlas["nodes"]) + 1
+            and expanded["coverage"]["lexical_provisional_labels"] == inherited_provisional + 1
+            and expanded["coverage"]["source_reviewed_labels"] == 352
             and marker["evidence_basis"] == "lexical-provisional"
             and marker["review_evidence"] is None
             and marker["provenance_lineage"]["independent_approval"] is False,
@@ -333,10 +340,38 @@ def fixture_new_symbol(root, t, baseline):
     return timings
 
 
+
+def verify_canonical_derived_diff_contract():
+    """Allow only the derived Go-index paths; forbid unrelated mutations.
+
+    The independent go run ./cmd/ice validate compares each derived file
+    byte-for-byte with canonical source. This test protects the narrow
+    filename allowlist, not a claim of independent semantic approval.
+    """
+    from validate_code_atlas import ALLOWED_DIFF
+    derived = {
+        ".ice/dependency-map.json",
+        ".ice/symbol-map.json",
+        ".ice/test-map.json",
+    }
+    require(derived.issubset(ALLOWED_DIFF),
+            "G26_CANONICAL_DERIVED_SOURCE_INDEX_NOT_ADMITTED")
+    forbidden = {
+        "research/jepa/stream.go",
+        ".github/workflows/native.yml",
+        ".ice/unknown-generated.json",
+        "go.mod",
+        "research/status/accepted-science.json",
+    }
+    require(not (forbidden & ALLOWED_DIFF),
+            "G26_UNRELATED_SOURCE_OR_RESEARCH_SCOPE_ADMITTED")
+
+
 def run(root, scratch_parent, *, workers_override=None):
     started = time.perf_counter()
     timings = {}
     root = root.resolve()
+    verify_canonical_derived_diff_contract()
     baseline = good(root, "git", "rev-parse", "HEAD").strip()
     require(not good(root, "git", "status", "--porcelain").strip(),
             "real checkout dirty before testing")

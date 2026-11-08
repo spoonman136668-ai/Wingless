@@ -15,6 +15,9 @@ ALLOWED_DIFF = {
     ".ice/code-intelligence.html",
     ".ice/manifest.json",
     ".ice/architecture-map.json",
+    ".ice/dependency-map.json",
+    ".ice/symbol-map.json",
+    ".ice/test-map.json",
     "scripts/validate_code_atlas.py",
     "scripts/test_code_atlas_tamper.py",
     "scripts/test_atlas_browser.py",
@@ -99,6 +102,13 @@ def validate(root, relationship_file):
     changed = set(git(root, "diff", "--name-only", source_commit, "HEAD").splitlines())
     if NATIVE_WORKFLOW in changed:
         verify_reviewed_native_autorun(root, source_commit)
+    else:
+        # Also reject uncommitted native workflow tampering after an atlas
+        # lineage reanchor: committed-tree diff alone cannot see dirty bytes.
+        committed_native = subprocess.check_output(
+            ["git", "show", source_commit + ":" + NATIVE_WORKFLOW], cwd=root)
+        require((root / NATIVE_WORKFLOW).read_bytes() == committed_native,
+                "native workflow differs from exact reviewed auto-trigger extension")
     require(changed.issubset(ALLOWED_DIFF | {NATIVE_WORKFLOW}),
             "unexpected changed paths: " + repr(sorted(changed - ALLOWED_DIFF - {NATIVE_WORKFLOW})))
     require(architecture == manifest.get("files"), "original ICE file coverage diverged")
