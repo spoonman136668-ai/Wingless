@@ -1,0 +1,117 @@
+name: Wingless one-shot public free Nemotron quota probe (2026-11-08)
+
+# Single use, isolated diagnostic; never an autonomous research controller.
+# Only the initial file-add commit on this exact disposable branch qualifies.
+on:
+  push:
+    branches:
+      - diagnostic/nemotron-free-once-20261108
+    paths:
+      - .github/workflows/nemotron-free-once-20261108.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wingless-nemotron-free-once-20261108
+  cancel-in-progress: false
+
+jobs:
+  quota-and-one-public-smoke:
+    if: >-
+      github.repository == 'spoonman136668-ai/Wingless' &&
+      github.event_name == 'push' &&
+      github.actor == 'spoonman136668-ai' &&
+      github.run_attempt == 1 &&
+      contains(github.event.head_commit.added, '.github/workflows/nemotron-free-once-20261108.yml')
+    runs-on: [self-hosted, Windows, X64, wingless-up-b]
+    timeout-minutes: 5
+    steps:
+      - name: Read existing DPAPI key, quota GET, at most one public-only free POST
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          if ($env:GITHUB_REPOSITORY -cne 'spoonman136668-ai/Wingless') { throw 'REPOSITORY_IDENTITY_MISMATCH' }
+          if ($env:RUNNER_NAME -ine 'WINGLESS-UP-B') { throw 'ORIGINAL_WINGLESS_RUNNER_IDENTITY_MISMATCH' }
+          $model = 'nvidia/nemotron-3-ultra-550b-a55b:free'
+          $paths = @(
+            'C:\ProgramData\CKBR\research-sidecar-yggdrasil\secrets\openrouter.dpapi',
+            'C:\ProgramData\CKBR\research-sidecar\secrets\openrouter.dpapi'
+          )
+          $path = $paths | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+          if ([string]::IsNullOrWhiteSpace($path)) {
+            Write-Host 'NEMOTRON_CREDENTIAL=NOT_FOUND; MODEL_CALLS=0'
+            exit 2
+          }
+          $token = $null
+          $headers = $null
+          function HttpStatus($e) {
+            try { return [int]$e.Response.StatusCode } catch { return 0 }
+          }
+          try {
+            try {
+              $cipher = (Get-Content -LiteralPath $path -Raw).Trim()
+              $secure = $cipher | ConvertTo-SecureString
+              $ptr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
+              try { $token = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr) }
+              finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr) }
+              if ([string]::IsNullOrWhiteSpace($token)) { throw 'EMPTY_KEY' }
+            } catch {
+              Write-Host 'NEMOTRON_CREDENTIAL=UNREADABLE_FOR_RUNNER_IDENTITY; MODEL_CALLS=0'
+              exit 3
+            }
+            $headers = @{ Authorization = 'Bearer ' + $token; Accept = 'application/json' }
+            try {
+              $reply = Invoke-RestMethod -Method Get -Uri 'https://openrouter.ai/api/v1/key' -Headers $headers -TimeoutSec 20 -MaximumRedirection 0
+            } catch {
+              $status = HttpStatus $_.Exception
+              Write-Host "OPENROUTER_KEY_CHECK=FAILED HTTP_STATUS=$status MODEL_CALLS=0"
+              exit 4
+            }
+            $data = $reply.data
+            if ($null -eq $data -or $null -eq $data.PSObject.Properties['free_model_daily_requests']) {
+              Write-Host 'OPENROUTER_QUOTA=UNVERIFIED MODEL_CALLS=0'
+              exit 5
+            }
+            $daily = $data.free_model_daily_requests
+            $remaining = $daily.remaining
+            foreach ($field in @('used','limit','remaining')) {
+              if ($null -ne $daily.PSObject.Properties[$field]) {
+                $v = [string]$daily.$field
+                if ($v -match '^\d+$') { Write-Host "OPENROUTER_FREE_DAILY_$($field.ToUpperInvariant())=$v" }
+              }
+            }
+            if ($null -eq $remaining -or [string]$remaining -notmatch '^\d+$') {
+              Write-Host 'NEMOTRON_SMOKE=BLOCKED_QUOTA_UNVERIFIED MODEL_CALLS=0'
+              exit 6
+            }
+            if ([int64]$remaining -lt 1) {
+              Write-Host 'NEMOTRON_SMOKE=BLOCKED_QUOTA_EXHAUSTED MODEL_CALLS=0'
+              exit 7
+            }
+            # No repo content, secrets, memory, or proprietary research sent.
+            # No retry, redirect, tool use, paid fallback, subprocess, or writes.
+            $body = @{
+              model = $model
+              messages = @(@{ role = 'user'; content = 'Reply with exactly READY.' })
+              max_tokens = 24
+              temperature = 0
+            } | ConvertTo-Json -Depth 5 -Compress
+            try {
+              $response = Invoke-RestMethod -Method Post -Uri 'https://openrouter.ai/api/v1/chat/completions' -Headers $headers -ContentType 'application/json' -Body $body -TimeoutSec 90 -MaximumRedirection 0
+              if ($null -eq $response.choices -or @($response.choices).Count -lt 1) {
+                Write-Host 'NEMOTRON_SMOKE=RESPONSE_SHAPE_UNVERIFIED MODEL_CALLS=1 RETRIES=0'
+                exit 8
+              }
+              Write-Host 'NEMOTRON_SMOKE=HTTP_SUCCESS MODEL_CALLS=1 RETRIES=0 PUBLIC_ONLY=true'
+            } catch {
+              $status = HttpStatus $_.Exception
+              $state = if ($status -eq 429) { 'RATE_LIMITED_429' } else { 'REQUEST_FAILED' }
+              Write-Host "NEMOTRON_SMOKE=$state HTTP_STATUS=$status MODEL_CALLS=1 RETRIES=0"
+              exit 9
+            }
+          } finally {
+            $headers = $null
+            $token = $null
+          }
