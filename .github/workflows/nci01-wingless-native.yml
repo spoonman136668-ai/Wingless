@@ -1,0 +1,53 @@
+name: NCI01 Wingless native recurrent component qualification
+on:
+  push:
+    branches: [research/nci01-native-recurrent-memory-20261020]
+    paths: ['.github/workflows/nci01-wingless-native.yml']
+permissions:
+  contents: read
+jobs:
+  native-recurrent:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Assert preimplementation freeze and exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 970f3fccf89feb2d1cc07df3be39d2df972af698 "$GITHUB_SHA"
+          test "$(git hash-object nativecognition/recurrent.go)" = f78d18e4d5a9eb8310be236c922a1e6ae57702d2
+          test "$(git hash-object nativecognition/recurrent_test.go)" = 96c2879980e4b22c4607d900a6889df451b20e7d
+          python - <<'PY'
+          import json
+          p=json.load(open("research/contrib/openai/nci01/prereg.json"))
+          assert p["schema"]=="native-cognition.nci01.wingless.dev-prereg.v1"
+          assert p["scientific_first_use"] is False and p["accepted_model"] is False
+          assert p["worker_integration"] is False
+          print("NCI01_W_PREREG_AND_IDENTITY=PASS")
+          PY
+      - name: Focused native streaming and checkpoint tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./nativecognition -count=1 -v
+          go vet ./nativecognition
+          echo "NCI01_W_FOCUSED=PASS"
+      - name: One full Go source regression on Linux
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./... -count=1
+          echo "NCI01_W_FULL_SOURCE_REGRESSION=PASS"
