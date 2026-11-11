@@ -84,6 +84,9 @@ func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []by
         action, err := s.Learner.ChooseRewardExplore(
             before, s.MinimumSelectedSamples)
         if err != nil {
+            // The source reset already happened. Never repeat it when
+            // selection fails; original owner must reconcile custody.
+            s.quarantined = true
             return zero, nil, err
         }
         observed, err := env.StepPublic(action)
