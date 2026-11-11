@@ -28,6 +28,15 @@ jobs:
         with:
           python-version: '3.12'
 
+      # Development-only R8 source inventory: never substitutes for Atlas review.
+      - name: Verify source-authenticated R8 G28 provisional preflight
+        if: github.head_ref == 'development/r8-g28-source-review-preflight-20261111'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python -B -m unittest scripts.test_r8_g28_source_review_preflight -v
+          if ($LASTEXITCODE -ne 0) { throw 'R8_G28_SOURCE_PREFLIGHT_FAILED' }
+
       - name: Verify unconditional PR scope and classify changed files
         id: scope
         shell: pwsh
