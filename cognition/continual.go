@@ -3,8 +3,10 @@
 package cognition
 
 import (
+ "bytes"
  "encoding/json"
  "errors"
+ "io"
  "math"
 )
 
@@ -51,7 +53,9 @@ func (s State) Snapshot()([]byte,error){return json.Marshal(s)}
 func (s *State) Restore(blob []byte)error{
  if len(blob)>4096{return errors.New("oversized snapshot")}
  var wire struct{Weights []float64 `json:"weights"`;Updates uint64 `json:"updates"`}
- if err:=json.Unmarshal(blob,&wire);err!=nil{return err}
+ dec:=json.NewDecoder(bytes.NewReader(blob));dec.DisallowUnknownFields()
+ if err:=dec.Decode(&wire);err!=nil{return err}
+ if err:=dec.Decode(&struct{}{});err!=io.EOF{return errors.New("trailing snapshot data")}
  if len(wire.Weights)!=4{return errors.New("invalid weight count")}
  var next State
  for i,v:=range wire.Weights{if math.IsNaN(v)||math.IsInf(v,0){return errors.New("invalid weight")};next.Weights[i]=v}
