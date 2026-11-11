@@ -1,7 +1,7 @@
 TITLE: Wingless Human/Machine Symbol and Relationship Atlas
 STATUS: ADVISORY SOURCE-BOUND NAVIGATION
 REPOSITORY: spoonman136668-ai/Wingless
-SOURCE_COMMIT: a6f825ad6420e769db8fadee560fd2a379b94ce9
+SOURCE_COMMIT: fd00165e92b4fc21d93d33292c32038e6e96bb22
 SCHEMA: wingless.ice.semantic-code-atlas.v1
 EVIDENCE: .ice/code-intelligence.json (complete machine-readable 352-symbol index)
 AUTHORITY: Source code and qualified tests outrank these descriptions; never grant runtime or acceptance authority.
@@ -125,3 +125,11 @@ FRESH_RECEIPT_COUNT: 0
 FRESH_RECEIPTS_ARE_SELF_ASSERTED: TRUE
 INDEPENDENT_HUMAN_REVIEW_REQUIRED_FOR_PROMOTION: TRUE
 Historical evidence is retained as lineage, never silently renewed for changed declarations. Syntax-only edges remain provisional.
+
+PROVENANCE REANCHOR — 2026-10-20
+PREVIOUS_SOURCE_COMMIT: a6f825ad6420e769db8fadee560fd2a379b94ce9
+PROTECTED_MAIN_SOURCE_COMMIT: fd00165e92b4fc21d93d33292c32038e6e96bb22
+INDEXED_SOURCE_BLOB_IDENTITY: 138_OF_138_EQUAL
+REVIEWED_DECLARATIONS_REUSED: 352_OF_352
+HISTORICAL_PROVENANCE: retained per-symbol in code-intelligence.json
+SCIENTIFIC_ACCEPTANCE: NONE; advisory navigation only

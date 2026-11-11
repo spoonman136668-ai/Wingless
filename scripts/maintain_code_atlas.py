@@ -121,10 +121,14 @@ def generate(root, receipts_path=None):
     }
     require(len(old_by_key) == len(old["nodes"]) and
             len(current_by_key) == len(symbols), "duplicate symbol identity")
-    require(set(old_by_key) == set(current_by_key),
-            "symbol added/deleted/renamed: separate source review and graph migration required")
-    require(len(symbols) == 352 and len(idx["files"]) == 138,
-            "outside frozen 352-symbol maintenance cohort")
+    require(set(old_by_key).issubset(current_by_key),
+            "G28_REMOVED_OR_RENAMED_REVIEWED_SYMBOL")
+    require(len(old_by_key) >= 352 and len(idx["files"]) >= 138
+            and {n["file"] for n in old["nodes"]}.issubset(files),
+            "G28_FROZEN_REVIEWED_BASELINE_MISSING")
+    added_keys = set(current_by_key) - set(old_by_key)
+    require(not added_keys or receipts_path is not None,
+            "G28_NEW_SYMBOL_SOURCE_RECEIPTS_REQUIRED")
     require(git(root, "rev-parse", "HEAD").decode().strip() == target,
             "target identity moved")
     receipts = []
@@ -146,10 +150,73 @@ def generate(root, receipts_path=None):
     used_receipts = set()
     reused = 0
     fresh = 0
+    provisional_added = 0
     for key, current in current_by_key.items():
-        oldnode = old_by_key[key]
+        oldnode = old_by_key.get(key)
         path = key[0]
         require(path in files, "current node outside canonical source files")
+        if oldnode is None:
+            receipt = receipt_by_key.get(key)
+            require(receipt is not None, "G28_NEW_SYMBOL_REVIEW_RECEIPT_REQUIRED " + repr(key))
+            if path not in current_sources:
+                raw = (root / path).read_bytes()
+                require(sha(raw) == files[path]["sha256"],
+                        "G28_NEW_SYMBOL_SOURCE_HASH_DRIFT: " + path)
+                current_sources[path] = raw
+            new_file = current_sources[path]
+            new_decl = span(new_file, current["start"], current["end"])
+            require(receipt.get("target_source_commit") == target
+                    and receipt.get("file_sha256") == sha(new_file)
+                    and receipt.get("declaration_sha256") == sha(new_decl)
+                    and receipt.get("start_line") == current["start"]
+                    and receipt.get("end_line") == current["end"],
+                    "G28_NEW_SYMBOL_RECEIPT_IDENTITY_DRIFT: " + repr(key))
+            require(isinstance(receipt.get("reviewer"), str)
+                    and len(receipt["reviewer"].strip()) >= 3,
+                    "G28_NEW_SYMBOL_REVIEWER_ASSERTION_REQUIRED")
+            for field in ("description", "label"):
+                require(isinstance(receipt.get(field), str)
+                        and len(receipt[field].strip()) >= 12,
+                        "G28_NEW_SYMBOL_DESCRIPTION_REQUIRED: " + field)
+            tokens = receipt.get("literal_tokens")
+            require(isinstance(tokens, list) and 1 <= len(tokens) <= 12
+                    and all(isinstance(t, str) and len(t) >= 4
+                            and t.strip() == t and t.encode("utf-8") in new_decl
+                            for t in tokens),
+                    "G28_NEW_SYMBOL_LITERAL_WITNESS_INVALID")
+            receiver = current.get("receiver", "")
+            node = {
+                "id": symbol_id({
+                    "file": path, "kind": current["kind"], "name": current["name"],
+                    "receiver": receiver, "start_line": current["start"]}),
+                "file": path, "file_sha256": sha(new_file),
+                "kind": current["kind"], "name": current["name"],
+                "start_line": current["start"], "end_line": current["end"],
+                "label": "PROVISIONAL: " + receipt["label"],
+                "description": (receipt["description"]
+                                + " — not a verified behavioral description"),
+                "evidence_basis": "lexical-provisional",
+                "source_url": ("https://github.com/" + REPO + "/blob/"
+                               + target + "/" + path + "#L"
+                               + str(current["start"]) + "-L"
+                               + str(current["end"])),
+                "syntax_calls": sorted(set(current.get("calls") or [])),
+                "review_evidence": None,
+                "file_level_local_package_dependencies": None,
+                "provenance_lineage": {
+                    "mode": "new-symbol-source-bound-provisional",
+                    "target_source_commit": target,
+                    "file_sha256": sha(new_file),
+                    "current_declaration_sha256": sha(new_decl.replace(b"\r\n", b"\n")),
+                    "literal_tokens": tokens,
+                    "reviewer_assertion": receipt["reviewer"],
+                    "independent_approval": False,
+                },
+            }
+            new_nodes.append(node)
+            used_receipts.add(key)
+            provisional_added += 1
+            continue
         if path not in historical_sources:
             raw = source_bytes(root, previous, path)
             require(sha(raw) == oldnode["file_sha256"],
@@ -272,6 +339,13 @@ def generate(root, receipts_path=None):
     revised["nodes"] = new_nodes
     revised["coverage"]["symbols"] = len(new_nodes)
     revised["coverage"]["source_files"] = len(files)
+    reviewed_count = len(new_nodes) - provisional_added
+    require(reviewed_count >= 352, "G28_HISTORICAL_REVIEW_LOST")
+    revised["coverage"]["source_reviewed_labels"] = reviewed_count
+    revised["coverage"]["source_evidenced_new_labels"] = reviewed_count
+    revised["coverage"]["source_dependency_bound_labels"] = reviewed_count
+    revised["coverage"]["all_reviewed_source_evidenced_labels"] = reviewed_count
+    revised["coverage"]["lexical_provisional_labels"] = provisional_added
     for edge in revised.get("relationships", []):
         if edge.get("kind") != "imports_local_package":
             require(edge["from"] in id_mapping and edge["to"] in id_mapping,
@@ -298,6 +372,17 @@ def generate(root, receipts_path=None):
     require(narrative.splitlines().count(orig_marker) == 1, "durable header source ambiguous")
     require("STATUS: ADVISORY" in narrative, "durable authority is not advisory")
     narrative = narrative.replace(orig_marker, "SOURCE_COMMIT: " + target, 1)
+    if provisional_added:
+        narrative = re.sub(r"(?m)^EVIDENCE: .*?$",
+                           "EVIDENCE: .ice/code-intelligence.json ("
+                           + str(len(new_nodes)) + " source-indexed symbols; "
+                           + str(provisional_added) + " provisional)", narrative)
+        narrative = re.sub(r"(?m)^COVERAGE: .*?$",
+                           "COVERAGE: " + str(len(new_nodes)) + " symbols in "
+                           + str(len(files)) + " indexed files; "
+                           + str(reviewed_count) + " source-reviewed labels; "
+                           + str(provisional_added) + " unreviewed provisional labels.",
+                           narrative)
     narrative += (
         "\nG26 SOURCE-AWARE ATLAS MAINTENANCE\n"
         "TARGET_SOURCE_COMMIT: " + target + "\n"
@@ -320,6 +405,7 @@ def generate(root, receipts_path=None):
         "previous_source_commit": previous,
         "reused_declarations": reused,
         "fresh_review_receipts": fresh,
+        "new_source_bound_provisional": provisional_added,
         "total_declarations": len(new_nodes),
         "independent_approval": False,
         "outputs": [ATLAS, HTML, ICE],
