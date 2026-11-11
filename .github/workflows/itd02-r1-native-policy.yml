@@ -1,0 +1,34 @@
+name: ITD-02 Wingless native 3-action interface
+on:
+  push:
+    branches: [research/itd02-r1-three-action-native-20261024]
+permissions:
+  contents: read
+jobs:
+  source-only-native-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 16
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: false
+      - name: Verify preregistration preceded additive native implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse 'ae69b09be7f55bc4f81c100b6f36b41bd8b2a3d3^')" = '9087de76fd4be50eb304fd3b2cec1ae443ba2b65'
+          git merge-base --is-ancestor ae69b09be7f55bc4f81c100b6f36b41bd8b2a3d3 HEAD
+          test "$(git hash-object research/native/itd02/r1/PREREG.json)" = 'b8643f8a2f0494c9a8a125012987161a71e1a945'
+          echo 'ITD02_R1_NATIVE_PROTOCOL_IDENTITY=PASS'
+      - name: Run actual source-owned native three-action qualification and cold process
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./research/native/itd02/r1 -count=1 -v
+          echo 'ITD02_R1_NATIVE_SOURCE_ONLY_INTERFACE=PASS'
+          echo 'ITD02_R1_MINIGRID_PROSPECTIVE_SCIENCE=NOT_STARTED'

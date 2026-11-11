@@ -1,0 +1,48 @@
+{
+  "schema": "itd02.r1.three-action-native-source-contract-v1",
+  "scope": "SOURCE_ONLY_INTERFACE_QUALIFICATION_NOT_SCIENTIFIC_FIRST_USE",
+  "component": "Wingless",
+  "parent_commit": "9087de76fd4be50eb304fd3b2cec1ae443ba2b65",
+  "upstream_pr": 389,
+  "benchmark_source": {
+    "repo": "Farama-Foundation/Minigrid",
+    "commit": "7f5853792ea7f04f75614661006d87fcf949f26d",
+    "qualified_FORGE_PR": 874,
+    "K4S_blocker_PR": 876,
+    "MiniGrid_legal_actions": [
+      0,
+      1,
+      2
+    ],
+    "existing_K4R_DEV_seeds": "3100..3107; forbidden for new native evaluation"
+  },
+  "mechanism": "A three-action, source-agnostic native Go fast/slow contextual action-value learner; each observed public transition updates only the selected action. Fast temporal-difference reward-prediction state and slower exponentially consolidated state. Do not reuse old binary FastSlowState or claim it supports action2.",
+  "method": "Fixed local TD target reward+0.15*(Manhattan_before-Manhattan_after)+0.9*max(next action estimate) if not terminal; fast update alpha0.12, slow update alpha0.015. No gradient across episodes. Strict checkpoint SHA and version.",
+  "public_information": "Pure public MiniGrid FullyObsWrapper image-derived x,y,direction,goal coords,front-blocked; no secret grid, seed, environment family or shortest path. Rewards from completed original env.step, optional public Manhattan-distance progress computed only after the step.",
+  "add_only_files": [
+    "research/native/itd02/r1/policy.go",
+    "research/native/itd02/r1/policy_test.go",
+    ".github/workflows/itd02-r1-native-policy.yml"
+  ],
+  "focus_test": "go test ./research/native/itd02/r1 -count=1 -v",
+  "gates": [
+    "A real native policy returns an integer in {0,1,2} from current public observation and its own learned local state",
+    "Original native interface accepts chosen action2 as both prediction and consequence-learning input",
+    "Real after-step consequence update changes genuinely learned state; no hidden label or future outcome accessible during choose",
+    "Cold serialized checkpoint authenticates version/schema/digest and restores exact native predictions in a fresh process or instance",
+    "Invalid action, invalid or nonfinite public sensor/reward, stale checkpoint or tampering fail closed without mutating state",
+    "Demonstrate all three candidate decisions are reachable with independently generated public training examples, no hard-coded expert path or output mapping",
+    "Focused original repo source-only native tests and own GitHub hosted CI must pass; no MiniGrid CHECK or DEV trial, no science admission"
+  ],
+  "scientific_metrics_future": "Independent preregistration before FIT and DEV in FORGE with *new* seed families and equal experienced observations/actions/consequences; strong BFS, tabular Q, recurrent, simple count, random; cold restart retention, interference and public action learning, CPU/RSS/snapshot/resource accounting.",
+  "governance": {
+    "no_main_merge": true,
+    "no_F139_controller_change": true,
+    "no_FSA_first_use": true,
+    "no_CKB_plane_change": true,
+    "no_paid_API": true,
+    "source_only_and_no_new_MINIGRID_worlds": true,
+    "preserve_prior_native_negative": true,
+    "draft_only": true
+  }
+}
