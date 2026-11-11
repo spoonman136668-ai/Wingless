@@ -13,7 +13,11 @@ import (
 
 // Offline source-free native cognition interface. No queue, tool or broker calls.
 func runCognition(in io.Reader,out io.Writer)error {
- scanner:=bufio.NewScanner(io.LimitReader(in,1<<20+1))
+ const maxCognitionInputBytes = 1 << 20
+ raw, err := io.ReadAll(io.LimitReader(in, maxCognitionInputBytes+1))
+ if err != nil { return err }
+ if len(raw) > maxCognitionInputBytes { return errors.New("cognition input exceeds byte limit") }
+ scanner:=bufio.NewScanner(bytes.NewReader(raw))
  scanner.Buffer(make([]byte,4096),1<<16)
  enc:=json.NewEncoder(out)
  var s cognition.State

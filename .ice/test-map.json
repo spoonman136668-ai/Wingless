@@ -127,6 +127,114 @@
     ]
   },
   {
+    "name": "TestCognitionInputByteLimitExactAccepted",
+    "kind": "function",
+    "file": "cmd/wingless/cognition_input_limit_test.go",
+    "start": 25,
+    "end": 31,
+    "calls": [
+      "bytes.Count",
+      "bytes.NewReader",
+      "fullInputAtLimit",
+      "len",
+      "len",
+      "out.Bytes",
+      "runCognition",
+      "t.Fatal",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCognitionInputByteLimitPlusOneRejectedWithoutOutput",
+    "kind": "function",
+    "file": "cmd/wingless/cognition_input_limit_test.go",
+    "start": 33,
+    "end": 38,
+    "calls": [
+      "append",
+      "byte",
+      "bytes.NewReader",
+      "err.Error",
+      "fullInputAtLimit",
+      "out.Len",
+      "out.Len",
+      "runCognition",
+      "strings.Contains",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCognitionInputFullAdditionalEventRejectedWithoutOutput",
+    "kind": "function",
+    "file": "cmd/wingless/cognition_input_limit_test.go",
+    "start": 40,
+    "end": 45,
+    "calls": [
+      "append",
+      "bytes.NewReader",
+      "err.Error",
+      "fullInputAtLimit",
+      "out.Len",
+      "out.Len",
+      "runCognition",
+      "strings.Contains",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCognitionInputScannerTokenLimitStillDenied",
+    "kind": "function",
+    "file": "cmd/wingless/cognition_input_limit_test.go",
+    "start": 47,
+    "end": 51,
+    "calls": [
+      "out.Len",
+      "out.Len",
+      "runCognition",
+      "strings.NewReader",
+      "strings.Repeat",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCognitionInputReaderErrorDeniedWithoutOutput",
+    "kind": "function",
+    "file": "cmd/wingless/cognition_input_limit_test.go",
+    "start": 58,
+    "end": 62,
+    "calls": [
+      "err.Error",
+      "out.Len",
+      "out.Len",
+      "runCognition",
+      "strings.Contains",
+      "t.Fatalf",
+      "t.Fatalf"
+    ]
+  },
+  {
+    "name": "TestCognitionInputOrdinaryFlowPreserved",
+    "kind": "function",
+    "file": "cmd/wingless/cognition_input_limit_test.go",
+    "start": 63,
+    "end": 68,
+    "calls": [
+      "bytes.Contains",
+      "bytes.Contains",
+      "out.Bytes",
+      "out.Bytes",
+      "out.String",
+      "runCognition",
+      "strings.NewReader",
+      "t.Fatal",
+      "t.Fatalf"
+    ]
+  },
+  {
     "name": "TestOfflineCognition",
     "kind": "function",
     "file": "cmd/wingless/cognition_test.go",
