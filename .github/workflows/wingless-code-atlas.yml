@@ -60,6 +60,29 @@ jobs:
           python scripts/validate_code_atlas.py --root . --relationships "$env:RUNNER_TEMP\wingless-type-relationships.json"
           if ($LASTEXITCODE -ne 0) { throw 'SEMANTIC_ATLAS_VALIDATION_FAILED' }
 
+      # DEV-only artifact export AFTER the original source-freshness gate fails.
+      # The earlier Atlas step remains unchanged and its failure stays terminal.
+      - name: DEV only capture exact generated ICE after source-stale failure
+        if: ${{ failure() && github.head_ref == 'development/r8-cognition-input-limit-20261111' }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          go run ./cmd/ice build
+          if ($LASTEXITCODE -ne 0) { throw 'DEV_ICE_BUILD_FAILED' }
+          go run ./cmd/ice validate
+          if ($LASTEXITCODE -ne 0) { throw 'DEV_ICE_VALIDATE_FAILED' }
+          tar -czf "$env:RUNNER_TEMP\wingless-r8-cognition-ice.tar.gz" .ice
+          if ($LASTEXITCODE -ne 0) { throw 'DEV_ICE_ARCHIVE_FAILED' }
+          Write-Output 'DEV_ICE_SOURCE_GENERATED_NO_ATLAS_APPROVAL'
+      - name: DEV only upload source-generated ICE artifact
+        if: ${{ always() && github.head_ref == 'development/r8-cognition-input-limit-20261111' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-r8-cognition-ice-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/wingless-r8-cognition-ice.tar.gz
+          if-no-files-found: warn
+          retention-days: 3
+
       - name: Tamper-resistance negative acceptance in disposable exact-head clone
         if: steps.scope.outputs.atlas_relevant == 'true'
         shell: pwsh
