@@ -75,6 +75,7 @@ def main():
         require(overflow.returncode != 0 and
                 b"exceeds 1 MiB" in overflow.stderr,
                 "multi-line aggregate overflow silently accepted")
+        require(overflow.stdout == b"", "rejected aggregate overflow emitted partial output")
 
         head = b'{"op":"snapshot"}'
         last_spaces = (1 << 20) - len(under) - len(head) - 1
@@ -92,6 +93,7 @@ def main():
         require(rejected.returncode != 0 and
                 b"exceeds 1 MiB" in rejected.stderr,
                 "1 MiB plus one byte silently accepted")
+        require(rejected.stdout == b"", "rejected boundary-plus-one emitted partial output")
 
     print(json.dumps({
         "gate": "NRM1U_INHERITED_CLI_SUBPROCESS_BOUNDARY",
