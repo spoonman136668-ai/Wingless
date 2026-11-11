@@ -27,10 +27,12 @@ SHA40 = re.compile(r"[0-9a-f]{40}\Z")
 # Any other workflow modification fails closed rather than becoming a broad grant.
 WORKFLOW = ".github/workflows/wingless-code-atlas.yml"
 WORKFLOW_GIT_BLOB = "39b7e20f867bc091a0d4c0a3b8bd32a8327d7efc"
+INDEX_BLOBS = {".ice/manifest.json":"9fdf7828b6bcd8856af5b862079415b5fefca496",".ice/architecture-map.json":"f12e143111d69a9a618935c0010742844e63ed34"}
 LOCAL_ONLY = frozenset({
     "scripts/r8_g28_source_review_preflight.py",
     "scripts/test_r8_g28_source_review_preflight.py",
     WORKFLOW,
+    *INDEX_BLOBS,
 })
 
 
@@ -194,6 +196,9 @@ def run(root: Path) -> dict:
     require(changed <= LOCAL_ONLY, "SOURCE_OR_REVIEW_POLICY_MUTATION")
     require(git(root, "rev-parse", "HEAD:" + WORKFLOW).decode().strip()
             == WORKFLOW_GIT_BLOB, "WORKFLOW_CONTENT_DRIFT")
+    for indexed_path, indexed_sha in INDEX_BLOBS.items():
+        require(git(root, "rev-parse", "HEAD:" + indexed_path).decode().strip()
+                == indexed_sha, "GENERATED_ICE_BLOB_DRIFT")
     for ref in (ACCEPTED, HISTORICAL_REVIEW, R8_INDEXED):
         require(git(root, "cat-file", "-t", ref).strip() == b"commit",
                 "MISSING_IMMUTABLE_SOURCE")
