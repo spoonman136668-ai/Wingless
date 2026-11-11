@@ -1,0 +1,70 @@
+name: Wingless isolated source-only Graphify Obsidian refresh
+on:
+  push:
+    branches:
+      - knowledge/graphify-obsidian-refresh-20261027
+    paths:
+      - .github/workflows/graphify-obsidian-refresh-once.yml
+permissions:
+  contents: write
+jobs:
+  refresh:
+    if: github.actor == 'spoonman136668-ai'
+    runs-on: windows-2022
+    timeout-minutes: 35
+    env:
+      GRAPHIFY_QUERY_LOG_DISABLE: '1'
+      GRAPHIFY_QUERY_LOG_RESPONSES: '0'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install source-only pinned Graphify
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python -m pip install --disable-pip-version-check 'uv==0.9.7'
+          if($LASTEXITCODE -ne 0){throw 'UV_INSTALL_FAILED'}
+      - name: Regenerate source-pinned advisory graph and dedicated vault
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $source=(git rev-parse HEAD).Trim()
+          if(@(git status --porcelain).Count -gt 0){throw 'DIRTY_SOURCE'}
+          $env:GRAPHIFY_QUERY_LOG_DISABLE='1'
+          $env:GRAPHIFY_QUERY_LOG_RESPONSES='0'
+          $version=(& uvx --from 'graphifyy==0.9.53' graphify --version)
+          if($LASTEXITCODE -ne 0 -or (($version -join ' ') -notmatch '0\.9\.53')){throw 'GRAPHIFY_VERSION_MISMATCH'}
+          & uvx --from 'graphifyy==0.9.53' graphify extract . --code-only --force *> $env:RUNNER_TEMP\graphify-refresh.log
+          if($LASTEXITCODE -ne 0){throw 'SOURCE_EXTRACTION_FAILED'}
+          if(-not (Test-Path graphify-out/graph.json -PathType Leaf)){throw 'GRAPH_NOT_GENERATED'}
+          New-Item -ItemType Directory -Force .ice/derived/graphify,.ice/derived/obsidian|Out-Null
+          Copy-Item graphify-out/graph.json .ice/derived/graphify/graph.json -Force
+          & uvx --from 'graphifyy==0.9.53' graphify export obsidian --graph .ice/derived/graphify/graph.json --dir .ice/derived/obsidian *> $env:RUNNER_TEMP\graphify-export.log
+          if($LASTEXITCODE -ne 0){throw 'VAULT_EXPORT_FAILED'}
+          $notes=@(Get-ChildItem .ice/derived/obsidian -Recurse -File -Filter '*.md')
+          if($notes.Count -lt 1 -or $notes.Count -gt 10000){throw 'VAULT_NOTE_LIMIT'}
+          $sum=($notes|Measure-Object -Property Length -Sum).Sum
+          if($sum -gt 100000000){throw 'VAULT_BYTES_LIMIT'}
+          $digest=(Get-FileHash .ice/derived/graphify/graph.json -Algorithm SHA256).Hash.ToLowerInvariant()
+          $record=[ordered]@{schema='research.advisory-graphify-refresh.v1';repository='spoonman136668-ai/Wingless';source_commit=$source;graph_sha256=$digest;graphify_version='0.9.53';notes=$notes.Count;mode='code-only';model_calls=0;research_authority=$false;promotion_authority=$false}
+          $record|ConvertTo-Json -Depth 4|Set-Content .ice/derived/graphify/build.json -Encoding utf8
+          Remove-Item $env:RUNNER_TEMP\graphify-refresh.log,$env:RUNNER_TEMP\graphify-export.log -Force -ErrorAction SilentlyContinue
+          Write-Host 'WINGLESS_ADVISORY_GRAPHIFY_OBSIDIAN=PASS'
+      - name: Commit only generated artifacts to isolated candidate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          git add -f .ice/derived/graphify .ice/derived/obsidian
+          $files=@(git diff --cached --name-only)
+          if($files.Count -lt 2){throw 'GENERATED_FILES_MISSING'}
+          $outside=@(git diff --cached --name-only -- . ':(exclude).ice/derived/**')
+          if($outside.Count -gt 0){throw 'OUT_OF_SCOPE'}
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Regenerate advisory code-only Graphify and Obsidian'
+          if($LASTEXITCODE -ne 0){throw 'COMMIT_FAILED'}
+          git push origin HEAD:knowledge/graphify-obsidian-refresh-20261027
+          if($LASTEXITCODE -ne 0){throw 'PUSH_FAILED'}
