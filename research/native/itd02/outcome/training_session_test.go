@@ -184,3 +184,27 @@ func TestNativeTrainingCheckpointSinkIsBoundedAndFailClosed(t *testing.T){
     if _,err:=s.TrainBounded(source,129,func([]byte)error{return nil});err==nil{
         t.Fatal("accepted unbounded training")}
 }
+
+// A valid external reset followed by an invalid source-public observation
+// must not permit a second ResetPublic or even one StepPublic. Prior to the
+// guard, the second RunEpisode can reset the same external source again.
+func TestNativeSessionQuarantinesChoiceFailureAfterSourceReset(t *testing.T) {
+    bad := selectedFixture()
+    bad.Direction = 4 // R1 allows only the four public orientations 0..3.
+    source := &sessionFixture{initial:bad, terminal:true}
+    model := NewSelected()
+    session := &TrainingSession{Learner:model,
+        MinimumSelectedSamples:2, MaximumEpisodeSteps:1}
+    _, _, err := session.RunEpisode(source)
+    if err == nil || source.resets != 1 || len(source.actions) != 0 {
+        t.Fatal("invalid public observation failed to stop before StepPublic")
+    }
+    if model.Policy.Armed || model.Policy.LiveSeen != 0 || model.Rewards.NextID != 1 {
+        t.Fatal("model custody changed on failed pre-action selection")
+    }
+    source.initial = selectedFixture() // The next reset would now be valid.
+    _, _, err = session.RunEpisode(source)
+    if err == nil || source.resets != 1 || len(source.actions) != 0 {
+        t.Fatal("external ResetPublic was replayed after a failed choice")
+    }
+}

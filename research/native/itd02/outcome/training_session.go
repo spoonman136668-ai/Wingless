@@ -84,6 +84,9 @@ func (s *TrainingSession) RunEpisode(env PublicEnvironment) (EpisodeResult, []by
         action, err := s.Learner.ChooseRewardExplore(
             before, s.MinimumSelectedSamples)
         if err != nil {
+            // ResetPublic has already affected the external source.
+            // Without source-owner reconciliation, never reset it again.
+            s.quarantined = true
             return zero, nil, err
         }
         observed, err := env.StepPublic(action)
