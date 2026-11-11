@@ -23,9 +23,14 @@ ALLOWED_SOURCE_DRIFT = {
     "cmd/wingless/main.go",
 }
 SHA40 = re.compile(r"[0-9a-f]{40}\Z")
+# This is the exact frozen, additive test step in the EXISTING Atlas workflow.
+# Any other workflow modification fails closed rather than becoming a broad grant.
+WORKFLOW = ".github/workflows/wingless-code-atlas.yml"
+WORKFLOW_GIT_BLOB = "39b7e20f867bc091a0d4c0a3b8bd32a8327d7efc"
 LOCAL_ONLY = frozenset({
     "scripts/r8_g28_source_review_preflight.py",
     "scripts/test_r8_g28_source_review_preflight.py",
+    WORKFLOW,
 })
 
 
@@ -187,6 +192,8 @@ def run(root: Path) -> dict:
     require(not git(root, "status", "--porcelain").strip(), "DIRTY_CHECKOUT")
     changed = set(git(root, "diff", "--name-only", R8_INDEXED, head).decode().splitlines())
     require(changed <= LOCAL_ONLY, "SOURCE_OR_REVIEW_POLICY_MUTATION")
+    require(git(root, "rev-parse", "HEAD:" + WORKFLOW).decode().strip()
+            == WORKFLOW_GIT_BLOB, "WORKFLOW_CONTENT_DRIFT")
     for ref in (ACCEPTED, HISTORICAL_REVIEW, R8_INDEXED):
         require(git(root, "cat-file", "-t", ref).strip() == b"commit",
                 "MISSING_IMMUTABLE_SOURCE")
