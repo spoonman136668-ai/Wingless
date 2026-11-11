@@ -95,6 +95,30 @@ func (d *FastSlowState) Observe(action, prior, outcome int, rate float64) error 
  return nil
 }
 
+// ChooseDisagreementProbe proposes a public intervention whose outcome could
+// most distinguish two independently learned timescales. It accesses only the
+// existing predictive weights and public prior; never a future consequence,
+// environment identifier, hidden answer or evaluation oracle.
+//
+// Return ok=false on equal disagreements: evidence-free or symmetric traces
+// are not sufficient grounds to privilege either action. This is a bounded
+// development hypothesis, not proof of information gain or causal transfer.
+func (d *FastSlowState) ChooseDisagreementProbe(prior int) (action int, ok bool, err error) {
+ fast0, err := d.Fast.Predict(0, prior)
+ if err != nil { return 0, false, err }
+ slow0, err := d.Slow.Predict(0, prior)
+ if err != nil { return 0, false, err }
+ fast1, err := d.Fast.Predict(1, prior)
+ if err != nil { return 0, false, err }
+ slow1, err := d.Slow.Predict(1, prior)
+ if err != nil { return 0, false, err }
+ disagreement0 := math.Abs(fast0 - slow0)
+ disagreement1 := math.Abs(fast1 - slow1)
+ if disagreement0 == disagreement1 { return 0, false, nil }
+ if disagreement0 > disagreement1 { return 0, true, nil }
+ return 1, true, nil
+}
+
 // Snapshot and Restore retain both learned traces across process restarts;
 // the existing single-trace State checkpoint schema remains untouched.
 func (d FastSlowState) Snapshot() ([]byte, error) {
