@@ -23,6 +23,7 @@ func sigmoid(z float64)float64 {
 }
 func (s *State) Predict(action,prior int)(float64,error) {
  f,err:=features(action,prior);if err!=nil{return 0,err}
+ for _,w:=range s.Weights{if math.IsNaN(w)||math.IsInf(w,0){return 0,errors.New("nonfinite state")}}
  z:=0.0;for i,x:=range f{z+=s.Weights[i]*x}
  return sigmoid(z),nil
 }
@@ -31,6 +32,10 @@ func (s *State) Observe(action,prior,outcome int,rate float64)error {
  if (outcome!=0&&outcome!=1)||!(rate>0&&rate<=1)||math.IsNaN(rate)||math.IsInf(rate,0){return errors.New("invalid observation")}
  f,err:=features(action,prior);if err!=nil{return err}
  p,err:=s.Predict(action,prior);if err!=nil{return err}
+ // The count is a fixed-budget record of genuine observed consequences.
+ // Never wrap a trained model's evidence history back to zero; failure must
+ // leave both weights and metadata untouched.
+ if s.Updates==^uint64(0){return errors.New("native learning update counter exhausted")}
  next:=s.Weights
  for i,v:=range f {next[i]+=rate*(float64(outcome)-p)*v;if math.IsNaN(next[i])||math.IsInf(next[i],0){return errors.New("nonfinite state")}}
  s.Weights=next;s.Updates++;return nil
