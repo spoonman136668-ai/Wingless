@@ -179,6 +179,42 @@ def inventory(old_manifest: dict, target_manifest: dict, old_atlas: dict,
     }
 
 
+def verify_legacy_cli_delta(accepted: bytes, target: bytes) -> dict:
+    """Bound the ONE changed historic main() to the source-evidenced CLI branch.
+
+    A mechanical exact diff is NOT an authenticated independent source review.
+    The new cognition CLI and its imported native code remain provisional.
+    """
+    require(type(accepted) is bytes and type(target) is bytes,
+            "CLI_SOURCE_TYPE_DRIFT")
+    anchor = b"func main() {\n"
+    addition = (
+        b'\tif len(os.Args) == 2 && os.Args[1] == "cognition" {\n'
+        b"\t\tif e := cognitionCLI(); e != nil {\n"
+        b"\t\t\tfmt.Fprintln(os.Stderr, e)\n"
+        b"\t\t\tos.Exit(1)\n"
+        b"\t\t}\n"
+        b"\t\treturn\n"
+        b"\t}\n"
+    )
+    before_usage = b"usage: wingless host|demo|benchmark|local-benchmark"
+    after_usage = b"usage: wingless host|demo|benchmark|cognition|local-benchmark"
+    require(accepted.count(anchor) == 1 and accepted.count(before_usage) == 1,
+            "CLI_OLD_SOURCE_ANCHOR_DRIFT")
+    require(target == accepted.replace(
+        anchor, anchor + addition, 1).replace(before_usage, after_usage, 1),
+        "UNREVIEWED_LEGACY_CLI_DRIFT")
+    return {
+        "legacy_declaration": "cmd/wingless/main.go::main",
+        "old_git_blob": "89e3e68a4567ab69cbec3660e784743338107dcd",
+        "r8_git_blob": "5f1ddb8e1c5fbe28005451c7c1d76f217cdf3519",
+        "exact_added_command": "cognition",
+        "existing_cli_paths_byte_preserved": True,
+        "independent_review_completed": False,
+        "source_admission_authorized": False,
+    }
+
+
 def git(root: Path, *args: str) -> bytes:
     return subprocess.check_output(["git", *args], cwd=root, stderr=subprocess.PIPE)
 
@@ -206,10 +242,14 @@ def run(root: Path) -> dict:
         return git(root, "show", ref + ":" + path)
     def load(ref: str, path: str) -> dict:
         return json.loads(source(ref, path))
-    return inventory(load(ACCEPTED, ".ice/manifest.json"),
-                     load(R8_INDEXED, ".ice/manifest.json"),
-                     load(ACCEPTED, ".ice/code-intelligence.json"),
-                     source, target_sha=R8_INDEXED)
+    result = inventory(load(ACCEPTED, ".ice/manifest.json"),
+                       load(R8_INDEXED, ".ice/manifest.json"),
+                       load(ACCEPTED, ".ice/code-intelligence.json"),
+                       source, target_sha=R8_INDEXED)
+    result["legacy_cli_delta"] = verify_legacy_cli_delta(
+        source(ACCEPTED, "cmd/wingless/main.go"),
+        source(R8_INDEXED, "cmd/wingless/main.go"))
+    return result
 
 
 def main() -> None:

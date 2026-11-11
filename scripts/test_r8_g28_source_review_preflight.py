@@ -90,6 +90,37 @@ class R8G28PreflightTests(unittest.TestCase):
             m.inventory({}, {}, {}, lambda sha, path: b"",
                         target_sha="0" * 40)
 
+    def test_legacy_main_cli_exact_delta_readonly(self):
+        x = self.result["legacy_cli_delta"]
+        self.assertEqual(x["legacy_declaration"], "cmd/wingless/main.go::main")
+        self.assertEqual(x["exact_added_command"], "cognition")
+        self.assertIs(x["existing_cli_paths_byte_preserved"], True)
+        self.assertIs(x["independent_review_completed"], False)
+        self.assertIs(x["source_admission_authorized"], False)
+
+    def test_legacy_main_unauthorized_delta_is_denied(self):
+        accepted = m.git(ROOT, "show", m.ACCEPTED + ":cmd/wingless/main.go")
+        current = m.git(ROOT, "show", m.R8_INDEXED + ":cmd/wingless/main.go")
+        self.assertIs(m.verify_legacy_cli_delta(
+            accepted, current)["existing_cli_paths_byte_preserved"], True)
+        with self.assertRaisesRegex(m.R8G28Denied, "UNREVIEWED_LEGACY_CLI_DRIFT"):
+            m.verify_legacy_cli_delta(accepted, current.replace(
+                b'os.Args[1] == "gpu"', b'os.Args[1] == "network"', 1))
+        with self.assertRaisesRegex(m.R8G28Denied, "UNREVIEWED_LEGACY_CLI_DRIFT"):
+            m.verify_legacy_cli_delta(accepted, current.replace(
+                b"\t\treturn\n\t}\n\tif len(os.Args) > 1",
+                b"\t\tpanic(\"unexpected\")\n\t}\n\tif len(os.Args) > 1", 1))
+
+    def test_legacy_main_missing_or_mutated_anchor_is_denied(self):
+        accepted = m.git(ROOT, "show", m.ACCEPTED + ":cmd/wingless/main.go")
+        current = m.git(ROOT, "show", m.R8_INDEXED + ":cmd/wingless/main.go")
+        with self.assertRaisesRegex(m.R8G28Denied, "CLI_OLD_SOURCE_ANCHOR_DRIFT"):
+            m.verify_legacy_cli_delta(
+                accepted.replace(b"func main() {", b"func different() {", 1),
+                current)
+        with self.assertRaisesRegex(m.R8G28Denied, "CLI_SOURCE_TYPE_DRIFT"):
+            m.verify_legacy_cli_delta(accepted.decode(), current)
+
     def test_no_fake_reviewer_receipt_is_generated(self):
         text = repr(self.result)
         self.assertNotIn("'reviewer_assertion'", text)
