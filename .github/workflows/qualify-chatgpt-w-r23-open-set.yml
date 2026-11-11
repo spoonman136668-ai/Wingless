@@ -1,0 +1,36 @@
+name: Wingless W-R23 frozen open-set scientific rejection
+on:
+  push:
+    branches: [research/chatgpt-w-r23-open-set-rejection-20261013]
+permissions:
+  contents: read
+jobs:
+  science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify exact immutable parent/prereg/source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 2ebe681a4ffa159251ef9e96a233ccc261f37e70 HEAD
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-open-set/prereg.json)" = 2fd2358c27f4c713d182863d51d12cd03a5ca68c
+          test "$(git hash-object research/contrib/chatgpt/20261013-w-r23-open-set/execute.py)" = 074d2173b09ffc3631aecc82689b35184c9a4056
+          python3 -m json.tool research/contrib/chatgpt/20261013-w-r23-open-set/prereg.json >/dev/null
+          python3 -m py_compile research/contrib/chatgpt/20261013-w-r23-open-set/execute.py
+      - name: Original frozen W-R23 open-set science
+        run: |
+          set -euo pipefail
+          python3 -B research/contrib/chatgpt/20261013-w-r23-open-set/execute.py > /tmp/W-R23-original.json
+          python3 -m json.tool /tmp/W-R23-original.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: W-R23-original-open-set
+          path: /tmp/W-R23-original.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Full Wingless regression and build
+        run: go test ./... && go build ./...
