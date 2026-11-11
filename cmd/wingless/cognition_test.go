@@ -8,7 +8,7 @@ func TestOfflineCognition(t *testing.T){
  if e:=runCognition(strings.NewReader(`{"op":"execute"}`+"\n"),&out);e==nil{t.Fatal("unauthorized command accepted")}
 }
 
-func TestCognitionOversizeInputHasNoPartialOutput(t *testing.T) {
+func TestOfflineCognitionOversizeInputHasNoPartialOutput(t *testing.T) {
  line:=append([]byte(`{"op":"snapshot"}`),bytes.Repeat([]byte(" "),60000)...)
  line=append(line,'\n')
  data:=bytes.Repeat(line,18)
@@ -24,7 +24,7 @@ func (r *cognitionFailingReader) Read(p []byte)(int,error){
  if !r.read{r.read=true;return copy(p,[]byte(`{"op":"snapshot"}`+"\n")),nil}
  return 0,errors.New("injected cognition reader failure")
 }
-func TestCognitionReaderFailureHasNoPartialOutput(t *testing.T) {
+func TestOfflineCognitionReaderFailureHasNoPartialOutput(t *testing.T) {
  var out bytes.Buffer
  err:=runCognition(&cognitionFailingReader{},&out)
  if err==nil||!strings.Contains(err.Error(),"injected cognition reader failure"){t.Fatalf("reader failure was not returned: %v",err)}
