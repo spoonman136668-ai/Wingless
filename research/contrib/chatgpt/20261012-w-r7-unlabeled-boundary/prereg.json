@@ -1,0 +1,37 @@
+{
+  "id": "W-R7-UNLABELED-BOUNDARY",
+  "parent": "03bdb83f27a4995b1a7a8d70b6c92d17e27ac9c6",
+  "hypothesis": "Without explicit episode-start observation, an index-free synthetic boundary cue cannot uniquely resolve all entity aliases; measure recoverability versus the W-R6 informed-phase upper bound.",
+  "arms": [
+    "A0 sorted support only",
+    "A1 observed first context (oracle upper-bound control)",
+    "A2 lexicographically minimum observed context as label-free inferred boundary",
+    "A3 lexicographically maximum observed context as label-free inferred boundary"
+  ],
+  "frozen_budget": {
+    "entities": 9,
+    "families": 3,
+    "contexts": 16,
+    "surfaces": 27,
+    "records": 432,
+    "model_calls": 0
+  },
+  "source": "exact W-R6 synthetic byte-context formula",
+  "metrics": [
+    "signature classes",
+    "complete three-member alias groups",
+    "cross-entity collisions"
+  ],
+  "outcomes": {
+    "supported": "A1 yields 9 complete groups and both index-free boundaries yield fewer than 9",
+    "negative": "Either index-free arm yields all 9 complete groups",
+    "invalid": "A0/A1 control or source identity fails"
+  },
+  "constraints": [
+    "no post-result feature tuning",
+    "no external data",
+    "no extra trainable capacity",
+    "no accepted reference changes",
+    "read-only result"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "W-R8-TEMPORAL-ALIGNMENT",
+  "parent": "9e406e12c46523ce9ca8e522a5668bf95bd440e2",
+  "question": "Does entity alias identifiability depend on observing episode-start specifically, or on any synchronized temporal index across families?",
+  "arms": {
+    "A0": "support-only baseline",
+    "A1": "16 fixed synchronized index t=0..15, context(t) joined to support",
+    "A2": "16 misaligned family shifts t_f=(t+5*f) mod 16, joined to support"
+  },
+  "budget": {
+    "entities": 9,
+    "families": 3,
+    "ticks": 16,
+    "classes_per_arm": 16,
+    "model_calls": 0,
+    "trainable_parameters": 0
+  },
+  "controls": [
+    "A0 8 support classes, seven correct alias triplets",
+    "A1 at t=0 nine triplets",
+    "same frozen four-byte context formula, no learned synchronization",
+    "evaluate all 16 offsets without tuning or postselection"
+  ],
+  "outcomes": {
+    "supported": "all 16 synchronized indices yield nine complete entity triplets and all 16 family-shifted indices yield fewer than nine",
+    "mixed": "controls pass and synchronized or shifted conditions differ across ticks",
+    "negative": "controls pass but aligned and misaligned arms do not separate",
+    "invalid": "source/budget or control parity fails"
+  },
+  "scope": "synthetic formula replay only; no independent Go primary acceptance"
+}

@@ -1,0 +1,39 @@
+name: Wingless W-R7 unlabeled phase qualification
+on:
+  push:
+    branches: [research/w-r7-unlabeled-boundary-r1]
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Exact source and four-arm replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 03bdb83f27a4995b1a7a8d70b6c92d17e27ac9c6 HEAD
+          python3 -B research/contrib/chatgpt/20261012-w-r7-unlabeled-boundary/replay.py > "$RUNNER_TEMP/wr7.json"
+          python3 - "$RUNNER_TEMP/wr7.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1]))
+          assert r["classification"]=="SUPPORTED",r
+          assert r["arms"]["A2"]==r["arms"]["A0"]
+          assert r["arms"]["A3"]==r["arms"]["A0"]
+          print("WR7_BOUNDARY_EXPERIMENT=SUPPORTED")
+          PY
+      - name: Archive primary experiment output
+        uses: actions/upload-artifact@v4
+        with:
+          name: w-r7-unlabeled-boundary-result
+          path: ${{ runner.temp }}/wr7.json
+          retention-days: 90
+      - name: Full Wingless regression
+        run: |
+          go test ./...
+          go build ./...
