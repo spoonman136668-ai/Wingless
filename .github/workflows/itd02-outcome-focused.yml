@@ -1,0 +1,325 @@
+name: ITD-02 isolated outcome learner focused qualification
+on:
+  push:
+    branches:
+      - research/itd02-selected-outcome-learner-20261026
+  pull_request:
+    paths:
+      - 'research/native/itd02/outcome/**'
+      - 'research/native/itd02/outcomebridge/**'
+      - '.github/workflows/itd02-outcome-focused.yml'
+permissions:
+  contents: read
+jobs:
+  outcome-focused:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Focused native outcome tests
+        run: go test -count=1 -v ./research/native/itd02/outcome ./research/native/itd02/outcomebridge
+      - name: Vet and build native outcome
+        run: |
+          go vet ./research/native/itd02/outcome ./research/native/itd02/outcomebridge
+          go build ./research/native/itd02/outcome ./research/native/itd02/outcomebridge
+      - name: Race safety on Linux
+        if: runner.os == 'Linux'
+        run: go test -race -count=1 ./research/native/itd02/outcome ./research/native/itd02/outcomebridge
+  ice-index-artifact:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Rebuild ICE in disposable checkout
+        run: |
+          go run ./cmd/ice build
+          go run ./cmd/ice validate
+      - name: Record exact generated delta
+        run: |
+          git diff --binary -- .ice > "$RUNNER_TEMP/itd02-ice-index.patch"
+          git diff --stat -- .ice > "$RUNNER_TEMP/itd02-ice-index-stat.txt"
+          git diff --name-only -- .ice > "$RUNNER_TEMP/itd02-ice-index-files.txt"
+          if test -s "$RUNNER_TEMP/itd02-ice-index.patch"; then
+            echo "ICE_INDEX_DELTA_PRESENT=true"
+          else
+            echo "ICE_INDEX_ALREADY_FRESH=true"
+          fi
+      - name: Package generated delta and index
+        run: tar -czf "$RUNNER_TEMP/itd02-ice-index.tar.gz" .ice
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itd02-ice-index
+          path: |
+            ${{ runner.temp }}/itd02-ice-index.tar.gz
+            ${{ runner.temp }}/itd02-ice-index.patch
+            ${{ runner.temp }}/itd02-ice-index-stat.txt
+            ${{ runner.temp }}/itd02-ice-index-files.txt
+          retention-days: 3
+  source-adapter-static:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test public-only source adapter without environment dependencies
+        run: |
+          python -m unittest discover -s research/native/itd02/outcome -p 'test_minigrid_source.py' -v
+          python -m unittest discover -s research/native/itd02/outcome -p 'test_ipc_source_runner.py' -v
+          python -m unittest discover -s research/native/itd02/outcome -p 'test_audit_source_evidence.py' -v
+          python -m unittest discover -s research/native/itd02/outcome -p 'test_source_controls.py' -v
+          python -m unittest discover -s research/native/itd02/outcome -p 'test_reward_ablation_restart.py' -v
+  source-minigrid-smoke:
+    # Authentically executed one-seed engineering smoke only; not an experiment
+    # claiming improved intelligence, held-out transfer, or scientific FSA.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned public source environment
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Compile native selected-action learner IPC
+        run: go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Execute bounded authentic source episode
+        run: python research/native/itd02/outcome/ipc_source_runner.py --native-binary "$RUNNER_TEMP/itd02-outcomebridge" --environment MiniGrid-Empty-5x5-v0 --seeds 7 --max-steps 32 --output "$RUNNER_TEMP/itd02-source-smoke.json" --run-source
+      - name: Audit authentic source reward and completion evidence
+        run: python research/native/itd02/outcome/audit_source_evidence.py "$RUNNER_TEMP/itd02-source-smoke.json"
+      - name: Check source evidence is explicitly engineering-only
+        run: |
+          python -c 'import json,os,pathlib; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-source-smoke.json"; e=json.loads(p.read_text()); assert e["science"]=="NOT_ACCEPTED" and e["status"]=="ENGINEERING_SOURCE_TRAINING_ONLY" and len(e["events"])>0 and e["events"][0]["event_id"]==1; print("SOURCE_SMOKE_EVIDENCE_PRESENT")'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-source-smoke
+          path: ${{ runner.temp }}/itd02-source-smoke.json
+          if-no-files-found: warn
+          retention-days: 7
+  source-controls-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install bounded public source environment
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Build both frozen R8 and outcome IPC executables
+        run: |
+          go build -o "$RUNNER_TEMP/itd02-r8bridge" ./research/native/itd02/r8bridge
+          go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Run predeclared randomized-start three-seed source controls
+        run: |
+          for seed in 7 11 19; do
+            python research/native/itd02/outcome/source_controls.py --environment MiniGrid-Empty-Random-5x5-v0 --seed "$seed" --max-steps 32 --outcome-binary "$RUNNER_TEMP/itd02-outcomebridge" --r8-binary "$RUNNER_TEMP/itd02-r8bridge" --output "$RUNNER_TEMP/itd02-source-controls-$seed.json" --run-source
+          done
+      - name: Fail closed unless independent source-public initial states differ
+        run: |
+          python - <<'PY'
+          import json,os,pathlib,hashlib
+          root=pathlib.Path(os.environ["RUNNER_TEMP"])
+          seeds=(7,11,19)
+          records=[json.loads((root/f"itd02-source-controls-{seed}.json").read_text()) for seed in seeds]
+          kinds=("fixed","native_r8","contextual_outcome")
+          for seed,r in zip(seeds,records):
+              assert r["environment_id"]=="MiniGrid-Empty-Random-5x5-v0"
+              assert r["seed"]==seed and r["scientific_acceptance"]=="NOT_ACCEPTED" and r["transfer"]=="NOT_TESTED"
+              assert set(r["controls"])==set(kinds)
+              assert all(0 < r["controls"][k]["steps"] <= 32 for k in kinds)
+              before=[r["controls"][k]["events"][0]["before"] for k in kinds]
+              assert before[0]==before[1]==before[2], "MATCHED_PUBLIC_START_MISMATCH"
+          unique={json.dumps(r["controls"]["fixed"]["events"][0]["before"],sort_keys=True) for r in records}
+          assert len(unique)>=2, "SOURCE_SEED_DIVERSITY_FAILED"
+          for name in kinds:
+              diversity=len({r["controls"][name]["events_sha256"] for r in records})
+              print(name,"distinct_trajectories",diversity)
+          print("SOURCE_PUBLIC_INITIAL_STATE_DIVERSITY",len(unique),"of",len(seeds))
+          print("ENGINEERING_ONLY_NOT_SCIENTIFICALLY_ACCEPTED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-source-controls
+          path: ${{ runner.temp }}/itd02-source-controls-*.json
+          if-no-files-found: warn
+          retention-days: 7
+  source-reward-ablation-restart:
+    # Exploratory known training seed; never a held-out scientific claim.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source world
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Build native outcome IPC
+        run: go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Run reward-aware versus reward-blind cold-restart source probes
+        run: python research/native/itd02/outcome/reward_ablation_restart.py --native-binary "$RUNNER_TEMP/itd02-outcomebridge" --output "$RUNNER_TEMP/itd02-reward-ablation.json" --run-source
+      - name: Verify reward-ablation custody without scientific acceptance
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-reward-ablation.json").read_text())
+          assert r["science"]=="NOT_ACCEPTED"
+          assert r["scope"]=="EXPLORATORY_KNOWN_SEED_NO_TRANSFER"
+          assert r["cold_restart_retained"]
+          assert r["train_seed"] not in r["probe_seeds"]
+          assert r["probe_seeds"]==[23,29,31,37] and len(r["reward_aware"]["probes"])==len(r["reward_blind"]["probes"])==4
+          print("REWARD_ABLATION_COLD_RESTART_EVIDENCE_RECORDED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-reward-ablation-restart
+          path: ${{ runner.temp }}/itd02-reward-ablation.json
+          if-no-files-found: warn
+          retention-days: 7
+  source-frozen-preference-probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source world
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Build native outcome IPC
+        run: go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Run four fresh source seeds with frozen checkpoint
+        run: python research/native/itd02/outcome/frozen_source_probe.py --native-binary "$RUNNER_TEMP/itd02-outcomebridge" --output "$RUNNER_TEMP/itd02-frozen-source-probe.json" --run-source
+      - name: Verify frozen checkpoint evidence remains explicitly exploratory
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-frozen-source-probe.json").read_text())
+          assert r["scientific_acceptance"]=="NOT_ACCEPTED"
+          assert r["choice_semantics"]=="FROZEN_CHECKPOINT_CLONE_PER_STEP"
+          assert r["checkpoint_immutable_during_probes"] is True
+          assert r["probe_seeds"]==[41,43,47,53]
+          assert len(r["reward_aware"]["probes"])==len(r["reward_blind"]["probes"])==4
+          print("FROZEN_NATIVE_PREFERENCE_EVIDENCE_RECORDED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-frozen-source-probe
+          path: ${{ runner.temp }}/itd02-frozen-source-probe.json
+          if-no-files-found: warn
+          retention-days: 7
+  source-unfamiliar-family-probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source environments
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Build native outcome learner
+        run: go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Run predeclared unfamiliar FourRooms source probes
+        run: python research/native/itd02/outcome/unfamiliar_family_probe.py --native-binary "$RUNNER_TEMP/itd02-outcomebridge" --output "$RUNNER_TEMP/itd02-unfamiliar-family.json" --run-source
+      - name: Verify unfamiliar source evidence remains restricted
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-unfamiliar-family.json").read_text())
+          assert r["scientific_acceptance"]=="NOT_ACCEPTED"
+          assert r["training_family"]=="MiniGrid-Empty-Random-5x5-v0"
+          assert r["target_family"]=="MiniGrid-FourRooms-v0"
+          assert r["target_seeds"]==[61,67,71,73]
+          assert r["frozen_checkpoint_verified_each_episode"]
+          assert set(r["results"])=={"reward_aware","reward_blind","fixed"}
+          assert all(len(v)==4 for v in r["results"].values())
+          for policy,episodes in r["results"].items():
+              for e in episodes:
+                  last=e["events"][-1]
+                  assert e["goal_reached"]==bool(last["terminated"] and e["return"]>0),policy
+                  assert e["source_truncated"]==last["truncated"],policy
+                  assert not (e["goal_reached"] and e["source_truncated"]),policy
+                  if e["completed"] and not e["goal_reached"]:
+                      print("SOURCE_EPISODE_ENDED_WITHOUT_GOAL",policy,e["seed"])
+          print("SOURCE_GOAL_VS_TRUNCATION_DISAMBIGUATED")
+          print("UNFAMILIAR_SOURCE_EVIDENCE_RECORDED_NOT_ACCEPTED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-unfamiliar-family
+          path: ${{ runner.temp }}/itd02-unfamiliar-family.json
+          if-no-files-found: warn
+          retention-days: 7
+  source-fourrooms-stateful-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source world
+        run: python -m pip install 'minigrid==2.3.1' 'gymnasium==0.29.1'
+      - name: Compile independent native actors
+        run: |
+          go build -o "$RUNNER_TEMP/itd02-r8bridge" ./research/native/itd02/r8bridge
+          go build -o "$RUNNER_TEMP/itd02-outcomebridge" ./research/native/itd02/outcomebridge
+      - name: Diagnose full stateful native FourRooms navigation
+        run: python research/native/itd02/outcome/fourrooms_stateful_diagnostic.py --outcome-binary "$RUNNER_TEMP/itd02-outcomebridge" --r8-binary "$RUNNER_TEMP/itd02-r8bridge" --output "$RUNNER_TEMP/itd02-fourrooms-stateful.json" --run-source
+      - name: Validate per-action navigation evidence and no scientific claim
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"itd02-fourrooms-stateful.json").read_text())
+          assert r["science"]=="NOT_ACCEPTED"
+          assert r["target_family"]=="MiniGrid-FourRooms-v0" and r["target_seeds"]==[79,83,89,97]
+          assert set(r["results"])=={"reward_aware","reward_blind","native_r8","fixed","reactive"}
+          assert all(len(v)==4 for v in r["results"].values())
+          for outcomes in r["results"].values():
+              for e in outcomes:
+                  d=e["diagnostic"]
+                  assert 0 < e["steps"] <= 128
+                  assert sum(d["selected_action_counts"].values())==e["steps"]
+                  assert d["source_goal_reached"]==e["goal_reached"]
+          print("FULL_ACTOR_FOURROOMS_DIAGNOSTIC_RECORDED_NOT_ACCEPTED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itd02-fourrooms-stateful-diagnostic
+          path: ${{ runner.temp }}/itd02-fourrooms-stateful.json
+          if-no-files-found: warn
+          retention-days: 7
