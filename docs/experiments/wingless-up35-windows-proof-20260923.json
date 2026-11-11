@@ -1,0 +1,56 @@
+{
+  "schema": "wingless.greedy-symmetry-induction-windows-proof.v1",
+  "experiment": "UP-35-greedy-task-driven-symmetry-induction",
+  "status": "qualified-scientific-positive",
+  "observed_at": "2026-09-23T18:10:15Z",
+  "source_head": "99ae568ad891577f702793e258948570daa66ce8",
+  "parent_up34_seal": "46403f5dbbbc73327f37ab392ea9db849c5eda4b",
+  "workflow_run_id": 35899713393,
+  "workflow_artifact_id": 10769275464,
+  "workflow_artifact_sha256": "128596d6c14576ab533abefb452027e7df0ee5a5a3b25472cb91eb7481d11de0",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "developmental_path": {
+    "starts_from_minimum_symmetry": true,
+    "finished_partition_menu_provided": false,
+    "pairwise_merge_only": true,
+    "merge_selection_training_only": true,
+    "selection_uses_heldout_data": false,
+    "capacity_price": 0.02,
+    "minimum_accepted_gain": 0.005,
+    "accepted_merge_count": 3,
+    "start_capacity": 6,
+    "selected_capacity": 18,
+    "max_capacity": 36,
+    "capacity_created_fraction": 0.4,
+    "stopped_by_frozen_gain_rule": true,
+    "selected_groups": [[0,1,2,5],[3],[4]]
+  },
+  "validation": {
+    "selected_held_out_accuracy": 0.9873046875,
+    "selected_commit_decode_accuracy": 0.9700520833333334,
+    "selected_exact_final_table_accuracy": 1.0,
+    "selected_relational_query_accuracy": 1.0
+  },
+  "true_heldout": {
+    "selected_held_out_accuracy": 1.0,
+    "selected_commit_decode_accuracy": 1.0,
+    "selected_exact_final_table_accuracy": 1.0,
+    "selected_relational_query_accuracy": 1.0,
+    "selected_min_value_margin": 0.4374768381608417,
+    "selected_min_relation_margin": 0.9416936353981261,
+    "full_capacity_held_out_accuracy": 1.0,
+    "full_capacity_commit_decode_accuracy": 1.0,
+    "heldout_retention_delta": 0.0,
+    "commit_retention_delta": 0.0
+  },
+  "diagnosis": {
+    "inner_split_balanced_pass": true,
+    "greedy_induction_pass": true
+  },
+  "interpretation": "UP-35 is the first positive experiment in this lineage where useful repeated-spectrum symmetry is constructed incrementally from the minimum-capacity singleton state rather than selected from a finished partition menu. Three training-only pairwise merges increased commutant capacity from 6 to 18, after which the frozen gain rule rejected further growth. The selected structure then matched the capacity-36 control at perfect true held-out and mutable performance. This is bounded task-driven symmetry induction. The next frontier is to remove the discrete pairwise-merge mutation operator and test continuous symmetry formation from independently parameterized spectral directions, using a fusion-style regularizer or equivalent continuous objective.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

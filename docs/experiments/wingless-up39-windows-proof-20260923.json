@@ -1,0 +1,53 @@
+{
+  "schema": "wingless.rich-direct-objective-windows-proof.v1",
+  "experiment": "UP-39-rich-task-direct-spectral-offset-optimization",
+  "status": "qualified-scientific-negative",
+  "observed_at": "2026-09-23T23:01:43Z",
+  "source_head": "62ad70fc579fe8fc780c5ca2f05f838a5868ac2c",
+  "parent_up38_seal": "54dc8619149bbd0db8f6949f21453f52d5707ca4",
+  "workflow_run_id": 35930763303,
+  "workflow_artifact_id": 10781501134,
+  "workflow_artifact_sha256": "d88d63542dd1656e21f3d78a1446853ca0ca6d19952b58ccae33eb3dc6f905db",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "optimizer": {
+    "name": "deterministic-projected-central-difference",
+    "optimization_steps": 12,
+    "selected_step": 7,
+    "start_capacity": 6,
+    "selected_capacity": 6,
+    "exact_fusion_occurred": false
+  },
+  "smooth_objective": {
+    "initial_objective": 0.6867884391276392,
+    "selected_objective": 0.6972457303665964,
+    "objective_gain": 0.0104572912389572,
+    "initial_harmonic_task_score": 0.6901217724609725,
+    "selected_harmonic_task_score": 0.7005790636999297,
+    "initial_phase_score": 0.8695699048392143,
+    "selected_phase_score": 0.8658133300953132,
+    "initial_correct_value_probability": 0.7715112595535571,
+    "selected_correct_value_probability": 0.7659343528811765,
+    "initial_correct_relation_probability": 0.5260644564224123,
+    "selected_correct_relation_probability": 0.5489698582362194
+  },
+  "true_heldout": {
+    "held_out_accuracy": 0.901123046875,
+    "commit_decode_accuracy": 0.34375,
+    "exact_final_table_accuracy": 0.3541666666666667,
+    "relational_query_accuracy": 0.5416666666666666,
+    "heldout_retention_delta": 0.098876953125,
+    "commit_retention_delta": 0.65625
+  },
+  "diagnosis": {
+    "inner_split_balanced_pass": true,
+    "selection_uses_true_heldout": false,
+    "rich_direct_pass": false,
+    "frozen_interpretation_fork": "teacher-forcing-exposure-mismatch"
+  },
+  "interpretation": "The richer smooth task objective improved deterministically, principally through relation confidence, but no exact symmetry emerged and actual free-running recurrent mutable behavior remained poor. Under the preregistered interpretation fork, the next controlled test replaces teacher forcing with a differentiable free-running probabilistic memory rollout while preserving the corrected direct optimizer and all final scientific gates.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

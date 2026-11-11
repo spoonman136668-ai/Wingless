@@ -1,0 +1,39 @@
+{
+  "schema": "wingless.direct-offset-optimization-windows-proof.v1",
+  "experiment": "UP-38-direct-continuous-spectral-offset-optimization",
+  "status": "qualified-scientific-negative",
+  "observed_at": "2026-09-23T22:44:19Z",
+  "source_head": "984081060f25d50cbf112f0821addeebf25d0d5b",
+  "parent_up37_seal": "79d2638496cfa94591d332c6369ad66b1062402f",
+  "workflow_run_id": 35929190469,
+  "workflow_artifact_id": 10780732367,
+  "workflow_artifact_sha256": "94407b15b48b18ac71604d1335c6188c9043ded65e902b99e4497151cef5189d",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "optimizer": {
+    "name": "deterministic-projected-central-difference",
+    "optimization_steps": 12,
+    "selected_step": 10,
+    "start_capacity": 6,
+    "selected_capacity": 6,
+    "exact_fusion_occurred": false,
+    "selected_mean_phase_cosine": 0.8847250035698582
+  },
+  "true_heldout": {
+    "held_out_accuracy": 0.900634765625,
+    "commit_decode_accuracy": 0.3424479166666667,
+    "exact_final_table_accuracy": 0.375,
+    "relational_query_accuracy": 0.6041666666666666,
+    "heldout_retention_delta": 0.099365234375,
+    "commit_retention_delta": 0.6575520833333333
+  },
+  "diagnosis": {
+    "inner_split_balanced_pass": true,
+    "direct_optimization_pass": false
+  },
+  "interpretation": "Direct continuous optimization of the spectral offsets under mean phase cosine plus smooth symmetry cost does not create useful exact degeneracy. The optimizer improves its smooth phase objective but remains at capacity 6 and performs poorly on mutable and relational behavior. This isolates the objective as a major bottleneck: phase alignment alone is insufficient to express the task pressure that UP-35/UP-37 captured. The next experiment should preserve direct parameter optimization while replacing the phase-only task term with a richer smooth training-side objective containing mutable value confidence and correct relation probability.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "wingless.unitary-fullrank-integration-windows-proof.v1",
+  "experiment": "UP-12-fullrank-decoder-saturation-integration",
+  "status": "qualified",
+  "observed_at": "2026-09-23T04:12:40-04:00",
+  "source_head": "65eccb205b53642e3fa306beb0a1ad4e46899097",
+  "baseline_head": "48db0c6fe4180a71a2f1a118eaea83691736c35f",
+  "platform": "windows",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "code_rank": 4,
+  "pilot_states": 5,
+  "pilot_complex_scalars": 80,
+  "features_per_entity": 8,
+  "runtime_prototype_lookup": false,
+  "explicit_inverse_readout": false,
+  "explicit_depth_provided": false,
+  "global_phase_nuisance": true,
+  "memory_noise_amplitude": 0.05,
+  "full_train_pool_tables": 128,
+  "full_held_out_pool_tables": 128,
+  "min_train_marginal_count": 32,
+  "min_held_out_marginal_count": 32,
+  "unitary_static": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 1.0,
+    "optimizer_steps": 1200,
+    "train_trials_per_table_depth": 4,
+    "held_out_trials_per_table_depth": 2
+  },
+  "matched_control_static": {
+    "train_accuracy": 0.9521484375,
+    "held_out_accuracy": 0.860595703125
+  },
+  "unitary_mutable_integration": {
+    "scenarios": 48,
+    "writes_per_scenario": 16,
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "min_value_margin": 0.9301842157965665,
+    "min_relation_margin": 0.9622169888928173,
+    "max_norm_drift": 6.616929226765933e-14
+  },
+  "diagnosis": {
+    "static_saturation_pass": true,
+    "mutable_integration_pass": true,
+    "up11_rank4_noisy_accuracy": 0.95703125,
+    "saturated_static_accuracy": 1.0,
+    "static_accuracy_gain": 0.04296875,
+    "decoder_data_limit_supported": true,
+    "nonlinear_readout_indicated": false
+  },
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "With the rank-4 co-evolving frame frozen, expanding decoder coverage to the complete balanced table pools and increasing deterministic optimization removed the remaining UP-11 static errors. The same saturated heads then achieved perfect sequential mutable-memory integration across 768 commits and 48 final queries. This supports decoder/data limitation, not missing frame rank or nonlinear readout, as the residual UP-11 bottleneck."
+}

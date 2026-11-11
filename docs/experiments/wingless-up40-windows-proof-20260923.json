@@ -1,0 +1,55 @@
+{
+  "schema": "wingless.free-running-direct-objective-windows-proof.v1",
+  "experiment": "UP-40-free-running-probabilistic-direct-objective",
+  "status": "qualified-scientific-negative",
+  "observed_at": "2026-09-23T23:26:48Z",
+  "source_head": "f7bc7d5c8c4e0011c36fe342cb7b8389e7dafbc6",
+  "parent_up39_seal": "8994882409133d2da22bf7f6d482aa09e6dd0a9f",
+  "workflow_run_id": 35933007237,
+  "workflow_artifact_id": 10781762268,
+  "workflow_artifact_sha256": "3552391043d25b12029989c516a067b00a81d9caeaef90b90ec2e8b66b89fa36",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "optimizer": {
+    "name": "deterministic-projected-central-difference",
+    "optimization_steps": 12,
+    "selected_step": 8,
+    "start_capacity": 6,
+    "selected_capacity": 6,
+    "exact_fusion_occurred": false,
+    "selected_nearest_offset_gap": 0.022420927672370555,
+    "exact_fusion_tolerance": 0.0025
+  },
+  "smooth_objective": {
+    "initial_objective": 0.6498734172582427,
+    "selected_objective": 0.652129699142142,
+    "objective_gain": 0.0022562818838993,
+    "initial_harmonic_task_score": 0.653206750591576,
+    "selected_harmonic_task_score": 0.6554630324754753,
+    "initial_phase_score": 0.8695699048392143,
+    "selected_phase_score": 0.8698807481862422,
+    "initial_correct_value_probability": 0.598355212519807,
+    "selected_correct_value_probability": 0.5983032501953924,
+    "initial_correct_relation_probability": 0.5644982456399539,
+    "selected_correct_relation_probability": 0.5694951939595628
+  },
+  "true_heldout": {
+    "held_out_accuracy": 0.9013671875,
+    "commit_decode_accuracy": 0.34375,
+    "exact_final_table_accuracy": 0.375,
+    "relational_query_accuracy": 0.5625,
+    "heldout_retention_delta": 0.0986328125,
+    "commit_retention_delta": 0.65625
+  },
+  "diagnosis": {
+    "inner_split_balanced_pass": true,
+    "selection_uses_true_heldout": false,
+    "free_running_direct_pass": false,
+    "frozen_interpretation_fork": "optimizer-reachability-adequacy"
+  },
+  "interpretation": "The exposure-aware probabilistic rollout lowered the optimistic teacher-forced mutable confidence and still produced a deterministic smooth-objective improvement, but the direct optimizer did not create exact symmetry and hard recurrent capability remained far below frozen gates. The next experiment should isolate optimizer reachability, separating sequential directional-gradient estimation from irreversible sticky projection against an independently established known-good symmetry target.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

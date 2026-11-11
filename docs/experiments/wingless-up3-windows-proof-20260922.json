@@ -1,0 +1,34 @@
+{
+  "schema": "wingless.unitary-stress-windows-proof.v1",
+  "experiment": "UP-3-depth-retention",
+  "status": "qualified",
+  "observed_at": "2026-09-22T20:17:44-04:00",
+  "source_head": "b4115bdcf58125b856851ad0fbd90355b40de86c",
+  "baseline_head": "fa5e9e80737d90e9c1ad901319bcd2b045c3c94f",
+  "platform": "windows",
+  "focused_pass": true,
+  "full_regression_pass": true,
+  "dimension": 16,
+  "classes": 4,
+  "distractor_dimensions": 12,
+  "samples": 32,
+  "couplings_per_block": 32,
+  "depths": [0,1,8,32,128],
+  "unitary": {
+    "accuracy_at_depth_128": 1.0,
+    "max_norm_drift": 7.771561172376096e-15,
+    "max_gram_error": 2.7755575615628914e-15,
+    "max_perturbation_gain": 1.0000000000000098,
+    "max_round_trip_error": 9.92884257223707e-15
+  },
+  "non_unitary_matched": {
+    "accuracy_at_depth_128": 1.0,
+    "max_norm_drift": 26.751397615116673,
+    "max_gram_error": 0.0781818758548447,
+    "max_perturbation_gain": 5.541839982219787
+  },
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "Both paths retained classification accuracy through depth 128. The unitary path additionally preserved norm, pairwise fidelity geometry, perturbation magnitude, and reversibility to floating-point tolerance. The matched non-unitary path showed substantial state-norm and perturbation amplification. This is a transport/stability result, not evidence of language reasoning."
+}

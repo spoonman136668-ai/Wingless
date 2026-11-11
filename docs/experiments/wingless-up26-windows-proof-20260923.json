@@ -1,0 +1,57 @@
+{
+  "schema": "wingless.unitary-discovery-breadth-windows-proof.v1",
+  "experiment": "UP-26-dynamics-discovered-observable-breadth",
+  "status": "qualified-strong-partial-positive-mutable-gate-negative",
+  "observed_at": "2026-09-23T13:53:39Z",
+  "source_head": "663ae33f9ef84d425e9a9da687ae3281af266113",
+  "parent_up25_seal": "6dcbec3c567e2dc39f4052948925a62c758377fb",
+  "workflow_run_id": 35870174317,
+  "workflow_artifact_id": 10755200813,
+  "workflow_artifact_sha256": "c365869b7fd17ed14224c58b6239b4994a07f8d430c1a831fa088ab2292618b4",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "baseline_32": {
+    "reproduction_pass": true,
+    "held_out_accuracy": 0.9248046875,
+    "held_out_delta_from_up25": 0.0
+  },
+  "primary_64": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 0.998779296875,
+    "per_entity_held_out_accuracy": [
+      0.9970703125,
+      1.0,
+      1.0,
+      0.998046875
+    ],
+    "mean_phase_cosine": 0.9846522514565942,
+    "max_norm_drift": 1.3704593015972932e-12
+  },
+  "discovery": {
+    "commutator_pass": true,
+    "feature_invariance_pass": true,
+    "max_commutator_entry_error": 2.678430105985744e-7,
+    "max_feature_drift": 0.000022507818803811815,
+    "min_pre_normalization_frobenius": 0.2364342958104593
+  },
+  "matched_control_64": {
+    "held_out_accuracy": 0.64697265625,
+    "max_norm_drift": 2201078893387.29
+  },
+  "mutable_integration_64": {
+    "pass": false,
+    "commit_decode_accuracy": 0.984375,
+    "commit_correct": 756,
+    "commit_total": 768,
+    "exact_final_table_accuracy": 0.9583333333333334,
+    "relational_query_accuracy": 1.0,
+    "min_value_margin": 0.10864597177588947,
+    "min_relation_margin": 0.9168795836209941,
+    "max_norm_drift": 1.248112724283601e-12
+  },
+  "interpretation": "Doubling the dynamics-discovered bank from 32 to 64 observables closes essentially all static unseen-depth error while exactly reproducing the 32-observable UP-25 control. The remaining failure is narrow recurrent robustness: 12 of 768 commit decodes fail, although exact-final and relational gates pass. The next experiment must keep runtime width at 64 and use training-only task relevance to select 64 observables from a larger discovered candidate bank rather than increasing runtime breadth blindly.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

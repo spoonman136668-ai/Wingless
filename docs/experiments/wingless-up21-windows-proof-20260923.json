@@ -1,0 +1,60 @@
+{
+  "schema": "wingless.unitary-phase-code-windows-proof.v1",
+  "experiment": "UP-21-anonymous-phase-code-bottleneck",
+  "status": "qualified",
+  "observed_at": "2026-09-23T11:08:40Z",
+  "source_head": "6b150300b2782625e11ad97136861dece6ebac37",
+  "parent_up20_seal": "bd735f81c8586a462bc9992f7de37da52563f45d",
+  "workflow_run_id": 35852739971,
+  "workflow_artifact_id": 10746053464,
+  "workflow_artifact_sha256": "bbc889b9700a3ac9d648a3f7ac37dc2313532b4719c988fd2471d711a444fdda",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "representation": {
+    "runtime_state_objects": 1,
+    "composite_dimension": 96,
+    "anonymous_channels": 6,
+    "semantic_channel_locations_known": false,
+    "known_mixer_exposed_to_learner": false,
+    "runtime_mixer_inverse_applied": false,
+    "learned_demixer_used": false,
+    "direct_anonymous_readout": true,
+    "phase_alphabet_supervision": true,
+    "phase_code_dimension": 2,
+    "quadratic_feature_dimension": 702
+  },
+  "unitary": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 1.0,
+    "per_entity_train_accuracy": [1.0, 1.0, 1.0, 1.0],
+    "per_entity_held_out_accuracy": [1.0, 1.0, 1.0, 1.0],
+    "max_norm_drift": 3.3306690738754696e-14
+  },
+  "matched_control": {
+    "held_out_accuracy": 0.59765625,
+    "max_norm_drift": 2211700831922.4893
+  },
+  "phase_code": {
+    "mean_held_phase_cosine": 0.9861381590317367
+  },
+  "mutable_integration": {
+    "scenarios": 48,
+    "writes_per_scenario": 16,
+    "commit_decode_accuracy": 1.0,
+    "exact_final_table_accuracy": 1.0,
+    "relational_query_accuracy": 1.0,
+    "min_value_margin": 0.5043631193460631,
+    "min_relation_margin": 0.9014937818220882,
+    "max_norm_drift": 3.241851231905457e-14
+  },
+  "diagnosis": {
+    "phase_code_learning_pass": true,
+    "unseen_depth_pass": true,
+    "mutable_integration_pass": true
+  },
+  "interpretation": "A two-dimensional bottleneck supervised by the already task-learned UP-13 phase alphabet closes the anonymous-state generalization gap completely. The observer does not reconstruct or receive semantic channel locations, hidden mixer information, inverse transport, explicit depth, or prototypes. The remaining structural assumption is the six anonymous 16-dimensional block factorization itself.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

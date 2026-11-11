@@ -1,0 +1,64 @@
+{
+  "schema": "wingless.unitary-task-selected-commutant-windows-proof.v1",
+  "experiment": "UP-27-training-selected-discovered-commutant",
+  "status": "qualified-scientific-negative-selector",
+  "observed_at": "2026-09-23T13:59:45Z",
+  "source_head": "8123bf823fc4679fea8ac1ac4fc23beaa82fe0a2",
+  "parent_up26_seal": "e9b94494eac451e94c97a5b17a26cd53ba0ced64",
+  "workflow_run_id": 35870850841,
+  "workflow_artifact_id": 10754986758,
+  "workflow_artifact_sha256": "c1dfb5a3c56e59f2690fd358e3ea9ba3f84eddae6ccb4148849ed3318915ef66",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "selection": {
+    "candidate_count": 128,
+    "runtime_count": 64,
+    "training_labels_only": true,
+    "heldout_data_used": false,
+    "explicit_depth_used": false,
+    "selected_overlap_with_prefix64": 31
+  },
+  "prefix64_control": {
+    "reproduction_pass": true,
+    "held_out_accuracy": 0.998779296875,
+    "held_out_delta": 0.0
+  },
+  "selected64": {
+    "train_accuracy": 1.0,
+    "held_out_accuracy": 0.995849609375,
+    "per_entity_held_out_accuracy": [
+      0.9951171875,
+      0.998046875,
+      0.9931640625,
+      0.9970703125
+    ],
+    "mean_phase_cosine": 0.980913215521698,
+    "max_norm_drift": 1.3704593015972932e-12
+  },
+  "discovery": {
+    "commutator_pass": true,
+    "feature_invariance_pass": true,
+    "max_commutator_entry_error": 2.678430105985744e-7,
+    "max_feature_drift": 0.000018706206334082043
+  },
+  "matched_control": {
+    "held_out_accuracy": 0.537841796875,
+    "max_norm_drift": 2201078893387.29
+  },
+  "mutable_integration": {
+    "pass": false,
+    "commit_decode_accuracy": 0.9869791666666666,
+    "commit_correct": 758,
+    "commit_total": 768,
+    "exact_final_table_accuracy": 0.9791666666666666,
+    "relational_query_accuracy": 1.0,
+    "min_value_margin": 0.05303787586522274,
+    "min_relation_margin": 0.2879274032252918,
+    "max_norm_drift": 1.248112724283601e-12
+  },
+  "interpretation": "Simple training-only single-observable correlation ranking does not identify a superior runtime bank. It replaces 33 of the prefix-64 observables, slightly improves mutable commit accuracy, but reduces static held-out accuracy and still misses the 99% commit gate. Because the successful phase-code decoder uses quadratic interactions among observable expectations, the next experiment should score candidates from a full training-only quadratic task model so pairwise interactions influence selection.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}

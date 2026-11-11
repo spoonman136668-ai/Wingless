@@ -1,0 +1,41 @@
+{
+  "schema": "wingless.unitary-compressed-frame-windows-proof.v1",
+  "experiment": "UP-10-compressed-noisy-internal-frame",
+  "status": "qualified-negative",
+  "observed_at": "2026-09-22T21:30:49-04:00",
+  "source_head": "f6f36cfc6c0a3532a7472b1e6492b7670699f7a5",
+  "baseline_head": "8c4b2b9f108169fed4b01897c14dadb492541c78",
+  "platform": "windows",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "full_pilot_states": 5,
+  "full_pilot_complex_scalars": 80,
+  "compressed_pilot_states": 3,
+  "compressed_pilot_complex_scalars": 48,
+  "pilot_state_reduction": 0.4,
+  "features_per_entity": 1,
+  "full_five_accuracy": 1.0,
+  "compressed_clean_accuracy": 0.85546875,
+  "reference_noise_0_01_accuracy": 0.853515625,
+  "reference_noise_0_03_accuracy": 0.818359375,
+  "reference_drift_1e_4_accuracy": 0.853515625,
+  "reference_drift_1e_3_accuracy": 0.8515625,
+  "control_compressed_clean_accuracy": 0.541015625,
+  "integration": {
+    "commit_decode_accuracy": 0.375,
+    "exact_final_table_accuracy": 0.6875,
+    "relational_query_accuracy": 0.65625,
+    "min_value_margin": 0.00005977526601674832,
+    "min_relation_margin": 0.03995278155631404,
+    "max_norm_drift": 6.838973831690964e-14
+  },
+  "diagnosis": {
+    "compression_pass": false,
+    "noisy_frame_pass": false,
+    "mutable_program_pass": false
+  },
+  "post_run_generated_ice_dirty": true,
+  "activation_authorized": false,
+  "acceptance_authority_changed": false,
+  "interpretation": "The 40% pilot-state compression failed its primary gates. Because reference noise 0.01 and reference transport mismatch up to 1e-3 changed held-out accuracy only marginally from the compressed baseline, the dominant limitation is not reference corruption or synchronization drift. The remaining ambiguity is whether the three-pilot representation is intrinsically under-ranked or merely too fragile to the standing memory-noise level; UP-11 must isolate pilot rank from memory-noise sensitivity before attempting learned frame folding."
+}

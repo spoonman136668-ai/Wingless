@@ -1,0 +1,45 @@
+{
+  "schema": "wingless.continuous-fusion-windows-proof.v1",
+  "experiment": "UP-36-task-weighted-continuous-symmetry-fusion",
+  "status": "qualified-scientific-negative",
+  "observed_at": "2026-09-23T20:19:26Z",
+  "source_head": "c5dcbd283d27c1757102f2f5359658b23bd3c73a",
+  "parent_up35_seal": "09284aa70203adf8881be42f67084c49b338dabe",
+  "workflow_run_id": 35913964677,
+  "workflow_artifact_id": 10774792356,
+  "workflow_artifact_sha256": "475eee8899623a73d264b69323703f6ccaa5acf1b379714f19ae8a3d7260cf91",
+  "platform": "windows-self-hosted",
+  "runner": "WINGLESS-LINKDEADKB",
+  "harness_pass": true,
+  "full_regression_pass": true,
+  "continuous_process": {
+    "positive_affinity_count": 14,
+    "selected_step": 1,
+    "start_capacity": 6,
+    "selected_capacity": 8,
+    "continuous_fusion_occurred": true,
+    "selected_groups": [[0],[1,2],[3],[4],[5]]
+  },
+  "validation": {
+    "selected_static_accuracy": 0.8466796875,
+    "selected_commit_accuracy": 0.3580729166666667,
+    "selected_validation_score": 0.35362847222222227
+  },
+  "true_heldout": {
+    "selected_held_out_accuracy": 0.974609375,
+    "selected_commit_decode_accuracy": 0.8502604166666666,
+    "selected_exact_final_table_accuracy": 0.7916666666666666,
+    "selected_relational_query_accuracy": 0.8333333333333334,
+    "full_capacity_held_out_accuracy": 1.0,
+    "full_capacity_commit_decode_accuracy": 1.0,
+    "heldout_retention_delta": 0.025390625,
+    "commit_retention_delta": 0.14973958333333337
+  },
+  "diagnosis": {
+    "inner_split_balanced_pass": true,
+    "continuous_fusion_pass": false
+  },
+  "interpretation": "UP-36 demonstrates that a continuous task-weighted attraction field can create exact spectral degeneracy from independent offsets, but the one-shot affinity field learned at the singleton baseline is not sufficient to organize enough symmetry for robust mutable behavior. The selected checkpoint fused only one pair, reaching capacity 8, and underperformed the preregistered held-out and mutable gates. The next experiment should preserve continuous fusion but recompute task-derived affinities after each flow step so guidance can adapt as the transport geometry changes.",
+  "activation_authorized": false,
+  "acceptance_authority_changed": false
+}
