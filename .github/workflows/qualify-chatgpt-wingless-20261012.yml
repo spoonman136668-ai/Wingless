@@ -1,0 +1,33 @@
+name: Read-only Wingless external mechanistic qualification 20261012
+on:
+  push:
+    branches:
+      - 'contrib/chatgpt-20261012-w-r5-phase-observability'
+    paths:
+      - 'research/contrib/chatgpt/20261012-w-r5-phase-observability/**'
+      - '.github/workflows/qualify-chatgpt-wingless-20261012.yml'
+permissions:
+  contents: read
+concurrency:
+  group: read-only-20261012-wingless-external
+  cancel-in-progress: false
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Focused mechanical tests (not primary science)
+        run: python -m unittest discover -s 'research/contrib/chatgpt/20261012-w-r5-phase-observability' -p 'test_probe.py' -v
+      - name: Complete Wingless Go regression
+        run: |
+          go test ./...
+          go build ./...
+      - name: No primary experiment launch
+        run: echo 'MECHANICAL_AND_REGRESSION_ONLY; no science outcome accepted'
