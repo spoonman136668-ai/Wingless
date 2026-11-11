@@ -1,0 +1,122 @@
+name: Wingless ITD-02 R3 original source-only causal edges
+on:
+  push:
+    branches: [research/itd02-r3-native-causal-edges-20261024]
+permissions:
+  contents: read
+jobs:
+  native-r3-mechanism-not-science:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 32
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Frozen original R1/R2 lineage and new R3 source only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor c8156515890cc6742289d9850b2be9dd5a77030a HEAD
+          test "$(git hash-object research/native/itd02/r1/policy.go)" = 8d1845d82dd8578a709b00e8841bdc5edc8dbc10
+          test "$(git hash-object research/native/itd02/r2/affordance.go)" = e1564172079359ca4c450dcc87487a4733210584
+          test "$(git hash-object research/native/itd02/r2/affordance_test.go)" = e63c7bf2cd5e55a9eb04ed35b25b18fa41ac4afe
+          echo R3_ORIGINAL_PARENT_AND_SOURCE_IDENTITY=PASS
+      - name: Exact ICE structural and reviewed-graph migration census (scratch only)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          scratch="$(mktemp -d)"
+          git worktree add --quiet --detach "$scratch/source" HEAD
+          cleanup() {
+            git worktree remove --force "$scratch/source" || true
+            rmdir "$scratch" || true
+          }
+          trap cleanup EXIT
+          (
+            cd "$scratch/source"
+            # Original reviewed semantic source was squash-integrated. Fetch
+            # its exact immutable commit by SHA for independent Git-blob custody
+            # without altering any branch, promoting labels, or claiming ancestry.
+            git fetch --quiet --no-tags --depth=1 origin a6f825ad6420e769db8fadee560fd2a379b94ce9
+            test "$(git cat-file -t a6f825ad6420e769db8fadee560fd2a379b94ce9)" = commit
+            go run ./cmd/ice build
+            go run ./cmd/ice validate
+            python -B - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          old=json.loads(subprocess.check_output(["git","show","HEAD:.ice/manifest.json"]))
+          current=json.loads(Path(".ice/manifest.json").read_text())
+          earlier=json.loads(subprocess.check_output(["git","show","HEAD:.ice/code-intelligence.json"]))
+          source_file_ids={f["path"] for f in old["files"]}
+          current_file_ids={f["path"] for f in current["files"]}
+          def key(s):
+              return (s["file"],s["kind"],s["name"],s.get("receiver",""))
+          old_symbols={key(s) for s in old["symbols"]}
+          new_symbols={key(s) for s in current["symbols"]}
+          introduced=sorted(current_file_ids-source_file_ids)
+          retired=sorted(source_file_ids-current_file_ids)
+          new_declarations=sorted(new_symbols-old_symbols)
+          removed_declarations=sorted(old_symbols-new_symbols)
+          print("R3_ICE_STRUCTURAL_SCRATCH_REBUILD=PASS")
+          print("R3_ICE_REVIEWED_BASE_FILES="+str(len(source_file_ids)))
+          print("R3_ICE_REBUILT_SOURCE_FILES="+str(len(current_file_ids)))
+          print("R3_ICE_REVIEWED_BASE_SYMBOLS="+str(len(old_symbols)))
+          print("R3_ICE_REBUILT_SOURCE_SYMBOLS="+str(len(new_symbols)))
+          print("R3_ICE_SOURCE_FILES_ADDED="+str(len(introduced)))
+          print("R3_ICE_DECLARATIONS_ADDED="+str(len(new_declarations)))
+          print("R3_ICE_DECLARATIONS_REMOVED="+str(len(removed_declarations)))
+          print("R3_ICE_NEW_FILES="+json.dumps(introduced))
+          print("R3_ICE_NEW_R3_SYMBOLS="+json.dumps([list(k) for k in new_declarations if k[0].startswith("research/native/itd02/r3/")]))
+          if len(source_file_ids)!=138 or len(old_symbols)!=352 or earlier["coverage"]["symbols"]!=352:
+              raise SystemExit("R3_ORIGINAL_REVIEWED_GRAPH_IDENTITY_DRIFT")
+          if not introduced or not new_declarations:
+              raise SystemExit("R3_UNEXPECTED_NO_NATIVE_GRAPH_EXPANSION")
+          print("R3_ICE_SEMANTIC_ATLAS_ADMISSION=BLOCKED_PENDING_AUTHENTICATED_GRAPH_REVIEW")
+          PY
+            python -B scripts/ice_r3_review_packet.py --root . --output "$RUNNER_TEMP/r3-ice-review-packet.json"
+            python -B scripts/test_ice_r3_review_packet.py --root . --scratch-parent "$RUNNER_TEMP"
+          )
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo R3_ORIGINAL_CHECKOUT_UNCHANGED=PASS
+      - name: Preserve exact-head source-review queue in GitHub artifacts
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingless-itd02-r3-ice-source-review-queue
+          path: ${{ runner.temp }}/r3-ice-review-packet.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Native R1 R2 R3 focused learning integrity tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -count=1 -v ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3
+          go vet ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3
+          go build ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3
+          echo R3_NATIVE_SOURCE_ONLY_TEST_VET_BUILD=PASS
+      - name: Linux bounded native race integrity
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -race -count=1 ./research/native/itd02/r1 ./research/native/itd02/r2 ./research/native/itd02/r3
+          echo R3_NATIVE_RACE=PASS
+      - name: Clean source and explicit scientific non-acceptance
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo R3_REPOSITORY_CLEAN=PASS
+          echo R3_ORIGINAL_ENVIRONMENT_EXECUTION=NOT_PERFORMED
+          echo R3_SCIENTIFIC_FIRST_USE=NOT_PERFORMED
+          echo R3_NOVEL_CAUSAL_TRANSFER=NOT_CLAIMED
