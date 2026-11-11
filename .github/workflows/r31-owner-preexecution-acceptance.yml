@@ -1,0 +1,40 @@
+name: Wingless R31 native owner preexecution source qualification
+on:
+  push:
+    branches: [engineering/r31-owner-preexecution-observation-20261015-r1]
+  pull_request:
+    paths:
+      - 'scripts/Write-ResearchPreexecutionObservation.ps1'
+      - 'scripts/Invoke-RepoLocalResearchCycle.ps1'
+      - 'scripts/Test-R31PreexecutionObservation.ps1'
+      - '.github/workflows/r31-owner-preexecution-acceptance.yml'
+      - '.github/workflows/research-auto-launch.yml'
+permissions:
+  contents: read
+concurrency:
+  group: r31-owner-source-wingless-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  source-only:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Native bounded Git-first preexecution and no-replay
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if ((git rev-parse HEAD) -ne $env:GITHUB_SHA) { throw 'R31_SOURCE_SHA_DRIFT' }
+          & ./scripts/Test-R31PreexecutionObservation.ps1 -Lane 'Wingless'
+          if (-not $?) { throw 'R31_NATIVE_PREEXECUTION_FAILED' }
+          Write-Host 'R31_RESEARCH_WORKER_STARTS=0'
+          Write-Host 'R31_CLOUDFLARE_WRITES=0'
+          Write-Host 'R31_SIGNED_OWNER_AUTHORITY=NOT_ESTABLISHED'
+          Write-Host 'R31_INDEPENDENT_FIRST_USE=NOT_ESTABLISHED'
